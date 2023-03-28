@@ -20,7 +20,7 @@ MonoBehaviour:
   globalRotation: 20
   fingerJointRotationThresholds:
   - jointThresholds:
-    - {x: 30, y: 40}
+    - {x: 25, y: 30}
     - {x: 30, y: 30}
     - {x: 30, y: 30}
   - jointThresholds:

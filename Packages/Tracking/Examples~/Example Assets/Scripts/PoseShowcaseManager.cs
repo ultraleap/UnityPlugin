@@ -4,8 +4,6 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Experimental.GlobalIllumination;
-using UnityEngine.XR.OpenXR.Input;
 
 public class PoseShowcaseManager : MonoBehaviour
 {
@@ -15,9 +13,9 @@ public class PoseShowcaseManager : MonoBehaviour
     [Serializable]
     struct ShowCasePose
     {
+        public string poseName;
         public HandPoseViewer poseViewer;
         public Light spotlight;
-        public string poseName;
     }
     [SerializeField]
     List<ShowCasePose> poseList = new List<ShowCasePose>();

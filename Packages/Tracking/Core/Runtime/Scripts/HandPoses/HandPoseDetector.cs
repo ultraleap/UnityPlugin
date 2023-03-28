@@ -171,7 +171,7 @@ namespace Leap.Unity
             DirectionSource directionSource = new DirectionSource();
             directionSource.enabled = true;
             directionSource.finger = (int)Finger.FingerType.TYPE_INDEX;
-            directionSource.bone = (int)Bone.BoneType.TYPE_DISTAL;
+            directionSource.bone = (int)Bone.BoneType.TYPE_INTERMEDIATE;
             directionSource.direction = new List<SourceDirection>();
 
             SourceDirection sourceDirection = new SourceDirection();
