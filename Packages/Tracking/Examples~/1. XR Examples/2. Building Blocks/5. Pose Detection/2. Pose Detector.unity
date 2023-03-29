@@ -5690,6 +5690,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Pose Detector
       objectReference: {fileID: 0}
+    - target: {fileID: 5571620627189813233, guid: 5a2b7cdd5b910414d94d31dd271b3a1e, type: 3}
+      propertyPath: _poseToDetect
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 5571620627189813234, guid: 5a2b7cdd5b910414d94d31dd271b3a1e, type: 3}
       propertyPath: m_RootOrder
       value: 3
