@@ -2,6 +2,7 @@ using Leap.Unity;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 
@@ -19,6 +20,9 @@ public class PoseShowcaseManager : MonoBehaviour
     }
     [SerializeField]
     List<ShowCasePose> poseList = new List<ShowCasePose>();
+
+
+    List<string> detectedPosesNames = new List<string>(); 
 
     private void Start()
     {
@@ -41,6 +45,7 @@ public class PoseShowcaseManager : MonoBehaviour
     public void PoseDetected(string inputString)
     {
         TurnOnGreenLight(inputString);
+        UpdateDetectionText(inputString);
     }
 
     private void TurnOnGreenLight(string inputString)
@@ -55,13 +60,35 @@ public class PoseShowcaseManager : MonoBehaviour
                 }
             }
         }
-        detectionText.text = inputString;
+        
 
+    }
+
+    private void UpdateDetectionText(string inputString, bool add = true)
+    {
+        if(add)
+        {
+            detectedPosesNames.Add(inputString);
+        }
+        else
+        {
+            detectedPosesNames.Remove(inputString);
+        }
+
+        if (detectedPosesNames.Count != 0)
+        {
+            detectionText.text = detectedPosesNames.Last();
+        }
+        else
+        {
+            detectionText.text = "No pose detected";
+        }
     }
 
     public void PoseLost(string inputString)
     {
         TurnOffGreenLight(inputString);
+        UpdateDetectionText(inputString, false);
     }
 
     private void TurnOffGreenLight(string inputString)
@@ -76,8 +103,6 @@ public class PoseShowcaseManager : MonoBehaviour
                 }
             }
         }
-        detectionText.text = "No pose detected";
-
     }
 
 }
