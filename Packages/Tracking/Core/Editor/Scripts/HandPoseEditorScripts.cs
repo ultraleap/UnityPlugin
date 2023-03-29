@@ -312,12 +312,12 @@ namespace Leap.Unity
 
             #region Bone Directions 
 
-            EditorGUILayout.LabelField("Pose Rules", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("Direction Rules", EditorStyles.boldLabel);
             var thinGreyLine = EditorGUILayout.GetControlRect(false, GUILayout.Height(2), GUILayout.Width(Screen.width));
             EditorGUI.DrawRect(thinGreyLine, Color.grey);
 
-            string poseDirectionExplanationText = "Rules allow you to create a more specific pose. \n\n" +
-                "These rules can be made up of many optional targets and are tied to the direction of specific parts of a hand, \ne.g. in the direction of your index finger.";
+            string poseDirectionExplanationText = "Rules allow you to limit when your pose will be detected. \n\n" +
+                "These rules can be made up of many optional targets and are tied to the direction of specific parts of a hand. \ne.g. in the direction of your index finger.";
 
             GUILayout.BeginVertical();
             EditorStyles.textField.clipping = TextClipping.Overflow;
