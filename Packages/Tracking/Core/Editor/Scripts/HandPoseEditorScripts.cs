@@ -127,7 +127,7 @@ namespace Leap.Unity
 
                         target.fingerJointRotationThresholds[fingerID].jointThresholds[jointID] = new Vector2(flex, abd);
                     }
-                    else
+                    else if(fingerID == 0 || (fingerID != 0 && jointID != 2)) // Only present distal for thumbs
                     {
                         EditorGUIUtility.labelWidth = 30;
 

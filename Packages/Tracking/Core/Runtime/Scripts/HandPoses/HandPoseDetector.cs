@@ -328,11 +328,6 @@ namespace Leap.Unity
                 // Each bone in the finger 
                 for (int boneNum = 0; boneNum < serializedHand.Fingers[fingerNum].bones.Length; boneNum++)
                 {
-                    if(fingerNum != 0 && boneNum == 4)
-                    {
-                        continue;
-                    }
-
                     // Get the same bone for both comparison hand and player hand
                     Bone activeHandBone = playerHand.Fingers[fingerNum].bones[boneNum];
                     Bone serializedHandBone = serializedHand.Fingers[fingerNum].bones[boneNum];
@@ -342,6 +337,12 @@ namespace Leap.Unity
                     {
                         lastBoneRotation = activeHandBone.Rotation;
                         lastSerializedBoneRotation = serializedHandBone.Rotation;
+                        continue;
+                    }
+
+                    if (fingerNum != 0 &&
+                        serializedHandBone.Type == Bone.BoneType.TYPE_DISTAL)
+                    {
                         continue;
                     }
 
