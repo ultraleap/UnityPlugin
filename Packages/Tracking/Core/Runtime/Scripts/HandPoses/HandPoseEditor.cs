@@ -1,9 +1,10 @@
+using System;
 using System.Collections.Generic;
+
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
-using System;
 
 namespace Leap.Unity
 {
@@ -33,23 +34,18 @@ namespace Leap.Unity
         /// </summary>
         public HandPoseScriptableObject handPose;
 
-        /// <summary>
-        /// List for pose scriptable objects in the editor
-        /// </summary>
-        [HideInInspector]
-        public Dictionary<int, string> PoseScritableIntName = new Dictionary<int, string>();
-
-        public void SetHandPose(HandPoseScriptableObject poseToSet)
-        {
-            handPose = poseToSet;
-        }
-
         public Transform handsLocation;
 
         private List<Tuple<Hand, HandPoseScriptableObject>> currentHandsAndPosedObjects = new List<Tuple<Hand, HandPoseScriptableObject>>();
 
         [SerializeField, Tooltip("Sets the colors of the gizmos that represent the rotation thresholds for each joint")]
         private Color[] gizmoColors = new Color[2] { Color.red, Color.blue };
+
+
+        public void SetHandPose(HandPoseScriptableObject poseToSet)
+        {
+            handPose = poseToSet;
+        }
 
         private void Update()
         {
@@ -113,18 +109,18 @@ namespace Leap.Unity
 
             for (int j = 0; j < hand.Fingers.Count; j++)
             {
-                var finger = hand.Fingers[j];
-                var proximal = finger.Bone(Bone.BoneType.TYPE_PROXIMAL);
-                var intermediate = finger.Bone(Bone.BoneType.TYPE_INTERMEDIATE);
+                Finger finger = hand.Fingers[j];
+                Bone proximal = finger.Bone(Bone.BoneType.TYPE_PROXIMAL);
+                Bone intermediate = finger.Bone(Bone.BoneType.TYPE_INTERMEDIATE);
 
                 Plane fingerNormalPlane = new Plane(proximal.PrevJoint, proximal.NextJoint, intermediate.NextJoint);
-                var normal = fingerNormalPlane.normal;
+                Vector3 normal = fingerNormalPlane.normal;
                 
                 if (handPoseScriptableObject.GetFingerIndexesToCheck().Contains(j))
                 {
                     for (int i = 1; i < finger.bones.Length; i++) // start i at 1 to ignore metacarpal
                     {
-                        var bone = finger.bones[i];
+                        Bone bone = finger.bones[i];
                         Gizmos.matrix = Matrix4x4.identity;
 
                         //currently only uses x threshold
@@ -134,7 +130,7 @@ namespace Leap.Unity
 
                         if (finger.bones[i].Type == Bone.BoneType.TYPE_PROXIMAL) 
                         {
-                            var proximalNormal = Quaternion.AngleAxis(90, bone.Direction.normalized) * normal;
+                            Vector3 proximalNormal = Quaternion.AngleAxis(90, bone.Direction.normalized) * normal;
                             DrawThresholdGizmo(handPoseScriptableObject.GetBoneRotationthreshold(j, i - 1).y, // i-1 to ignore metacarpal
                             bone.Direction.normalized,
                             bone.PrevJoint, proximalNormal, gizmoColors[1], bone.Length);
@@ -149,13 +145,13 @@ namespace Leap.Unity
             Gizmos.color = color;
             Handles.color = color;
 
-            var pointDiff = direction.normalized * radius;
+            Vector3 pointDiff = direction.normalized * radius;
+
+            Quaternion arcRotation = Quaternion.AngleAxis(angle, normal);
+            Vector3 arcEnd = RotatePointAroundPivot(pointLocation + pointDiff, pointLocation, arcRotation);
 
             Handles.DrawWireArc(pointLocation, normal, pointDiff, angle, radius, thickness);
             Handles.DrawWireArc(pointLocation, -normal, pointDiff, angle, radius, thickness);
-
-            var arcRotation = Quaternion.AngleAxis(angle, normal);
-            var arcEnd = RotatePointAroundPivot(pointLocation + pointDiff, pointLocation, arcRotation);
 
             Handles.DrawLine(pointLocation, arcEnd, thickness);
 

@@ -1,8 +1,9 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor;
+
 using UnityEngine;
+
+using UnityEditor;
 
 namespace Leap.Unity
 {
@@ -20,7 +21,7 @@ namespace Leap.Unity
             EditorGUILayout.LabelField("Pose save path: ");
             GUILayout.FlexibleSpace();
             EditorGUILayout.LabelField(_assetsPath, GUILayout.Width(50));
-            poseRecorderScript.SavePath = EditorGUILayout.TextField("HandPoses/");
+            poseRecorderScript.savePath = EditorGUILayout.TextField("HandPoses/");
             EditorGUILayout.EndHorizontal();
             
             if (GUILayout.Button("Save Current Hand Pose"))
@@ -185,15 +186,15 @@ namespace Leap.Unity
             switch (fingerID)
             {
                 case 0:
-                    return target.DetectThumb;
+                    return target.detectThumb;
                 case 1:
-                    return target.DetectIndex;
+                    return target.detectIndex;
                 case 2:
-                    return target.DetectMiddle;
+                    return target.detectMiddle;
                 case 3:
-                    return target.DetectRing;
+                    return target.detectRing;
                 case 4:
-                    return target.DetectPinky;
+                    return target.detectPinky;
             }
 
             return true;
@@ -227,11 +228,11 @@ namespace Leap.Unity
             // Draw the toggles
             EditorGUI.BeginDisabledGroup(false);
 
-            MakeToggle(new Vector2(-0.310F, 0.170F), ref target.DetectThumb); // thumb
-            MakeToggle(new Vector2(-0.060F, -0.170F), ref target.DetectIndex); // index
-            MakeToggle(new Vector2(0.080F, -0.190F), ref target.DetectMiddle); // middle
-            MakeToggle(new Vector2(0.220F, -0.150F), ref target.DetectRing); // ring
-            MakeToggle(new Vector2(0.340F, -0.050F), ref target.DetectPinky); // pinky
+            MakeToggle(new Vector2(-0.310F, 0.170F), ref target.detectThumb); // thumb
+            MakeToggle(new Vector2(-0.060F, -0.170F), ref target.detectIndex); // index
+            MakeToggle(new Vector2(0.080F, -0.190F), ref target.detectMiddle); // middle
+            MakeToggle(new Vector2(0.220F, -0.150F), ref target.detectRing); // ring
+            MakeToggle(new Vector2(0.340F, -0.050F), ref target.detectPinky); // pinky
 
             EditorGUI.EndDisabledGroup();
 
@@ -294,19 +295,19 @@ namespace Leap.Unity
             HandPoseDetector poseDetectionScript = (HandPoseDetector)target;
 
             GUILayout.Space(10);
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("_poseToDetect"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("poseToDetect"));
 
             EditorGUI.indentLevel = 2;
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("_posesToDetect"), new GUIContent("Pose variations: "));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("posesToDetect"), new GUIContent("Pose variations: "));
             EditorGUI.indentLevel = 0;
 
             GUILayout.Space(10);
 
-            poseDetectionScript.CheckBothHands = EditorGUILayout.Toggle("Detect both hands?", poseDetectionScript.CheckBothHands);
+            poseDetectionScript.checkBothHands = EditorGUILayout.Toggle("Detect both hands?", poseDetectionScript.checkBothHands);
             
-            if (!poseDetectionScript.CheckBothHands)
+            if (!poseDetectionScript.checkBothHands)
             {
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("ChiralityToCheck"));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("chiralityToCheck"));
             }
             GUILayout.Space(10);
 
@@ -331,14 +332,14 @@ namespace Leap.Unity
             EditorGUILayout.BeginHorizontal();
             if (GUILayout.Button(" + Add a new rule for finger/palm"))
             {
-                poseDetectionScript.CreateDirectionSource();
+                poseDetectionScript.CreatePoseRule();
             }
             GUILayout.FlexibleSpace();
             EditorGUILayout.EndHorizontal();
 
             GUILayout.Space(10);
 
-            var sources = serializedObject.FindProperty("Sources");
+            var sources = serializedObject.FindProperty("poseRules");
             if (sourceFoldout.Count != sources.arraySize)
             {
                 sourceFoldout.Clear();
@@ -379,7 +380,7 @@ namespace Leap.Unity
                     var thinnerGreyLine = EditorGUILayout.GetControlRect(false, GUILayout.Height(1), GUILayout.Width(Screen.width));
                     EditorGUI.DrawRect(thinnerGreyLine, Color.grey);
 
-                    var directionList = source.FindPropertyRelative("direction");
+                    var directionList = source.FindPropertyRelative("directions");
                     for (int j = 0; j < directionList.arraySize; j++)
                     {
                         EditorGUI.indentLevel = 0;
@@ -420,7 +421,7 @@ namespace Leap.Unity
 
                         if (GUILayout.Button("Remove target"))
                         {
-                            poseDetectionScript.RemoveDirection(i, j);
+                            poseDetectionScript.RemoveRuleDirection(i, j);
                         }
 
                         GUILayout.FlexibleSpace();
@@ -436,7 +437,7 @@ namespace Leap.Unity
                     GUILayout.FlexibleSpace();
                     if (GUILayout.Button("+ Add target"))
                     {
-                        poseDetectionScript.CreateSourceDirection(i);
+                        poseDetectionScript.CreateRuleDirection(i);
                     }
                     GUILayout.FlexibleSpace();
                     EditorGUILayout.EndHorizontal();
@@ -448,7 +449,7 @@ namespace Leap.Unity
                     GUILayout.FlexibleSpace();
                     if (GUILayout.Button("Remove rule"))
                     {
-                        poseDetectionScript.RemoveSource(i);
+                        poseDetectionScript.RemoveRule(i);
                     }
                     EditorGUILayout.EndHorizontal();
 
@@ -476,7 +477,7 @@ namespace Leap.Unity
             if (_showFineTuningOptions)
             {
                 fineTuningOptionsButtonLabel = "Hide Fine Tuning Options";
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("_leapProvider"));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("leapProvider"));
             }
             else
             {

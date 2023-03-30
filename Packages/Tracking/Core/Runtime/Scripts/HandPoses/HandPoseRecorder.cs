@@ -1,8 +1,9 @@
 using System.IO;
+
+using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
-using UnityEngine;
 
 namespace Leap.Unity
 {
@@ -31,7 +32,7 @@ namespace Leap.Unity
         /// When saved, this will create the folder if one does not exist.
         /// </summary>
         [HideInInspector]
-        public string SavePath = "HandPoses/";
+        public string savePath = "HandPoses/";
 
         private Hand hand = new Hand();
 
@@ -52,17 +53,17 @@ namespace Leap.Unity
             newItem.name = handPoseName;
             newItem.SaveHandPose(handData);
 
-            if (!Directory.Exists("Assets/" + SavePath))
+            if (!Directory.Exists("Assets/" + savePath))
             {
-                Directory.CreateDirectory("Assets/" + SavePath);
+                Directory.CreateDirectory("Assets/" + savePath);
             }
 
-            string fullPath = "Assets/" + SavePath + handPoseName + ".asset";
+            string fullPath = "Assets/" + savePath + handPoseName + ".asset";
 
             int fileIterator = 1;
             while (File.Exists(fullPath))
             {
-                fullPath = "Assets/" + SavePath + handPoseName + " (" + fileIterator + ")" + ".asset";
+                fullPath = "Assets/" + savePath + handPoseName + " (" + fileIterator + ")" + ".asset";
                 fileIterator++;
             }
 

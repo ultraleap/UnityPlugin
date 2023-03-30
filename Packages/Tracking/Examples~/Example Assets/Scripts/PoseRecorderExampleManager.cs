@@ -1,23 +1,19 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor;
+
 using UnityEngine;
 using TMPro;
-using Leap.Unity;
 
 namespace Leap.Unity.Examples
 {
     public class PoseRecorderExampleManager : MonoBehaviour
     {
         [Header("Count Down")]
-        public GameObject countDownGO;
+        public GameObject countDownGameObject;
         public TextMeshProUGUI countDownText;
         public float recordCountDown = 3;
-        public GameObject poseDetectedGO;
+        public GameObject poseDetectedGameObject;
         public TextMeshProUGUI poseDetectedText;
-
-
-
 
         [Header("References")]
         public HandPoseRecorder recorder;
@@ -41,12 +37,12 @@ namespace Leap.Unity.Examples
                 HandPoseScriptableObject detectedPose = detector.GetCurrentlyDetectedPose();
                 if (detectedPose != null)
                 {
-                    poseDetectedGO.SetActive(true);
+                    poseDetectedGameObject.SetActive(true);
                     poseDetectedText.text = "Detected pose: " + detectedPose.name;
                 }
                 else
                 {
-                    poseDetectedGO.SetActive(false);
+                    poseDetectedGameObject.SetActive(false);
                     poseDetectedText.text = "No pose detected";
                 }
             }
@@ -73,7 +69,7 @@ namespace Leap.Unity.Examples
 
         IEnumerator RecordAfterCountDown()
         {
-            countDownGO.SetActive(true);
+            countDownGameObject.SetActive(true);
             float timeLeft = recordCountDown;
 
             while (timeLeft > 0)
@@ -85,7 +81,7 @@ namespace Leap.Unity.Examples
             countDownText.text = "0";
 
             HandPoseScriptableObject savedPose = recorder.SaveCurrentHandPose();
-            countDownText.text = savedPose.name + " saved in " + "Assets/" + recorder.SavePath;
+            countDownText.text = savedPose.name + " saved in " + "Assets/" + recorder.savePath;
             posesRecordedThisSession.Add(savedPose);
             capturing = false;
             detector.SetPosesToDetect(posesRecordedThisSession); 

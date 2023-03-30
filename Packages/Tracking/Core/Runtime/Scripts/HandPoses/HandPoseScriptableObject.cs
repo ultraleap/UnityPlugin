@@ -1,8 +1,10 @@
 using System.Collections.Generic;
+
+using UnityEngine;
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
-using UnityEngine;
 
 namespace Leap.Unity
 {
@@ -30,6 +32,7 @@ namespace Leap.Unity
         }
     }
 #endif
+
     [CreateAssetMenu(fileName = "HandPose", menuName = "ScriptableObjects/HandPose")]
     public class HandPoseScriptableObject : ScriptableObject
     {
@@ -40,15 +43,15 @@ namespace Leap.Unity
         }
 
         [HideInInspector]
-        public bool DetectThumb = true;
+        public bool detectThumb = true;
         [HideInInspector]
-        public bool DetectIndex = true;
+        public bool detectIndex = true;
         [HideInInspector]
-        public bool DetectMiddle = true;
+        public bool detectMiddle = true;
         [HideInInspector]
-        public bool DetectRing = true;
+        public bool detectRing = true;
         [HideInInspector]
-        public bool DetectPinky = true;
+        public bool detectPinky = true;
 
         private List<int> fingerIndexesToCheck = new List<int>();
         
@@ -61,7 +64,7 @@ namespace Leap.Unity
         #region Finger Thresholds
 
         [HideInInspector]
-        public float globalRotation = 20;
+        public float globalRotation = 30;
 
         [HideInInspector]
         public FingerJointThresholds[] fingerJointRotationThresholds = new FingerJointThresholds[5];
@@ -81,15 +84,6 @@ namespace Leap.Unity
         {
             return mirroredHand;
         }
-
-        /// <summary>
-        /// The distance a bone must move away from being detected before the pose is no longer enabled.
-        /// This means that users cannot hover just on the edge of a detection and cause it to send rapid detections while straying still.
-        /// E.g. Detection threshold is 15 degrees, so when the user gets within 15 degrees, detection will occur.
-        /// Hysteresis threshold is 5 so the user need to move 20 degrees from the pose before the detection will drop.
-        /// </summary>
-        [SerializeField, Tooltip("When a joint is within the rotation threshold, how many degrees away from the original threshold " +
-            "must the user move to stop the detection of each joint for the pose. This helps to avoid flickering detection when on the boundaries of thresholds")]
 
         [HideInInspector]
         public float hysteresisThreshold = 5;
@@ -139,11 +133,11 @@ namespace Leap.Unity
         private void ApplyFingersToUse()
         {
             fingerIndexesToCheck.Clear();
-            if (DetectThumb) { fingerIndexesToCheck.Add(0); }
-            if (DetectIndex) { fingerIndexesToCheck.Add(1); }
-            if (DetectMiddle) { fingerIndexesToCheck.Add(2); }
-            if (DetectRing) { fingerIndexesToCheck.Add(3); }
-            if (DetectPinky) { fingerIndexesToCheck.Add(4); }
+            if (detectThumb) { fingerIndexesToCheck.Add(0); }
+            if (detectIndex) { fingerIndexesToCheck.Add(1); }
+            if (detectMiddle) { fingerIndexesToCheck.Add(2); }
+            if (detectRing) { fingerIndexesToCheck.Add(3); }
+            if (detectPinky) { fingerIndexesToCheck.Add(4); }
         }
 
         public void SetAllBoneThresholds(float threshold, bool forceAll = false)

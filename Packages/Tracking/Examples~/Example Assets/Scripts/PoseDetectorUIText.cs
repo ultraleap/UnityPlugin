@@ -1,9 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
+
 using TMPro;
-using Leap.Unity;
 
 namespace Leap.Unity.Examples
 {

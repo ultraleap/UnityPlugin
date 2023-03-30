@@ -1,83 +1,86 @@
-using Leap.Unity;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using TMPro;
+
 using UnityEngine;
 
-public class PoseShowcaseManager : MonoBehaviour
+using TMPro;
+
+namespace Leap.Unity.Examples
 {
-    [SerializeField]
-    TextMeshProUGUI detectionText;
 
-    [Serializable]
-    struct ShowCasePose
+    public class PoseShowcaseManager : MonoBehaviour
     {
-        public string poseName;
-        public HandPoseViewer poseViewer;
-        public Light spotlight;
-    }
-    [SerializeField]
-    List<ShowCasePose> poseList = new List<ShowCasePose>();
+        [SerializeField]
+        TextMeshProUGUI detectionText;
 
-    private void Start()
-    {
-        for (int i = 0; i < poseList.Count; i++)
+        [Serializable]
+        struct ShowCasePose
         {
-            var pose = poseList[i];
-
-            if(pose.spotlight == null)
-            {
-                pose.spotlight = pose.poseViewer.GetComponentInChildren<Light>();
-            }
-
-            if(pose.poseName == null)
-            {
-                pose.poseName = pose.poseViewer.name;
-            }
+            public string poseName;
+            public HandPoseViewer poseViewer;
+            public Light spotlight;
         }
-    }
 
-    public void PoseDetected(string inputString)
-    {
-        TurnOnGreenLight(inputString);
-    }
+        [SerializeField]
+        List<ShowCasePose> poseList = new List<ShowCasePose>();
 
-    private void TurnOnGreenLight(string inputString)
-    {
-        foreach (var pose in poseList)
+        private void Start()
         {
-            if (string.Equals(inputString, pose.poseName, StringComparison.OrdinalIgnoreCase))
+            for (int i = 0; i < poseList.Count; i++)
             {
-                if (pose.spotlight.color != Color.green)
+                var pose = poseList[i];
+
+                if (pose.spotlight == null)
                 {
-                    pose.spotlight.color = Color.green;
+                    pose.spotlight = pose.poseViewer.GetComponentInChildren<Light>();
+                }
+
+                if (pose.poseName == null)
+                {
+                    pose.poseName = pose.poseViewer.name;
                 }
             }
         }
-        detectionText.text = inputString;
 
-    }
-
-    public void PoseLost(string inputString)
-    {
-        TurnOffGreenLight(inputString);
-    }
-
-    private void TurnOffGreenLight(string inputString)
-    {
-        foreach (var pose in poseList)
+        public void PoseDetected(string inputString)
         {
-            if (string.Equals(inputString, pose.poseName, StringComparison.OrdinalIgnoreCase))
+            TurnOnGreenLight(inputString);
+        }
+
+        private void TurnOnGreenLight(string inputString)
+        {
+            foreach (var pose in poseList)
             {
-                if (pose.spotlight.color != Color.white)
+                if (string.Equals(inputString, pose.poseName, StringComparison.OrdinalIgnoreCase))
                 {
-                    pose.spotlight.color = Color.white;
+                    if (pose.spotlight.color != Color.green)
+                    {
+                        pose.spotlight.color = Color.green;
+                    }
                 }
             }
+            detectionText.text = inputString;
         }
-        detectionText.text = "No pose detected";
 
+        public void PoseLost(string inputString)
+        {
+            TurnOffGreenLight(inputString);
+        }
+
+        private void TurnOffGreenLight(string inputString)
+        {
+            foreach (var pose in poseList)
+            {
+                if (string.Equals(inputString, pose.poseName, StringComparison.OrdinalIgnoreCase))
+                {
+                    if (pose.spotlight.color != Color.white)
+                    {
+                        pose.spotlight.color = Color.white;
+                    }
+                }
+            }
+
+            detectionText.text = "No pose detected";
+        }
     }
-
 }

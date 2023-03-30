@@ -1,15 +1,12 @@
-using Leap.Unity.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+
 using UnityEngine;
 using UnityEngine.Events;
 
 namespace Leap.Unity
 {
-    [Serializable]
-    public class PoseDetectionEvents : UnityEvent { }
-
     public class HandPoseDetector : MonoBehaviour
     {
         /// <summary>
@@ -17,39 +14,43 @@ namespace Leap.Unity
         /// Untick to enable single hand poses. E.g. only allowing left hand to activate pose.
         /// </summary>
         [HideInInspector]
-        public bool CheckBothHands = true;
+        public bool checkBothHands = true;
+
         /// <summary>
         /// Which hand should the detector check?
         /// </summary>
         [HideInInspector]
-        public Chirality ChiralityToCheck;
+        public Chirality chiralityToCheck;
 
         [SerializeField]
-        private HandPoseScriptableObject _poseToDetect;
+        private HandPoseScriptableObject poseToDetect;
+
         /// <summary>
         /// List of poses that the detector will check through. This list can be filled with different variations of the same pose.
         /// Once one of these poses is found, the class will call the "Pose Detected event"
         /// </summary>
         [SerializeField]
-        private List<HandPoseScriptableObject> _posesToDetect;
+        private List<HandPoseScriptableObject> posesToDetect;
         /// <summary>
         /// OPTIONAL. Specify a particular leap provider. If none is selected, the script will automatically find one in the scene.
         /// </summary>
         [SerializeField]
-        private LeapProvider _leapProvider = null;
+        private LeapProvider leapProvider = null;
 
         /// <summary>
         /// Has a pose been detected since last time there was no pose was detected? 
         /// </summary>
-        private bool _poseAlreadyDetected = false;
+        private bool poseAlreadyDetected = false;
+
         /// <summary>
         /// Gives us the pose which has been detected.
         /// </summary>
-        private HandPoseScriptableObject _detectedPose = null;
+        private HandPoseScriptableObject detectedPose = null;
+
         /// <summary>
         /// did all of the bone directions match last frame? (For hysteresis)
         /// </summary>
-        private bool _directionTargetsMatchedLastFrame = false;
+        private bool allRulesMatchedLastFrame = false;
 
         private bool cacheValidationData = false;
 
@@ -60,37 +61,39 @@ namespace Leap.Unity
         public struct ValidationData
         {
             public int fingerNum;
-            public int jointNum;
+            public int boneNum;
             public bool withinThreshold;
             public Chirality chirality;
-            public ValidationData(Chirality _chirality, int _fingerNum, int _boneNum, bool _withinThreshold)
+
+            public ValidationData(Chirality chirality, int fingerNum, int boneNum, bool withinThreshold)
             {
-                this.chirality = _chirality;
-                this.fingerNum = _fingerNum;
-                this.jointNum = _boneNum;
-                this.withinThreshold = _withinThreshold;
+                this.chirality = chirality;
+                this.fingerNum = fingerNum;
+                this.boneNum = boneNum;
+                this.withinThreshold = withinThreshold;
             }
         }
-        private List<ValidationData> _validationDatas = new List<ValidationData>();
+
+        private List<ValidationData> validationDatas = new List<ValidationData>();
 
         public List<ValidationData> GetValidationData()
         {
-            return _validationDatas;
+            return validationDatas;
         }
 
         public List<HandPoseScriptableObject> GetPosesToDetect()
         {
-            return _posesToDetect;
+            return posesToDetect;
         }
 
         public void SetPosesToDetect(List<HandPoseScriptableObject> posesToDetect)
         {
-            _posesToDetect = posesToDetect;
+            this.posesToDetect = posesToDetect;
         }
 
         public void AddPoseToDetect(HandPoseScriptableObject poseToAdd)
         {
-            _posesToDetect.Add(poseToAdd);
+            posesToDetect.Add(poseToAdd);
         }
 
         public void EnablePoseCaching()
@@ -142,21 +145,21 @@ namespace Leap.Unity
         /// E.g. if the user needs to point at an object with their index finger for the pose to be considered detected"
         /// </summary>
         [SerializeField]
-        public List<DirectionSource> Sources;
+        public List<PoseRule> poseRules;
 
         [Serializable]
-        public struct DirectionSource
+        public struct PoseRule
         {
             public bool enabled;
             public int finger;
             public int bone;
-            public List<SourceDirection> direction;
+            public List<RuleDirection> directions;
         }
         /// <summary>
         /// Holds information about different fingers, bones and their directional targets.
         /// </summary>
         [Serializable]
-        public struct SourceDirection
+        public struct RuleDirection
         {
             public bool enabled;
             public TypeOfDirectionCheck typeOfDirectionCheck;
@@ -166,60 +169,52 @@ namespace Leap.Unity
             public float rotationThreshold;
         }
 
-        public void CreateDirectionSource()
+        public void CreatePoseRule()
         {
-            DirectionSource directionSource = new DirectionSource();
-            directionSource.enabled = true;
-            directionSource.finger = (int)Finger.FingerType.TYPE_INDEX;
-            directionSource.bone = (int)Bone.BoneType.TYPE_INTERMEDIATE;
-            directionSource.direction = new List<SourceDirection>();
+            PoseRule poseRule = new PoseRule();
+            poseRule.enabled = true;
+            poseRule.finger = (int)Finger.FingerType.TYPE_INDEX;
+            poseRule.bone = (int)Bone.BoneType.TYPE_INTERMEDIATE;
+            poseRule.directions = new List<RuleDirection>();
 
-            SourceDirection sourceDirection = new SourceDirection();
+            poseRules.Add(poseRule);
 
-            sourceDirection.typeOfDirectionCheck = TypeOfDirectionCheck.CameraDirection;
-            sourceDirection.isPalmDirection = false;
-            sourceDirection.poseTarget = null;
-            sourceDirection.axisToFace = AxisToFace.Forward;
-            sourceDirection.rotationThreshold = 15;
-            sourceDirection.enabled = true;
-
-            directionSource.direction.Add(sourceDirection);
-            Sources.Add(directionSource);
+            CreateRuleDirection(poseRules.Count - 1);
         }
 
-        public void CreateSourceDirection(int sourceIndex)
+        public void CreateRuleDirection(int sourceIndex)
         {
-            SourceDirection fingerDirection = new SourceDirection();
+            RuleDirection fingerDirection = new RuleDirection();
             fingerDirection.typeOfDirectionCheck = TypeOfDirectionCheck.CameraDirection;
             fingerDirection.isPalmDirection = false;
             fingerDirection.poseTarget = null;
             fingerDirection.axisToFace = AxisToFace.Forward;
-            fingerDirection.rotationThreshold = 15;
+            fingerDirection.rotationThreshold = 45;
             fingerDirection.enabled = true;
 
-            Sources.ElementAt(sourceIndex).direction.Add(fingerDirection);
+            poseRules.ElementAt(sourceIndex).directions.Add(fingerDirection);
         }
 
-        public void RemoveSource(int index)
+        public void RemoveRule(int index)
         {
-            Sources.RemoveAt(index);
-        }
-        public void RemoveDirection(int sourceIndex, int directionIndex)
-        {
-            Sources[sourceIndex].direction.RemoveAt(directionIndex);
+            poseRules.RemoveAt(index);
         }
 
-        public List<PoseDirectionCache> poseDirectionsForValidator = new List<PoseDirectionCache>();
-        public struct PoseDirectionCache
+        public void RemoveRuleDirection(int ruleIndex, int directionIndex)
+        {
+            poseRules[ruleIndex].directions.RemoveAt(directionIndex);
+        }
+
+        public List<PoseRuleCache> poseRulesForValidator = new List<PoseRuleCache>();
+        public struct PoseRuleCache
         {
             public Chirality chirality;
-            public Tuple<DirectionSource, bool> sourceDirectionAndStatus;
-            public PoseDirectionCache(Chirality _chirality, Tuple<DirectionSource, bool> _sourceDirectionAndStatus)
+            public Tuple<PoseRule, bool> poseRuleAndStatus;
+            public PoseRuleCache(Chirality chirality, Tuple<PoseRule, bool> poseRuleAndStatus)
             {
-                this.chirality = _chirality;
-                this.sourceDirectionAndStatus = _sourceDirectionAndStatus;
+                this.chirality = chirality;
+                this.poseRuleAndStatus = poseRuleAndStatus;
             }
-
         }
 
         #endregion
@@ -232,39 +227,39 @@ namespace Leap.Unity
         /// <returns> currently detected pose (will be null if no pose is currently detected)</returns>
         public HandPoseScriptableObject GetCurrentlyDetectedPose()
         {
-            return _detectedPose;
+            return detectedPose;
         }
 
         private void Start()
         {
-            if (_leapProvider == null)
+            if (leapProvider == null)
             {
-                _leapProvider = Hands.Provider;
+                leapProvider = Hands.Provider;
             }
 
             //add the primary pose to the list of poses to be used
-            if (_poseToDetect != null)
+            if (poseToDetect != null)
             {
-                _posesToDetect.Add(_poseToDetect);
+                posesToDetect.Add(poseToDetect);
             }
         }
 
         private void Update()
         {
             bool anyHandMatched = CompareAllHandsAndPoses();
-            if (anyHandMatched && !_poseAlreadyDetected)
+            if (anyHandMatched && !poseAlreadyDetected)
             {
-                _poseAlreadyDetected = true;
+                poseAlreadyDetected = true;
                 OnPoseDetected.Invoke();
             }
-            else if (!anyHandMatched && _poseAlreadyDetected)
+            else if (!anyHandMatched && poseAlreadyDetected)
             {
-                _poseAlreadyDetected = false;
+                poseAlreadyDetected = false;
                 OnPoseLost.Invoke();
-                _detectedPose = null;
+                detectedPose = null;
             }
 
-            if (_detectedPose != null)
+            if (detectedPose != null)
             {
                 WhilePoseDetected.Invoke();
             }
@@ -273,17 +268,17 @@ namespace Leap.Unity
         private bool CompareAllHandsAndPoses()
         {
             bool poseDetectedOnEitherHand = false;
-            _validationDatas.Clear();
-            foreach (var activePlayerHand in _leapProvider.CurrentFrame.Hands)
+            validationDatas.Clear();
+            foreach (var activePlayerHand in leapProvider.CurrentFrame.Hands)
             {
-                if ((CheckBothHands || activePlayerHand.GetChirality() == ChiralityToCheck))
+                if ((checkBothHands || activePlayerHand.GetChirality() == chiralityToCheck))
                 {
-                    foreach (HandPoseScriptableObject pose in _posesToDetect)
+                    foreach (HandPoseScriptableObject pose in posesToDetect)
                     {
                         bool poseDetectedThisFrame = ComparePoseToHand(pose, activePlayerHand);
                         if (poseDetectedThisFrame)
                         {
-                            _detectedPose = pose;
+                            detectedPose = pose;
                             poseDetectedOnEitherHand = true;
                         }
                     }
@@ -292,26 +287,26 @@ namespace Leap.Unity
             return poseDetectedOnEitherHand;
         }
 
-        private bool ComparePoseToHand(HandPoseScriptableObject pose, Hand activePlayerHand)
+        private bool ComparePoseToHand(HandPoseScriptableObject pose, Hand playerHand)
         {
-            poseDirectionsForValidator.Clear();
+            poseRulesForValidator.Clear();
             // Check any finger directions set up in the pose detector
-            if (Sources.Count > 0)
+            if (poseRules.Count > 0)
             {
-                if (CheckPoseDirection(activePlayerHand) == false)
+                if (CheckPoseDirection(playerHand) == false)
                 {
                     return false;
                 }
             }
 
             Hand serializedHand = pose.GetSerializedHand();
-            Hand playerHand = activePlayerHand;
 
             if (serializedHand == null || playerHand == null)
             {
                 return false;
             }
 
+            // Swap to mirrored hand depending on chirality of playerHand
             if (serializedHand.GetChirality() != playerHand.GetChirality())
             {
                 serializedHand = pose.GetMirroredHand();
@@ -340,6 +335,7 @@ namespace Leap.Unity
                         continue;
                     }
 
+                    // Do not check distal for fingers, only for thumb
                     if (fingerNum != 0 &&
                         serializedHandBone.Type == Bone.BoneType.TYPE_DISTAL)
                     {
@@ -366,7 +362,7 @@ namespace Leap.Unity
                     lastSerializedBoneRotation = serializedBoneRotation;
 
                     // If the pose has been detected, use the Hysteresis value to check if it should be undetected
-                    if (_poseAlreadyDetected)
+                    if (poseAlreadyDetected)
                     {
                         if (boneDifference.x <= (jointRotationThresholds.x + pose.GetHysteresisThreshold()) && boneDifference.x >= (-jointRotationThresholds.x - pose.GetHysteresisThreshold()))
                         {
@@ -404,7 +400,7 @@ namespace Leap.Unity
 
                     if (cacheValidationData)
                     {
-                        _validationDatas.Add(new ValidationData(serializedHand.GetChirality(), fingerNum, boneNum, boneMatched));
+                        validationDatas.Add(new ValidationData(serializedHand.GetChirality(), fingerNum, boneNum, boneMatched));
                     }
 
                     if (!boneMatched)
@@ -422,103 +418,96 @@ namespace Leap.Unity
             return false;
         }
 
-
-
-        private bool CheckPoseDirection(Hand activePlayerHand)
+        private bool CheckPoseDirection(Hand playerHand)
         {
-            bool allBonesInCorrectDirection = true;
-            foreach (var source in Sources)
+            bool allRulesPassed = true;
+            foreach (var rule in poseRules)
             {
-                bool oneDirectionCorrectInSource = false;
-                if(source.direction.Count <= 0) 
+                bool directionMatchInRule = false;
+                if(rule.directions.Count <= 0) // If there are no directions for this rule, skip this rule
                 {
-                    oneDirectionCorrectInSource = true;
+                    directionMatchInRule = true;
                     continue;
                 }
                 
-                foreach (var direction in source.direction)
+                foreach (var direction in rule.directions)
                 {
                     if(direction.enabled == false)
                     {
-                        oneDirectionCorrectInSource = true;
                         continue;
                     }
-
-                    if (direction.enabled == true)
+                    else // This is an active direction, check that it is correct
                     {
                         Vector3 pointDirection;
                         Vector3 pointPosition;
 
-                        if ((int)source.finger == 5)
+                        if ((int)rule.finger == 5) // This represents the palm
                         {
-                            pointDirection = activePlayerHand.PalmNormal.normalized;
-                            pointPosition = activePlayerHand.PalmPosition;
+                            pointDirection = playerHand.PalmNormal.normalized;
+                            pointPosition = playerHand.PalmPosition;
                         }
                         else
                         {
-                            pointDirection = activePlayerHand.Fingers[(int)source.finger].bones[source.bone].Direction.normalized;
-                            pointPosition = activePlayerHand.Fingers[(int)source.finger].bones[source.bone].NextJoint;
+                            pointDirection = playerHand.Fingers[(int)rule.finger].bones[rule.bone].Direction.normalized;
+                            pointPosition = playerHand.Fingers[(int)rule.finger].bones[rule.bone].NextJoint;
                         }
+
                         float hysteresisToAdd = 0;
+
+                        if (allRulesMatchedLastFrame)
+                        {
+                            hysteresisToAdd = 5f;
+                        }
 
                         switch (direction.typeOfDirectionCheck)
                         {
                             case TypeOfDirectionCheck.TowardsObject:
                             {
-                                if (_directionTargetsMatchedLastFrame)
+                                float angleToDot = direction.rotationThreshold + hysteresisToAdd;
+                                angleToDot = 1 - (Mathf.Clamp01(angleToDot / 180) * 2);
+
+                                if (GetIsFacingObject(pointPosition, direction.poseTarget.position, pointDirection, angleToDot))
                                 {
-                                    hysteresisToAdd = -0.03f;
-                                }
-                                if (GetIsFacingObject(pointPosition, direction.poseTarget.position, pointDirection, 0.8f + hysteresisToAdd))
-                                {
-                                    oneDirectionCorrectInSource = true;
+                                    directionMatchInRule = true;
                                 }
                                 break;
                             }
                             case TypeOfDirectionCheck.WorldDirection:
                             {
-                                if (_directionTargetsMatchedLastFrame)
-                                {
-                                    hysteresisToAdd = 5f;
-                                }
                                 if (GetIsFacingDirection(pointDirection, GetAxis(direction.axisToFace), direction.rotationThreshold + hysteresisToAdd))
                                 {
-                                    oneDirectionCorrectInSource = true;
+                                    directionMatchInRule = true;
                                 }
                                 break;
                             }
                             case TypeOfDirectionCheck.CameraDirection:
                             {
-                                if (_directionTargetsMatchedLastFrame)
-                                {
-                                    hysteresisToAdd = 5f;
-                                }
                                 if (GetIsFacingDirection(pointDirection,
                                     (Camera.main.transform.rotation.normalized * GetAxis(direction.axisToFace).normalized).normalized, direction.rotationThreshold + hysteresisToAdd))
                                 {
-                                    oneDirectionCorrectInSource = true;
+                                    directionMatchInRule = true;
                                 }
                                 break;
                             }
                         }
-                        poseDirectionsForValidator.Add(new PoseDirectionCache(activePlayerHand.GetChirality(),
-                            new Tuple<DirectionSource, bool>(source, oneDirectionCorrectInSource)));
+                        poseRulesForValidator.Add(new PoseRuleCache(playerHand.GetChirality(),
+                            new Tuple<PoseRule, bool>(rule, directionMatchInRule)));
                     }
                 }
 
-                if(oneDirectionCorrectInSource == false)
+                if(directionMatchInRule == false)
                 {
-                    allBonesInCorrectDirection = false;
+                    allRulesPassed = false;
                 }
             }
 
-            _directionTargetsMatchedLastFrame = allBonesInCorrectDirection;
-            return allBonesInCorrectDirection;
+            allRulesMatchedLastFrame = allRulesPassed;
+            return allRulesPassed;
         }
 
         public bool IsPoseCurrentlyDetected()
         {
-            return _poseAlreadyDetected;
+            return poseAlreadyDetected;
         }
 
         #region Helper Functions
