@@ -13,6 +13,11 @@ namespace Leap.Unity.Examples
         public GameObject countDownGO;
         public TextMeshProUGUI countDownText;
         public float recordCountDown = 3;
+        public GameObject poseDetectedGO;
+        public TextMeshProUGUI poseDetectedText;
+
+
+
 
         [Header("References")]
         public HandPoseRecorder recorder;
@@ -36,13 +41,13 @@ namespace Leap.Unity.Examples
                 HandPoseScriptableObject detectedPose = detector.GetCurrentlyDetectedPose();
                 if (detectedPose != null)
                 {
-                    countDownGO.SetActive(true);
-                    countDownText.text = "Detected pose: " + detectedPose.name;
+                    poseDetectedGO.SetActive(true);
+                    poseDetectedText.text = "Detected pose: " + detectedPose.name;
                 }
                 else
                 {
-                    countDownGO.SetActive(false);
-                    countDownText.text = "No pose detected";
+                    poseDetectedGO.SetActive(false);
+                    poseDetectedText.text = "No pose detected";
                 }
             }
         }
@@ -60,6 +65,7 @@ namespace Leap.Unity.Examples
         {
             if (!capturing)
             {
+                
                 capturing = true;
                 StartCoroutine(RecordAfterCountDown());
             }
@@ -76,9 +82,10 @@ namespace Leap.Unity.Examples
                 countDownText.text = Mathf.CeilToInt(timeLeft).ToString();
                 yield return null;
             }
+            countDownText.text = "0";
 
-            countDownGO.SetActive(false);
             HandPoseScriptableObject savedPose = recorder.SaveCurrentHandPose();
+            countDownText.text = savedPose.name + " saved in " + "Assets/" + recorder.SavePath;
             posesRecordedThisSession.Add(savedPose);
             capturing = false;
             detector.SetPosesToDetect(posesRecordedThisSession); 
