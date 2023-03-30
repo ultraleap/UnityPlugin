@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using System;
 
 namespace Leap.Unity
@@ -29,15 +31,8 @@ namespace Leap.Unity
         /// <summary>
         /// Pose to use
         /// </summary>
-        /// 
-        [HideInInspector]
         public HandPoseScriptableObject handPose;
 
-        /// <summary>
-        /// Selected hand pose for viewing
-        /// </summary>
-        [HideInInspector]
-        public int Selected = 0;
         /// <summary>
         /// List for pose scriptable objects in the editor
         /// </summary>
@@ -100,6 +95,7 @@ namespace Leap.Unity
             DispatchUpdateFrameEvent(CurrentFrame);
         }
 
+#if UNITY_EDITOR
         private void OnDrawGizmos()
         {
             foreach(var hand in currentHandsAndPosedObjects)
@@ -177,5 +173,6 @@ namespace Leap.Unity
 
             return result;
         }
+#endif
     }
 }

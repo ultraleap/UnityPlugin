@@ -7,9 +7,9 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Skybox
-  m_Shader: {fileID: 4800000, guid: 0a558f5ac7f88f04b8afb3b210252219, type: 3}
-  m_ShaderKeywords: 
+  m_Name: Ghost Hand-PoseDetector
+  m_Shader: {fileID: 4800000, guid: c5b35a4c19d643f4f87637cdd8587b98, type: 3}
+  m_ShaderKeywords: _USEFRESNEL_ON _USEOUTLINE_ON
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -40,7 +40,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: e911cba1eec0c364681095f165f68321, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
@@ -60,24 +60,29 @@ Material:
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
+    - _FresnelIntensity: 1
+    - _FresnelPower: 0.25
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
+    - _LightIntensity: 1
     - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 1
+    - _Outline: 0.0045
     - _Parallax: 0.02
-    - _Screenspace: 0
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _UVSec: 0
     - _ZWrite: 1
-    - _mult: 2
-    - _pwer: 1
+    - _useFresnel: 1
+    - _useLighting: 0
+    - _useOutline: 1
     m_Colors:
-    - _Bottom: {r: 0.8490566, g: 0.8490566, b: 0.8490566, a: 0}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _Top: {r: 0.5216091, g: 0.64738876, b: 0.6792453, a: 0}
+    - _FresnelColor: {r: 22.408676, g: 22.408676, b: 22.408676, a: 0.09803922}
+    - _MainColor: {r: 3.5648696, g: 3.5648696, b: 3.5648696, a: 0.105882354}
+    - _OutlineColor: {r: 0.33962262, g: 0.33962262, b: 0.33962262, a: 1}
   m_BuildTextureStacks: []

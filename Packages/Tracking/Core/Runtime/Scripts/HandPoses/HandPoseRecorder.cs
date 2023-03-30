@@ -1,5 +1,7 @@
 using System.IO;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using UnityEngine;
 
 namespace Leap.Unity
@@ -45,6 +47,7 @@ namespace Leap.Unity
 
         private HandPoseScriptableObject CreateScriptableObject(string handPoseName, Hand handData)
         {
+#if UNITY_EDITOR
             HandPoseScriptableObject newItem = ScriptableObject.CreateInstance<HandPoseScriptableObject>();
             newItem.name = handPoseName;
             newItem.SaveHandPose(handData);
@@ -70,6 +73,10 @@ namespace Leap.Unity
 
             Debug.Log("New pose saved to: " + fullPath, AssetDatabase.LoadMainAssetAtPath(fullPath));
             return newItem;
+#else
+            Debug.LogError("Error saving Hand Pose: You can not save Hand Poses in a built application.");
+            return null;
+#endif
         }
 
         public HandPoseScriptableObject SaveCurrentHandPose()
