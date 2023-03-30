@@ -293,8 +293,8 @@ namespace Leap.Unity
 
             HandPoseDetector poseDetectionScript = (HandPoseDetector)target;
 
-            EditorGUILayout.LabelField("Pose to detect: ", EditorStyles.boldLabel);
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("_poseToDetect"), GUIContent.none);
+            GUILayout.Space(10);
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("_poseToDetect"));
 
             EditorGUI.indentLevel = 2;
             EditorGUILayout.PropertyField(serializedObject.FindProperty("_posesToDetect"), new GUIContent("Pose variations: "));
@@ -511,8 +511,6 @@ namespace Leap.Unity
     [CustomEditor(typeof(HandPoseEditor), editorForChildClasses: true)]
     public class HandPoseEditorEditor : CustomEditorBase<HandPoseEditor>
     {
-        List<HandPoseScriptableObject> handPoses = new List<HandPoseScriptableObject>();
-
         bool _showFineTuningOptions = false;
 
         protected override void OnEnable()
@@ -524,55 +522,15 @@ namespace Leap.Unity
             specifyConditionalDrawing(() => false, "editTimePose");
         }
 
-        private void UpdatedPoseDropdown()
-        {
-            var handPoseEditor = (HandPoseEditor)target;
-            var handPoseGuids = AssetDatabase.FindAssets("t:HandPoseScriptableObject");
-            handPoses.Clear();
-            foreach (var guid in handPoseGuids)
-            {
-                var path = AssetDatabase.GUIDToAssetPath(guid);
-                handPoses.Add(AssetDatabase.LoadAssetAtPath<HandPoseScriptableObject>(path));
-            }
-
-            if(handPoseEditor.PoseScritableIntName.Count != handPoses.Count)
-            {
-                handPoseEditor.PoseScritableIntName.Clear();
-
-                for (int i = 0; i < handPoses.Count; i++)
-                {
-                    var scriptableObject = handPoses.ElementAt(i);
-                    handPoseEditor.PoseScritableIntName.Add(i, scriptableObject.name);
-                }
-            }
-
-            if (handPoseEditor.PoseScritableIntName.Count > 0)
-            {
-                EditorGUILayout.LabelField("Select Pose");
-                handPoseEditor.Selected = EditorGUILayout.Popup(handPoseEditor.Selected, handPoseEditor.PoseScritableIntName.Values.ToArray());
-
-                if (handPoses.Count > handPoseEditor.Selected)
-                {
-                    target.handPose = handPoses.ElementAt(handPoseEditor.Selected);
-                }
-                EditorGUILayout.Space(10);
-            }
-            else
-            {
-                EditorGUILayout.LabelField("No poses found, please record a pose using the pose recorder in order to view a pose.");
-                EditorGUILayout.Space(10);
-            }
-
-            EditorUtility.SetDirty(target);
-        }
-
         public override void OnInspectorGUI()
         {
             EditorGUI.BeginDisabledGroup(true);
             EditorGUILayout.ObjectField("Script", MonoScript.FromMonoBehaviour((MonoBehaviour)target), GetType(), false);
             EditorGUI.EndDisabledGroup();
 
-            UpdatedPoseDropdown();
+            EditorGUILayout.Space(10);
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("handPose"));
+            EditorGUILayout.Space(10);
 
             EditorGUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
@@ -602,10 +560,6 @@ namespace Leap.Unity
     [CustomEditor(typeof(HandPoseViewer), editorForChildClasses: true)]
     public class HandPoseViewerEditor : CustomEditorBase<HandPoseViewer>
     {
-        List<HandPoseScriptableObject> handPoses = new List<HandPoseScriptableObject>();
-
-        bool _showFineTuningOptions = false;
-
         protected override void OnEnable()
         {
             base.OnEnable();
@@ -613,55 +567,6 @@ namespace Leap.Unity
             // Edit-time pose is only relevant for providers that generate hands.
             // Post-process Providers are a special case and don't generate their own hands.
             specifyConditionalDrawing(() => false, "editTimePose");
-        }
-
-        private void UpdatedPoseDropdown()
-        {
-            var handPoseViewer = (HandPoseViewer)target;
-            var handPoseGuids = AssetDatabase.FindAssets("t:HandPoseScriptableObject");
-            handPoses.Clear();
-            foreach (var guid in handPoseGuids)
-            {
-                var path = AssetDatabase.GUIDToAssetPath(guid);
-                handPoses.Add(AssetDatabase.LoadAssetAtPath<HandPoseScriptableObject>(path));
-            }
-
-            if (handPoseViewer.PoseScritableIntName.Count != handPoses.Count)
-            {
-                handPoseViewer.PoseScritableIntName.Clear();
-
-                for (int i = 0; i < handPoses.Count; i++)
-                {
-                    var scriptableObject = handPoses.ElementAt(i);
-                    handPoseViewer.PoseScritableIntName.Add(i, scriptableObject.name);
-                }
-            }
-
-            if (handPoseViewer.PoseScritableIntName.Count > 0)
-            {
-                EditorGUILayout.LabelField("Select Pose");
-                handPoseViewer.Selected = EditorGUILayout.Popup(handPoseViewer.Selected, handPoseViewer.PoseScritableIntName.Values.ToArray());
-
-                if (handPoses.Count > handPoseViewer.Selected)
-                {
-                    target.handPose = handPoses.ElementAt(handPoseViewer.Selected);
-                }
-                EditorGUILayout.Space(10);
-            }
-            else
-            {
-                EditorGUILayout.LabelField("No poses found, please record a pose using the pose recorder in order to view a pose.");
-                EditorGUILayout.Space(10);
-            }
-
-            EditorUtility.SetDirty(target);
-        }
-
-        public override void OnInspectorGUI()
-        {
-            base.OnInspectorGUI();
-            UpdatedPoseDropdown();
-
         }
     }
 }

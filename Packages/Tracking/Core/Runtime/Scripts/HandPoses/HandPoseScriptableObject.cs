@@ -1,10 +1,12 @@
 using System.Collections.Generic;
-using System.Linq;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using UnityEngine;
 
 namespace Leap.Unity
 {
+#if UNITY_EDITOR
     public class NamedListAttribute : PropertyAttribute
     {
         public readonly string[] names;
@@ -27,7 +29,7 @@ namespace Leap.Unity
             }
         }
     }
-
+#endif
     [CreateAssetMenu(fileName = "HandPose", menuName = "ScriptableObjects/HandPose")]
     public class HandPoseScriptableObject : ScriptableObject
     {

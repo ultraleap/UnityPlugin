@@ -1,9 +1,5 @@
-using Leap.Unity;
-using Leap;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 
 namespace Leap.Unity
@@ -32,20 +28,7 @@ namespace Leap.Unity
         /// <summary>
         /// Pose to use
         /// </summary>
-        /// 
-        [HideInInspector]
         public HandPoseScriptableObject handPose;
-
-        /// <summary>
-        /// Selected hand pose for viewing
-        /// </summary>
-        [HideInInspector]
-        public int Selected = 0;
-        /// <summary>
-        /// List for pose scriptable objects in the editor
-        /// </summary>
-        [HideInInspector]
-        public Dictionary<int, string> PoseScritableIntName = new Dictionary<int, string>();
 
         public void SetHandPose(HandPoseScriptableObject poseToSet)
         {
@@ -74,13 +57,10 @@ namespace Leap.Unity
             Hand posedHand = new Hand();
             Hand mirroredHand = new Hand();
 
-
             posedHand.CopyFrom(handPose.GetSerializedHand());
             mirroredHand.CopyFrom(handPose.GetMirroredHand());
 
-
-            Vector3 handPosition = this.transform.position;
-            Vector3 unusedHandPosition = Camera.main.transform.position + (Camera.main.transform.forward * 0.5f);
+            Vector3 handPosition = transform.position;
 
             if (handLocation != null)
             {
@@ -89,13 +69,13 @@ namespace Leap.Unity
 
             if (posedHand.IsLeft)
             {
-                posedHand.SetTransform(handPosition, (posedHand.Rotation * handLocation.rotation));
-                mirroredHand.SetTransform(handPosition, (posedHand.Rotation * handLocation.rotation));
+                posedHand.SetTransform(handPosition, posedHand.Rotation * handLocation.rotation);
+                mirroredHand.SetTransform(handPosition, posedHand.Rotation * handLocation.rotation);
             }
             else
             {
-                posedHand.SetTransform(handPosition, (posedHand.Rotation * handLocation.rotation));
-                mirroredHand.SetTransform(handPosition, (posedHand.Rotation * handLocation.rotation));
+                posedHand.SetTransform(handPosition, posedHand.Rotation * handLocation.rotation);
+                mirroredHand.SetTransform(handPosition, posedHand.Rotation * handLocation.rotation);
             }
 
             currentHandsAndPosedObjects.Add(new Tuple<Hand, HandPoseScriptableObject>(posedHand, handPose));

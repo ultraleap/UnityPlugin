@@ -11,7 +11,6 @@ public class HandPoseValidator : MonoBehaviour
     /// </summary>
     [SerializeField]
     private List<CapsuleHand> _validationHands = new List<CapsuleHand>();
-
     private List<CapsuleHand> _storedValidationHands = new List<CapsuleHand>();
     private int _validationHandsActive = 0;
     private int _validationHandsActivePrevFrame = 0;
@@ -25,8 +24,9 @@ public class HandPoseValidator : MonoBehaviour
     private Color[] _leftCapsuleHandColours = new Color[32];
     private Color[] _rightCapsuleHandColours = new Color[32];
 
-
     public Transform validatorHandPrefab;
+
+    List<GameObject> lineRenderers = new List<GameObject>();
 
     private void Start()
     {
@@ -34,11 +34,14 @@ public class HandPoseValidator : MonoBehaviour
         {
             _poseDetector = FindObjectOfType<HandPoseDetector>();
         }
+
         _poseDetector.EnablePoseCaching();
+
         if(_validationHands.Count == 0)
         {
-            var instCapsuleHands = Instantiate(validatorHandPrefab);
-            var capsuleHandScript = instCapsuleHands.GetComponentsInChildren<CapsuleHand>(true);
+            Transform instCapsuleHands = Instantiate(validatorHandPrefab);
+            CapsuleHand[] capsuleHandScript = instCapsuleHands.GetComponentsInChildren<CapsuleHand>(true);
+
             foreach (var capHand in capsuleHandScript)
             {
                 capHand.leapProvider = _leapProvider;
@@ -50,10 +53,7 @@ public class HandPoseValidator : MonoBehaviour
         {
             _storedValidationHands = _validationHands;
         }
-        
     }
-
-    List<GameObject> lineRenderers = new List<GameObject>();
 
     private void Update()
     {
@@ -86,7 +86,7 @@ public class HandPoseValidator : MonoBehaviour
 
     private void ColorHandJoints()
     {
-        var colourCapsuleHand = _storedValidationHands.FirstOrDefault();
+        CapsuleHand colourCapsuleHand = _storedValidationHands.FirstOrDefault();
 
         if (colourCapsuleHand != null)
         {
@@ -96,7 +96,7 @@ public class HandPoseValidator : MonoBehaviour
 
         if (_storedValidationHands.Count > 0)
         {
-            var validationData = _poseDetector.GetValidationData();
+            List<HandPoseDetector.ValidationData> validationData = _poseDetector.GetValidationData();
 
             foreach (var visHand in _storedValidationHands)
             {
@@ -149,7 +149,8 @@ public class HandPoseValidator : MonoBehaviour
 
     private void RenderDirectionRays()
     {
-        var lineRenderCount = 0;
+        int lineRenderCount = 0;
+
         for (int j = 0; j < _storedValidationHands.Count; j++)
         {
             if (_storedValidationHands.ElementAt(j).enabled)
@@ -173,7 +174,7 @@ public class HandPoseValidator : MonoBehaviour
                         if (AtleastOneDirectionActive)
                         {
                             Color lineColor = Color.gray;
-                            var capsuleHand = _storedValidationHands.ElementAt(j);
+                            CapsuleHand capsuleHand = _storedValidationHands.ElementAt(j);
                             foreach (var directionForValidator in _poseDetector.poseDirectionsForValidator)
                             {
                                 if (directionForValidator.chirality == capsuleHand.Handedness &&

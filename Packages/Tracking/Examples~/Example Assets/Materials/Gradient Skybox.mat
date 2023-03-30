@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Skybox
+  m_Name: Gradient Skybox
   m_Shader: {fileID: 4800000, guid: 0a558f5ac7f88f04b8afb3b210252219, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
