@@ -15,9 +15,9 @@ namespace Leap.Unity
         public override Frame CurrentFrame
         {
             get
-            { 
+            {
                 List<Hand> hands = new List<Hand>();
-                foreach(var hand in currentHandsAndPosedObjects)
+                foreach (var hand in currentHandsAndPosedObjects)
                 {
                     hands.Add(hand.Item1);
                 }
@@ -74,7 +74,7 @@ namespace Leap.Unity
                 handPosition = handsLocation.position;
             }
 
-            if(posedHand.IsLeft)
+            if (posedHand.IsLeft)
             {
                 posedHand.SetTransform((handPosition + new Vector3(-0.15f, 0, 0)), posedHand.Rotation);
                 mirroredHand.SetTransform((handPosition + new Vector3(0.15f, 0, 0)), mirroredHand.Rotation);

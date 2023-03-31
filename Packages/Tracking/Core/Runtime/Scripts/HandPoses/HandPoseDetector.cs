@@ -290,7 +290,7 @@ namespace Leap.Unity
 
         private bool ComparePoseToHand(HandPoseScriptableObject pose, Hand playerHand)
         {
-            
+
             // Check any finger directions set up in the pose detector
             if (poseRules.Count > 0)
             {
@@ -425,15 +425,15 @@ namespace Leap.Unity
             foreach (var rule in poseRules)
             {
                 bool directionMatchInRule = false;
-                if(rule.directions.Count <= 0) // If there are no directions for this rule, skip this rule
+                if (rule.directions.Count <= 0) // If there are no directions for this rule, skip this rule
                 {
                     directionMatchInRule = true;
                     continue;
                 }
-                
+
                 foreach (var direction in rule.directions)
                 {
-                    if(direction.enabled == false)
+                    if (direction.enabled == false)
                     {
                         continue;
                     }
@@ -463,40 +463,40 @@ namespace Leap.Unity
                         switch (direction.typeOfDirectionCheck)
                         {
                             case TypeOfDirectionCheck.TowardsObject:
-                            {
-                                float angleToDot = direction.rotationThreshold + hysteresisToAdd;
-                                angleToDot = 1 - (Mathf.Clamp01(angleToDot / 180) * 2);
+                                {
+                                    float angleToDot = direction.rotationThreshold + hysteresisToAdd;
+                                    angleToDot = 1 - (Mathf.Clamp01(angleToDot / 180) * 2);
 
-                                if (GetIsFacingObject(pointPosition, direction.poseTarget.position, pointDirection, angleToDot))
-                                {
-                                    directionMatchInRule = true;
+                                    if (GetIsFacingObject(pointPosition, direction.poseTarget.position, pointDirection, angleToDot))
+                                    {
+                                        directionMatchInRule = true;
+                                    }
+                                    break;
                                 }
-                                break;
-                            }
                             case TypeOfDirectionCheck.WorldDirection:
-                            {
-                                if (GetIsFacingDirection(pointDirection, GetAxis(direction.axisToFace), direction.rotationThreshold + hysteresisToAdd))
                                 {
-                                    directionMatchInRule = true;
+                                    if (GetIsFacingDirection(pointDirection, GetAxis(direction.axisToFace), direction.rotationThreshold + hysteresisToAdd))
+                                    {
+                                        directionMatchInRule = true;
+                                    }
+                                    break;
                                 }
-                                break;
-                            }
                             case TypeOfDirectionCheck.CameraDirection:
-                            {
-                                if (GetIsFacingDirection(pointDirection,
-                                    (Camera.main.transform.rotation.normalized * GetAxis(direction.axisToFace).normalized).normalized, direction.rotationThreshold + hysteresisToAdd))
                                 {
-                                    directionMatchInRule = true;
+                                    if (GetIsFacingDirection(pointDirection,
+                                        (Camera.main.transform.rotation.normalized * GetAxis(direction.axisToFace).normalized).normalized, direction.rotationThreshold + hysteresisToAdd))
+                                    {
+                                        directionMatchInRule = true;
+                                    }
+                                    break;
                                 }
-                                break;
-                            }
                         }
                         poseRulesForValidator.Add(new PoseRuleCache(playerHand.GetChirality(),
                             new Tuple<PoseRule, bool>(rule, directionMatchInRule)));
                     }
                 }
 
-                if(directionMatchInRule == false)
+                if (directionMatchInRule == false)
                 {
                     allRulesPassed = false;
                 }
@@ -527,7 +527,7 @@ namespace Leap.Unity
 
         private bool GetIsFacingDirection(Vector3 boneDirection, Vector3 TargetDirectionDirection, float thresholdInDegrees)
         {
-            return(Vector3.Angle(boneDirection.normalized, TargetDirectionDirection.normalized) < thresholdInDegrees);
+            return (Vector3.Angle(boneDirection.normalized, TargetDirectionDirection.normalized) < thresholdInDegrees);
         }
 
         private Vector2 GetBoneRotationThreshold(HandPoseScriptableObject pose, int fingerNum, int boneNum)
