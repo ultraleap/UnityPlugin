@@ -61,7 +61,6 @@ namespace Leap.Unity.Examples
         {
             if (!capturing)
             {
-                
                 capturing = true;
                 StartCoroutine(RecordAfterCountDown());
             }
@@ -71,20 +70,29 @@ namespace Leap.Unity.Examples
         {
             countDownGameObject.SetActive(true);
             float timeLeft = recordCountDown;
+            countDownText.text = timeLeft.ToString();
 
             while (timeLeft > 0)
             {
+                yield return null;
                 timeLeft -= Time.deltaTime;
                 countDownText.text = Mathf.CeilToInt(timeLeft).ToString();
-                yield return null;
             }
-            countDownText.text = "0";
 
             HandPoseScriptableObject savedPose = recorder.SaveCurrentHandPose();
-            countDownText.text = savedPose.name + " saved in " + "Assets/" + recorder.savePath;
-            posesRecordedThisSession.Add(savedPose);
-            capturing = false;
-            detector.SetPosesToDetect(posesRecordedThisSession); 
+
+            if (savedPose == null)
+            {
+                countDownText.text = "Pose not saved\nNo " + recorder.handToRecord.ToString().ToLower() + " hand found";
+                capturing = false;
+            }
+            else
+            {
+                countDownText.text = savedPose.name + " saved in " + "Assets/" + recorder.savePath;
+                posesRecordedThisSession.Add(savedPose);
+                capturing = false;
+                detector.SetPosesToDetect(posesRecordedThisSession);
+            }
         }
     }
 }

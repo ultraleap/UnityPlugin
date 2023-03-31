@@ -18,8 +18,7 @@ namespace Leap.Unity
         /// <summary>
         /// Which hand should be captured?
         /// </summary>
-        [SerializeField]
-        private Chirality handToRecord = Chirality.Left;
+        public Chirality handToRecord = Chirality.Left;
 
         /// <summary>
         /// Specify a leap provider. If none is selected, the script will automatically find one in the scene.

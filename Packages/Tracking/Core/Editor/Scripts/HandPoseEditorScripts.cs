@@ -339,13 +339,13 @@ namespace Leap.Unity
 
             GUILayout.Space(10);
 
-            var sources = serializedObject.FindProperty("poseRules");
+            SerializedProperty sources = serializedObject.FindProperty("poseRules");
             if (sourceFoldout.Count != sources.arraySize)
             {
                 sourceFoldout.Clear();
                 foreach (var item in sources)
                 {
-                    sourceFoldout.Add(false);
+                    sourceFoldout.Add(true);
                 }
             }
 
