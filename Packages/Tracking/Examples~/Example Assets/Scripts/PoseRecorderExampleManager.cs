@@ -79,6 +79,10 @@ namespace Leap.Unity.Examples
                 countDownText.text = Mathf.CeilToInt(timeLeft).ToString();
             }
 
+            countDownText.text = "Pose!";
+
+            yield return new WaitForSeconds(0.5f);
+
             HandPoseScriptableObject savedPose = recorder.SaveCurrentHandPose();
 
             if (savedPose == null)
