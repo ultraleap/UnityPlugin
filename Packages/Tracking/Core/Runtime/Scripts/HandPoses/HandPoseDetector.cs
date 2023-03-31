@@ -269,6 +269,7 @@ namespace Leap.Unity
         {
             bool poseDetectedOnEitherHand = false;
             validationDatas.Clear();
+            poseRulesForValidator.Clear();
             foreach (var activePlayerHand in leapProvider.CurrentFrame.Hands)
             {
                 if ((checkBothHands || activePlayerHand.GetChirality() == chiralityToCheck))
@@ -289,7 +290,7 @@ namespace Leap.Unity
 
         private bool ComparePoseToHand(HandPoseScriptableObject pose, Hand playerHand)
         {
-            poseRulesForValidator.Clear();
+            
             // Check any finger directions set up in the pose detector
             if (poseRules.Count > 0)
             {
