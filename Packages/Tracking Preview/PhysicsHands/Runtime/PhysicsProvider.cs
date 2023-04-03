@@ -84,11 +84,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         public int SolverIterations => _handSolverIterations;
         [SerializeField, Tooltip("The solver iterations used when calculating the hand. This can be different to your overall project iterations. Higher numbers will be more robust, but more expensive to compute."), Min(10f)]
-        private int _handSolverIterations = 15;
+        private int _handSolverIterations = 20;
 
         public int SolverVelocityIterations => _handSolverVelocityIterations;
         [SerializeField, Tooltip("The solver iterations used when calculating the hand velocity. This can be different to your overall project iterations. Higher numbers will be more robust, but more expensive to compute."), Min(5f)]
-        private int _handSolverVelocityIterations = 5;
+        private int _handSolverVelocityIterations = 15;
 
         // Helper Settings
         [SerializeField, Tooltip("Enabling helpers is recommended as these allow the user to pick up objects they normally would not be able to. " +
@@ -132,7 +132,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private Dictionary<PhysicsHand, float[]> _fingerStrengths = new Dictionary<PhysicsHand, float[]>();
         public Dictionary<PhysicsHand, float[]> FingerStrengths => _fingerStrengths;
 
-        private LayerMask _hoverMask, _contactMask;
+        private LayerMask _hoverMask, _interactionMask;
+        public LayerMask InteractionMask => _interactionMask;
 
         // These events are place holders
         public Action<Rigidbody> OnHover, OnHoverExit;
@@ -149,12 +150,21 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         private bool _leftWasNull = true, _rightWasNull = true;
 
+        private WaitForFixedUpdate _waitForFixedUpdate = new WaitForFixedUpdate();
+
         private void Awake()
         {
             _leftOriginalLeap = new Hand();
             _rightOriginalLeap = new Hand();
             GenerateLayers();
             SetupAutomaticCollisionLayers();
+        }
+
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+            _waitForFixedUpdate = new WaitForFixedUpdate();
+            StartCoroutine(LateFixedFrameProcess());
         }
 
         #region Layer Generation
@@ -223,11 +233,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
             }
 
             _hoverMask = new LayerMask();
-            _contactMask = new LayerMask();
+            _interactionMask = new LayerMask();
             for (int i = 0; i < _interactableLayers.Count; i++)
             {
                 _hoverMask = _hoverMask | _interactableLayers[i].layerMask;
-                _contactMask = _contactMask | _interactableLayers[i].layerMask;
+                _interactionMask = _interactionMask | _interactableLayers[i].layerMask;
             }
 
             _layersGenerated = true;
@@ -318,26 +328,36 @@ namespace Leap.Unity.Interaction.PhysicsHands
         {
             UpdatePhysicsHand(LeftHand, _leftIndex == -1 ? null : _leftOriginalLeap, ref _leftWasNull);
             UpdatePhysicsHand(RightHand, _rightIndex == -1 ? null : _rightOriginalLeap, ref _rightWasNull);
+        }
 
-            if (_enableHelpers)
+        // Happens after the physics simulation
+        private IEnumerator LateFixedFrameProcess()
+        {
+            yield return null;
+            for (; ; )
             {
-                ComputeHelperBones();
-            }
-
-            PhysicsGraspHelper.State oldState, state;
-
-            foreach (var helper in _graspHelpers)
-            {
-                // Removed ignore check here and moved into the helper so we can still get state information
-                oldState = helper.Value.GraspState;
-                state = helper.Value.UpdateHelper();
-                if (state != oldState)
+                if (_enableHelpers)
                 {
-                    OnObjectStateChange?.Invoke(helper.Value.Rigidbody, helper.Value);
+                    ComputeHelperBones();
                 }
-            }
 
-            UpdateHandStates();
+                PhysicsGraspHelper.State oldState, state;
+
+                foreach (var helper in _graspHelpers)
+                {
+                    // Removed ignore check here and moved into the helper so we can still get state information
+                    oldState = helper.Value.GraspState;
+                    state = helper.Value.UpdateHelper();
+                    if (state != oldState)
+                    {
+                        OnObjectStateChange?.Invoke(helper.Value.Rigidbody, helper.Value);
+                    }
+                }
+
+                UpdateHandStates();
+
+                yield return _waitForFixedUpdate;
+            }
         }
 
         private void ApplyHand(int index, ref Frame inputFrame, PhysicsHand hand)
@@ -432,14 +452,14 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             PhysicsHand.Hand pH = hand.GetPhysicsHand();
 
-            Vector3 radiusAmount = Vector3.Scale(pH.palmCollider.size, PhysExts.AbsVec3(pH.palmCollider.transform.lossyScale)) * 0.2f;
+            Vector3 radiusAmount = Vector3.Scale(pH.palmCollider.size, PhysExts.AbsVec3(pH.palmCollider.transform.lossyScale)) * 0.5f;
 
-            _resultCount = PhysExts.OverlapBoxNonAllocOffset(pH.palmCollider, Vector3.zero, _resultsCache, _contactMask, QueryTriggerInteraction.Ignore, extraRadius: -PhysExts.MaxVec3(radiusAmount));
+            _resultCount = PhysExts.OverlapBoxNonAllocOffset(pH.palmCollider, Vector3.zero, _resultsCache, _interactionMask, QueryTriggerInteraction.Ignore, extraRadius: -PhysExts.MaxVec3(radiusAmount));
             HandleOverlaps(hand);
 
             for (int i = 0; i < pH.jointColliders.Length; i++)
             {
-                _resultCount = PhysExts.OverlapCapsuleNonAllocOffset(pH.jointColliders[i], Vector3.zero, _resultsCache, _contactMask, QueryTriggerInteraction.Ignore, extraRadius: -pH.jointColliders[i].radius * 0.2f);
+                _resultCount = PhysExts.OverlapCapsuleNonAllocOffset(pH.jointColliders[i], Vector3.zero, _resultsCache, _interactionMask, QueryTriggerInteraction.Ignore, extraRadius: -pH.jointColliders[i].radius * 0.5f);
                 HandleOverlaps(hand);
             }
         }
@@ -609,7 +629,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             _tempVector.x = 0;
             _tempVector.y = -pH.triggerDistance;
-            _resultCount = PhysExts.OverlapBoxNonAllocOffset(pH.palmCollider, _tempVector, _resultsCache, _contactMask);
+            _resultCount = PhysExts.OverlapBoxNonAllocOffset(pH.palmCollider, _tempVector, _resultsCache, _interactionMask);
             for (int i = 0; i < _resultCount; i++)
             {
                 if (_resultsCache[i].attachedRigidbody != null)
@@ -637,14 +657,14 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 {
                     _tempVector.x = -pH.triggerDistance / 2f;
                     _tempVector.z = pH.triggerDistance / 2f;
-                    radius *= 0.8f;
+                    radius *= 0.4f;
                 }
                 else
                 {
                     // Inflate the bones slightly
                     _tempVector.x = 0;
                     _tempVector.z = 0;
-                    radius *= 0.2f;
+                    radius *= 0.1f;
                 }
                 // Move the finger tips forward a tad
                 if (pH.jointBones[i].Joint == 2)
@@ -660,7 +680,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 }
 #endif
 
-                _resultCount = PhysExts.OverlapCapsuleNonAllocOffset(pH.jointColliders[i], _tempVector, _resultsCache, _contactMask, extraRadius: radius);
+                _resultCount = PhysExts.OverlapCapsuleNonAllocOffset(pH.jointColliders[i], _tempVector, _resultsCache, _interactionMask, extraRadius: radius);
                 for (int j = 0; j < _resultCount; j++)
                 {
                     if (_resultsCache[j].attachedRigidbody != null)
@@ -696,8 +716,19 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         private void UpdateHandStates()
         {
+            UpdateBoneStats(LeftHand);
+            UpdateBoneStats(RightHand);
             FindHandState(LeftHand);
             FindHandState(RightHand);
+        }
+
+        private void UpdateBoneStats(PhysicsHand hand)
+        {
+            hand.GetPhysicsHand().palmBone.UpdateBoneDistances();
+            foreach (var bone in hand.GetPhysicsHand().jointBones)
+            {
+                bone.UpdateBoneDistances();
+            }
         }
 
         private void FindHandState(PhysicsHand hand)

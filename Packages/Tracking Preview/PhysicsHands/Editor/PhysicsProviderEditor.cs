@@ -12,10 +12,12 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private const int RECOMMENDED_SOLVER_ITERATIONS = 15;
         private const int RECOMMENDED_SOLVER_VELOCITY_ITERATIONS = 5;
         private const float RECOMMENDED_TIMESTEP = 0.011111f;
+        private const float RECOMMENDED_GRAVITY = -4.905f;
+        private const float RECOMMENDED_SLEEP_THRESHOLD = 0.001f;
 
-        private readonly int[] HAND_SOLVER_ITERATIONS = { 10, 15, 30 };
-        private readonly int[] HAND_SOLVER_VELOCITY_ITERATIONS = { 4, 5, 10 };
-        private readonly string[] HAND_SOLVER_NAMES = { "Low", "Medium", "High", "Custom" };
+        private readonly int[] HAND_SOLVER_ITERATIONS = { 20, 30 };
+        private readonly int[] HAND_SOLVER_VELOCITY_ITERATIONS = { 15, 20 };
+        private readonly string[] HAND_SOLVER_NAMES = { "Standard", "High", "Custom" };
         private int _currentPreset = -1;
 
         PhysicsProvider _physicsProvider;
@@ -139,6 +141,29 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 if (GUILayout.Button("Fix Now", GUILayout.Width(80)))
                 {
                     Physics.defaultSolverVelocityIterations = RECOMMENDED_SOLVER_VELOCITY_ITERATIONS;
+                }
+                EditorGUILayout.EndHorizontal();
+            }
+            // Gravity
+            if (Physics.gravity.y < RECOMMENDED_GRAVITY)
+            {
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.HelpBox($"Project gravity forces are lower than {RECOMMENDED_GRAVITY} ({Physics.gravity.y}). " +
+                    $"It is recommended to reduce this as it will make it easier for the player to grab falling objects.", MessageType.Warning);
+                if (GUILayout.Button("Fix Now", GUILayout.Width(80)))
+                {
+                    Physics.gravity = new Vector3(0, RECOMMENDED_GRAVITY, 0);
+                }
+                EditorGUILayout.EndHorizontal();
+            }
+            if (Physics.sleepThreshold > RECOMMENDED_SLEEP_THRESHOLD)
+            {
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.HelpBox($"Project physics sleep threshold is larger than {RECOMMENDED_SLEEP_THRESHOLD} ({Physics.sleepThreshold}). " +
+                    $"It is recommended to reduce this to limit issues with misaligned slow moving objects.", MessageType.Warning);
+                if (GUILayout.Button("Fix Now", GUILayout.Width(80)))
+                {
+                    Physics.sleepThreshold = RECOMMENDED_SLEEP_THRESHOLD;
                 }
                 EditorGUILayout.EndHorizontal();
             }
