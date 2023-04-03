@@ -6,26 +6,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
 
-
-## [NEXT] - unreleased
+## [6.7.0] - 3/4/23
 
 ### Added
 - Brand new pose detection feature!
 	- Pose Detector (Invokes events when the chosen pose is made)
 	- Pose Detection Library (A library of pre-defined poses)
-		- Thumbs up
-		- Thumbs down
-		- OK
-		- Point
-		- Open palm up
-		- Open palm down
-		- Fist
-		- Horns
+		- Thumbs up, OK, Point, Open palm, Fist, Horns
 	- Pose Recorder (To record poses of your own)
 	- New Example Scenes
 		- Pose Recorder (A scene set up for you to record poses of your own)
 		- Pose Detection (A barebones scene to show how you can use the detector in your own scenes)
 		- Pose Showcase (To view and try out our new library of poses)
+			- Thumbs up, Thumbs down, OK, Point, Open palm up, Open palm down, Fist, Horns
 - (Physics Hands) Warnings for gravity and timestep settings
 - (Physics Hands) Exposed interaction mask
 - (Physics Hands) Dynamically adjusting fingers when grabbing objects

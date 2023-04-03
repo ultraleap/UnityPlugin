@@ -1,9 +1,7 @@
+using Leap.Unity;
 using System.Collections.Generic;
 using System.Linq;
-
 using UnityEngine;
-
-using Leap.Unity;
 
 public class HandPoseValidator : MonoBehaviour
 {
@@ -39,7 +37,7 @@ public class HandPoseValidator : MonoBehaviour
 
         poseDetector.EnablePoseCaching();
 
-        if(validationHands.Count == 0)
+        if (validationHands.Count == 0)
         {
             Transform instCapsuleHands = Instantiate(validatorHandPrefab);
             CapsuleHand[] capsuleHandScript = instCapsuleHands.GetComponentsInChildren<CapsuleHand>(true);
@@ -61,13 +59,13 @@ public class HandPoseValidator : MonoBehaviour
     {
         foreach (var hand in storedValidationHands)
         {
-            if(!hand.isActiveAndEnabled)
+            if (!hand.isActiveAndEnabled)
             {
                 validationHandsActive--;
             }
         }
 
-        if(validationHandsActive != validationHandsActivePrevFrame)
+        if (validationHandsActive != validationHandsActivePrevFrame)
         {
             validationHandsActivePrevFrame = validationHandsActive;
 
@@ -79,7 +77,7 @@ public class HandPoseValidator : MonoBehaviour
             lineRenderers.Clear();
         }
 
-        if (poseDetector != null) 
+        if (poseDetector != null)
         {
             ColorHandJoints();
             RenderDirectionRays();

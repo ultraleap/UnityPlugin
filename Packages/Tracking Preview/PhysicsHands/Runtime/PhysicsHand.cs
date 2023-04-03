@@ -466,7 +466,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         // Happens after the physics simulation
         private IEnumerator LateFixedUpdate()
         {
-            for(; ; )
+            for (; ; )
             {
                 for (int fingerIndex = 0; fingerIndex < Hand.FINGERS; fingerIndex++)
                 {

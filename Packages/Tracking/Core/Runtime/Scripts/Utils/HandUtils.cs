@@ -395,7 +395,7 @@ namespace Leap.Unity
         /// </summary>
         public static float GetFingerPinchDistance(this Hand hand, int finger)
         {
-            if(hand == null || finger == 0)
+            if (hand == null || finger == 0)
             {
                 return float.MaxValue;
             }

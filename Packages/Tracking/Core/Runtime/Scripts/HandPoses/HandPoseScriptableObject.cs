@@ -54,7 +54,7 @@ namespace Leap.Unity
         public bool detectPinky = true;
 
         private List<int> fingerIndexesToCheck = new List<int>();
-        
+
         public List<int> GetFingerIndexesToCheck()
         {
             ApplyFingersToUse();
@@ -114,7 +114,7 @@ namespace Leap.Unity
 
         public Vector2 GetBoneRotationthreshold(int fingerNum, int boneNum)
         {
-            if(fingerJointRotationThresholds.Length > 0)
+            if (fingerJointRotationThresholds.Length > 0)
             {
                 return fingerJointRotationThresholds[fingerNum].jointThresholds[boneNum];
             }
@@ -144,7 +144,7 @@ namespace Leap.Unity
         {
             Vector2 newRotation = new Vector2(threshold, threshold);
 
-            for(int fingerIndex = 0; fingerIndex < fingerJointRotationThresholds.Length; fingerIndex++)
+            for (int fingerIndex = 0; fingerIndex < fingerJointRotationThresholds.Length; fingerIndex++)
             {
                 if (forceAll)
                 {
@@ -152,9 +152,9 @@ namespace Leap.Unity
                 }
                 else
                 {
-                    for(int jointIndex = 0; jointIndex < fingerJointRotationThresholds[fingerIndex].jointThresholds.Length; jointIndex++)
+                    for (int jointIndex = 0; jointIndex < fingerJointRotationThresholds[fingerIndex].jointThresholds.Length; jointIndex++)
                     {
-                        if(fingerJointRotationThresholds[fingerIndex].jointThresholds[jointIndex].x == globalRotation)
+                        if (fingerJointRotationThresholds[fingerIndex].jointThresholds[jointIndex].x == globalRotation)
                         {
                             fingerJointRotationThresholds[fingerIndex].jointThresholds[jointIndex].x = threshold;
                         }

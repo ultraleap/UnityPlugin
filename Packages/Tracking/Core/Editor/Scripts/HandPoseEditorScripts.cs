@@ -1,9 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
-
-using UnityEngine;
-
 using UnityEditor;
+using UnityEngine;
 
 namespace Leap.Unity
 {
@@ -23,7 +21,7 @@ namespace Leap.Unity
             EditorGUILayout.LabelField(_assetsPath, GUILayout.Width(50));
             poseRecorderScript.savePath = EditorGUILayout.TextField("HandPoses/");
             EditorGUILayout.EndHorizontal();
-            
+
             if (GUILayout.Button("Save Current Hand Pose"))
             {
                 poseRecorderScript.SaveCurrentHandPose();
@@ -66,7 +64,7 @@ namespace Leap.Unity
             {
                 _showFineTuningOptions = !_showFineTuningOptions;
             }
-            
+
             if (_showFineTuningOptions)
             {
                 DrawDefaultInspector();
@@ -104,7 +102,7 @@ namespace Leap.Unity
 
             for (int fingerID = 0; fingerID < target.fingerJointRotationThresholds.Length; fingerID++)
             {
-                if(!ShouldShowFinger(fingerID))
+                if (!ShouldShowFinger(fingerID))
                 {
                     continue;
                 }
@@ -128,7 +126,7 @@ namespace Leap.Unity
 
                         target.fingerJointRotationThresholds[fingerID].jointThresholds[jointID] = new Vector2(flex, abd);
                     }
-                    else if(fingerID == 0 || (fingerID != 0 && jointID != 2)) // Only present distal for thumbs
+                    else if (fingerID == 0 || (fingerID != 0 && jointID != 2)) // Only present distal for thumbs
                     {
                         EditorGUIUtility.labelWidth = 30;
 
@@ -149,7 +147,7 @@ namespace Leap.Unity
 
         string GetJointName(int jointID)
         {
-            switch(jointID)
+            switch (jointID)
             {
                 case 0:
                     return "Proximal Joint";
@@ -304,7 +302,7 @@ namespace Leap.Unity
             GUILayout.Space(10);
 
             poseDetectionScript.checkBothHands = EditorGUILayout.Toggle("Detect both hands?", poseDetectionScript.checkBothHands);
-            
+
             if (!poseDetectionScript.checkBothHands)
             {
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("chiralityToCheck"));
@@ -397,20 +395,20 @@ namespace Leap.Unity
                         switch (direction.FindPropertyRelative("typeOfDirectionCheck").enumValueIndex)
                         {
                             case 0: //OBJECT
-                            {
-                                EditorGUILayout.PropertyField(direction.FindPropertyRelative("poseTarget"), new GUIContent("Object to face:"));
-                                break;
-                            }
+                                {
+                                    EditorGUILayout.PropertyField(direction.FindPropertyRelative("poseTarget"), new GUIContent("Object to face:"));
+                                    break;
+                                }
                             case 1: //WORLD
-                            {
-                                EditorGUILayout.PropertyField(direction.FindPropertyRelative("axisToFace"), new GUIContent("Axis to face:"));
-                                break;
-                            }
+                                {
+                                    EditorGUILayout.PropertyField(direction.FindPropertyRelative("axisToFace"), new GUIContent("Axis to face:"));
+                                    break;
+                                }
                             case 2: //CAMERALOCAL
-                            {
-                                EditorGUILayout.PropertyField(direction.FindPropertyRelative("axisToFace"), new GUIContent("Axis to face:"));
-                                break;
-                            }
+                                {
+                                    EditorGUILayout.PropertyField(direction.FindPropertyRelative("axisToFace"), new GUIContent("Axis to face:"));
+                                    break;
+                                }
                         }
 
                         EditorGUILayout.PropertyField(direction.FindPropertyRelative("rotationThreshold"), new GUIContent("Rotation threshold:"));
@@ -536,7 +534,7 @@ namespace Leap.Unity
             EditorGUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
 
-            if (GUILayout.Button("Edit Pose", GUILayout.Width(Screen.width/2), GUILayout.Height(30)))
+            if (GUILayout.Button("Edit Pose", GUILayout.Width(Screen.width / 2), GUILayout.Height(30)))
             {
                 EditorGUIUtility.PingObject(target.handPose);
                 Selection.SetActiveObjectWithContext(target.handPose, target.handPose);

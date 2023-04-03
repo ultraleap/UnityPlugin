@@ -145,7 +145,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 EditorGUILayout.EndHorizontal();
             }
             // Gravity
-            if(Physics.gravity.y < RECOMMENDED_GRAVITY)
+            if (Physics.gravity.y < RECOMMENDED_GRAVITY)
             {
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.HelpBox($"Project gravity forces are lower than {RECOMMENDED_GRAVITY} ({Physics.gravity.y}). " +
@@ -156,7 +156,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 }
                 EditorGUILayout.EndHorizontal();
             }
-            if(Physics.sleepThreshold > RECOMMENDED_SLEEP_THRESHOLD)
+            if (Physics.sleepThreshold > RECOMMENDED_SLEEP_THRESHOLD)
             {
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.HelpBox($"Project physics sleep threshold is larger than {RECOMMENDED_SLEEP_THRESHOLD} ({Physics.sleepThreshold}). " +
