@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fcf7219bab7fe46a1ad266029b2fee19, type: 3}
+  m_Name: Test
+  m_EditorClassIdentifier: 
+  icon: {fileID: 0}
+  title: Do this!
+  scene: {fileID: 102900000, guid: a63c328e357a40645a31df29deb47f3a, type: 3}
+  sections:
+  - heading: 
+    text: You really need to do something in player settings!<br>wooo
+    linkText: 
+    url: 
+    settingsPage: Project/Player
+    image: {fileID: 0}
+  - heading: 
+    text: And then something in physics settings!
+    linkText: 
+    url: 
+    settingsPage: Project/Physics
+    image: {fileID: 0}
+  loadedLayout: 0
