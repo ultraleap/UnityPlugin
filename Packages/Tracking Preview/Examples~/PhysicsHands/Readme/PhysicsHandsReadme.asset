@@ -50,63 +50,12 @@ MonoBehaviour:
     image: {fileID: 0}
     imageHeight: 0
   - heading: 
-    text: 'Set your <b>Gravity</b> to <b>X: 0, Y: -4.905, Z: 0</b>'
-    linkText: 
-    url: 
-    pingSceneElement: 
-    settingsPage: 
-    image: {fileID: 0}
-    imageHeight: 0
-  - heading: 
-    text: Reduce the <b>Default Max Depenetration Velocity</b> To <b>1</b>
-    linkText: 
-    url: 
-    pingSceneElement: 
-    settingsPage: 
-    image: {fileID: 0}
-    imageHeight: 0
-  - heading: 
-    text: Reduce the <b>Sleep Threshold</b> to <b>0.001</b>
-    linkText: 
-    url: 
-    pingSceneElement: 
-    settingsPage: 
-    image: {fileID: 0}
-    imageHeight: 0
-  - heading: 
-    text: Enable <b>Adaptive Force</b>
-    linkText: 
-    url: 
-    pingSceneElement: 
-    settingsPage: 
-    image: {fileID: 0}
-    imageHeight: 0
-  - heading: 
-    text: Set <b>Contacts Generation</b> to <b>Persistent Contact Manifold</b>
-    linkText: 
-    url: 
-    pingSceneElement: 
-    settingsPage: 
-    image: {fileID: 0}
-    imageHeight: 0
-  - heading: 
-    text: Change the <b>Friction Type</b> to <b>Two Directional Fricton</b>
-    linkText: 
-    url: 
-    pingSceneElement: 
-    settingsPage: 
-    image: {fileID: 0}
-    imageHeight: 0
-  - heading: 
-    text: Enable <b>Enchanced Determinism</b>
-    linkText: 
-    url: 
-    pingSceneElement: 
-    settingsPage: 
-    image: {fileID: 0}
-    imageHeight: 0
-  - heading: 
-    text: Change the <b>Solver Type</b> to <b>Temporal Gauss Seidel</b>
+    text: 'Set your <b>Gravity</b> to <b>X: 0, Y: -4.905, Z: 0</b> \nReduce the <b>Default
+      Max Depenetration Velocity</b> To <b>1</b> \nReduce the <b>Sleep Threshold</b>
+      to <b>0.001</b> \nEnable <b>Adaptive Force</b> \nSet <b>Contacts Generation</b>
+      to <b>Persistent Contact Manifold</b> \nChange the <b>Friction Type</b> to
+      <b>Two Directional Fricton</b> \nEnable <b>Enchanced Determinism</b> \nChange
+      the <b>Solver Type</b> to <b>Temporal Gauss Seidel</b>'
     linkText: 
     url: 
     pingSceneElement: 
@@ -115,9 +64,9 @@ MonoBehaviour:
     imageHeight: 0
   - heading: Modifying Physics Hands Settings
     text: Most other Physics Hands settings can be changed via the <b>Physics Provider</b>.
-      This scene shows an ideal setup, where your original <b>Leap Provider</b> sends
-      data to the <b>Physics Provider</b>, which then sends data to the <b>Hand Binder</b>
-      for visuals.
+      \nThis scene shows an ideal setup, where your original <b>Leap Provider</b>
+      sends data to the <b>Physics Provider</b>, which then sends data to the <b>Hand
+      Binder</b> for visuals.
     linkText: 
     url: 
     pingSceneElement: Leap/PhysicsProvider

@@ -11,7 +11,9 @@ namespace Leap.Unity.Readme
 
         private static string kReadmeScene = "ReadmeEditor.latestScenePath";
 
-        private static float kSpace = 16f;
+        private static float kSpace = 14f;
+
+        private static float miniSpace = 3f;
 
         private static SceneReadme sceneReadme = null;
 
@@ -116,11 +118,13 @@ namespace Leap.Unity.Readme
 
             if (readme.sections != null)
             {
+                GUILayout.Space(miniSpace);
                 foreach (var section in readme.sections)
                 {
                     if (!string.IsNullOrEmpty(section.heading))
                     {
                         GUILayout.Label(section.heading, HeadingStyle);
+                        GUILayout.Space(miniSpace);
                     }
                     if (section.image != null)
                     {
@@ -128,10 +132,22 @@ namespace Leap.Unity.Readme
                     }
                     if (!string.IsNullOrEmpty(section.text))
                     {
-                        GUILayout.Label(section.text, BodyStyle);
+                        string[] lines = section.text.Split(
+                            new string[] { "\\r\\n", "\\r", "\\n" },
+                            System.StringSplitOptions.None
+                        );
+                        for (int i = 0; i < lines.Length; i++)
+                        {
+                            if(i > 0)
+                            {
+                                GUILayout.Space(miniSpace);
+                            }
+                            GUILayout.Label(lines[i], BodyStyle);
+                        }
                     }
                     if (!string.IsNullOrEmpty(section.pingSceneElement))
                     {
+                        GUILayout.Space(miniSpace);
                         int pos = section.pingSceneElement.LastIndexOf("/") + 1;
                         if (GUILayout.Button($"Ping {section.pingSceneElement.Substring(pos, section.pingSceneElement.Length - pos)} in the Scene"))
                         {
@@ -144,6 +160,7 @@ namespace Leap.Unity.Readme
                     }
                     if (!string.IsNullOrEmpty(section.settingsPage))
                     {
+                        GUILayout.Space(miniSpace);
                         int pos = section.settingsPage.LastIndexOf("/") + 1;
                         if (GUILayout.Button($"Open {section.settingsPage.Substring(pos, section.settingsPage.Length - pos)} Settings"))
                         {
@@ -152,6 +169,7 @@ namespace Leap.Unity.Readme
                     }
                     if (!string.IsNullOrEmpty(section.linkText))
                     {
+                        GUILayout.Space(miniSpace);
                         if (LinkLabel(new GUIContent(section.linkText)))
                         {
                             Application.OpenURL(section.url);
