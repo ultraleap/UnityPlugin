@@ -1,0 +1,136 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fcf7219bab7fe46a1ad266029b2fee19, type: 3}
+  m_Name: PhysicsHandsReadme
+  m_EditorClassIdentifier: 
+  icon: {fileID: 2800000, guid: 34f556d724b1bbf4097ca6220db2c581, type: 3}
+  title: Physics Hands Example
+  scene: {fileID: 102900000, guid: 1a70a889c083dac4480e0dd4c4a547d8, type: 3}
+  sections:
+  - heading: Project Setup
+    text: Physics Hands requires a few project settings to be modified to get the
+      best out of them.
+    linkText: 
+    url: 
+    pingSceneElement: 
+    settingsPage: 
+    image: {fileID: 0}
+    imageHeight: 0
+  - heading: Time Settings
+    text: First we need to modify your time settings.
+    linkText: 
+    url: 
+    pingSceneElement: 
+    settingsPage: Project/Time
+    image: {fileID: 0}
+    imageHeight: 0
+  - heading: 
+    text: Set your <b>Fixed Timestep</b> to <b>0.011111</b>
+    linkText: 
+    url: 
+    pingSceneElement: 
+    settingsPage: 
+    image: {fileID: 0}
+    imageHeight: 0
+  - heading: Physics Settings
+    text: Next we need to modify your Physics Settings.
+    linkText: 
+    url: 
+    pingSceneElement: 
+    settingsPage: Project/Physics
+    image: {fileID: 0}
+    imageHeight: 0
+  - heading: 
+    text: 'Set your <b>Gravity</b> to <b>X: 0, Y: -4.905, Z: 0</b>'
+    linkText: 
+    url: 
+    pingSceneElement: 
+    settingsPage: 
+    image: {fileID: 0}
+    imageHeight: 0
+  - heading: 
+    text: Reduce the <b>Default Max Depenetration Velocity</b> To <b>1</b>
+    linkText: 
+    url: 
+    pingSceneElement: 
+    settingsPage: 
+    image: {fileID: 0}
+    imageHeight: 0
+  - heading: 
+    text: Reduce the <b>Sleep Threshold</b> to <b>0.001</b>
+    linkText: 
+    url: 
+    pingSceneElement: 
+    settingsPage: 
+    image: {fileID: 0}
+    imageHeight: 0
+  - heading: 
+    text: Enable <b>Adaptive Force</b>
+    linkText: 
+    url: 
+    pingSceneElement: 
+    settingsPage: 
+    image: {fileID: 0}
+    imageHeight: 0
+  - heading: 
+    text: Set <b>Contacts Generation</b> to <b>Persistent Contact Manifold</b>
+    linkText: 
+    url: 
+    pingSceneElement: 
+    settingsPage: 
+    image: {fileID: 0}
+    imageHeight: 0
+  - heading: 
+    text: Change the <b>Friction Type</b> to <b>Two Directional Fricton</b>
+    linkText: 
+    url: 
+    pingSceneElement: 
+    settingsPage: 
+    image: {fileID: 0}
+    imageHeight: 0
+  - heading: 
+    text: Enable <b>Enchanced Determinism</b>
+    linkText: 
+    url: 
+    pingSceneElement: 
+    settingsPage: 
+    image: {fileID: 0}
+    imageHeight: 0
+  - heading: 
+    text: Change the <b>Solver Type</b> to <b>Temporal Gauss Seidel</b>
+    linkText: 
+    url: 
+    pingSceneElement: 
+    settingsPage: 
+    image: {fileID: 0}
+    imageHeight: 0
+  - heading: Modifying Physics Hands Settings
+    text: Most other Physics Hands settings can be changed via the <b>Physics Provider</b>.
+      This scene shows an ideal setup, where your original <b>Leap Provider</b> sends
+      data to the <b>Physics Provider</b>, which then sends data to the <b>Hand Binder</b>
+      for visuals.
+    linkText: 
+    url: 
+    pingSceneElement: Leap/PhysicsProvider
+    settingsPage: 
+    image: {fileID: 0}
+    imageHeight: 0
+  - heading: Adding Custom Physics Objects
+    text: Physics Hands work best when your <b>Rigibodies</b> have their <b>Collision
+      Detection Mode</b> set to either <b>Discrete</b> or <b>Continuous Speculative</b>.
+      Other collision modes will result in very poor results.
+    linkText: 
+    url: 
+    pingSceneElement: 
+    settingsPage: 
+    image: {fileID: 0}
+    imageHeight: 0

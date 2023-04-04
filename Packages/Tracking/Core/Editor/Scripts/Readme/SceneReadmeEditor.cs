@@ -188,6 +188,7 @@ namespace Leap.Unity.Readme
                 return;
             m_BodyStyle = new GUIStyle(EditorStyles.label);
             m_BodyStyle.wordWrap = true;
+            m_BodyStyle.richText = true;
             m_BodyStyle.fontSize = 14;
 
             m_InfoStyle = new GUIStyle(m_BodyStyle);
