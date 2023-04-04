@@ -6,6 +6,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
 
+## [NEXT]
+
+### Added
+
+### Changed
+- (Physics Hands) Significantly improved palm latency
+- (Physics Hands) Reduced overall forces of hands and fingers
+- (Physics Hands) Improved object weight movement (less wobbly, overall faster and more predictable)
+- (Physics Hands) Improved contact information of helpers
+- (Physics Hands) Removed grasp distance
+- (Physics Hands) Removed "strength" from the provider and replaced with per hand velocity limits
+- (Physics Hands) Grasp helpers now modify object mass on grasp and restore it on release
+
+### Fixed
+- (Physics Hands) Fixed joints exploding when teleporting the hand for one frame
+- (Physics Hands) Fixed wrist position becoming misaligned over time
+
 ## [6.7.0] - 3/4/23
 
 ### Added
@@ -34,15 +51,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (Physics Hands) Thumb joints reverted to revolute for non-0th thumb joints
 - (Physics Hands) Default physics hands solver iterations & presets
 - (Physics Hands) Heuristic calculations moved to WaitForFixedUpdate
-- (Physics Hands) Non-0th joints are now only revolute once again 
+- (Physics Hands) Non-0th joints are now only revolute once again
 - Reordered example assets to make it easier to traverse
-- (Physics Hands) Significantly improved palm latency
-- (Physics Hands) Reduced overall forces of hands and fingers
-- (Physics Hands) Improved object weight movement (less wobbly, overall faster and more predictable)
-- (Physics Hands) Improved contact information of helpers
-- (Physics Hands) Removed grasp distance
-- (Physics Hands) Removed "strength" from the provider and replaced with per hand velocity limits
-- (Physics Hands) Grasp helpers now modify object mass on grasp and restore it on release
 
 ### Fixed
 - (Physics Hands) Bone directions when converting back to Leap Hands
@@ -53,8 +63,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Creating objects from GameObject/Ultraleap/ menu makes more than just prefabs - Ghost Hands (with Arms)
 - (UIInput) several interaction events not firing when both direct and indirect interaction is enabled 
 - Incorrect warning of duplicate InteractionHands in InteractionManager
-- (Physics Hands) Fixed joints exploding when teleporting the hand for one frame
-- (Physics Hands) Fixed wrist position becoming misaligned over time
 
 ### Known issues 
 - Scenes containing the infrared viewer render incorrectly on Android build targets and in scriptable render pipelines such as URP and HDRP. 
