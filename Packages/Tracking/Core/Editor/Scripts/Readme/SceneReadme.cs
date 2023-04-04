@@ -11,7 +11,6 @@ namespace Leap.Unity.Readme
         public string title;
         public SceneAsset scene;
         public Section[] sections;
-        public bool loadedLayout;
 
         [Serializable]
         public class Section
