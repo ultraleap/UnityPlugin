@@ -15,8 +15,6 @@ namespace Leap.Unity.Readme
 
         private static float miniSpace = 3f;
 
-        private static SceneReadme sceneReadme = null;
-
         static SceneReadmeEditor()
         {
             EditorApplication.delayCall += FirstLoad;
@@ -29,10 +27,6 @@ namespace Leap.Unity.Readme
             {
                 SessionState.SetString(kReadmeScene, EditorSceneManager.GetActiveScene().path);
                 SelectSceneReadme();
-                if (sceneReadme != null)
-                {
-                    ActiveEditorTracker.sharedTracker.isLocked = true;
-                }
             }
         }
 
@@ -44,12 +38,11 @@ namespace Leap.Unity.Readme
         }
 
         [MenuItem("Window/Ultraleap/Show Readme For Scene")]
-        private static void SelectSceneReadme()
+        public static void SelectSceneReadme()
         {
             var ids = AssetDatabase.FindAssets("t:SceneReadme");
             if (ids.Length > 0)
             {
-                sceneReadme = null;
                 SceneAsset currentSceneFile = AssetDatabase.LoadAssetAtPath<SceneAsset>(EditorSceneManager.GetActiveScene().path);
                 for (int i = 0; i < ids.Length; i++)
                 {
@@ -65,7 +58,6 @@ namespace Leap.Unity.Readme
                         if (currentSceneFile == readmeObject.scene)
                         {
                             Selection.objects = new UnityEngine.Object[] { readmeObject };
-                            sceneReadme = readmeObject;
                             break;
                         }
                     }
