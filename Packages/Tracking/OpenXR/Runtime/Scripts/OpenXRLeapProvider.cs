@@ -277,7 +277,7 @@ namespace Ultraleap.Tracking.OpenXR
                     hand.GetFingerStrength(fingerIndex) < 0.4, // Fixed for now
                     (Finger.FingerType)fingerIndex);
             }
-            
+
             // Populate the whole hand information.
             // NOTE: Ordering is important as some of the `Calculate*` functions requires some of this data to be set.
             float handScale = CalculateHandScale(ref hand); // Requires fingers to be set.
