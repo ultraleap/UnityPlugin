@@ -86,7 +86,7 @@ namespace Leap.Unity.Preview.HandRays
                 if (!ShouldEnableRay())
                 {
                     HandRayEnabled = false;
-                    OnHandRayStateChange?.Invoke(handRayDirection, HandRayEnabled);
+                    InvokeHandRayStateChange();
                 }
                 else
                 {
@@ -100,7 +100,7 @@ namespace Leap.Unity.Preview.HandRays
                     HandRayEnabled = true;
                     ResetRay();
                     CalculateRayDirection();
-                    OnHandRayStateChange?.Invoke(handRayDirection, HandRayEnabled);
+                    InvokeHandRayStateChange();
                 }
             }
         }
@@ -124,6 +124,16 @@ namespace Leap.Unity.Preview.HandRays
             handRayDirection.RayOrigin = CalculateRayOrigin();
 
             handRayDirection.Direction = CalculateDirection();
+            InvokeHandRayFrame();
+        }
+
+        protected void InvokeHandRayStateChange()
+        {
+            OnHandRayStateChange?.Invoke(handRayDirection, HandRayEnabled);
+        }
+
+        protected void InvokeHandRayFrame()
+        {
             OnHandRayFrame?.Invoke(handRayDirection);
         }
 
