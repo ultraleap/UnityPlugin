@@ -3,7 +3,6 @@ using Leap.Unity;
 using Leap.Unity.Encoding;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.SpatialTracking;
 using UnityEngine.XR.Management;
@@ -15,18 +14,23 @@ namespace Ultraleap.Tracking.OpenXR
 {
     public class OpenXRLeapProvider : LeapProvider
     {
+        private class HandState
+        {
+            public int  Id;
+            public long FirstSeenTicks;
+            public long LastTrackedTicks;
+        }
+        
         private LeapTransform trackerTransform = new LeapTransform(Vector3.zero, Quaternion.identity);
 
         private Frame _currentFrame = new Frame();
+        private long _currentFrameId;
 
+        private int _lastHandId;
         private Hand _leftHand = new Hand();
         private Hand _rightHand = new Hand();
-
-        private int _handId = 0;
-        private int _leftHandId = 0;
-        private int _rightHandId = 0;
-        private long _leftHandFirstSeen_ticks;
-        private long _rightHandFirstSeen_ticks;
+        private HandState _leftHandState = new HandState();
+        private HandState _rightHandState = new HandState();
 
         // Magic 0th thumb bone rotation offsets from LeapC
         public const float HAND_ROTATION_OFFSET_Y = 25.9f, HAND_ROTATION_OFFSET_Z = -63.45f;
@@ -75,7 +79,7 @@ namespace Ultraleap.Tracking.OpenXR
         private TrackedPoseDriver _trackedPoseDriver;
         private HandJointLocation[] _joints;
 
-        public override TrackingSource TrackingDataSource { get { return CheckOpenXRAvailable(); } }
+        public override TrackingSource TrackingDataSource => CheckOpenXRAvailable();
 
         private TrackingSource CheckOpenXRAvailable()
         {
@@ -150,7 +154,7 @@ namespace Ultraleap.Tracking.OpenXR
         private void PopulateLeapFrame(ref Frame leapFrame)
         {
             leapFrame.Hands.Clear();
-            leapFrame.Id = _frameId++;
+            leapFrame.Id = _currentFrameId++;
             leapFrame.DeviceID = 0;
             leapFrame.Timestamp = (long)(Time.realtimeSinceStartup * 1000000f);
             leapFrame.CurrentFramesPerSecond = 1.0f / Time.smoothDeltaTime;
@@ -169,42 +173,35 @@ namespace Ultraleap.Tracking.OpenXR
         private bool PopulateLeapHandFromOpenXRJoints(HandTracker handTracker, ref Hand hand)
         {
             _joints ??= new HandJointLocation[handTracker.JointCount];
+            HandState handState = handTracker == HandTracker.Left ? _leftHandState : _rightHandState;
 
             if (!handTracker.TryLocateHandJoints(_joints))
             {
-                if (handTracker == HandTracker.Left)
-                {
-                    _leftHandFirstSeen_ticks = -1;
-                }
-                else
-                {
-                    _rightHandFirstSeen_ticks = -1;
-                }
-
+                handState.FirstSeenTicks = -1;
                 return false;
             }
 
             long currentDateTimeTicks = DateTime.Now.Ticks;
-
             float timeVisible = 0;
-            if (handTracker == HandTracker.Left)
+            float timeSinceTracked = 0;
+
+            if (handState.FirstSeenTicks == -1)
             {
-                if (_leftHandFirstSeen_ticks == -1)
-                {
-                    _leftHandFirstSeen_ticks = currentDateTimeTicks;
-                    _leftHandId = _handId++;
-                }
-                timeVisible = ((float)(currentDateTimeTicks - _leftHandFirstSeen_ticks)) / (float)TimeSpan.TicksPerSecond;
+                handState.FirstSeenTicks = currentDateTimeTicks;
+                handState.Id = _lastHandId++;
             }
             else
             {
-                if (_rightHandFirstSeen_ticks == -1)
-                {
-                    _rightHandFirstSeen_ticks = currentDateTimeTicks;
-                    _rightHandId = _handId++;
-                }
-                timeVisible = ((float)(currentDateTimeTicks - _rightHandFirstSeen_ticks)) /
-                              (float)TimeSpan.TicksPerSecond;
+                timeVisible = (float)(currentDateTimeTicks - handState.FirstSeenTicks) / TimeSpan.TicksPerSecond;
+            }
+
+            if (_joints[(int)HandJoint.Palm].IsTracked)
+            {
+                handState.LastTrackedTicks = currentDateTimeTicks;
+            }
+            else
+            {
+                timeSinceTracked = (DateTime.Now.Ticks - handState.LastTrackedTicks) / (float)TimeSpan.TicksPerSecond;
             }
 
             for (int fingerIndex = 0; fingerIndex < 5; fingerIndex++)
@@ -269,7 +266,7 @@ namespace Ultraleap.Tracking.OpenXR
 
                 // Populate the higher - level finger data.
                 hand.Fingers[fingerIndex].Fill(
-                    _frameId,
+                    _currentFrameId,
                     (handTracker == HandTracker.Left ? 0 : 1),
                     fingerIndex,
                     timeVisible,
@@ -286,7 +283,7 @@ namespace Ultraleap.Tracking.OpenXR
             float handScale = CalculateHandScale(ref hand); // Requires fingers to be set.
             hand.FrameId = _frameId;
             hand.Id = handTracker == HandTracker.Left ? _leftHandId : _rightHandId;
-            hand.Confidence = 1.0f;
+            hand.Confidence =  Mathf.Clamp01(Mathf.Clamp01(timeVisible * 5.0f) - Mathf.Clamp01(timeSinceTracked * 5.0f));
             hand.PalmWidth = handScale * DEFAULT_HAND_SCALE;
             hand.IsLeft = handTracker == HandTracker.Left;
             hand.TimeVisible = timeVisible;

@@ -3,25 +3,26 @@
     Properties
     {
         [NoScaleOffset] _MainTex("Texture", 2D) = "white" {}
-        [HDR]_MainColor("Main Color", Color) = (0,0,0,1)
+        [HDR] _MainColor("Main Color", Color) = (0,0,0,1)
 
         [MaterialToggle] _useOutline("Use Outline", Float) = 0
-        [HDR]_OutlineColor("Outline Color", Color) = (0,0,0,1)
+        [HDR] _OutlineColor("Outline Color", Color) = (0,0,0,1)
         _Outline("Outline width", Range(0,.2)) = .01
 
         [MaterialToggle] _useLighting("Use Lighting", Float) = 0
         _LightIntensity("Light Intensity", Range(0,1)) = 1
 
         [MaterialToggle] _useFresnel("Use Fresnel", Float) = 0
-        [HDR]_FresnelColor("Fresnel Color", Color) = (1,1,1,0)
+        [HDR] _FresnelColor("Fresnel Color", Color) = (1,1,1,0)
         _FresnelPower("Fresnel Power", Range(0,1)) = 1
+
+        [HideInInspector] _Confidence("Confidence Fade", Range(0,1)) = 1
     }
 
     CGINCLUDE
-
     #include "UnityCG.cginc"   // for & UNITY_VERTEX_OUTPUT_STEREO UnityObjectToWorldNormal() 
     #include "AutoLight.cginc" // for UNITY_SHADOW_COORDS() & UNITY_TRANSFER_SHADOW()
-    
+
     float4 _MainColor;
     float _Outline;
     float4 _OutlineColor;
@@ -32,6 +33,7 @@
     float _useLighting;
     float _useFresnel;
     float _useOutline;
+    float _Confidence;
 
     struct v2f
     {
@@ -44,14 +46,16 @@
         UNITY_VERTEX_OUTPUT_STEREO
         UNITY_SHADOW_COORDS(2) // Uses TEXCOORD2
     };
-
     ENDCG
 
     SubShader
     {
         Tags
         {
-            "Queue" = "Transparent" "IgnoreProjector" = "True" "RenderType" = "Transparent" "LightMode" = "ForwardBase"
+            "Queue" = "Transparent"
+            "IgnoreProjector" = "True"
+            "RenderType" = "Transparent"
+            "LightMode" = "ForwardBase"
         }
 
         ZWrite On
@@ -88,7 +92,7 @@
 
             half4 frag(v2f i) :COLOR
             {
-                fixed4 col = tex2D(_MainTex, i.uv) * _OutlineColor;
+                fixed4 col = tex2D(_MainTex, i.uv) * _OutlineColor * _Confidence * _Confidence;
                 return col;
             }
             ENDCG
@@ -125,7 +129,7 @@
             //This is the fresnel function that shader graph uses
             float Unity_FresnelEffect_float(float3 Normal, float3 ViewDir, float Power)
             {
-                return pow((1.0 - saturate(dot(normalize(Normal), normalize(ViewDir)))), Power);
+                return pow(1.0 - saturate(dot(normalize(Normal), normalize(ViewDir))), Power);
             }
 
             half4 frag(v2f i) :COLOR
@@ -134,12 +138,17 @@
                 col *= _MainColor;
 
                 if (_useLighting)
-                    col.rgb *= (i.diff * _LightIntensity);
+                {
+                    col.rgb *= i.diff * _LightIntensity;
+                }
+
                 if (_useFresnel)
+                {
                     col.rgb *= _FresnelColor * Unity_FresnelEffect_float(i.worldNormal, i.viewDir, _FresnelPower) *
                         _FresnelColor.a;
+                }
 
-                return col;
+                return col * _Confidence * _Confidence;
             }
             ENDCG
         }
