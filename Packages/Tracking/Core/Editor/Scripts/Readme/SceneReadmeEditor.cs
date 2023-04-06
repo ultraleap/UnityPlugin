@@ -150,6 +150,37 @@ namespace Leap.Unity.Readme
                             }
                         }
                     }
+                    if(section.assetLink != null)
+                    {
+                        GUILayout.Space(miniSpace);
+                        string pingText;
+                        if (!string.IsNullOrEmpty(section.assetLinkText))
+                        {
+                            pingText = section.assetLinkText;
+                        }
+                        else
+                        {
+                            if (section.assetLinkOpens)
+                            {
+                                pingText = $"Open {section.assetLink.name} from your Assets";
+                            }
+                            else
+                            {
+                                pingText = $"Ping {section.assetLink.name} in your Assets";
+                            }
+                        }
+                        if (GUILayout.Button(pingText))
+                        {
+                            if (section.assetLinkOpens)
+                            {
+                                AssetDatabase.OpenAsset(section.assetLink);
+                            }
+                            else
+                            {
+                                EditorGUIUtility.PingObject(section.assetLink);
+                            }
+                        }
+                    }
                     if (!string.IsNullOrEmpty(section.settingsPage))
                     {
                         GUILayout.Space(miniSpace);
