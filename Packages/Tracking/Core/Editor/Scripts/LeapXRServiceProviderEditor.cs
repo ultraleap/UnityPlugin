@@ -76,6 +76,7 @@ namespace Leap.Unity
             addPropertyToFoldout("_deviceOrigin", "Advanced Options");
             addPropertyToFoldout("_updateHandInPrecull", "Advanced Options");
             addPropertyToFoldout("_preventInitializingTrackingMode", "Advanced Options");
+            addPropertyToFoldout("_autoCreateTrackedPoseDriver", "Advanced Options");
             hideField("_trackingOptimization");
 
             targetTransform = (target as LeapXRServiceProvider).transform;

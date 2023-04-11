@@ -333,12 +333,25 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
                         if (i == 0)
                         {
-                            if (hand.GetOriginalLeapHand().PinchDistance / 1000f <= REQUIRED_PINCH_DISTANCE)
+                            for (int j = 1; j < 5; j++)
                             {
-                                c = 2;
-                                // Make very small pinches more sticky
-                                _graspingValues[hand].fingerStrength[0] *= 0.85f;
-                                _graspingValues[hand].fingerStrength[1] *= 0.85f;
+                                if (hand.GetOriginalLeapHand().GetFingerPinchDistance(j) <= REQUIRED_PINCH_DISTANCE)
+                                {
+                                    // Make very small pinches more sticky
+                                    _graspingValues[hand].fingerStrength[j] *= 0.85f;
+                                    if (c == 0)
+                                    {
+                                        c = 2;
+                                        _graspingValues[hand].fingerStrength[0] *= 0.85f;
+                                    }
+                                    else
+                                    {
+                                        c++;
+                                    }
+                                }
+                            }
+                            if (c > 0)
+                            {
                                 break;
                             }
                         }
@@ -346,10 +359,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
                         {
                             c++;
                         }
-                        if (c == 2)
-                            break;
                     }
-                    if (c == 2)
+                    if (c >= 2)
                     {
                         if (Manager.HelperMovesObjects && !Ignored && _graspingHands.Count == 0)
                         {
@@ -432,12 +443,10 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     if (fist.Value.fingerStrength[i] != -1)
                     {
                         c++;
-                        if (c == 2)
-                            break;
                     }
                 }
 
-                if (c == 2)
+                if (c >= 2)
                 {
                     SetBoneGrasping(fist, true);
                     continue;
@@ -792,7 +801,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             {
                 foreach (var hand in _graspingCandidates)
                 {
-                    hand.IgnoreCollision(_rigid, 0f, 0.04f);
+                    hand.IgnoreCollision(_rigid, 0f, 0.005f);
                 }
                 // We only want to apply the forces if we actually want to cause movement to the object
                 // We're still disabling collisions though to allow for the physics system to fully control if necessary
