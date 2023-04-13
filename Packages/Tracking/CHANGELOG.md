@@ -9,9 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [NEXT] - x/x/xx
 
 ### Added
-- Code to automatically create a basic curve for attraction reach distance on new instance of the script
+- (Anchorable Behaviour) Code to automatically create a basic curve for attraction reach distance on new instance of the script
 ### Changed
-- Ability to change the speed at which an object is attracted to the hand
+- (Anchorable Behaviour) Ability to change the speed at which an object is attracted to the hand
 
 
 ### Fixed
