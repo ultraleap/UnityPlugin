@@ -92,6 +92,36 @@ namespace Leap
             CreatePrefab("Pose Detector");
         }
 
+        [MenuItem("GameObject/Ultraleap/Interaction/InteractableCube", false, 20)]
+        public static void CreateInteractionCube()
+        {
+            CreatePrefab("InteractionCube");
+        }
+
+        [MenuItem("GameObject/Ultraleap/Interaction/3dButton", false, 20)]
+        public static void Create3dButton()
+        {
+            CreatePrefab("Interaction 3D UI Button");
+        }
+
+        [MenuItem("GameObject/Ultraleap/Interaction/3dUIPanel", false, 20)]
+        public static void Create3dUI()
+        {
+            CreatePrefab("Interaction 3D UI Panel");
+        }
+
+        [MenuItem("GameObject/Ultraleap/Interaction/AnchorableObject", false, 20)]
+        public static void CreateAnchorableObject()
+        {
+            CreatePrefab("Anchorable Object (Magenta)");
+        }
+
+        [MenuItem("GameObject/Ultraleap/Interaction/Anchor", false, 20)]
+        public static void CreateAnchor()
+        {
+            CreatePrefab("Anchor");
+        }
+
         public static void CreatePrefab(string prefabName)
         {
             var guids = AssetDatabase.FindAssets(prefabName);
