@@ -112,7 +112,7 @@ namespace Leap.Unity.InputModule
         public bool IsUserInteractingDirectly
         {
             get
-            { 
+            {
                 switch (module?.InteractionMode)
                 {
                     case InteractionCapability.Both:
@@ -206,7 +206,7 @@ namespace Leap.Unity.InputModule
             switch (module?.InteractionMode)
             {
                 case InteractionCapability.Both:
-                    return (PrevTriggeringInteraction && (!IsTriggeringInteraction(hand) || 
+                    return (PrevTriggeringInteraction && (!IsTriggeringInteraction(hand) ||
                         (PointerStateTactile == PointerStates.OffCanvas && PointerStateProjective == PointerStates.OffCanvas)));
 
                 case InteractionCapability.Direct:
@@ -504,7 +504,7 @@ namespace Leap.Unity.InputModule
                         CurrentGameObject = CurrentGameObjectUnderPointer;
 
                         //See if this object, or one of its parents, has a pointerDownHandler
-                        var gameObjectJustPressed = ExecuteEvents.ExecuteHierarchy(CurrentGameObject, EventData, 
+                        var gameObjectJustPressed = ExecuteEvents.ExecuteHierarchy(CurrentGameObject, EventData,
                             ExecuteEvents.pointerDownHandler);
 
                         //If not, see if one has a pointerClickHandler!
@@ -841,7 +841,7 @@ namespace Leap.Unity.InputModule
                     }
                 }
             }
-            
+
             if (StateChangeActionMap.TryGetValue((prevState, pointerState), out var result))
             {
                 result.Action.Invoke(module, this);

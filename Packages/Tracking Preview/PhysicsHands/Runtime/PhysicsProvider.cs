@@ -334,7 +334,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private IEnumerator LateFixedFrameProcess()
         {
             yield return null;
-            for(; ; )
+            for (; ; )
             {
                 if (_enableHelpers)
                 {

@@ -157,7 +157,18 @@ namespace Leap.Unity
         /// <param name="hand"></param>
         public override void SetLeapHand(Hand hand)
         {
-            _hand = hand;
+            if (hand != null)
+            {
+                if (_hand == null)
+                {
+                    _hand = new Hand();
+                }
+                _hand = _hand.CopyFrom(hand);
+            }
+            else
+            {
+                _hand = null;
+            }
         }
 
         /// <summary>
