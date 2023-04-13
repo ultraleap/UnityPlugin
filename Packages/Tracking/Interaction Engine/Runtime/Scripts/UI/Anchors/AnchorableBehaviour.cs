@@ -264,7 +264,7 @@ namespace Leap.Unity.Interaction
 
         [Tooltip("This curve converts the distance of the hand (X axis) to the desired attraction reach distance for the object (Y axis). "
                + "The evaluated value is clamped between 0 and 1, and then scaled by maxAttractionReach.")]
-        public AnimationCurve attractionReachByDistance;
+        public AnimationCurve attractionReachByDistance = new AnimationCurve(new Keyframe(0, 0), new Keyframe(1, 1));
 
         private Anchor _preferredAnchor = null;
         /// <summary>
