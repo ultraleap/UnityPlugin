@@ -276,7 +276,7 @@ namespace Leap
                     return Pose.identity;
                 
                 // Return a valid pose.
-                return new Pose(transformMatrix.GetPosition(), transformMatrix.rotation);
+                return new Pose(transformMatrix.GetColumn(3), transformMatrix.rotation);
             }
         }
 
