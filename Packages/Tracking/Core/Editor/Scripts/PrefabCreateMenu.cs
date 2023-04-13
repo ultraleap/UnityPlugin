@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -44,11 +44,79 @@ namespace Leap
             CreatePrefab("Service Provider (Screentop)");
         }
 
+        [MenuItem("GameObject/Ultraleap/Hands/Capsule Hands", false, 20)]
+        public static void CreateCapsuleHands()
+        {
+            CreatePrefab("CapsuleHands");
+        }
+
+        [MenuItem("GameObject/Ultraleap/Hands/Low Poly Hands", false, 21)]
+        public static void CreateLowPolyHands()
+        {
+            CreatePrefab("LowPolyHandsWithArms");
+        }
+
+        [MenuItem("GameObject/Ultraleap/Hands/Ghost Hands (with arms)", false, 22)]
+        public static void CreateGenericHand_Arm()
+        {
+            CreatePrefab("GenericHand_Arm");
+        }
+
+        [MenuItem("GameObject/Ultraleap/Hands/Ghost Hands", false, 23)]
+        public static void CreateGhostHands()
+        {
+            CreatePrefab("GhostHands");
+        }
+
+        [MenuItem("GameObject/Ultraleap/Hands/Outline Hands", false, 24)]
+        public static void CreateOutlineHands()
+        {
+            CreatePrefab("OutlineHands");
+        }
+
+        [MenuItem("GameObject/Ultraleap/Hands/Skeleton Hands", false, 25)]
+        public static void CreateSkeletonHands()
+        {
+            CreatePrefab("SkeletonHands");
+        }
+
+        [MenuItem("GameObject/Ultraleap/Hands/Attachment Hands", false, 26)]
+        public static void CreateAttachmentHands()
+        {
+            CreatePrefab("Attachment Hands");
+        }
+
+        [MenuItem("GameObject/Ultraleap/Pose Detection/Pose Detector", false, 20)]
+        public static void CreatePoseDetectorCapsuleHands()
+        {
+            CreatePrefab("Pose Detector");
+        }
+
         public static void CreatePrefab(string prefabName)
         {
             var guids = AssetDatabase.FindAssets(prefabName);
 
-            foreach(var guid in guids)
+            // look for exact matched first
+            foreach (var guid in guids)
+            {
+                string assetPath = AssetDatabase.GUIDToAssetPath(guid);
+
+                string[] assetPathSplit = assetPath.Split('/', '\\', '.');
+
+                if (assetPathSplit[assetPathSplit.Length - 2] == prefabName && assetPathSplit[assetPathSplit.Length - 1] == "prefab")
+                {
+                    GameObject newObject = (GameObject)AssetDatabase.LoadAssetAtPath(assetPath, typeof(GameObject));
+
+                    if (newObject != null)
+                    {
+                        HandleObjectCreation(newObject);
+                        return;
+                    }
+                }
+            }
+
+            // fallback to near-matches
+            foreach (var guid in guids)
             {
                 string assetPath = AssetDatabase.GUIDToAssetPath(guid);
                 GameObject newObject = (GameObject)AssetDatabase.LoadAssetAtPath(assetPath, typeof(GameObject));

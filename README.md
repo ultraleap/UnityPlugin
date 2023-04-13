@@ -34,13 +34,12 @@
 # Ultraleap Unity Plugin
 
 [![documentation](https://img.shields.io/badge/Documentation-docs.ultraleap.com-00cf75)][documentation]
-[![forum](https://img.shields.io/badge/Community-Developer%20Forum-00cf75)][developer-forum]
 [![mail](https://img.shields.io/badge/Contact-support%40ultraleap.com-00cf75)](mailto:support@ultraleap.com)
+[![discord](https://img.shields.io/badge/Discord-Server-blueviolet)][discord]
 ![GitHub](https://img.shields.io/github/license/ultraleap/UnityPlugin)
 
 [![openupm-tracking](https://img.shields.io/npm/v/com.ultraleap.tracking?label=OpenUPM%20Tracking&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.ultraleap.tracking/)
 [![openupm-tracking-preview](https://img.shields.io/npm/v/com.ultraleap.tracking.preview?label=OpenUPM%20Tracking%20Preview&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.ultraleap.tracking.preview/)
-[![openupm-tracking-openxr](https://img.shields.io/npm/v/com.ultraleap.tracking.openxr?label=OpenUPM%20Tracking%20OpenXR&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.ultraleap.tracking.openxr/)
 
 The Ultraleap Unity Plugin empowers developers to build Unity applications using Ultraleap's hand tracking technology. It includes various assets, examples, and utilities that make it easy to design and build applications using hand tracking in XR projects.
 
@@ -106,7 +105,7 @@ In `Edit -> Project Settings -> Package Manager`, add a new scoped registry with
 
   Ultraleap UPM packages should be available in the list. Click on the package you wish to install/modify.
   
-  Note: Ultraleap Tracking contains the Core, Hands and Interaction Engine modules. There are older packages created indepentently by a third party for these modules that are no longer updated.
+  Note: Ultraleap Tracking contains the Core, Hands and Interaction Engine modules. There are older packages created independently by a third party for these modules that are no longer updated.
 
   ![packagelist.png](Markdown/images/packagelist.png)
 
@@ -139,7 +138,7 @@ Git URL is available as another option to consume the UnityPlugin as a UPM packa
 > - Does not resolve dependencies automatically.
 > - Discovering versions requires looking through repository tags.
 >
-> If the OpenUPM workflow does not meet your needs, consider using the Local UPM Package contributor workflow instead of a Git URL. It is not suspectable to the non-deterministic version pitfall and will resolve dependencies automatically. However, the contributor workflow requires using git to change between versions.
+> If the OpenUPM workflow does not meet your needs, consider using the Local UPM Package contributor workflow instead of a Git URL. It is not susceptible to the non-deterministic version pitfall and will resolve dependencies automatically. However, the contributor workflow requires using git to change between versions.
 > Another alternative is to use 
 
 The headings below will guide you in accomplishing specific tasks tailored to the UnityPlugin but for more details it is recommended to read Unity's documentation for [installing using Git URL][upm-giturl-installing] and handling [Git dependencies][upm-giturl-dependencies].
@@ -296,7 +295,8 @@ Our Tracking Preview package gives you early access to additional functionality 
   - Combines hands seen by multiple devices into one aggregated pair of hands.
 - Hand Rays
   - Allows you to easily generate and use hand rays based on the hand position. Includes WristShoulderFarFieldHandRay as a default ray to use - this ray lets you blend between a wrist offset and inferred shoulder position as a ray origin to create a ray that is both expressive and stable. 
- 
+- Locomotion
+  - Hand Ray based teleportation using pinch and Jump Gems to move in a scene, to anchors or freely. Includes example scenes.
   
 ## Contributing
 

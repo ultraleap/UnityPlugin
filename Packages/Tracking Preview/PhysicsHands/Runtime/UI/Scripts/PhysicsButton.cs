@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -200,7 +200,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 _buttonElement = GetComponentInChildren<PhysicsButtonElement>(true);
             }
 
-            if(_buttonElement == null)
+            if (_buttonElement == null)
             {
                 Debug.LogError("The PhysicsButton is missing a PhysicsButtonElement and has been disabled. Please ensure it has been added and assigned.", this);
                 enabled = false;
@@ -258,7 +258,16 @@ namespace Leap.Unity.Interaction.PhysicsHands
         {
             if (_provider != null)
             {
+                ResetOnBadState();
                 ProcessPhysicsEvents();
+            }
+        }
+
+        private void ResetOnBadState()
+        {
+            if (_buttonElement.transform.localRotation.eulerAngles.magnitude > 0.25f)
+            {
+                _buttonElement.transform.localRotation = Quaternion.identity;
             }
         }
 
@@ -386,10 +395,10 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private void SetupJoint(ConfigurableJoint joint)
         {
             joint.connectedBody = _rigidbody;
-            joint.anchor = Vector3.up * 0.5f;
+            joint.anchor = Vector3.zero;
             joint.axis = Vector3.right;
             joint.autoConfigureConnectedAnchor = false;
-            joint.connectedAnchor = Vector3.up * buttonHeightLimit;
+            joint.connectedAnchor = Vector3.up * (buttonHeightLimit / 2f);
 
             joint.xMotion = ConfigurableJointMotion.Locked;
             joint.yMotion = ConfigurableJointMotion.Limited;
@@ -435,7 +444,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             softLimit.limit = heightLimit / 2f;
             _buttonElement.Joint.linearLimit = softLimit;
 
-            _buttonElement.Joint.connectedAnchor = Vector3.up * heightLimit;
+            _buttonElement.Joint.connectedAnchor = Vector3.up * (heightLimit / 2f);
             _buttonElement.Joint.targetPosition = Vector3.down * heightLimit;
         }
 
@@ -478,28 +487,31 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         private void OnValidate()
         {
-            if(_rigidbody == null)
+            if (_rigidbody == null)
             {
                 _rigidbody = GetComponent<Rigidbody>();
-                if(_rigidbody == null)
+                if (_rigidbody == null)
                 {
                     _rigidbody = gameObject.AddComponent<Rigidbody>();
                 }
             }
 
-            if(_buttonElement == null)
+            if (_buttonElement == null)
             {
                 _buttonElement = GetComponentInChildren<PhysicsButtonElement>(true);
             }
 
-            if (buttonToggleHeightLimit > buttonHeightLimit)
+            if (isToggleable)
             {
-                buttonHeightLimit = buttonToggleHeightLimit;
-            }
+                if (buttonToggleHeightLimit > buttonHeightLimit)
+                {
+                    buttonHeightLimit = buttonToggleHeightLimit;
+                }
 
-            if (buttonHeightLimit < buttonToggleHeightLimit)
-            {
-                buttonToggleHeightLimit = buttonHeightLimit;
+                if (buttonHeightLimit < buttonToggleHeightLimit)
+                {
+                    buttonToggleHeightLimit = buttonHeightLimit;
+                }
             }
 
             if (_buttonElement != null)

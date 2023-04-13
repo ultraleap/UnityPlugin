@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -37,6 +37,13 @@ namespace Leap.Unity.InputModule
         private InteractionCapability interactionMode = InteractionCapability.Both;
 
         public InteractionCapability InteractionMode => interactionMode;
+
+        //Should the pointer cursor be shown for direct interaction
+        [Tooltip("Show pointer cursor for direct interaction")]
+        [SerializeField]
+        private bool showDirectPointerCursor = true;
+
+        public bool ShowDirectPointerCursor => showDirectPointerCursor;
 
         //The LeapProvider providing tracking data to the scene.
         [Tooltip("The main camera used for calculating interactions.")]

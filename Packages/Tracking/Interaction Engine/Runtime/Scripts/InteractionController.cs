@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -1088,13 +1088,15 @@ namespace Leap.Unity.Interaction
             float errorDistance = 0f;
             float errorFraction = 0f;
 
+            float boneWidth = contactBone.width;
+
             Vector3 lastTargetPositionTransformedAhead = contactBone.lastTargetPosition;
             if (manager.hasMovingFrameOfReference)
             {
                 manager.TransformAheadByFixedUpdate(contactBone.lastTargetPosition, out lastTargetPositionTransformedAhead);
             }
             errorDistance = Vector3.Distance(lastTargetPositionTransformedAhead, body.position);
-            errorFraction = errorDistance / contactBone.width;
+            errorFraction = errorDistance / boneWidth;
 
             // Adjust the mass of the contact bone based on the mass of
             // the object it is currently touching.
@@ -1118,7 +1120,7 @@ namespace Leap.Unity.Interaction
             // Attempt to move the contact bone to its target position and rotation
             // by setting its target velocity and angular velocity. Include a "deadzone"
             // for position to avoid tiny vibrations.
-            float deadzone = Mathf.Min(DEAD_ZONE_FRACTION * contactBone.width, 0.01F * scale);
+            float deadzone = Mathf.Min(DEAD_ZONE_FRACTION * boneWidth, 0.01F * scale);
             Vector3 delta = (targetPosition - body.position);
             float deltaMag = delta.magnitude;
             if (deltaMag <= deadzone)

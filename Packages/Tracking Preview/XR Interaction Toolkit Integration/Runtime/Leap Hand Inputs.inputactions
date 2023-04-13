@@ -1,0 +1,274 @@
+{
+    "name": "Leap Hand Inputs",
+    "maps": [
+        {
+            "name": "Left Hand",
+            "id": "61d514fd-b74a-4024-91d9-33ad82e943eb",
+            "actions": [
+                {
+                    "name": "Tracked",
+                    "type": "Value",
+                    "id": "6f45222c-ddf2-4999-a084-2d70bc5dadbe",
+                    "expectedControlType": "Integer",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Palm Position",
+                    "type": "Value",
+                    "id": "39fa2c0c-ba70-4bfa-a2bf-32125b18535e",
+                    "expectedControlType": "Vector3",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Palm Direction",
+                    "type": "Value",
+                    "id": "c6f6e8f3-1276-4afd-b37d-9f1d5e4d1152",
+                    "expectedControlType": "Quaternion",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Index Tip Position",
+                    "type": "Value",
+                    "id": "37d6dc20-849b-4438-9a98-393b8b99f3b9",
+                    "expectedControlType": "Vector3",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Grabbing",
+                    "type": "Button",
+                    "id": "2b247621-c11e-4564-8733-e48bd9aa6bc0",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Pinching",
+                    "type": "Button",
+                    "id": "b0add372-8705-4313-b2be-92f43adcdff6",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "5c25ca7f-35e4-4baf-b6c1-ead8bdd315ab",
+                    "path": "<Leap Hand>{LeftHand}/Palm Position",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Palm Position",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "bdcdbefc-7f5e-4328-a721-7d5012553061",
+                    "path": "<Leap Hand>{LeftHand}/Index Tip Position",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Index Tip Position",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "e7f28911-b861-4a03-935e-34be8d2326bc",
+                    "path": "<Leap Hand>{LeftHand}/Is Grabbing",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Grabbing",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "cc4d4b6d-d87e-4b7c-8fa7-e7a54d652add",
+                    "path": "<Leap Hand>{LeftHand}/Is Pinching",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Pinching",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b298b394-ac26-4279-b216-8f60c87eb48c",
+                    "path": "<Leap Hand>{LeftHand}/Palm Direction",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Palm Direction",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "eff82bd9-cf34-404f-a673-46e7d2f62024",
+                    "path": "<Leap Hand>{LeftHand}/Tracked",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Tracked",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "Right Hand",
+            "id": "1e07793b-1320-47da-b3eb-05be10be58b1",
+            "actions": [
+                {
+                    "name": "Tracked",
+                    "type": "Value",
+                    "id": "4adc1681-3497-4308-9064-98d8fc982f12",
+                    "expectedControlType": "Integer",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Palm Position",
+                    "type": "Value",
+                    "id": "c5a3b86c-7b7d-4e8f-b57d-2003337f741f",
+                    "expectedControlType": "Vector3",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Palm Direction",
+                    "type": "Value",
+                    "id": "ce074d28-bea5-4edd-93bd-2473e5dda9a3",
+                    "expectedControlType": "Quaternion",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Index Tip Position",
+                    "type": "Value",
+                    "id": "04bc9ecb-d47a-461d-a45e-c32be9ffca2e",
+                    "expectedControlType": "Vector3",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Grabbing",
+                    "type": "Button",
+                    "id": "3ef8f0a0-4fa8-4db7-a2a2-5e73726ad242",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Pinching",
+                    "type": "Button",
+                    "id": "c1c63da3-9ed1-433b-84c9-30932f36e536",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "585ccf75-7403-46a8-972e-9a467b7a4374",
+                    "path": "<Leap Hand>{RightHand}/Palm Position",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Palm Position",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "3ae306a6-fc6b-4969-8107-1b66e96b883d",
+                    "path": "<Leap Hand>{RightHand}/Index Tip Position",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Index Tip Position",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "a5f59700-fe6e-4234-afff-5ac040d8cbe8",
+                    "path": "<Leap Hand>{RightHand}/Is Grabbing",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Grabbing",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "eb32d85c-2d24-4d70-a4be-ca9871e8a135",
+                    "path": "<Leap Hand>{RightHand}/Is Pinching",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Pinching",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "da824632-bfe6-440f-8d05-c65cf3f306a4",
+                    "path": "<Leap Hand>{RightHand}/Palm Direction",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Palm Direction",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b48d1eb2-bd59-47ea-8466-e84ed390907a",
+                    "path": "<Leap Hand>{RightHand}/Tracked",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Tracked",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": [
+        {
+            "name": "Ultraleap control scheme",
+            "bindingGroup": "Ultraleap control scheme",
+            "devices": [
+                {
+                    "devicePath": "<Leap Hand>",
+                    "isOptional": false,
+                    "isOR": false
+                }
+            ]
+        }
+    ]
+}

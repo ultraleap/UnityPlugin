@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -274,6 +274,9 @@ namespace Leap.Unity
             }
         }
 
+        [Tooltip("Automatically adds a TrackedPoseDriver to the MainCamera if there is not one already")]
+        public bool _autoCreateTrackedPoseDriver = true;
+
         #endregion
 
         #region Internal Memory
@@ -314,7 +317,7 @@ namespace Leap.Unity
             resetShaderTransforms();
 
 #if XR_MANAGEMENT_AVAILABLE
-            if (mainCamera.GetComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>() == null)
+            if (mainCamera.GetComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>() == null && _autoCreateTrackedPoseDriver)
             {
                 mainCamera.gameObject.AddComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>().UseRelativeTransform = true;
             }
@@ -505,7 +508,7 @@ namespace Leap.Unity
             return _leapController.Now()
                     - (long)_smoothedTrackingLatency.value
                     + ((updateHandInPrecull && !endOfFrame) ?
-                        (long)(Time.smoothDeltaTime * S_TO_NS / Time.timeScale)
+                        (long)(Time.smoothDeltaTime * S_TO_US / Time.timeScale)
                         : 0);
 #endif
         }

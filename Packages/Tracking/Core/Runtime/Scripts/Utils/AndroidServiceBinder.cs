@@ -29,6 +29,7 @@ namespace Leap.Unity
                 }
             }
 
+            IsBound = isBound;
             return isBound;
         }
 

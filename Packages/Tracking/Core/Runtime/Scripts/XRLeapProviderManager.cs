@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -9,7 +9,10 @@
 using System;
 using System.Collections;
 using UnityEngine;
+
+#if XR_MANAGEMENT_AVAILABLE
 using UnityEngine.XR.Management;
+#endif
 
 namespace Leap.Unity
 {
@@ -77,26 +80,37 @@ namespace Leap.Unity
         /// <summary>
         /// The chosen source of hand tracking data
         /// </summary>
-        [Tooltip("AUTOMATIC - Windows will use LeapService, other platforms will use OpenXR if available and LeapService if OpenXR if not" +
+        [Tooltip("AUTOMATIC - Windows will use LeapService, other platforms will use OpenXR if available and LeapService if OpenXR is not" +
                     "OPEN_XR - Use OpenXR as the source of tracking" +
                     "LEAP_DIRECT - Directly use LeapC as the source of tracking")]
         public TrackingSourceType trackingSource;
 
         private IEnumerator Start()
         {
+#if !XR_MANAGEMENT_AVAILABLE
+            trackingSource = TrackingSourceType.LEAP_DIRECT;
+            Debug.Log("Unity XR Management not available. Automatically selecting LEAP_DIRECT for Hand Tracking");
+#endif
+
             if (trackingSource == TrackingSourceType.AUTOMATIC)
             {
-                while (XRGeneralSettings.Instance == null) yield return new WaitForEndOfFrame();
-
+#if XR_MANAGEMENT_AVAILABLE
+                while (XRGeneralSettings.Instance == null ||
+                        XRGeneralSettings.Instance.Manager == null ||
+                        XRGeneralSettings.Instance.Manager.activeLoader == null)
+                {
+                    yield return new WaitForEndOfFrame();
+                }
+                
                 if (openXRLeapProvider != null && openXRLeapProvider.TrackingDataSource == TrackingSource.OPENXR_LEAP)
                 {
                     SelectTrackingSource(TrackingSourceType.OPEN_XR);
                 }
-                else if(leapXRServiceProvider != null && leapXRServiceProvider.TrackingDataSource == TrackingSource.LEAPC)
+                else if (leapXRServiceProvider != null && leapXRServiceProvider.TrackingDataSource == TrackingSource.LEAPC)
                 {
                     SelectTrackingSource(TrackingSourceType.LEAP_DIRECT);
                 }
-                else if(openXRLeapProvider != null && openXRLeapProvider.TrackingDataSource == TrackingSource.OPENXR)
+                else if (openXRLeapProvider != null && openXRLeapProvider.TrackingDataSource == TrackingSource.OPENXR)
                 {
                     SelectTrackingSource(TrackingSourceType.OPEN_XR);
                 }
@@ -105,6 +119,7 @@ namespace Leap.Unity
                     Debug.LogWarning("No hand tracking sources found");
                     yield break;
                 }
+#endif
             }
             else
             {
@@ -114,6 +129,8 @@ namespace Leap.Unity
             LeapProvider.gameObject.SetActive(true);
 
             OnProviderSet?.Invoke(LeapProvider);
+
+            yield break;
         }
 
 
@@ -133,7 +150,7 @@ namespace Leap.Unity
             {
                 LeapProvider = openXRLeapProvider;
 
-                if(openXRLeapProvider != null && openXRLeapProvider.TrackingDataSource == TrackingSource.OPENXR_LEAP)
+                if (openXRLeapProvider != null && openXRLeapProvider.TrackingDataSource == TrackingSource.OPENXR_LEAP)
                 {
                     Debug.Log("Using Ultraleap OpenXR for Hand Tracking");
                 }

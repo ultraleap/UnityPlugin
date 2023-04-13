@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -49,6 +49,10 @@ namespace Leap.Unity.HandsModule
         /// </summary>
         [Tooltip("Set the assigned transforms to the same position as the Leap Hand")]
         public bool SetPositions = true;
+
+
+        [Tooltip("Moves the elbow so that when the forearm scales the bone doesnt clip into the hand model. Particularly useful for non-skinned hands.")]
+        public bool UseScaleToPositionElbow = false;
 
         /// <summary> 
         /// Set the assigned transforms to the same position as the Leap Hand 
@@ -240,9 +244,12 @@ namespace Leap.Unity.HandsModule
                 float ratio = leapFingerLength / fingerTipLength;
                 //Adjust the ratio by an offset value exposed in the inspector and the overal scale that has been calculated
                 float adjustedRatio = (ratio * (finger.fingerTipScaleOffset) - BoundHand.scaleOffset);
-
+                //Adjust the ratio to account for service provider scale, assuming the service provider is uniformly scaled
+                var serviceProviderScale = leapProvider?.gameObject.transform.lossyScale.x ?? 1f;
+                adjustedRatio /= serviceProviderScale;
                 //Calculate the direction that goes up the bone towards the next bone
                 Vector3 direction = (intermediateBone.boundTransform.position - distalBone.boundTransform.position).normalized;
+
                 //Calculate which axis to scale along
                 Vector3 axis = CalculateAxis(distalBone.boundTransform, direction);
                 //Calculate the scale by ensuring all axis are 1 apart from the axis to scale along
@@ -266,13 +273,22 @@ namespace Leap.Unity.HandsModule
         /// </summary>
         void TransformElbow()
         {
+
+
             if (BoundHand.elbow.boundTransform != null)
             {
+
+                float scaleElbowLength = 1;
+                if (UseScaleToPositionElbow)
+                {
+                    scaleElbowLength = BoundHand.elbow.boundTransform.lossyScale.z;
+                }
+
                 //Calculate the direction of the elbow 
                 Vector3 dir = -LeapHand.Arm.Direction.normalized;
 
                 //Position the elbow at the models elbow length
-                Vector3 position = LeapHand.WristPosition + dir * (ElbowLength);
+                Vector3 position = LeapHand.WristPosition + dir * (ElbowLength * scaleElbowLength);
 
                 if (SetModelScale)
                 {
@@ -284,7 +300,7 @@ namespace Leap.Unity.HandsModule
                     else
                     {
                         //Use the models length to position the elbow and allow it to be mofied by elbow offset
-                        position = LeapHand.WristPosition + dir * (ElbowLength * BoundHand.elbowOffset);
+                        position = LeapHand.WristPosition + dir * ((ElbowLength * scaleElbowLength) * BoundHand.elbowOffset);
                     }
                 }
                 else
@@ -422,6 +438,10 @@ namespace Leap.Unity.HandsModule
         Vector3 CalculateAxis(Transform t, Vector3 dir)
         {
             var boneForward = t.InverseTransformDirection(dir.normalized).normalized;
+            // Ensure axes are positive to account for negative model scaling
+            boneForward.x = Mathf.Abs(boneForward.x);
+            boneForward.y = Mathf.Abs(boneForward.y);
+            boneForward.z = Mathf.Abs(boneForward.z);
             return boneForward;
         }
         #endregion

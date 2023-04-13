@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -43,11 +43,11 @@ namespace Leap.Unity.Interaction.PhysicsHands.Example
 
         private void FixedUpdate()
         {
-            if(_physicsProvider != null)
+            if (_physicsProvider != null)
             {
                 if (_physicsProvider.IsObjectHovered(_rigid))
                 {
-                    if(_physicsProvider.GetObjectState(_rigid, out var state))
+                    if (_physicsProvider.GetObjectState(_rigid, out var state))
                     {
                         _text.text = _prefix + state.ToString();
                     }

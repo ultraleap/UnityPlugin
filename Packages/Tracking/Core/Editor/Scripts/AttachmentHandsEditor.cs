@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -100,6 +100,19 @@ namespace Leap.Unity.Attachments
             EditorGUI.EndDisabledGroup();
 
             EditorGUILayout.EndVertical();
+
+            EditorGUILayout.Space();
+
+            if (GUILayout.Button("Clear all attachments"))
+            {
+                if (EditorUtility.DisplayDialog("Delete all attachments?",
+                                                   "Doing so will destroy all child GameObjects of " + target.gameObject.name + ".",
+                                                   "Delete", "Cancel"))
+                {
+                    target.attachmentPoints = AttachmentPointFlags.None;
+                    GUIUtility.ExitGUI();
+                }
+            }
         }
 
         private void makeAttachmentPointsToggle(string attachmentFlagName, Vector2 offCenterPosImgSpace)

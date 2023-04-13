@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -655,13 +655,31 @@ namespace Leap.Unity.Interaction
 
             if (preferredAnchor != null)
             {
-                _preferredAnchor = preferredAnchor;
-                anchor = preferredAnchor;
-                isAttached = true;
+                AttachToNearestAnchor(preferredAnchor);
                 return true;
             }
 
             return false;
+        }
+
+        public void AttachToNearestAnchor()
+        {
+            AttachToNearestAnchor(null);
+        }
+
+        private void AttachToNearestAnchor(Anchor preferredAnchor)
+        {
+            if (preferredAnchor == null)
+            {
+                preferredAnchor = FindPreferredAnchor();
+            }
+
+            if (preferredAnchor != null)
+            {
+                _preferredAnchor = preferredAnchor;
+                anchor = preferredAnchor;
+                isAttached = true;
+            }
         }
 
         /// <summary> Score an anchor based on its proximity and this object's trajectory relative to it. </summary>
