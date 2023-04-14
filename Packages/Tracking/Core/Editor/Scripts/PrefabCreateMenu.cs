@@ -92,31 +92,49 @@ namespace Leap
             CreatePrefab("Pose Detector");
         }
 
-        [MenuItem("GameObject/Ultraleap/Interaction/InteractableCube", false, 20)]
+        [MenuItem("GameObject/Ultraleap/Interaction/Interaction Manager", false, 20)]
+        public static void CreateInteractionManager()
+        {
+            CreatePrefab("Interaction Manager");
+        }
+
+        [MenuItem("GameObject/Ultraleap/Interaction/Interactable Cube", false, 21)]
         public static void CreateInteractionCube()
         {
             CreatePrefab("InteractionCube");
         }
 
-        [MenuItem("GameObject/Ultraleap/Interaction/3dButton", false, 20)]
-        public static void Create3dButton()
+        [MenuItem("GameObject/Ultraleap/Interaction/Simple 3D Button", false, 22)]
+        public static void CreateSimple3dButton()
         {
-            CreatePrefab("Interaction 3D UI Button");
+            CreatePrefab("Simple Interaction 3D UI Button");
         }
 
-        [MenuItem("GameObject/Ultraleap/Interaction/3dUIPanel", false, 20)]
+        [MenuItem("GameObject/Ultraleap/Interaction/Full 3D Button", false, 23)]
+        public static void Create3dButton()
+        {
+            CreatePrefab("Complex Interaction 3D UI Button");
+        }
+
+        [MenuItem("GameObject/Ultraleap/Interaction/3D UI Panel", false, 24)]
         public static void Create3dUI()
         {
             CreatePrefab("Interaction 3D UI Panel");
         }
 
-        [MenuItem("GameObject/Ultraleap/Interaction/AnchorableObject", false, 20)]
+        [MenuItem("GameObject/Ultraleap/Interaction/Attachment Hand Menu", false, 25)]
+        public static void CreateAttachmentHandMenu()
+        {
+            CreatePrefab("Attachment Hand Menu");
+        }
+
+        [MenuItem("GameObject/Ultraleap/Interaction/Anchorable Object", false, 26)]
         public static void CreateAnchorableObject()
         {
             CreatePrefab("Anchorable Object (Magenta)");
         }
 
-        [MenuItem("GameObject/Ultraleap/Interaction/Anchor", false, 20)]
+        [MenuItem("GameObject/Ultraleap/Interaction/Anchor", false, 27)]
         public static void CreateAnchor()
         {
             CreatePrefab("Anchor");

@@ -1,0 +1,731 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3141328478709323463
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3138176846596184247}
+  - component: {fileID: 3027549902683624709}
+  m_Layer: 0
+  m_Name: Interaction Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3138176846596184247
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3141328478709323463}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 3139595084681836933}
+  - {fileID: 3138226750446569147}
+  - {fileID: 5050163523033950295}
+  - {fileID: 5050103900492175619}
+  - {fileID: 5047300687608587072}
+  - {fileID: 5049931455092883916}
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3027549902683624709
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3141328478709323463}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0625e574c0d47a241b7dfc7a8c67ca2b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _interactionControllers:
+    _values:
+    - {fileID: 3029561150037234287}
+    - {fileID: 3027598717288697647}
+  hoverActivationRadius: 0.2
+  touchActivationRadius: 0.075
+  multiGraspHoldingMode: 0
+  _autoGenerateLayers: 1
+  _templateLayer:
+    layerIndex: 0
+  _interactionLayer:
+    layerIndex: 8
+  _interactionNoContactLayer:
+    layerIndex: 9
+  _contactBoneLayer:
+    layerIndex: 10
+  _drawControllerRuntimeGizmos: 0
+--- !u!1 &3141398297953789585
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3139595084681836933}
+  - component: {fileID: 3029561150037234287}
+  m_Layer: 0
+  m_Name: Interaction Hand (Left)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3139595084681836933
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3141398297953789585}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3138176846596184247}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3029561150037234287
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3141398297953789585}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29207d17cdd06e84d9fecbdef2401c1c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  manager: {fileID: 3027549902683624709}
+  _hoverEnabled: 1
+  _contactEnabled: 1
+  _graspingEnabled: 1
+  _leapProvider: {fileID: 0}
+  _handDataMode: 0
+  enabledPrimaryHoverFingertips: 0101010000
+--- !u!1 &3141401188232574305
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3138226750446569147}
+  - component: {fileID: 3027598717288697647}
+  m_Layer: 0
+  m_Name: Interaction Hand (Right)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3138226750446569147
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3141401188232574305}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3138176846596184247}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3027598717288697647
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3141401188232574305}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29207d17cdd06e84d9fecbdef2401c1c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  manager: {fileID: 3027549902683624709}
+  _hoverEnabled: 1
+  _contactEnabled: 1
+  _graspingEnabled: 1
+  _leapProvider: {fileID: 0}
+  _handDataMode: 1
+  enabledPrimaryHoverFingertips: 0101010000
+--- !u!1001 &5045404063624342140
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 3138176846596184247}
+    m_Modifications:
+    - target: {fileID: 1393620680427892, guid: 80e9754fad44e784f97f6c76a2c7255b, type: 3}
+      propertyPath: m_Name
+      value: VR Vive-style Controller (Left)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1393620680427892, guid: 80e9754fad44e784f97f6c76a2c7255b, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4360080876800316, guid: 80e9754fad44e784f97f6c76a2c7255b, type: 3}
+      propertyPath: m_RootOrder
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4360080876800316, guid: 80e9754fad44e784f97f6c76a2c7255b, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.0801
+      objectReference: {fileID: 0}
+    - target: {fileID: 4360080876800316, guid: 80e9754fad44e784f97f6c76a2c7255b, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.178
+      objectReference: {fileID: 0}
+    - target: {fileID: 4360080876800316, guid: 80e9754fad44e784f97f6c76a2c7255b, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.064
+      objectReference: {fileID: 0}
+    - target: {fileID: 4360080876800316, guid: 80e9754fad44e784f97f6c76a2c7255b, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4360080876800316, guid: 80e9754fad44e784f97f6c76a2c7255b, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4360080876800316, guid: 80e9754fad44e784f97f6c76a2c7255b, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4360080876800316, guid: 80e9754fad44e784f97f6c76a2c7255b, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4360080876800316, guid: 80e9754fad44e784f97f6c76a2c7255b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4360080876800316, guid: 80e9754fad44e784f97f6c76a2c7255b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4360080876800316, guid: 80e9754fad44e784f97f6c76a2c7255b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114384944290433142, guid: 80e9754fad44e784f97f6c76a2c7255b, type: 3}
+      propertyPath: _deviceJoystickTokens
+      value: openvr controller left
+      objectReference: {fileID: 0}
+    - target: {fileID: 114384944290433142, guid: 80e9754fad44e784f97f6c76a2c7255b, type: 3}
+      propertyPath: _enableObjectsOnlyWhenTracked.Array.size
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 114384944290433142, guid: 80e9754fad44e784f97f6c76a2c7255b, type: 3}
+      propertyPath: _enableObjectsOnlyWhenTracked.Array.data[2]
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 114384944290433142, guid: 80e9754fad44e784f97f6c76a2c7255b, type: 3}
+      propertyPath: _enableObjectsOnlyWhenTracked.Array.data[3]
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 114384944290433142, guid: 80e9754fad44e784f97f6c76a2c7255b, type: 3}
+      propertyPath: _enableObjectsOnlyWhenTracked.Array.data[4]
+      value: 
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 80e9754fad44e784f97f6c76a2c7255b, type: 3}
+--- !u!1 &5044052740624343816 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1393620680427892, guid: 80e9754fad44e784f97f6c76a2c7255b, type: 3}
+  m_PrefabInstance: {fileID: 5045404063624342140}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &5045404063624342136
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5044052740624343816}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 820cd3c2c5bc5794d9179a4f453271f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  intCtrl: {fileID: 5157326100794286602}
+  intHand: {fileID: 3029561150037234287}
+  OnInteractionHandEnabled:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: set_enabled
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+  OnInteractionHandDisabled:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: set_enabled
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+--- !u!4 &5047300687608587072 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4360080876800316, guid: 80e9754fad44e784f97f6c76a2c7255b, type: 3}
+  m_PrefabInstance: {fileID: 5045404063624342140}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &5157326100794286602 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 114384944290433142, guid: 80e9754fad44e784f97f6c76a2c7255b, type: 3}
+  m_PrefabInstance: {fileID: 5045404063624342140}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5044052740624343816}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e55d3703de8ab5d418cb97104179cb49, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!1001 &5045404063809943287
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 3138176846596184247}
+    m_Modifications:
+    - target: {fileID: 1135166102121244, guid: 40e809833d307ef4983e1e71fe56e23b, type: 3}
+      propertyPath: m_Name
+      value: VR Oculus-style Controller (Left)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1135166102121244, guid: 40e809833d307ef4983e1e71fe56e23b, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4829828358790816, guid: 40e809833d307ef4983e1e71fe56e23b, type: 3}
+      propertyPath: m_RootOrder
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4829828358790816, guid: 40e809833d307ef4983e1e71fe56e23b, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.0801
+      objectReference: {fileID: 0}
+    - target: {fileID: 4829828358790816, guid: 40e809833d307ef4983e1e71fe56e23b, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.17799997
+      objectReference: {fileID: 0}
+    - target: {fileID: 4829828358790816, guid: 40e809833d307ef4983e1e71fe56e23b, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.064
+      objectReference: {fileID: 0}
+    - target: {fileID: 4829828358790816, guid: 40e809833d307ef4983e1e71fe56e23b, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4829828358790816, guid: 40e809833d307ef4983e1e71fe56e23b, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4829828358790816, guid: 40e809833d307ef4983e1e71fe56e23b, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4829828358790816, guid: 40e809833d307ef4983e1e71fe56e23b, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4829828358790816, guid: 40e809833d307ef4983e1e71fe56e23b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4829828358790816, guid: 40e809833d307ef4983e1e71fe56e23b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4829828358790816, guid: 40e809833d307ef4983e1e71fe56e23b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114205148317838364, guid: 40e809833d307ef4983e1e71fe56e23b, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114205148317838364, guid: 40e809833d307ef4983e1e71fe56e23b, type: 3}
+      propertyPath: _deviceJoystickTokens
+      value: oculus touch left
+      objectReference: {fileID: 0}
+    - target: {fileID: 114205148317838364, guid: 40e809833d307ef4983e1e71fe56e23b, type: 3}
+      propertyPath: _enableObjectsOnlyWhenTracked.Array.size
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 114205148317838364, guid: 40e809833d307ef4983e1e71fe56e23b, type: 3}
+      propertyPath: _enableObjectsOnlyWhenTracked.Array.data[2]
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 114205148317838364, guid: 40e809833d307ef4983e1e71fe56e23b, type: 3}
+      propertyPath: _enableObjectsOnlyWhenTracked.Array.data[3]
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 114205148317838364, guid: 40e809833d307ef4983e1e71fe56e23b, type: 3}
+      propertyPath: _enableObjectsOnlyWhenTracked.Array.data[4]
+      value: 
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 40e809833d307ef4983e1e71fe56e23b, type: 3}
+--- !u!1 &5044286870678347243 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1135166102121244, guid: 40e809833d307ef4983e1e71fe56e23b, type: 3}
+  m_PrefabInstance: {fileID: 5045404063809943287}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &5045404063809943283
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5044286870678347243}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 820cd3c2c5bc5794d9179a4f453271f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  intCtrl: {fileID: 5157005000550210283}
+  intHand: {fileID: 3029561150037234287}
+  OnInteractionHandEnabled:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: set_enabled
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+  OnInteractionHandDisabled:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: set_enabled
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+--- !u!4 &5050163523033950295 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4829828358790816, guid: 40e809833d307ef4983e1e71fe56e23b, type: 3}
+  m_PrefabInstance: {fileID: 5045404063809943287}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &5157005000550210283 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 114205148317838364, guid: 40e809833d307ef4983e1e71fe56e23b, type: 3}
+  m_PrefabInstance: {fileID: 5045404063809943287}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5044286870678347243}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e55d3703de8ab5d418cb97104179cb49, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!1001 &5045404064304402727
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 3138176846596184247}
+    m_Modifications:
+    - target: {fileID: 1180994678239160, guid: 9361ab6d13ee87644bc370bccb524144, type: 3}
+      propertyPath: m_Name
+      value: VR Oculus-style Controller (Right)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1180994678239160, guid: 9361ab6d13ee87644bc370bccb524144, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4911511504652324, guid: 9361ab6d13ee87644bc370bccb524144, type: 3}
+      propertyPath: m_RootOrder
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4911511504652324, guid: 9361ab6d13ee87644bc370bccb524144, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.0801
+      objectReference: {fileID: 0}
+    - target: {fileID: 4911511504652324, guid: 9361ab6d13ee87644bc370bccb524144, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.17799997
+      objectReference: {fileID: 0}
+    - target: {fileID: 4911511504652324, guid: 9361ab6d13ee87644bc370bccb524144, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.064
+      objectReference: {fileID: 0}
+    - target: {fileID: 4911511504652324, guid: 9361ab6d13ee87644bc370bccb524144, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4911511504652324, guid: 9361ab6d13ee87644bc370bccb524144, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4911511504652324, guid: 9361ab6d13ee87644bc370bccb524144, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4911511504652324, guid: 9361ab6d13ee87644bc370bccb524144, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4911511504652324, guid: 9361ab6d13ee87644bc370bccb524144, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4911511504652324, guid: 9361ab6d13ee87644bc370bccb524144, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4911511504652324, guid: 9361ab6d13ee87644bc370bccb524144, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114252805458954098, guid: 9361ab6d13ee87644bc370bccb524144, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114252805458954098, guid: 9361ab6d13ee87644bc370bccb524144, type: 3}
+      propertyPath: _deviceJoystickTokens
+      value: oculus touch right
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 9361ab6d13ee87644bc370bccb524144, type: 3}
+--- !u!1 &5044262858211868319 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1180994678239160, guid: 9361ab6d13ee87644bc370bccb524144, type: 3}
+  m_PrefabInstance: {fileID: 5045404064304402727}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &5045404064304402723
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5044262858211868319}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 820cd3c2c5bc5794d9179a4f453271f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  intCtrl: {fileID: 5156911921497380437}
+  intHand: {fileID: 3027598717288697647}
+  OnInteractionHandEnabled:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: set_enabled
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+  OnInteractionHandDisabled:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: set_enabled
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+--- !u!4 &5050103900492175619 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4911511504652324, guid: 9361ab6d13ee87644bc370bccb524144, type: 3}
+  m_PrefabInstance: {fileID: 5045404064304402727}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &5156911921497380437 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 114252805458954098, guid: 9361ab6d13ee87644bc370bccb524144, type: 3}
+  m_PrefabInstance: {fileID: 5045404064304402727}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5044262858211868319}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e55d3703de8ab5d418cb97104179cb49, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!1001 &5045404065141998266
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 3138176846596184247}
+    m_Modifications:
+    - target: {fileID: 1257637052428748, guid: 72368278d054cda4bb18e5aa08ce971d, type: 3}
+      propertyPath: m_Name
+      value: VR Vive-style Controller (Right)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1257637052428748, guid: 72368278d054cda4bb18e5aa08ce971d, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4527397571117942, guid: 72368278d054cda4bb18e5aa08ce971d, type: 3}
+      propertyPath: m_RootOrder
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4527397571117942, guid: 72368278d054cda4bb18e5aa08ce971d, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.0801
+      objectReference: {fileID: 0}
+    - target: {fileID: 4527397571117942, guid: 72368278d054cda4bb18e5aa08ce971d, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.17799997
+      objectReference: {fileID: 0}
+    - target: {fileID: 4527397571117942, guid: 72368278d054cda4bb18e5aa08ce971d, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.064
+      objectReference: {fileID: 0}
+    - target: {fileID: 4527397571117942, guid: 72368278d054cda4bb18e5aa08ce971d, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4527397571117942, guid: 72368278d054cda4bb18e5aa08ce971d, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4527397571117942, guid: 72368278d054cda4bb18e5aa08ce971d, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4527397571117942, guid: 72368278d054cda4bb18e5aa08ce971d, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4527397571117942, guid: 72368278d054cda4bb18e5aa08ce971d, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4527397571117942, guid: 72368278d054cda4bb18e5aa08ce971d, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4527397571117942, guid: 72368278d054cda4bb18e5aa08ce971d, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114446365300099102, guid: 72368278d054cda4bb18e5aa08ce971d, type: 3}
+      propertyPath: _deviceJoystickTokens
+      value: openvr controller right
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 72368278d054cda4bb18e5aa08ce971d, type: 3}
+--- !u!1 &5044198242600743798 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1257637052428748, guid: 72368278d054cda4bb18e5aa08ce971d, type: 3}
+  m_PrefabInstance: {fileID: 5045404065141998266}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &5045404065141998246
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5044198242600743798}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 820cd3c2c5bc5794d9179a4f453271f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  intCtrl: {fileID: 5157316598345091748}
+  intHand: {fileID: 3027598717288697647}
+  OnInteractionHandEnabled:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: set_enabled
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+  OnInteractionHandDisabled:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: set_enabled
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+--- !u!4 &5049931455092883916 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4527397571117942, guid: 72368278d054cda4bb18e5aa08ce971d, type: 3}
+  m_PrefabInstance: {fileID: 5045404065141998266}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &5157316598345091748 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 114446365300099102, guid: 72368278d054cda4bb18e5aa08ce971d, type: 3}
+  m_PrefabInstance: {fileID: 5045404065141998266}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5044198242600743798}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e55d3703de8ab5d418cb97104179cb49, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
