@@ -6,6 +6,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
 
+## [NEXT] - x/x/xx
+
+### Added
+- (Anchorable Behaviour) Code to automatically create a basic curve for attraction reach distance on new instance of the script
+### Changed
+- (Anchorable Behaviour) Ability to change the speed at which an object is attracted to the hand
+
+
+### Fixed
+
+
+### Known issues 
+
+
 ## [6.7.0] - 3/4/23
 
 ### Added
