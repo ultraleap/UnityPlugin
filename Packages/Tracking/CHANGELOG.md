@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - (Anchorable Behaviour) Code to automatically create a basic curve for attraction reach distance on new instance of the script
+- (Interaction Engine) New options to the create menu under "Interaction", can now create:
+	- Interaction Cube, Interaction 3D Button (Simple & Complex), Interaction 3D UI panel, (Anchorable Behavoiur) Anchor, (Anchorable Behaviour) Anchorable Object, Attachment Hand Menu, Interaction Manacher
+
 ### Changed
 - (Anchorable Behaviour) Ability to change the speed at which an object is attracted to the hand
 
