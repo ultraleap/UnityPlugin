@@ -16,7 +16,6 @@ namespace Leap.Unity.Preview.InputActions
     {
         SerializedProperty inputLeapProviderProp;
 
-        SerializedProperty directionSourceProp;
         SerializedProperty isPinchingIsBinaryProp;
         SerializedProperty isGrabbingIsBinaryProp;
 

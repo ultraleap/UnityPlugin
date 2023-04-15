@@ -26,14 +26,14 @@ namespace Leap.Unity.Preview.InputActions
 
         private InputDevice leftDevice, rightDevice;
 
-        [Tooltip("Should the pinching InputAction be set via a binary decision, or a float PinchStrength?")]
-        public bool pinchingIsBinary = true;
+        [SerializeField, Tooltip("Should the pinching InputAction be set via a binary decision, or a float PinchStrength?")]
+        private bool pinchingIsBinary = true;
 
-        [Tooltip("Should the grabbing InputAction be set via a binary decision, or a float GrabStrength?")]
-        public bool grabbingIsBinary = true;
+        [SerializeField, Tooltip("Should the grabbing InputAction be set via a binary decision, or a float GrabStrength?")]
+        private bool grabbingIsBinary = true;
 
-        [Tooltip("Should interactions (e.g. grabbing and pinching) reset when the hand is lost?")]
-        public bool resetInteractionsOnTrackingLost = true;
+        [SerializeField, Tooltip("Should interactions (e.g. selecting and activating) reset when the hand is lost?")]
+        private bool resetInteractionsOnTrackingLost = true;
 
         private void Start()
         {
@@ -58,7 +58,7 @@ namespace Leap.Unity.Preview.InputActions
 
         public override void ProcessFrame(ref Frame inputFrame)
         {
-            // Do nothing as we should update the input system based in its own events
+            // Do nothing as we should update the input system based in its own InputSystem.onBeforeUpdate events
         }
 
         /// <summary>
@@ -73,7 +73,7 @@ namespace Leap.Unity.Preview.InputActions
                     ConvertLeapHandToState(ref handState, hand);
                     InputSystem.QueueStateEvent(inputDevice, handState);
                 }
-                else
+                else // No hand, so handle relevant states
                 {
                     if (handState.tracked != 0)
                     {
@@ -91,9 +91,13 @@ namespace Leap.Unity.Preview.InputActions
             }
         }
 
+        /// <summary>
+        /// Update all InputActions within the LeapHandState based on the given Hand
+        /// This uses delegates to allow users to be able to override the values based on their own use cases
+        /// </summary>
         private void ConvertLeapHandToState(ref LeapHandState state, Hand hand)
         {
-            LeapHandStateOverrides stateOverrides = hand.IsLeft == true ? leftHandOverrides : rightHandOverrides;
+            LeapHandStateDelegates stateOverrides = hand.IsLeft == true ? leftHandStateDelegates : rightHandStateDelegates;
 
             state.tracked = stateOverrides.trackedDelegate(hand);
 
@@ -115,21 +119,24 @@ namespace Leap.Unity.Preview.InputActions
 
         #region Default State Getters
 
+        /// <summary>
+        /// Set each of the default "Getters" to their relevant delegate
+        /// </summary>
         void SetupDefaultStateGetters()
         {
-            leftHandOverrides.trackedDelegate = GetTrackedState;
-            leftHandOverrides.selectDelegate = GetSelecting;
-            leftHandOverrides.activateDelegate = GetActvating;
-            leftHandOverrides.palmPositionDelegate = GetPalmPosition;
-            leftHandOverrides.palmDirectionDelegate = GetPalmDirection;
-            leftHandOverrides.aimPositionDelegate = GetAimPosition;
-            leftHandOverrides.aimDirectionDelegate = GetAimDirection;
-            leftHandOverrides.pinchPositionDelegate = GetPinchPosition;
-            leftHandOverrides.pinchDirectionDelegate = GetPinchDirection;
-            leftHandOverrides.pokePositionDelegate = GetPokePosition;
-            leftHandOverrides.pokeDirectionDelegate = GetPokeDirection;
+            leftHandStateDelegates.trackedDelegate = GetTrackedState;
+            leftHandStateDelegates.selectDelegate = GetSelecting;
+            leftHandStateDelegates.activateDelegate = GetActvating;
+            leftHandStateDelegates.palmPositionDelegate = GetPalmPosition;
+            leftHandStateDelegates.palmDirectionDelegate = GetPalmDirection;
+            leftHandStateDelegates.aimPositionDelegate = GetAimPosition;
+            leftHandStateDelegates.aimDirectionDelegate = GetAimDirection;
+            leftHandStateDelegates.pinchPositionDelegate = GetPinchPosition;
+            leftHandStateDelegates.pinchDirectionDelegate = GetPinchDirection;
+            leftHandStateDelegates.pokePositionDelegate = GetPokePosition;
+            leftHandStateDelegates.pokeDirectionDelegate = GetPokeDirection;
 
-            rightHandOverrides = leftHandOverrides;
+            rightHandStateDelegates = leftHandStateDelegates;
         }
 
         int GetTrackedState(Hand hand)
@@ -277,8 +284,19 @@ namespace Leap.Unity.Preview.InputActions
 
         #endregion
 
-        #region User Possible Overrides
-        public struct LeapHandStateOverrides
+        #region User State Overrides
+
+        /// <summary>
+        /// A collection of delegates for users to override with their own methods if necessary.
+        /// E.g. If LeapHandStateDelegates.aimPositionDelegate = OverrideAimPosToPalmPos, it would always return the palm position of hand:
+        /// 
+        ///     Vector3 OverrideAimPosToPalmPos(Hand hand)
+        ///     { 
+        ///         return hand.PalmPosition;
+        ///     }
+        ///     
+        /// </summary>
+        public struct LeapHandStateDelegates
         {
             public IntFromHandDelegate trackedDelegate;
 
@@ -303,8 +321,8 @@ namespace Leap.Unity.Preview.InputActions
         public delegate Vector3 PositionFromHandDelegate(Hand hand);
         public delegate Quaternion RotationFromHandDelegate(Hand hand);
 
-        public LeapHandStateOverrides leftHandOverrides;
-        public LeapHandStateOverrides rightHandOverrides;
+        public LeapHandStateDelegates leftHandStateDelegates;
+        public LeapHandStateDelegates rightHandStateDelegates;
 
         #endregion
     }
