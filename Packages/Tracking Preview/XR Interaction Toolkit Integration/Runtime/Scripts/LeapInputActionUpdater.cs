@@ -16,33 +16,21 @@ using UnityEngine.InputSystem.Layouts;
 namespace Leap.Unity.Preview.InputActions
 {
     /// <summary>
-    /// PALM_DIRECTION - Uses the palm normal to set the direction of the hands
-    /// PINCH_DIRECTION - Determines a pinch direction based on an assumed shoulder position relative to the camera
-    /// </summary>
-    public enum LeapInputDirection
-    {
-        PALM_DIRECTION,
-        PINCH_DIRECTION
-    }
-
-    /// <summary>
     /// Updates Ultraleap Input Actions with the latest available hand data
     /// Must be provided information from a LeapProvider
     /// </summary>
+    [DefaultExecutionOrder(-1)]
     public class LeapInputActionUpdater : PostProcessProvider
     {
-        private LeapHandState _leftState = new LeapHandState(), _rightState = new LeapHandState();
+        private LeapHandState leftState = new LeapHandState(), rightState = new LeapHandState();
 
-        private InputDevice _leftDevice, _rightDevice;
-
-        [Tooltip("The source of the hand direction output. Adjust depending on your use case")]
-        public LeapInputDirection directionSource = LeapInputDirection.PINCH_DIRECTION;
+        private InputDevice leftDevice, rightDevice;
 
         [Tooltip("Should the pinching InputAction be set via a binary decision, or a float PinchStrength?")]
-        public bool isPinchingIsBinary = true;
+        public bool pinchingIsBinary = true;
 
         [Tooltip("Should the grabbing InputAction be set via a binary decision, or a float GrabStrength?")]
-        public bool isGrabbingIsBinary = true;
+        public bool grabbingIsBinary = true;
 
         [Tooltip("Should interactions (e.g. grabbing and pinching) reset when the hand is lost?")]
         public bool resetInteractionsOnTrackingLost = true;
@@ -50,6 +38,8 @@ namespace Leap.Unity.Preview.InputActions
         private void Start()
         {
             InputSystem.onBeforeUpdate += InputSystem_onBeforeUpdate;
+
+            SetupDefaultStateGetters();
         }
 
         private void OnDestroy()
@@ -61,19 +51,14 @@ namespace Leap.Unity.Preview.InputActions
         {
             if (Application.isPlaying)
             {
-                UpdateStateWithLeapHand(_leftDevice, _inputLeapProvider.CurrentFrame.GetHand(Chirality.Left), ref _leftState);
-                UpdateStateWithLeapHand(_rightDevice, _inputLeapProvider.CurrentFrame.GetHand(Chirality.Right), ref _rightState);
+                UpdateStateWithLeapHand(leftDevice, _inputLeapProvider.CurrentFrame.GetHand(Chirality.Left), ref leftState);
+                UpdateStateWithLeapHand(rightDevice, _inputLeapProvider.CurrentFrame.GetHand(Chirality.Right), ref rightState);
             }
         }
 
         public override void ProcessFrame(ref Frame inputFrame)
         {
-            // Running this on ProcessFrame causes jittery results. Probably due to the way the QueueStateEvent is handled, use InputSystem.onBeforeUpdate instead
-            //if (Application.isPlaying) 
-            //{
-            //    UpdateStateWithLeapHand(_leftDevice, inputFrame.GetHand(Chirality.Left), ref _leftState);
-            //    UpdateStateWithLeapHand(_rightDevice, inputFrame.GetHand(Chirality.Right), ref _rightState);
-            //}
+            // Do nothing as we should update the input system based in its own events
         }
 
         /// <summary>
@@ -96,8 +81,8 @@ namespace Leap.Unity.Preview.InputActions
 
                         if (resetInteractionsOnTrackingLost)
                         {
-                            handState.isGrabbing = 0;
-                            handState.isPinching = 0;
+                            handState.activating = 0;
+                            handState.selecting = 0;
                         }
 
                         InputSystem.QueueStateEvent(inputDevice, handState);
@@ -108,23 +93,98 @@ namespace Leap.Unity.Preview.InputActions
 
         private void ConvertLeapHandToState(ref LeapHandState state, Hand hand)
         {
-            state.tracked = (int)(UnityEngine.XR.InputTrackingState.Position | UnityEngine.XR.InputTrackingState.Rotation);
-            state.position = hand.PalmPosition;
+            LeapHandStateOverrides stateOverrides = hand.IsLeft == true ? leftHandOverrides : rightHandOverrides;
 
-            switch (directionSource)
-            {
-                case LeapInputDirection.PALM_DIRECTION:
-                    state.direction = Quaternion.LookRotation(hand.PalmNormal, hand.Direction);
-                    break;
-                case LeapInputDirection.PINCH_DIRECTION:
-                    state.direction = GetSimpleShoulderPinchDirection(hand);
-                    break;
-            }
+            state.tracked = stateOverrides.trackedDelegate(hand);
 
-            state.indexTipPosition = hand.Fingers[1].Bone(Bone.BoneType.TYPE_DISTAL).NextJoint;
+            state.selecting = stateOverrides.selectDelegate(hand);
+            state.activating = stateOverrides.activateDelegate(hand);
 
-            state.isGrabbing = isGrabbingIsBinary ? (hand.GrabStrength > 0.8 ? 1 : 0) : hand.GrabStrength;
-            state.isPinching = isPinchingIsBinary ? (hand.PinchStrength > 0.8 ? 1 : 0) : hand.PinchStrength;
+            state.palmPosition = stateOverrides.palmPositionDelegate(hand);
+            state.palmDirection = stateOverrides.palmDirectionDelegate(hand);
+
+            state.aimPosition = stateOverrides.aimPositionDelegate(hand);
+            state.aimDirection = stateOverrides.aimDirectionDelegate(hand);
+
+            state.pinchPosition = stateOverrides.pinchPositionDelegate(hand);
+            state.pinchDirection = stateOverrides.pinchDirectionDelegate(hand);
+
+            state.pokePosition = stateOverrides.pokePositionDelegate(hand);
+            state.pokeDirection = stateOverrides.pokeDirectionDelegate(hand);
+        }
+
+        #region Default State Getters
+
+        void SetupDefaultStateGetters()
+        {
+            leftHandOverrides.trackedDelegate = GetTrackedState;
+            leftHandOverrides.selectDelegate = GetSelecting;
+            leftHandOverrides.activateDelegate = GetActvating;
+            leftHandOverrides.palmPositionDelegate = GetPalmPosition;
+            leftHandOverrides.palmDirectionDelegate = GetPalmDirection;
+            leftHandOverrides.aimPositionDelegate = GetAimPosition;
+            leftHandOverrides.aimDirectionDelegate = GetAimDirection;
+            leftHandOverrides.pinchPositionDelegate = GetPinchPosition;
+            leftHandOverrides.pinchDirectionDelegate = GetPinchDirection;
+            leftHandOverrides.pokePositionDelegate = GetPokePosition;
+            leftHandOverrides.pokeDirectionDelegate = GetPokeDirection;
+
+            rightHandOverrides = leftHandOverrides;
+        }
+
+        int GetTrackedState(Hand hand)
+        {
+            return (int)(UnityEngine.XR.InputTrackingState.Position | UnityEngine.XR.InputTrackingState.Rotation);
+        }
+
+        float GetSelecting(Hand hand)
+        {
+            return pinchingIsBinary ? (hand.PinchStrength > 0.8 ? 1 : 0) : hand.PinchStrength;
+        }
+
+        float GetActvating(Hand hand)
+        {
+            return grabbingIsBinary ? (hand.GrabStrength > 0.8 ? 1 : 0) : hand.GrabStrength;
+        }
+
+        Vector3 GetPalmPosition(Hand hand)
+        {
+            return hand.PalmPosition;
+        }
+
+        Quaternion GetPalmDirection(Hand hand)
+        {
+            return Quaternion.LookRotation(hand.PalmNormal, hand.Direction);
+        }
+
+        Vector3 GetAimPosition(Hand hand)
+        {
+            return hand.GetPredictedPinchPosition();
+        }
+
+        Quaternion GetAimDirection(Hand hand)
+        {
+            return GetSimpleShoulderPinchDirection(hand);
+        }
+
+        Vector3 GetPinchPosition(Hand hand)
+        {
+            return hand.GetPredictedPinchPosition();
+        }
+
+        Quaternion GetPinchDirection(Hand hand)
+        {
+            return Quaternion.LookRotation(hand.GetPredictedPinchPosition() - hand.Fingers[1].Bone(Bone.BoneType.TYPE_PROXIMAL).PrevJoint);
+        }
+
+        Vector3 GetPokePosition(Hand hand)
+        {
+            return hand.Fingers[1].Bone(Bone.BoneType.TYPE_DISTAL).NextJoint;
+        }
+
+        Quaternion GetPokeDirection(Hand hand)
+        {
+            return Quaternion.LookRotation(hand.Fingers[1].Bone(Bone.BoneType.TYPE_DISTAL).NextJoint - hand.Fingers[1].Bone(Bone.BoneType.TYPE_DISTAL).PrevJoint);
         }
 
         /// <summary>
@@ -142,6 +202,8 @@ namespace Leap.Unity.Preview.InputActions
 
             return Quaternion.LookRotation(direction);
         }
+
+        #endregion
 
         // "Leap Bone" is Not currently required as we are not sending full data
         //public static void ConvertLeapBoneToState(ref LeapBone outBone, Bone inBone)
@@ -162,22 +224,22 @@ namespace Leap.Unity.Preview.InputActions
                 product = "Leap Hand"
             };
 
-            _leftDevice = InputSystem.AddDevice(hand);
+            leftDevice = InputSystem.AddDevice(hand);
 
             try
             {
-                InputSystem.SetDeviceUsage(_leftDevice, CommonUsages.LeftHand);
+                InputSystem.SetDeviceUsage(leftDevice, CommonUsages.LeftHand);
             }
             catch
             {
                 ShowWarning();
             }
 
-            _rightDevice = InputSystem.AddDevice(hand);
+            rightDevice = InputSystem.AddDevice(hand);
 
             try
             {
-                InputSystem.SetDeviceUsage(_rightDevice, CommonUsages.RightHand);
+                InputSystem.SetDeviceUsage(rightDevice, CommonUsages.RightHand);
             }
             catch
             {
@@ -192,13 +254,13 @@ namespace Leap.Unity.Preview.InputActions
 
         private void OnDeviceRemoved()
         {
-            if (_leftDevice != null)
+            if (leftDevice != null)
             {
-                InputSystem.RemoveDevice(_leftDevice);
+                InputSystem.RemoveDevice(leftDevice);
             }
-            if (_rightDevice != null)
+            if (rightDevice != null)
             {
-                InputSystem.RemoveDevice(_rightDevice);
+                InputSystem.RemoveDevice(rightDevice);
             }
         }
 
@@ -212,6 +274,37 @@ namespace Leap.Unity.Preview.InputActions
         {
             OnDeviceRemoved();
         }
+
+        #endregion
+
+        #region User Possible Overrides
+        public struct LeapHandStateOverrides
+        {
+            public IntFromHandDelegate trackedDelegate;
+
+            public FloatFromHandDelegate selectDelegate;
+            public FloatFromHandDelegate activateDelegate;
+
+            public PositionFromHandDelegate palmPositionDelegate;
+            public RotationFromHandDelegate palmDirectionDelegate;
+
+            public PositionFromHandDelegate aimPositionDelegate;
+            public RotationFromHandDelegate aimDirectionDelegate;
+
+            public PositionFromHandDelegate pinchPositionDelegate;
+            public RotationFromHandDelegate pinchDirectionDelegate;
+
+            public PositionFromHandDelegate pokePositionDelegate;
+            public RotationFromHandDelegate pokeDirectionDelegate;
+        }
+
+        public delegate int IntFromHandDelegate(Hand hand);
+        public delegate float FloatFromHandDelegate(Hand hand);
+        public delegate Vector3 PositionFromHandDelegate(Hand hand);
+        public delegate Quaternion RotationFromHandDelegate(Hand hand);
+
+        public LeapHandStateOverrides leftHandOverrides;
+        public LeapHandStateOverrides rightHandOverrides;
 
         #endregion
     }

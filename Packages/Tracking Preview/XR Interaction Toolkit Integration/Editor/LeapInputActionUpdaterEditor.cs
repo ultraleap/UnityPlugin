@@ -28,9 +28,8 @@ namespace Leap.Unity.Preview.InputActions
 
             inputLeapProviderProp = serializedObject.FindProperty("_inputLeapProvider");
 
-            directionSourceProp = serializedObject.FindProperty("directionSource");
-            isPinchingIsBinaryProp = serializedObject.FindProperty("isPinchingIsBinary");
-            isGrabbingIsBinaryProp = serializedObject.FindProperty("isGrabbingIsBinary");
+            isPinchingIsBinaryProp = serializedObject.FindProperty("pinchingIsBinary");
+            isGrabbingIsBinaryProp = serializedObject.FindProperty("grabbingIsBinary");
 
             resetInteractionsProp = serializedObject.FindProperty("resetInteractionsOnTrackingLost");
         }
@@ -44,10 +43,6 @@ namespace Leap.Unity.Preview.InputActions
             EditorGUILayout.Space();
 
             EditorGUILayout.PropertyField(inputLeapProviderProp);
-
-            EditorGUILayout.Space();
-
-            EditorGUILayout.PropertyField(directionSourceProp);
 
             EditorGUILayout.Space();
 
