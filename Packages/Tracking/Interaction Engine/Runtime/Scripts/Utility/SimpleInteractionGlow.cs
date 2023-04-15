@@ -6,11 +6,9 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity;
-using Leap.Unity.Interaction;
 using UnityEngine;
 
-namespace Leap.Unity.InteractionEngine.Examples
+namespace Leap.Unity.Interaction
 {
     /// <summary>
     /// This simple script changes the color of an InteractionBehaviour as
@@ -25,18 +23,18 @@ namespace Leap.Unity.InteractionEngine.Examples
         public bool useHover = true;
 
         [Tooltip("If enabled, the object will use its primaryHoverColor when the primary hover of an InteractionHand.")]
-        public bool usePrimaryHover = false;
+        public bool usePrimaryHover = true;
 
         [Header("InteractionBehaviour Colors")]
-        public Color defaultColor = Color.Lerp(Color.black, Color.white, 0.1F);
+        public Color defaultColor = Color.white;
 
         public Color suspendedColor = Color.red;
-        public Color hoverColor = Color.Lerp(Color.black, Color.white, 0.7F);
-        public Color primaryHoverColor = Color.Lerp(Color.black, Color.white, 0.8F);
+        public Color hoverColor = new Color(1, 0.05f, 0.65f, 1);
+        public Color primaryHoverColor = new Color(1, 0.55f, 0, 1);
 
         [Header("InteractionButton Colors")]
         [Tooltip("This color only applies if the object is an InteractionButton or InteractionSlider.")]
-        public Color pressedColor = Color.white;
+        public Color pressedColor = new Color(0, 1, 0.45f, 1);
 
         private Material[] _materials;
 
@@ -71,7 +69,6 @@ namespace Leap.Unity.InteractionEngine.Examples
         {
             if (_materials != null)
             {
-
                 // The target color for the Interaction object will be determined by various simple state checks.
                 Color targetColor = defaultColor;
 
@@ -110,6 +107,10 @@ namespace Leap.Unity.InteractionEngine.Examples
                 {
                     targetColor = pressedColor;
                 }
+                else if(_intObj.isGrasped)
+                {
+                    targetColor = pressedColor;
+                }
 
                 // Lerp actual material color to the target color.
                 for (int i = 0; i < _materials.Length; i++)
@@ -118,6 +119,5 @@ namespace Leap.Unity.InteractionEngine.Examples
                 }
             }
         }
-
     }
 }
