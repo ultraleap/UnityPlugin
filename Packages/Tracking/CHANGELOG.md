@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (Physics Hands) Removed grasp distance
 - (Physics Hands) Removed "strength" from the provider and replaced with per hand velocity limits
 - (Physics Hands) Grasp helpers now modify object mass on grasp and restore it on release
+- (Hand Rays) TransformWristShoulderRay interpolates direction, rather than aim position
 
 ### Fixed
 - (Physics Hands) Fixed joints exploding when teleporting the hand for one frame
@@ -57,6 +58,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (Physics Hands) Heuristic calculations moved to WaitForFixedUpdate
 - (Physics Hands) Non-0th joints are now only revolute once again
 - Reordered example assets to make it easier to traverse
+
 
 ### Fixed
 - (Physics Hands) Bone directions when converting back to Leap Hands
