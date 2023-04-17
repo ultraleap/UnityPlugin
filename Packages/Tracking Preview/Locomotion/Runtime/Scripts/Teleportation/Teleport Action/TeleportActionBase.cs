@@ -296,16 +296,7 @@ namespace Leap.Unity.Preview.Locomotion
 
         protected void SelectTeleport(bool selected = true)
         {
-            if (selected && !IsSelected)
-            {
-                OnTeleportSelected?.Invoke(true);
-            }
-            else if (!selected && IsSelected)
-            {
-                OnTeleportSelected?.Invoke(false);
-            }
-
-
+            bool wasSelected = IsSelected;
             _isSelected = selected;
             if (handRayRenderer != null)
             {
@@ -335,6 +326,15 @@ namespace Leap.Unity.Preview.Locomotion
             else
             {
                 freeTeleportAnchor.gameObject.SetActive(!(movementType == TeleportActionMovementType.FIXED));
+            }
+
+            if (selected && !wasSelected)
+            {
+                OnTeleportSelected?.Invoke(true);
+            }
+            else if (!selected && wasSelected)
+            {
+                OnTeleportSelected?.Invoke(false);
             }
         }
 
