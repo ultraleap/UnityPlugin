@@ -86,7 +86,13 @@ namespace Leap.Unity.Interaction.PhysicsHands
             return false;
         }
 
-        private bool Grasped(PhysicsHand hand, int finger)
+        /// <summary>
+        /// Returns true if the finger on the provided hand is grasping, and false if not
+        /// </summary>
+        /// <param name="hand">The hand to check</param>
+        /// <param name="finger">The finger to check</param>
+        /// <returns>If the finger on the provided hand is grasped</returns>
+        public bool Grasped(PhysicsHand hand, int finger)
         {
             if (_bones.TryGetValue(hand, out var bones))
             {
