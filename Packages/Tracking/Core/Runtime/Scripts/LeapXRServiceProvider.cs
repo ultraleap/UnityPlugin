@@ -593,20 +593,27 @@ namespace Leap.Unity
             // Normalize the rotation Quaternion.
             warpedRotation = warpedRotation.ToNormalized();
 
-            // If we are NOT using a transform to offset the tracking
-            if (_deviceOffsetMode != DeviceOffsetMode.Transform)
+            switch (_deviceOffsetMode)
             {
-                warpedPosition += warpedRotation * Vector3.up * deviceOffsetYAxis
-                                + warpedRotation * Vector3.forward * deviceOffsetZAxis;
-                warpedRotation *= Quaternion.Euler(deviceTiltXAxis, 0f, 0f);
+                case DeviceOffsetMode.Default:
+                    if (_currentDevice != null)
+                    {
+                        warpedPosition += warpedRotation * _currentDevice.DevicePose.position;
+                        warpedRotation *= _currentDevice.DevicePose.rotation;
+                    }
+                    warpedRotation *= Quaternion.Euler(-90f, 180f, 0f);
+                    break;
+                case DeviceOffsetMode.ManualHeadOffset:
+                    warpedPosition += warpedRotation * Vector3.up * deviceOffsetYAxis
+                                    + warpedRotation * Vector3.forward * deviceOffsetZAxis;
+                    warpedRotation *= Quaternion.Euler(deviceTiltXAxis, 0f, 0f);
 
-                warpedRotation *= Quaternion.Euler(-90f, 180f, 0f);
+                    warpedRotation *= Quaternion.Euler(-90f, 180f, 0f);
+                    break;
+                case DeviceOffsetMode.Transform:
+                    warpedRotation *= Quaternion.Euler(-90f, 90f, 90f);
+                    break;
             }
-            else
-            {
-                warpedRotation *= Quaternion.Euler(-90f, 90f, 90f);
-            }
-
 
             // Use the mainCamera parent to transfrom the warped positions so the player can move around
             if (mainCamera.transform.parent != null)
