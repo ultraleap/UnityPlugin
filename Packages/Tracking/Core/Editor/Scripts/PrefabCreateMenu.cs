@@ -80,6 +80,18 @@ namespace Leap
             CreatePrefab("SkeletonHands");
         }
 
+        [MenuItem("GameObject/Ultraleap/Hands/Attachment Hands", false, 26)]
+        public static void CreateAttachmentHands()
+        {
+            CreatePrefab("Attachment Hands");
+        }
+
+        [MenuItem("GameObject/Ultraleap/Pose Detection/Pose Detector", false, 20)]
+        public static void CreatePoseDetectorCapsuleHands()
+        {
+            CreatePrefab("Pose Detector");
+        }
+
         public static void CreatePrefab(string prefabName)
         {
             var guids = AssetDatabase.FindAssets(prefabName);

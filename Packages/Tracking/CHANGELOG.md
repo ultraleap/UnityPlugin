@@ -6,16 +6,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
 
-
-## [NEXT] - unreleased
+## [NEXT] - x/x/xx
 
 ### Added
+- (Anchorable Behaviour) Code to automatically create a basic curve for attraction reach distance on new instance of the script
+
+### Changed
+- (Anchorable Behaviour) Ability to change the speed at which an object is attracted to the hand
+- (Physics Hands) Significantly improved palm latency
+- (Physics Hands) Reduced overall forces of hands and fingers
+- (Physics Hands) Improved object weight movement (less wobbly, overall faster and more predictable)
+- (Physics Hands) Improved contact information of helpers
+- (Physics Hands) Removed grasp distance
+- (Physics Hands) Removed "strength" from the provider and replaced with per hand velocity limits
+- (Physics Hands) Grasp helpers now modify object mass on grasp and restore it on release
+- (Hand Rays) TransformWristShoulderRay interpolates direction, rather than aim position
+
+### Fixed
+- (Physics Hands) Fixed joints exploding when teleporting the hand for one frame
+- (Physics Hands) Fixed wrist position becoming misaligned over time
+
+### Known issues 
+
+## [6.7.0] - 3/4/23
+
+### Added
+- Brand new pose detection feature!
+	- Pose Detector (Invokes events when the chosen pose is made)
+	- Pose Detection Library (A library of pre-defined poses)
+		- Thumbs up, OK, Point, Open palm, Fist, Horns
+	- Pose Recorder (To record poses of your own)
+	- New Example Scenes
+		- Pose Recorder (A scene set up for you to record poses of your own)
+		- Pose Detection (A barebones scene to show how you can use the detector in your own scenes)
+		- Pose Showcase (To view and try out our new library of poses)
+			- Thumbs up, Thumbs down, OK, Point, Open palm up, Open palm down, Fist, Horns
 - (Physics Hands) Warnings for gravity and timestep settings
 - (Physics Hands) Exposed interaction mask
 - (Physics Hands) Dynamically adjusting fingers when grabbing objects
 - (Physics Hands) Distance calculations and values for each bone
 - Per finger pinch distances in HandUtils
-- Added advanced option to LeapXRServiceProvider to avoid adding TrackedPoseDrivers to MainCamera 
+- Ability for AnchorableBehaviours to attach on demand
+- Added advanced option to LeapXRServiceProvider to avoid adding TrackedPoseDrivers to MainCamera
+- Ability to clear all attachments on AttachmentHands component
+- (UIInput) Added an option to hide the pointer cursor when hands are interacting with UI elements in direct/tactile mode
 
 ### Changed
 - (Physics Hands) Reduced hand to object collision radius when throwing and testing overlaps
@@ -23,7 +57,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (Physics Hands) Default physics hands solver iterations & presets
 - (Physics Hands) Heuristic calculations moved to WaitForFixedUpdate
 - (Physics Hands) Non-0th joints are now only revolute once again
-- (Hand Rays) TransformWristShoulderRay interpolates direction, rather than aim position
+- Reordered example assets to make it easier to traverse
+
 
 ### Fixed
 - (Physics Hands) Bone directions when converting back to Leap Hands
@@ -32,6 +67,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - "Pullcord" jitters when being interacted with
 - Hand Binder finger tip scale disproportionately when LeapProvider Transform is scaled
 - Creating objects from GameObject/Ultraleap/ menu makes more than just prefabs - Ghost Hands (with Arms)
+- (UIInput) several interaction events not firing when both direct and indirect interaction is enabled 
 - Incorrect warning of duplicate InteractionHands in InteractionManager
 
 ### Known issues 
