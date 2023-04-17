@@ -145,8 +145,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         private WaitForFixedUpdate _waitForFixedUpdate = new WaitForFixedUpdate();
 
-        public bool oldPalmMethod = false;
-
         private void Awake()
         {
             _leftOriginalLeap = new Hand();
