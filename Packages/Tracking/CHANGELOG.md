@@ -10,15 +10,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - (Anchorable Behaviour) Code to automatically create a basic curve for attraction reach distance on new instance of the script
+
 ### Changed
 - (Anchorable Behaviour) Ability to change the speed at which an object is attracted to the hand
-
+- (Physics Hands) Significantly improved palm latency
+- (Physics Hands) Reduced overall forces of hands and fingers
+- (Physics Hands) Improved object weight movement (less wobbly, overall faster and more predictable)
+- (Physics Hands) Improved contact information of helpers
+- (Physics Hands) Removed grasp distance
+- (Physics Hands) Removed "strength" from the provider and replaced with per hand velocity limits
+- (Physics Hands) Grasp helpers now modify object mass on grasp and restore it on release
 
 ### Fixed
-
+- (Physics Hands) Fixed joints exploding when teleporting the hand for one frame
+- (Physics Hands) Fixed wrist position becoming misaligned over time
 
 ### Known issues 
-
 
 ## [6.7.0] - 3/4/23
 
