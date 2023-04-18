@@ -250,7 +250,9 @@ namespace Leap
         /// Reports the ID assoicated with the device
         /// </summary>
         public uint DeviceID { get; private set; }
-        
+
+        private Pose devicePose = Pose.identity;
+
         /// <summary>
         /// The transform to world coordinates from 3D Leap coordinates.
         /// </summary>
@@ -258,6 +260,11 @@ namespace Leap
         {
             get
             {
+                if(devicePose != Pose.identity) // Assumes the devicePose never changes and so, uses the cached pose.
+                {
+                    return devicePose;
+                }
+
                 eLeapRS result = LeapC.GetDeviceTransform(InternalHandle, out float[] data);
                 if (result != eLeapRS.eLeapRS_Success)
                     return Pose.identity;

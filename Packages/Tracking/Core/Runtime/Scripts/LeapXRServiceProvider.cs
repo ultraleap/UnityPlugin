@@ -27,15 +27,9 @@ namespace Leap.Unity
 
         #region Inspector
         // Manual Device Offset
-#if UNITY_ANDROID
-        private const float DEFAULT_DEVICE_OFFSET_Y_AXIS = -0.0114f;
-        private const float DEFAULT_DEVICE_OFFSET_Z_AXIS = 0.0981f;
-        private const float DEFAULT_DEVICE_TILT_X_AXIS = 0f;
-#else
         private const float DEFAULT_DEVICE_OFFSET_Y_AXIS = 0f;
-        private const float DEFAULT_DEVICE_OFFSET_Z_AXIS = 0.12f;
-        private const float DEFAULT_DEVICE_TILT_X_AXIS = 5f;
-#endif
+        private const float DEFAULT_DEVICE_OFFSET_Z_AXIS = 0.08f;
+        private const float DEFAULT_DEVICE_TILT_X_AXIS = 0f;
 
         /// <summary>
         /// Supported modes for device offset. Used for deviceOffsetMode which allows 
@@ -44,8 +38,8 @@ namespace Leap.Unity
         public enum DeviceOffsetMode
         {
             /// <summary>
-            /// Defaults to constants set at the top of LeapServiceProvider 
-            /// (currently: offset y axis = 0; offset z axis = 0.12; tilt x axis = 5)
+            /// Uses pre-defined offsets, if none are available, falls back to 
+            /// the constants at the top of the LeapXRServiceProvider.cs
             /// </summary>
             Default,
             /// <summary>
@@ -598,8 +592,17 @@ namespace Leap.Unity
                 case DeviceOffsetMode.Default:
                     if (_currentDevice != null)
                     {
-                        warpedPosition += warpedRotation * _currentDevice.DevicePose.position;
-                        warpedRotation *= _currentDevice.DevicePose.rotation;
+                        if (_currentDevice.DevicePose != Pose.identity)
+                        {
+                            warpedPosition += warpedRotation * _currentDevice.DevicePose.position;
+                            warpedRotation *= _currentDevice.DevicePose.rotation;
+                        }
+                        else // Fall back to the consts if we are given a Pose.identity as it is assumed to be false
+                        {
+                            warpedPosition += warpedRotation * Vector3.up * deviceOffsetYAxis
+                                            + warpedRotation * Vector3.forward * deviceOffsetZAxis;
+                            warpedRotation *= Quaternion.Euler(deviceTiltXAxis, 0f, 0f);
+                        }
                     }
                     warpedRotation *= Quaternion.Euler(-90f, 180f, 0f);
                     break;
