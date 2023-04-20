@@ -131,9 +131,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
         // These events are place holders
         public Action<Rigidbody> OnHover, OnHoverExit;
 
+        public Action<Rigidbody> OnContact, OnContactExit;
+        
         public Action<Rigidbody> OnGrasp, OnGraspExit;
 
-        public Action<Rigidbody> OnContact, OnContactExit;
+        public Action<Rigidbody> OnGraspedPinch, OnGraspedUnpinch;
 
         public Action<Rigidbody, PhysicsGraspHelper> OnObjectStateChange;
 
@@ -818,6 +820,62 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 {
                     hand = helper.GraspingHands[helper.GraspingHands.Count - 1];
                     return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Reports whether a rigidbody is currently being pinched.
+        /// Only returns true if that rigidbody is also being grapsed.
+        /// A pinch is defined as thumb tip to provided finger tip.
+        /// If no finger is provided, we default to index.
+        /// </summary>
+        /// <param name="rigid">The rigidbody you want to check</param>
+        /// <param name="finger">The finger to check if is pinching</param>
+        /// <returns></returns>
+        public bool IsPinchingObject(Rigidbody rigid, int finger = 1)
+        {
+            return IsPinchingObject(rigid, out PhysicsHand _, finger);
+        }
+
+        /// <summary>
+        /// Reports whether a rigidbody is currently being pinched, while providing the current dominant hand pinching it.
+        /// Only returns true if that rigidbody is also being grapsed.
+        /// A pinch is defined as thumb tip to provided finger tip.
+        /// If no finger is provided, we default to index.
+        /// </summary>
+        /// <param name="rigid">The rigidbody you want to check</param>
+        /// <param name="finger">The finger to check if is pinching</param>
+
+        public bool IsPinchingObject(Rigidbody rigid, out PhysicsHand hand, int finger = 1)
+        {
+            hand = null;
+            if (_graspHelpers.TryGetValue(rigid, out PhysicsGraspHelper helper))
+            {
+                if (helper.GraspState == PhysicsGraspHelper.State.Grasp && helper.GraspingHands.Count > 0)
+                {
+                    hand = helper.GraspingHands[helper.GraspingHands.Count - 1];
+
+                    // If thumb isn't grasping, then we're unable to pinch
+                    if (!helper.Grasped(hand, 0))
+                    {
+                        return false;
+                    }
+
+                    Hand originalLeapHand = hand.GetOriginalLeapHand();
+                    Vector3 thumbTipPos = originalLeapHand.GetThumb().TipPosition;
+
+                    // If tips are close enough to count as pinching
+                    if (Vector3.Distance(thumbTipPos, originalLeapHand.Fingers[finger].TipPosition) < 0.015f)
+                    {
+                        // If the pinched finger is grasping
+                        if (helper.Grasped(hand, finger))
+                        {
+                            return true;
+                        }
+                    }
+
                 }
             }
             return false;
