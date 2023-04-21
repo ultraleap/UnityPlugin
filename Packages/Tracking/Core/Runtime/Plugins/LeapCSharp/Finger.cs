@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -21,6 +21,12 @@ namespace Leap
     [Serializable]
     public class Finger
     {
+        /// <summary>
+        /// An array of Bone objects that represents each bone of the finger
+        /// 
+        /// There are 4 bones per finger by default
+        /// @since 3.0
+        /// </summary>
         public Bone[] bones = new Bone[4];
 
         /// <summary>
@@ -129,7 +135,7 @@ namespace Leap
 
         /// <summary>
         /// The direction in which this finger or tool is pointing. The direction is expressed 
-        /// as a unit vector pointing in the same direction as the tip.
+        /// as a unit vector pointing in the same direction as the intermediate bone.
         /// @since 1.0
         /// </summary>
         public Vector3 Direction;

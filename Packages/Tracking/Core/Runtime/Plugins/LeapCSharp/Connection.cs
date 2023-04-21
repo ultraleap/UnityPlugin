@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -21,7 +21,7 @@ namespace LeapInternal
             public readonly int connectionId;
             public readonly string serverNamespace;
 
-            public Key(int connectionId, string serverNamespace = null)
+            public Key(int connectionId, string serverNamespace = "Leap Service")
             {
                 this.connectionId = connectionId;
                 this.serverNamespace = serverNamespace;
@@ -416,6 +416,11 @@ namespace LeapInternal
             if (LeapFrame != null)
             {
                 LeapFrame.DispatchOnContext(this, EventContext, new FrameEventArgs(new Frame(deviceID).CopyFrom(ref trackingMsg)));
+            }
+
+            if (LeapInternalFrame != null)
+            {
+                LeapInternalFrame.DispatchOnContext(this, EventContext, new InternalFrameEventArgs(ref trackingMsg));
             }
         }
 
@@ -1020,6 +1025,56 @@ namespace LeapInternal
         }
 
         /// <summary>
+        /// Temporarily makes a connection to determine if a Service is available.
+        /// Returns the result and closes the temporary connection upon completion.
+        /// </summary>
+        public static bool IsConnectionAvailable(string serverNamespace = "Leap Service")
+        {
+            LEAP_CONNECTION_CONFIG config = new LEAP_CONNECTION_CONFIG();
+            config.server_namespace = Marshal.StringToHGlobalAnsi(serverNamespace);
+            config.flags = 0;
+            config.size = (uint)Marshal.SizeOf(config);
+
+            IntPtr tempConnection;
+
+            eLeapRS result;
+
+            result = LeapC.CreateConnection(ref config, out tempConnection);
+
+            if (result != eLeapRS.eLeapRS_Success || tempConnection == IntPtr.Zero)
+            {
+                LeapC.CloseConnection(tempConnection);
+                return false;
+            }
+
+            result = LeapC.OpenConnection(tempConnection);
+
+            if (result != eLeapRS.eLeapRS_Success)
+            {
+                LeapC.CloseConnection(tempConnection);
+                return false;
+            }
+
+            LEAP_CONNECTION_MESSAGE _msg = new LEAP_CONNECTION_MESSAGE();
+            uint timeout = 150;
+            result = LeapC.PollConnection(tempConnection, timeout, ref _msg);
+
+            LEAP_CONNECTION_INFO pInfo = new LEAP_CONNECTION_INFO();
+            pInfo.size = (uint)Marshal.SizeOf(pInfo);
+            result = LeapC.GetConnectionInfo(tempConnection, ref pInfo);
+
+            if (pInfo.status == eLeapConnectionStatus.eLeapConnectionStatus_Connected)
+            {
+                LeapC.CloseConnection(tempConnection);
+                return true;
+            }
+
+            LeapC.CloseConnection(tempConnection);
+
+            return false;
+        }
+
+        /// <summary>
         /// Gets the active setting for a specific policy.
         ///
         /// Keep in mind that setting a policy flag is asynchronous, so changes are
@@ -1054,6 +1109,17 @@ namespace LeapInternal
             }
 
             return false;
+        }
+
+        public bool IsDeviceAvailable(Device device = null)
+        {
+            uint deviceID = 0;
+            if (device != null)
+            {
+                deviceID = device.DeviceID;
+            }
+
+            return _activePolicies.ContainsKey(deviceID);
         }
 
         public uint GetConfigValue(string config_key)
@@ -1228,6 +1294,24 @@ namespace LeapInternal
         {
             LEAP_VECTOR rayStruct = new LEAP_VECTOR(ray);
             LEAP_VECTOR pixel = LeapC.LeapRectilinearToPixel(_leapConnection,
+                   (camera == Image.CameraType.LEFT ?
+                   eLeapPerspectiveType.eLeapPerspectiveType_stereo_left :
+                   eLeapPerspectiveType.eLeapPerspectiveType_stereo_right),
+                   rayStruct);
+            return new UnityEngine.Vector3(pixel.x, pixel.y, pixel.z);
+        }
+
+        /// <summary>
+        /// Converts from camera-space rectilinear coordinates to image-space pixel coordinates
+        /// 
+        /// Also allows specifying a specific device handle and calibration type.
+        /// </summary>
+        public UnityEngine.Vector3 RectilinearToPixelEx(IntPtr deviceHandle,
+                                           Image.CameraType camera, UnityEngine.Vector3 ray)
+        {
+            LEAP_VECTOR rayStruct = new LEAP_VECTOR(ray);
+            LEAP_VECTOR pixel = LeapC.LeapRectilinearToPixelEx(_leapConnection,
+                   deviceHandle,
                    (camera == Image.CameraType.LEFT ?
                    eLeapPerspectiveType.eLeapPerspectiveType_stereo_left :
                    eLeapPerspectiveType.eLeapPerspectiveType_stereo_right),

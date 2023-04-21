@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -32,7 +32,7 @@ namespace Leap
         public LeapTransform(Vector3 translation, Quaternion rotation, Vector3 scale) :
           this()
         {
-            _scale = scale;
+            this.scale = scale;
             // these are non-trival setters.
             this.translation = translation;
             this.rotation = rotation; // Calls validateBasis
@@ -44,11 +44,9 @@ namespace Leap
         /// <param name="t">Unity Transform</param>
         public LeapTransform(Transform t) : this()
         {
-            float MM_TO_M = 1e-3f;
-            _scale = new Vector3(t.lossyScale.x * MM_TO_M, t.lossyScale.y * MM_TO_M, t.lossyScale.z * MM_TO_M);
+            this.scale = t.lossyScale;
             this.translation = t.position;
             this.rotation = t.rotation;
-            this.MirrorZ(); // Unity is left handed.
         }
 
         /// <summary>

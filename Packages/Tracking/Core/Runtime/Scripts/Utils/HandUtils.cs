@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -35,15 +35,25 @@ namespace Leap.Unity
 
         private static void InitStatic()
         {
-            s_provider = Object.FindObjectOfType<LeapServiceProvider>();
+            // Fall through to the best available Leap Provider if none is assigned
             if (s_provider == null)
             {
-                s_provider = Object.FindObjectOfType<LeapProvider>();
+                s_provider = Object.FindObjectOfType<PostProcessProvider>();
                 if (s_provider == null)
                 {
-                    return;
+                    s_provider = Object.FindObjectOfType<XRLeapProviderManager>();
+                    if (s_provider == null)
+                    {
+                        s_provider = Object.FindObjectOfType<LeapProvider>();
+                        if (s_provider == null)
+                        {
+                            Debug.Log("There are no Leap Providers in the scene, please assign one manually");
+                            return;
+                        }
+                    }
                 }
             }
+            Debug.Log("LeapProvider was not assigned. Auto assigning: " + s_provider);
 
             Camera providerCamera = s_provider.GetComponentInParent<Camera>();
             if (providerCamera == null) return;
@@ -122,7 +132,7 @@ namespace Leap.Unity
             {
                 if (Provider == null) return null;
                 if (Provider.CurrentFrame == null) return null;
-                return Provider.CurrentFrame.Hands.FirstOrDefault(hand => hand.IsLeft);
+                return Provider.CurrentFrame.GetHand(Chirality.Left);
             }
         }
 
@@ -136,7 +146,7 @@ namespace Leap.Unity
             {
                 if (Provider == null) return null;
                 if (Provider.CurrentFrame == null) return null;
-                else return Provider.CurrentFrame.Hands.FirstOrDefault(hand => hand.IsRight);
+                return Provider.CurrentFrame.GetHand(Chirality.Right);
             }
         }
 
@@ -150,7 +160,7 @@ namespace Leap.Unity
             {
                 if (Provider == null) return null;
                 if (Provider.CurrentFixedFrame == null) return null;
-                return Provider.CurrentFixedFrame.Hands.FirstOrDefault(hand => hand.IsLeft);
+                return Provider.CurrentFixedFrame.GetHand(Chirality.Left);
             }
         }
 
@@ -164,7 +174,7 @@ namespace Leap.Unity
             {
                 if (Provider == null) return null;
                 if (Provider.CurrentFixedFrame == null) return null;
-                else return Provider.CurrentFixedFrame.Hands.FirstOrDefault(hand => hand.IsRight);
+                return Provider.CurrentFixedFrame.GetHand(Chirality.Right);
             }
         }
 
@@ -316,6 +326,25 @@ namespace Leap.Unity
         }
 
         /// <summary>
+        /// Predicted Pinch Position without influence from the thumb or index tip.
+        /// Useful for calculating extremely stable pinch calculations.
+        /// Not good for visualising the pinch point - recommended to use PredictedPinchPosition instead
+        /// </summary>
+        public static Vector3 GetStablePinchPosition(this Hand hand)
+        {
+            // The stable pinch point is a rigid point in hand-space linearly offset by the
+            // index finger knuckle position and scaled by the index finger's length
+
+            Vector3 indexKnuckle = hand.Fingers[1].bones[1].PrevJoint;
+            float indexLength = hand.Fingers[1].Length;
+            Vector3 radialAxis = hand.RadialAxis();
+            Vector3 stablePinchPoint = indexKnuckle + hand.PalmarAxis() * indexLength * 0.85F
+                                                       + hand.DistalAxis() * indexLength * 0.20F
+                                                       + radialAxis * indexLength * 0.20F;
+            return stablePinchPoint;
+        }
+
+        /// <summary>
         /// Returns whether this vector faces from a given world position towards another world position within a maximum angle of error.
         /// </summary>
         public static bool IsFacing(this Vector3 facingVector, Vector3 fromWorldPosition, Vector3 towardsWorldPosition, float maxOffsetAngleAllowed)
@@ -358,6 +387,28 @@ namespace Leap.Unity
             }
 
             return Vector3.Dot(hand.Fingers[finger].Direction, -hand.DistalAxis()).Map(-1, 1, 0, 1);
+        }
+
+        /// <summary>
+        /// Returns the distance between the tip of the finger and the tip of the thumb.
+        /// Finger 0 (thumb) will always return float.MaxValue.
+        /// </summary>
+        public static float GetFingerPinchDistance(this Hand hand, int finger)
+        {
+            if (hand == null || finger == 0)
+            {
+                return float.MaxValue;
+            }
+
+            return Vector3.Distance(hand.Fingers[0].TipPosition, hand.Fingers[finger].TipPosition);
+        }
+
+        /// <summary>
+        /// Returns the Chirality of the hand
+        /// </summary>
+        public static Chirality GetChirality(this Hand hand)
+        {
+            return hand.IsLeft ? Chirality.Left : Chirality.Right;
         }
 
         /// <summary>
@@ -585,9 +636,20 @@ namespace Leap.Unity
         /// <returns>The first hand of the argument whichHand found in the argument frame.</returns>
         public static Hand GetHand(this Frame frame, Chirality whichHand)
         {
-            if (frame.Hands == null) { return null; }
-            return frame.Hands.FirstOrDefault(
-              h => h.IsLeft == (whichHand == Chirality.Left));
+            if (frame.Hands == null)
+            {
+                return null;
+            }
+
+            foreach (var hand in frame.Hands)
+            {
+                if (hand.IsLeft && whichHand == Chirality.Left || hand.IsRight && whichHand == Chirality.Right)
+                {
+                    return hand;
+                }
+            }
+
+            return null;
         }
 
         #endregion

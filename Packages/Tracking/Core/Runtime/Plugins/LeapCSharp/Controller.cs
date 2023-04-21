@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -609,6 +609,17 @@ namespace Leap
         public bool IsPolicySet(PolicyFlag policy, Device device = null)
         {
             return _connection.IsPolicySet(policy, device);
+        }
+
+        /// <summary>
+        /// Checks if the specified device is available.
+        /// 
+        /// Device availability is determined by checking it has active policy flags set against it
+        /// via its connection.
+        /// </summary>
+        public bool IsDeviceAvailable(Device device = null)
+        {
+            return _connection.IsDeviceAvailable(device);
         }
 
         /// <summary>

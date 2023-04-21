@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -379,11 +379,26 @@ namespace Leap.Unity.Attachments
             var pointBehaviour = GetBehaviourForPoint(singlePoint);
             if (pointBehaviour != null)
             {
-                Destroy(pointBehaviour.gameObject);
+#if UNITY_EDITOR
+                if (!Application.isPlaying)
+                {
+                    if (PrefabUtility.IsPartOfPrefabInstance(pointBehaviour.gameObject))
+                    {
+                        PrefabUtility.UnpackPrefabInstance(PrefabUtility.GetOutermostPrefabInstanceRoot(pointBehaviour.transform),
+                              PrefabUnpackMode.Completely,
+                              InteractionMode.AutomatedAction);
+                    }
+
+                    DestroyImmediate(pointBehaviour.gameObject);
+                }
+                else
+#endif
+                {
+                    Destroy(pointBehaviour.gameObject);
+                }
+
                 setBehaviourForPoint(singlePoint, null);
-
                 pointBehaviour = null;
-
                 _attachmentPointsDirty = true;
 
 #if UNITY_EDITOR
