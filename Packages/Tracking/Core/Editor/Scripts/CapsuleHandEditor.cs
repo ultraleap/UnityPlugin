@@ -24,6 +24,7 @@ namespace Leap.Unity
             if (newValue != targ.Preset)
             {
                 targ.ChangePreset(newValue);
+                EditorUtility.SetDirty(target);
             }
 
             EditorGUILayout.Space();

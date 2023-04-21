@@ -62,6 +62,8 @@ namespace Leap.Unity.Interaction
         public float minHeightFromHead = -0.65f;
         public bool drawGrabBallRestrictionGizmos = true;
 
+        public bool continuouslyRestrictGrabBallDistanceFromHead = true;
+
         private Pose _attachedObjectTargetPose = Pose.identity;
         private Transform _head;
         private Vector3 _attachedObjectOffset;
@@ -70,17 +72,6 @@ namespace Leap.Unity.Interaction
 
         private const float LERP_POSITION_LIMIT = 0.001f;
         private const float LERP_ROTATION_LIMIT = 1;
-
-
-        private void OnEnable()
-        {
-            _attachedObjectOffset = InverseTransformPointUnscaled(grabBallInteractionBehaviour.transform, attachedObject.position);
-
-            if (useAttachedObjectsXRotation)
-            {
-                xRotation = attachedObject.rotation.eulerAngles.x;
-            }
-        }
 
         private void Start()
         {
@@ -105,9 +96,16 @@ namespace Leap.Unity.Interaction
                 }
             }
 
+            _attachedObjectOffset = InverseTransformPointUnscaled(grabBallInteractionBehaviour.transform, attachedObject.position);
+
+            if (useAttachedObjectsXRotation)
+            {
+                xRotation = attachedObject.rotation.eulerAngles.x;
+            }
+
             _transformHelper = new GameObject("GrabBall_TransformHelper").transform;
             _transformHelper.SetParent(transform);
-            UpdateAttachedObjectTargetPose();
+            UpdateAttachedObjectTargetPose(false);
         }
 
         private void Update()
@@ -126,6 +124,10 @@ namespace Leap.Unity.Interaction
                     _moveGrabBallToPositionOnUngrasp = false;
                 }
             }
+            else if (continuouslyRestrictGrabBallDistanceFromHead)
+            {
+                ConstrainGrabBallToArea();
+            }
 
             if (IsAttachedObjectCloseToTargetPose())
             {
@@ -137,6 +139,12 @@ namespace Leap.Unity.Interaction
                 Pose attachedObjectPose = attachedObject.ToPose().Lerp(_attachedObjectTargetPose, Time.deltaTime * lerpSpeed);
                 attachedObject.SetPose(attachedObjectPose);
             }
+        }
+
+        void ConstrainGrabBallToArea()
+        {
+            grabBallInteractionBehaviour.transform.position = Vector3.Lerp(grabBallInteractionBehaviour.transform.position, grabBallPose.position, Time.deltaTime * lerpSpeed);
+            UpdateAttachedObjectTargetPose(false);
         }
 
         /// <summary>
@@ -199,14 +207,14 @@ namespace Leap.Unity.Interaction
             // Y restriction
             float yDiff = grabBallInteractionBehaviour.transform.position.y - _head.position.y;
 
-            if(yDiff > maxHeightFromHead)
+            if (yDiff > maxHeightFromHead)
             {
                 // clamp height to max
                 grabBallPose.position.y = _head.position.y + maxHeightFromHead;
                 grabBallRestrictionStatus.heightMax = true;
                 grabBallRestrictionStatus.heightMin = false;
             }
-            else if(yDiff < minHeightFromHead)
+            else if (yDiff < minHeightFromHead)
             {
                 // clamp height to min
                 grabBallPose.position.y = _head.position.y + minHeightFromHead;
@@ -222,23 +230,31 @@ namespace Leap.Unity.Interaction
             }
         }
 
-        private void UpdateAttachedObjectTargetPose()
+        private void UpdateAttachedObjectTargetPose(bool setRotation = true)
         {
             if (restrictGrabBallDistanceFromHead)
             {
                 RestrictGrabBallPosition();
-            } 
+            }
             else
             {
                 grabBallPose.position = grabBallInteractionBehaviour.transform.position;
             }
 
             _transformHelper.position = grabBallPose.position;
-            grabBallPose.rotation = LookAtRotationParallelToHorizon(grabBallPose.position, _head.position);
-            _transformHelper.rotation = grabBallPose.rotation;
+
+            if (setRotation)
+            {
+                grabBallPose.rotation = LookAtRotationParallelToHorizon(grabBallPose.position, _head.position);
+                _transformHelper.rotation = grabBallPose.rotation;
+            }
 
             _attachedObjectTargetPose.position = _transformHelper.TransformPoint(_attachedObjectOffset);
-            _attachedObjectTargetPose.rotation = Quaternion.Euler(xRotation, grabBallPose.rotation.eulerAngles.y, grabBallPose.rotation.eulerAngles.z);
+
+            if (setRotation)
+            {
+                _attachedObjectTargetPose.rotation = Quaternion.Euler(xRotation, grabBallPose.rotation.eulerAngles.y, grabBallPose.rotation.eulerAngles.z);
+            }
         }
         private bool IsAttachedObjectCloseToTargetPose()
         {

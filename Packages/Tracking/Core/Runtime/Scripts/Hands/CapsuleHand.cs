@@ -24,7 +24,6 @@ namespace Leap.Unity
         public enum CapsuleHandPreset
         {
             Default,
-            Classic,
             Minimal,
             Ultraleap
         }
@@ -58,22 +57,22 @@ namespace Leap.Unity
         [SerializeField]
         private bool _showArm = true;
 
-        [SerializeField]
+        [Space, SerializeField]
         private bool _showPalmJoint = true;
 
         [SerializeField]
         private bool _showPinkyMetacarpal = true;
 
-        [SerializeField]
+        [Space, SerializeField]
         private bool _joinFingerProximals = true;
 
         [SerializeField]
         private bool _joinThumbProximal = true;
 
-        [SerializeField]
+        [Space, SerializeField]
         private bool _castShadows = true;
 
-        [SerializeField]
+        [Space, SerializeField]
         private Material _material;
         private Material _backing_material;
 
@@ -115,6 +114,8 @@ namespace Leap.Unity
 
         private MaterialPropertyBlock _materialPropertyBlock;
         private Color[] _sphereColors;
+
+        private float currentLossyScaleX;
 
         [HideInInspector]
         public bool SetIndividualSphereColors = false;
@@ -186,7 +187,18 @@ namespace Leap.Unity
         /// <param name="hand"></param>
         public override void SetLeapHand(Hand hand)
         {
-            _hand = hand;
+            if (hand != null)
+            {
+                if (_hand == null)
+                {
+                    _hand = new Hand();
+                }
+                _hand = _hand.CopyFrom(hand);
+            }
+            else
+            {
+                _hand = null;
+            }
         }
 
         /// <summary>
@@ -325,6 +337,8 @@ namespace Leap.Unity
         /// </summary>
         public override void UpdateHand()
         {
+            currentLossyScaleX = transform.lossyScale.x;
+
             _curSphereIndex = 0;
             _curCylinderIndex = 0;
 
@@ -348,8 +362,8 @@ namespace Leap.Unity
                 for (int j = 0; j < 4; j++)
                 {
                     int key = getFingerJointIndex((int)finger.Type, j);
-                    
-                    
+
+
                     Vector3 position;
                     if (finger.Type == Finger.FingerType.TYPE_THUMB && j == 0)
                     {
@@ -360,7 +374,7 @@ namespace Leap.Unity
                     {
                         position = finger.Bone((Bone.BoneType)j).NextJoint;
                     }
-                    
+
                     _spherePositions[key] = position;
                     drawSphere(position);
                 }
@@ -488,7 +502,7 @@ namespace Leap.Unity
 
             //multiply radius by 2 because the default unity sphere has a radius of 0.5 meters at scale 1.
             _sphereMatrices[_curSphereIndex++] = Matrix4x4.TRS(position,
-              Quaternion.identity, Vector3.one * radius * 2.0f * transform.lossyScale.x);
+              Quaternion.identity, Vector3.one * radius * 2.0f * currentLossyScaleX);
         }
 
         private void drawCylinder(Vector3 a, Vector3 b)
@@ -500,7 +514,7 @@ namespace Leap.Unity
             if ((a - b).magnitude > 0.001f)
             {
                 _cylinderMatrices[_curCylinderIndex++] = Matrix4x4.TRS(a,
-                  Quaternion.LookRotation(b - a), new Vector3(transform.lossyScale.x, transform.lossyScale.x, length));
+                  Quaternion.LookRotation(b - a), new Vector3(currentLossyScaleX, currentLossyScaleX, length));
             }
         }
 
@@ -589,20 +603,6 @@ namespace Leap.Unity
             switch (preset)
             {
                 case CapsuleHandPreset.Default:
-                    _showArm = true;
-                    _showPalmJoint = false;
-                    _showPinkyMetacarpal = true;
-                    _joinFingerProximals = true;
-                    _joinThumbProximal = true;
-                    _castShadows = true;
-                    _cylinderResolution = 12;
-                    _jointRadius = 0.006f;
-                    _cylinderRadius = 0.006f;
-                    _useCustomColors = true;
-                    _sphereColor = Color.white;
-                    _cylinderColor = Color.white;
-                    break;
-                case CapsuleHandPreset.Classic:
                     _showArm = true;
                     _showPalmJoint = true;
                     _showPinkyMetacarpal = true;

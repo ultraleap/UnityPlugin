@@ -6,6 +6,8 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
+using UnityEngine;
+
 namespace Leap
 {
     using LeapInternal;
@@ -246,9 +248,44 @@ namespace Leap
 
         /// <summary>
         /// Reports the ID assoicated with the device
-        /// 
         /// </summary>
         public uint DeviceID { get; private set; }
+
+        private Pose devicePose = Pose.identity;
+
+        /// <summary>
+        /// The transform to world coordinates from 3D Leap coordinates.
+        /// </summary>
+        public Pose DevicePose
+        {
+            get
+            {
+                if(devicePose != Pose.identity) // Assumes the devicePose never changes and so, uses the cached pose.
+                {
+                    return devicePose;
+                }
+
+                eLeapRS result = LeapC.GetDeviceTransform(InternalHandle, out float[] data);
+                if (result != eLeapRS.eLeapRS_Success)
+                    return Pose.identity;
+
+                // Get transform matrix and convert to unity space by inverting Z.
+                var transformMatrix = new Matrix4x4(
+                    new Vector4(data[0], data[1], data[2], data[3]),
+                    new Vector4(data[4], data[5], data[6], data[7]),
+                    new Vector4(data[8], data[9], data[10], data[11]),
+                    new Vector4(data[12], data[13], data[14], data[15]));
+                var toUnity = Matrix4x4.Scale(new Vector3(1, 1, -1));
+                transformMatrix = toUnity * transformMatrix;
+
+                // Identity matrix here means we have no device transform, also check validity.
+                if (transformMatrix.isIdentity || !transformMatrix.ValidTRS())
+                    return Pose.identity;
+                
+                // Return a valid pose.
+                return new Pose(transformMatrix.GetColumn(3), transformMatrix.rotation);
+            }
+        }
 
         /// <summary>
         /// Returns the internal status field of the current device
