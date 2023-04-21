@@ -254,8 +254,15 @@ namespace Leap.Unity.Encoding
         /// the camera-local hand rotation uses 4 bytes, and each joint position component is
         /// encoded in hand-local space using 3 bytes.
         /// </summary>
-        public int numBytesRequired { get { return 311; } }
-        public const int NUM_BYTES = 311;
+        public int numBytesRequired { get { return reducedLossyEncoding ? NUM_BYTES_REDUCED_LOSSY : NUM_BYTES; } }
+        public const int NUM_BYTES = 86;
+        public const int NUM_BYTES_REDUCED_LOSSY = 311;
+
+        /// <summary>
+        /// Uses more Bytes, but reduces the lossy nature of the encoded hands.
+        /// </summary>
+        [SerializeField, Tooltip("Reduces the data loss when encoding hands. Uses 311 bytes rather than the default 86. Ensure this value is matched when both encoding and decoding")]
+        private bool reducedLossyEncoding = false;
 
         /// <summary>
         /// Fills this VectorHand with data read from the provided byte array, starting at
@@ -297,14 +304,21 @@ namespace Leap.Unity.Encoding
             {
                 for (int j = 0; j < 3; j++)
                 {
-                    byte[] floatBytes = new byte[4];
-
-                    for(int k = 0; k < 4; k++)
+                    if (reducedLossyEncoding) // Convert the byte arrays to floats
                     {
-                        floatBytes[k] = bytes[offset++];
-                    }
+                        byte[] floatBytes = new byte[4];
 
-                    jointPositions[i][j] = VectorHandExtensions.ByteArrayToFloat(floatBytes);
+                        for (int k = 0; k < 4; k++)
+                        {
+                            floatBytes[k] = bytes[offset++];
+                        }
+
+                        jointPositions[i][j] = VectorHandExtensions.ByteArrayToFloat(floatBytes);
+                    }
+                    else // Use compressed bytes-to-floats
+                    {
+                        jointPositions[i][j] = VectorHandExtensions.ByteToFloat(bytes[offset++]);
+                    }
                 }
             }
         }
@@ -352,11 +366,18 @@ namespace Leap.Unity.Encoding
             {
                 for (int i = 0; i < 3; i++)
                 {
-                    var bytes = VectorHandExtensions.FloatToByteArray(jointPositions[j][i]);
-
-                    foreach(var byt in bytes)
+                    if (reducedLossyEncoding) // Encode the joint floats as byte arrays
                     {
-                        bytesToFill[offset++] = byt;
+                        var bytes = VectorHandExtensions.FloatToByteArray(jointPositions[j][i]);
+
+                        foreach (var byt in bytes)
+                        {
+                            bytesToFill[offset++] = byt;
+                        }
+                    }
+                    else // Compress the joint floats to single bytes
+                    {
+                        bytesToFill[offset++] = VectorHandExtensions.FloatToByte(jointPositions[j][i]);
                     }
                 }
             }
@@ -394,7 +415,7 @@ namespace Leap.Unity.Encoding
         {
             if (fromHand == null)
             {
-                for (int i = offset; i < offset + NUM_BYTES; i++)
+                for (int i = offset; i < offset + numBytesRequired; i++)
                 {
                     bytes[i] = 0;
                 }
