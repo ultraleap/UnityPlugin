@@ -31,10 +31,6 @@ namespace Leap.Unity.Preview.HandRays
                     _transformToFollow = value;
                     // Reset interpolations on transform change
                     _interpCalcTime = Time.time;
-                    if (_transformToFollow != null)
-                    {
-                        _interpolatedPosition = transformToFollow.position;
-                    }
                 }
             }
         }
@@ -49,7 +45,7 @@ namespace Leap.Unity.Preview.HandRays
 
         [Tooltip("The maximum length of time that the object will interpolate over. This amount is controlled by the interpolation amount.")]
         public float interpolationTime = 2f;
-        private Vector3 _interpolatedPosition = Vector3.zero;
+        private Vector3 _interpolatedDirection = Vector3.zero;
         private float _interpCalcTime = 0, _interpCurrentTime = 0, _interpCurrentAmount = 0;
 
         protected override Vector3 CalculateVisualAimPosition()
@@ -59,24 +55,25 @@ namespace Leap.Unity.Preview.HandRays
 
         protected override Vector3 CalculateAimPosition()
         {
-            return aimPositionFilter.Filter(transformToFollow == null ? handRayDirection.Hand.GetStablePinchPosition() : CalculateInterpolatedPosition(), Time.time);
+            return aimPositionFilter.Filter(transformToFollow == null ? handRayDirection.Hand.GetStablePinchPosition() : transformToFollow.position, Time.time);
         }
 
-        private Vector3 CalculateInterpolatedPosition()
+        protected override Vector3 CalculateDirection()
         {
-            if (transformToFollow == null)
-            {
-                return handRayDirection.Hand.GetStablePinchPosition();
-            }
+            return CalculateInterpolatedDirection(base.CalculateDirection());
+        }
+
+        private Vector3 CalculateInterpolatedDirection(Vector3 currentDirection)
+        {
 
             if (_interpCalcTime == Time.time)
             {
-                return _interpolatedPosition;
+                return _interpolatedDirection;
             }
 
             if (_interpCalcTime - Time.time > interpolationAmount)
             {
-                _interpolatedPosition = transformToFollow.position;
+                _interpolatedDirection = currentDirection;
             }
 
             _interpCalcTime = Time.time;
@@ -93,9 +90,9 @@ namespace Leap.Unity.Preview.HandRays
 
             _interpCurrentTime = Mathf.Lerp(0, interpolationTime, _interpCurrentAmount);
 
-            _interpolatedPosition = Vector3.Lerp(_interpolatedPosition, transformToFollow.position, Time.deltaTime * (1.0f / _interpCurrentTime));
+            _interpolatedDirection = Vector3.Lerp(_interpolatedDirection, currentDirection, Time.deltaTime * (1.0f / _interpCurrentTime));
 
-            return _interpolatedPosition;
+            return _interpolatedDirection;
         }
     }
 }

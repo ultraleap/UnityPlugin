@@ -6,6 +6,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
 
+## [NEXT] - x/x/xx
+
+### Added
+- (Anchorable Behaviour) Code to automatically create a basic curve for attraction reach distance on new instance of the script
+- (Interaction Engine) New options to the create menu under "Interaction", can now create:
+	- Interaction Cube, 3D Button, 3D UI panel, Anchor, Anchorable Object, Attachment Hand Menu, Interaction Manager
+- (Physics Hands) Added function to check if a grasped object has been pinched
+
+### Changed
+- (Anchorable Behaviour) Ability to change the speed at which an object is attracted to the hand
+- (Physics Hands) Significantly improved palm latency
+- (Physics Hands) Reduced overall forces of hands and fingers
+- (Physics Hands) Improved object weight movement (less wobbly, overall faster and more predictable)
+- (Physics Hands) Improved contact information of helpers
+- (Physics Hands) Removed grasp distance
+- (Physics Hands) Removed "strength" from the provider and replaced with per hand velocity limits
+- (Physics Hands) Grasp helpers now modify object mass on grasp and restore it on release
+- (Hand Rays) TransformWristShoulderRay interpolates direction, rather than aim position
+- LeapXRServiceProvider Default offset mode now uses known device transforms or falls back to a default value
+- (Interaction) Grab ball now has an option to Continuously restrict the grab balls distance from the player. This allows grab balls to follow the player
+- Leap provider can now be set manually in leap provider manager. 
+
+### Fixed
+- (Physics Hands) Fixed joints exploding when teleporting the hand for one frame
+- (Physics Hands) Fixed wrist position becoming misaligned over time
+
+### Known issues 
+- Scenes containing the infrared viewer render incorrectly on Android build targets and in scriptable render pipelines such as URP and HDRP. 
+- Use of the LeapCSharp Config class is unavailable with v5.X tracking service
+- Repeatedly opening scenes can cause memory use increase
+- Currently the Ultraleap Hand Tracking feature for OpenXR requires the New and Legacy input systems to be enabled, to simultaneously use OpenXR and the Ultraleap Unity Plugin's features.
+- The OpenXR Leap Provider does not currently support the `Confidence` hand property (and will return fixed values)
+- If using OpenXR when using Unity 2020 and Ultraleap Tracking Plugin via .unitypackage, an error will appear on import relating to HandTrackingFeature. This has been fixed by Unity on Unity 2021
+	- A workaround is to right click on \ThirdParty\Ultraleap\Tracking\OpenXR\Runtime\Scripts\HandTrackingFeature.cs and select 'Reimport'
+- DrawMeshInstanced error log on certain Unity versions when using Capsule Hands. [Unity Issue Tracker](https://issuetracker.unity3d.com/issues/drawmeshinstanced-does-not-support-dot-dot-dot-error-in-the-console-pops-up-when-the-shader-does-support-instanced-rendering)
+- After using Ultraleap OpenXR in Unity Editor, the tracking mode of device 0 will be set to HMD until the Unity Editor session ends. This can stop the testing of non-XR scenes until the Unity Editor is re-opened
+
 ## [6.7.0] - 3/4/23
 
 ### Added
@@ -37,6 +74,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (Physics Hands) Non-0th joints are now only revolute once again
 - Reordered example assets to make it easier to traverse
 
+
 ### Fixed
 - (Physics Hands) Bone directions when converting back to Leap Hands
 - (Physics Hands) Incorrect setup and positioning of physics buttons
@@ -57,7 +95,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 	- A workaround is to right click on \ThirdParty\Ultraleap\Tracking\OpenXR\Runtime\Scripts\HandTrackingFeature.cs and select 'Reimport'
 - DrawMeshInstanced error log on certain Unity versions when using Capsule Hands. [Unity Issue Tracker](https://issuetracker.unity3d.com/issues/drawmeshinstanced-does-not-support-dot-dot-dot-error-in-the-console-pops-up-when-the-shader-does-support-instanced-rendering)
 - After using Ultraleap OpenXR in Unity Editor, the tracking mode of device 0 will be set to HMD until the Unity Editor session ends. This can stop the testing of non-XR scenes until the Unity Editor is re-opened
-
 
 ## [6.6.0] - 17/02/23
 
