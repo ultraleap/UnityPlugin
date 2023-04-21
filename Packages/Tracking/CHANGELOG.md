@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (Interaction Engine) New options to the create menu under "Interaction", can now create:
 	- Interaction Cube, 3D Button, 3D UI panel, Anchor, Anchorable Object, Attachment Hand Menu, Interaction Manager
 - (Physics Hands) Added function to check if a grasped object has been pinched
+- Presets to Capsule Hands to be able to change the way they look easily
+- Options for Capsule Hands to change disable particular joints
 
 ### Changed
 - (Anchorable Behaviour) Ability to change the speed at which an object is attracted to the hand
