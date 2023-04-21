@@ -8,7 +8,7 @@
   "dependencies": {
     "com.ultraleap.tracking": "6.7.0",
     "com.unity.inputsystem": "1.4.4",
-    "com.unity.xr.interaction.toolkit": "2.0.0"
+    "com.unity.xr.interaction.toolkit": "2.3.1"
   },
   "keywords": [
     "ultraleap",

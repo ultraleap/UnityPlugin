@@ -146,12 +146,12 @@ namespace Leap.Unity.Preview.InputActions
 
         float GetSelecting(Hand hand)
         {
-            return pinchingIsBinary ? (hand.PinchStrength > 0.8 ? 1 : 0) : hand.PinchStrength;
+            return grabbingIsBinary ? (hand.GrabStrength > 0.8 ? 1 : 0) : hand.GrabStrength;
         }
 
         float GetActvating(Hand hand)
         {
-            return grabbingIsBinary ? (hand.GrabStrength > 0.8 ? 1 : 0) : hand.GrabStrength;
+            return pinchingIsBinary ? (hand.PinchStrength > 0.8 ? 1 : 0) : hand.PinchStrength;
         }
 
         Vector3 GetPalmPosition(Hand hand)
@@ -161,7 +161,7 @@ namespace Leap.Unity.Preview.InputActions
 
         Quaternion GetPalmDirection(Hand hand)
         {
-            return Quaternion.LookRotation(hand.PalmNormal, hand.Direction);
+            return Quaternion.LookRotation(hand.PalmNormal, hand.Direction).normalized;
         }
 
         Vector3 GetAimPosition(Hand hand)
@@ -171,7 +171,7 @@ namespace Leap.Unity.Preview.InputActions
 
         Quaternion GetAimDirection(Hand hand)
         {
-            return GetSimpleShoulderPinchDirection(hand);
+            return GetSimpleShoulderPinchDirection(hand).normalized;
         }
 
         Vector3 GetPinchPosition(Hand hand)
@@ -181,7 +181,7 @@ namespace Leap.Unity.Preview.InputActions
 
         Quaternion GetPinchDirection(Hand hand)
         {
-            return Quaternion.LookRotation(hand.GetPredictedPinchPosition() - hand.Fingers[1].Bone(Bone.BoneType.TYPE_PROXIMAL).PrevJoint);
+            return Quaternion.LookRotation(hand.GetPredictedPinchPosition() - hand.Fingers[1].Bone(Bone.BoneType.TYPE_PROXIMAL).PrevJoint).normalized;
         }
 
         Vector3 GetPokePosition(Hand hand)
@@ -191,7 +191,7 @@ namespace Leap.Unity.Preview.InputActions
 
         Quaternion GetPokeDirection(Hand hand)
         {
-            return Quaternion.LookRotation(hand.Fingers[1].Bone(Bone.BoneType.TYPE_DISTAL).NextJoint - hand.Fingers[1].Bone(Bone.BoneType.TYPE_DISTAL).PrevJoint);
+            return Quaternion.LookRotation(hand.Fingers[1].Bone(Bone.BoneType.TYPE_DISTAL).NextJoint - hand.Fingers[1].Bone(Bone.BoneType.TYPE_DISTAL).PrevJoint).normalized;
         }
 
         /// <summary>
