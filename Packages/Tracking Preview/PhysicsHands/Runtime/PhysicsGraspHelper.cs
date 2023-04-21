@@ -56,13 +56,13 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private Rigidbody _rigid;
         public Rigidbody Rigidbody => _rigid;
         private List<Collider> _colliders = new List<Collider>();
-        public Pose previousPose;
-        public Pose previousPalmPose;
 
         private Vector3 _newPosition;
         private Quaternion _newRotation;
 
         private bool _oldKinematic, _oldGravity;
+        private float _originalMass = 1f;
+        public float OriginalMass => _originalMass;
 
         // This means we can have bones stay "attached" for a small amount of time
         private List<PhysicsBone> _boneCooldownItems = new List<PhysicsBone>();
@@ -78,15 +78,21 @@ namespace Leap.Unity.Interaction.PhysicsHands
             {
                 // These values are limited by the EligibleBones
                 return (bones[0].Count > 0 || bones[5].Count > 0) && // A thumb or palm bone
-                    ((bones[1].Count > 0) || // The intermediate or distal of the index
-                    (bones[2].Count > 0) || // The intermediate or distal of the middle
-                    (bones[3].Count > 0) || // The distal of the ring
+                    ((bones[1].Count > 0 && bones[1].Any(x => x.Joint != 0)) || // The intermediate or distal of the index
+                    (bones[2].Count > 0 && bones[2].Any(x => x.Joint != 0)) || // The intermediate or distal of the middle
+                    (bones[3].Count > 0 && bones[3].Any(x => x.Joint != 0)) || // The distal of the ring
                     (bones[4].Count > 0 && bones[4].Any(x => x.Joint == 2))); // The distal of the pinky
             }
             return false;
         }
 
-        private bool Grasped(PhysicsHand hand, int finger)
+        /// <summary>
+        /// Returns true if the finger on the provided hand is grasping, and false if not
+        /// </summary>
+        /// <param name="hand">The hand to check</param>
+        /// <param name="finger">The finger to check</param>
+        /// <returns>If the finger on the provided hand is grasped</returns>
+        public bool Grasped(PhysicsHand hand, int finger)
         {
             if (_bones.TryGetValue(hand, out var bones))
             {
@@ -112,6 +118,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         public PhysicsGraspHelper(Rigidbody rigid, PhysicsProvider manager)
         {
             _rigid = rigid;
+            _originalMass = _rigid.mass;
             // Doing this prevents objects from misaligning during rotation
             if (_rigid.maxAngularVelocity < 100f)
             {
@@ -176,7 +183,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             foreach (var bone in bones)
             {
                 // Gate the bones coming in and don't dupe the events for boneHash
-                if (EligibleBone(bone) && !_boneHash.Contains(bone))
+                if (!_boneHash.Contains(bone))
                 {
                     _boneHash.Add(bone);
                     bone.AddContacting(_rigid);
@@ -198,11 +205,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     }
                 }
             }
-        }
-
-        private bool EligibleBone(PhysicsBone bone)
-        {
-            return bone.Finger == 5 || bone.Joint > 0;
         }
 
         private bool RemoveOldBones(PhysicsBone bone, HashSet<PhysicsBone> bones)
@@ -236,6 +238,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     // Only ever unset the rigidbody values here otherwise outside logic will get confused
                     _rigid.isKinematic = _oldKinematic;
                     _rigid.useGravity = _oldGravity;
+                    _rigid.mass = _originalMass;
                 }
                 if (Manager.EnhanceThrowing && !Ignored)
                 {
@@ -374,6 +377,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                         if (_graspingHands.Count > 0)
                         {
                             _justGrasped = true;
+                            _rigid.mass = 1f;
                             GraspState = State.Grasp;
                         }
                         _graspingValues[hand].offset = _rigid.position - hand.GetPhysicsHand().palmBone.transform.position;
@@ -587,8 +591,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 PhysicsHand hand = _graspingHands[_graspingHands.Count - 1];
                 if (hand.GetOriginalLeapHand() != null)
                 {
-                    _newPosition = hand.GetPhysicsHand().palmBone.transform.position + (hand.GetPhysicsHand().palmBone.transform.rotation * Quaternion.Inverse(_graspingValues[hand].originalHandRotation) * _graspingValues[hand].offset);
-                    _newRotation = hand.GetPhysicsHand().palmBone.transform.rotation * _graspingValues[hand].rotationOffset;
+                    PhysicsHand.Hand pHand = hand.GetPhysicsHand();
+                    _newPosition = pHand.palmBone.transform.position + (pHand.palmBody.velocity * Time.fixedDeltaTime) + (pHand.palmBone.transform.rotation * Quaternion.Inverse(_graspingValues[hand].originalHandRotation) * _graspingValues[hand].offset);
+                    _newRotation = pHand.palmBone.transform.rotation * Quaternion.Euler(pHand.palmBody.angularVelocity * Time.fixedDeltaTime) *  _graspingValues[hand].rotationOffset;
                 }
             }
         }
@@ -630,17 +635,16 @@ namespace Leap.Unity.Interaction.PhysicsHands
             {
                 _rigid.useGravity = false;
             }
-            PhysicsMovement(_newPosition, _newRotation, _rigid, _justGrasped);
+            PhysicsMovement(_newPosition, _newRotation, _rigid);
         }
 
         // Ripped from IE
-        protected float _maxVelocity = 12F;
-        private Vector3 _lastSolvedCoMPosition = Vector3.zero;
+        protected float _maxVelocity = 15F;
         protected AnimationCurve _strengthByDistance = new AnimationCurve(new Keyframe(0.0f, 1.0f, 0.0f, 0.0f),
                                                                              new Keyframe(0.08f, 0.3f, 0.0f, 0.0f));
 
         private void PhysicsMovement(Vector3 solvedPosition, Quaternion solvedRotation,
-                               Rigidbody intObj, bool justGrasped)
+                               Rigidbody intObj)
         {
             Vector3 solvedCenterOfMass = solvedRotation * intObj.centerOfMass + solvedPosition;
             Vector3 currCenterOfMass = intObj.rotation * intObj.centerOfMass + intObj.position;
@@ -658,23 +662,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 targetAngularVelocity *= targetPercent;
             }
 
-            float followStrength = 1F;
-            if (!justGrasped)
+            intObj.velocity = targetVelocity;
+            if (targetAngularVelocity.IsValid())
             {
-                float remainingDistanceLastFrame = Vector3.Distance(_lastSolvedCoMPosition, currCenterOfMass);
-                followStrength = _strengthByDistance.Evaluate(remainingDistanceLastFrame);
+                intObj.angularVelocity = targetAngularVelocity;
             }
-
-            Vector3 lerpedVelocity = Vector3.Lerp(intObj.velocity, targetVelocity, followStrength);
-            Vector3 lerpedAngularVelocity = Vector3.Lerp(intObj.angularVelocity, targetAngularVelocity, followStrength);
-
-            intObj.velocity = lerpedVelocity;
-            if (lerpedAngularVelocity.IsValid())
-            {
-                intObj.angularVelocity = lerpedAngularVelocity;
-            }
-
-            _lastSolvedCoMPosition = solvedCenterOfMass;
         }
 
         // It's more stable to use physics movement currently
@@ -691,11 +683,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
         // Taken from SlidingWindowThrow.cs
 
         // Length of time to average, and delay between the average and current time.
-        private float _windowLength = 0.05f, _windowDelay = 0.025f;
+        private float _windowLength = 0.045f, _windowDelay = 0.015f;
 
         // Throwing curve
         private AnimationCurve _throwVelocityMultiplierCurve = new AnimationCurve(
-                                                            new Keyframe(0.0F, 0.8F, 0, 0),
+                                                            new Keyframe(0.0F, 0.7F, 0, 0),
                                                             new Keyframe(3.0F, 1.0F, 0, 0));
 
         private Queue<VelocitySample> _velocityQueue = new Queue<VelocitySample>(64);
