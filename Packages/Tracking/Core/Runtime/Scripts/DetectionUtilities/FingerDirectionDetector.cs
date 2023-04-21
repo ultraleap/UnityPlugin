@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -12,7 +12,6 @@ using UnityEngine;
 
 namespace Leap.Unity
 {
-#pragma warning disable 0618
     /**
      * Detects when specified fingers are pointing in the specified manner.
      * 
@@ -153,8 +152,8 @@ namespace Leap.Unity
                     hand = HandModel.GetLeapHand();
                     if (hand != null)
                     {
-                        targetDirection = selectedDirection(hand.Fingers[selectedFinger].TipPosition.ToVector3());
-                        fingerDirection = hand.Fingers[selectedFinger].Bone(Bone.BoneType.TYPE_DISTAL).Direction.ToVector3();
+                        targetDirection = selectedDirection(hand.Fingers[selectedFinger].TipPosition);
+                        fingerDirection = hand.Fingers[selectedFinger].Bone(Bone.BoneType.TYPE_DISTAL).Direction;
                         float angleTo = Vector3.Angle(fingerDirection, targetDirection);
                         if (HandModel.IsTracked && angleTo <= OnAngle)
                         {
@@ -175,12 +174,12 @@ namespace Leap.Unity
             switch (PointingType)
             {
                 case PointingType.RelativeToHorizon:
-                    Quaternion cameraRot = MainCameraProvider.mainCamera.transform.rotation;
+                    Quaternion cameraRot = Camera.main.transform.rotation;
                     float cameraYaw = cameraRot.eulerAngles.y;
                     Quaternion rotator = Quaternion.AngleAxis(cameraYaw, Vector3.up);
                     return rotator * PointingDirection;
                 case PointingType.RelativeToCamera:
-                    return MainCameraProvider.mainCamera.transform.TransformDirection(PointingDirection);
+                    return Camera.main.transform.TransformDirection(PointingDirection);
                 case PointingType.RelativeToWorld:
                     return PointingDirection;
                 case PointingType.AtTarget:
@@ -224,14 +223,13 @@ namespace Leap.Unity
                     innerColor = OffColor;
                 }
                 Finger finger = HandModel.GetLeapHand().Fingers[selectedFingerOrdinal()];
-                Vector3 fingerDirection = finger.Bone(Bone.BoneType.TYPE_DISTAL).Direction.ToVector3();
-                Utils.DrawCone(finger.TipPosition.ToVector3(), fingerDirection, OnAngle, finger.Length, innerColor);
-                Utils.DrawCone(finger.TipPosition.ToVector3(), fingerDirection, OffAngle, finger.Length, LimitColor);
+                Vector3 fingerDirection = finger.Bone(Bone.BoneType.TYPE_DISTAL).Direction;
+                Utils.DrawCone(finger.TipPosition, fingerDirection, OnAngle, finger.Length, innerColor);
+                Utils.DrawCone(finger.TipPosition, fingerDirection, OffAngle, finger.Length, LimitColor);
                 Gizmos.color = DirectionColor;
-                Gizmos.DrawRay(finger.TipPosition.ToVector3(), selectedDirection(finger.TipPosition.ToVector3()));
+                Gizmos.DrawRay(finger.TipPosition, selectedDirection(finger.TipPosition));
             }
         }
 #endif
     }
-#pragma warning restore 0618
 }

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -11,7 +11,6 @@ using UnityEngine;
 namespace Leap
 {
     using System;
-#pragma warning disable 0618
     /// <summary>
     /// The Finger class represents a tracked finger.
     /// 
@@ -22,6 +21,12 @@ namespace Leap
     [Serializable]
     public class Finger
     {
+        /// <summary>
+        /// An array of Bone objects that represents each bone of the finger
+        /// 
+        /// There are 4 bones per finger by default
+        /// @since 3.0
+        /// </summary>
         public Bone[] bones = new Bone[4];
 
         /// <summary>
@@ -40,44 +45,6 @@ namespace Leap
             bones[3] = new Bone();
         }
 
-        /// <summary>
-        /// Constructs a finger.
-        /// 
-        /// Generally, you should not create your own finger objects. Such objects will not
-        /// have valid tracking data. Get valid finger objects from a hand in a frame
-        /// received from the service.
-        /// @since 3.0
-        /// </summary>
-        [System.Obsolete("This signature will be removed in the next major version of the plugin. Use the one with Vector3 instead.")]
-        public Finger(long frameId,
-                     int handId,
-                     int fingerId,
-                     float timeVisible,
-                     Vector tipPosition,
-                     Vector direction,
-                     float width,
-                     float length,
-                     bool isExtended,
-                     FingerType type,
-                     Bone metacarpal,
-                     Bone proximal,
-                     Bone intermediate,
-                     Bone distal)
-        {
-            Type = type;
-            bones[0] = metacarpal;
-            bones[1] = proximal;
-            bones[2] = intermediate;
-            bones[3] = distal;
-            Id = (handId * 10) + fingerId;
-            HandId = handId;
-            TipPosition = tipPosition;
-            Direction = direction;
-            Width = width;
-            Length = length;
-            IsExtended = isExtended;
-            TimeVisible = timeVisible;
-        }
         /// <summary>
         /// Constructs a finger.
         /// 
@@ -107,8 +74,8 @@ namespace Leap
             bones[3] = distal;
             Id = (handId * 10) + fingerId;
             HandId = handId;
-            TipPosition = ToVector(tipPosition);
-            Direction = ToVector(direction);
+            TipPosition = tipPosition;
+            Direction = direction;
             Width = width;
             Length = length;
             IsExtended = isExtended;
@@ -164,16 +131,14 @@ namespace Leap
         /// The tip position of this Finger.
         /// @since 1.0
         /// </summary>
-        [System.Obsolete("Its type will be changed from Vector to Vector3")]
-        public Vector TipPosition;
+        public Vector3 TipPosition;
 
         /// <summary>
         /// The direction in which this finger or tool is pointing. The direction is expressed 
-        /// as a unit vector pointing in the same direction as the tip.
+        /// as a unit vector pointing in the same direction as the intermediate bone.
         /// @since 1.0
         /// </summary>
-        [System.Obsolete("Its type will be changed from Vector to Vector3")]
-        public Vector Direction;
+        public Vector3 Direction;
 
         /// <summary>
         /// The estimated width of the finger.
@@ -220,13 +185,5 @@ namespace Leap
             TYPE_PINKY = 4,
             TYPE_UNKNOWN = -1
         }
-
-
-        [Obsolete("This will be removed in the next major version update")]
-        private Vector ToVector(Vector3 v)
-        {
-            return new Vector(v.x, v.y, v.z);
-        }
     }
-#pragma warning restore 0618
 }

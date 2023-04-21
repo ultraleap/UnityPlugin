@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -11,8 +11,7 @@ using UnityEngine;
 
 namespace Leap.Unity
 {
-#pragma warning disable 0618
-    public class RingBuffer<T> : IIndexable<T>
+    public class RingBuffer<T>
     {
 
         private T[] arr;
@@ -182,5 +181,4 @@ namespace Leap.Unity
             public T Current { get { return _buffer[_idx]; } }
         }
     }
-#pragma warning restore 0618
 }

@@ -1,10 +1,11 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
+
 
 using System;
 using UnityEngine;
@@ -54,7 +55,7 @@ namespace Leap.Unity.Interaction
                 // every frame, so it's unusable.
                 _isTrackingController = position != Vector3.zero && rotation != Quaternion.identity;
 
-                Transform rigTransform = MainCameraProvider.mainCamera.transform.parent;
+                Transform rigTransform = Camera.main.transform.parent;
                 if (rigTransform != null)
                 {
                     position = rigTransform.TransformPoint(position);

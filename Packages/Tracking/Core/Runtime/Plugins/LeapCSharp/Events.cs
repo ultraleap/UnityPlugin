@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -111,13 +111,6 @@ namespace Leap
             this.currentPolicies = currentPolicies;
             this.oldPolicies = oldPolicies;
             this.device = device;
-        }
-
-        [Obsolete("Use the constructor that takes the device and oldPolicyIsValid flag")]
-        public PolicyEventArgs(UInt64 currentPolicies, UInt64 oldPolicies) : base(LeapEvent.EVENT_POLICY_CHANGE)
-        {
-            this.currentPolicies = currentPolicies;
-            this.oldPolicies = oldPolicies;
         }
 
         /// <summary>

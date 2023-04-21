@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -9,7 +9,7 @@
 using Leap.Interaction.Internal.InteractionEngineUtility;
 using Leap.Unity.Attributes;
 using Leap.Unity.Interaction.Internal;
-using Leap.Unity.Space;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -680,12 +680,6 @@ namespace Leap.Unity.Interaction
             get { return _rigidbody; }
             protected set { _rigidbody = value; }
         }
-
-        /// <summary>
-        /// A maximum of one (1) LeapSpace is supported per InteractionBehaviour.
-        /// </summary>
-        [System.Obsolete("This code will be removed in the next major version of the plugin. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
-        public ISpaceComponent space { get; protected set; }
 
         [Header("Interaction Overrides")]
 

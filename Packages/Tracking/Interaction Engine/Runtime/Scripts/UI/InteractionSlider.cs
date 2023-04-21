@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -21,7 +21,6 @@ namespace Leap.Unity.Interaction
     ///</summary>
     public class InteractionSlider : InteractionButton
     {
-
         #region Inspector & Properties
 
         public enum SliderType
@@ -175,6 +174,7 @@ namespace Leap.Unity.Interaction
                 localPhysicsPosition.x = Mathf.Lerp(initialLocalPosition.x + horizontalSlideLimits.x, initialLocalPosition.x + horizontalSlideLimits.y, _horizontalSliderPercent);
                 physicsPosition = transform.parent.TransformPoint(localPhysicsPosition);
                 rigidbody.position = physicsPosition;
+                HorizontalSlideEvent(HorizontalSliderValue);
             }
         }
 
@@ -196,6 +196,7 @@ namespace Leap.Unity.Interaction
                 localPhysicsPosition.y = Mathf.Lerp(initialLocalPosition.y + verticalSlideLimits.x, initialLocalPosition.y + verticalSlideLimits.y, _verticalSliderPercent);
                 physicsPosition = transform.parent.TransformPoint(localPhysicsPosition);
                 rigidbody.position = physicsPosition;
+                VerticalSlideEvent(VerticalSliderValue);
             }
         }
 

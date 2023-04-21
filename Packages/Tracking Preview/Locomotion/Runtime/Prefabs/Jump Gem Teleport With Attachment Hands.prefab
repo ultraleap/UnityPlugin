@@ -1,0 +1,245 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &8091300037721170192
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 529290695823889759}
+  m_Layer: 0
+  m_Name: Jump Gem Teleport With Attachment Hands
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &529290695823889759
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8091300037721170192}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 3530496812633476398}
+  - {fileID: 2172032951858911056}
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &3508242594491347251
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 529290695823889759}
+    m_Modifications:
+    - target: {fileID: 218799569343106947, guid: ed5db959c7f016e409c7cf5a1c22f6c1, type: 3}
+      propertyPath: leapProvider
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2442385178323449161, guid: ed5db959c7f016e409c7cf5a1c22f6c1, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.57859993
+      objectReference: {fileID: 0}
+    - target: {fileID: 2442385178323449161, guid: ed5db959c7f016e409c7cf5a1c22f6c1, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 2.1352184
+      objectReference: {fileID: 0}
+    - target: {fileID: 2442385178323449161, guid: ed5db959c7f016e409c7cf5a1c22f6c1, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -2.6403396
+      objectReference: {fileID: 0}
+    - target: {fileID: 3353867234842391808, guid: ed5db959c7f016e409c7cf5a1c22f6c1, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.18140012
+      objectReference: {fileID: 0}
+    - target: {fileID: 3353867234842391808, guid: ed5db959c7f016e409c7cf5a1c22f6c1, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 2.1352184
+      objectReference: {fileID: 0}
+    - target: {fileID: 3353867234842391808, guid: ed5db959c7f016e409c7cf5a1c22f6c1, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -2.6403394
+      objectReference: {fileID: 0}
+    - target: {fileID: 3353867236534347362, guid: ed5db959c7f016e409c7cf5a1c22f6c1, type: 3}
+      propertyPath: _leapProvider
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3353867236534347363, guid: ed5db959c7f016e409c7cf5a1c22f6c1, type: 3}
+      propertyPath: m_RootOrder
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3353867236534347363, guid: ed5db959c7f016e409c7cf5a1c22f6c1, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3353867236534347363, guid: ed5db959c7f016e409c7cf5a1c22f6c1, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3353867236534347363, guid: ed5db959c7f016e409c7cf5a1c22f6c1, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3353867236534347363, guid: ed5db959c7f016e409c7cf5a1c22f6c1, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3353867236534347363, guid: ed5db959c7f016e409c7cf5a1c22f6c1, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3353867236534347363, guid: ed5db959c7f016e409c7cf5a1c22f6c1, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3353867236534347363, guid: ed5db959c7f016e409c7cf5a1c22f6c1, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3353867236534347363, guid: ed5db959c7f016e409c7cf5a1c22f6c1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3353867236534347363, guid: ed5db959c7f016e409c7cf5a1c22f6c1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3353867236534347363, guid: ed5db959c7f016e409c7cf5a1c22f6c1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3353867236534347389, guid: ed5db959c7f016e409c7cf5a1c22f6c1, type: 3}
+      propertyPath: m_Name
+      value: Jump Gem Attachment Hands
+      objectReference: {fileID: 0}
+    - target: {fileID: 3659002003166000297, guid: ed5db959c7f016e409c7cf5a1c22f6c1, type: 3}
+      propertyPath: leapProvider
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3659002004534801192, guid: ed5db959c7f016e409c7cf5a1c22f6c1, type: 3}
+      propertyPath: leapProvider
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 4413976993696306273, guid: ed5db959c7f016e409c7cf5a1c22f6c1, type: 3}
+      propertyPath: leapProvider
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 5170059106221151641, guid: ed5db959c7f016e409c7cf5a1c22f6c1, type: 3}
+      propertyPath: leapProvider
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 5204268919168905936, guid: ed5db959c7f016e409c7cf5a1c22f6c1, type: 3}
+      propertyPath: leapProvider
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 5204268920150750545, guid: ed5db959c7f016e409c7cf5a1c22f6c1, type: 3}
+      propertyPath: leapProvider
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 8788617311211900539, guid: ed5db959c7f016e409c7cf5a1c22f6c1, type: 3}
+      propertyPath: leapProvider
+      value: 
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: ed5db959c7f016e409c7cf5a1c22f6c1, type: 3}
+--- !u!4 &2172032951858911056 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3353867236534347363, guid: ed5db959c7f016e409c7cf5a1c22f6c1, type: 3}
+  m_PrefabInstance: {fileID: 3508242594491347251}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &4557638258395929315
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 529290695823889759}
+    m_Modifications:
+    - target: {fileID: 1135228147649426938, guid: 96865c084214ab34e8c8563d5acb1033, type: 3}
+      propertyPath: leapProvider
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 1135228148254873548, guid: 96865c084214ab34e8c8563d5acb1033, type: 3}
+      propertyPath: Player
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 1135228148254873548, guid: 96865c084214ab34e8c8563d5acb1033, type: 3}
+      propertyPath: movementType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1135228148254873548, guid: 96865c084214ab34e8c8563d5acb1033, type: 3}
+      propertyPath: handRayInteractor
+      value: 
+      objectReference: {fileID: 3413209223664059393}
+    - target: {fileID: 1135228148254873549, guid: 96865c084214ab34e8c8563d5acb1033, type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1135228148254873549, guid: 96865c084214ab34e8c8563d5acb1033, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1135228148254873549, guid: 96865c084214ab34e8c8563d5acb1033, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1135228148254873549, guid: 96865c084214ab34e8c8563d5acb1033, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1135228148254873549, guid: 96865c084214ab34e8c8563d5acb1033, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1135228148254873549, guid: 96865c084214ab34e8c8563d5acb1033, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1135228148254873549, guid: 96865c084214ab34e8c8563d5acb1033, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1135228148254873549, guid: 96865c084214ab34e8c8563d5acb1033, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1135228148254873549, guid: 96865c084214ab34e8c8563d5acb1033, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1135228148254873549, guid: 96865c084214ab34e8c8563d5acb1033, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1135228148254873549, guid: 96865c084214ab34e8c8563d5acb1033, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1135228148254873551, guid: 96865c084214ab34e8c8563d5acb1033, type: 3}
+      propertyPath: m_Name
+      value: Jump Gem Teleport
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 96865c084214ab34e8c8563d5acb1033, type: 3}
+--- !u!4 &3530496812633476398 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1135228148254873549, guid: 96865c084214ab34e8c8563d5acb1033, type: 3}
+  m_PrefabInstance: {fileID: 4557638258395929315}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &3413209223664059393 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1180466939248385762, guid: 96865c084214ab34e8c8563d5acb1033, type: 3}
+  m_PrefabInstance: {fileID: 4557638258395929315}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63e1eae231d74354faee12391cbfbf6e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

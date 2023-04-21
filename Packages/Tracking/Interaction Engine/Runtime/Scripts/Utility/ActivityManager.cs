@@ -1,19 +1,17 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity.Space;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Leap.Unity.Interaction
 {
-#pragma warning disable 0618
     /// <summary>
     /// ActivityManager is a wrapper around PhysX sphere queries for arbitrary Unity objects.
     /// "Active" objects are objects found in the latest query. It's also possible to get the
@@ -92,7 +90,7 @@ namespace Leap.Unity.Interaction
 
         [ThreadStatic]
         private static Collider[] s_colliderResultsBuffer = new Collider[32];
-        public void UpdateActivityQuery(Vector3? queryPosition, List<LeapSpace> spaces = null)
+        public void UpdateActivityQuery(Vector3? queryPosition)
         {
             _activeObjects.Clear();
 
@@ -187,5 +185,4 @@ namespace Leap.Unity.Interaction
             }
         }
     }
-#pragma warning restore 0618
 }

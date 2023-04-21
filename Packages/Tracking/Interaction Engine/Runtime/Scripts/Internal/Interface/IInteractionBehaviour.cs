@@ -1,28 +1,23 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap;
-using Leap.Unity.Attributes;
-using Leap.Unity.Space;
-using System.Collections;
+
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Leap.Unity.Interaction
 {
-#pragma warning disable 0618
     /// <summary>
     /// IInteractionBehaviour is the interface that defines all Interaction objects,
     /// specifying the minimum set of functionality required to make objects interactable.
     /// </summary>
-    public interface IInteractionBehaviour /* : IInternalInteractionBehaviour */
+    public interface IInteractionBehaviour
     {
-
         // Properties from MonoBehaviour.
         string name { get; } // (subclass MonoBehaviour to satisfy)
         GameObject gameObject { get; } // ^
@@ -31,8 +26,6 @@ namespace Leap.Unity.Interaction
         // Properties for interaction.
         InteractionManager manager { get; }
         Rigidbody rigidbody { get; }
-        ISpaceComponent space { get; } // OK to return null if this object is not in
-                                       // curved space.
 
         // Interaction overrides.
         IgnoreHoverMode ignoreHoverMode { get; }
@@ -85,7 +78,5 @@ namespace Leap.Unity.Interaction
         bool isSuspended { get; }
         void BeginSuspension(InteractionController beganSuspending);
         void EndSuspension(InteractionController endedSuspending);
-
     }
-#pragma warning restore 0618
 }

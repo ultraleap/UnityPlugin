@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -16,13 +16,6 @@ namespace Leap
         Frame Frame(int history = 0);
         Frame GetTransformedFrame(LeapTransform trs, int history = 0);
         Frame GetInterpolatedFrame(Int64 time);
-
-        [Obsolete]
-        void SetPolicy(Controller.PolicyFlag policy);
-        [Obsolete]
-        void ClearPolicy(Controller.PolicyFlag policy);
-        [Obsolete]
-        bool IsPolicySet(Controller.PolicyFlag policy);
 
         void SetPolicy(Controller.PolicyFlag policy, Device device = null);
         void ClearPolicy(Controller.PolicyFlag policy, Device device = null);

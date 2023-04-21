@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -12,7 +12,6 @@ using UnityEngine;
 
 namespace Leap.Unity
 {
-#pragma warning disable 0618
     /// <summary>
     /// The CapsuleHand is a basic Leap hand model that generates a set of spheres and 
     /// cylinders to render hands using Leap hand data.
@@ -24,7 +23,6 @@ namespace Leap.Unity
     {
         private const int TOTAL_JOINT_COUNT = 4 * 5;
         private const float CYLINDER_MESH_RESOLUTION = 0.1f; //in centimeters, meshes within this resolution will be re-used
-        private const int THUMB_BASE_INDEX = (int)Finger.FingerType.TYPE_THUMB * 4;
         private const int PINKY_BASE_INDEX = (int)Finger.FingerType.TYPE_PINKY * 4;
 
         private static int _leftColorIndex = 0;
@@ -32,18 +30,17 @@ namespace Leap.Unity
         private static Color[] _leftColorList = { new Color(0.0f, 0.0f, 1.0f), new Color(0.2f, 0.0f, 0.4f), new Color(0.0f, 0.2f, 0.2f) };
         private static Color[] _rightColorList = { new Color(1.0f, 0.0f, 0.0f), new Color(1.0f, 1.0f, 0.0f), new Color(1.0f, 0.5f, 0.0f) };
 
-#pragma warning disable 0649
         [SerializeField]
         private Chirality handedness;
 
         [SerializeField]
         private bool _showArm = true;
 
-        [SerializeField]
-        private bool _showUpperArm = true;
+        [SerializeField, Tooltip("Shows the upper arm. Best in XR, assumes the camera is positioned at the users head")]
+        private bool _showUpperArm = false;
 
         [SerializeField]
-        private bool _showUpperBody = false;
+        private bool _showPalmJoint = true;
 
         [SerializeField]
         private bool _castShadows = true;
@@ -79,7 +76,6 @@ namespace Leap.Unity
         [SerializeField]
         [DisableIf("_useCustomColors", isEqualTo: false)]
         private Color _sphereColor = Color.green, _cylinderColor = Color.white;
-#pragma warning restore 0649
 
         private Material _sphereMat;
         private Hand _hand;
@@ -91,6 +87,8 @@ namespace Leap.Unity
 
         private MaterialPropertyBlock _materialPropertyBlock;
         private Color[] _sphereColors;
+
+        private float currentLossyScaleX;
 
         [HideInInspector]
         public bool SetIndividualSphereColors = false;
@@ -162,7 +160,18 @@ namespace Leap.Unity
         /// <param name="hand"></param>
         public override void SetLeapHand(Hand hand)
         {
-            _hand = hand;
+            if (hand != null)
+            {
+                if (_hand == null)
+                {
+                    _hand = new Hand();
+                }
+                _hand = _hand.CopyFrom(hand);
+            }
+            else
+            {
+                _hand = null;
+            }
         }
 
         /// <summary>
@@ -301,6 +310,8 @@ namespace Leap.Unity
         /// </summary>
         public override void UpdateHand()
         {
+            currentLossyScaleX = transform.lossyScale.x;
+
             _curSphereIndex = 0;
             _curCylinderIndex = 0;
 
@@ -325,22 +336,22 @@ namespace Leap.Unity
                 {
                     int key = getFingerJointIndex((int)finger.Type, j);
 
-                    Vector3 position = finger.Bone((Bone.BoneType)j).NextJoint.ToVector3();
-                    _spherePositions[key] = position;
 
+                    Vector3 position;
+                    if (finger.Type == Finger.FingerType.TYPE_THUMB && j == 0)
+                    {
+                        // Hand the base of the thumb differently, and move it to the base of the index metacarpal.
+                        position = _hand.GetIndex().Bone((Bone.BoneType)j).PrevJoint;
+                    }
+                    else
+                    {
+                        position = finger.Bone((Bone.BoneType)j).NextJoint;
+                    }
+
+                    _spherePositions[key] = position;
                     drawSphere(position);
                 }
             }
-
-            //Now we just have a few more spheres for the hands
-            //PalmPos, WristPos, and mockThumbJointPos, which is derived and not taken from the frame obj
-
-            Vector3 palmPosition = _hand.PalmPosition.ToVector3();
-            drawSphere(palmPosition, _palmRadius);
-
-            Vector3 thumbBaseToPalm = _spherePositions[THUMB_BASE_INDEX] - _hand.PalmPosition.ToVector3();
-            Vector3 mockThumbJointPos = _hand.PalmPosition.ToVector3() + Vector3.Reflect(thumbBaseToPalm, _hand.Basis.xBasis.ToVector3());
-            drawSphere(mockThumbJointPos);
 
             //If we want to show the arm, do the calculations and display the meshes
             if (_showArm)
@@ -351,11 +362,6 @@ namespace Leap.Unity
             if (_showUpperArm)
             {
                 DrawUpperArm();
-            }
-
-            if(_showUpperBody)
-            {
-                DrawUpperBody();
             }
 
             //Draw cylinders between finger joints
@@ -385,9 +391,20 @@ namespace Leap.Unity
                 drawCylinder(posA, posB);
             }
 
-            //Draw the rest of the hand
-            drawCylinder(mockThumbJointPos, THUMB_BASE_INDEX);
-            drawCylinder(mockThumbJointPos, PINKY_BASE_INDEX);
+            if (_showPalmJoint)
+            {
+                //Now we just have a few more spheres for the hands
+                //PalmPos, WristPos, and the virtual palm drawn from the metacarpals.
+                Vector3 palmPosition = _hand.PalmPosition;
+                drawSphere(palmPosition, _palmRadius);
+            }
+
+            Vector3 pinkyMetacarpal = _hand.GetPinky().Bone(Bone.BoneType.TYPE_METACARPAL).PrevJoint;
+            Vector3 indexMetacarpal = _hand.GetIndex().Bone(Bone.BoneType.TYPE_METACARPAL).PrevJoint;
+
+            drawSphere(pinkyMetacarpal);
+            drawCylinder(pinkyMetacarpal, indexMetacarpal);
+            drawCylinder(pinkyMetacarpal, PINKY_BASE_INDEX);
 
             if (SetIndividualSphereColors)
             {
@@ -425,12 +442,12 @@ namespace Leap.Unity
         {
             var arm = _hand.Arm;
 
-            Vector3 right = arm.Basis.xBasis.ToVector3() * arm.Width * 0.7f * 0.5f;
-            Vector3 wrist = arm.WristPosition.ToVector3();
-            Vector3 elbow = arm.ElbowPosition.ToVector3();
+            Vector3 right = arm.Basis.xBasis * arm.Width * 0.7f * 0.5f;
+            Vector3 wrist = arm.WristPosition;
+            Vector3 elbow = arm.ElbowPosition;
 
             float armLength = Vector3.Distance(wrist, elbow);
-            wrist -= arm.Direction.ToVector3() * armLength * 0.05f;
+            wrist -= arm.Direction * armLength * 0.05f;
 
             Vector3 armFrontRight = wrist + right;
             Vector3 armFrontLeft = wrist - right;
@@ -454,8 +471,8 @@ namespace Leap.Unity
 
             var arm = _hand.Arm;
 
-            Vector3 elbow = arm.ElbowPosition.ToVector3();
-            Vector3 right = arm.Basis.xBasis.ToVector3() * arm.Width * 0.7f * 0.5f;
+            Vector3 elbow = arm.ElbowPosition;
+            Vector3 right = arm.Basis.xBasis * arm.Width * 0.7f * 0.5f;
 
             Vector3 armFrontRight = elbow + right;
             Vector3 armFrontLeft = elbow - right;
@@ -471,98 +488,6 @@ namespace Leap.Unity
             drawCylinder(armFrontRight, armBackRight);
         }
 
-        void DrawUpperBody()
-        {
-            if ((leapProvider != null && leapProvider.CurrentFrame.Hands.Count == 1) || handedness == Chirality.Left)
-            {
-                // Head
-
-                Vector3 headBottomLeftFront = Camera.main.transform.TransformPoint(0.06f, -0.05f, 0) + new Vector3(0, -0.05f, 0);
-                Vector3 headBottomRightFront = Camera.main.transform.TransformPoint(-0.06f, -0.05f, 0) + new Vector3(0, -0.05f, 0);
-                Vector3 headTopLeftFront = Camera.main.transform.TransformPoint(0.07f, 0.08f, 0) + new Vector3(0, -0.05f, 0);
-                Vector3 headTopRightFront = Camera.main.transform.TransformPoint(-0.07f, 0.08f, 0) + new Vector3(0, -0.05f, 0);
-
-                Vector3 headBottomLeftBack = Camera.main.transform.TransformPoint(0.06f, -0.05f, -0.1f) + new Vector3(0, -0.05f, 0);
-                Vector3 headBottomRightBack = Camera.main.transform.TransformPoint(-0.06f, -0.05f, -0.1f) + new Vector3(0, -0.05f, 0);
-                Vector3 headTopLeftBack = Camera.main.transform.TransformPoint(0.07f, 0.08f, -0.1f) + new Vector3(0, -0.05f, 0);
-                Vector3 headTopRightBack = Camera.main.transform.TransformPoint(-0.07f, 0.08f, -0.1f) + new Vector3(0, -0.05f, 0);
-
-                drawSphere(headBottomLeftFront);
-                drawSphere(headBottomRightFront);
-                drawSphere(headTopLeftFront);
-                drawSphere(headTopRightFront);
-
-                drawCylinder(headBottomLeftFront, headBottomRightFront);
-                drawCylinder(headTopLeftFront, headTopRightFront);
-                drawCylinder(headBottomLeftFront, headTopLeftFront);
-                drawCylinder(headBottomRightFront, headTopRightFront);
-
-                drawSphere(headBottomLeftBack);
-                drawSphere(headBottomRightBack);
-                drawSphere(headTopLeftBack);
-                drawSphere(headTopRightBack);
-
-                drawCylinder(headBottomLeftBack, headBottomRightBack);
-                drawCylinder(headTopLeftBack, headTopRightBack);
-                drawCylinder(headBottomLeftBack, headTopLeftBack);
-                drawCylinder(headBottomRightBack, headTopRightBack);
-
-                drawCylinder(headTopRightBack, headTopRightFront);
-                drawCylinder(headTopLeftBack, headTopLeftFront);
-                drawCylinder(headBottomLeftBack, headBottomLeftFront);
-                drawCylinder(headBottomRightBack, headBottomRightFront);
-
-                // Neck
-
-                Vector3 neckBottomLeft = Camera.main.transform.TransformPoint(0.02f, -0.15f, -0.05f);
-                Vector3 neckBottomRight = Camera.main.transform.TransformPoint(-0.02f, -0.15f, -0.05f);
-                Vector3 neckTopLeft = (headBottomLeftBack + headBottomLeftFront) / 2;
-                Vector3 neckTopRight = (headBottomRightBack + headBottomRightFront) / 2;
-
-                drawSphere(neckBottomLeft);
-                drawSphere(neckBottomRight);
-                drawSphere(neckTopLeft);
-                drawSphere(neckTopRight);
-
-                drawCylinder(neckBottomLeft, neckBottomRight);
-                drawCylinder(neckTopLeft, neckTopRight);
-                drawCylinder(neckBottomLeft, neckTopLeft);
-                drawCylinder(neckBottomRight, neckTopRight);
-
-                // Torso
-
-                Vector3 torsoBottomLeft = Camera.main.transform.TransformPoint(-0.1f, -0.3f, -0.05f);
-                Vector3 torsoBottomRight = Camera.main.transform.TransformPoint(0.1f, -0.3f, -0.05f);
-                Vector3 torsoTopLeft = Camera.main.transform.TransformPoint(-0.12f, -0.15f, -0.05f);
-                Vector3 torsoTopRight = Camera.main.transform.TransformPoint(0.12f, -0.15f, -0.05f);
-
-                drawSphere(torsoBottomLeft);
-                drawSphere(torsoBottomRight);
-                drawSphere(torsoTopLeft);
-                drawSphere(torsoTopRight);
-
-                drawCylinder(torsoBottomLeft, torsoBottomRight);
-                drawCylinder(torsoTopLeft, torsoTopRight);
-                drawCylinder(torsoBottomLeft, torsoTopLeft);
-                drawCylinder(torsoBottomRight, torsoTopRight);
-
-                Vector3 torsoLowerTopLeft = Camera.main.transform.TransformPoint(-0.05f, -0.3f, -0.05f);
-                Vector3 torsoLowerTopRight = Camera.main.transform.TransformPoint(0.05f, -0.3f, -0.05f);
-                Vector3 torsoLowerBottomLeft = torsoLowerTopLeft + new Vector3(0f, -0.2f, 0);
-                Vector3 torsoLowerBottomRight = torsoLowerTopRight + new Vector3(0f, -0.2f, 0);
-
-                drawSphere(torsoLowerBottomLeft);
-                drawSphere(torsoLowerBottomRight);
-                drawSphere(torsoLowerTopLeft);
-                drawSphere(torsoLowerTopRight);
-
-                drawCylinder(torsoLowerBottomLeft, torsoLowerBottomRight);
-                drawCylinder(torsoLowerTopLeft, torsoLowerTopRight);
-                drawCylinder(torsoLowerBottomLeft, torsoLowerTopLeft);
-                drawCylinder(torsoLowerBottomRight, torsoLowerTopRight);
-            }
-        }
-
         private void drawSphere(Vector3 position)
         {
             drawSphere(position, _jointRadius);
@@ -574,7 +499,7 @@ namespace Leap.Unity
 
             //multiply radius by 2 because the default unity sphere has a radius of 0.5 meters at scale 1.
             _sphereMatrices[_curSphereIndex++] = Matrix4x4.TRS(position,
-              Quaternion.identity, Vector3.one * radius * 2.0f * transform.lossyScale.x);
+              Quaternion.identity, Vector3.one * radius * 2.0f * currentLossyScaleX);
         }
 
         private void drawCylinder(Vector3 a, Vector3 b)
@@ -586,7 +511,7 @@ namespace Leap.Unity
             if ((a - b).magnitude > 0.001f)
             {
                 _cylinderMatrices[_curCylinderIndex++] = Matrix4x4.TRS(a,
-                  Quaternion.LookRotation(b - a), new Vector3(transform.lossyScale.x, transform.lossyScale.x, length));
+                  Quaternion.LookRotation(b - a), new Vector3(currentLossyScaleX, currentLossyScaleX, length));
             }
         }
 
@@ -668,5 +593,4 @@ namespace Leap.Unity
             return mesh;
         }
     }
-#pragma warning restore 0618
 }

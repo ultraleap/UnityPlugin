@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -16,7 +16,6 @@ using UnityEngine;
 
 namespace Leap.Unity.Interaction.Internal
 {
-#pragma warning disable 0618
     public class HeuristicGrabClassifier
     {
 
@@ -82,8 +81,8 @@ namespace Leap.Unity.Interaction.Internal
 
                 for (int i = 0; i < hand.Fingers.Count; i++)
                 {
-                    _fingerTipPositions[i] = hand.Fingers[i].TipPosition.ToVector3();
-                    _fingerKnucklePositions[i] = hand.Fingers[i].Bone(Bone.BoneType.TYPE_METACARPAL).NextJoint.ToVector3();
+                    _fingerTipPositions[i] = hand.Fingers[i].TipPosition;
+                    _fingerKnucklePositions[i] = hand.Fingers[i].Bone(Bone.BoneType.TYPE_METACARPAL).NextJoint;
                 }
 
                 GrabClassifierHeuristics.UpdateAllProbeColliders(_fingerTipPositions, _fingerKnucklePositions, ref _collidingCandidates, ref _numberOfColliders, _scaledGrabParams);
@@ -256,19 +255,18 @@ namespace Leap.Unity.Interaction.Internal
         protected void FillClassifier(IInteractionBehaviour behaviour, Hand hand, ref GrabClassifierHeuristics.GrabClassifier classifier)
         {
             classifier.handChirality = hand.IsLeft;
-            classifier.handDirection = hand.Direction.ToVector3();
-            classifier.handXBasis = hand.Basis.xBasis.ToVector3();
+            classifier.handDirection = hand.Direction;
+            classifier.handXBasis = hand.Basis.xBasis;
             float simScale = interactionHand.manager.SimulationScale;
             classifier.handGrabCenter = (hand.PalmPosition
                                          + (hand.Direction * 0.05f * simScale)
-                                         + (hand.PalmNormal * 0.01f * simScale)).ToVector3();
+                                         + (hand.PalmNormal * 0.01f * simScale));
             for (int i = 0; i < hand.Fingers.Count; i++)
             {
-                classifier.probes[i].direction = hand.Fingers[i].Direction.ToVector3();
+                classifier.probes[i].direction = hand.Fingers[i].Direction;
             }
             classifier.isGrabbed = behaviour.isGrasped;
         }
 
     }
-#pragma warning restore 0618
 }

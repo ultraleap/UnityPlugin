@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -10,7 +10,6 @@ using UnityEngine;
 namespace Leap
 {
     using System;
-#pragma warning disable 0618
     /// <summary>
     /// The LeapTransform class represents a transform in three dimensional space.
     /// 
@@ -21,15 +20,6 @@ namespace Leap
     {
         /// <summary>
         /// Constructs a new transform from the specified translation and rotation.
-        /// @since 3.1.2
-        /// </summary>
-        [System.Obsolete("This signature will be removed in the next major version of the plugin. Use the one with Vector3 and Quaternion instead.")]
-        public LeapTransform(Vector translation, LeapQuaternion rotation) :
-          this(translation, rotation, Vector.Ones)
-        {
-        }
-        /// <summary>
-        /// Constructs a new transform from the specified translation and rotation.
         /// </summary>
         public LeapTransform(Vector3 translation, Quaternion rotation) :
           this(translation, rotation, Vector3.one)
@@ -38,27 +28,14 @@ namespace Leap
 
         /// <summary>
         /// Constructs a new transform from the specified translation, rotation and scale.
-        /// @since 3.1.2
-        /// </summary>
-        [System.Obsolete("This signature will be removed in the next major version of the plugin. Use the one with Vector3 and Quaternion instead.")]
-        public LeapTransform(Vector translation, LeapQuaternion rotation, Vector scale) :
-          this()
-        {
-            _scale = scale;
-            // these are non-trival setters.
-            this.translation = translation;
-            this.rotation = rotation; // Calls validateBasis
-        }
-        /// <summary>
-        /// Constructs a new transform from the specified translation, rotation and scale.
         /// </summary>
         public LeapTransform(Vector3 translation, Quaternion rotation, Vector3 scale) :
           this()
         {
-            _scale = ToVector(scale);
+            this.scale = scale;
             // these are non-trival setters.
-            this.translation = ToVector(translation);
-            this.rotation = ToLeapQuaternion(rotation); // Calls validateBasis
+            this.translation = translation;
+            this.rotation = rotation; // Calls validateBasis
         }
 
         /// <summary>
@@ -67,92 +44,35 @@ namespace Leap
         /// <param name="t">Unity Transform</param>
         public LeapTransform(Transform t) : this()
         {
-            float MM_TO_M = 1e-3f;
-            _scale = new Vector(t.lossyScale.x * MM_TO_M, t.lossyScale.y * MM_TO_M, t.lossyScale.z * MM_TO_M);
-            this.translation = ToVector(t.position);
-            this.rotation = ToLeapQuaternion(t.rotation);
-            this.MirrorZ(); // Unity is left handed.
+            this.scale = t.lossyScale;
+            this.translation = t.position;
+            this.rotation = t.rotation;
         }
 
-        /// <summary>
-        /// Transforms the specified position vector, applying translation, rotation and scale.
-        /// @since 3.1.2
-        /// </summary>
-        [System.Obsolete("This signature will be removed in the next major version of the plugin. Use the one with Vector3 instead.")]
-        public Vector TransformPoint(Vector point)
-        {
-            return _xBasisScaled * point.x + _yBasisScaled * point.y + _zBasisScaled * point.z + translation;
-        }
         /// <summary>
         /// Transforms the specified position vector, applying translation, rotation and scale.
         /// </summary>
         public Vector3 TransformPoint(Vector3 point)
         {
-            return ToVector3(_xBasisScaled * point.x + _yBasisScaled * point.y + _zBasisScaled * point.z + translation);
+            return _xBasisScaled * point.x + _yBasisScaled * point.y + _zBasisScaled * point.z + translation;
         }
 
-        /// <summary>
-        /// Transforms the specified direction vector, applying rotation only.
-        /// @since 3.1.2
-        /// </summary>
-        [System.Obsolete("This signature will be removed in the next major version of the plugin. Use the one with Vector3 instead.")]
-        public Vector TransformDirection(Vector direction)
-        {
-            return _xBasis * direction.x + _yBasis * direction.y + _zBasis * direction.z;
-        }
         /// <summary>
         /// Transforms the specified direction vector, applying rotation only.
         /// </summary>
         public Vector3 TransformDirection(Vector3 direction)
         {
-            return ToVector3(_xBasis * direction.x + _yBasis * direction.y + _zBasis * direction.z);
+            return _xBasis * direction.x + _yBasis * direction.y + _zBasis * direction.z;
         }
 
-        /// <summary>
-        /// Transforms the specified velocity vector, applying rotation and scale.
-        /// @since 3.1.2
-        /// </summary>
-        [System.Obsolete("This signature will be removed in the next major version of the plugin. Use the one with Vector3 instead.")]
-        public Vector TransformVelocity(Vector velocity)
-        {
-            return _xBasisScaled * velocity.x + _yBasisScaled * velocity.y + _zBasisScaled * velocity.z;
-        }
         /// <summary>
         /// Transforms the specified velocity vector, applying rotation and scale.
         /// </summary>
         public Vector3 TransformVelocity(Vector3 velocity)
         {
-            return ToVector3(_xBasisScaled * velocity.x + _yBasisScaled * velocity.y + _zBasisScaled * velocity.z);
+            return _xBasisScaled * velocity.x + _yBasisScaled * velocity.y + _zBasisScaled * velocity.z;
         }
 
-        /// <summary>
-        /// Transforms the specified quaternion.
-        /// Multiplies the quaternion representing the rotational part of this transform by the specified
-        /// quaternion.
-        ///
-        /// **Important:** Modifying the basis vectors of this transform directly leaves the underlying quaternion in
-        /// an indeterminate state. Neither this function nor the LeapTransform.rotation quaternion can be used after
-        /// the basis vectors are set.
-        ///
-        /// @since 3.1.2
-        /// </summary>
-        [System.Obsolete("This signature will be removed in the next major version of the plugin. Use the one with UnityEngine.Quaternion instead.")]
-        public LeapQuaternion TransformQuaternion(LeapQuaternion rhs)
-        {
-            if (_quaternionDirty)
-                throw new InvalidOperationException("Calling TransformQuaternion after Basis vectors have been modified.");
-
-            if (_flip)
-            {
-                // Mirror the axis of rotation across the flip axis.
-                rhs.x *= _flipAxes.x;
-                rhs.y *= _flipAxes.y;
-                rhs.z *= _flipAxes.z;
-            }
-
-            LeapQuaternion t = _quaternion.Multiply(rhs);
-            return t;
-        }
         /// <summary>
         /// Transforms the specified quaternion.
         /// Multiplies the quaternion representing the rotational part of this transform by the specified
@@ -175,7 +95,7 @@ namespace Leap
                 rhs.z *= _flipAxes.z;
             }
 
-            Quaternion t = ToQuaternion(_quaternion) * rhs;
+            Quaternion t = _quaternion * rhs;
             return t;
         }
 
@@ -216,8 +136,7 @@ namespace Leap
         ///
         /// @since 3.1.2
         /// </summary>
-        [System.Obsolete("Its type will be changed from Vector to Vector3")]
-        public Vector xBasis
+        public Vector3 xBasis
         {
             get { return _xBasis; }
             set
@@ -237,8 +156,7 @@ namespace Leap
         ///
         /// @since 3.1.2
         /// </summary>
-        [System.Obsolete("Its type will be changed from Vector to Vector3")]
-        public Vector yBasis
+        public Vector3 yBasis
         {
             get { return _yBasis; }
             set
@@ -258,8 +176,7 @@ namespace Leap
         ///
         /// @since 3.1.2
         /// </summary>
-        [System.Obsolete("Its type will be changed from Vector to Vector3")]
-        public Vector zBasis
+        public Vector3 zBasis
         {
             get { return _zBasis; }
             set
@@ -274,8 +191,7 @@ namespace Leap
         /// The translation component of the transform.
         /// @since 3.1.2
         /// </summary>
-        [System.Obsolete("Its type will be changed from Vector to Vector3")]
-        public Vector translation
+        public Vector3 translation
         {
             get { return _translation; }
             set
@@ -289,8 +205,7 @@ namespace Leap
         /// Scale is kept separate from translation.
         /// @since 3.1.2
         /// </summary>
-        [System.Obsolete("Its type will be changed from Vector to Vector3")]
-        public Vector scale
+        public Vector3 scale
         {
             get { return _scale; }
             set
@@ -311,8 +226,7 @@ namespace Leap
         ///
         /// @since 3.1.2
         /// </summary>
-        [System.Obsolete("Its type will be changed from LeapQuaternion to UnityEngine.Quaternion")]
-        public LeapQuaternion rotation
+        public Quaternion rotation
         {
             get
             {
@@ -331,9 +245,9 @@ namespace Leap
                 float xx = value.x * xs, xy = value.x * ys, xz = value.x * zs;
                 float yy = value.y * ys, yz = value.y * zs, zz = value.z * zs;
 
-                _xBasis = new Vector(1.0f - (yy + zz), xy + wz, xz - wy);
-                _yBasis = new Vector(xy - wz, 1.0f - (xx + zz), yz + wx);
-                _zBasis = new Vector(xz + wy, yz - wx, 1.0f - (xx + yy));
+                _xBasis = new Vector3(1.0f - (yy + zz), xy + wz, xz - wy);
+                _yBasis = new Vector3(xy - wz, 1.0f - (xx + zz), yz + wx);
+                _zBasis = new Vector3(xz + wy, yz - wx, 1.0f - (xx + yy));
 
                 _xBasisScaled = _xBasis * scale.x;
                 _yBasisScaled = _yBasis * scale.y;
@@ -341,7 +255,7 @@ namespace Leap
 
                 _quaternionDirty = false;
                 _flip = false;
-                _flipAxes = new Vector(1.0f, 1.0f, 1.0f);
+                _flipAxes = new Vector3(1.0f, 1.0f, 1.0f);
             }
         }
 
@@ -351,52 +265,17 @@ namespace Leap
         /// </summary>
         public static readonly LeapTransform Identity = new LeapTransform(Vector3.zero, Quaternion.identity, Vector3.one);
 
-        [System.Obsolete("Its type will be changed from Vector to Vector3")]
-        private Vector _translation;
-        [System.Obsolete("Its type will be changed from Vector to Vector3")]
-        private Vector _scale;
-        [System.Obsolete("Its type will be changed from LeapQuaternion to UnityEngine.Quaternion")]
-        private LeapQuaternion _quaternion;
+        private Vector3 _translation;
+        private Vector3 _scale;
+        private Quaternion _quaternion;
         private bool _quaternionDirty;
         private bool _flip;
-        [System.Obsolete("Its type will be changed from Vector to Vector3")]
-        private Vector _flipAxes;
-        [System.Obsolete("Its type will be changed from Vector to Vector3")]
-        private Vector _xBasis;
-        [System.Obsolete("Its type will be changed from Vector to Vector3")]
-        private Vector _yBasis;
-        [System.Obsolete("Its type will be changed from Vector to Vector3")]
-        private Vector _zBasis;
-        [System.Obsolete("Its type will be changed from Vector to Vector3")]
-        private Vector _xBasisScaled;
-        [System.Obsolete("Its type will be changed from Vector to Vector3")]
-        private Vector _yBasisScaled;
-        [System.Obsolete("Its type will be changed from Vector to Vector3")]
-        private Vector _zBasisScaled;
-
-        [Obsolete("This will be removed in the next major version update")]
-        private Vector ToVector(Vector3 v)
-        {
-            return new Vector(v.x, v.y, v.z);
-        }
-
-        [Obsolete("This will be removed in the next major version update")]
-        private Vector3 ToVector3(Vector v)
-        {
-            return new Vector3(v.x, v.y, v.z);
-        }
-
-        [Obsolete("This will be removed in the next major version update")]
-        private LeapQuaternion ToLeapQuaternion(Quaternion q)
-        {
-            return new LeapQuaternion(q.x, q.y, q.z, q.w);
-        }
-
-        [Obsolete("This will be removed in the next major version update")]
-        private Quaternion ToQuaternion(LeapQuaternion q)
-        {
-            return new Quaternion(q.x, q.y, q.z, q.w);
-        }
+        private Vector3 _flipAxes;
+        private Vector3 _xBasis;
+        private Vector3 _yBasis;
+        private Vector3 _zBasis;
+        private Vector3 _xBasisScaled;
+        private Vector3 _yBasisScaled;
+        private Vector3 _zBasisScaled;
     }
-#pragma warning restore 0618
 }

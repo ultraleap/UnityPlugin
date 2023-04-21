@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -9,31 +9,22 @@
 using LeapInternal;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
 
 namespace Leap.Unity
 {
-
     [CustomEditor(typeof(LeapServiceProvider))]
     public class LeapServiceProviderEditor : CustomEditorBase<LeapServiceProvider>
     {
-        [Obsolete]
-        protected Quaternion deviceRotation = Quaternion.identity;
         protected bool isVRProvider = false;
-
-        [Obsolete]
-        protected Vector3 controllerOffset = Vector3.zero;
 
         private LeapServiceProvider _leapServiceProvider;
         private Controller _leapController;
 
         private List<string> _serialNumbers;
         private int _chosenDeviceIndex;
-
 
         protected override void OnEnable()
         {
@@ -72,7 +63,7 @@ namespace Leap.Unity
             specifyCustomDrawer("_specificSerialNumber", drawSerialNumberToggle);
 
             deferProperty("_serverNameSpace");
-            deferProperty("_workerThreadProfiling");
+            deferProperty("_useInterpolation");
 
             if (!(LeapServiceProvider is LeapXRServiceProvider))
             {
@@ -82,8 +73,8 @@ namespace Leap.Unity
             {
                 hideField("_trackingOptimization");
             }
+            addPropertyToFoldout("_useInterpolation", "Advanced Options");
             addPropertyToFoldout("_serverNameSpace", "Advanced Options");
-            addPropertyToFoldout("_workerThreadProfiling", "Advanced Options");
         }
 
         private void frameOptimizationWarning(SerializedProperty property)
@@ -272,6 +263,5 @@ namespace Leap.Unity
             // Repaint the inspector windows if the devices have changed
             Repaint();
         }
-
     }
 }

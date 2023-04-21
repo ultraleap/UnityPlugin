@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -69,30 +69,6 @@ namespace Leap
         /// @since 4.1
         /// </summary>
         public UInt32 DeviceID;
-
-        [Obsolete]
-        public int SerializeLength
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        [Obsolete]
-        public byte[] Serialize
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        [Obsolete]
-        public void Deserialize(byte[] arg)
-        {
-            throw new NotImplementedException();
-        }
 
         /// <summary>
         /// The Hand object with the specified ID in this frame, or null if none

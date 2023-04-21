@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -8,7 +8,6 @@
 
 namespace Leap
 {
-#pragma warning disable 0618
     public static class CopyFromOtherExtensions
     {
 
@@ -46,7 +45,6 @@ namespace Leap
             hand.Id = source.Id;
             hand.Confidence = source.Confidence;
             hand.GrabStrength = source.GrabStrength;
-            hand.GrabAngle = source.GrabAngle;
             hand.Rotation = source.Rotation;
             hand.PinchStrength = source.PinchStrength;
             hand.PinchDistance = source.PinchDistance;
@@ -117,5 +115,4 @@ namespace Leap
             return bone;
         }
     }
-#pragma warning restore 0618
 }

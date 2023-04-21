@@ -1,15 +1,11 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity;
-using Leap.Unity.Attachments;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Leap.Unity.Attachments
@@ -17,7 +13,6 @@ namespace Leap.Unity.Attachments
 
     public class AttachmentHandEnableDisable : MonoBehaviour
     {
-
         public AttachmentHand attachmentHand;
 
         void Update()
@@ -34,7 +29,5 @@ namespace Leap.Unity.Attachments
                 attachmentHand.gameObject.SetActive(true);
             }
         }
-
     }
-
 }

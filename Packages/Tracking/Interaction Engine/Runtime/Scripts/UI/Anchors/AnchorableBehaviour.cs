@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -7,13 +7,13 @@
  ******************************************************************************/
 
 using Leap.Unity.Attributes;
+
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Leap.Unity.Interaction
 {
-#pragma warning disable 0618
     /// <summary>
     /// AnchorableBehaviours mix well with InteractionBehaviours you'd like to be able to
     /// pick up and place in specific locations, specified by other GameObjects with an
@@ -257,9 +257,14 @@ namespace Leap.Unity.Interaction
                + "towards a nearby InteractionHand? Value is in Unity distance units, WORLD space.")]
         public float maxAttractionReach = 0.1F;
 
+        [Tooltip("If the object is attracted to hands, how fast should the object move towards the hand? Higher values are faster. " 
+                +"This speed is multiplied by deltaTime.")]
+        [Range(0, 100F)]
+        public float anchorHandAttractionRate = 5.0f;
+
         [Tooltip("This curve converts the distance of the hand (X axis) to the desired attraction reach distance for the object (Y axis). "
                + "The evaluated value is clamped between 0 and 1, and then scaled by maxAttractionReach.")]
-        public AnimationCurve attractionReachByDistance;
+        public AnimationCurve attractionReachByDistance = new AnimationCurve(new Keyframe(0, 0), new Keyframe(1, 1));
 
         private Anchor _preferredAnchor = null;
         /// <summary>
@@ -655,13 +660,31 @@ namespace Leap.Unity.Interaction
 
             if (preferredAnchor != null)
             {
-                _preferredAnchor = preferredAnchor;
-                anchor = preferredAnchor;
-                isAttached = true;
+                AttachToNearestAnchor(preferredAnchor);
                 return true;
             }
 
             return false;
+        }
+
+        public void AttachToNearestAnchor()
+        {
+            AttachToNearestAnchor(null);
+        }
+
+        private void AttachToNearestAnchor(Anchor preferredAnchor)
+        {
+            if (preferredAnchor == null)
+            {
+                preferredAnchor = FindPreferredAnchor();
+            }
+
+            if (preferredAnchor != null)
+            {
+                _preferredAnchor = preferredAnchor;
+                anchor = preferredAnchor;
+                isAttached = true;
+            }
         }
 
         /// <summary> Score an anchor based on its proximity and this object's trajectory relative to it. </summary>
@@ -728,7 +751,7 @@ namespace Leap.Unity.Interaction
             {
                 if (_offsetTowardsHand != Vector3.zero)
                 {
-                    _offsetTowardsHand = Vector3.Lerp(_offsetTowardsHand, Vector3.zero, 5F * Time.deltaTime);
+                    _offsetTowardsHand = Vector3.Lerp(_offsetTowardsHand, Vector3.zero, anchorHandAttractionRate * Time.deltaTime);
                 }
 
                 return;
@@ -744,7 +767,7 @@ namespace Leap.Unity.Interaction
                 if (hoveringController is InteractionHand)
                 {
                     Hand hoveringHand = interactionBehaviour.closestHoveringHand;
-                    hoverTarget = hoveringHand.PalmPosition.ToVector3();
+                    hoverTarget = hoveringHand.PalmPosition;
                 }
                 else
                 {
@@ -757,7 +780,7 @@ namespace Leap.Unity.Interaction
             }
 
             Vector3 targetOffsetTowardsHand = towardsHand * maxAttractionReach * reachTargetAmount;
-            _offsetTowardsHand = Vector3.Lerp(_offsetTowardsHand, targetOffsetTowardsHand, 5 * Time.deltaTime);
+            _offsetTowardsHand = Vector3.Lerp(_offsetTowardsHand, targetOffsetTowardsHand, anchorHandAttractionRate * Time.deltaTime);
         }
 
         private void updateAnchorAttachment()
@@ -954,10 +977,8 @@ namespace Leap.Unity.Interaction
 
         #region Unity Events (Internal)
 
-#pragma warning disable 0649
         [SerializeField]
         private EnumEventTable _eventTable;
-#pragma warning restore 0649
 
         public enum EventType
         {
@@ -1001,5 +1022,4 @@ namespace Leap.Unity.Interaction
         #endregion
 
     }
-#pragma warning restore 0618
 }

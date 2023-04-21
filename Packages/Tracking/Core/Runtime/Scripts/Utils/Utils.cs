@@ -1,12 +1,11 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2021.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity.Query;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -102,73 +101,6 @@ namespace Leap.Unity
             array = newArray;
         }
 
-        [System.Obsolete("This code will be removed in the next major version of the plugin. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
-        /// <summary>
-        /// Returns whether or not two lists contain the same elements ignoring order.
-        /// </summary>
-        public static bool AreEqualUnordered<T>(IList<T> a, IList<T> b)
-        {
-            var _count = Pool<Dictionary<T, int>>.Spawn();
-            try
-            {
-                int _nullCount = 0;
-
-                foreach (var i in a)
-                {
-                    if (i == null)
-                    {
-                        _nullCount++;
-                    }
-                    else
-                    {
-                        int count;
-                        if (!_count.TryGetValue(i, out count))
-                        {
-                            count = 0;
-                        }
-                        _count[i] = count + 1;
-                    }
-                }
-
-                foreach (var i in b)
-                {
-                    if (i == null)
-                    {
-                        _nullCount--;
-                    }
-                    else
-                    {
-                        int count;
-                        if (!_count.TryGetValue(i, out count))
-                        {
-                            return false;
-                        }
-                        _count[i] = count - 1;
-                    }
-                }
-
-                if (_nullCount != 0)
-                {
-                    return false;
-                }
-
-                foreach (var pair in _count)
-                {
-                    if (pair.Value != 0)
-                    {
-                        return false;
-                    }
-                }
-
-                return true;
-            }
-            finally
-            {
-                _count.Clear();
-                Pool<Dictionary<T, int>>.Recycle(_count);
-            }
-        }
-
         // http://stackoverflow.com/a/19317229/2471635
         /// <summary>
         /// Returns whether this type implements the argument interface type.
@@ -226,33 +158,6 @@ namespace Leap.Unity
             ordering.Sort((a, b) => list[a].CompareTo(list[b]));
 
             return ordering;
-        }
-
-        [System.Obsolete("This code will be removed in the next major version of the plugin. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
-        /// <summary>
-        /// Given a list and an ordering, order the list according to the ordering.
-        /// This method assumes the ordering is a valid ordering.
-        /// </summary>
-        public static void ApplyOrdering<T>(this IList<T> list, List<int> ordering)
-        {
-            Assert.IsNotNull(list);
-            Assert.IsNotNull(ordering);
-            Assert.AreEqual(list.Count, ordering.Count, "List must be the same length as the ordering.");
-
-            List<T> copy = Pool<List<T>>.Spawn();
-            try
-            {
-                copy.AddRange(list);
-                for (int i = 0; i < list.Count; i++)
-                {
-                    list[i] = copy[ordering[i]];
-                }
-            }
-            finally
-            {
-                copy.Clear();
-                Pool<List<T>>.Recycle(copy);
-            }
         }
 
         public static string MakeRelativePath(string relativeTo, string path)
@@ -990,32 +895,6 @@ namespace Leap.Unity
 
         #region Array Utils
 
-        /// <summary>
-        /// Sets all elements in the array of type T to default(T).
-        /// </summary>
-        [System.Obsolete("This code will be removed in the next major version of the plugin. Please use Fill<T> instead")]
-        public static T[] ClearWithDefaults<T>(this T[] arr)
-        {
-            for (int i = 0; i < arr.Length; i++)
-            {
-                arr[i] = default(T);
-            }
-            return arr;
-        }
-
-        /// <summary>
-        /// Sets all elements in the array of type T to the argument value.
-        /// </summary>
-        [System.Obsolete("This code will be removed in the next major version of the plugin. Please use Fill<T> instead")]
-        public static T[] ClearWith<T>(this T[] arr, T value)
-        {
-            for (int i = 0; i < arr.Length; i++)
-            {
-                arr[i] = value;
-            }
-            return arr;
-        }
-
         /// <summary> Executes the delegate for each object in the array that is
         /// non-null. </summary>
         public static void ForEach<T>(this T[] arr, Action<T> doFunc)
@@ -1115,34 +994,6 @@ namespace Leap.Unity
         }
 
         #endregion
-
-        #region Dictionary Utils
-
-        [System.Obsolete("This code will be removed in the next major version of the plugin. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
-        /// <summary> Removes all entries where check returns true. </summary>
-        public static void RemoveAll<K, V>(this Dictionary<K, V> d, Func<K, V, bool> check)
-        {
-            var removeBuffer = Pool<List<K>>.Spawn().Cleared();
-            try
-            {
-                foreach (var kv in d)
-                {
-                    var k = kv.Key; var v = kv.Value;
-                    if (check(k, v)) { removeBuffer.Add(k); }
-                }
-                foreach (var k in removeBuffer)
-                {
-                    d.Remove(k);
-                }
-            }
-            finally
-            {
-                Pool<List<K>>.Recycle(removeBuffer);
-            }
-        }
-
-        #endregion
-
 
         #region Camera Utils
 
@@ -1313,28 +1164,6 @@ namespace Leap.Unity
 #else
             return false;
 #endif
-        }
-
-        /// <summary>
-        /// Usage is the same as FindObjectOfType, but this method will also return objects
-        /// that are inactive.
-        /// 
-        /// Use this method to search for singleton-pattern objects even if they are disabled,
-        /// but be warned that it's not cheap to call!
-        /// </summary>
-        [System.Obsolete("This code will be removed in the next major version of the plugin. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
-        public static T FindObjectInHierarchy<T>() where T : UnityEngine.Object
-        {
-            return Resources.FindObjectsOfTypeAll<T>().Query()
-              .Where(o =>
-              {
-#if UNITY_EDITOR
-                  // Exclude prefab assets found by the Resources scan.
-                  if (IsObjectPartOfPrefabAsset(o)) { return false; }
-#endif
-                  return true;
-              })
-              .FirstOrDefault();
         }
 
         #endregion
@@ -1554,91 +1383,6 @@ namespace Leap.Unity
 
         #endregion
 
-        #region Component Utils
-
-        /// <summary>
-        /// Recursively searches the hierarchy of the argument Transform to find all of the
-        /// Components of type ComponentType (the first type argument) that should be "owned"
-        /// by the OwnerType component type (the second type argument).
-        /// 
-        /// If a child GameObject itself has an OwnerType component, that
-        /// child is ignored, and its children are ignored -- the assumption being that such
-        /// a child owns itself and any ComponentType components beneath it.
-        /// 
-        /// For example, a call to FindOwnedChildComponents with ComponentType Collider and
-        /// OwnerType Rigidbody would return all of the Colliders that are attached to the
-        /// rootObj Rigidbody, but none of the colliders that are attached to a rootObj's
-        /// child's own Rigidbody.
-        /// 
-        /// Optionally, ComponentType components of inactive GameObjects can be included
-        /// in the returned list; by default, these components are skipped.
-        /// 
-        /// This is not a cheap method to call, but it does not allocate garbage, so it is safe
-        /// for use at runtime.
-        /// </summary>
-        /// 
-        /// <typeparam name="ComponentType">
-        /// The component type to search for.
-        /// </typeparam>
-        /// 
-        /// <typeparam name="OwnerType">
-        /// The component type that assumes ownership of any ComponentType in its own Transform
-        /// or its Transform's children/grandchildren.
-        /// </typeparam>
-        [System.Obsolete("This code will be removed in the next major version of the plugin. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
-        public static void FindOwnedChildComponents<ComponentType, OwnerType>
-                                                   (OwnerType rootObj,
-                                                    List<ComponentType> ownedComponents,
-                                                    bool includeInactiveObjects = false)
-                                                   where OwnerType : Component
-        {
-            ownedComponents.Clear();
-            Stack<Transform> toVisit = Pool<Stack<Transform>>.Spawn();
-            List<ComponentType> componentsBuffer = Pool<List<ComponentType>>.Spawn();
-
-            try
-            {
-                toVisit.Push(rootObj.transform);
-                Transform curTransform;
-                while (toVisit.Count > 0)
-                {
-                    curTransform = toVisit.Pop();
-
-                    // Recursively search children and children's children.
-                    foreach (var child in curTransform.GetChildren())
-                    {
-                        // Ignore children with OwnerType components of their own; its own OwnerType
-                        // component owns its own ComponentType components and the ComponentType
-                        // components of its children.
-                        if (child.GetComponent<OwnerType>() == null
-                            && (includeInactiveObjects || child.gameObject.activeInHierarchy))
-                        {
-                            toVisit.Push(child);
-                        }
-                    }
-
-                    // Since we'll visit every valid child, all we need to do is add the
-                    // ComponentType components of every transform we visit.
-                    componentsBuffer.Clear();
-                    curTransform.GetComponents<ComponentType>(componentsBuffer);
-                    foreach (var component in componentsBuffer)
-                    {
-                        ownedComponents.Add(component);
-                    }
-                }
-            }
-            finally
-            {
-                toVisit.Clear();
-                Pool<Stack<Transform>>.Recycle(toVisit);
-
-                componentsBuffer.Clear();
-                Pool<List<ComponentType>>.Recycle(componentsBuffer);
-            }
-        }
-
-        #endregion
-
         #region Orientation Utils
 
         /// <summary>
@@ -1795,24 +1539,6 @@ namespace Leap.Unity
               maxAngle);
         }
 
-        [System.Obsolete("This code will be removed in the next major version of the plugin. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
-        public static Vector3 GetCentroid(
-          System.Action<List<Vector3>> fillPoints)
-        {
-            var points = Pool<List<Vector3>>.Spawn().Cleared();
-            fillPoints(points);
-            if (points.Count == 0) { return default(Vector3); }
-
-            var centroid = Vector3.zero;
-            for (var i = 0; i < points.Count; i++)
-            {
-                centroid += points[i];
-            }
-            centroid /= points.Count;
-
-            return centroid;
-        }
-
         public static Vector3 GetCentroid(Vector3[] points)
         {
             var centroid = Vector3.zero;
@@ -1947,6 +1673,16 @@ namespace Leap.Unity
         public static Quaternion MirroredZ(this Quaternion q)
         {
             return new Quaternion(q.x, q.y, -q.z, -q.w);
+        }
+
+        public static Quaternion TransformRotation(this Transform transform, Quaternion rotation)
+        {
+            return transform.rotation * rotation;
+        }
+
+        public static Quaternion InverseTransformRotation(this Transform transform, Quaternion rotation)
+        {
+            return Quaternion.Inverse(transform.rotation) * rotation;
         }
 
         #region Compression
@@ -2368,50 +2104,6 @@ namespace Leap.Unity
 
         #endregion
 
-        #region Physics Utils
-
-        /// <summary>
-        /// Calls Physics.IgnoreCollision for each Collider in the first GameObject against
-        /// each Collider in the second GameObject.
-        /// 
-        /// If you have many colliders that need to ignore collisions, consider utilizing
-        /// Layer collision settings as an optimization.
-        /// </summary>
-        [System.Obsolete("This code will be removed in the next major version of the plugin. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
-        public static void IgnoreCollisions(GameObject first, GameObject second,
-                                            bool ignore = true)
-        {
-            if (first == null || second == null)
-                return;
-
-            var firstColliders = Pool<List<Collider>>.Spawn(); firstColliders.Clear();
-            var secondColliders = Pool<List<Collider>>.Spawn(); secondColliders.Clear();
-            try
-            {
-                first.GetComponentsInChildren(firstColliders);
-                second.GetComponentsInChildren(secondColliders);
-
-                for (int i = 0; i < firstColliders.Count; ++i)
-                {
-                    for (int j = 0; j < secondColliders.Count; ++j)
-                    {
-                        if (firstColliders[i] != secondColliders[j] &&
-                            firstColliders[i].enabled && secondColliders[j].enabled)
-                        {
-                            Physics.IgnoreCollision(firstColliders[i], secondColliders[j], ignore);
-                        }
-                    }
-                }
-            }
-            finally
-            {
-                firstColliders.Clear(); Pool<List<Collider>>.Recycle(firstColliders);
-                secondColliders.Clear(); Pool<List<Collider>>.Recycle(secondColliders);
-            }
-        }
-
-        #endregion
-
         #region Collider Utils
 
         #region Capsule Collider Utils
@@ -2437,14 +2129,14 @@ namespace Leap.Unity
             switch (capsule.direction)
             {
                 case 0:
-                    effRadiusMult = Swizzle.Swizzle.yz(capsule.transform.lossyScale).CompMax();
+                    effRadiusMult = Swizzle.yz(capsule.transform.lossyScale).CompMax();
                     break;
                 case 1:
-                    effRadiusMult = Swizzle.Swizzle.xz(capsule.transform.lossyScale).CompMax();
+                    effRadiusMult = Swizzle.xz(capsule.transform.lossyScale).CompMax();
                     break;
                 case 2:
                 default:
-                    effRadiusMult = Swizzle.Swizzle.xy(capsule.transform.lossyScale).CompMax();
+                    effRadiusMult = Swizzle.xy(capsule.transform.lossyScale).CompMax();
                     break;
             }
             return effRadiusMult;
@@ -3023,27 +2715,6 @@ namespace Leap.Unity
             public void Reset()
             {
                 index = -1;
-            }
-
-            [System.Obsolete("This code will be removed in the next major version of the plugin. If you believe that it needs to be kept, please open a discussion on the GitHub forum (https://github.com/ultraleap/UnityPlugin/discussions)")]
-            public Query<Rect> Query()
-            {
-                List<Rect> rects = Pool<List<Rect>>.Spawn();
-                try
-                {
-
-                    foreach (var rect in this)
-                    {
-                        rects.Add(rect);
-                    }
-                    return new Query<Rect>(rects);
-
-                }
-                finally
-                {
-                    rects.Clear();
-                    Pool<List<Rect>>.Recycle(rects);
-                }
             }
         }
 
