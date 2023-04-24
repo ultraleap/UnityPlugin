@@ -1,19 +1,15 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 //#if UNITY_EDITOR
-using UnityEditor;
-using UnityEngine.SocialPlatforms.Impl;
-using UnityEngine.PlayerLoop;
 using System.IO;
+using System.Collections.Generic;
+using UnityEditor;
 using UnityEditor.PackageManager.UI;
-using UnityEditor.PackageManager;
-using static UnityEditor.Progress;
+using System.Linq;
 //#endif
-
 
 namespace Leap.Unity
 {
+    //#if UNITY_EDITOR
     [InitializeOnLoad]
     public static class RunOnStart
     {
@@ -24,45 +20,31 @@ namespace Leap.Unity
 
         static void DoOnce()
         {
-            ///////////////////// Remove This! ////////////////////
-            EditorPrefs.SetBool("ShowExamplePopup", true);
-            ////////////////////////////////////////////////////
-
+            PluginSettingsPopupWindow window = new PluginSettingsPopupWindow();
             
-
             if (!PluginSettingsPopupWindow.TrackingExamplesExist() && PluginSettingsPopupWindow.GetPackageInfo("com.ultraleap.tracking") != null 
                 || !PluginSettingsPopupWindow.TrackingPreviewExamplesExist() && PluginSettingsPopupWindow.GetPackageInfo("com.ultraleap.tracking.preview") != null
                  )
             {
-                PluginSettingsPopupWindow window = new PluginSettingsPopupWindow();
                 window.name = "Ultraleap Examples";
 
-                if (!SessionState.GetBool("FirstInitDone", false))
+                if (!SessionState.GetBool("FirstInitDone", false) && (EditorPrefs.GetBool("ShowExamplePopup")))
                 {
                     SessionState.SetBool("FirstInitDone", true);
 
-                    if (EditorPrefs.GetBool("ShowExamplePopup"))
-                    {
-                        window.position = new Rect(Screen.width / 2, Screen.height / 2, 250, 150);
-                        window.ShowUtility();
-                    }
+                    window.position = new Rect(Screen.width / 2, Screen.height / 2, 250, 150);
+                    window.ShowUtility();
                 }
             }
         }
-
-        private static bool TrackingExamplesExist()
-        {
-            return Directory.Exists("Assets/Samples/Ultraleap Tracking");
-        }
-
     }
 
 
-    
     public class PluginSettingsPopupWindow : EditorWindow
     {
         void OnGUI()
         {
+            this.autoRepaintOnSceneChange = true;
             EditorGUILayout.LabelField("We've noticed you dont have our examples inported in this project, would you like to import them now?", EditorStyles.wordWrappedLabel);
             GUILayout.Space(20);
 
@@ -96,23 +78,13 @@ namespace Leap.Unity
             }
             else
             {
+                //contentExists = true;
                 if (GUILayout.Button("No Thanks"))
                 {
                     this.Close();
                 }
             }
 
-            
-        }
-
-
-        public static bool TrackingExamplesExist()
-        {
-            return Directory.Exists("Assets/Samples/Ultraleap Tracking");
-        }
-        public static bool TrackingPreviewExamplesExist()
-        {
-            return Directory.Exists("Assets/Samples/Ultraleap Tracking Preview");
         }
 
         private bool ImportPackageExamples(string packageName)
@@ -133,29 +105,24 @@ namespace Leap.Unity
 
         public static UnityEditor.PackageManager.PackageInfo GetPackageInfo(string packageName) 
         {
-            var allPackages = UnityEditor.PackageManager.PackageInfo.GetAllRegisteredPackages();
-            foreach (var package in allPackages)
-            {
-                if (package.name == packageName)
-                {
-                    return package;
-                }
-            }
-            return null;
-        }
-        
-        static string GetPackageFullPath(string packageName)
-        {
-            // Check for potential UPM package
-            string packagePath = Path.GetFullPath("Packages/" + packageName);
-            if (Directory.Exists(packagePath))
-            {
-                return packagePath;
-            }
+            List<UnityEditor.PackageManager.PackageInfo> packageJsons = AssetDatabase.FindAssets("package")
+                .Select(AssetDatabase.GUIDToAssetPath).Where(x => AssetDatabase.LoadAssetAtPath<TextAsset>(x) != null)
+                .Select(UnityEditor.PackageManager.PackageInfo.FindForAssetPath).ToList();
 
-            return null;
+            return packageJsons.FirstOrDefault(x => x.name == packageName);
+        }
+
+        public static bool TrackingExamplesExist()
+        {
+            return Directory.Exists("Assets/Samples/Ultraleap Tracking");
+        }
+        public static bool TrackingPreviewExamplesExist()
+        {
+            return Directory.Exists("Assets/Samples/Ultraleap Tracking Preview");
         }
     }
+    //#endif
 
 
 }
+
