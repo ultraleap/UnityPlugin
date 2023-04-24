@@ -28,7 +28,11 @@ namespace Leap.Unity
             EditorPrefs.SetBool("ShowExamplePopup", true);
             ////////////////////////////////////////////////////
 
-            if (!TrackingExamplesExist())
+            
+
+            if (!PluginSettingsPopupWindow.TrackingExamplesExist() && PluginSettingsPopupWindow.GetPackageInfo("com.ultraleap.tracking") != null 
+                || !PluginSettingsPopupWindow.TrackingPreviewExamplesExist() && PluginSettingsPopupWindow.GetPackageInfo("com.ultraleap.tracking.preview") != null
+                 )
             {
                 PluginSettingsPopupWindow window = new PluginSettingsPopupWindow();
                 window.name = "Ultraleap Examples";
@@ -83,20 +87,30 @@ namespace Leap.Unity
             }
             GUILayout.EndHorizontal();
 
-            if (GUILayout.Button("No Thanks"))
+            if (TrackingPreviewExamplesExist() && TrackingExamplesExist())
             {
-                this.Close();
+                if (GUILayout.Button("All Examples Imported. Close this window."))
+                {
+                    this.Close();
+                }
+            }
+            else
+            {
+                if (GUILayout.Button("No Thanks"))
+                {
+                    this.Close();
+                }
             }
 
             
         }
 
 
-        private static bool TrackingExamplesExist()
+        public static bool TrackingExamplesExist()
         {
             return Directory.Exists("Assets/Samples/Ultraleap Tracking");
         }
-        private static bool TrackingPreviewExamplesExist()
+        public static bool TrackingPreviewExamplesExist()
         {
             return Directory.Exists("Assets/Samples/Ultraleap Tracking Preview");
         }
@@ -117,7 +131,7 @@ namespace Leap.Unity
             return false;
         }
 
-        private UnityEditor.PackageManager.PackageInfo GetPackageInfo(string packageName) 
+        public static UnityEditor.PackageManager.PackageInfo GetPackageInfo(string packageName) 
         {
             var allPackages = UnityEditor.PackageManager.PackageInfo.GetAllRegisteredPackages();
             foreach (var package in allPackages)
