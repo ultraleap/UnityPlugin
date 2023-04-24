@@ -11,8 +11,10 @@ namespace Leap.Unity
 {
     //#if UNITY_EDITOR
     [InitializeOnLoad]
-    public static class RunOnStart
+    public class RunOnStart
     {
+        
+
         static RunOnStart()
         {
             EditorApplication.delayCall += DoOnce;
@@ -20,9 +22,15 @@ namespace Leap.Unity
 
         static void DoOnce()
         {
-            PluginSettingsPopupWindow window = new PluginSettingsPopupWindow();
-            
-            if (!PluginSettingsPopupWindow.TrackingExamplesExist() && PluginSettingsPopupWindow.GetPackageInfo("com.ultraleap.tracking") != null 
+            EditorPrefs.SetBool("ShowExamplePopup", true);
+
+            PluginSettingsPopupWindow window = EditorWindow.GetWindow<PluginSettingsPopupWindow>();
+            if(window == null ) 
+            {
+                window = new PluginSettingsPopupWindow();
+            }
+
+            if (!PluginSettingsPopupWindow.TrackingExamplesExist() && PluginSettingsPopupWindow.GetPackageInfo("com.ultraleap.tracking") != null
                 || !PluginSettingsPopupWindow.TrackingPreviewExamplesExist() && PluginSettingsPopupWindow.GetPackageInfo("com.ultraleap.tracking.preview") != null
                  )
             {
@@ -36,17 +44,24 @@ namespace Leap.Unity
                     window.ShowUtility();
                 }
             }
+            
         }
     }
 
 
     public class PluginSettingsPopupWindow : EditorWindow
     {
-        void OnGUI()
+        private void OnGUI()
         {
-            this.autoRepaintOnSceneChange = true;
-            EditorGUILayout.LabelField("We've noticed you dont have our examples inported in this project, would you like to import them now?", EditorStyles.wordWrappedLabel);
-            GUILayout.Space(20);
+            if (TrackingPreviewExamplesExist() && TrackingExamplesExist())
+            {
+                EditorGUILayout.LabelField("All Examples are now imported, you can find them in 'Assets/Samples'", EditorStyles.wordWrappedLabel);
+            }
+            else
+            {
+                EditorGUILayout.LabelField("We've noticed you dont have our examples inported in this project, would you like to import them now?", EditorStyles.wordWrappedLabel);
+            }
+                GUILayout.Space(20);
 
             bool showAgain = !GUILayout.Toggle(EditorPrefs.GetBool("ShowExamplePopup"), "Do not show this again?");
 
@@ -71,7 +86,7 @@ namespace Leap.Unity
 
             if (TrackingPreviewExamplesExist() && TrackingExamplesExist())
             {
-                if (GUILayout.Button("All Examples Imported. Close this window."))
+                if (GUILayout.Button("Close this window."))
                 {
                     this.Close();
                 }
