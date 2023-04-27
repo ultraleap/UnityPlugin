@@ -37,6 +37,11 @@ namespace Leap.Unity.Preview.InputActions
 
         private void Start()
         {
+            if (inputLeapProvider == null)
+            {
+                inputLeapProvider = Hands.Provider;
+            }
+
             InputSystem.onBeforeUpdate += InputSystem_onBeforeUpdate;
 
             SetupDefaultStateGetters();
