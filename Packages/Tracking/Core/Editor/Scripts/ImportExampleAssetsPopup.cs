@@ -29,19 +29,24 @@ namespace Leap.Unity
             {
                 window = new PluginSettingsPopupWindow();
             }
+            bool trackingButNoExamples = PluginSettingsPopupWindow.TrackingPackageInstalledExamplesDontExist();
+            bool trackingPreviewButNoExamples = PluginSettingsPopupWindow.TrackingPreviewPackageInstalledExamplesDontExist();
 
-            if (!PluginSettingsPopupWindow.TrackingExamplesExist() && PluginSettingsPopupWindow.GetPackageInfo("com.ultraleap.tracking") != null
-                || !PluginSettingsPopupWindow.TrackingPreviewExamplesExist() && PluginSettingsPopupWindow.GetPackageInfo("com.ultraleap.tracking.preview") != null
-                 )
+            if (trackingButNoExamples != null && trackingPreviewButNoExamples != null)
             {
-                window.name = "Ultraleap Examples";
-
-                if (!SessionState.GetBool("FirstInitDone", false) && (EditorPrefs.GetBool("ShowExamplePopup")))
+                if (PluginSettingsPopupWindow.TrackingPackageInstalledExamplesDontExist()
+                    || PluginSettingsPopupWindow.TrackingPreviewPackageInstalledExamplesDontExist()
+                     )
                 {
-                    SessionState.SetBool("FirstInitDone", true);
+                    window.name = "Ultraleap Examples";
 
-                    window.position = new Rect(Screen.width / 2, Screen.height / 2, 250, 150);
-                    window.ShowUtility();
+                    if (!SessionState.GetBool("FirstInitDone", false) && (EditorPrefs.GetBool("ShowExamplePopup")))
+                    {
+                        SessionState.SetBool("FirstInitDone", true);
+
+                        window.position = new Rect(Screen.width / 2, Screen.height / 2, 250, 150);
+                        window.ShowUtility();
+                    }
                 }
             }
             
@@ -49,19 +54,29 @@ namespace Leap.Unity
     }
 
 
+
+
     public class PluginSettingsPopupWindow : EditorWindow
     {
         private void OnGUI()
         {
-            if (TrackingPreviewExamplesExist() && TrackingExamplesExist())
+            if (TrackingPackageInstalledExamplesExist() && TrackingPreviewPackageInstalledExamplesExist()) // both packages installed and both examples exist
+            {
+                EditorGUILayout.LabelField("All Examples are now imported, you can find them in 'Assets/Samples'", EditorStyles.wordWrappedLabel);
+            }
+            else if(TrackingPackageInstalledExamplesExist() && GetPackageInfo("com.ultraleap.tracking.preview") == null)
+            {
+                EditorGUILayout.LabelField("All Examples are now imported, you can find them in 'Assets/Samples'", EditorStyles.wordWrappedLabel);
+            }
+            else if (TrackingPreviewPackageInstalledExamplesExist() && GetPackageInfo("com.ultraleap.tracking") == null)
             {
                 EditorGUILayout.LabelField("All Examples are now imported, you can find them in 'Assets/Samples'", EditorStyles.wordWrappedLabel);
             }
             else
             {
-                EditorGUILayout.LabelField("We've noticed you dont have our examples inported in this project, would you like to import them now?", EditorStyles.wordWrappedLabel);
+                EditorGUILayout.LabelField("We've noticed you dont have our examples imported in this project, would you like to import them now?", EditorStyles.wordWrappedLabel);
             }
-                GUILayout.Space(20);
+            GUILayout.Space(20);
 
             bool showAgain = !GUILayout.Toggle(EditorPrefs.GetBool("ShowExamplePopup"), "Do not show this again?");
 
@@ -125,6 +140,24 @@ namespace Leap.Unity
                 .Select(UnityEditor.PackageManager.PackageInfo.FindForAssetPath).ToList();
 
             return packageJsons.FirstOrDefault(x => x.name == packageName);
+        }
+
+        public static bool TrackingPackageInstalledExamplesDontExist()
+        {
+            return !PluginSettingsPopupWindow.TrackingExamplesExist() && PluginSettingsPopupWindow.GetPackageInfo("com.ultraleap.tracking") != null;
+        }
+        public static bool TrackingPreviewPackageInstalledExamplesDontExist()
+        {
+            return !PluginSettingsPopupWindow.TrackingPreviewExamplesExist() && PluginSettingsPopupWindow.GetPackageInfo("com.ultraleap.tracking.preview") != null;
+        }
+
+        public static bool TrackingPackageInstalledExamplesExist()
+        {
+            return PluginSettingsPopupWindow.TrackingExamplesExist() && PluginSettingsPopupWindow.GetPackageInfo("com.ultraleap.tracking") != null;
+        }
+        public static bool TrackingPreviewPackageInstalledExamplesExist()
+        {
+            return PluginSettingsPopupWindow.TrackingPreviewExamplesExist() && PluginSettingsPopupWindow.GetPackageInfo("com.ultraleap.tracking.preview") != null;
         }
 
         public static bool TrackingExamplesExist()
