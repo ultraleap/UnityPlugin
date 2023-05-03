@@ -36,6 +36,9 @@ namespace Leap.Unity
         [SerializeField]
         private bool _showArm = true;
 
+        [SerializeField, Tooltip("Shows the upper arm. Best in XR, assumes the camera is positioned at the users head")]
+        private bool _showUpperArm = false;
+
         [SerializeField]
         private bool _showPalmJoint = true;
 
@@ -77,8 +80,8 @@ namespace Leap.Unity
         private Material _sphereMat;
         private Hand _hand;
         private Vector3[] _spherePositions;
-        private Matrix4x4[] _sphereMatrices = new Matrix4x4[32],
-                            _cylinderMatrices = new Matrix4x4[32];
+        private Matrix4x4[] _sphereMatrices = new Matrix4x4[64],
+                            _cylinderMatrices = new Matrix4x4[64];
         private int _curSphereIndex = 0, _curCylinderIndex = 0;
         private Color _backingDefault = Color.white;
 
@@ -353,29 +356,12 @@ namespace Leap.Unity
             //If we want to show the arm, do the calculations and display the meshes
             if (_showArm)
             {
-                var arm = _hand.Arm;
+                DrawArm();
+            }
 
-                Vector3 right = arm.Basis.xBasis * arm.Width * 0.7f * 0.5f;
-                Vector3 wrist = arm.WristPosition;
-                Vector3 elbow = arm.ElbowPosition;
-
-                float armLength = Vector3.Distance(wrist, elbow);
-                wrist -= arm.Direction * armLength * 0.05f;
-
-                Vector3 armFrontRight = wrist + right;
-                Vector3 armFrontLeft = wrist - right;
-                Vector3 armBackRight = elbow + right;
-                Vector3 armBackLeft = elbow - right;
-
-                drawSphere(armFrontRight);
-                drawSphere(armFrontLeft);
-                drawSphere(armBackLeft);
-                drawSphere(armBackRight);
-
-                drawCylinder(armFrontLeft, armFrontRight);
-                drawCylinder(armBackLeft, armBackRight);
-                drawCylinder(armFrontLeft, armBackLeft);
-                drawCylinder(armFrontRight, armBackRight);
+            if (_showUpperArm)
+            {
+                DrawUpperArm();
             }
 
             //Draw cylinders between finger joints
@@ -450,6 +436,56 @@ namespace Leap.Unity
 #endif
             Graphics.DrawMeshInstanced(_cylinderMesh, 0, _backing_material, _cylinderMatrices, _curCylinderIndex, null,
               _castShadows ? UnityEngine.Rendering.ShadowCastingMode.On : UnityEngine.Rendering.ShadowCastingMode.Off, true, gameObject.layer);
+        }
+
+        void DrawArm()
+        {
+            var arm = _hand.Arm;
+
+            Vector3 right = arm.Basis.xBasis * arm.Width * 0.7f * 0.5f;
+            Vector3 wrist = arm.WristPosition;
+            Vector3 elbow = arm.ElbowPosition;
+
+            float armLength = Vector3.Distance(wrist, elbow);
+            wrist -= arm.Direction * armLength * 0.05f;
+
+            Vector3 armFrontRight = wrist + right;
+            Vector3 armFrontLeft = wrist - right;
+            Vector3 armBackRight = elbow + right;
+            Vector3 armBackLeft = elbow - right;
+
+            drawSphere(armFrontRight);
+            drawSphere(armFrontLeft);
+            drawSphere(armBackLeft);
+            drawSphere(armBackRight);
+
+            drawCylinder(armFrontLeft, armFrontRight);
+            drawCylinder(armBackLeft, armBackRight);
+            drawCylinder(armFrontLeft, armBackLeft);
+            drawCylinder(armFrontRight, armBackRight);
+        }
+
+        void DrawUpperArm()
+        {
+            Vector3 shoulderPos = Camera.main.transform.TransformPoint(handedness == Chirality.Left ? -0.15f : 0.15f, -0.15f, -0.05f);
+
+            var arm = _hand.Arm;
+
+            Vector3 elbow = arm.ElbowPosition;
+            Vector3 right = arm.Basis.xBasis * arm.Width * 0.7f * 0.5f;
+
+            Vector3 armFrontRight = elbow + right;
+            Vector3 armFrontLeft = elbow - right;
+            Vector3 armBackRight = shoulderPos + right;
+            Vector3 armBackLeft = shoulderPos - right;
+
+            drawSphere(armBackLeft);
+            drawSphere(armBackRight);
+
+            drawCylinder(armFrontLeft, armFrontRight);
+            drawCylinder(armBackLeft, armBackRight);
+            drawCylinder(armFrontLeft, armBackLeft);
+            drawCylinder(armFrontRight, armBackRight);
         }
 
         private void drawSphere(Vector3 position)
