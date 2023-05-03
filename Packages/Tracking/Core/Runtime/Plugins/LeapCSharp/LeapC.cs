@@ -1049,7 +1049,7 @@ namespace LeapInternal
         public static extern eLeapRS GetDeviceInfo(IntPtr hDevice, ref LEAP_DEVICE_INFO info);
 
         [DllImport("LeapC", EntryPoint = "LeapGetDeviceTransform")]
-        public static extern eLeapRS GetDeviceTransform(IntPtr hDevice, out float[] transform);
+        public static extern eLeapRS GetDeviceTransform(IntPtr hDevice, [MarshalAs(UnmanagedType.LPArray, SizeConst = 16)] float[] transform);
 
         [DllImport("LeapC", EntryPoint = "LeapSetPolicyFlags")]
         public static extern eLeapRS SetPolicyFlags(IntPtr hConnection, UInt64 set, UInt64 clear);
