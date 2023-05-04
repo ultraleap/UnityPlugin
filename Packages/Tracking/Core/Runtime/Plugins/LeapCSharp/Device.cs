@@ -55,7 +55,6 @@ namespace Leap
                       uint deviceID)
         {
             Handle = deviceHandle;
-            InternalHandle = internalHandle;
             HorizontalViewAngle = horizontalViewAngle;
             VerticalViewAngle = verticalViewAngle;
             Range = range;
@@ -141,12 +140,10 @@ namespace Leap
         /// </summary>
         public IntPtr Handle { get; private set; }
 
-        private IntPtr InternalHandle;
-
+        [Obsolete("Use LeapC.SetLeapPause instead")]
         public bool SetPaused(bool pause)
         {
-            eLeapRS result = LeapC.LeapSetPause(Handle, pause);
-            return result == eLeapRS.eLeapRS_Success;
+            return false;
         }
 
         /// <summary>
@@ -251,6 +248,7 @@ namespace Leap
         /// </summary>
         public uint DeviceID { get; private set; }
 
+        private bool poseSet = false;
         private Pose devicePose = Pose.identity;
 
         /// <summary>
@@ -260,30 +258,41 @@ namespace Leap
         {
             get
             {
-                if(devicePose != Pose.identity) // Assumes the devicePose never changes and so, uses the cached pose.
+                if (poseSet) // Assumes the devicePose never changes and so, uses the cached pose.
                 {
                     return devicePose;
                 }
 
-                eLeapRS result = LeapC.GetDeviceTransform(InternalHandle, out float[] data);
-                if (result != eLeapRS.eLeapRS_Success)
-                    return Pose.identity;
+                //float[] data = new float[16];
+                //eLeapRS result = LeapC.GetDeviceTransform(Handle, data);
 
-                // Get transform matrix and convert to unity space by inverting Z.
-                var transformMatrix = new Matrix4x4(
-                    new Vector4(data[0], data[1], data[2], data[3]),
-                    new Vector4(data[4], data[5], data[6], data[7]),
-                    new Vector4(data[8], data[9], data[10], data[11]),
-                    new Vector4(data[12], data[13], data[14], data[15]));
-                var toUnity = Matrix4x4.Scale(new Vector3(1, 1, -1));
-                transformMatrix = toUnity * transformMatrix;
+                //if (result != eLeapRS.eLeapRS_Success || data == null)
+                //{
+                //    devicePose = Pose.identity;
+                //    return devicePose;
+                //}
 
-                // Identity matrix here means we have no device transform, also check validity.
-                if (transformMatrix.isIdentity || !transformMatrix.ValidTRS())
-                    return Pose.identity;
-                
-                // Return a valid pose.
-                return new Pose(transformMatrix.GetColumn(3), transformMatrix.rotation);
+                //// Get transform matrix and convert to unity space by inverting Z.
+                //Matrix4x4 transformMatrix = new Matrix4x4(
+                //    new Vector4(data[0], data[1], data[2], data[3]),
+                //    new Vector4(data[4], data[5], data[6], data[7]),
+                //    new Vector4(data[8], data[9], data[10], data[11]),
+                //    new Vector4(data[12], data[13], data[14], data[15]));
+                //Matrix4x4 toUnity = Matrix4x4.Scale(new Vector3(1, 1, -1));
+                //transformMatrix = toUnity * transformMatrix;
+
+                //// Identity matrix here means we have no device transform, also check validity.
+                //if (transformMatrix.isIdentity || !transformMatrix.ValidTRS())
+                //{
+                //    devicePose = Pose.identity;
+                //    return devicePose;
+                //}
+
+                //// Return the valid pose
+                //devicePose = new Pose(transformMatrix.GetColumn(3), transformMatrix.rotation);
+
+                poseSet = true;
+                return devicePose;
             }
         }
 
@@ -297,7 +306,7 @@ namespace Leap
             LEAP_DEVICE_INFO deviceInfo = new LEAP_DEVICE_INFO();
             deviceInfo.serial = IntPtr.Zero;
             deviceInfo.size = (uint)System.Runtime.InteropServices.Marshal.SizeOf(deviceInfo);
-            result = LeapC.GetDeviceInfo(InternalHandle, ref deviceInfo);
+            result = LeapC.GetDeviceInfo(Handle, ref deviceInfo);
 
             if (result != eLeapRS.eLeapRS_Success)
                 return 0;
