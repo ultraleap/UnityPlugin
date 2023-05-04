@@ -263,33 +263,34 @@ namespace Leap
                     return devicePose;
                 }
 
-                float[] data = new float[16];
-                eLeapRS result = LeapC.GetDeviceTransform(Handle, data);
+                //float[] data = new float[16];
+                //eLeapRS result = LeapC.GetDeviceTransform(Handle, data);
 
-                if (result != eLeapRS.eLeapRS_Success || data == null)
-                {
-                    devicePose = Pose.identity;
-                    return devicePose;
-                }
+                //if (result != eLeapRS.eLeapRS_Success || data == null)
+                //{
+                //    devicePose = Pose.identity;
+                //    return devicePose;
+                //}
 
-                // Get transform matrix and convert to unity space by inverting Z.
-                Matrix4x4 transformMatrix = new Matrix4x4(
-                    new Vector4(data[0], data[1], data[2], data[3]),
-                    new Vector4(data[4], data[5], data[6], data[7]),
-                    new Vector4(data[8], data[9], data[10], data[11]),
-                    new Vector4(data[12], data[13], data[14], data[15]));
-                Matrix4x4 toUnity = Matrix4x4.Scale(new Vector3(1, 1, -1));
-                transformMatrix = toUnity * transformMatrix;
+                //// Get transform matrix and convert to unity space by inverting Z.
+                //Matrix4x4 transformMatrix = new Matrix4x4(
+                //    new Vector4(data[0], data[1], data[2], data[3]),
+                //    new Vector4(data[4], data[5], data[6], data[7]),
+                //    new Vector4(data[8], data[9], data[10], data[11]),
+                //    new Vector4(data[12], data[13], data[14], data[15]));
+                //Matrix4x4 toUnity = Matrix4x4.Scale(new Vector3(1, 1, -1));
+                //transformMatrix = toUnity * transformMatrix;
 
-                // Identity matrix here means we have no device transform, also check validity.
-                if (transformMatrix.isIdentity || !transformMatrix.ValidTRS())
-                {
-                    devicePose = Pose.identity;
-                    return devicePose;
-                }
+                //// Identity matrix here means we have no device transform, also check validity.
+                //if (transformMatrix.isIdentity || !transformMatrix.ValidTRS())
+                //{
+                //    devicePose = Pose.identity;
+                //    return devicePose;
+                //}
 
-                // Return the valid pose
-                devicePose = new Pose(transformMatrix.GetColumn(3), transformMatrix.rotation);
+                //// Return the valid pose
+                //devicePose = new Pose(transformMatrix.GetColumn(3), transformMatrix.rotation);
+
                 poseSet = true;
                 return devicePose;
             }
