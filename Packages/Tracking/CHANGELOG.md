@@ -27,7 +27,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (Hand Rays) TransformWristShoulderRay interpolates direction, rather than aim position
 - LeapXRServiceProvider Default offset mode now uses known device transforms or falls back to a default value
 - (Interaction) Grab ball now has an option to Continuously restrict the grab balls distance from the player. This allows grab balls to follow the player
-- Leap provider can now be set manually in leap provider manager. 
+- Leap provider can now be set manually in leap provider manager
+- Removed Infrared Viewer example scene and prefab
 
 ### Fixed
 - (Physics Hands) Fixed joints exploding when teleporting the hand for one frame
