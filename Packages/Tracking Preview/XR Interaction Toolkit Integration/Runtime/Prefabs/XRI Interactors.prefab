@@ -119,7 +119,7 @@ MonoBehaviour:
         m_Action: Select
         m_Flags: 0
       m_Flags: 0
-    m_Reference: {fileID: 5823378087187910516, guid: 43529326aef197244a5478dec3e6bc58, type: 3}
+    m_Reference: {fileID: 9206376294463382644, guid: 43529326aef197244a5478dec3e6bc58, type: 3}
   m_SelectActionValue:
     m_UseReference: 0
     m_Action:
@@ -167,7 +167,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: 9206376294463382644, guid: 43529326aef197244a5478dec3e6bc58, type: 3}
+    m_Reference: {fileID: 5823378087187910516, guid: 43529326aef197244a5478dec3e6bc58, type: 3}
   m_UIPressActionValue:
     m_UseReference: 0
     m_Action:
@@ -692,7 +692,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: -1514684639673722297, guid: 43529326aef197244a5478dec3e6bc58, type: 3}
+    m_Reference: {fileID: 2422188697211618174, guid: 43529326aef197244a5478dec3e6bc58, type: 3}
   m_SelectActionValue:
     m_UseReference: 0
     m_Action:
@@ -1080,7 +1080,7 @@ MonoBehaviour:
         m_Action: Select
         m_Flags: 0
       m_Flags: 0
-    m_Reference: {fileID: -1514684639673722297, guid: 43529326aef197244a5478dec3e6bc58, type: 3}
+    m_Reference: {fileID: 2422188697211618174, guid: 43529326aef197244a5478dec3e6bc58, type: 3}
   m_SelectActionValue:
     m_UseReference: 0
     m_Action:
@@ -1128,7 +1128,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: 2422188697211618174, guid: 43529326aef197244a5478dec3e6bc58, type: 3}
+    m_Reference: {fileID: -1514684639673722297, guid: 43529326aef197244a5478dec3e6bc58, type: 3}
   m_UIPressActionValue:
     m_UseReference: 0
     m_Action:
@@ -1562,7 +1562,6 @@ GameObject:
   m_Component:
   - component: {fileID: 7966239817583637820}
   - component: {fileID: 7966239817583637819}
-  - component: {fileID: 7966239817583637821}
   m_Layer: 0
   m_Name: XR Interaction Manager
   m_TagString: Untagged
@@ -1598,20 +1597,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_StartingHoverFilters: []
   m_StartingSelectFilters: []
---- !u!114 &7966239817583637821
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7966239817583637818}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 017c5e3933235514c9520e1dace2a4b2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_ActionAssets:
-  - {fileID: -944628639613478452, guid: 43529326aef197244a5478dec3e6bc58, type: 3}
 --- !u!1 &7966239818524277702
 GameObject:
   m_ObjectHideFlags: 0
@@ -1713,7 +1698,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: 5823378087187910516, guid: 43529326aef197244a5478dec3e6bc58, type: 3}
+    m_Reference: {fileID: 9206376294463382644, guid: 43529326aef197244a5478dec3e6bc58, type: 3}
   m_SelectActionValue:
     m_UseReference: 0
     m_Action:
