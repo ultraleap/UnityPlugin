@@ -95,37 +95,48 @@ namespace Leap.Unity.Preview.InputActions
     {
         public FourCC format => new FourCC('L', 'H', 'N', 'D');
 
-        #region Tracking ID
+        #region Tracking
 
         [InputControl(name = "Tracked", layout = "Integer")]
         public int tracked;
 
         #endregion
 
-        #region Palm
+        #region Actions
+
+        [InputControl(name = "Selecting", layout = "Button")]
+        public float selecting;
+
+        [InputControl(name = "Activating", layout = "Button")]
+        public float activating;
+
+        #endregion
+
+        #region Positions and Directions
 
         [InputControl(name = "Palm Position", layout = "Vector3")]
-        public Vector3 position;
+        public Vector3 palmPosition;
 
         [InputControl(name = "Palm Direction", layout = "Quaternion")]
-        public Quaternion direction;
+        public Quaternion palmDirection;
 
-        #endregion
+        [InputControl(name = "Aim Position", layout = "Vector3")]
+        public Vector3 aimPosition;
 
-        #region Index
+        [InputControl(name = "Aim Direction", layout = "Quaternion")]
+        public Quaternion aimDirection;
 
-        [InputControl(name = "Index Tip Position", layout = "Vector3")]
-        public Vector3 indexTipPosition;
+        [InputControl(name = "Pinch Position", layout = "Vector3")]
+        public Vector3 pinchPosition;
 
-        #endregion
+        [InputControl(name = "Pinch Direction", layout = "Quaternion")]
+        public Quaternion pinchDirection;
 
-        #region Extras
+        [InputControl(name = "Poke Position", layout = "Vector3")]
+        public Vector3 pokePosition;
 
-        [InputControl(name = "Is Pinching", layout = "Button")]
-        public float isPinching;
-
-        [InputControl(name = "Is Grabbing", layout = "Button")]
-        public float isGrabbing;
+        [InputControl(name = "Poke Direction", layout = "Quaternion")]
+        public Quaternion pokeDirection;
 
         #endregion
     }
@@ -166,6 +177,8 @@ namespace Leap.Unity.Preview.InputActions
                 .WithManufacturer("Ultraleap")
                 .WithProduct("^(Leap Hand)")
                 );
+
+            InputSystem.settings.SetInternalFeatureFlag("USE_OPTIMIZED_CONTROLS", true);
         }
     }
 }

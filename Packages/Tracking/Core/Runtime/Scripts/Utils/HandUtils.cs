@@ -636,7 +636,7 @@ namespace Leap.Unity
         /// <returns>The first hand of the argument whichHand found in the argument frame.</returns>
         public static Hand GetHand(this Frame frame, Chirality whichHand)
         {
-            if (frame.Hands == null)
+            if (frame == null || frame.Hands == null)
             {
                 return null;
             }
