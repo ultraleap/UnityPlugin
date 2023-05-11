@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
 
-## [NEXT] - x/x/xx
+## [6.8.0] - 12/05/23
 
 ### Added
 - (Anchorable Behaviour) Code to automatically create a basic curve for attraction reach distance on new instance of the script
