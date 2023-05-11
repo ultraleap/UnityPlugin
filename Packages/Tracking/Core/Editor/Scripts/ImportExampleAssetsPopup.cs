@@ -81,12 +81,29 @@ namespace Leap.Unity
                     ImportPackageExamples("com.ultraleap.tracking");
                 }
             }
+            else if(TrackingPackageInstalledAndExamplesExist())
+            {
+                GUI.enabled = false;
+                if (GUILayout.Button("Import Examples"))
+                {
+                }
+                GUI.enabled = true;
+            }
             if (!TrackingPreviewExamplesExist() && GetPackageInfo("com.ultraleap.tracking.preview") != null)
             {
+                
                 if (GUILayout.Button("Import Preview Examples"))
                 {
                     ImportPackageExamples("com.ultraleap.tracking.preview");
                 }
+            }
+            else if(TrackingPreviewPackageInstalledAndExamplesExist())
+            {
+                GUI.enabled = false;
+                if (GUILayout.Button("Import Preview Examples"))
+                {
+                }
+                GUI.enabled = true;
             }
             GUILayout.EndHorizontal();
 
