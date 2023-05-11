@@ -35,6 +35,7 @@ namespace Leap.Unity
                                         (int)LeapServiceProvider.InteractionVolumeVisualization.StereoIR170,
                                         (int)LeapServiceProvider.InteractionVolumeVisualization.Device_3Di,
                                         (int)LeapServiceProvider.InteractionVolumeVisualization.LeapMotionController,
+                                        (int)LeapServiceProvider.InteractionVolumeVisualization.LeapMotionController2,
                                         (int)LeapServiceProvider.InteractionVolumeVisualization.Automatic},
                                         "FOV_Visualization",
                                         "OptimalFOV_Visualization",

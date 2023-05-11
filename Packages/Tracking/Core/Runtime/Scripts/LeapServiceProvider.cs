@@ -84,7 +84,8 @@ namespace Leap.Unity
             LeapMotionController,
             StereoIR170,
             Device_3Di,
-            Automatic
+            Automatic,
+            LeapMotionController2,
         }
         [Tooltip("Displays a representation of the traking device")]
         [SerializeField]
@@ -1107,6 +1108,9 @@ namespace Leap.Unity
                 case LeapServiceProvider.InteractionVolumeVisualization.Device_3Di:
                     DrawTrackingDevice(targetTransform, "3Di");
                     break;
+                case LeapServiceProvider.InteractionVolumeVisualization.LeapMotionController2:
+                    DrawTrackingDevice(targetTransform, "Leap Motion Controller 2");
+                    break;
                 case LeapServiceProvider.InteractionVolumeVisualization.Automatic:
                     DetectConnectedDevice(targetTransform);
                     break;
@@ -1159,6 +1163,10 @@ namespace Leap.Unity
                     DrawTrackingDevice(targetTransform, "Leap Motion Controller");
                     return;
                 }
+                else if (deviceType == Device.DeviceType.TYPE_LMC2)
+                {
+                    DrawTrackingDevice(targetTransform, "Leap Motion Controller 2");
+                }
             }
 
             // if no devices connected, no serial number selected or the connected device type isn't matching one of the above,
@@ -1180,7 +1188,6 @@ namespace Leap.Unity
                 deviceModelMatrix *= Matrix4x4.Translate(new Vector3(0, xrProvider.deviceOffsetYAxis, xrProvider.deviceOffsetZAxis));
                 deviceModelMatrix *= Matrix4x4.Rotate(Quaternion.Euler(-90 - xrProvider.deviceTiltXAxis, 180, 0));
             }
-
 
             LeapFOVInfo info = null;
             foreach (var leapInfo in leapFOVInfos.SupportedDevices)
@@ -1215,12 +1222,10 @@ namespace Leap.Unity
 
         private void DrawInteractionZone(Matrix4x4 deviceModelMatrix)
         {
-
             _visualFOV.UpdateFOVS();
 
             optimalFOVMesh = _visualFOV.OptimalFOVMesh;
             maxFOVMesh = _visualFOV.MaxFOVMesh;
-
 
             if (OptimalFOV_Visualization && optimalFOVMesh != null)
             {
@@ -1240,12 +1245,14 @@ namespace Leap.Unity
             }
         }
 
-
         private void LoadFOVData()
         {
             leapFOVInfos = JsonUtility.FromJson<LeapFOVInfos>(Resources.Load<TextAsset>("TrackingVolumeVisualization/SupportedTrackingDevices").text);
 
-            if (_visualFOV == null) _visualFOV = new VisualFOV();
+            if (_visualFOV == null)
+            {
+                _visualFOV = new VisualFOV();
+            }
         }
 
         public void SetDeviceInfo(LeapFOVInfo leapInfo)
@@ -1275,6 +1282,5 @@ namespace Leap.Unity
         }
 
         #endregion
-
     }
 }
