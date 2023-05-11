@@ -374,6 +374,11 @@ namespace Leap
             /// The Ultraleap 3Di hand tracking camera.
             /// </summary>
             TYPE_3DI = (int)eLeapDeviceType.eLeapDevicePID_3Di,
+
+            /// <summary>
+            /// The Ultraleap Leap Motion Controller 2 hand tracking camera.
+            /// </summary>
+            TYPE_LMC2 = (int)eLeapDeviceType.eLeapDevicePID_LMC2
         }
     }
 }
