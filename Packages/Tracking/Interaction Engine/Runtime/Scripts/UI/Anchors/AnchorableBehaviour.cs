@@ -257,8 +257,8 @@ namespace Leap.Unity.Interaction
                + "towards a nearby InteractionHand? Value is in Unity distance units, WORLD space.")]
         public float maxAttractionReach = 0.1F;
 
-        [Tooltip("If the object is attracted to hands, how fast should the object move towards the hand? Higher values are faster. " 
-                +"This speed is multiplied by deltaTime.")]
+        [Tooltip("If the object is attracted to hands, how fast should the object move towards the hand? Higher values are faster. "
+                + "This speed is multiplied by deltaTime.")]
         [Range(0, 100F)]
         public float anchorHandAttractionRate = 5.0f;
 

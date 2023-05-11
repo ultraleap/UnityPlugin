@@ -593,7 +593,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 {
                     PhysicsHand.Hand pHand = hand.GetPhysicsHand();
                     _newPosition = pHand.palmBone.transform.position + (pHand.palmBody.velocity * Time.fixedDeltaTime) + (pHand.palmBone.transform.rotation * Quaternion.Inverse(_graspingValues[hand].originalHandRotation) * _graspingValues[hand].offset);
-                    _newRotation = pHand.palmBone.transform.rotation * Quaternion.Euler(pHand.palmBody.angularVelocity * Time.fixedDeltaTime) *  _graspingValues[hand].rotationOffset;
+                    _newRotation = pHand.palmBone.transform.rotation * Quaternion.Euler(pHand.palmBody.angularVelocity * Time.fixedDeltaTime) * _graspingValues[hand].rotationOffset;
                 }
             }
         }
