@@ -20,8 +20,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
     public class PhysicsButton : MonoBehaviour
     {
         // Consts used to modify thresholds of buttons pressed
-        private const float FIVE_PERCENT_MULTIPLIER = 0.05F;
-        private const float ONE_PERCENT_MULTIPLIER = 0.01F;
+        private const float BUTTON_PRESS_EXIT_THRESHOLD = 0.15F;
+        private const float BUTTON_PRESS_THRESHOLD = 0.01F;
 
         #region Inspector
 
@@ -180,6 +180,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private PhysicsProvider _provider;
         public PhysicsProvider Provider => _provider;
 
+        private Vector3 _elementScale = Vector3.zero;
+
         #endregion
 
         #region Unity Events
@@ -205,6 +207,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 Debug.LogError("The PhysicsButton is missing a PhysicsButtonElement and has been disabled. Please ensure it has been added and assigned.", this);
                 enabled = false;
             }
+        }
+
+        private void OnEnable()
+        {
+            SetupButton();
         }
 
         protected void OnDisable()
@@ -265,9 +272,16 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         private void ResetOnBadState()
         {
-            if (_buttonElement.transform.localRotation.eulerAngles.magnitude > 0.25f)
+            if (Mathf.Abs(_buttonElement.transform.localRotation.eulerAngles.x) > 0.005f ||
+                Mathf.Abs(_buttonElement.transform.localRotation.eulerAngles.y) > 0.005f ||
+                Mathf.Abs(_buttonElement.transform.localRotation.eulerAngles.z) > 0.005f)
             {
                 _buttonElement.transform.localRotation = Quaternion.identity;
+            }
+            if (_buttonElement.transform.lossyScale != _elementScale)
+            {
+                _elementScale = _buttonElement.transform.lossyScale;
+                SetupButton();
             }
         }
 
@@ -332,7 +346,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             }
 
             // Check if the button is at least 5% unpressed
-            if (_isPressed && _buttonElement.transform.localPosition.y >= buttonHeightLimit * FIVE_PERCENT_MULTIPLIER)
+            if (_isPressed && _buttonElement.transform.localPosition.y >= buttonHeightLimit * BUTTON_PRESS_EXIT_THRESHOLD)
             {
                 _isPressed = false;
                 _unpressedThisFrame = true;
@@ -340,7 +354,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             }
 
             // Lerps up to 99% pressed to account for physics wobble
-            pressedAmount = Mathf.InverseLerp(buttonHeightLimit * 0.99f, buttonHeightLimit * ONE_PERCENT_MULTIPLIER, _buttonElement.transform.localPosition.y);
+            pressedAmount = Mathf.InverseLerp(buttonHeightLimit * 0.99f, buttonHeightLimit * BUTTON_PRESS_THRESHOLD, _buttonElement.transform.localPosition.y);
 
             if (_pressedThisFrame && isToggleable)
             {
@@ -353,7 +367,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private void PressValidation()
         {
             // Check if the button is more than 99% pressed to account for physics wobble
-            if (!_isPressed && _buttonElement.transform.localPosition.y <= buttonHeightLimit * ONE_PERCENT_MULTIPLIER)
+            if (!_isPressed && _buttonElement.transform.localPosition.y <= buttonHeightLimit * BUTTON_PRESS_THRESHOLD)
             {
                 _isPressed = true;
                 _pressedThisFrame = true;
@@ -388,8 +402,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
             _buttonElement.Rigid.useGravity = false;
             _buttonElement.Rigid.isKinematic = false;
             _buttonElement.Rigid.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
-
             SetupJoint(_buttonElement.Joint);
+            _buttonElement.transform.localPosition = new Vector3(0, buttonHeightLimit, 0);
         }
 
         private void SetupJoint(ConfigurableJoint joint)
@@ -516,7 +530,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             if (_buttonElement != null)
             {
-                _buttonElement.transform.localPosition = new Vector3(0, buttonHeightLimit, 0);
                 SetupButton();
             }
         }

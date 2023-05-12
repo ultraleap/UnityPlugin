@@ -54,7 +54,7 @@ namespace Leap.Unity
             {
                 return (_leapProvider == null) ? leapXRServiceProvider : _leapProvider;
             }
-            private set
+            set
             {
                 if (Application.isPlaying && _leapProvider != null)
                 {

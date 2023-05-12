@@ -42,7 +42,8 @@ namespace Leap.Unity.Interaction
 
             specifyConditionalDrawing("isAttractedByHand",
                                       "maxAttractionReach",
-                                      "attractionReachByDistance");
+                                      "attractionReachByDistance",
+                                      "anchorHandAttractionRate");
         }
 
         private EnumEventTableEditor _tableEditor;
