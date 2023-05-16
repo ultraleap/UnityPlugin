@@ -151,7 +151,7 @@ namespace Leap
             if (camera != CameraType.LEFT && camera != CameraType.RIGHT)
                 return null;
 
-            return imageData(camera).DistortionData.Data;
+            return imageData(camera).DistortionData.FlippedData;
         }
 
         /// <summary>
