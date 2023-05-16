@@ -258,40 +258,42 @@ namespace Leap
         {
             get
             {
-                if (poseSet) // Assumes the devicePose never changes and so, uses the cached pose.
+                float[] data = new float[16];
+                eLeapRS result = LeapC.GetDeviceTransform(Handle, data);
+                if (result != eLeapRS.eLeapRS_Success || data == null)
                 {
-                    return devicePose;
+                    Debug.Log("Transform data is null");
+                    devicePose = Pose.identity;
+                    //return devicePose;
                 }
 
-                //float[] data = new float[16];
-                //eLeapRS result = LeapC.GetDeviceTransform(Handle, data);
+                System.Numerics.Matrix4x4 transformMatrix = new System.Numerics.Matrix4x4(
+                    data[0], data[1], data[2], data[3],
+                    data[4], data[5], data[6], data[7],
+                    data[8], data[9], data[10], data[11],
+                    data[12], data[13], data[14], data[15]);
 
-                //if (result != eLeapRS.eLeapRS_Success || data == null)
-                //{
-                //    devicePose = Pose.identity;
-                //    return devicePose;
-                //}
+                System.Numerics.Matrix4x4 transposedMtrx = System.Numerics.Matrix4x4.Transpose(transformMatrix);
 
-                //// Get transform matrix and convert to unity space by inverting Z.
-                //Matrix4x4 transformMatrix = new Matrix4x4(
-                //    new Vector4(data[0], data[1], data[2], data[3]),
-                //    new Vector4(data[4], data[5], data[6], data[7]),
-                //    new Vector4(data[8], data[9], data[10], data[11]),
-                //    new Vector4(data[12], data[13], data[14], data[15]));
-                //Matrix4x4 toUnity = Matrix4x4.Scale(new Vector3(1, 1, -1));
-                //transformMatrix = toUnity * transformMatrix;
+                UnityEngine.Matrix4x4 unityTransformMatrix = new UnityEngine.Matrix4x4(
+                    new Vector4(transposedMtrx.M11, transposedMtrx.M12, transposedMtrx.M13, transposedMtrx.M14),
+                    new Vector4(transposedMtrx.M21, transposedMtrx.M22, transposedMtrx.M23, transposedMtrx.M24),
+                    new Vector4(transposedMtrx.M31, transposedMtrx.M32, transposedMtrx.M33, transposedMtrx.M34),
+                    new Vector4(transposedMtrx.M41, transposedMtrx.M42, transposedMtrx.M43, transposedMtrx.M44)
+                    );
 
-                //// Identity matrix here means we have no device transform, also check validity.
-                //if (transformMatrix.isIdentity || !transformMatrix.ValidTRS())
-                //{
-                //    devicePose = Pose.identity;
-                //    return devicePose;
-                //}
-
-                //// Return the valid pose
-                //devicePose = new Pose(transformMatrix.GetColumn(3), transformMatrix.rotation);
-
-                poseSet = true;
+                // Identity matrix here means we have no device transform, also check validity.
+                if (unityTransformMatrix.isIdentity || !unityTransformMatrix.ValidTRS())
+                {
+                    if (!unityTransformMatrix.ValidTRS())
+                    {
+                        Debug.Log("Matrix is InvalidTRS");
+                    }
+                    devicePose = Pose.identity;
+                    //return devicePose;
+                }
+                devicePose = new Pose(unityTransformMatrix.GetColumn(3), unityTransformMatrix.rotation);
+                // Return a valid pose.
                 return devicePose;
             }
         }

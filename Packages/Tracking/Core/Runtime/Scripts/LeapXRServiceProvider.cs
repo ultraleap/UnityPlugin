@@ -28,7 +28,7 @@ namespace Leap.Unity
         #region Inspector
         // Manual Device Offset
         private const float DEFAULT_DEVICE_OFFSET_Y_AXIS = 0f;
-        private const float DEFAULT_DEVICE_OFFSET_Z_AXIS = 0.08f;
+        private const float DEFAULT_DEVICE_OFFSET_Z_AXIS = 0.48f;
         private const float DEFAULT_DEVICE_TILT_X_AXIS = 0f;
 
         /// <summary>
@@ -587,7 +587,7 @@ namespace Leap.Unity
             // Normalize the rotation Quaternion.
             warpedRotation = warpedRotation.ToNormalized();
 
-            switch (_deviceOffsetMode)
+switch (_deviceOffsetMode)
             {
                 case DeviceOffsetMode.Default:
                     if (_currentDevice != null)
@@ -602,9 +602,10 @@ namespace Leap.Unity
                             warpedPosition += warpedRotation * Vector3.up * deviceOffsetYAxis
                                             + warpedRotation * Vector3.forward * deviceOffsetZAxis;
                             warpedRotation *= Quaternion.Euler(deviceTiltXAxis, 0f, 0f);
+
+                            warpedRotation *= Quaternion.Euler(-90f, 180f, 0f);
                         }
                     }
-                    warpedRotation *= Quaternion.Euler(-90f, 180f, 0f);
                     break;
                 case DeviceOffsetMode.ManualHeadOffset:
                     warpedPosition += warpedRotation * Vector3.up * deviceOffsetYAxis
