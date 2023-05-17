@@ -321,7 +321,7 @@ namespace Ultraleap.Tracking.OpenXR
             return true;
         }
 
-        private static readonly float[] DefaultMetacarpalLengths = { 0.6812f, 0.6460f, 0.5800f, 0.5369f };
+        private static readonly float[] DefaultMetacarpalLengths = { 0, 0.6812f, 0.6460f, 0.5800f, 0.5369f };
         
         private float CalculateHandScale(ref Hand hand)
         {
