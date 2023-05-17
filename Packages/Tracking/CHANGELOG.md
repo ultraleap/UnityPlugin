@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Preview package version dependency mismatch for XRI when using InputSystem 1.4.4
+- Control panel IR image / hand vertical alignment across device types and individual devices, through changing the handdling of the distortion matrix
 
 ### Known issues 
 - Scenes containing the infrared viewer render incorrectly on Android build targets and in scriptable render pipelines such as URP and HDRP. 
