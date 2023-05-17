@@ -151,6 +151,7 @@ namespace Leap
             if (camera != CameraType.LEFT && camera != CameraType.RIGHT)
                 return null;
 
+            // We return the FlippedData, not the Data member as this corrects for a Y flip in the distortion matrix coming from the service.
             return imageData(camera).DistortionData.FlippedData;
         }
 
