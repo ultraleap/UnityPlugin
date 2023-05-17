@@ -1109,7 +1109,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &429484572
 GameObject:
@@ -2099,9 +2099,13 @@ PrefabInstance:
       propertyPath: m_Name
       value: XR Leap Provider Manager
       objectReference: {fileID: 0}
+    - target: {fileID: 5270838610523157747, guid: d1c00f89ef60a3446ad9eef2d361e2a1, type: 3}
+      propertyPath: trackingSource
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5270838610523157748, guid: d1c00f89ef60a3446ad9eef2d361e2a1, type: 3}
       propertyPath: m_RootOrder
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5270838610523157748, guid: d1c00f89ef60a3446ad9eef2d361e2a1, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2158,7 +2162,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6102045132113314873, guid: 8203c90277bfec6438c88015fb831f99, type: 3}
       propertyPath: m_RootOrder
-      value: 7
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6102045132113314873, guid: 8203c90277bfec6438c88015fb831f99, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2517,7 +2521,7 @@ RectTransform:
   m_Children:
   - {fileID: 698290775}
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 40.339, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -3030,7 +3034,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5336407799547206892, guid: a4f31c9f6421beb42a81b0031924ff15, type: 3}
       propertyPath: m_RootOrder
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 5336407799547206892, guid: a4f31c9f6421beb42a81b0031924ff15, type: 3}
       propertyPath: m_LocalPosition.x
@@ -3856,7 +3860,7 @@ Transform:
   m_Children:
   - {fileID: 1957538745}
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1784702085
 GameObject:
@@ -4569,7 +4573,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 5545121022949003465, guid: 017cd424a94c9c34091f9ab4748c0131, type: 3}
       propertyPath: m_RootOrder
-      value: 3
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 5545121022949003465, guid: 017cd424a94c9c34091f9ab4748c0131, type: 3}
       propertyPath: m_LocalPosition.x
@@ -4609,6 +4613,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5545121022949003465, guid: 017cd424a94c9c34091f9ab4748c0131, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5545121022949003466, guid: 017cd424a94c9c34091f9ab4748c0131, type: 3}
+      propertyPath: directionSource
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5545121022949003466, guid: 017cd424a94c9c34091f9ab4748c0131, type: 3}
@@ -4717,7 +4725,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7966239817136689155, guid: 1ae8545277c64a044aa2a43469be2fa6, type: 3}
       propertyPath: m_RootOrder
-      value: 4
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 7966239817136689155, guid: 1ae8545277c64a044aa2a43469be2fa6, type: 3}
       propertyPath: m_LocalPosition.x
@@ -4757,25 +4765,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7966239817136689155, guid: 1ae8545277c64a044aa2a43469be2fa6, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7966239817136689156, guid: 1ae8545277c64a044aa2a43469be2fa6, type: 3}
-      propertyPath: _comment
-      value: 'A set of default Unity XRI Interactors with references to Ultraleap
-        Hand Input Actions
-
-
-        Also includes the default XRI Manager with an
-        InputActionManager that references the Leap Hand Inputs as required to update
-        custom Input Actions
-
-
-
-        Note: You can change which hands control
-        which interactors by enabling/disabling the child objects of this prefab'
-      objectReference: {fileID: 0}
-    - target: {fileID: 7966239817136689156, guid: 1ae8545277c64a044aa2a43469be2fa6, type: 3}
-      propertyPath: _isEditing
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

@@ -137,8 +137,8 @@ namespace Leap.Unity
                 {
                     // rawTextureWidth and Height are a bigger than the combinedTexture width and height, 
                     // so that all different textures (from different devices) fit into it
-                    int rawTextureWidth = 800;
-                    int rawTextureHeight = 800;
+                    int rawTextureWidth = 1024;
+                    int rawTextureHeight = 1024;
                     _globalRawTextures = new Texture2DArray(rawTextureWidth, rawTextureHeight, MAX_NUMBER_OF_GLOBAL_TEXTURES, _combinedTexture.format, false, true);
                     _globalRawTextures.wrapMode = TextureWrapMode.Clamp;
                     _globalRawTextures.filterMode = FilterMode.Bilinear;

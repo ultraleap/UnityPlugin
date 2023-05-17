@@ -122,7 +122,7 @@ GameObject:
   - component: {fileID: 114589100428820638}
   - component: {fileID: 8916041555348036645}
   m_Layer: 0
-  m_Name: Anchor
+  m_Name: Example Anchor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
