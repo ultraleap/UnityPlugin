@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 
 
 ### Changed
-- 
+- Changed OpenXRLeapProvider to calculate a LeapC-style palm width and pinch strength
 
 ### Fixed
 - Preview package version dependency mismatch for XRI when using InputSystem 1.4.4
