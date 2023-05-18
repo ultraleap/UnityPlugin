@@ -31,6 +31,10 @@ namespace Ultraleap.Tracking.OpenXR
         // Magic 0th thumb bone rotation offsets from LeapC
         public const float HAND_ROTATION_OFFSET_Y = 25.9f, HAND_ROTATION_OFFSET_Z = -63.45f;
 
+        // Magic numbers for palm width and PinchStrength calculation
+        private static readonly float[] DefaultMetacarpalLengths = { 0, 0.06812f, 0.06460f, 0.05800f, 0.05369f };
+        private const float DEFAULT_HAND_SCALE = 0.08425f;
+
         private long _frameId = 0;
 
         [Tooltip("Specifies the main camera. Falls back to Camera.main if not set")]
@@ -255,8 +259,8 @@ namespace Ultraleap.Tracking.OpenXR
                     (Finger.FingerType)fingerIndex);
             }
 
-            var handScale = CalculateHandScale(ref hand);
-            var palmWidth = handScale * 0.08425f;
+            float handScale = CalculateHandScale(ref hand);
+            float palmWidth = handScale * DEFAULT_HAND_SCALE;
 
             // Populate the whole hand information.
             hand.Fill(
@@ -321,16 +325,15 @@ namespace Ultraleap.Tracking.OpenXR
             return true;
         }
 
-        private static readonly float[] DefaultMetacarpalLengths = { 0, 0.6812f, 0.6460f, 0.5800f, 0.5369f };
-        
         private float CalculateHandScale(ref Hand hand)
         {
             // Iterate through the fingers, skipping the thumb and accumulate the scale.
             float scale = 0.0f;
             for (var i = 1; i < hand.Fingers.Count; ++i)
             {
-                scale += hand.Fingers[i].Bone(Bone.BoneType.TYPE_METACARPAL).Length / DefaultMetacarpalLengths[i] / 4.0f;
+                scale += (hand.Fingers[i].Bone(Bone.BoneType.TYPE_METACARPAL).Length / DefaultMetacarpalLengths[i]) / 4.0f;
             }
+
             return scale;
         }
 
