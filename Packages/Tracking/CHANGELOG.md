@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
 
-## [NEXT] - XX/XX/XX
+## [6.8.1] - 19/05/23
 
 ### Added
 - 
