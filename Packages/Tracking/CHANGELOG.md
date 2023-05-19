@@ -6,6 +6,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
 
+## [NEXT] - --/--/--
+
+### Added
+- 
+
+### Changed
+- 
+
+### Fixed
+- 
+
+### Known issues 
+- Use of the LeapCSharp Config class is unavailable with v5.X tracking service
+- Repeatedly opening scenes can cause memory use increase
+- Currently the Ultraleap Hand Tracking feature for OpenXR requires the New and Legacy input systems to be enabled, to simultaneously use OpenXR and the Ultraleap Unity Plugin's features.
+- The OpenXR Leap Provider does not currently support the `Confidence` hand property (and will return fixed values)
+- If using OpenXR when using Unity 2020 and Ultraleap Tracking Plugin via .unitypackage, an error will appear on import relating to HandTrackingFeature. This has been fixed by Unity on Unity 2021
+	- A workaround is to right click on \ThirdParty\Ultraleap\Tracking\OpenXR\Runtime\Scripts\HandTrackingFeature.cs and select 'Reimport'
+- After using Ultraleap OpenXR in Unity Editor, the tracking mode of device 0 will be set to HMD until the Unity Editor session ends. This can stop the testing of non-XR scenes until the Unity Editor is re-opened
+
 ## [6.8.1] - 19/05/23
 
 ### Added
