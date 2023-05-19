@@ -124,7 +124,7 @@ namespace Leap
         }
 
         internal void OnDataChanged()
-        { 
+        {
             UpdateFlippedData();
         }
 
