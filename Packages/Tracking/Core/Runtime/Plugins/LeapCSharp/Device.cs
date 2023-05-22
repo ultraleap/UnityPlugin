@@ -267,36 +267,98 @@ namespace Leap
                     //return devicePose;
                 }
 
-                System.Numerics.Matrix4x4 transformMatrix = new System.Numerics.Matrix4x4(
-                    data[0], data[1], data[2], data[3],
-                    data[4], data[5], data[6], data[7],
-                    data[8], data[9], data[10], data[11],
-                    data[12], data[13], data[14], data[15]);
 
-                System.Numerics.Matrix4x4 transposedMtrx = System.Numerics.Matrix4x4.Transpose(transformMatrix);
+                //test matrix so that we can test in editor with SIR170
+                var deviceTransform = new System.Numerics.Matrix4x4(
+                    -0.001f, 0, 0, 0,
+                    0, 0, -0.001f, 0,
+                    0, -0.001f, 0, -0.075f,
+                    0, 0, 0, 1);
 
-                UnityEngine.Matrix4x4 unityTransformMatrix = new UnityEngine.Matrix4x4(
-                    new Vector4(transposedMtrx.M11, transposedMtrx.M12, transposedMtrx.M13, transposedMtrx.M14),
-                    new Vector4(transposedMtrx.M21, transposedMtrx.M22, transposedMtrx.M23, transposedMtrx.M24),
-                    new Vector4(transposedMtrx.M31, transposedMtrx.M32, transposedMtrx.M33, transposedMtrx.M34),
-                    new Vector4(transposedMtrx.M41, transposedMtrx.M42, transposedMtrx.M43, transposedMtrx.M44)
-                    );
+                //System.Numerics.Matrix4x4 openXrToUnity = new System.Numerics.Matrix4x4(
+                //    1, 0, 0, 0,
+                //    0, 1, 0, 0,
+                //    0, 0, -1, 0,
+                //    0, 0, 0, 1);
+
+                System.Numerics.Matrix4x4 unityToLeap = new System.Numerics.Matrix4x4(
+                    -1, 0, 0, 0,
+                    0, 0, -1, 0,
+                    0, 1, 0, 0,
+                    0, 0, 0, 1);
+
+                //The real data from the service coming in.
+                //var deviceTransform = new Matrix4x4(
+                //                    new Vector4(data[0], data[1], data[2], data[3]),
+                //                    new Vector4(data[4], data[5], data[6], data[7]),
+                //                    new Vector4(data[8], data[9], data[10], data[11]),
+                //                    new Vector4(data[12], data[13], data[14], data[15]));
+
+
+                //var deviceTransform = new Matrix4x4(
+                //    new Vector4(-0.001f, 0, 0, 0),
+                //    new Vector4(0, 0, -0.001f, 0),
+                //    new Vector4(0, -0.001f, 0, 0),
+                //    new Vector4(0, 0, -0.075f, 1));
+
+                //Matrix4x4 openXrToUnity = new Matrix4x4(
+                //    new Vector4(1, 0, 0, 0),
+                //    new Vector4(0, 1, 0, 0),
+                //    new Vector4(0, 0, -1, 0),
+                //    new Vector4(0, 0, 0, 1));
+
+
+                //Matrix4x4 unityToLeap = new Matrix4x4(
+                //    new Vector4(-1, 0, 0, 0),
+                //    new Vector4(0, 0, -1, 0),
+                //    new Vector4(0, 1, 0, 0),
+                //    new Vector4(0, 0, 0, 1));
+
+                deviceTransform = unityToLeap * deviceTransform;
+
+                //deviceTransform = openXrToUnity * deviceTransform;
+
 
                 // Identity matrix here means we have no device transform, also check validity.
+                UnityEngine.Matrix4x4 unityTransformMatrix = new UnityEngine.Matrix4x4(
+                    new Vector4(deviceTransform.M11, deviceTransform.M21, deviceTransform.M31, deviceTransform.M41),
+                    new Vector4(deviceTransform.M12, deviceTransform.M22, deviceTransform.M32, deviceTransform.M42),
+                    new Vector4(deviceTransform.M13, deviceTransform.M23, deviceTransform.M33, deviceTransform.M43),
+                    new Vector4(deviceTransform.M14, deviceTransform.M24, deviceTransform.M34, deviceTransform.M44)
+                    );
+
                 if (unityTransformMatrix.isIdentity || !unityTransformMatrix.ValidTRS())
                 {
                     if (!unityTransformMatrix.ValidTRS())
                     {
                         Debug.Log("Matrix is InvalidTRS");
                     }
+                    else
+                    {
+                        Debug.Log("Matrix is Identity");
+                    }
                     devicePose = Pose.identity;
-                    //return devicePose;
+                    return devicePose;
                 }
-                devicePose = new Pose(unityTransformMatrix.GetColumn(3), unityTransformMatrix.rotation);
+
+
+                
+
+
+                // Using CreateFromRotationMatrix
+                System.Numerics.Quaternion numericsQ = System.Numerics.Quaternion.CreateFromRotationMatrix(deviceTransform);
+                
+                Quaternion unityQ = new Quaternion(numericsQ.X, numericsQ.Y, numericsQ.Z, numericsQ.W).normalized;
+
+
+                devicePose = new Pose(unityTransformMatrix.GetColumn(3), unityQ);
+                Debug.Log(devicePose.position + " " + devicePose.rotation.eulerAngles);
                 // Return a valid pose.
                 return devicePose;
             }
         }
+
+       
 
         /// <summary>
         /// Returns the internal status field of the current device
