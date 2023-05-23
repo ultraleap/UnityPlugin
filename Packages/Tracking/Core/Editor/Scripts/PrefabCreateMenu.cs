@@ -179,7 +179,7 @@ namespace Leap
             {
                 string assetPath = AssetDatabase.GUIDToAssetPath(guid);
 
-                if(!assetPath.Contains("Ultraleap") && !assetPath.Contains("ultraleap"))
+                if (!assetPath.Contains("Ultraleap") && !assetPath.Contains("ultraleap"))
                 {
                     continue;
                 }

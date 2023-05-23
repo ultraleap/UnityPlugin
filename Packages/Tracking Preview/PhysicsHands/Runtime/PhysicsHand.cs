@@ -397,7 +397,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 _timeOnReset = Time.time;
             }
 
-            PhysicsHandsUtils.UpdatePhysicsPalm(ref _physicsHand, _originalLeapHand,  _physicsProvider.HandTeleportDistance, IsContacting, IsGrasping, _physicsProvider.InterpolatingMass ? _graspMass : 1f, _physicsProvider.MaxMass);
+            PhysicsHandsUtils.UpdatePhysicsPalm(ref _physicsHand, _originalLeapHand, _physicsProvider.HandTeleportDistance, IsContacting, IsGrasping, _physicsProvider.InterpolatingMass ? _graspMass : 1f, _physicsProvider.MaxMass);
 
             // Fix the hand if it gets into a bad situation by teleporting and holding in place until its bad velocities disappear
             HandleTeleportingHands(AreBonesRotatedBeyondThreshold());
@@ -524,7 +524,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     for (int jointIndex = Hand.BONES - 1; jointIndex >= 0; jointIndex--)
                     {
                         int boneArrayIndex = fingerIndex * Hand.BONES + jointIndex;
-                     
+
                         if (_physicsHand.jointBones[boneArrayIndex].IsContacting || _physicsHand.jointBones[boneArrayIndex].IsGrasping || _physicsHand.jointBones[boneArrayIndex].IsObjectNearBone)
                         {
                             _fingerContacting[fingerIndex] = true;

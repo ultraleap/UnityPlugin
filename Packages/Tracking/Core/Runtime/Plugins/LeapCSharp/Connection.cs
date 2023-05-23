@@ -858,6 +858,7 @@ namespace LeapInternal
             //since the distortion struct cannot be represented safely in c#
             distortionData.Data = new float[(int)(distortionData.Width * distortionData.Height * 2)]; //2 float values per map point
             Marshal.Copy(image.distortionMatrix, distortionData.Data, 0, distortionData.Data.Length);
+            distortionData.OnDataChanged();
 
             if (LeapDistortionChange != null)
             {

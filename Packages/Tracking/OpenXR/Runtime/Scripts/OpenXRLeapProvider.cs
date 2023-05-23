@@ -31,6 +31,10 @@ namespace Ultraleap.Tracking.OpenXR
         // Magic 0th thumb bone rotation offsets from LeapC
         public const float HAND_ROTATION_OFFSET_Y = 25.9f, HAND_ROTATION_OFFSET_Z = -63.45f;
 
+        // Magic numbers for palm width and PinchStrength calculation
+        private static readonly float[] DefaultMetacarpalLengths = { 0, 0.06812f, 0.06460f, 0.05800f, 0.05369f };
+        private const float DEFAULT_HAND_SCALE = 0.08425f;
+
         private long _frameId = 0;
 
         [Tooltip("Specifies the main camera. Falls back to Camera.main if not set")]
@@ -255,7 +259,8 @@ namespace Ultraleap.Tracking.OpenXR
                     (Finger.FingerType)fingerIndex);
             }
 
-            var palmWidth = _joints[(int)HandJoint.Palm].Radius * 2.0f;
+            float handScale = CalculateHandScale(ref hand);
+            float palmWidth = handScale * DEFAULT_HAND_SCALE;
 
             // Populate the whole hand information.
             hand.Fill(
@@ -263,7 +268,7 @@ namespace Ultraleap.Tracking.OpenXR
                 handTracker == HandTracker.Left ? _leftHandId : _rightHandId,
                 1f,
                 CalculateGrabStrength(hand),
-                CalculatePinchStrength(ref hand, palmWidth),
+                CalculatePinchStrength(ref hand, handScale),
                 CalculatePinchDistance(ref hand),
                 palmWidth,
                 handTracker == HandTracker.Left,
@@ -320,13 +325,20 @@ namespace Ultraleap.Tracking.OpenXR
             return true;
         }
 
-        private float CalculatePinchStrength(ref Hand hand, float palmWidth)
+        private float CalculateHandScale(ref Hand hand)
         {
-            // Magic values taken from existing LeapC implementation (scaled to metres)
-            float handScale = palmWidth / 0.08425f;
-            float distanceZero = 0.0600f * handScale;
-            float distanceOne = 0.0220f * handScale;
+            // Iterate through the fingers, skipping the thumb and accumulate the scale.
+            float scale = 0.0f;
+            for (var i = 1; i < hand.Fingers.Count; ++i)
+            {
+                scale += (hand.Fingers[i].Bone(Bone.BoneType.TYPE_METACARPAL).Length / DefaultMetacarpalLengths[i]) / 4.0f;
+            }
 
+            return scale;
+        }
+
+        private float CalculatePinchStrength(ref Hand hand, float handScale)
+        {
             // Get the thumb position.
             var thumbTipPosition = hand.GetThumb().TipPosition;
 
@@ -340,7 +352,9 @@ namespace Ultraleap.Tracking.OpenXR
                 minDistanceSquared = Mathf.Min(distanceSquared, minDistanceSquared);
             }
 
-            // Compute the pinch strength.
+            // Compute the pinch strength. Magic values taken from existing LeapC implementation (scaled to metres)
+            float distanceZero = 0.0600f * handScale;
+            float distanceOne = 0.0220f * handScale;
             return Mathf.Clamp01((Mathf.Sqrt(minDistanceSquared) - distanceZero) / (distanceOne - distanceZero));
         }
 

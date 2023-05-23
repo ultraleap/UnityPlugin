@@ -73,7 +73,11 @@ namespace LeapInternal
         /// <summary>
         /// The Ultraleap 3Di hand tracking camera.
         /// </summary>
-        eLeapDevicePID_3Di = 0x1204
+        eLeapDevicePID_3Di = 0x1204,
+        /// <summary>
+        /// The Ultraleap Leap Motion Controller 2 hand tracking camera.
+        /// </summary>
+        eLeapDevicePID_LMC2 = 0x1206
     };
 
     public enum eLeapServiceDisposition : uint
