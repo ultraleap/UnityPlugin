@@ -26,7 +26,7 @@ namespace Leap.Unity.Readme
             if (SessionState.GetString(kReadmeScene, null) != EditorSceneManager.GetActiveScene().path)
             {
                 SessionState.SetString(kReadmeScene, EditorSceneManager.GetActiveScene().path);
-                SelectSceneReadme();
+                SelectSceneReadme(true);
             }
         }
 
@@ -37,10 +37,16 @@ namespace Leap.Unity.Readme
             ChangedScene(EditorSceneManager.GetActiveScene(), OpenSceneMode.Single);
         }
 
-        [MenuItem("Window/Ultraleap/Show Readme For Scene")]
-        public static void SelectSceneReadme()
+        [MenuItem("Ultraleap/Show Readme For Scene")]
+        public static void SelectSceneReadmeDropdown()
+        {
+            SelectSceneReadme();
+        }
+
+        public static void SelectSceneReadme(bool silent = false)
         {
             var ids = AssetDatabase.FindAssets("t:SceneReadme");
+            bool found = false;
             if (ids.Length > 0)
             {
                 SceneAsset currentSceneFile = AssetDatabase.LoadAssetAtPath<SceneAsset>(EditorSceneManager.GetActiveScene().path);
@@ -57,6 +63,7 @@ namespace Leap.Unity.Readme
 
                         if (currentSceneFile == readmeObject.scene)
                         {
+                            found = true;
                             Selection.objects = new UnityEngine.Object[] { readmeObject };
                             break;
                         }
@@ -66,6 +73,10 @@ namespace Leap.Unity.Readme
                         continue;
                     }
                 }
+            }
+            if(!silent && !found)
+            {
+                EditorUtility.DisplayDialog("No Readme for Scene", "This scene does not currently have a readme associated to it.", "Ok");
             }
         }
 
