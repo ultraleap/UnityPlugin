@@ -15,7 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 
 
 ### Fixed
-- 
+- Finger `Direction` is incorrectly set to the tip bone direction rather than the intermediate in the OpenXR provider.
+- Hand `GrabStrength` is computed before all required information is available in the OpenXR provider.
 
 ### Known issues 
 - Use of the LeapCSharp Config class is unavailable with v5.X tracking service
