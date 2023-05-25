@@ -16,6 +16,18 @@ MonoBehaviour:
   title: Physics Hands Example
   scene: {fileID: 102900000, guid: 1a70a889c083dac4480e0dd4c4a547d8, type: 3}
   sections:
+  - heading: 
+    text: If you're looking for a more feature rich Physics Hands demo, check out
+      our Physics Hands Playground project on Github.
+    linkText: Physics Hands Playground
+    url: https://github.com/ultraleap/physicshandsplayground
+    pingSceneElement: 
+    settingsPage: 
+    assetLinkText: 
+    assetLink: {fileID: 0}
+    assetLinkOpens: 0
+    image: {fileID: 0}
+    imageHeight: 0
   - heading: Project Setup
     text: Physics Hands requires a few project settings to be modified to get the
       best out of them.
@@ -23,6 +35,9 @@ MonoBehaviour:
     url: 
     pingSceneElement: 
     settingsPage: 
+    assetLinkText: 
+    assetLink: {fileID: 0}
+    assetLinkOpens: 0
     image: {fileID: 0}
     imageHeight: 0
   - heading: Time Settings
@@ -31,6 +46,9 @@ MonoBehaviour:
     url: 
     pingSceneElement: 
     settingsPage: Project/Time
+    assetLinkText: 
+    assetLink: {fileID: 0}
+    assetLinkOpens: 0
     image: {fileID: 0}
     imageHeight: 0
   - heading: 
@@ -39,6 +57,9 @@ MonoBehaviour:
     url: 
     pingSceneElement: 
     settingsPage: 
+    assetLinkText: 
+    assetLink: {fileID: 0}
+    assetLinkOpens: 0
     image: {fileID: 0}
     imageHeight: 0
   - heading: Physics Settings
@@ -47,19 +68,25 @@ MonoBehaviour:
     url: 
     pingSceneElement: 
     settingsPage: Project/Physics
+    assetLinkText: 
+    assetLink: {fileID: 0}
+    assetLinkOpens: 0
     image: {fileID: 0}
     imageHeight: 0
   - heading: 
     text: 'Set your <b>Gravity</b> to <b>X: 0, Y: -4.905, Z: 0</b> \nReduce the <b>Default
       Max Depenetration Velocity</b> To <b>1</b> \nReduce the <b>Sleep Threshold</b>
-      to <b>0.001</b> \nEnable <b>Adaptive Force</b> \nSet <b>Contacts Generation</b>
-      to <b>Persistent Contact Manifold</b> \nChange the <b>Friction Type</b> to
-      <b>Two Directional Fricton</b> \nEnable <b>Enchanced Determinism</b> \nChange
-      the <b>Solver Type</b> to <b>Temporal Gauss Seidel</b>'
+      to <b>0.001</b> \nSet <b>Contacts Generation</b> to <b>Persistent Contact Manifold</b>
+      \nChange the <b>Friction Type</b> to <b>Two Directional Fricton</b> \nEnable
+      <b>Enchanced Determinism</b> \nChange the <b>Solver Type</b> to <b>Temporal
+      Gauss Seidel</b>'
     linkText: 
     url: 
     pingSceneElement: 
     settingsPage: 
+    assetLinkText: 
+    assetLink: {fileID: 0}
+    assetLinkOpens: 0
     image: {fileID: 0}
     imageHeight: 0
   - heading: Modifying Physics Hands Settings
@@ -71,6 +98,9 @@ MonoBehaviour:
     url: 
     pingSceneElement: Leap/PhysicsProvider
     settingsPage: 
+    assetLinkText: 
+    assetLink: {fileID: 0}
+    assetLinkOpens: 0
     image: {fileID: 0}
     imageHeight: 0
   - heading: Adding Custom Physics Objects
@@ -81,5 +111,8 @@ MonoBehaviour:
     url: 
     pingSceneElement: 
     settingsPage: 
+    assetLinkText: 
+    assetLink: {fileID: 0}
+    assetLinkOpens: 0
     image: {fileID: 0}
     imageHeight: 0
