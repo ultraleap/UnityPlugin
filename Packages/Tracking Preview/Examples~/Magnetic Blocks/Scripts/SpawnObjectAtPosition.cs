@@ -2,13 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SpawnObjectAtPosition : MonoBehaviour
+namespace Leap.Unity.Examples.Experiments
 {
-    public Transform objectToSpawn;
-    public Transform spawnPoint;
-
-    public void SpawnObject()
+    public class SpawnObjectAtPosition : MonoBehaviour
     {
-        Instantiate(objectToSpawn, spawnPoint.position, Quaternion.identity);
+        public Transform objectToSpawn;
+        public Transform spawnPoint;
+
+        public void SpawnObject()
+        {
+            Instantiate(objectToSpawn, spawnPoint.position, Quaternion.identity);
+        }
     }
 }

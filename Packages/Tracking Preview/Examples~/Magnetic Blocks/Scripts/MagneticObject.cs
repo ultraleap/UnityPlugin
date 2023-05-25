@@ -16,7 +16,7 @@ namespace Leap.Unity.Interaction
     {
         const float NEARBY_MAGNETICS_RADIUS = 0.02f;
 
-        public Magnet[] magneticPoints;
+        Magnet[] magneticPoints;
         public Rigidbody rbody;
 
         [Space, Header("Magnet Values")]
@@ -35,6 +35,8 @@ namespace Leap.Unity.Interaction
             {
                 rbody = GetComponent<Rigidbody>();
             }
+
+            magneticPoints = GetComponentsInChildren<Magnet>();
         }
 
         private void FixedUpdate()
