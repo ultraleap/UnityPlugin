@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -30,15 +30,21 @@ namespace Leap.Unity
     {
         #region Constants
 
-        /// <summary>
-        /// Converts nanoseconds to seconds.
-        /// </summary>
+        [Obsolete("This const is named incorrectly. Use US_TO_S instead.")]
         protected const double NS_TO_S = 1e-6;
 
-        /// <summary>
-        /// Converts seconds to nanoseconds.
-        /// </summary>
+        [Obsolete("This const is named incorrectly. Use S_TO_US instead.")]
         protected const double S_TO_NS = 1e6;
+
+        /// <summary>
+        /// Converts Microseconds to seconds.
+        /// </summary>
+        protected const double US_TO_S = 1e-6;
+
+        /// <summary>
+        /// Converts seconds to Microseconds.
+        /// </summary>
+        protected const double S_TO_US = 1e6;
 
         /// <summary>
         /// The transform array used for late-latching.
@@ -78,7 +84,8 @@ namespace Leap.Unity
             LeapMotionController,
             StereoIR170,
             Device_3Di,
-            Automatic
+            Automatic,
+            LeapMotionController2,
         }
         [Tooltip("Displays a representation of the traking device")]
         [SerializeField]
@@ -267,20 +274,23 @@ namespace Leap.Unity
         [EditTimeOnly]
         protected string _serverNameSpace = "Leap Service";
 
-        #endregion
-
-        #region Internal Settings & Memory
+        public override TrackingSource TrackingDataSource { get { return CheckLeapServiceAvailable(); } }
 
         /// <summary>
         /// Determines if the service provider should temporally resample frames for smoothness.
         /// </summary>
-        protected bool _useInterpolation = true;
+        [SerializeField]
+        public bool _useInterpolation = true;
+
+        #endregion
+
+        #region Internal Settings & Memory
 
         // Extrapolate on Android to compensate for the latency introduced by its graphics
         // pipeline.
 #if UNITY_ANDROID && !UNITY_EDITOR
-    protected int ExtrapolationAmount = 0; // 15;
-    protected int BounceAmount = 70;
+        protected int ExtrapolationAmount = 0; // 15;
+        protected int BounceAmount = 70;
 #else
         protected int ExtrapolationAmount = 0;
         protected int BounceAmount = 0;
@@ -605,7 +615,7 @@ namespace Leap.Unity
                 _smoothedTrackingLatency.Update((float)(_leapController.Now() - _leapController.FrameTimestamp()), Time.deltaTime);
 #endif
                 long timestamp = CalculateInterpolationTime() + (ExtrapolationAmount * 1000);
-                _unityToLeapOffset = timestamp - (long)(Time.time * S_TO_NS);
+                _unityToLeapOffset = timestamp - (long)(Time.time * S_TO_US);
 
                 _leapController.GetInterpolatedFrameFromTime(_untransformedUpdateFrame, timestamp, CalculateInterpolationTime() - (BounceAmount * 1000), _currentDevice);
             }
@@ -641,7 +651,7 @@ namespace Leap.Unity
                         // timeline as Update.  We add an extrapolation value to help compensate
                         // for latency.
                         float extrapolatedTime = Time.fixedTime + CalculatePhysicsExtrapolation();
-                        timestamp = (long)(extrapolatedTime * S_TO_NS) + _unityToLeapOffset;
+                        timestamp = (long)(extrapolatedTime * S_TO_US) + _unityToLeapOffset;
                         break;
                     case FrameOptimizationMode.ReusePhysicsForUpdate:
                         // If we are re-using physics frames for update, we don't even want to care
@@ -1036,6 +1046,33 @@ namespace Leap.Unity
             dest.CopyFrom(source).Transform(new LeapTransform(transform));
         }
 
+        private TrackingSource CheckLeapServiceAvailable()
+        {
+            if (_trackingSource != TrackingSource.NONE)
+            {
+                return _trackingSource;
+            }
+
+#if UNITY_ANDROID && !UNITY_EDITOR
+            if(AndroidServiceBinder.Bind())
+            {
+                _trackingSource = TrackingSource.LEAPC;
+                return _trackingSource;
+            }
+#endif
+
+            if (LeapInternal.Connection.IsConnectionAvailable(_serverNameSpace))
+            {
+                _trackingSource = TrackingSource.LEAPC;
+            }
+            else
+            {
+                _trackingSource = TrackingSource.NONE;
+            }
+
+            return _trackingSource;
+        }
+
         #endregion
 
         #region Draw Gizmos
@@ -1070,6 +1107,9 @@ namespace Leap.Unity
                     break;
                 case LeapServiceProvider.InteractionVolumeVisualization.Device_3Di:
                     DrawTrackingDevice(targetTransform, "3Di");
+                    break;
+                case LeapServiceProvider.InteractionVolumeVisualization.LeapMotionController2:
+                    DrawTrackingDevice(targetTransform, "Leap Motion Controller 2");
                     break;
                 case LeapServiceProvider.InteractionVolumeVisualization.Automatic:
                     DetectConnectedDevice(targetTransform);
@@ -1123,6 +1163,10 @@ namespace Leap.Unity
                     DrawTrackingDevice(targetTransform, "Leap Motion Controller");
                     return;
                 }
+                else if (deviceType == Device.DeviceType.TYPE_LMC2)
+                {
+                    DrawTrackingDevice(targetTransform, "Leap Motion Controller 2");
+                }
             }
 
             // if no devices connected, no serial number selected or the connected device type isn't matching one of the above,
@@ -1144,7 +1188,6 @@ namespace Leap.Unity
                 deviceModelMatrix *= Matrix4x4.Translate(new Vector3(0, xrProvider.deviceOffsetYAxis, xrProvider.deviceOffsetZAxis));
                 deviceModelMatrix *= Matrix4x4.Rotate(Quaternion.Euler(-90 - xrProvider.deviceTiltXAxis, 180, 0));
             }
-
 
             LeapFOVInfo info = null;
             foreach (var leapInfo in leapFOVInfos.SupportedDevices)
@@ -1179,12 +1222,10 @@ namespace Leap.Unity
 
         private void DrawInteractionZone(Matrix4x4 deviceModelMatrix)
         {
-
             _visualFOV.UpdateFOVS();
 
             optimalFOVMesh = _visualFOV.OptimalFOVMesh;
             maxFOVMesh = _visualFOV.MaxFOVMesh;
-
 
             if (OptimalFOV_Visualization && optimalFOVMesh != null)
             {
@@ -1204,12 +1245,14 @@ namespace Leap.Unity
             }
         }
 
-
         private void LoadFOVData()
         {
             leapFOVInfos = JsonUtility.FromJson<LeapFOVInfos>(Resources.Load<TextAsset>("TrackingVolumeVisualization/SupportedTrackingDevices").text);
 
-            if (_visualFOV == null) _visualFOV = new VisualFOV();
+            if (_visualFOV == null)
+            {
+                _visualFOV = new VisualFOV();
+            }
         }
 
         public void SetDeviceInfo(LeapFOVInfo leapInfo)
@@ -1239,6 +1282,5 @@ namespace Leap.Unity
         }
 
         #endregion
-
     }
 }

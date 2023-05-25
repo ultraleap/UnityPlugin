@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -27,15 +27,9 @@ namespace Leap.Unity
 
         #region Inspector
         // Manual Device Offset
-#if UNITY_ANDROID
-        private const float DEFAULT_DEVICE_OFFSET_Y_AXIS = -0.0114f;
-        private const float DEFAULT_DEVICE_OFFSET_Z_AXIS = 0.0981f;
-        private const float DEFAULT_DEVICE_TILT_X_AXIS = 0f;
-#else
         private const float DEFAULT_DEVICE_OFFSET_Y_AXIS = 0f;
-        private const float DEFAULT_DEVICE_OFFSET_Z_AXIS = 0.12f;
-        private const float DEFAULT_DEVICE_TILT_X_AXIS = 5f;
-#endif
+        private const float DEFAULT_DEVICE_OFFSET_Z_AXIS = 0.08f;
+        private const float DEFAULT_DEVICE_TILT_X_AXIS = 0f;
 
         /// <summary>
         /// Supported modes for device offset. Used for deviceOffsetMode which allows 
@@ -44,8 +38,8 @@ namespace Leap.Unity
         public enum DeviceOffsetMode
         {
             /// <summary>
-            /// Defaults to constants set at the top of LeapServiceProvider 
-            /// (currently: offset y axis = 0; offset z axis = 0.12; tilt x axis = 5)
+            /// Uses pre-defined offsets, if none are available, falls back to 
+            /// the constants at the top of the LeapXRServiceProvider.cs
             /// </summary>
             Default,
             /// <summary>
@@ -274,6 +268,9 @@ namespace Leap.Unity
             }
         }
 
+        [Tooltip("Automatically adds a TrackedPoseDriver to the MainCamera if there is not one already")]
+        public bool _autoCreateTrackedPoseDriver = true;
+
         #endregion
 
         #region Internal Memory
@@ -314,7 +311,7 @@ namespace Leap.Unity
             resetShaderTransforms();
 
 #if XR_MANAGEMENT_AVAILABLE
-            if (mainCamera.GetComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>() == null)
+            if (mainCamera.GetComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>() == null && _autoCreateTrackedPoseDriver)
             {
                 mainCamera.gameObject.AddComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>().UseRelativeTransform = true;
             }
@@ -505,7 +502,7 @@ namespace Leap.Unity
             return _leapController.Now()
                     - (long)_smoothedTrackingLatency.value
                     + ((updateHandInPrecull && !endOfFrame) ?
-                        (long)(Time.smoothDeltaTime * S_TO_NS / Time.timeScale)
+                        (long)(Time.smoothDeltaTime * S_TO_US / Time.timeScale)
                         : 0);
 #endif
         }
@@ -590,34 +587,52 @@ namespace Leap.Unity
             // Normalize the rotation Quaternion.
             warpedRotation = warpedRotation.ToNormalized();
 
-            // If we are NOT using a transform to offset the tracking
-            if (_deviceOffsetMode != DeviceOffsetMode.Transform)
+            switch (_deviceOffsetMode)
             {
-                warpedPosition += warpedRotation * Vector3.up * deviceOffsetYAxis
-                                + warpedRotation * Vector3.forward * deviceOffsetZAxis;
-                warpedRotation *= Quaternion.Euler(deviceTiltXAxis, 0f, 0f);
+                case DeviceOffsetMode.Default:
+                    if (_currentDevice != null)
+                    {
+                        if (_currentDevice.DevicePose != Pose.identity)
+                        {
+                            warpedPosition += warpedRotation * _currentDevice.DevicePose.position;
+                            warpedRotation *= _currentDevice.DevicePose.rotation;
+                        }
+                        else // Fall back to the consts if we are given a Pose.identity as it is assumed to be false
+                        {
+                            warpedPosition += warpedRotation * Vector3.up * deviceOffsetYAxis
+                                            + warpedRotation * Vector3.forward * deviceOffsetZAxis;
+                            warpedRotation *= Quaternion.Euler(deviceTiltXAxis, 0f, 0f);
+                        }
+                    }
+                    warpedRotation *= Quaternion.Euler(-90f, 180f, 0f);
+                    break;
+                case DeviceOffsetMode.ManualHeadOffset:
+                    warpedPosition += warpedRotation * Vector3.up * deviceOffsetYAxis
+                                    + warpedRotation * Vector3.forward * deviceOffsetZAxis;
+                    warpedRotation *= Quaternion.Euler(deviceTiltXAxis, 0f, 0f);
 
-                warpedRotation *= Quaternion.Euler(-90f, 180f, 0f);
+                    warpedRotation *= Quaternion.Euler(-90f, 180f, 0f);
+                    break;
+                case DeviceOffsetMode.Transform:
+                    warpedRotation *= Quaternion.Euler(-90f, 90f, 90f);
+                    break;
             }
-            else
-            {
-                warpedRotation *= Quaternion.Euler(-90f, 90f, 90f);
-            }
-
 
             // Use the mainCamera parent to transfrom the warped positions so the player can move around
             if (mainCamera.transform.parent != null)
             {
                 leapTransform = new LeapTransform(
                   mainCamera.transform.parent.TransformPoint(warpedPosition),
-                  mainCamera.transform.parent.TransformRotation(warpedRotation)
+                  mainCamera.transform.parent.TransformRotation(warpedRotation),
+                  mainCamera.transform.parent.lossyScale
                   );
             }
             else
             {
                 leapTransform = new LeapTransform(
                   warpedPosition,
-                  warpedRotation
+                  warpedRotation,
+                  transform.lossyScale
                   );
             }
 

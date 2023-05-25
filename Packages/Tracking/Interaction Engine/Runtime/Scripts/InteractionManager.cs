@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -807,9 +807,7 @@ namespace Leap.Unity.Interaction
         {
             get
             {
-                return (this.transform.position - _prevPosition).magnitude > 0.0001F
-                    || Quaternion.Angle(transform.rotation * Quaternion.Inverse(_prevRotation),
-                                        Quaternion.identity) > 0.01F;
+                return (transform.position - _prevPosition).magnitude > 0.0001F;
             }
         }
 
@@ -819,8 +817,8 @@ namespace Leap.Unity.Interaction
 
         private void updateMovingFrameOfReferenceSupport()
         {
-            _prevPosition = this.transform.position;
-            _prevRotation = this.transform.rotation;
+            _prevPosition = transform.position;
+            _prevRotation = transform.rotation;
         }
 
         /// <summary>
@@ -831,9 +829,9 @@ namespace Leap.Unity.Interaction
         /// </summary>
         public void TransformAheadByFixedUpdate(Vector3 position, Quaternion rotation, out Vector3 newPosition, out Quaternion newRotation)
         {
-            Vector3 worldDisplacement = this.transform.position - _prevPosition;
-            Quaternion worldRotation = this.transform.rotation * Quaternion.Inverse(_prevRotation);
-            newPosition = ((worldRotation * (position - this.transform.position + worldDisplacement))) + this.transform.position;
+            Vector3 worldDisplacement = transform.position - _prevPosition;
+            Quaternion worldRotation = transform.rotation * Quaternion.Inverse(_prevRotation);
+            newPosition = ((worldRotation * (position - transform.position + worldDisplacement))) + transform.position;
             newRotation = worldRotation * rotation;
         }
 
@@ -845,9 +843,9 @@ namespace Leap.Unity.Interaction
         /// </summary>
         public void TransformAheadByFixedUpdate(Vector3 position, out Vector3 newPosition)
         {
-            Vector3 worldDisplacement = this.transform.position - _prevPosition;
-            Quaternion worldRotation = this.transform.rotation * Quaternion.Inverse(_prevRotation);
-            newPosition = ((worldRotation * (position - this.transform.position + worldDisplacement))) + this.transform.position;
+            Vector3 worldDisplacement = transform.position - _prevPosition;
+            Quaternion worldRotation = transform.rotation * Quaternion.Inverse(_prevRotation);
+            newPosition = ((worldRotation * (position - transform.position + worldDisplacement))) + transform.position;
         }
 
         #endregion

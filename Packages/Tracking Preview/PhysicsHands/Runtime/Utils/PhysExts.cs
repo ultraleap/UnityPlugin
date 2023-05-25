@@ -13,11 +13,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
             return OverlapBoxNonAllocOffset(box, Vector3.zero, results, layerMask, queryTriggerInteraction);
         }
 
-        public static int OverlapBoxNonAllocOffset(BoxCollider box, Vector3 offset, Collider[] results, int layerMask = Physics.DefaultRaycastLayers, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
+        public static int OverlapBoxNonAllocOffset(BoxCollider box, Vector3 offset, Collider[] results, int layerMask = Physics.DefaultRaycastLayers, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal, float extraRadius = 0)
         {
             Vector3 center, halfExtents;
             Quaternion orientation;
-            box.ToWorldSpaceBoxOffset(offset, out center, out halfExtents, out orientation);
+            box.ToWorldSpaceBoxOffset(offset, out center, out halfExtents, out orientation, extraRadius);
             return Physics.OverlapBoxNonAlloc(center, halfExtents, results, orientation, layerMask, queryTriggerInteraction);
         }
 
@@ -26,13 +26,13 @@ namespace Leap.Unity.Interaction.PhysicsHands
             ToWorldSpaceBoxOffset(box, Vector3.zero, out center, out halfExtents, out orientation);
         }
 
-        public static void ToWorldSpaceBoxOffset(this BoxCollider box, Vector3 offset, out Vector3 center, out Vector3 halfExtents, out Quaternion orientation)
+        public static void ToWorldSpaceBoxOffset(this BoxCollider box, Vector3 offset, out Vector3 center, out Vector3 halfExtents, out Quaternion orientation, float extraRadius = 0)
         {
             orientation = box.transform.rotation;
             center = box.transform.TransformPoint(box.center + offset);
             var lossyScale = box.transform.lossyScale;
             var scale = AbsVec3(lossyScale);
-            halfExtents = Vector3.Scale(scale, box.size) * 0.5f;
+            halfExtents = (Vector3.Scale(scale, box.size) * 0.5f) + (extraRadius == 0 ? Vector3.zero : new Vector3(extraRadius, extraRadius, extraRadius));
         }
 
         public static int OverlapSphereNonAlloc(SphereCollider sphere, Collider[] results, int layerMask = Physics.DefaultRaycastLayers, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
@@ -54,12 +54,12 @@ namespace Leap.Unity.Interaction.PhysicsHands
             return OverlapCapsuleNonAllocOffset(capsule, Vector3.zero, results, layerMask, queryTriggerInteraction);
         }
 
-        public static int OverlapCapsuleNonAllocOffset(CapsuleCollider capsule, Vector3 offset, Collider[] results, int layerMask = Physics.DefaultRaycastLayers, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal, float radius = -1)
+        public static int OverlapCapsuleNonAllocOffset(CapsuleCollider capsule, Vector3 offset, Collider[] results, int layerMask = Physics.DefaultRaycastLayers, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal, float extraRadius = 0)
         {
             Vector3 point0, point1;
             float radiusOut;
             capsule.ToWorldSpaceCapsuleOffset(offset, out point0, out point1, out radiusOut);
-            return Physics.OverlapCapsuleNonAlloc(point0, point1, radius == -1 ? radiusOut : radius, results, layerMask, queryTriggerInteraction);
+            return Physics.OverlapCapsuleNonAlloc(point0, point1, extraRadius + radiusOut, results, layerMask, queryTriggerInteraction);
         }
 
         public static void ToWorldSpaceCapsule(this CapsuleCollider capsule, out Vector3 point0, out Vector3 point1, out float radius)
@@ -103,12 +103,12 @@ namespace Leap.Unity.Interaction.PhysicsHands
             point1 = center - dir * (height * 0.5f - radius);
         }
 
-        private static Vector3 AbsVec3(Vector3 v)
+        public static Vector3 AbsVec3(Vector3 v)
         {
             return new Vector3(Mathf.Abs(v.x), Mathf.Abs(v.y), Mathf.Abs(v.z));
         }
 
-        private static float MaxVec3(Vector3 v)
+        public static float MaxVec3(Vector3 v)
         {
             return Mathf.Max(v.x, Mathf.Max(v.y, v.z));
         }

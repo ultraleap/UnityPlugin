@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -52,11 +52,20 @@ namespace Leap.Unity.InputModule
                 return;
             }
 
+            if (element.IsUserInteractingDirectly && !element.ShowDirectPointerCursor)
+            {
+                spriteRenderer.enabled = false;
+            }
+            else
+            {
+                spriteRenderer.enabled = true;
+            }
+
             spriteRenderer.transform.localScale = hand != null
                 ? Vector3.Lerp(initialScale, initialScale * interactionPointerScale, hand.PinchStrength)
                 : Vector3.one;
 
-            switch (element.PointerState)
+            switch (element.AggregatePointerState)
             {
                 case PointerStates.OnCanvas:
                     spriteRenderer.color = colorBlock.normalColor;

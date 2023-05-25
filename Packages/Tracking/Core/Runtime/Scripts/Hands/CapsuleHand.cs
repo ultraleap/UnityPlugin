@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -23,7 +23,6 @@ namespace Leap.Unity
     {
         private const int TOTAL_JOINT_COUNT = 4 * 5;
         private const float CYLINDER_MESH_RESOLUTION = 0.1f; //in centimeters, meshes within this resolution will be re-used
-        private const int THUMB_BASE_INDEX = (int)Finger.FingerType.TYPE_THUMB * 4;
         private const int PINKY_BASE_INDEX = (int)Finger.FingerType.TYPE_PINKY * 4;
 
         private static int _leftColorIndex = 0;
@@ -36,6 +35,12 @@ namespace Leap.Unity
 
         [SerializeField]
         private bool _showArm = true;
+
+        [SerializeField, Tooltip("Shows the upper arm. Best in XR, assumes the camera is positioned at the users head")]
+        private bool _showUpperArm = false;
+
+        [SerializeField]
+        private bool _showPalmJoint = true;
 
         [SerializeField]
         private bool _castShadows = true;
@@ -75,13 +80,15 @@ namespace Leap.Unity
         private Material _sphereMat;
         private Hand _hand;
         private Vector3[] _spherePositions;
-        private Matrix4x4[] _sphereMatrices = new Matrix4x4[32],
-                            _cylinderMatrices = new Matrix4x4[32];
+        private Matrix4x4[] _sphereMatrices = new Matrix4x4[64],
+                            _cylinderMatrices = new Matrix4x4[64];
         private int _curSphereIndex = 0, _curCylinderIndex = 0;
         private Color _backingDefault = Color.white;
 
         private MaterialPropertyBlock _materialPropertyBlock;
         private Color[] _sphereColors;
+
+        private float currentLossyScaleX;
 
         [HideInInspector]
         public bool SetIndividualSphereColors = false;
@@ -153,7 +160,18 @@ namespace Leap.Unity
         /// <param name="hand"></param>
         public override void SetLeapHand(Hand hand)
         {
-            _hand = hand;
+            if (hand != null)
+            {
+                if (_hand == null)
+                {
+                    _hand = new Hand();
+                }
+                _hand = _hand.CopyFrom(hand);
+            }
+            else
+            {
+                _hand = null;
+            }
         }
 
         /// <summary>
@@ -292,6 +310,8 @@ namespace Leap.Unity
         /// </summary>
         public override void UpdateHand()
         {
+            currentLossyScaleX = transform.lossyScale.x;
+
             _curSphereIndex = 0;
             _curCylinderIndex = 0;
 
@@ -316,49 +336,32 @@ namespace Leap.Unity
                 {
                     int key = getFingerJointIndex((int)finger.Type, j);
 
-                    Vector3 position = finger.Bone((Bone.BoneType)j).NextJoint;
-                    _spherePositions[key] = position;
 
+                    Vector3 position;
+                    if (finger.Type == Finger.FingerType.TYPE_THUMB && j == 0)
+                    {
+                        // Hand the base of the thumb differently, and move it to the base of the index metacarpal.
+                        position = _hand.GetIndex().Bone((Bone.BoneType)j).PrevJoint;
+                    }
+                    else
+                    {
+                        position = finger.Bone((Bone.BoneType)j).NextJoint;
+                    }
+
+                    _spherePositions[key] = position;
                     drawSphere(position);
                 }
             }
 
-            //Now we just have a few more spheres for the hands
-            //PalmPos, WristPos, and mockThumbJointPos, which is derived and not taken from the frame obj
-
-            Vector3 palmPosition = _hand.PalmPosition;
-            drawSphere(palmPosition, _palmRadius);
-
-            Vector3 thumbBaseToPalm = _spherePositions[THUMB_BASE_INDEX] - _hand.PalmPosition;
-            Vector3 mockThumbJointPos = _hand.PalmPosition + Vector3.Reflect(thumbBaseToPalm, _hand.Basis.xBasis);
-            drawSphere(mockThumbJointPos);
-
             //If we want to show the arm, do the calculations and display the meshes
             if (_showArm)
             {
-                var arm = _hand.Arm;
+                DrawArm();
+            }
 
-                Vector3 right = arm.Basis.xBasis * arm.Width * 0.7f * 0.5f;
-                Vector3 wrist = arm.WristPosition;
-                Vector3 elbow = arm.ElbowPosition;
-
-                float armLength = Vector3.Distance(wrist, elbow);
-                wrist -= arm.Direction * armLength * 0.05f;
-
-                Vector3 armFrontRight = wrist + right;
-                Vector3 armFrontLeft = wrist - right;
-                Vector3 armBackRight = elbow + right;
-                Vector3 armBackLeft = elbow - right;
-
-                drawSphere(armFrontRight);
-                drawSphere(armFrontLeft);
-                drawSphere(armBackLeft);
-                drawSphere(armBackRight);
-
-                drawCylinder(armFrontLeft, armFrontRight);
-                drawCylinder(armBackLeft, armBackRight);
-                drawCylinder(armFrontLeft, armBackLeft);
-                drawCylinder(armFrontRight, armBackRight);
+            if (_showUpperArm)
+            {
+                DrawUpperArm();
             }
 
             //Draw cylinders between finger joints
@@ -388,9 +391,20 @@ namespace Leap.Unity
                 drawCylinder(posA, posB);
             }
 
-            //Draw the rest of the hand
-            drawCylinder(mockThumbJointPos, THUMB_BASE_INDEX);
-            drawCylinder(mockThumbJointPos, PINKY_BASE_INDEX);
+            if (_showPalmJoint)
+            {
+                //Now we just have a few more spheres for the hands
+                //PalmPos, WristPos, and the virtual palm drawn from the metacarpals.
+                Vector3 palmPosition = _hand.PalmPosition;
+                drawSphere(palmPosition, _palmRadius);
+            }
+
+            Vector3 pinkyMetacarpal = _hand.GetPinky().Bone(Bone.BoneType.TYPE_METACARPAL).PrevJoint;
+            Vector3 indexMetacarpal = _hand.GetIndex().Bone(Bone.BoneType.TYPE_METACARPAL).PrevJoint;
+
+            drawSphere(pinkyMetacarpal);
+            drawCylinder(pinkyMetacarpal, indexMetacarpal);
+            drawCylinder(pinkyMetacarpal, PINKY_BASE_INDEX);
 
             if (SetIndividualSphereColors)
             {
@@ -424,6 +438,56 @@ namespace Leap.Unity
               _castShadows ? UnityEngine.Rendering.ShadowCastingMode.On : UnityEngine.Rendering.ShadowCastingMode.Off, true, gameObject.layer);
         }
 
+        void DrawArm()
+        {
+            var arm = _hand.Arm;
+
+            Vector3 right = arm.Basis.xBasis * arm.Width * 0.7f * 0.5f;
+            Vector3 wrist = arm.WristPosition;
+            Vector3 elbow = arm.ElbowPosition;
+
+            float armLength = Vector3.Distance(wrist, elbow);
+            wrist -= arm.Direction * armLength * 0.05f;
+
+            Vector3 armFrontRight = wrist + right;
+            Vector3 armFrontLeft = wrist - right;
+            Vector3 armBackRight = elbow + right;
+            Vector3 armBackLeft = elbow - right;
+
+            drawSphere(armFrontRight);
+            drawSphere(armFrontLeft);
+            drawSphere(armBackLeft);
+            drawSphere(armBackRight);
+
+            drawCylinder(armFrontLeft, armFrontRight);
+            drawCylinder(armBackLeft, armBackRight);
+            drawCylinder(armFrontLeft, armBackLeft);
+            drawCylinder(armFrontRight, armBackRight);
+        }
+
+        void DrawUpperArm()
+        {
+            Vector3 shoulderPos = Camera.main.transform.TransformPoint(handedness == Chirality.Left ? -0.15f : 0.15f, -0.15f, -0.05f);
+
+            var arm = _hand.Arm;
+
+            Vector3 elbow = arm.ElbowPosition;
+            Vector3 right = arm.Basis.xBasis * arm.Width * 0.7f * 0.5f;
+
+            Vector3 armFrontRight = elbow + right;
+            Vector3 armFrontLeft = elbow - right;
+            Vector3 armBackRight = shoulderPos + right;
+            Vector3 armBackLeft = shoulderPos - right;
+
+            drawSphere(armBackLeft);
+            drawSphere(armBackRight);
+
+            drawCylinder(armFrontLeft, armFrontRight);
+            drawCylinder(armBackLeft, armBackRight);
+            drawCylinder(armFrontLeft, armBackLeft);
+            drawCylinder(armFrontRight, armBackRight);
+        }
+
         private void drawSphere(Vector3 position)
         {
             drawSphere(position, _jointRadius);
@@ -435,7 +499,7 @@ namespace Leap.Unity
 
             //multiply radius by 2 because the default unity sphere has a radius of 0.5 meters at scale 1.
             _sphereMatrices[_curSphereIndex++] = Matrix4x4.TRS(position,
-              Quaternion.identity, Vector3.one * radius * 2.0f * transform.lossyScale.x);
+              Quaternion.identity, Vector3.one * radius * 2.0f * currentLossyScaleX);
         }
 
         private void drawCylinder(Vector3 a, Vector3 b)
@@ -447,7 +511,7 @@ namespace Leap.Unity
             if ((a - b).magnitude > 0.001f)
             {
                 _cylinderMatrices[_curCylinderIndex++] = Matrix4x4.TRS(a,
-                  Quaternion.LookRotation(b - a), new Vector3(transform.lossyScale.x, transform.lossyScale.x, length));
+                  Quaternion.LookRotation(b - a), new Vector3(currentLossyScaleX, currentLossyScaleX, length));
             }
         }
 

@@ -10,16 +10,16 @@ namespace Leap.Unity.Interaction.PhysicsHands
     {
         private const float GRAB_COOLDOWNTIME = 0.025f;
         private const float MINIMUM_STRENGTH = 0.25f, MINIMUM_THUMB_STRENGTH = 0.2f;
-        private const float REQUIRED_ENTRY_STRENGTH = 0.15f, REQUIRED_EXIT_STRENGTH = 0.05f, REQUIRED_THUMB_EXIT_STRENGTH = 0.1f, REQUIRED_PINCH_DISTANCE = 0.018f;
+        private const float REQUIRED_ENTRY_STRENGTH = 0.15f, REQUIRED_EXIT_STRENGTH = 0.05f, REQUIRED_THUMB_EXIT_STRENGTH = 0.1f, REQUIRED_PINCH_DISTANCE = 0.012f;
 
         public enum State
         {
-            Idle,
+            Hover,
             Contact,
             Grasp
         }
 
-        public State GraspState { get; private set; } = State.Idle;
+        public State GraspState { get; private set; } = State.Hover;
 
         public HashSet<PhysicsBone> BoneHash => _boneHash;
         private HashSet<PhysicsBone> _boneHash = new HashSet<PhysicsBone>();
@@ -56,16 +56,13 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private Rigidbody _rigid;
         public Rigidbody Rigidbody => _rigid;
         private List<Collider> _colliders = new List<Collider>();
-        public Pose previousPose;
-        public Pose previousPalmPose;
-
-        private Vector3 _maxVelocityLerped = Vector3.zero;
-        private float _releaseTimer = 0;
 
         private Vector3 _newPosition;
         private Quaternion _newRotation;
 
         private bool _oldKinematic, _oldGravity;
+        private float _originalMass = 1f;
+        public float OriginalMass => _originalMass;
 
         // This means we can have bones stay "attached" for a small amount of time
         private List<PhysicsBone> _boneCooldownItems = new List<PhysicsBone>();
@@ -81,15 +78,21 @@ namespace Leap.Unity.Interaction.PhysicsHands
             {
                 // These values are limited by the EligibleBones
                 return (bones[0].Count > 0 || bones[5].Count > 0) && // A thumb or palm bone
-                    ((bones[1].Count > 0) || // The intermediate or distal of the index
-                    (bones[2].Count > 0) || // The distal of the middle
-                    (bones[3].Count > 0) || // The distal of the ring
-                    (bones[4].Count > 0)); // The distal of the pinky
+                    ((bones[1].Count > 0 && bones[1].Any(x => x.Joint != 0)) || // The intermediate or distal of the index
+                    (bones[2].Count > 0 && bones[2].Any(x => x.Joint != 0)) || // The intermediate or distal of the middle
+                    (bones[3].Count > 0 && bones[3].Any(x => x.Joint != 0)) || // The distal of the ring
+                    (bones[4].Count > 0 && bones[4].Any(x => x.Joint == 2))); // The distal of the pinky
             }
             return false;
         }
 
-        private bool Grasped(PhysicsHand hand, int finger)
+        /// <summary>
+        /// Returns true if the finger on the provided hand is grasping, and false if not
+        /// </summary>
+        /// <param name="hand">The hand to check</param>
+        /// <param name="finger">The finger to check</param>
+        /// <returns>If the finger on the provided hand is grasped</returns>
+        public bool Grasped(PhysicsHand hand, int finger)
         {
             if (_bones.TryGetValue(hand, out var bones))
             {
@@ -101,9 +104,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
                     case 1:
                     case 2:
+                    case 3:
                         return bones[finger].Count > 0 && bones[finger].Any(x => x.Joint != 0);
 
-                    case 3:
                     case 4:
                         return bones[finger].Count > 0 && bones[finger].Any(x => x.Joint == 2);
                 }
@@ -115,8 +118,12 @@ namespace Leap.Unity.Interaction.PhysicsHands
         public PhysicsGraspHelper(Rigidbody rigid, PhysicsProvider manager)
         {
             _rigid = rigid;
-            _oldKinematic = _rigid.isKinematic;
-            _oldGravity = _rigid.useGravity;
+            _originalMass = _rigid.mass;
+            // Doing this prevents objects from misaligning during rotation
+            if (_rigid.maxAngularVelocity < 100f)
+            {
+                _rigid.maxAngularVelocity = 100f;
+            }
             _colliders = rigid.GetComponentsInChildren<Collider>(true).ToList();
             _ignored = rigid.GetComponentInChildren<PhysicsIgnoreHelpers>();
             Manager = manager;
@@ -128,15 +135,10 @@ namespace Leap.Unity.Interaction.PhysicsHands
             {
                 SetBoneGrasping(item, false);
             }
-            GraspState = State.Idle;
+            GraspState = State.Hover;
             _valuesD.Clear();
             _graspingValues.Clear();
             _graspingCandidates.Clear();
-            if (_rigid != null)
-            {
-                _rigid.isKinematic = _oldKinematic;
-                _rigid.useGravity = _oldGravity;
-            }
             _boneHash.Clear();
             foreach (var pair in _bones)
             {
@@ -181,7 +183,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             foreach (var bone in bones)
             {
                 // Gate the bones coming in and don't dupe the events for boneHash
-                if (EligibleBone(bone) && !_boneHash.Contains(bone))
+                if (!_boneHash.Contains(bone))
                 {
                     _boneHash.Add(bone);
                     bone.AddContacting(_rigid);
@@ -203,11 +205,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     }
                 }
             }
-        }
-
-        private bool EligibleBone(PhysicsBone bone)
-        {
-            return bone.Finger == 5 || bone.Joint > 0;
         }
 
         private bool RemoveOldBones(PhysicsBone bone, HashSet<PhysicsBone> bones)
@@ -232,41 +229,40 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         public void ReleaseObject()
         {
-            GraspState = State.Idle;
-            _releaseTimer = GRAB_COOLDOWNTIME;
-            if (Manager.HelperMovesObjects)
+            GraspState = State.Hover;
+            // Make sure the object hasn't been destroyed
+            if (_rigid != null)
             {
-                _rigid.isKinematic = _oldKinematic;
-                _rigid.useGravity = _oldGravity;
+                if (Manager.HelperMovesObjects && !Ignored)
+                {
+                    // Only ever unset the rigidbody values here otherwise outside logic will get confused
+                    _rigid.isKinematic = _oldKinematic;
+                    _rigid.useGravity = _oldGravity;
+                    _rigid.mass = _originalMass;
+                }
+                if (Manager.EnhanceThrowing && !Ignored)
+                {
+                    ThrowingOnRelease();
+                }
             }
         }
 
         public State UpdateHelper()
         {
-            if (GraspState == State.Idle)
-            {
-                // Trying to prevent pinging....
-                if (_releaseTimer > 0)
-                {
-                    _releaseTimer -= Time.fixedDeltaTime;
-                    _rigid.velocity = Vector3.ClampMagnitude(_rigid.velocity, _maxVelocityLerped.magnitude);
-                }
-            }
-
             // Check to see if we no longer have any bones
             UpdateRemovedBones();
 
             if (_boneHash.Count == 0 && GraspState != State.Grasp)
             {
                 // If we don't then and we're not grasping then just return
-                return GraspState = State.Idle;
+                return GraspState = State.Hover;
             }
 
             GraspingContactCheck();
 
             switch (GraspState)
             {
-                case State.Idle:
+                case State.Hover:
                     if (_boneHash.Count > 0)
                     {
                         GraspState = State.Contact;
@@ -277,9 +273,13 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     if (_graspingHands.Count > 0)
                     {
                         UpdateHandPositions();
-                        if (Manager.HelperMovesObjects)
+                        if (Manager.HelperMovesObjects && !Ignored)
                         {
                             MoveObject();
+                        }
+                        if (Manager.EnhanceThrowing && !Ignored)
+                        {
+                            ThrowingOnHold();
                         }
                         _justGrasped = false;
                     }
@@ -336,9 +336,25 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
                         if (i == 0)
                         {
-                            if (hand.GetOriginalLeapHand().PinchDistance / 1000f <= REQUIRED_PINCH_DISTANCE)
+                            for (int j = 1; j < 5; j++)
                             {
-                                c = 2;
+                                if (hand.GetOriginalLeapHand().GetFingerPinchDistance(j) <= REQUIRED_PINCH_DISTANCE)
+                                {
+                                    // Make very small pinches more sticky
+                                    _graspingValues[hand].fingerStrength[j] *= 0.85f;
+                                    if (c == 0)
+                                    {
+                                        c = 2;
+                                        _graspingValues[hand].fingerStrength[0] *= 0.85f;
+                                    }
+                                    else
+                                    {
+                                        c++;
+                                    }
+                                }
+                            }
+                            if (c > 0)
+                            {
                                 break;
                             }
                         }
@@ -346,13 +362,14 @@ namespace Leap.Unity.Interaction.PhysicsHands
                         {
                             c++;
                         }
-                        if (c == 2)
-                            break;
                     }
-                    if (c == 2)
+                    if (c >= 2)
                     {
-                        if (Manager.HelperMovesObjects && _graspingHands.Count == 0)
+                        if (Manager.HelperMovesObjects && !Ignored && _graspingHands.Count == 0)
                         {
+                            // Store the original rigidbody variables
+                            _oldKinematic = _rigid.isKinematic;
+                            _oldGravity = _rigid.useGravity;
                             _rigid.useGravity = false;
                             _rigid.isKinematic = false;
                         }
@@ -360,6 +377,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                         if (_graspingHands.Count > 0)
                         {
                             _justGrasped = true;
+                            _rigid.mass = 1f;
                             GraspState = State.Grasp;
                         }
                         _graspingValues[hand].offset = _rigid.position - hand.GetPhysicsHand().palmBone.transform.position;
@@ -429,12 +447,10 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     if (fist.Value.fingerStrength[i] != -1)
                     {
                         c++;
-                        if (c == 2)
-                            break;
                     }
                 }
 
-                if (c == 2)
+                if (c >= 2)
                 {
                     SetBoneGrasping(fist, true);
                     continue;
@@ -550,6 +566,10 @@ namespace Leap.Unity.Interaction.PhysicsHands
         {
             for (int i = 0; i < _colliders.Count; i++)
             {
+                if (_colliders[i] == null)
+                {
+                    continue;
+                }
                 if (IsPointWithinCollider(_colliders[i], bone.NextJoint) || IsPointWithinCollider(_colliders[i], bone.Center))
                 {
                     return true;
@@ -571,8 +591,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 PhysicsHand hand = _graspingHands[_graspingHands.Count - 1];
                 if (hand.GetOriginalLeapHand() != null)
                 {
-                    _newPosition = hand.GetPhysicsHand().palmBone.transform.position + (hand.GetPhysicsHand().palmBone.transform.rotation * Quaternion.Inverse(_graspingValues[hand].originalHandRotation) * _graspingValues[hand].offset);
-                    _newRotation = hand.GetPhysicsHand().palmBone.transform.rotation * _graspingValues[hand].rotationOffset;
+                    PhysicsHand.Hand pHand = hand.GetPhysicsHand();
+                    _newPosition = pHand.palmBone.transform.position + (pHand.palmBody.velocity * Time.fixedDeltaTime) + (pHand.palmBone.transform.rotation * Quaternion.Inverse(_graspingValues[hand].originalHandRotation) * _graspingValues[hand].offset);
+                    _newRotation = pHand.palmBone.transform.rotation * Quaternion.Euler(pHand.palmBody.angularVelocity * Time.fixedDeltaTime) * _graspingValues[hand].rotationOffset;
                 }
             }
         }
@@ -614,17 +635,16 @@ namespace Leap.Unity.Interaction.PhysicsHands
             {
                 _rigid.useGravity = false;
             }
-            PhysicsMovement(_newPosition, _newRotation, _rigid, _justGrasped);
+            PhysicsMovement(_newPosition, _newRotation, _rigid);
         }
 
         // Ripped from IE
-        protected float _maxVelocity = 6F;
-        private Vector3 _lastSolvedCoMPosition = Vector3.zero;
+        protected float _maxVelocity = 15F;
         protected AnimationCurve _strengthByDistance = new AnimationCurve(new Keyframe(0.0f, 1.0f, 0.0f, 0.0f),
                                                                              new Keyframe(0.08f, 0.3f, 0.0f, 0.0f));
 
         private void PhysicsMovement(Vector3 solvedPosition, Quaternion solvedRotation,
-                               Rigidbody intObj, bool justGrasped)
+                               Rigidbody intObj)
         {
             Vector3 solvedCenterOfMass = solvedRotation * intObj.centerOfMass + solvedPosition;
             Vector3 currCenterOfMass = intObj.rotation * intObj.centerOfMass + intObj.position;
@@ -642,23 +662,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 targetAngularVelocity *= targetPercent;
             }
 
-            float followStrength = 1F;
-            if (!justGrasped)
+            intObj.velocity = targetVelocity;
+            if (targetAngularVelocity.IsValid())
             {
-                float remainingDistanceLastFrame = Vector3.Distance(_lastSolvedCoMPosition, currCenterOfMass);
-                followStrength = _strengthByDistance.Evaluate(remainingDistanceLastFrame);
+                intObj.angularVelocity = targetAngularVelocity;
             }
-
-            Vector3 lerpedVelocity = Vector3.Lerp(intObj.velocity, targetVelocity, followStrength);
-            Vector3 lerpedAngularVelocity = Vector3.Lerp(intObj.angularVelocity, targetAngularVelocity, followStrength);
-
-            intObj.velocity = lerpedVelocity;
-            if (lerpedAngularVelocity.IsValid())
-            {
-                intObj.angularVelocity = lerpedAngularVelocity;
-            }
-
-            _lastSolvedCoMPosition = solvedCenterOfMass;
         }
 
         // It's more stable to use physics movement currently
@@ -669,5 +677,138 @@ namespace Leap.Unity.Interaction.PhysicsHands
             intObj.MovePosition(solvedPosition);
             intObj.MoveRotation(solvedRotation);
         }
+
+        #region Throwing
+
+        // Taken from SlidingWindowThrow.cs
+
+        // Length of time to average, and delay between the average and current time.
+        private float _windowLength = 0.045f, _windowDelay = 0.015f;
+
+        // Throwing curve
+        private AnimationCurve _throwVelocityMultiplierCurve = new AnimationCurve(
+                                                            new Keyframe(0.0F, 0.7F, 0, 0),
+                                                            new Keyframe(3.0F, 1.0F, 0, 0));
+
+        private Queue<VelocitySample> _velocityQueue = new Queue<VelocitySample>(64);
+
+        private struct VelocitySample
+        {
+            public float time;
+            public Vector3 position;
+            public Quaternion rotation;
+
+            public VelocitySample(Vector3 position, Quaternion rotation, float time)
+            {
+                this.position = position;
+                this.rotation = rotation;
+                this.time = Time.fixedTime;
+            }
+
+            public static VelocitySample Interpolate(VelocitySample a, VelocitySample b, float time)
+            {
+                float alpha = Mathf.Clamp01(Mathf.InverseLerp(a.time, b.time, time));
+
+                return new VelocitySample(Vector3.Lerp(a.position, b.position, alpha),
+                                          Quaternion.Slerp(a.rotation, b.rotation, alpha),
+                                          time);
+            }
+        }
+
+        private void ThrowingOnHold()
+        {
+            _velocityQueue.Enqueue(new VelocitySample(_rigid.position,
+                                                      _rigid.rotation,
+                                                      Time.fixedTime));
+
+            while (true)
+            {
+                VelocitySample oldestVelocity = _velocityQueue.Peek();
+
+                // Dequeue conservatively if the oldest velocity is more than 4 frames later
+                // than the start of the window.
+                if (oldestVelocity.time + (Time.fixedDeltaTime * 4) < Time.fixedTime
+                                                                      - _windowLength
+                                                                      - _windowDelay)
+                {
+                    _velocityQueue.Dequeue();
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
+
+        private void ThrowingOnRelease()
+        {
+            if (_velocityQueue.Count < 2)
+            {
+                _rigid.velocity = Vector3.zero;
+                _rigid.angularVelocity = Vector3.zero;
+                return;
+            }
+
+            float windowEnd = Time.fixedTime - _windowDelay;
+            float windowStart = windowEnd - _windowLength;
+
+            // 0 occurs before 1,
+            // start occurs before end.
+            VelocitySample start0, start1;
+            VelocitySample end0, end1;
+            VelocitySample s0, s1;
+
+            s0 = s1 = start0 = start1 = end0 = end1 = _velocityQueue.Dequeue();
+
+            while (_velocityQueue.Count != 0)
+            {
+                s0 = s1;
+                s1 = _velocityQueue.Dequeue();
+
+                if (s0.time < windowStart && s1.time >= windowStart)
+                {
+                    start0 = s0;
+                    start1 = s1;
+                }
+
+                if (s0.time < windowEnd && s1.time >= windowEnd)
+                {
+                    end0 = s0;
+                    end1 = s1;
+
+                    // We have assigned both start and end and can break out of the loop.
+                    _velocityQueue.Clear();
+                    break;
+                }
+            }
+
+            VelocitySample start = VelocitySample.Interpolate(start0, start1, windowStart);
+            VelocitySample end = VelocitySample.Interpolate(end0, end1, windowEnd);
+
+            Vector3 interpolatedVelocity = PhysicsUtility.ToLinearVelocity(start.position,
+                                                                           end.position,
+                                                                           _windowLength);
+
+            if (interpolatedVelocity.magnitude > 1.0f)
+            {
+                foreach (var hand in _graspingCandidates)
+                {
+                    hand.IgnoreCollision(_rigid, 0f, 0.005f);
+                }
+                // We only want to apply the forces if we actually want to cause movement to the object
+                // We're still disabling collisions though to allow for the physics system to fully control if necessary
+                if (Manager.HelperMovesObjects && !Ignored)
+                {
+                    _rigid.velocity = interpolatedVelocity;
+                    _rigid.angularVelocity = PhysicsUtility.ToAngularVelocity(start.rotation,
+                                                                                        end.rotation,
+                                                                                        _windowLength);
+
+                    _rigid.velocity *= _throwVelocityMultiplierCurve.Evaluate(_rigid.velocity.magnitude);
+                }
+            }
+        }
+
+        #endregion
     }
 }

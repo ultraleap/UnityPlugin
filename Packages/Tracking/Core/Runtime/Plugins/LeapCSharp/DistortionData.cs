@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -22,6 +22,9 @@ namespace Leap
     /// </summary>
     public class DistortionData
     {
+        private float[] _flippedData;
+        private float[] _originalData;
+
         /// <summary>
         /// Constructs an uninitialized distortion object.
         /// @since 3.0
@@ -67,11 +70,41 @@ namespace Leap
         /// </summary>
         public float Height { get; set; }
         /// <summary>
-        /// The distortion data.
+        /// The original distortion data, as provided by the service
         ///
         /// @since 3.0
         /// </summary>
-        public float[] Data { get; set; }
+        public float[] Data
+        {
+            get
+            {
+                return _originalData;
+            }
+
+            set
+            {
+                _originalData = value;
+
+                // Note, the contents of the array are normally copied into the buffer by a marshall operation,
+                // so the flipped data needs to be updated explicitly, not when the _orginalData member is set 
+            }
+        }
+
+        /// <summary>
+        /// Returns the distortion data, adjusted so that a location in the distortion map texture now refers to the 
+        /// same region of the texture containing the IR image - e.g. the bottom left of the distortion texture
+        /// maps to bottom left of the IR image
+        ///
+        /// @since 3.0
+        /// </summary>
+        public float[] FlippedData
+        {
+            get
+            {
+                return _flippedData;
+            }
+        }
+
         /// <summary>
         /// Reports whether the distortion data is internally consistent.
         /// @since 3.0
@@ -89,5 +122,33 @@ namespace Leap
                 return false;
             }
         }
+
+        internal void OnDataChanged()
+        {
+            UpdateFlippedData();
+        }
+
+        private void UpdateFlippedData()
+        {
+            if (_originalData == null)
+            {
+                return;
+            }
+
+            // This is called normally once a session, so allocation is fine
+            float[] flipped = new float[LeapInternal.LeapC.DistortionSize * LeapInternal.LeapC.DistortionSize * 2];
+            for (int x = 0; x < LeapInternal.LeapC.DistortionSize; x++)
+            {
+                for (int y = 0; y < LeapInternal.LeapC.DistortionSize; y++)
+                {
+                    // We change the data so that the *mapped* Y value is inverted 
+                    flipped[((x + y * LeapInternal.LeapC.DistortionSize) * 2)] = _originalData[((x + y * LeapInternal.LeapC.DistortionSize) * 2)];
+                    flipped[((x + y * LeapInternal.LeapC.DistortionSize) * 2) + 1] = (float)1.0 - _originalData[((x + y * LeapInternal.LeapC.DistortionSize) * 2) + 1];
+                }
+            }
+
+            _flippedData = flipped;
+        }
+
     }
 }
