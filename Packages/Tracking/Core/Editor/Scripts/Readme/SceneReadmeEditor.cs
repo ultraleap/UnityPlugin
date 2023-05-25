@@ -43,7 +43,7 @@ namespace Leap.Unity.Readme
             SelectSceneReadme();
         }
 
-        public static void SelectSceneReadme(bool silent = false)
+        public static bool SelectSceneReadme(bool silent = false)
         {
             var ids = AssetDatabase.FindAssets("t:SceneReadme");
             bool found = false;
@@ -78,6 +78,7 @@ namespace Leap.Unity.Readme
             {
                 EditorUtility.DisplayDialog("No Readme for Scene", "This scene does not currently have a readme associated to it.", "Ok");
             }
+            return !found;
         }
 
         protected override void OnHeaderGUI()

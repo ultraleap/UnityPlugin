@@ -7,7 +7,10 @@ namespace Leap.Unity.Readme
     {
         public override void OnInspectorGUI()
         {
-            SceneReadmeEditor.SelectSceneReadme();
+            if (SceneReadmeEditor.SelectSceneReadme(true))
+            {
+                EditorGUILayout.HelpBox("No Readme currently exists for this scene.", MessageType.Warning);
+            }
         }
     }
 }
