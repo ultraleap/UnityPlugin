@@ -78,7 +78,7 @@ namespace Leap.Unity.Readme
             {
                 EditorUtility.DisplayDialog("No Readme for Scene", "This scene does not currently have a readme associated to it.", "Ok");
             }
-            return !found;
+            return found;
         }
 
         protected override void OnHeaderGUI()
