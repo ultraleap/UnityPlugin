@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 
 
 ### Fixed
+- Adjust hand `Rotation`, `Direction`, `PalmPosition`, `PalmNormal` and `StabilisedPalmPosition` to better match LeapC in the OpenXR provider which causes some distortion on models.
+- Fix elbow length being incorrectly calculated in the OpenXR provider.
 - Finger `Direction` is incorrectly set to the tip bone direction rather than the intermediate in the OpenXR provider.
 - Hand `GrabStrength` is computed before all required information is available in the OpenXR provider.
 
