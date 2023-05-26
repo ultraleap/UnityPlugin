@@ -282,8 +282,8 @@ namespace Ultraleap.Tracking.OpenXR
             // NOTE: Ordering is important as some of the `Calculate*` functions requires some of this data to be set.
             float handScale = CalculateHandScale(ref hand); // Requires fingers to be set.
             hand.FrameId = _frameId;
-            hand.Id = handTracker == HandTracker.Left ? _leftHandId : _rightHandId;
-            hand.Confidence =  Mathf.Clamp01(Mathf.Clamp01(timeVisible * 5.0f) - Mathf.Clamp01(timeSinceTracked * 5.0f));
+            hand.Id = handTracker == HandTracker.Left ? _leftHandState.Id : _rightHandState.Id;
+            hand.Confidence =  Mathf.Clamp01(Mathf.Clamp01(timeVisible * 6.0f) - Mathf.Clamp01(timeSinceTracked * 6.0f));
             hand.PalmWidth = handScale * DEFAULT_HAND_SCALE;
             hand.IsLeft = handTracker == HandTracker.Left;
             hand.TimeVisible = timeVisible;
