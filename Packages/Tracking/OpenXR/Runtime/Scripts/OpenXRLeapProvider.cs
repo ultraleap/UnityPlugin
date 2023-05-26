@@ -319,8 +319,8 @@ namespace Ultraleap.Tracking.OpenXR
                 var elbowPosition = _joints[(int)HandJoint.Elbow].Pose.position;
                 var elbowRotation = _joints[(int)HandJoint.Elbow].Pose.rotation;
                 var elbowDirection = elbowRotation * Vector3.back;
-                var elbowLength = (elbowPosition - palmPosition).magnitude;
-                var centerPosition = (elbowPosition + palmPosition) / 2f;
+                var elbowLength = (elbowPosition - wristPosition).magnitude;
+                var centerPosition = (elbowPosition + wristPosition) / 2f;
                 hand.Arm.Fill(
                     elbowPosition,
                     wristPosition,
@@ -333,10 +333,10 @@ namespace Ultraleap.Tracking.OpenXR
             }
             else
             {
+                const float elbowLength = 0.3f;
                 var elbowRotation = _joints[(int)HandJoint.Palm].Pose.rotation;
                 var elbowDirection = elbowRotation * Vector3.back;
-                var elbowPosition = _joints[(int)HandJoint.Palm].Pose.position + (elbowDirection * 0.3f);
-                var elbowLength = 0.3f;
+                var elbowPosition = _joints[(int)HandJoint.Palm].Pose.position + (elbowDirection * elbowLength);
                 var centerPosition = (elbowPosition + palmPosition) / 2f;
                 hand.Arm.Fill(
                     elbowPosition,
