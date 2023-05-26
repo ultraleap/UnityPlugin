@@ -38,9 +38,10 @@ namespace Ultraleap.Tracking.OpenXR
             Quaternion.Euler(0, +HAND_ROTATION_OFFSET_Y, +HAND_ROTATION_OFFSET_Z),
             Quaternion.Euler(0, -HAND_ROTATION_OFFSET_Y, -HAND_ROTATION_OFFSET_Z),
         };
-        private static readonly Quaternion[] PalmRotationOffset =
+        private static readonly Pose[] PalmOffset =
         {
-            Quaternion.Euler(-8.5f, -0.63f, -8.4f), Quaternion.Euler(-8.5f, +0.63f, +8.4f),
+            new Pose(new Vector3(-0.001039105f, -0.008749885f, 0.01165112f), Quaternion.Euler(-8f, -0.63f, -8.4f)),
+            new Pose(new Vector3(0.001039105f, -0.008749885f, 0.01165112f), Quaternion.Euler(-8f, +0.63f, +8.4f)),
         };
         
         
@@ -293,9 +294,9 @@ namespace Ultraleap.Tracking.OpenXR
             hand.WristPosition = _joints[(int)HandJoint.Wrist].Pose.position;
             
             // Calculate adjusted palm position, rotation and direction.
-            hand.PalmPosition = _joints[(int)HandJoint.Palm].Pose.position;
+            hand.Rotation = _joints[(int)HandJoint.Palm].Pose.rotation * PalmOffset[hand.IsLeft ? 0 : 1].rotation;
+            hand.PalmPosition = _joints[(int)HandJoint.Palm].Pose.position + hand.Rotation * PalmOffset[hand.IsLeft ? 0 : 1].position;
             hand.StabilizedPalmPosition = hand.PalmPosition;
-            hand.Rotation = _joints[(int)HandJoint.Palm].Pose.rotation * PalmRotationOffset[hand.IsLeft ? 0 : 1];
             hand.PalmNormal = hand.Rotation * Vector3.down;
             hand.Direction = hand.Rotation * Vector3.forward;
 
