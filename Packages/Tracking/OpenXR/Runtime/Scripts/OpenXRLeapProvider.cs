@@ -33,6 +33,17 @@ namespace Ultraleap.Tracking.OpenXR
 
         // Magic numbers for palm width and PinchStrength calculation
         private static readonly float[] DefaultMetacarpalLengths = { 0, 0.06812f, 0.06460f, 0.05800f, 0.05369f };
+        private static readonly Quaternion[] ThumbMetacarpalRotationOffset =
+        {
+            Quaternion.Euler(0, +HAND_ROTATION_OFFSET_Y, +HAND_ROTATION_OFFSET_Z),
+            Quaternion.Euler(0, -HAND_ROTATION_OFFSET_Y, -HAND_ROTATION_OFFSET_Z),
+        };
+        private static readonly Quaternion[] PalmRotationOffset =
+        {
+            Quaternion.Euler(-8.5f, -0.63f, -8.4f), Quaternion.Euler(-8.5f, +0.63f, +8.4f),
+        };
+        
+        
         private const float DEFAULT_HAND_SCALE = 0.08425f;
 
         private long _frameId = 0;
@@ -221,7 +232,7 @@ namespace Ultraleap.Tracking.OpenXR
                             0f,
                             _joints[(int)HandJoint.ThumbMetacarpal].Radius * 2f,
                             (Bone.BoneType)boneIndex,
-                            _joints[(int)HandJoint.Palm].Pose.rotation * Quaternion.Euler(0, hand.IsLeft ? HAND_ROTATION_OFFSET_Y : -HAND_ROTATION_OFFSET_Y, hand.IsLeft ? HAND_ROTATION_OFFSET_Z : -HAND_ROTATION_OFFSET_Z));
+                            _joints[(int)HandJoint.Palm].Pose.rotation * ThumbMetacarpalRotationOffset[hand.IsLeft ? 0 : 1]);
                         continue;
                     }
 
@@ -268,35 +279,34 @@ namespace Ultraleap.Tracking.OpenXR
                     hand.GetFingerStrength(fingerIndex) < 0.4, // Fixed for now
                     (Finger.FingerType)fingerIndex);
             }
-
-            float handScale = CalculateHandScale(ref hand);
-            float palmWidth = handScale * DEFAULT_HAND_SCALE;
-
+            
             // Populate the whole hand information.
-            hand.Fill(
-                _frameId,
-                handTracker == HandTracker.Left ? _leftHandId : _rightHandId,
-                1f,
-                0.0f, // Calculated later
-                0.0f, // Calculated later
-                0.0f, // Calculated later.
-                palmWidth,
-                handTracker == HandTracker.Left,
-                timeVisible,
-                null, // Already Populated
-                _joints[(int)HandJoint.Palm].Pose.position,
-                _joints[(int)HandJoint.Palm].Pose.position,
-                _joints[(int)HandJoint.Palm].LinearVelocity,
-                -_joints[(int)HandJoint.Palm].Pose.up,
-                _joints[(int)HandJoint.Palm].Pose.rotation,
-                _joints[(int)HandJoint.Palm].Pose.forward,
-                _joints[(int)HandJoint.Wrist].Pose.position
-            );
+            // NOTE: Ordering is important as some of the `Calculate*` functions requires some of this data to be set.
+            float handScale = CalculateHandScale(ref hand); // Requires fingers to be set.
+            hand.FrameId = _frameId;
+            hand.Id = handTracker == HandTracker.Left ? _leftHandId : _rightHandId;
+            hand.Confidence = 1.0f;
+            hand.PalmWidth = handScale * DEFAULT_HAND_SCALE;
+            hand.IsLeft = handTracker == HandTracker.Left;
+            hand.TimeVisible = timeVisible;
+            hand.PalmVelocity = _joints[(int)HandJoint.Palm].LinearVelocity;
+            hand.WristPosition = _joints[(int)HandJoint.Wrist].Pose.position;
+            
+            // Calculate adjusted palm position, rotation and direction.
+            hand.PalmPosition = _joints[(int)HandJoint.Palm].Pose.position;
+            hand.StabilizedPalmPosition = hand.PalmPosition;
+            hand.Rotation = _joints[(int)HandJoint.Palm].Pose.rotation * PalmRotationOffset[hand.IsLeft ? 0 : 1];
+            hand.PalmNormal = hand.Rotation * Vector3.down;
+            hand.Direction = hand.Rotation * Vector3.forward;
 
             // Calculate now we have the hand data available.
+            // Requires `Hand.Rotation` and fingers to be set.
             hand.GrabStrength = CalculateGrabStrength(ref hand);
             hand.PinchStrength = CalculatePinchStrength(ref hand, handScale);
             hand.PinchDistance = CalculatePinchDistance(ref hand);
+
+            // Other hand-properties are derived.
+            hand.PalmNormal = hand.Rotation * Vector3.down;
 
             // Fill arm data.
             var palmPosition = _joints[(int)HandJoint.Palm].Pose.position;
