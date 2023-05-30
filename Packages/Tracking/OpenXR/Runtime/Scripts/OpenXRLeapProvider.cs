@@ -29,22 +29,26 @@ namespace Ultraleap.Tracking.OpenXR
         private long _rightHandFirstSeen_ticks;
 
         // Magic 0th thumb bone rotation offsets from LeapC
+        [Obsolete("These values will be made private in the next major release")]
         public const float HAND_ROTATION_OFFSET_Y = 25.9f, HAND_ROTATION_OFFSET_Z = -63.45f;
 
         // Magic numbers for palm width and PinchStrength calculation
         private static readonly float[] DefaultMetacarpalLengths = { 0, 0.06812f, 0.06460f, 0.05800f, 0.05369f };
+        
+        // Correction for the 0th thumb bone rotation offsets to match LeapC
         private static readonly Quaternion[] ThumbMetacarpalRotationOffset =
         {
-            Quaternion.Euler(0, +HAND_ROTATION_OFFSET_Y, +HAND_ROTATION_OFFSET_Z),
-            Quaternion.Euler(0, -HAND_ROTATION_OFFSET_Y, -HAND_ROTATION_OFFSET_Z),
+            Quaternion.Euler(0, +25.9f, +63.45f),
+            Quaternion.Euler(0, -25.9f, -63.45f),
         };
+        
+        // Correction for the Palm position & rotation to match LeapC. Also used for the hand rotation.
         private static readonly Pose[] PalmOffset =
         {
             new Pose(new Vector3(-0.001039105f, -0.008749885f, 0.01165112f), Quaternion.Euler(-8f, -0.63f, -8.4f)),
             new Pose(new Vector3(0.001039105f, -0.008749885f, 0.01165112f), Quaternion.Euler(-8f, +0.63f, +8.4f)),
         };
-        
-        
+
         private const float DEFAULT_HAND_SCALE = 0.08425f;
 
         private long _frameId = 0;
