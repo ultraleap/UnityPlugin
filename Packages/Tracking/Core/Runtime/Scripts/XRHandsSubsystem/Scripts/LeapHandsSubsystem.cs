@@ -87,20 +87,63 @@ namespace Leap.Unity
                 return false;
             }
 
-            rootPose = new Pose(leapHand.PalmPosition, leapHand.Rotation);
+            rootPose = new Pose(leapHand.WristPosition, leapHand.Rotation);
             Handedness handedness = (Handedness)((int)leapHand.GetChirality() + 1); // +1 as unity has "invalid" handedness while we do not 
-
-            int jointIndex = 0;
+            handJoints[0] = XRHandProviderUtility.CreateJoint(handedness,
+                        XRHandJointTrackingState.Pose,
+                        XRHandJointIDUtility.FromIndex(1),
+                        new Pose(leapHand.WristPosition, leapHand.Rotation));
+            handJoints[1] = XRHandProviderUtility.CreateJoint(handedness,
+                        XRHandJointTrackingState.Pose,
+                        XRHandJointIDUtility.FromIndex(1),
+                        new Pose(leapHand.PalmPosition, leapHand.Rotation));
+            int jointIndex = 2;
 
             foreach (var finger in leapHand.Fingers)
             {
-                foreach (var bone in finger.bones)
+                if (finger.Type == Finger.FingerType.TYPE_THUMB)
                 {
-                    handJoints[jointIndex] = XRHandProviderUtility.CreateJoint(handedness,
-                    XRHandJointTrackingState.Pose,
-                    XRHandJointIDUtility.FromIndex(jointIndex),
-                    new Pose(bone.PrevJoint, bone.Rotation));
+                    for (int i = 1; i < 4; i++)
+                    {
+                        var bone = finger.bones[i];
 
+                        handJoints[jointIndex] = XRHandProviderUtility.CreateJoint(handedness,
+                            XRHandJointTrackingState.Pose,
+                            XRHandJointIDUtility.FromIndex(jointIndex),
+                            new Pose(bone.PrevJoint, bone.Rotation));
+                        Debug.Log(finger.Type + " hit. Index: " + jointIndex);
+
+                        jointIndex++;
+
+                    }
+
+                    var distal = finger.Bone(Bone.BoneType.TYPE_DISTAL);
+                    handJoints[jointIndex] = XRHandProviderUtility.CreateJoint(handedness,
+                        XRHandJointTrackingState.Pose,
+                        XRHandJointIDUtility.FromIndex(jointIndex),
+                        new Pose(distal.NextJoint, distal.Rotation));
+                    Debug.Log(finger.Type + " tip. Index: " + jointIndex);
+                    jointIndex++;
+
+                }
+                else
+                {
+                    foreach (var bone in finger.bones)
+                    {
+                        handJoints[jointIndex] = XRHandProviderUtility.CreateJoint(handedness,
+                            XRHandJointTrackingState.Pose,
+                            XRHandJointIDUtility.FromIndex(jointIndex),
+                            new Pose(bone.PrevJoint, bone.Rotation));
+                        Debug.Log(finger.Type + " hit. Index: " + jointIndex);
+                        jointIndex++;
+                    }
+
+                    var distal = finger.Bone(Bone.BoneType.TYPE_DISTAL);
+                    handJoints[jointIndex] = XRHandProviderUtility.CreateJoint(handedness,
+                        XRHandJointTrackingState.Pose,
+                        XRHandJointIDUtility.FromIndex(jointIndex),
+                        new Pose(distal.NextJoint, distal.Rotation));
+                    Debug.Log(finger.Type + " tip. Index: " + jointIndex);
                     jointIndex++;
                 }
             }
@@ -172,29 +215,12 @@ namespace Leap.Unity
             return updateSuccessFlags;
         }
 
+
         bool PopulateXRHandFromLeap(Hand leapHand, ref Pose rootPose, ref NativeArray<XRHandJoint> handJoints)
         {
             if (leapHand == null)
             {
                 return false;
-            }
-
-            rootPose = new Pose(leapHand.PalmPosition, leapHand.Rotation);
-            Handedness handedness = (Handedness)((int)leapHand.GetChirality() + 1); // +1 as unity has "invalid" handedness while we do not 
-
-            int jointIndex = 0;
-
-            foreach (var finger in leapHand.Fingers)
-            {
-                foreach (var bone in finger.bones)
-                {
-                    handJoints[jointIndex] = XRHandProviderUtility.CreateJoint(handedness,
-                    XRHandJointTrackingState.Pose,
-                    XRHandJointIDUtility.FromIndex(jointIndex),
-                    new Pose(bone.PrevJoint, bone.Rotation));
-
-                    jointIndex++;
-                }
             }
 
             return true;
