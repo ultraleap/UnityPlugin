@@ -1,14 +1,7 @@
 using Unity.Collections;
 using UnityEngine;
 using UnityEngine.XR.Hands;
-using UnityEngine.SubsystemsImplementation;
 using UnityEngine.XR.Hands.ProviderImplementation;
-
-using Leap;
-using Leap.Unity;
-using System;
-using static UnityEngine.XR.Hands.XRHandSubsystem;
-using UnityEngine.XR.Hands.OpenXR;
 
 namespace Leap.Unity
 {
@@ -18,6 +11,7 @@ namespace Leap.Unity
 
         public override void Destroy()
         {
+
         }
 
         public override void GetHandLayout(NativeArray<bool> handJointsInLayout)
@@ -26,7 +20,8 @@ namespace Leap.Unity
 
         public override void Start()
         {
-            provider = GameObject.FindObjectOfType<XRLeapProviderManager>();
+            
+            provider = Hands.Provider;
         }
 
         public override void Stop()
@@ -34,22 +29,22 @@ namespace Leap.Unity
         }
 
         static internal string id { get; private set; }
-
         static LeapXRHandProvider() => id = "UL XR Hands";
 
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-        static void Register()
-        {
+        // This method registers the subsystem descriptor with the SubsystemManager
+        //[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        //static void RegisterDescriptor()
+        //{
+        //    var handsSubsystemCinfo = new XRHandSubsystemDescriptor.Cinfo
+        //    {
+        //        id = id,
+        //        providerType = typeof(LeapXRHandProvider)
+        //        //subsystemTypeOverride = typeof(LeapHandSubsystem)
+        //    };
+        //    XRHandSubsystemDescriptor.Register(handsSubsystemCinfo);
+        //}
 
-            ///This needs to be implemented here when we have the subsystem in place
-            //var handsSubsystemCinfo = new XRHandSubsystemDescriptor.Cinfo
-            //{
-            //    id = id,
-            //    providerType = typeof(OpenXRHandProvider)
-            //};
-            //XRHandSubsystemDescriptor.Register(handsSubsystemCinfo);
-            
-        }
+        
 
         public override XRHandSubsystem.UpdateSuccessFlags TryUpdateHands(
             XRHandSubsystem.UpdateType updateType, 
@@ -58,6 +53,7 @@ namespace Leap.Unity
             ref Pose rightHandRootPose, 
             NativeArray<XRHandJoint> rightHandJoints)
         {
+
             Frame currentFrame = provider.CurrentFrame;
 
             XRHandSubsystem.UpdateSuccessFlags updateSuccessFlags = XRHandSubsystem.UpdateSuccessFlags.None;
@@ -148,9 +144,8 @@ namespace Leap.Unity
     // This class defines a hand subsystem
     class LeapHandSubsystem : XRHandSubsystem
     {
-
-        // This method registers the subsystem descriptor with the SubsystemManager
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        //This method registers the subsystem descriptor with the SubsystemManager
+       [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         static void RegisterDescriptor()
         {
             var handsSubsystemCinfo = new XRHandSubsystemDescriptor.Cinfo
@@ -162,9 +157,6 @@ namespace Leap.Unity
             XRHandSubsystemDescriptor.Register(handsSubsystemCinfo);
         }
 
-        protected override void OnCreate()
-        {
-            base.OnCreate();
-        }
+
     }
 }
