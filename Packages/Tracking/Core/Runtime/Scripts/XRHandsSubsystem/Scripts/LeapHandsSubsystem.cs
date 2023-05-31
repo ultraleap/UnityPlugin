@@ -27,7 +27,7 @@ namespace Leap.Unity
         public override void Start()
         {
             provider = GameObject.FindObjectOfType<XRLeapProviderManager>();
-            Debug.Log("started");
+            Debug.Log("Ultraleap subsystem provider started");
         }
 
         public override void Stop()
@@ -111,7 +111,6 @@ namespace Leap.Unity
                             XRHandJointTrackingState.Pose,
                             XRHandJointIDUtility.FromIndex(jointIndex),
                             new Pose(bone.PrevJoint, bone.Rotation));
-                        Debug.Log(finger.Type + " hit. Index: " + jointIndex);
 
                         jointIndex++;
 
@@ -122,7 +121,6 @@ namespace Leap.Unity
                         XRHandJointTrackingState.Pose,
                         XRHandJointIDUtility.FromIndex(jointIndex),
                         new Pose(distal.NextJoint, distal.Rotation));
-                    Debug.Log(finger.Type + " tip. Index: " + jointIndex);
                     jointIndex++;
 
                 }
@@ -134,7 +132,6 @@ namespace Leap.Unity
                             XRHandJointTrackingState.Pose,
                             XRHandJointIDUtility.FromIndex(jointIndex),
                             new Pose(bone.PrevJoint, bone.Rotation));
-                        Debug.Log(finger.Type + " hit. Index: " + jointIndex);
                         jointIndex++;
                     }
 
@@ -143,7 +140,6 @@ namespace Leap.Unity
                         XRHandJointTrackingState.Pose,
                         XRHandJointIDUtility.FromIndex(jointIndex),
                         new Pose(distal.NextJoint, distal.Rotation));
-                    Debug.Log(finger.Type + " tip. Index: " + jointIndex);
                     jointIndex++;
                 }
             }
@@ -175,7 +171,7 @@ namespace Leap.Unity
         {
             base.OnCreate();
             provider = GameObject.FindObjectOfType<XRLeapProviderManager>();
-            Debug.Log("started");
+            Debug.Log("Ultraleap subsystem started");
 
         }
 
@@ -190,7 +186,6 @@ namespace Leap.Unity
             NativeArray< XRHandJoint > rightHandJoints = new NativeArray<XRHandJoint>(XRHandJointID.EndMarker.ToIndex(), Allocator.Persistent);
 
 
-            Debug.Log("Subsystem updateHand");
             Frame currentFrame = provider.CurrentFrame;
 
             UpdateSuccessFlags updateSuccessFlags = UpdateSuccessFlags.None;
