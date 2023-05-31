@@ -21,7 +21,7 @@ namespace Leap.Unity.Controllers
 
         protected override bool IsTrueLogic()
         {
-            if (GetController() && _provider.Get(hand) != null)
+            if (GetController() && _provider.GetHand(hand) != null)
             {
                 if (InputDistanceCheck())
                 {
@@ -42,14 +42,14 @@ namespace Leap.Unity.Controllers
 
             if (inputMethodType == InputMethodType.LeapHand)
             {
-                if (Vector3.Distance(_provider.Get(hand).PalmPosition, xrControllerPosition) <= actionThreshold)
+                if (Vector3.Distance(_provider.GetHand(hand).PalmPosition, xrControllerPosition) <= actionThreshold)
                 {
                     return true;
                 }
             }
             else
             {
-                if (Vector3.Distance(_provider.Get(hand).PalmPosition, xrControllerPosition) >= actionThreshold)
+                if (Vector3.Distance(_provider.GetHand(hand).PalmPosition, xrControllerPosition) >= actionThreshold)
                 {
                     return true;
                 }
