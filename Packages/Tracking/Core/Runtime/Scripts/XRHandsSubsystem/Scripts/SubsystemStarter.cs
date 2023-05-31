@@ -15,10 +15,6 @@ namespace Leap.Unity
     public class SubsystemStarter : MonoBehaviour
     {
         XRHandSubsystem m_Subsystem = null;
-        XRHandSubsystem m_BaseSubsystem = null;
-        XRHandSubsystemProvider m_subsystemProvider = null;
-
-
 
         private void Awake()
         {
@@ -44,12 +40,6 @@ namespace Leap.Unity
                     m_Subsystem.Start();
                 }
             }
-
-
-            m_BaseSubsystem = XRGeneralSettings.Instance?
-                .Manager?
-                .activeLoader?
-                .GetLoadedSubsystem<XRHandSubsystem>();
         }
 
         private void OnDestroy()
@@ -65,7 +55,6 @@ namespace Leap.Unity
             if (m_Subsystem != null)
             {
                 m_Subsystem.TryUpdateHands(XRHandSubsystem.UpdateType.BeforeRender);
-                
             }
         }
     }

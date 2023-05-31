@@ -27,7 +27,6 @@ namespace Leap.Unity
         public override void Start()
         {
             provider = GameObject.FindObjectOfType<XRLeapProviderManager>();
-            Debug.Log("Ultraleap subsystem provider started");
         }
 
         public override void Stop()
@@ -38,8 +37,6 @@ namespace Leap.Unity
 
         static LeapXRHandProvider() => id = "UL XR Hands";
 
-        //public Action<XRHandSubsystemProvider, UpdateSuccessFlags, UpdateType> updatedHands;
-        //public UpdateSuccessFlags updateSuccessFlags { get; protected set; }
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         static void Register()
         {
@@ -151,6 +148,7 @@ namespace Leap.Unity
     // This class defines a hand subsystem
     class LeapHandSubsystem : XRHandSubsystem
     {
+
         // This method registers the subsystem descriptor with the SubsystemManager
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         static void RegisterDescriptor()
@@ -164,61 +162,9 @@ namespace Leap.Unity
             XRHandSubsystemDescriptor.Register(handsSubsystemCinfo);
         }
 
-        LeapProvider provider;
-
-
         protected override void OnCreate()
         {
             base.OnCreate();
-            provider = GameObject.FindObjectOfType<XRLeapProviderManager>();
-            Debug.Log("Ultraleap subsystem started");
-
-        }
-
-
-        public override UpdateSuccessFlags TryUpdateHands(XRHandSubsystem.UpdateType updateType)
-        {
-            base.TryUpdateHands(updateType);
-
-            Pose leftHandRootPose = new Pose();
-            NativeArray<XRHandJoint> leftHandJoints = new NativeArray<XRHandJoint>(XRHandJointID.EndMarker.ToIndex(), Allocator.Persistent);
-            Pose rightHandRootPose = new Pose();
-            NativeArray< XRHandJoint > rightHandJoints = new NativeArray<XRHandJoint>(XRHandJointID.EndMarker.ToIndex(), Allocator.Persistent);
-
-
-            Frame currentFrame = provider.CurrentFrame;
-
-            UpdateSuccessFlags updateSuccessFlags = UpdateSuccessFlags.None;
-
-            if (PopulateXRHandFromLeap(currentFrame.GetHand(Chirality.Left), ref leftHandRootPose, ref leftHandJoints))
-            {
-                updateSuccessFlags |= UpdateSuccessFlags.LeftHandRootPose;
-                updateSuccessFlags |= UpdateSuccessFlags.LeftHandJoints;
-            }
-
-            if (PopulateXRHandFromLeap(currentFrame.GetHand(Chirality.Right), ref rightHandRootPose, ref rightHandJoints))
-            {
-                updateSuccessFlags |= UpdateSuccessFlags.RightHandRootPose;
-                updateSuccessFlags |= UpdateSuccessFlags.RightHandJoints;
-            }
-
-            if (updatedHands != null)
-                updatedHands.Invoke(this, updateSuccessFlags, updateType);
-
-
-
-            return updateSuccessFlags;
-        }
-
-
-        bool PopulateXRHandFromLeap(Hand leapHand, ref Pose rootPose, ref NativeArray<XRHandJoint> handJoints)
-        {
-            if (leapHand == null)
-            {
-                return false;
-            }
-
-            return true;
         }
     }
 }
