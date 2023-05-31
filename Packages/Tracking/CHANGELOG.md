@@ -14,7 +14,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - (HandUtils) Only cache static Provider and CameraRig references when they are requested
 - (HandUtils) Mark Provider-dependant methods as obsolete and point to suitable replacements
-- (HandModelBase) Avoid Auto-referencing Providers to ensure correct Providers are referenced
 
 ### Fixed
 - Adjust hand `Rotation`, `Direction`, `PalmPosition`, `PalmNormal` and `StabilisedPalmPosition` to better match LeapC in the OpenXR provider which causes some distortion on models.
