@@ -38,8 +38,8 @@ namespace Ultraleap.Tracking.OpenXR
         // Correction for the 0th thumb bone rotation offsets to match LeapC
         private static readonly Quaternion[] ThumbMetacarpalRotationOffset =
         {
-            Quaternion.Euler(0, +25.9f, +63.45f),
-            Quaternion.Euler(0, -25.9f, -63.45f),
+            Quaternion.Euler(0, +25.9f, -63.45f),
+            Quaternion.Euler(0, -25.9f, +63.45f),
         };
         
         // Correction for the Palm position & rotation to match LeapC. Also used for the hand rotation.
