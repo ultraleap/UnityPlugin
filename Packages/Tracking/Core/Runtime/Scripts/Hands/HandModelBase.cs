@@ -189,10 +189,16 @@ namespace Leap.Unity
 
             if (leapProvider == null)
             {
-                Debug.LogError($"No Leap Provider referenced for {gameObject.name}, hand model has been disabled", this.gameObject);
-                this.enabled = false;
-                this.gameObject.SetActive(false);
-                return;
+                //Try to set the provider for the user
+                leapProvider = FindObjectOfType<LeapProvider>();
+
+                if (leapProvider == null)
+                {
+                    Debug.LogError("No leap provider found in the scene, hand model has been disabled", this.gameObject);
+                    this.enabled = false;
+                    this.gameObject.SetActive(false);
+                    return;
+                }
             }
 
             if (HandModelType == ModelType.Graphics)
@@ -281,7 +287,20 @@ namespace Leap.Unity
 
                 if (leapProvider == null)
                 {
-                    hand = TestHandFactory.MakeTestHand(Handedness == Chirality.Left);
+                    //Try to set the provider for the user
+                    leapProvider = FindObjectOfType<LeapProvider>();
+                    if (leapProvider == null)
+                    {
+                        //If we still have a null hand, construct one manually
+                        if (hand == null)
+                        {
+                            hand = TestHandFactory.MakeTestHand(Handedness == Chirality.Left);
+                        }
+                    }
+                    else
+                    {
+                        hand = leapProvider.CurrentFrame.GetHand(Handedness);
+                    }
                 }
                 else
                 {
