@@ -236,7 +236,7 @@ namespace Ultraleap.Tracking.OpenXR
                             0f,
                             _joints[(int)HandJoint.ThumbMetacarpal].Radius * 2f,
                             (Bone.BoneType)boneIndex,
-                            _joints[(int)HandJoint.Palm].Pose.rotation * ThumbMetacarpalRotationOffset[hand.IsLeft ? 0 : 1]);
+                            (_joints[(int)HandJoint.Palm].Pose.rotation * PalmOffset[hand.IsLeft ? 0 : 1].rotation) * ThumbMetacarpalRotationOffset[hand.IsLeft ? 0 : 1]);
                         continue;
                     }
 
