@@ -16,10 +16,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (HandUtils) Mark Provider-dependant methods as obsolete and point to suitable replacements
 
 ### Fixed
-- Adjust hand `Rotation`, `Direction`, `PalmPosition`, `PalmNormal` and `StabilisedPalmPosition` to better match LeapC in the OpenXR provider which causes some distortion on models.
-- Fix elbow length being incorrectly calculated in the OpenXR provider.
-- Finger `Direction` is incorrectly set to the tip bone direction rather than the intermediate in the OpenXR provider.
-- Hand `GrabStrength` is computed before all required information is available in the OpenXR provider.
+- (OpenXRProvider) Hand `Rotation`, `Direction`, `PalmPosition`, `PalmNormal` and `StabilisedPalmPosition` do not match LeapC when using OpenXR layer 1.4.4
+- (OpenXRProvider) Elbow length incorrectly calculated.
+- (OpenXRProvider) Finger `Direction` is incorrectly set to the tip bone direction rather than the intermediate
+- (OpenXRProvider) Hand `GrabStrength` is computed before all required information is available
 
 ### Known issues 
 - Use of the LeapCSharp Config class is unavailable with v5.X tracking service
