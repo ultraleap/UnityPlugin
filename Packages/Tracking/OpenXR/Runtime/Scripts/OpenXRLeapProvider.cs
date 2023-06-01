@@ -90,8 +90,7 @@ namespace Ultraleap.Tracking.OpenXR
 
             if (XRGeneralSettings.Instance != null &&
                 XRGeneralSettings.Instance.Manager != null &&
-                XRGeneralSettings.Instance.Manager.activeLoader != null &&
-                XRGeneralSettings.Instance.Manager.activeLoader.name.Replace(" ", "") == "OpenXRLoader" && // Some Unity versions have spaces and some don't so remove the spaces
+                XRGeneralSettings.Instance.Manager.ActiveLoaderAs<OpenXRLoaderBase>() != null &&
                 OpenXRSettings.Instance != null &&
                 OpenXRSettings.Instance.GetFeature<HandTrackingFeature>() != null &&
                 OpenXRSettings.Instance.GetFeature<HandTrackingFeature>().SupportsHandTracking)
