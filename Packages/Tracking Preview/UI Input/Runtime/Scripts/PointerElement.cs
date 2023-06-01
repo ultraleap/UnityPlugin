@@ -317,7 +317,7 @@ namespace Leap.Unity.InputModule
 
                 if(hadHandLastProcessUpdate)
                 {
-                    CancelAllInput(hand, projectionOriginProvider);
+                    CancelAllInput(hand);
                     hadHandLastProcessUpdate = false;
                 }
 
@@ -391,7 +391,7 @@ namespace Leap.Unity.InputModule
             ProcessUnityEvents(hand);
         }
 
-        void CancelAllInput(Hand hand, IProjectionOriginProvider projectionOriginProvider)
+        void CancelAllInput(Hand hand)
         {
             PrevStateProjective = PointerStateProjective;
             PrevStateTactile = PointerStateTactile;
@@ -532,6 +532,11 @@ namespace Leap.Unity.InputModule
             //If we hit something with our Raycast, let's see if we should interact with it
             if (EventData.pointerCurrentRaycast.gameObject == null || OffCanvas())
             {
+                PreviousGameObjectUnderPointer = CurrentGameObjectUnderPointer;
+                CurrentGameObjectUnderPointer = null;
+
+                //Trigger Enter or Exit Events on the UI Element (like highlighting)
+                module.HandlePointerExitAndEnterProxy(EventData, CurrentGameObjectUnderPointer);
                 return;
             }
 
