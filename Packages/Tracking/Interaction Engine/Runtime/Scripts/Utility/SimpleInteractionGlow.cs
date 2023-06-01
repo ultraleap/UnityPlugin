@@ -107,7 +107,7 @@ namespace Leap.Unity.Interaction
                 {
                     targetColor = pressedColor;
                 }
-                else if(_intObj.isGrasped)
+                else if (_intObj.isGrasped)
                 {
                     targetColor = pressedColor;
                 }

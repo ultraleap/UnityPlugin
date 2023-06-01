@@ -6,10 +6,9 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace Leap.Unity
 {
@@ -18,33 +17,29 @@ namespace Leap.Unity
     /// </summary>
     public static class Hands
     {
-
         private static LeapProvider s_provider;
         private static GameObject s_leapRig;
 
-        static Hands()
-        {
-            InitStatic();
-            SceneManager.activeSceneChanged += InitStaticOnNewScene;
-        }
-
-        private static void InitStaticOnNewScene(Scene unused, Scene unused2)
-        {
-            InitStatic();
-        }
-
-        private static void InitStatic()
+        /// <summary>
+        /// Assign a static reference to the most suitable provider in the scene.
+        /// 
+        /// Order:
+        /// - First PostProcessProvider found
+        /// - First XRLeapProviderManager found
+        /// - First LeapProvider found
+        /// </summary>
+        private static void AssignBestLeapProvider()
         {
             // Fall through to the best available Leap Provider if none is assigned
             if (s_provider == null)
             {
-                s_provider = Object.FindObjectOfType<PostProcessProvider>();
+                s_provider = UnityEngine.Object.FindObjectOfType<PostProcessProvider>();
                 if (s_provider == null)
                 {
-                    s_provider = Object.FindObjectOfType<XRLeapProviderManager>();
+                    s_provider = UnityEngine.Object.FindObjectOfType<XRLeapProviderManager>();
                     if (s_provider == null)
                     {
-                        s_provider = Object.FindObjectOfType<LeapProvider>();
+                        s_provider = UnityEngine.Object.FindObjectOfType<LeapProvider>();
                         if (s_provider == null)
                         {
                             Debug.Log("There are no Leap Providers in the scene, please assign one manually");
@@ -53,11 +48,22 @@ namespace Leap.Unity
                     }
                 }
             }
-            Debug.Log("LeapProvider was not assigned. Auto assigning: " + s_provider);
 
-            Camera providerCamera = s_provider.GetComponentInParent<Camera>();
-            if (providerCamera == null) return;
-            if (providerCamera.transform.parent == null) return;
+            Debug.Log("LeapProvider was not assigned. Auto assigning: " + s_provider);
+        }
+
+        /// <summary>
+        /// Finds the Camera Rig; Assuming a Camera is a child of the Camera Rig and the static Provider is a child of the Camera.
+        /// </summary>
+        private static void AssignCameraRig()
+        {
+            Camera providerCamera = Provider?.GetComponentInParent<Camera>();
+
+            if (providerCamera == null || providerCamera.transform.parent == null)
+            {
+                return;
+            }
+
             s_leapRig = providerCamera.transform.parent.gameObject;
         }
 
@@ -72,10 +78,11 @@ namespace Leap.Unity
             {
                 if (s_leapRig == null)
                 {
-                    InitStatic();
+                    AssignCameraRig();
                 }
                 return s_leapRig;
             }
+            set { s_leapRig = value; }
         }
 
         /// <summary>
@@ -96,7 +103,7 @@ namespace Leap.Unity
             {
                 if (s_provider == null)
                 {
-                    InitStatic();
+                    AssignBestLeapProvider();
                 }
                 return s_provider;
             }
@@ -107,6 +114,7 @@ namespace Leap.Unity
         /// Returns the first hand of the argument Chirality in the current frame,
         /// otherwise returns null if no such hand is found.
         /// </summary>
+        [Obsolete("Specifying Providers is highly recommended. Use LeapProvider.GetHand() instead")]
         public static Hand Get(Chirality chirality)
         {
             if (chirality == Chirality.Left) return Left;
@@ -116,6 +124,7 @@ namespace Leap.Unity
         /// <summary>
         /// As Get, but returns the FixedUpdate (physics timestep) hand as opposed to the Update hand.
         /// </summary>
+        [Obsolete("Specifying Providers is highly recommended. Use LeapProvider.GetHand() instead")]
         public static Hand GetFixed(Chirality chirality)
         {
             if (chirality == Chirality.Left) return FixedLeft;
@@ -126,6 +135,7 @@ namespace Leap.Unity
         /// Returns the first left hand found by Leap in the current frame, otherwise
         /// returns null if no such hand is found.
         /// </summary>
+        [Obsolete("Specifying Providers is highly recommended. Use LeapProvider.GetHand(Chirality.Left) instead")]
         public static Hand Left
         {
             get
@@ -140,6 +150,7 @@ namespace Leap.Unity
         /// Returns the first right hand found by Leap in the current frame, otherwise
         /// returns null if no such hand is found.
         /// </summary>
+        [Obsolete("Specifying Providers is highly recommended. Use LeapProvider.GetHand(Chirality.Right) instead")]
         public static Hand Right
         {
             get
@@ -154,6 +165,7 @@ namespace Leap.Unity
         /// Returns the first left hand found by Leap in the current fixed frame, otherwise
         /// returns null if no such hand is found. The fixed frame is aligned with the physics timestep.
         /// </summary>
+        [Obsolete("Specifying Providers is highly recommended. Use LeapProvider.GetHand(Chirality.Left) instead")]
         public static Hand FixedLeft
         {
             get
@@ -168,6 +180,7 @@ namespace Leap.Unity
         /// Returns the first right hand found by Leap in the current fixed frame, otherwise
         /// returns null if no such hand is found. The fixed frame is aligned with the physics timestep.
         /// </summary>
+        [Obsolete("Specifying Providers is highly recommended. Use LeapProvider.GetHand(Chirality.Right) instead")]
         public static Hand FixedRight
         {
             get
@@ -636,7 +649,7 @@ namespace Leap.Unity
         /// <returns>The first hand of the argument whichHand found in the argument frame.</returns>
         public static Hand GetHand(this Frame frame, Chirality whichHand)
         {
-            if (frame.Hands == null)
+            if (frame == null || frame.Hands == null)
             {
                 return null;
             }
@@ -661,6 +674,7 @@ namespace Leap.Unity
         /// </summary>
         /// <returns>The first hand of the argument whichHand found in the current frame of 
         /// the argument provider.</returns>
+        [Obsolete("Naming updated. Use LeapProvider.GetHand() instead")]
         public static Hand Get(this LeapProvider provider, Chirality whichHand)
         {
             Frame frame;
@@ -674,6 +688,23 @@ namespace Leap.Unity
             }
 
             return frame.GetHand(whichHand);
+        }
+
+        /// <summary>
+        /// Finds a hand in the current frame.
+        /// </summary>
+        /// <returns>The first hand of the argument whichHand found in the current frame of 
+        /// the argument provider.</returns>
+        public static Hand GetHand(this LeapProvider provider, Chirality whichHand)
+        {
+            if (Time.inFixedTimeStep)
+            {
+                return provider.CurrentFixedFrame.GetHand(whichHand);
+            }
+            else
+            {
+                return provider.CurrentFrame.GetHand(whichHand);
+            }
         }
 
         #endregion

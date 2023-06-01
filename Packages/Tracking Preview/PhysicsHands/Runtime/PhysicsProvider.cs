@@ -132,7 +132,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         public Action<Rigidbody> OnHover, OnHoverExit;
 
         public Action<Rigidbody> OnContact, OnContactExit;
-        
+
         public Action<Rigidbody> OnGrasp, OnGraspExit;
 
         public Action<Rigidbody> OnGraspedPinch, OnGraspedUnpinch;

@@ -27,6 +27,8 @@ namespace Leap.Unity.Interaction
         SerializedProperty _grabBallInteractionBehaviour;
         SerializedProperty _lerpSpeed;
 
+        SerializedProperty _continuouslyRestrictGrabBallDistanceFromHead;
+
         public override void OnInspectorGUI()
         {
             GetProperties();
@@ -75,12 +77,12 @@ namespace Leap.Unity.Interaction
                 EditorGUILayout.PropertyField(_minHeightFromHead);
                 GUILayout.Space(2.5f);
                 EditorGUILayout.PropertyField(_drawGrabBallRestrictionGizmos);
+
+                EditorGUILayout.PropertyField(_continuouslyRestrictGrabBallDistanceFromHead);
             }
             EditorGUILayout.Space();
 
-
             serializedObject.ApplyModifiedProperties();
-
         }
 
         private void GetProperties()
@@ -96,6 +98,7 @@ namespace Leap.Unity.Interaction
             _maxHeightFromHead = serializedObject.FindProperty("maxHeightFromHead");
             _minHeightFromHead = serializedObject.FindProperty("minHeightFromHead");
             _drawGrabBallRestrictionGizmos = serializedObject.FindProperty("drawGrabBallRestrictionGizmos");
+            _continuouslyRestrictGrabBallDistanceFromHead = serializedObject.FindProperty("continuouslyRestrictGrabBallDistanceFromHead");
         }
     }
 }
