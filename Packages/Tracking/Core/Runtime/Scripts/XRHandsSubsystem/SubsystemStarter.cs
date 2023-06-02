@@ -21,8 +21,7 @@ namespace Leap.Unity
 
             if(leapProvider == null)
             {
-                GameObject leapProviderGO = new GameObject();
-                leapProviderGO.name = "LeapXRServiceProvider";
+                GameObject leapProviderGO = new GameObject("LeapXRServiceProvider");
                 leapProvider = (LeapProvider)leapProviderGO.AddComponent<LeapXRServiceProvider>();
                 GameObject.DontDestroyOnLoad(leapProviderGO);
             }
@@ -47,10 +46,9 @@ namespace Leap.Unity
                 if(subsystemProvider != null)
                 {
                     LeapXRHandProvider leapXRHandProvider = (LeapXRHandProvider)subsystemProvider;
-                    leapXRHandProvider.provider = leapProvider;
-                }    
+                    leapXRHandProvider.TrackingProvider = leapProvider;
+                }
             }
-
         }
         
         private static void OnQuit()
