@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - (Physics Hands) In-editor readme for example scene
+- (LeapServiceProvider) Ability to change the number of Service connection attempts and interval
 
 ### Changed
 - (HandUtils) Only cache static Provider and CameraRig references when they are requested
