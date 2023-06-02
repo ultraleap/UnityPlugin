@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.Hands;
 using UnityEngine.XR.Hands.ProviderImplementation;
+using UnityEngine.SubsystemsImplementation.Extensions;
 
 namespace Leap.Unity
 {
@@ -12,9 +13,20 @@ namespace Leap.Unity
         static XRHandProviderUtility.SubsystemUpdater updater = null;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-        private static void Awake()
+        private static void RunAfterSceneLoad()
         {
-            Application.quitting += OnDestroy;
+            Application.quitting += OnQuit;
+            LeapProvider leapProvider = Hands.Provider;
+            XRHandSubsystemProvider subsystemProvider = null;
+
+            if(leapProvider == null)
+            {
+                var providerGO = new GameObject();
+                var instantiated = GameObject.Instantiate(providerGO) as GameObject;
+                instantiated.name = "LeapProvider";
+                leapProvider = (LeapProvider)instantiated.AddComponent<LeapXRServiceProvider>();
+                GameObject.DontDestroyOnLoad(instantiated);
+            }
 
             var descriptors = new List<XRHandSubsystemDescriptor>();
             SubsystemManager.GetSubsystemDescriptors(descriptors);
@@ -30,12 +42,19 @@ namespace Leap.Unity
                     m_Subsystem.Start();
                     updater = new XRHandProviderUtility.SubsystemUpdater(m_Subsystem);
                     updater.Start();
+                    subsystemProvider = m_Subsystem.GetProvider();
                 }
+
+                if(subsystemProvider != null)
+                {
+                    var leapXRHandProvider = (LeapXRHandProvider)subsystemProvider;
+                    leapXRHandProvider.provider = leapProvider;
+                }    
             }
 
         }
         
-        private static void OnDestroy()
+        private static void OnQuit()
         {
             if (m_Subsystem != null)
             {

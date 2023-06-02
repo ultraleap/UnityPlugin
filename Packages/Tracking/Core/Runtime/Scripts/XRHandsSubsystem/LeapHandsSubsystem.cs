@@ -7,7 +7,7 @@ namespace Leap.Unity
 {
     class LeapXRHandProvider : XRHandSubsystemProvider
     {
-        LeapProvider provider;
+        public LeapProvider provider;
 
         public override void Destroy()
         {
