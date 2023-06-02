@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [NEXT] - XX/XX/XX
 
 ### Added
-- 
+- Runtime unit tests for pose detection
 
 ### Changed
 - 
