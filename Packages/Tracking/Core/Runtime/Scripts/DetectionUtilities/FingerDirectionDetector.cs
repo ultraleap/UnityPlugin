@@ -224,8 +224,8 @@ namespace Leap.Unity
                 }
                 Finger finger = HandModel.GetLeapHand().Fingers[selectedFingerOrdinal()];
                 Vector3 fingerDirection = finger.Bone(Bone.BoneType.TYPE_DISTAL).Direction;
-                Utils.DrawCone(finger.TipPosition, fingerDirection, OnAngle, finger.Length, innerColor);
-                Utils.DrawCone(finger.TipPosition, fingerDirection, OffAngle, finger.Length, LimitColor);
+                Leap.Unity.Utils.DrawCone(finger.TipPosition, fingerDirection, OnAngle, finger.Length, innerColor);
+                Leap.Unity.Utils.DrawCone(finger.TipPosition, fingerDirection, OffAngle, finger.Length, LimitColor);
                 Gizmos.color = DirectionColor;
                 Gizmos.DrawRay(finger.TipPosition, selectedDirection(finger.TipPosition));
             }
