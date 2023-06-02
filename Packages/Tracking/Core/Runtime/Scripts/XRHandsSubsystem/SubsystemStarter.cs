@@ -21,14 +21,13 @@ namespace Leap.Unity
 
             if(leapProvider == null)
             {
-                var providerGO = new GameObject();
-                var instantiated = GameObject.Instantiate(providerGO) as GameObject;
-                instantiated.name = "LeapProvider";
-                leapProvider = (LeapProvider)instantiated.AddComponent<LeapXRServiceProvider>();
-                GameObject.DontDestroyOnLoad(instantiated);
+                GameObject leapProviderGO = new GameObject();
+                leapProviderGO.name = "LeapXRServiceProvider";
+                leapProvider = (LeapProvider)leapProviderGO.AddComponent<LeapXRServiceProvider>();
+                GameObject.DontDestroyOnLoad(leapProviderGO);
             }
 
-            var descriptors = new List<XRHandSubsystemDescriptor>();
+            List<XRHandSubsystemDescriptor> descriptors = new List<XRHandSubsystemDescriptor>();
             SubsystemManager.GetSubsystemDescriptors(descriptors);
             foreach (var descriptor in descriptors)
             {
@@ -47,7 +46,7 @@ namespace Leap.Unity
 
                 if(subsystemProvider != null)
                 {
-                    var leapXRHandProvider = (LeapXRHandProvider)subsystemProvider;
+                    LeapXRHandProvider leapXRHandProvider = (LeapXRHandProvider)subsystemProvider;
                     leapXRHandProvider.provider = leapProvider;
                 }    
             }
