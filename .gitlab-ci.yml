@@ -80,7 +80,7 @@ check-formatting:
     - |
       Get-ChildItem -Path "$PACKAGES_PATH/" -Filter *.cs -Recurse -File -Name | ForEach-Object {
           $ScriptContent = Get-Content -Path "$PACKAGES_PATH/$_";
-          $ScriptContent -replace ' Utils.', ' Leap.Unity.Utils.';
+          $ScriptContent = $ScriptContent -replace ' Utils.', ' Leap.Unity.Utils.';
           $ScriptContent -Join "`n" | Set-Content -NoNewline "$PACKAGES_PATH/$_";
       }
     
