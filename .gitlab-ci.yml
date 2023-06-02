@@ -79,7 +79,9 @@ check-formatting:
     # Make sure uses of Utils specify the Leap.Unity namespace
     - |
       Get-ChildItem -Path "$PACKAGES_PATH/" -Filter *.cs -Recurse -File -Name | ForEach-Object {
-          (Get-Content $_) -replace ' Utils.', ' Leap.Unity.Utils.' | Set-Content $_
+          $ScriptContent = Get-Content -Path "$PACKAGES_PATH/$_";
+          $ScriptContent -replace ' Utils.', ' Leap.Unity.Utils.';
+          $ScriptContent -Join "`n" | Set-Content -NoNewline "$PACKAGES_PATH/$_";
       }
     
     # git diff so we can see the changes needed to be made
