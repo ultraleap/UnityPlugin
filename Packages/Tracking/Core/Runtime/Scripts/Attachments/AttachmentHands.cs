@@ -137,7 +137,7 @@ namespace Leap.Unity.Attachments
         void Update()
         {
 #if UNITY_EDITOR
-            if (Utils.IsObjectPartOfPrefabAsset(this.gameObject))
+            if (Leap.Unity.Utils.IsObjectPartOfPrefabAsset(this.gameObject))
             {
                 return;
             }
@@ -303,7 +303,7 @@ namespace Leap.Unity.Attachments
 #if UNITY_EDITOR
         private bool getIsPrefab()
         {
-            return Utils.IsObjectPartOfPrefabAsset(this.gameObject);
+            return Leap.Unity.Utils.IsObjectPartOfPrefabAsset(this.gameObject);
         }
 #endif
 
