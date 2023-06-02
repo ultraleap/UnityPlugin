@@ -1,17 +1,36 @@
+using System.Collections.Generic;
 using Unity.Collections;
 using UnityEngine;
+using UnityEngine.SubsystemsImplementation.Extensions;
 using UnityEngine.XR.Hands;
 using UnityEngine.XR.Hands.ProviderImplementation;
 
 namespace Leap.Unity
 {
-    class LeapXRHandProvider : XRHandSubsystemProvider
+    public class LeapXRHandProvider : XRHandSubsystemProvider
     {
-        LeapProvider provider;
+        private bool trackingProviderAvailableLastFrame = false;
+
+        private LeapProvider trackingProvider;
+        public LeapProvider TrackingProvider
+        {
+            get
+            { 
+                if (trackingProvider == null)
+                {
+                    trackingProvider = Hands.Provider;
+                }
+
+                return trackingProvider;
+            }
+            set
+            {
+                trackingProvider = value; 
+            }
+        }
 
         public override void Destroy()
         {
-
         }
 
         public override void GetHandLayout(NativeArray<bool> handJointsInLayout)
@@ -20,8 +39,6 @@ namespace Leap.Unity
 
         public override void Start()
         {
-            
-            provider = Hands.Provider;
         }
 
         public override void Stop()
@@ -44,8 +61,6 @@ namespace Leap.Unity
         //    XRHandSubsystemDescriptor.Register(handsSubsystemCinfo);
         //}
 
-        
-
         public override XRHandSubsystem.UpdateSuccessFlags TryUpdateHands(
             XRHandSubsystem.UpdateType updateType, 
             ref Pose leftHandRootPose, 
@@ -53,8 +68,18 @@ namespace Leap.Unity
             ref Pose rightHandRootPose, 
             NativeArray<XRHandJoint> rightHandJoints)
         {
+            if(TrackingProvider == null)
+            {
+                if(trackingProviderAvailableLastFrame)
+                {
+                    Debug.LogWarning("Leap XRHands Tracking Provider has been lost. Without a LeapProvider in your scene, you will not receive Leap XRHands.");
+                    trackingProviderAvailableLastFrame = false;
+                }
 
-            Frame currentFrame = provider.CurrentFrame;
+                return XRHandSubsystem.UpdateSuccessFlags.None;
+            }
+
+            Frame currentFrame = TrackingProvider.CurrentFrame;
 
             XRHandSubsystem.UpdateSuccessFlags updateSuccessFlags = XRHandSubsystem.UpdateSuccessFlags.None;
 
@@ -69,6 +94,8 @@ namespace Leap.Unity
                 updateSuccessFlags |= XRHandSubsystem.UpdateSuccessFlags.RightHandRootPose;
                 updateSuccessFlags |= XRHandSubsystem.UpdateSuccessFlags.RightHandJoints;
             }
+
+            trackingProviderAvailableLastFrame = true;
 
             return updateSuccessFlags;
         }
@@ -139,6 +166,22 @@ namespace Leap.Unity
 
             return true;
         }
+
+        public static void SetSubsystemTrackingProvider(LeapProvider leapProvider)
+        {
+            List<LeapHandSubsystem> subsystems = new List<LeapHandSubsystem>();
+            SubsystemManager.GetSubsystems(subsystems);
+
+            if(subsystems.Count > 0)
+            {
+                LeapXRHandProvider subsystemProvider = subsystems[0].GetProvider() as LeapXRHandProvider;
+                subsystemProvider.TrackingProvider = leapProvider;
+            }
+            else
+            {
+                Debug.LogWarning("No LeapHandSubsystem found, LeapProvider could not be set.");
+            }
+        }
     }
 
     // This class defines a hand subsystem
@@ -156,7 +199,5 @@ namespace Leap.Unity
             };
             XRHandSubsystemDescriptor.Register(handsSubsystemCinfo);
         }
-
-
     }
 }

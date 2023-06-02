@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.Hands;
 using UnityEngine.XR.Hands.ProviderImplementation;
+using UnityEngine.SubsystemsImplementation.Extensions;
 
 namespace Leap.Unity
 {
@@ -12,11 +13,20 @@ namespace Leap.Unity
         static XRHandProviderUtility.SubsystemUpdater updater = null;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-        private static void Awake()
+        private static void RunAfterSceneLoad()
         {
-            Application.quitting += OnDestroy;
+            Application.quitting += OnQuit;
+            LeapProvider leapProvider = Hands.Provider;
+            XRHandSubsystemProvider subsystemProvider = null;
 
-            var descriptors = new List<XRHandSubsystemDescriptor>();
+            if(leapProvider == null)
+            {
+                GameObject leapProviderGO = new GameObject("LeapXRServiceProvider");
+                leapProvider = (LeapProvider)leapProviderGO.AddComponent<LeapXRServiceProvider>();
+                GameObject.DontDestroyOnLoad(leapProviderGO);
+            }
+
+            List<XRHandSubsystemDescriptor> descriptors = new List<XRHandSubsystemDescriptor>();
             SubsystemManager.GetSubsystemDescriptors(descriptors);
             foreach (var descriptor in descriptors)
             {
@@ -30,12 +40,18 @@ namespace Leap.Unity
                     m_Subsystem.Start();
                     updater = new XRHandProviderUtility.SubsystemUpdater(m_Subsystem);
                     updater.Start();
+                    subsystemProvider = m_Subsystem.GetProvider();
+                }
+
+                if(subsystemProvider != null)
+                {
+                    LeapXRHandProvider leapXRHandProvider = (LeapXRHandProvider)subsystemProvider;
+                    leapXRHandProvider.TrackingProvider = leapProvider;
                 }
             }
-
         }
         
-        private static void OnDestroy()
+        private static void OnQuit()
         {
             if (m_Subsystem != null)
             {
