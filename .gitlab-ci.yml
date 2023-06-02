@@ -77,7 +77,7 @@ check-formatting:
       }
     
     # Make sure uses of Utils specify the Leap.Unity namespace
-    - find . -name "*.cs" -type f -exec sed -i 's/ Utils\./ Leap.Unity.Utils./g' {} +
+    - find . -name "*.cs" -type f -exec sed -i 's/Utils\./Leap.Unity.Utils./g' {} +
     
     # git diff so we can see the changes needed to be made
     - $linter_errors = git --no-pager diff --name-only "*.cs";
