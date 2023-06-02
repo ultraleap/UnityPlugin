@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - (HandUtils) Only cache static Provider and CameraRig references when they are requested
 - (HandUtils) Mark Provider-dependant methods as obsolete and point to suitable replacements
+- (UIInput) Cursors are disabled by default and enabled when required
 
 ### Fixed
 - (OpenXRProvider) Hand `Rotation`, `Direction`, `PalmPosition`, `PalmNormal` and `StabilisedPalmPosition` do not match LeapC when using OpenXR layer 1.4.4
