@@ -146,7 +146,7 @@ namespace Leap.Unity
                 float angle;
                 circleRotation.ToAngleAxis(out angle, out axis);
                 Leap.Unity.Utils.DrawCircle(centerPosition, axis, ActivateDistance / 2, centerColor);
-                Utils.DrawCircle(centerPosition, axis, DeactivateDistance / 2, Color.blue);
+                Leap.Unity.Utils.DrawCircle(centerPosition, axis, DeactivateDistance / 2, Color.blue);
             }
         }
 #endif
