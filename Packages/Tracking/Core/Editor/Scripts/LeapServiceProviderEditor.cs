@@ -66,6 +66,9 @@ namespace Leap.Unity
             deferProperty("_serverNameSpace");
             deferProperty("_useInterpolation");
 
+            deferProperty("_reconnectionAttempts");
+            deferProperty("_reconnectionInterval");
+
             if (!(LeapServiceProvider is LeapXRServiceProvider))
             {
                 addPropertyToFoldout("_trackingOptimization", "Advanced Options");
@@ -76,6 +79,9 @@ namespace Leap.Unity
             }
             addPropertyToFoldout("_useInterpolation", "Advanced Options");
             addPropertyToFoldout("_serverNameSpace", "Advanced Options");
+
+            addPropertyToFoldout("_reconnectionAttempts", "Advanced Options");
+            addPropertyToFoldout("_reconnectionInterval", "Advanced Options");
         }
 
         private void frameOptimizationWarning(SerializedProperty property)
