@@ -232,7 +232,7 @@ namespace Leap.Unity
                 Vector3 axis;
                 float angle;
                 circleRotation.ToAngleAxis(out angle, out axis);
-                Utils.DrawCircle(centerPosition, Normal, Distance / 2, centerColor);
+                Leap.Unity.Utils.DrawCircle(centerPosition, Normal, Distance / 2, centerColor);
                 Gizmos.color = NormalColor;
                 Gizmos.DrawLine(centerPosition, centerPosition + Direction * Distance / 2);
                 Gizmos.color = DirectionColor;

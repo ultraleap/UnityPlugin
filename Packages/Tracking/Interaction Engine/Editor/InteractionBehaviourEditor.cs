@@ -52,7 +52,7 @@ namespace Leap.Unity.Interaction
             bool shouldDrawInteractionManagerNotSetWarning = false;
             foreach (var target in targets)
             {
-                if (Utils.IsObjectPartOfPrefabAsset(target)) continue;
+                if (Leap.Unity.Utils.IsObjectPartOfPrefabAsset(target)) continue;
 
                 if (target.manager == null)
                 {
@@ -108,7 +108,7 @@ namespace Leap.Unity.Interaction
                 {
                     foreach (var target in targets)
                     {
-                        if (Utils.IsObjectPartOfPrefabAsset(target)) continue;
+                        if (Leap.Unity.Utils.IsObjectPartOfPrefabAsset(target)) continue;
 
                         Undo.RecordObject(target, "Auto-set Interaction Manager");
                         target.manager = manager;
