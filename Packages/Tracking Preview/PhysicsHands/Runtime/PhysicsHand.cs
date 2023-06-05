@@ -259,8 +259,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             gameObject.SetActive(true);
             _physicsHand.gameObject.SetActive(false);
-            _waitForFixedUpdate = new WaitForFixedUpdate();
-            StartCoroutine(LateFixedUpdate());
         }
 
         #region Hand Reset
@@ -507,10 +505,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
         }
 
         // Happens after the physics simulation
-        private IEnumerator LateFixedUpdate()
+        internal void LateFixedUpdate()
         {
-            for (; ; )
-            {
                 for (int fingerIndex = 0; fingerIndex < Hand.FINGERS; fingerIndex++)
                 {
                     _graspingFingerDistance[fingerIndex] = 1f;
@@ -596,8 +592,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
                 CacheComputedPositions();
 
-                yield return _waitForFixedUpdate;
-            }
         }
 
         private void CachePositions()
@@ -678,7 +672,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             // Fix the hand if it gets into a bad situation by teleporting and holding in place until its bad velocities disappear
             if (Vector3.Distance(_originalOldPosition, _originalLeapHand.PalmPosition) > _physicsProvider.HandTeleportDistance ||
                 bonesAreOverRotated ||
-                (!IsGrasping && DistanceFromDataHand > _physicsProvider.HandTeleportDistance) && (IsGrasping ||
+                DistanceFromDataHand > _physicsProvider.HandTeleportDistance && (IsGrasping ||
                 IsCloseToObject))
             {
                 ResetPhysicsHand(true);
