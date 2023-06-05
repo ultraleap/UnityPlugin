@@ -87,6 +87,8 @@ namespace Leap.Unity.InputModule
         private bool PrevTriggeringInteraction { get; set; }
         private float TimeEnteredCanvas { get; set; }
 
+        private bool hadHandLastProcessUpdate = false;
+
         private List<RaycastResult> _raycastResultCache = new List<RaycastResult>();
 
         private static readonly Dictionary<(PointerStates from, PointerStates to), (string ActionName, Action<IInputModuleEventHandler, PointerElement> Action)> StateChangeActionMap
@@ -313,23 +315,33 @@ namespace Leap.Unity.InputModule
                     cursor.gameObject.SetActive(false);
                 }
 
+                if(hadHandLastProcessUpdate)
+                {
+                    CancelAllInput(hand);
+                    hadHandLastProcessUpdate = false;
+                }
+
                 return;
             }
+            else
+            {
+                hadHandLastProcessUpdate = true;
 
-            if (forceDisable)
-            {
-                cursor.gameObject.SetActive(false);
-            }
-            else if (disableWhenOffCanvas && OffCanvas())
-            {
-                if (cursor.gameObject.activeSelf)
+                if (forceDisable)
                 {
                     cursor.gameObject.SetActive(false);
                 }
-            }
-            else if (!cursor.gameObject.activeSelf)
-            {
-                cursor.gameObject.SetActive(true);
+                else if (disableWhenOffCanvas && OffCanvas())
+                {
+                    if (cursor.gameObject.activeSelf)
+                    {
+                        cursor.gameObject.SetActive(false);
+                    }
+                }
+                else if (!cursor.gameObject.activeSelf)
+                {
+                    cursor.gameObject.SetActive(true);
+                }
             }
 
             //Select interaction
@@ -377,6 +389,55 @@ namespace Leap.Unity.InputModule
 
             ResetTimeEnteredCanvas();
             ProcessUnityEvents(hand);
+        }
+
+        void CancelAllInput(Hand hand)
+        {
+            PrevStateProjective = PointerStateProjective;
+            PrevStateTactile = PointerStateTactile;
+
+            UpdatePointer(EventData);
+
+            PointerStateTactile = PointerStates.OffCanvas;
+            PointerStateProjective = PointerStates.OffCanvas;
+
+            OnPointerStateChanged?.Invoke(this, hand);
+
+            if (EventData != null)
+            {
+                PrevScreenPosition = EventData.position;
+            }
+
+            switch (module?.InteractionMode)
+            {
+                case InteractionCapability.Both:
+
+                    // Only raise projective events if there are no interesting tactile interactions happening
+                    if (PointerStateTactile != PointerStates.OffCanvas && PrevStateTactile != PointerStates.OffCanvas)
+                    {
+                        RaiseEventsForStateChanges(PointerStateTactile, PrevStateTactile);
+                    }
+
+                    RaiseEventsForStateChanges(PointerStateProjective, PrevStateProjective);
+                    break;
+
+                case InteractionCapability.Direct:
+                    RaiseEventsForStateChanges(PointerStateTactile, PrevStateTactile);
+                    break;
+
+                case InteractionCapability.Indirect:
+                    RaiseEventsForStateChanges(PointerStateProjective, PrevStateProjective);
+                    break;
+            }
+
+            ResetTimeEnteredCanvas();
+            ProcessUnityEvents(hand);
+
+            PreviousGameObjectUnderPointer = CurrentGameObjectUnderPointer;
+            CurrentGameObjectUnderPointer = null;
+
+            //Trigger Enter or Exit Events on the UI Element (like highlighting)
+            module.HandlePointerExitAndEnterProxy(EventData, CurrentGameObjectUnderPointer);
         }
 
         private void ResetTimeEnteredCanvas()
@@ -471,6 +532,11 @@ namespace Leap.Unity.InputModule
             //If we hit something with our Raycast, let's see if we should interact with it
             if (EventData.pointerCurrentRaycast.gameObject == null || OffCanvas())
             {
+                PreviousGameObjectUnderPointer = CurrentGameObjectUnderPointer;
+                CurrentGameObjectUnderPointer = null;
+
+                //Trigger Enter or Exit Events on the UI Element (like highlighting)
+                module.HandlePointerExitAndEnterProxy(EventData, CurrentGameObjectUnderPointer);
                 return;
             }
 
@@ -628,7 +694,7 @@ namespace Leap.Unity.InputModule
         private void ProcessUnityEvents_HandleNoLongerInteracting(Hand hand)
         {
             //If we WERE interacting last frame, but are not this frame...
-            if (NoLongerInteracting(hand))
+            if (hand == null ||  NoLongerInteracting(hand))
             {
                 PrevTriggeringInteraction = false;
 

@@ -858,6 +858,7 @@ namespace LeapInternal
             //since the distortion struct cannot be represented safely in c#
             distortionData.Data = new float[(int)(distortionData.Width * distortionData.Height * 2)]; //2 float values per map point
             Marshal.Copy(image.distortionMatrix, distortionData.Data, 0, distortionData.Data.Length);
+            distortionData.OnDataChanged();
 
             if (LeapDistortionChange != null)
             {
@@ -873,13 +874,11 @@ namespace LeapInternal
                 //Update distortion data, if changed
                 if ((_currentLeftDistortionData.Version != imageMsg.leftImage.matrix_version) || !_currentLeftDistortionData.IsValid)
                 {
-                    // WARNING: this has had the inputs for createDistortionData swapped to Right to account for issues in the reprojection shader
-                    _currentLeftDistortionData = createDistortionData(imageMsg.rightImage, Image.CameraType.RIGHT);
+                    _currentLeftDistortionData = createDistortionData(imageMsg.leftImage, Image.CameraType.LEFT);
                 }
                 if ((_currentRightDistortionData.Version != imageMsg.rightImage.matrix_version) || !_currentRightDistortionData.IsValid)
                 {
-                    // WARNING: this has had the inputs for createDistortionData swapped to Left to account for issues in the reprojection shader
-                    _currentRightDistortionData = createDistortionData(imageMsg.leftImage, Image.CameraType.LEFT);
+                    _currentRightDistortionData = createDistortionData(imageMsg.rightImage, Image.CameraType.RIGHT);
                 }
 
                 ImageData leftImage = new ImageData(Image.CameraType.LEFT, imageMsg.leftImage, _currentLeftDistortionData);

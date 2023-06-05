@@ -46,7 +46,7 @@ float2 LeapGetUndistortedUVWithOffset(float4 screenPos, float2 uvOffset) {
 	projection.z = UNITY_MATRIX_P[0][0];
 	projection.w = UNITY_MATRIX_P[1][1];
 
-  // Flip vertically.
+  // Flip vertically (seems to only be active on certain graphics pipelines)
   // Multiplication by _ProjectionParams.x is here for the case where this is negative
 	projection.y = -projection.y;
 	projection.w = -projection.w * _ProjectionParams.x;
@@ -60,10 +60,24 @@ float2 LeapGetUndistortedUVWithOffset(float4 screenPos, float2 uvOffset) {
 	// so apparently we won't either.
 	float2 distortionUV = saturate(0.125 * tangent + float2(0.5, 0.5))
 		* float2(1, 0.5) + uvOffset;
+
+	// Invert the V coordinate on each distortion map to 'unflip' the IR image in the rendered view (so it's the right way up)
+	if (distortionUV.y <= 0.5) // Camera zero image sits in the lower half of the texture (V=> 0-0.5)
+	{
+		distortionUV.y = 0.5 - distortionUV.y;
+	}
+	else if (distortionUV.y > 0.5 && distortionUV.y <= 1.0) // Camera one image sits in the upper half of the texture (V=> 0.5-1.0)
+	{
+		distortionUV.y = 1.0 - distortionUV.y + 0.5;
+	}
+
 	float4 distortionAmount = UNITY_SAMPLE_TEX2DARRAY(_LeapGlobalDistortion, float3(distortionUV, screenPos.z));
 
-	// DecodeFloatRG decodes two 8-bit/channel RG values into a single float between [0..1).
-	// More magic number alerts: I have no idea why 2.3 - float2(0.6, 0.6)
+	// A (32-bit) pixel from the distortion texture contains the X and Y (distortion lookup) coordinates packed into
+	// a pair of bytes. DecodeFloatRG decodes the two 8-bit/channel RG values into a single float between [0..1).
+	//  
+	// Note, the commit history for the magic numbers '2.3 - float2(0.6, 0.6)' is now lost, but Owen Morgen suspects
+	// they are specific values used for the LMC to generate a zoom + crop + shift so it looks decent in the VR Viz
 	float2 leapUV = float2(DecodeFloatRG(distortionAmount.xy), DecodeFloatRG(distortionAmount.zw)) * 2.3 - float2(0.6, 0.6);
 	return saturate(leapUV) * float2(1.0, 0.5 - _LeapGlobalRawPixelSize.y) + uvOffset;
 }
