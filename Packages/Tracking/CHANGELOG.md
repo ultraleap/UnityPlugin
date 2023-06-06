@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - (HandUtils) Only cache static Provider and CameraRig references when they are requested
 - (HandUtils) Mark Provider-dependant methods as obsolete and point to suitable replacements
+- (UIInput) Cursors are disabled by default and enabled when required
 - (LeapXRServiceProvider) When using Default offset, updated values will be used automatically
 - (Utils) All references to Utils in the Plugin specify Leap.Unity.Utils to avoid clashes with other Utils classes
 
