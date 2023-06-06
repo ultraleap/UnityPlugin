@@ -181,6 +181,7 @@ namespace Leap.Unity.Preview.Locomotion
                 _audioSource = GetComponentInChildren<AudioSource>(true);
             }
 
+            _attachmentHand = GetComponentInParent<AttachmentHand>();
             _head = Camera.main.transform;
 
             _meshRenderer = _pinchItem.GetComponentInChildren<MeshRenderer>(true);
