@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (OpenXRProvider) Finger `Direction` is incorrectly set to the tip bone direction rather than the intermediate
 - (OpenXRProvider) Hand `GrabStrength` is computed before all required information is available
 - (UIInput) When hand lost or leaves canvas near hovered button, button stays hovered
+- (Jump Gem Locomotion) Jump Gems look for audio sources in their children, even if the audio source was set
 
 ### Known issues 
 - Use of the LeapCSharp Config class is unavailable with v5.X tracking service
