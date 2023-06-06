@@ -62,7 +62,7 @@ namespace Leap.Unity.Interaction
         private void drawHandEditor(Rect controlRect)
         {
             // Determine whether the target object is a prefab. AttachmentPoints cannot be edited on prefabs.
-            var isTargetPrefab = Utils.IsObjectPartOfPrefabAsset(target.gameObject);
+            var isTargetPrefab = Leap.Unity.Utils.IsObjectPartOfPrefabAsset(target.gameObject);
 
             // Image container.
             Rect imageContainerRect = controlRect;

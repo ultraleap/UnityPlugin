@@ -114,7 +114,7 @@ namespace Leap.Unity.Examples
 
         private void Update()
         {
-            Utils.Swap(ref _currTipPoints, ref _prevTipPoints);
+            Leap.Unity.Utils.Swap(ref _currTipPoints, ref _prevTipPoints);
 
             _currTipPoints.Clear();
             foreach (var hand in _provider.CurrentFrame.Hands)
