@@ -513,7 +513,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             }
         }
 
-        public static void UpdatePhysicsPalm(ref PhysicsHand.Hand physicsHand, Leap.Hand dataHand, float maximumDistance, bool isContacting, bool isGrasping, float graspingWeight, float maximumWeight)
+        public static void UpdatePhysicsPalm(ref PhysicsHand.Hand physicsHand, Leap.Hand dataHand, float maximumDistance, bool isContacting, bool isGrasping, float graspingWeight, float maximumWeight, float fingerDisplacement)
         {
             if (isContacting || isGrasping)
             {
@@ -533,17 +533,24 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 physicsHand.currentPalmVelocityInterp = 0f;
             }
 
-            if (isGrasping)
+            if (isGrasping || fingerDisplacement > 1f)
             {
                 // Reduce the overall delta amount when the weight is heigher
-                physicsHand.currentPalmWeightInterp = Mathf.InverseLerp(Mathf.Min(maximumWeight * 0.1f, 1f), maximumWeight, graspingWeight).EaseOut();
+                if (isGrasping)
+                {
+                    physicsHand.currentPalmWeightInterp = Mathf.InverseLerp(Mathf.Min(maximumWeight * 0.1f, 1f), maximumWeight, graspingWeight).EaseOut();
+                }
+                else
+                {
+                    physicsHand.currentPalmWeightInterp = Mathf.InverseLerp(1f, 12f, fingerDisplacement).EaseOut();
+                }
             }
             else
             {
                 physicsHand.currentPalmWeightInterp = 0f;
             }
 
-            physicsHand.currentPalmWeight = Mathf.Lerp(physicsHand.currentPalmWeight, physicsHand.currentPalmWeightInterp, Time.fixedDeltaTime * (1.0f / 0.15f));
+            physicsHand.currentPalmWeight = Mathf.Lerp(physicsHand.currentPalmWeight, physicsHand.currentPalmWeightInterp, Time.fixedDeltaTime * (1.0f / 0.05f));
 
             Vector3 delta = dataHand.PalmPosition - physicsHand.transform.position;
 
@@ -635,7 +642,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             leapHand.WristPosition = physicsHand.transform.position - (physicsHand.transform.rotation * Quaternion.Inverse(originalHand.Rotation) * (originalHand.PalmPosition - originalHand.WristPosition));
 
-            leapHand.Arm.PrevJoint = Vector3.Lerp(physicsHand.elbowPosition, originalHand.Arm.PrevJoint, Mathf.Lerp(1.0f, 0.1f, physicsHand.currentPalmWeight));
+            leapHand.Arm.PrevJoint = Vector3.Lerp(physicsHand.elbowPosition, leapHand.WristPosition + (-originalHand.Arm.Length * originalHand.Arm.Direction), Mathf.Lerp(1.0f, 0.1f, physicsHand.currentPalmWeight));
             leapHand.Arm.NextJoint = leapHand.WristPosition;
             leapHand.Arm.Center = (leapHand.Arm.PrevJoint + leapHand.Arm.NextJoint) / 2f;
             leapHand.Arm.Length = Vector3.Distance(leapHand.Arm.PrevJoint, leapHand.Arm.NextJoint);

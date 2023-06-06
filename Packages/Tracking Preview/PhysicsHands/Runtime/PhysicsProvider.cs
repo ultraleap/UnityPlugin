@@ -227,6 +227,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 _interactableLayers.Add(new SingleLayer() { layerIndex = 0 });
             }
 
+            if (_interHandCollisions)
+            {
+                _interactableLayers.Add(_handsLayer);
+            }
+
             _hoverMask = new LayerMask();
             _interactionMask = new LayerMask();
             for (int i = 0; i < _interactableLayers.Count; i++)
@@ -711,16 +716,16 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         private void UpdateHandStates()
         {
-            UpdateBoneStats(LeftHand);
-            UpdateBoneStats(RightHand);
-            FindHandState(LeftHand);
-            FindHandState(RightHand);
             if (LeftHand.IsTracked)
             {
+                UpdateBoneStats(LeftHand);
+                FindHandState(LeftHand);
                 LeftHand.LateFixedUpdate();
             }
             if (RightHand.IsTracked)
             {
+                UpdateBoneStats(RightHand);
+                FindHandState(RightHand);
                 RightHand.LateFixedUpdate();
             }
         }
