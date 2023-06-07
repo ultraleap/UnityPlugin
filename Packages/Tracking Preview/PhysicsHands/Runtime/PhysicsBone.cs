@@ -238,6 +238,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
             {
                 // Run a second test pointing forward a bit for the tip
                 CalculateJointDistance(position + transform.rotation * new Vector3(0, radius * .2f, height * .15f), Vector3.Lerp(upDirection, transform.forward, 0.6f), radius, height * 2f);
+                // Add a third one for pointing out from the tip to improve button detection
+                CalculateJointDistance(position + transform.rotation * new Vector3(0, radius * .2f, height * .15f), transform.forward, radius, height * 0.5f);
             }
 
             if (Joint > 0)

@@ -421,14 +421,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     int boneArrayIndex = fingerIndex * Hand.BONES + jointIndex;
                     ArticulationBody body = _physicsHand.jointBodies[boneArrayIndex];
 
-                    if (_graspingFingers[fingerIndex] != -1)
-                    {
-                        _fingerStiffness[fingerIndex] = Mathf.Lerp(_fingerStiffness[fingerIndex], _physicsHand.stiffness * 2f, Time.fixedDeltaTime * (1.0f / 0.1f));
-                    }
-                    else
-                    {
-                        _fingerStiffness[fingerIndex] = Mathf.Lerp(_fingerStiffness[fingerIndex], _physicsHand.stiffness, Time.fixedDeltaTime * (1.0f / 0.1f));
-                    }
+                    _fingerStiffness[fingerIndex] = Mathf.Lerp(_fingerStiffness[fingerIndex], _physicsHand.stiffness, Time.fixedDeltaTime * (1.0f / 0.1f));
 
                     // Hand physicsBone resizing, done very slowly during movement.
                     // Initial resizing is very fast (while the user is bringing their hand into the frame).
@@ -521,8 +514,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 for (int jointIndex = Hand.BONES - 1; jointIndex >= 0; jointIndex--)
                 {
                     int boneArrayIndex = fingerIndex * Hand.BONES + jointIndex;
-
-                    Bone bone = _originalLeapHand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex + 1));
 
                     if (_physicsHand.jointBodies[boneArrayIndex].jointPosition.dofCount > 0)
                     {
