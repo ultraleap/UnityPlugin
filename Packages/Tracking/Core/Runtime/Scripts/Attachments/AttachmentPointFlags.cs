@@ -44,7 +44,9 @@ namespace Leap.Unity.Attachments
         PinkyKnuckle = 1 << 18,
         PinkyMiddleJoint = 1 << 19,
         PinkyDistalJoint = 1 << 20,
-        PinkyTip = 1 << 21
+        PinkyTip = 1 << 21,
+        
+        PinchPoint = 1 << 22
     }
 
     public static class AttachmentPointFlagsExtensions
