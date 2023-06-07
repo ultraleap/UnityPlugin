@@ -68,7 +68,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private float _stiffness = 200f;
 
         public float PerBoneMass => _perBoneMass;
-        [SerializeField, Tooltip("The mass of each finger bone; the palm will be 3x this.")]
+        [SerializeField, Tooltip("The mass of each finger bone; the palm will be 3x this. It is not recommended to modify this too far from the default (0.1)."), Range(0.01f, 0.25f)]
         private float _perBoneMass = 0.1f;
 
         public float HandTeleportDistance => _handTeleportDistance;
