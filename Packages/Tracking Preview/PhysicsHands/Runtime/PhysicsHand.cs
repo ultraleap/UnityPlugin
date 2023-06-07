@@ -51,23 +51,28 @@ namespace Leap.Unity.Interaction.PhysicsHands
             public float minimumPalmAngularVelocity = MINIMUM_PALM_ANGULAR_VELOCITY;
 
             [HideInInspector]
-            public float currentPalmVelocity = MAXIMUM_PALM_VELOCITY, currentPalmAngularVelocity = MAXIMUM_PALM_ANGULAR_VELOCITY;
+            internal float currentPalmVelocity = MAXIMUM_PALM_VELOCITY, currentPalmAngularVelocity = MAXIMUM_PALM_ANGULAR_VELOCITY;
             [HideInInspector]
-            public float currentPalmVelocityInterp = 0f;
+            internal float currentPalmVelocityInterp = 0f;
             [HideInInspector]
-            public float currentPalmWeightInterp = 0f, currentPalmWeight = 0f;
+            internal float currentPalmWeightInterp = 0f, currentPalmWeight = 0f;
 
             [HideInInspector]
-            public Vector3 oldPosition;
+            internal Vector3 oldPosition;
             public GameObject gameObject, rootObject;
             [HideInInspector]
-            public Vector3 previousDataPosition, computedPhysicsPosition;
+            internal Vector3 previousDataPosition, computedPhysicsPosition;
+            /// <summary>
+            /// Non-normalized
+            /// </summary>
             [HideInInspector]
-            public Vector3 elbowPosition;
+            internal Vector3 oldDistanceDirection, computedDistanceDirection;
             [HideInInspector]
-            public float computedHandDistance;
+            internal Vector3 elbowPosition;
             [HideInInspector]
-            public Quaternion previousDataRotation, computedPhysicsRotation;
+            internal float computedHandDistance;
+            [HideInInspector]
+            internal Quaternion previousDataRotation, computedPhysicsRotation;
             public Transform transform;
 
             public PhysicsBone palmBone;
@@ -78,19 +83,19 @@ namespace Leap.Unity.Interaction.PhysicsHands
             public ArticulationBody[] jointBodies;
             public CapsuleCollider[] jointColliders;
             [HideInInspector]
-            public int[] overRotationFrameCount;
+            internal int[] overRotationFrameCount;
 
             [HideInInspector]
-            public Quaternion[] defaultRotations;
+            internal Quaternion[] defaultRotations;
 
             [HideInInspector]
-            public bool justGhosted = false;
+            internal bool justGhosted = false;
 
             public float stiffness, forceLimit;
             public float boneMass;
 
             [HideInInspector]
-            public PhysicMaterial physicMaterial;
+            internal PhysicMaterial physicMaterial;
         }
 
         private PhysicsProvider _physicsProvider;
@@ -157,8 +162,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private int _resetWait = 0;
         private int _teleportFrameCount = 0;
         private Collider[] _colliderCache = new Collider[10];
-
-        private Vector3 _originalOldPosition = Vector3.zero;
 
         private int[] _graspingFingers = new int[5], _graspingFrames = new int[Hand.BONES * Hand.FINGERS];
         private bool[] _wasGraspingBones = new bool[Hand.BONES * Hand.FINGERS];
@@ -645,7 +648,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private void CachePositions()
         {
             _physicsHand.oldPosition = _physicsHand.transform.position;
-            _originalOldPosition = _originalLeapHand.PalmPosition;
             _physicsHand.previousDataPosition = _originalLeapHand.PalmPosition;
             _physicsHand.previousDataRotation = _originalLeapHand.Rotation;
         }
@@ -718,7 +720,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         {
             _physicsHand.justGhosted = false;
             // Fix the hand if it gets into a bad situation by teleporting and holding in place until its bad velocities disappear
-            if (Vector3.Distance(_originalOldPosition, _originalLeapHand.PalmPosition) > _physicsProvider.HandTeleportDistance ||
+            if (Vector3.Distance(_physicsHand.oldPosition, _originalLeapHand.PalmPosition) > _physicsProvider.HandTeleportDistance ||
                 bonesAreOverRotated ||
                 DistanceFromDataHand > _physicsProvider.HandTeleportDistance && (IsGrasping ||
                 IsCloseToObject))

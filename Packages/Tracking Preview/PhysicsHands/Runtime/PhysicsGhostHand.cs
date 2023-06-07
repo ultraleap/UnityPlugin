@@ -45,6 +45,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 {
                     val = _physicsHand.DistanceFromDataHand;
                 }
+                float contactDisplacement = Mathf.InverseLerp(0.8f, 20f, _physicsHand.FingerContactDisplacement);
+                if (val < contactDisplacement)
+                {
+                    val = contactDisplacement;
+                }
                 if (val < _minimumDistance)
                 {
                     val = 0;
