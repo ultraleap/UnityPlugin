@@ -533,7 +533,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 physicsHand.currentPalmVelocityInterp = 0f;
             }
 
-            if (isGrasping || fingerDisplacement > 1f)
+            if (isGrasping || fingerDisplacement > 0.8f)
             {
                 // Reduce the overall delta amount when the weight is heigher
                 if (isGrasping)
@@ -542,7 +542,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 }
                 else
                 {
-                    physicsHand.currentPalmWeightInterp = Mathf.InverseLerp(1f, 12f, fingerDisplacement).EaseOut();
+                    physicsHand.currentPalmWeightInterp = Mathf.InverseLerp(0.8f, 10f, fingerDisplacement).EaseOut();
                 }
             }
             else
@@ -550,7 +550,14 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 physicsHand.currentPalmWeightInterp = 0f;
             }
 
-            physicsHand.currentPalmWeight = Mathf.Lerp(physicsHand.currentPalmWeight, physicsHand.currentPalmWeightInterp, Time.fixedDeltaTime * (1.0f / 0.05f));
+            if(physicsHand.currentPalmWeightInterp > physicsHand.currentPalmWeight)
+            {
+                physicsHand.currentPalmWeight = physicsHand.currentPalmWeightInterp;
+            }
+            else
+            {
+                physicsHand.currentPalmWeight = Mathf.Lerp(physicsHand.currentPalmWeight, physicsHand.currentPalmWeightInterp, Time.fixedDeltaTime * (1.0f / 0.1f));
+            }
 
             Vector3 delta = dataHand.PalmPosition - physicsHand.transform.position;
 
