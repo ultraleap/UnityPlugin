@@ -39,7 +39,7 @@ namespace Leap.Unity.Attachments
             EditorGUILayout.LabelField("Attachment Transforms", EditorStyles.boldLabel);
 
             // Determine whether the target object is a prefab. AttachmentPoints cannot be edited on prefabs.
-            var isTargetPrefab = Utils.IsObjectPartOfPrefabAsset(target.gameObject);
+            var isTargetPrefab = Leap.Unity.Utils.IsObjectPartOfPrefabAsset(target.gameObject);
 
             if (isTargetPrefab)
             {
