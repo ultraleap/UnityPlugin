@@ -48,18 +48,6 @@ namespace Leap.Unity
         static internal string id { get; private set; }
         static LeapXRHandProvider() => id = "UL XR Hands";
 
-        // This method registers the subsystem descriptor with the SubsystemManager
-        //[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-        //static void RegisterDescriptor()
-        //{
-        //    var handsSubsystemCinfo = new XRHandSubsystemDescriptor.Cinfo
-        //    {
-        //        id = id,
-        //        providerType = typeof(LeapXRHandProvider)
-        //        //subsystemTypeOverride = typeof(LeapHandSubsystem)
-        //    };
-        //    XRHandSubsystemDescriptor.Register(handsSubsystemCinfo);
-        //}
 
         public override XRHandSubsystem.UpdateSuccessFlags TryUpdateHands(
             XRHandSubsystem.UpdateType updateType, 

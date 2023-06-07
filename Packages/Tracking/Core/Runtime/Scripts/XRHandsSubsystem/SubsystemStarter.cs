@@ -11,17 +11,29 @@ namespace Leap.Unity
     {
         static XRHandSubsystem m_Subsystem = null;
         static XRHandProviderUtility.SubsystemUpdater updater = null;
+        static GameObject leapProviderGO = null;
+
+        static UltraleapSettings ultraleapSettings;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void RunAfterSceneLoad()
         {
+            UltraleapSettings.enableUltraleapSubsystem += RunAfterSceneLoad;
+            UltraleapSettings.disableUltraleapSubsystem += OnQuit;
+            ultraleapSettings = FindSettingsSO();
+
+            if (ultraleapSettings.LeapSubsystemEnabled == false)
+            {
+                return;
+            }
+            
             Application.quitting += OnQuit;
             LeapProvider leapProvider = Hands.Provider;
             XRHandSubsystemProvider subsystemProvider = null;
 
             if(leapProvider == null)
             {
-                GameObject leapProviderGO = new GameObject("LeapXRServiceProvider");
+                leapProviderGO = new GameObject("LeapXRServiceProvider");
                 leapProvider = (LeapProvider)leapProviderGO.AddComponent<LeapXRServiceProvider>();
                 GameObject.DontDestroyOnLoad(leapProviderGO);
             }
@@ -58,7 +70,16 @@ namespace Leap.Unity
                 m_Subsystem.Stop();
                 updater.Stop();
                 m_Subsystem.Destroy();
+                GameObject.Destroy(leapProviderGO);
             }
+            UltraleapSettings.disableUltraleapSubsystem -= OnQuit;
+        }
+
+        private static UltraleapSettings FindSettingsSO()
+        {
+            var settingsSO = Resources.FindObjectsOfTypeAll(typeof(UltraleapSettings))as UltraleapSettings[];
+            
+            return settingsSO[0];
         }
     }
 }
