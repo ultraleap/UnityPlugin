@@ -308,7 +308,7 @@ namespace Leap.Unity.Geometry
 
         public static Vector3 GetPerpendicular(this Vector3 v)
         {
-            return Utils.Perpendicular(v);
+            return Leap.Unity.Utils.Perpendicular(v);
         }
 
     }

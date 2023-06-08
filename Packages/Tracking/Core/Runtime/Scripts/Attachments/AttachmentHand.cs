@@ -265,7 +265,7 @@ namespace Leap.Unity.Attachments
         private void initializeAttachmentPointFlagConstants()
         {
             Array flagConstants = Enum.GetValues(typeof(AttachmentPointFlags));
-            if (_attachmentPointFlagConstants == null || _attachmentPointFlagConstants.Length == 0 
+            if (_attachmentPointFlagConstants == null || _attachmentPointFlagConstants.Length == 0
                 || _attachmentPointFlagConstants.Length != flagConstants.Length)
             {
                 _attachmentPointFlagConstants = new AttachmentPointFlags[flagConstants.Length];

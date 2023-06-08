@@ -1276,7 +1276,7 @@ namespace Leap.Unity
             return null;
         }
 
-        /// <summary> Returns the first child whose name includes the 'withName' argument string. Optionally pass caseSensitive: false to ignore case. Children are scanned deeply using Utils.GetAllChildren. If no such child exists, returns null. </summary>
+        /// <summary> Returns the first child whose name includes the 'withName' argument string. Optionally pass caseSensitive: false to ignore case. Children are scanned deeply using Leap.Unity.Utils.GetAllChildren. If no such child exists, returns null. </summary>
         public static Transform FindChild(this Transform t, string withName,
           bool caseSensitive = true)
         {
@@ -1691,7 +1691,7 @@ namespace Leap.Unity
         /// Fills the provided bytes buffer starting at the offset with a compressed form
         /// of the argument quaternion. The offset is also shifted by 4 bytes.
         /// 
-        /// Use Utils.DecompressBytesToQuat to decode this representation. This encoding ONLY
+        /// Use Leap.Unity.Utils.DecompressBytesToQuat to decode this representation. This encoding ONLY
         /// works with normalized Quaternions, taking advantage of the fact that their
         /// components sum to 1 to only encode three of Quaternion components. As a result,
         /// this method encodes a Quaternion as a single unsigned integer (4 bytes).
@@ -1771,10 +1771,10 @@ namespace Leap.Unity
 
         /// <summary>
         /// Reads 4 bytes from the argument bytes array (starting at the provided offset) and
-        /// returns a Quaternion as encoded by the Utils.CompressedQuatToBytes function. Also
+        /// returns a Quaternion as encoded by the Leap.Unity.Utils.CompressedQuatToBytes function. Also
         /// increments the provided offset by 4.
         /// 
-        /// See the Utils.CompressedQuatToBytes documentation for more details on the
+        /// See the Leap.Unity.Utils.CompressedQuatToBytes documentation for more details on the
         /// byte representation this method expects.
         /// 
         /// Sources:

@@ -72,7 +72,7 @@ namespace Leap.Unity.Query
             try
             {
                 int value = from;
-                int sign = Utils.Sign(to - from);
+                int sign = Leap.Unity.Utils.Sign(to - from);
 
                 if (sign != 0)
                 {
