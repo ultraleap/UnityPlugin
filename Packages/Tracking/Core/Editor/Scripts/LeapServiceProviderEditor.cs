@@ -35,6 +35,7 @@ namespace Leap.Unity
                                         (int)LeapServiceProvider.InteractionVolumeVisualization.StereoIR170,
                                         (int)LeapServiceProvider.InteractionVolumeVisualization.Device_3Di,
                                         (int)LeapServiceProvider.InteractionVolumeVisualization.LeapMotionController,
+                                        (int)LeapServiceProvider.InteractionVolumeVisualization.LeapMotionController2,
                                         (int)LeapServiceProvider.InteractionVolumeVisualization.Automatic},
                                         "FOV_Visualization",
                                         "OptimalFOV_Visualization",
@@ -65,6 +66,9 @@ namespace Leap.Unity
             deferProperty("_serverNameSpace");
             deferProperty("_useInterpolation");
 
+            deferProperty("_reconnectionAttempts");
+            deferProperty("_reconnectionInterval");
+
             if (!(LeapServiceProvider is LeapXRServiceProvider))
             {
                 addPropertyToFoldout("_trackingOptimization", "Advanced Options");
@@ -75,6 +79,9 @@ namespace Leap.Unity
             }
             addPropertyToFoldout("_useInterpolation", "Advanced Options");
             addPropertyToFoldout("_serverNameSpace", "Advanced Options");
+
+            addPropertyToFoldout("_reconnectionAttempts", "Advanced Options");
+            addPropertyToFoldout("_reconnectionInterval", "Advanced Options");
         }
 
         private void frameOptimizationWarning(SerializedProperty property)

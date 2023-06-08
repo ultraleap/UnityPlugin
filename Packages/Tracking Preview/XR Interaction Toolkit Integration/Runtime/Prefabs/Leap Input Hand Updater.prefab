@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5545121022949003465}
   - component: {fileID: 5545121022949003466}
+  - component: {fileID: 8359501322337553428}
   - component: {fileID: 1874119050}
   m_Layer: 0
   m_Name: Leap Input Hand Updater
@@ -48,10 +49,23 @@ MonoBehaviour:
   _inputLeapProvider: {fileID: 0}
   dataUpdateMode: 2
   passthroughOnly: 0
-  directionSource: 1
-  isPinchingIsBinary: 1
-  isGrabbingIsBinary: 1
+  pinchingIsBinary: 1
+  grabbingIsBinary: 1
   resetInteractionsOnTrackingLost: 1
+--- !u!114 &8359501322337553428
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5545121022949003467}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 017c5e3933235514c9520e1dace2a4b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_ActionAssets:
+  - {fileID: -944628639613478452, guid: 43529326aef197244a5478dec3e6bc58, type: 3}
 --- !u!114 &1874119050
 MonoBehaviour:
   m_ObjectHideFlags: 0

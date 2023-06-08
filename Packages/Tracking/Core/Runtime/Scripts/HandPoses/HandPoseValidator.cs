@@ -90,8 +90,8 @@ public class HandPoseValidator : MonoBehaviour
 
         if (colourCapsuleHand != null)
         {
-            Utils.Fill(leftCapsuleHandColours, Color.grey);
-            Utils.Fill(rightCapsuleHandColours, Color.grey);
+            Leap.Unity.Utils.Fill(leftCapsuleHandColours, Color.grey);
+            Leap.Unity.Utils.Fill(rightCapsuleHandColours, Color.grey);
         }
 
         if (storedValidationHands.Count > 0)

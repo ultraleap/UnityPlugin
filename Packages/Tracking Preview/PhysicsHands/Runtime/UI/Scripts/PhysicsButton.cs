@@ -278,7 +278,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             {
                 _buttonElement.transform.localRotation = Quaternion.identity;
             }
-            if(_buttonElement.transform.lossyScale != _elementScale)
+            if (_buttonElement.transform.lossyScale != _elementScale)
             {
                 _elementScale = _buttonElement.transform.lossyScale;
                 SetupButton();

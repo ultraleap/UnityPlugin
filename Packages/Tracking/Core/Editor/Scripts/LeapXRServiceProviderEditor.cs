@@ -85,6 +85,12 @@ namespace Leap.Unity
             {
                 targetTransform.hideFlags = HideFlags.NotEditable;
             }
+
+            // Ensure the default values are up to date by re-firing the property setter
+            if ((target as LeapXRServiceProvider).deviceOffsetMode == LeapXRServiceProvider.DeviceOffsetMode.Default)
+            {
+                (target as LeapXRServiceProvider).deviceOffsetMode = LeapXRServiceProvider.DeviceOffsetMode.Default;
+            }
         }
 
         void OnDisable()
@@ -100,27 +106,5 @@ namespace Leap.Unity
             property.enumValueIndex = EditorGUILayout.Popup("Edit Time Pose", property.enumValueIndex, testHandPoses);
             serializedObject.ApplyModifiedProperties();
         }
-
-
-        private void decorateAllowManualTimeAlignment(SerializedProperty property)
-        {
-            bool pcOrAndroidPlatformDetected = false;
-            string targetPlatform = "";
-#if UNITY_STANDALONE
-            pcOrAndroidPlatformDetected = true;
-            targetPlatform = "Standalone (Desktop)";
-#elif UNITY_ANDROID
-      pcOrAndroidPlatformDetected = true;
-      targetPlatform = "Android";
-#endif
-
-            if (pcOrAndroidPlatformDetected && property.boolValue)
-            {
-                EditorGUILayout.HelpBox(targetPlatform + " target platform detected; "
-                                      + "manual time alignment should not be enabled under most "
-                                      + "circumstances.", MessageType.Warning);
-            }
-        }
-
     }
 }

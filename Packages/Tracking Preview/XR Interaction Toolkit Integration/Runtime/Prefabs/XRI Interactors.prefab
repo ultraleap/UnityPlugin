@@ -75,7 +75,7 @@ MonoBehaviour:
         m_Action: Position
         m_Flags: 0
       m_Flags: 0
-    m_Reference: {fileID: 8424129750792309494, guid: 43529326aef197244a5478dec3e6bc58, type: 3}
+    m_Reference: {fileID: 7245291478317504281, guid: 43529326aef197244a5478dec3e6bc58, type: 3}
   m_RotationAction:
     m_UseReference: 1
     m_Action:
@@ -87,7 +87,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: -5190532815677689992, guid: 43529326aef197244a5478dec3e6bc58, type: 3}
+    m_Reference: {fileID: 6938756744090288918, guid: 43529326aef197244a5478dec3e6bc58, type: 3}
   m_TrackingStateAction:
     m_UseReference: 1
     m_Action:
@@ -119,7 +119,7 @@ MonoBehaviour:
         m_Action: Select
         m_Flags: 0
       m_Flags: 0
-    m_Reference: {fileID: 5823378087187910516, guid: 43529326aef197244a5478dec3e6bc58, type: 3}
+    m_Reference: {fileID: 9206376294463382644, guid: 43529326aef197244a5478dec3e6bc58, type: 3}
   m_SelectActionValue:
     m_UseReference: 0
     m_Action:
@@ -167,7 +167,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: 9206376294463382644, guid: 43529326aef197244a5478dec3e6bc58, type: 3}
+    m_Reference: {fileID: 5823378087187910516, guid: 43529326aef197244a5478dec3e6bc58, type: 3}
   m_UIPressActionValue:
     m_UseReference: 0
     m_Action:
@@ -249,6 +249,7 @@ MonoBehaviour:
     m_Bits: 4294967295
   m_AttachTransform: {fileID: 0}
   m_KeepSelectedTargetValid: 1
+  m_DisableVisualsWhenBlockedInGroup: 1
   m_StartingSelectedInteractable: {fileID: 0}
   m_StartingTargetFilter: {fileID: 0}
   m_HoverEntered:
@@ -333,9 +334,12 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   m_RaycastTriggerInteraction: 1
+  m_RaycastSnapVolumeInteraction: 1
   m_HitClosestOnly: 1
   m_HoverToSelect: 0
   m_HoverTimeToSelect: 0.5
+  m_AutoDeselect: 0
+  m_TimeToAutoDeselect: 3
   m_EnableUIInteraction: 1
   m_AllowAnchorControl: 1
   m_UseForceGrab: 1
@@ -575,6 +579,7 @@ MonoBehaviour:
   m_BlockedReticle: {fileID: 0}
   m_StopLineAtFirstRaycastHit: 1
   m_StopLineAtSelection: 0
+  m_SnapEndpointIfAvailable: 1
 --- !u!210 &7966239816980486236
 SortingGroup:
   m_ObjectHideFlags: 0
@@ -687,7 +692,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: -1514684639673722297, guid: 43529326aef197244a5478dec3e6bc58, type: 3}
+    m_Reference: {fileID: 2422188697211618174, guid: 43529326aef197244a5478dec3e6bc58, type: 3}
   m_SelectActionValue:
     m_UseReference: 0
     m_Action:
@@ -830,6 +835,7 @@ MonoBehaviour:
     m_Bits: 4294967295
   m_AttachTransform: {fileID: 0}
   m_KeepSelectedTargetValid: 1
+  m_DisableVisualsWhenBlockedInGroup: 1
   m_StartingSelectedInteractable: {fileID: 0}
   m_StartingTargetFilter: {fileID: 0}
   m_HoverEntered:
@@ -947,7 +953,13 @@ MonoBehaviour:
 
 
     Also includes the default XRI Manager with an InputActionManager
-    that references the Leap Hand Inputs as required to update custom Input Actions'
+    that references the Leap Hand Inputs as required to update custom Input Actions
+
+
+
+    Note:
+    You can change which hands control which interactors by enabling/disabling the
+    child objects of this prefab'
   _isEditing: 0
 --- !u!1 &7966239817490327360
 GameObject:
@@ -1024,7 +1036,7 @@ MonoBehaviour:
         m_Action: Position
         m_Flags: 0
       m_Flags: 0
-    m_Reference: {fileID: -1681823941901610492, guid: 43529326aef197244a5478dec3e6bc58, type: 3}
+    m_Reference: {fileID: -1396786411287998518, guid: 43529326aef197244a5478dec3e6bc58, type: 3}
   m_RotationAction:
     m_UseReference: 1
     m_Action:
@@ -1036,7 +1048,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: -2837424121112801464, guid: 43529326aef197244a5478dec3e6bc58, type: 3}
+    m_Reference: {fileID: 6027191166583851058, guid: 43529326aef197244a5478dec3e6bc58, type: 3}
   m_TrackingStateAction:
     m_UseReference: 1
     m_Action:
@@ -1068,7 +1080,7 @@ MonoBehaviour:
         m_Action: Select
         m_Flags: 0
       m_Flags: 0
-    m_Reference: {fileID: -1514684639673722297, guid: 43529326aef197244a5478dec3e6bc58, type: 3}
+    m_Reference: {fileID: 2422188697211618174, guid: 43529326aef197244a5478dec3e6bc58, type: 3}
   m_SelectActionValue:
     m_UseReference: 0
     m_Action:
@@ -1116,7 +1128,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: 2422188697211618174, guid: 43529326aef197244a5478dec3e6bc58, type: 3}
+    m_Reference: {fileID: -1514684639673722297, guid: 43529326aef197244a5478dec3e6bc58, type: 3}
   m_UIPressActionValue:
     m_UseReference: 0
     m_Action:
@@ -1198,6 +1210,7 @@ MonoBehaviour:
     m_Bits: 4294967295
   m_AttachTransform: {fileID: 0}
   m_KeepSelectedTargetValid: 1
+  m_DisableVisualsWhenBlockedInGroup: 1
   m_StartingSelectedInteractable: {fileID: 0}
   m_StartingTargetFilter: {fileID: 0}
   m_HoverEntered:
@@ -1282,9 +1295,12 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   m_RaycastTriggerInteraction: 1
+  m_RaycastSnapVolumeInteraction: 1
   m_HitClosestOnly: 1
   m_HoverToSelect: 0
   m_HoverTimeToSelect: 0.5
+  m_AutoDeselect: 0
+  m_TimeToAutoDeselect: 3
   m_EnableUIInteraction: 1
   m_AllowAnchorControl: 1
   m_UseForceGrab: 1
@@ -1524,6 +1540,7 @@ MonoBehaviour:
   m_BlockedReticle: {fileID: 0}
   m_StopLineAtFirstRaycastHit: 1
   m_StopLineAtSelection: 0
+  m_SnapEndpointIfAvailable: 1
 --- !u!210 &7966239817490327361
 SortingGroup:
   m_ObjectHideFlags: 0
@@ -1545,7 +1562,6 @@ GameObject:
   m_Component:
   - component: {fileID: 7966239817583637820}
   - component: {fileID: 7966239817583637819}
-  - component: {fileID: 7966239817583637821}
   m_Layer: 0
   m_Name: XR Interaction Manager
   m_TagString: Untagged
@@ -1581,20 +1597,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_StartingHoverFilters: []
   m_StartingSelectFilters: []
---- !u!114 &7966239817583637821
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7966239817583637818}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 017c5e3933235514c9520e1dace2a4b2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_ActionAssets:
-  - {fileID: -944628639613478452, guid: 43529326aef197244a5478dec3e6bc58, type: 3}
 --- !u!1 &7966239818524277702
 GameObject:
   m_ObjectHideFlags: 0
@@ -1696,7 +1698,7 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
-    m_Reference: {fileID: 5823378087187910516, guid: 43529326aef197244a5478dec3e6bc58, type: 3}
+    m_Reference: {fileID: 9206376294463382644, guid: 43529326aef197244a5478dec3e6bc58, type: 3}
   m_SelectActionValue:
     m_UseReference: 0
     m_Action:
@@ -1839,6 +1841,7 @@ MonoBehaviour:
     m_Bits: 4294967295
   m_AttachTransform: {fileID: 0}
   m_KeepSelectedTargetValid: 1
+  m_DisableVisualsWhenBlockedInGroup: 1
   m_StartingSelectedInteractable: {fileID: 0}
   m_StartingTargetFilter: {fileID: 0}
   m_HoverEntered:

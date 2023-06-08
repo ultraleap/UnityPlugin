@@ -257,8 +257,8 @@ namespace Leap.Unity.Interaction
                + "towards a nearby InteractionHand? Value is in Unity distance units, WORLD space.")]
         public float maxAttractionReach = 0.1F;
 
-        [Tooltip("If the object is attracted to hands, how fast should the object move towards the hand? Higher values are faster. " 
-                +"This speed is multiplied by deltaTime.")]
+        [Tooltip("If the object is attracted to hands, how fast should the object move towards the hand? Higher values are faster. "
+                + "This speed is multiplied by deltaTime.")]
         [Range(0, 100F)]
         public float anchorHandAttractionRate = 5.0f;
 
@@ -713,7 +713,7 @@ namespace Leap.Unity.Interaction
             float directedness = anchObjVel.magnitude.Map(0.20F, 1F, 0F, 1F);
 
             float effMaxDistance = directedness.Map(0F, 1F, nonDirectedMaxDistance, maxDistance);
-            Vector3 effPos = Utils.Map(Mathf.Sqrt(Mathf.Sqrt(directedness)), 0f, 1f,
+            Vector3 effPos = Leap.Unity.Utils.Map(Mathf.Sqrt(Mathf.Sqrt(directedness)), 0f, 1f,
                                        anchObjPos, (anchObjPos - anchObjVel.normalized * effMaxDistance * 0.30f));
 
             float distanceSqrd = (anchorPos - effPos).sqrMagnitude;

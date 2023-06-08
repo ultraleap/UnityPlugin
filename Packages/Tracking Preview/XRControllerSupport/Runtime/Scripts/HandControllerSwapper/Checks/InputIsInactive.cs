@@ -18,7 +18,7 @@ namespace Leap.Unity.Controllers
             switch (inputMethodType)
             {
                 case InputMethodType.LeapHand:
-                    return _provider.Get(hand) == null;
+                    return _provider.GetHand(hand) == null;
                 case InputMethodType.XRController:
                     return !GetController();
             }
