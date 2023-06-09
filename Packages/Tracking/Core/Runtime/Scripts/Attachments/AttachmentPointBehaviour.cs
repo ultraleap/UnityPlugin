@@ -181,8 +181,11 @@ namespace Leap.Unity.Attachments
                     position = hand.Fingers[4].bones[3].NextJoint;
                     rotation = hand.Fingers[4].bones[3].Rotation;
                     break;
+                case AttachmentPointFlags.PinchPoint:
+                    position = hand.GetPredictedPinchPosition();
+                    rotation = Quaternion.LookRotation(position - hand.Fingers[1].Bone(Bone.BoneType.TYPE_PROXIMAL).PrevJoint);
+                    break;
             }
         }
-
     }
 }
