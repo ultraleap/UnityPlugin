@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.Hands;
@@ -13,12 +12,17 @@ namespace Leap.Unity
         static XRHandProviderUtility.SubsystemUpdater updater = null;
         static GameObject leapProviderGO = null;
 
-        static UltraleapSettings ultraleapSettings;
-
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void RunAfterSceneLoad()
         {
-            ultraleapSettings = FindSettingsSO();
+            UltraleapSettings ultraleapSettings = null;
+            ultraleapSettings = UltraleapSettings.FindSettingsSO();
+            if (ultraleapSettings == null)
+            {
+                Debug.Log("There is no Ultraleap Settings object in the package. Subsystem will not be used.");
+                return;
+            }
+
             if (ultraleapSettings.LeapSubsystemEnabled == false)
             {
                 return;
@@ -73,11 +77,6 @@ namespace Leap.Unity
             UltraleapSettings.disableUltraleapSubsystem -= OnQuit;
         }
 
-        private static UltraleapSettings FindSettingsSO()
-        {
-            UltraleapSettings[] settingsSO = Resources.FindObjectsOfTypeAll(typeof(UltraleapSettings))as UltraleapSettings[];
-            
-            return settingsSO[0]; // Assume there is only one settings file
-        }
+        
     }
 }

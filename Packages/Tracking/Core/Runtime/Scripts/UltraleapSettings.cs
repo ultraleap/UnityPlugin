@@ -1,11 +1,6 @@
-
 using System;
-using System.Collections.Generic;
-
 using UnityEngine;
-
 using UnityEditor;
-
 namespace Leap.Unity
 {
 
@@ -28,20 +23,27 @@ namespace Leap.Unity
             
             var readOnlyText = new GUIStyle(EditorStyles.textField);
             readOnlyText.wordWrap = true;
-            EditorGUILayout.HelpBox("The Leap subsystem should be used when not using OpenXR for hand tracking inputs." +
-                "\n \n This cannot be toggled during runtime.", MessageType.Info, true); ;
+            EditorGUILayout.HelpBox("The Leap XRHands Subsystem passes hand input directly from the Leap Service to XRHands. " +
+                "If you are using OpenXR for hand input, do not enable this option. " +
+                "Instead, use the Hand Tracking Subsystem option in the OpenXR XR Plug-in Management settings." +
+                "\r\n\nThis option can not be toggled at runtime.", MessageType.Info, true); ;
             
             var settingsTarget = target as UltraleapSettings;
             bool editorBool = settingsTarget.LeapSubsystemEnabled;
-            EditorGUILayout.BeginHorizontal();
             settingsTarget.LeapSubsystemEnabled = EditorGUILayout.ToggleLeft("Enable the leap subsystem ", editorBool);
-            EditorGUILayout.EndHorizontal();
             EditorGUILayout.EndVertical();
+
+            EditorGUILayout.Space(30);
+            if(GUILayout.Button("Reset To Defaults"))
+            {
+                if(EditorUtility.DisplayDialog("Reset all settings", "This will reset all settings in this Ultraleap settings file", "Yes", "No"))
+                {
+                    settingsTarget.ResetToDefaults();
+                }
+            }
         }
     }
 
-
-    //[CreateAssetMenu(menuName = "Ultraleap/Settings/PluginSettings")]  /// comment out so the user cannot create these but may be needed for development
     public class UltraleapSettings : ScriptableObject
     {
         public static event Action enableUltraleapSubsystem;
@@ -67,6 +69,44 @@ namespace Leap.Unity
                         enableUltraleapSubsystem?.Invoke();
                     }
                 }
+            }
+        }
+
+        public void ResetToDefaults()
+        {
+            LeapSubsystemEnabled = false;
+        }
+
+        [MenuItem("Ultraleap/Open Ultraleap Settings")]
+        private static void SelectSceneReadmeDropdown()
+        {
+            SelectSceneReadme();
+        }
+
+        private static void SelectSceneReadme(bool silent = false)
+        {
+            UltraleapSettings ulSettings = FindSettingsSO();
+            if (ulSettings != null)
+            {
+                Selection.activeObject = ulSettings;
+            }
+            else
+            {
+                EditorUtility.DisplayDialog("No ultraleap settings file", "There is no settings file available, please try re-importing the plugin.", "Ok");
+            }
+
+        }
+
+        public static UltraleapSettings FindSettingsSO()
+        {
+            UltraleapSettings[] settingsSO = Resources.FindObjectsOfTypeAll(typeof(UltraleapSettings)) as UltraleapSettings[];
+            if (settingsSO[0] != null)
+            {
+                return settingsSO[0]; // Assume there is only one settings file
+            }
+            else
+            {
+                return null;
             }
         }
     }
