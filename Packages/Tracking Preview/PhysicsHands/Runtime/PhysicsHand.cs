@@ -62,11 +62,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
             public GameObject gameObject, rootObject;
             [HideInInspector]
             internal Vector3 previousDataPosition, computedPhysicsPosition;
-            /// <summary>
-            /// Non-normalized
-            /// </summary>
-            [HideInInspector]
-            internal Vector3 oldDistanceDirection, computedDistanceDirection;
             [HideInInspector]
             internal Vector3 elbowPosition;
             [HideInInspector]
