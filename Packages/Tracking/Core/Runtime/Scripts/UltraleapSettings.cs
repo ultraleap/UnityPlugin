@@ -18,7 +18,6 @@ namespace Leap.Unity
             base.OnInspectorGUI();
 
             LeapSubSystemSection();
-        
         }
 
         private void LeapSubSystemSection()
@@ -29,17 +28,20 @@ namespace Leap.Unity
             
             var readOnlyText = new GUIStyle(EditorStyles.textField);
             readOnlyText.wordWrap = true;
-            EditorGUILayout.LabelField("The Leap subsystem should be used when you do not want to use OpenXR for hand tracking inputs.", readOnlyText);
+            EditorGUILayout.HelpBox("The Leap subsystem should be used when not using OpenXR for hand tracking inputs." +
+                "\n \n This cannot be toggled during runtime.", MessageType.Info, true); ;
             
             var settingsTarget = target as UltraleapSettings;
             bool editorBool = settingsTarget.LeapSubsystemEnabled;
-            settingsTarget.LeapSubsystemEnabled = EditorGUILayout.Toggle("enable the leap subsystem ", editorBool);
+            EditorGUILayout.BeginHorizontal();
+            settingsTarget.LeapSubsystemEnabled = EditorGUILayout.ToggleLeft("Enable the leap subsystem ", editorBool);
+            EditorGUILayout.EndHorizontal();
             EditorGUILayout.EndVertical();
         }
     }
 
 
-    [CreateAssetMenu(menuName = "ScriptableObjects/Settings/PluginSettings")]
+    //[CreateAssetMenu(menuName = "Ultraleap/Settings/PluginSettings")]  /// comment out so the user cannot create these but may be needed for development
     public class UltraleapSettings : ScriptableObject
     {
         public static event Action enableUltraleapSubsystem;

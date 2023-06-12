@@ -18,15 +18,13 @@ namespace Leap.Unity
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void RunAfterSceneLoad()
         {
-            UltraleapSettings.enableUltraleapSubsystem += RunAfterSceneLoad;
-            UltraleapSettings.disableUltraleapSubsystem += OnQuit;
             ultraleapSettings = FindSettingsSO();
-
             if (ultraleapSettings.LeapSubsystemEnabled == false)
             {
                 return;
             }
-            
+            UltraleapSettings.enableUltraleapSubsystem += RunAfterSceneLoad;
+            UltraleapSettings.disableUltraleapSubsystem += OnQuit;
             Application.quitting += OnQuit;
             LeapProvider leapProvider = Hands.Provider;
             XRHandSubsystemProvider subsystemProvider = null;
@@ -77,9 +75,9 @@ namespace Leap.Unity
 
         private static UltraleapSettings FindSettingsSO()
         {
-            var settingsSO = Resources.FindObjectsOfTypeAll(typeof(UltraleapSettings))as UltraleapSettings[];
+            UltraleapSettings[] settingsSO = Resources.FindObjectsOfTypeAll(typeof(UltraleapSettings))as UltraleapSettings[];
             
-            return settingsSO[0];
+            return settingsSO[0]; // Assume there is only one settings file
         }
     }
 }
