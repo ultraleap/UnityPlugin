@@ -243,6 +243,7 @@ namespace Leap.Unity.Preview.Locomotion
                 {
                     _lastHighlightedAnchor.SetHighlighted(false);
                 }
+                handRayRenderer.SetValid(IsValid);
                 return;
             }
 
