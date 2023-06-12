@@ -1,9 +1,12 @@
 using System;
 using UnityEngine;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
+
 namespace Leap.Unity
 {
-
+#if UNITY_EDITOR
     [CustomEditor(typeof(UltraleapSettings))]
     public class UltraleapSettingsDrawer : Editor
     {
@@ -43,6 +46,7 @@ namespace Leap.Unity
             }
         }
     }
+#endif
 
     public class UltraleapSettings : ScriptableObject
     {
@@ -77,13 +81,14 @@ namespace Leap.Unity
             LeapSubsystemEnabled = false;
         }
 
+#if UNITY_EDITOR
         [MenuItem("Ultraleap/Open Ultraleap Settings")]
-        private static void SelectSceneReadmeDropdown()
+        private static void SelectULSettingsDropdown()
         {
-            SelectSceneReadme();
+            SelectUlSettings();
         }
 
-        private static void SelectSceneReadme(bool silent = false)
+        private static void SelectUlSettings(bool silent = false)
         {
             UltraleapSettings ulSettings = FindSettingsSO();
             if (ulSettings != null)
@@ -96,6 +101,7 @@ namespace Leap.Unity
             }
 
         }
+#endif
 
         public static UltraleapSettings FindSettingsSO()
         {
