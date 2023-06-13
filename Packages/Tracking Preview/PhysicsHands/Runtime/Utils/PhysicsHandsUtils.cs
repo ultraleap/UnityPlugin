@@ -560,7 +560,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             physicsHand.palmBody.velocity = Vector3.ClampMagnitude(Vector3.MoveTowards(physicsHand.palmBody.velocity, delta * Mathf.Lerp(1.0f, 0.05f, physicsHand.currentPalmWeight) / Time.fixedDeltaTime, 15f), physicsHand.currentPalmVelocity * Time.fixedDeltaTime);
 
-            Quaternion rotationDelta = Quaternion.Normalize(Quaternion.Slerp(Quaternion.identity, dataHand.Rotation * Quaternion.Inverse(physicsHand.transform.rotation), Mathf.Lerp(1.0f, 0.075f, physicsHand.currentPalmWeight)));
+            Quaternion rotationDelta = Quaternion.Normalize(Quaternion.Slerp(Quaternion.identity, dataHand.Rotation * Quaternion.Inverse(physicsHand.transform.rotation), Mathf.Lerp(1.0f, 0.1f, physicsHand.currentPalmWeight)));
 
             rotationDelta.ToAngleAxis(out float angleInDeg, out Vector3 rotationAxis);
 

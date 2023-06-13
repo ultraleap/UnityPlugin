@@ -114,9 +114,10 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private Dictionary<Rigidbody, HashSet<PhysicsBone>> _boneQueue = new Dictionary<Rigidbody, HashSet<PhysicsBone>>();
 
         // Cache for physics calculations
-        private int _resultCount = 0;
-        private Collider[] _resultsCache = new Collider[64];
         private Vector3 _tempVector = Vector3.zero;
+        private Collider[] _resultsCache = new Collider[16];
+        private bool[] _resultsFound = new bool[16];
+        private int _resultCount = 0;
 
         private HashSet<Rigidbody> _graspLayerRigid = new HashSet<Rigidbody>();
         private HashSet<Rigidbody> _hoveredItems = new HashSet<Rigidbody>();
@@ -125,7 +126,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private Dictionary<PhysicsHand, float[]> _fingerStrengths = new Dictionary<PhysicsHand, float[]>();
         public Dictionary<PhysicsHand, float[]> FingerStrengths => _fingerStrengths;
 
-        private LayerMask _hoverMask, _interactionMask;
+        private LayerMask _interactionMask;
         public LayerMask InteractionMask => _interactionMask;
 
         // These events are place holders
@@ -232,11 +233,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 _interactableLayers.Add(_handsLayer);
             }
 
-            _hoverMask = new LayerMask();
             _interactionMask = new LayerMask();
             for (int i = 0; i < _interactableLayers.Count; i++)
             {
-                _hoverMask = _hoverMask | _interactableLayers[i].layerMask;
                 _interactionMask = _interactionMask | _interactableLayers[i].layerMask;
             }
 
@@ -423,14 +422,24 @@ namespace Leap.Unity.Interaction.PhysicsHands
             // Apply Layers
             ApplyHoverLayers();
 
-            // Check Contacts
-            foreach (var hand in _hoveringHands)
+            if (LeftHand.IsTracked)
             {
-                PhysicsOverlapsForHand(hand);
+                LeftHand.UpdateHandHeuristics(ref _resultsCache, ref _resultsFound);
             }
 
+            if (RightHand.IsTracked)
+            {
+                RightHand.UpdateHandHeuristics(ref _resultsCache, ref _resultsFound);
+            }
+
+            //// Check Contacts
+            //foreach (var hand in _hoveringHands)
+            //{
+            //    PhysicsOverlapsForHand(hand);
+            //}
+
             // Send those bones to the helpers
-            ApplyGraspBones();
+            //ApplyGraspBones();
         }
 
         /// <summary>
@@ -587,7 +596,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             _resultCount = Physics.OverlapCapsuleNonAlloc(pH.transform.position + (-pH.transform.up * 0.025f) + (pH.transform.forward * 0.02f),
                 // Interpolate the tip position so we keep it relative to the straightest finger
                 pH.transform.position + (-pH.transform.up * Mathf.Lerp(0.025f, 0.07f, lerp)) + (pH.transform.forward * Mathf.Lerp(0.08f, 0.04f, lerp)),
-                0.075f, _resultsCache, _hoverMask);
+                0.075f, _resultsCache, _interactionMask);
 
             PhysicsGraspHelper tempHelper;
             for (int i = 0; i < _resultCount; i++)
@@ -628,7 +637,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             PhysicsHand.Hand pH = hand.GetPhysicsHand();
 
             _tempVector.x = 0;
-            _tempVector.y = -pH.triggerDistance;
+            _tempVector.y = -pH.contactDistance;
             _resultCount = PhysExts.OverlapBoxNonAllocOffset(pH.palmCollider, _tempVector, _resultsCache, _interactionMask);
             for (int i = 0; i < _resultCount; i++)
             {
@@ -655,8 +664,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 // Move the thumb closer to the palm
                 if (pH.jointBones[i].Finger == 0)
                 {
-                    _tempVector.x = -pH.triggerDistance / 2f;
-                    _tempVector.z = pH.triggerDistance / 2f;
+                    _tempVector.x = -pH.contactDistance / 2f;
+                    _tempVector.z = pH.contactDistance / 2f;
                     radius *= 0.3f;
                 }
                 else
@@ -669,7 +678,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 // Move the finger tips forward a tad
                 if (pH.jointBones[i].Joint == 2)
                 {
-                    _tempVector.z += pH.triggerDistance / 2f;
+                    _tempVector.z += pH.contactDistance / 2f;
                 }
 
 #if UNITY_EDITOR
@@ -712,30 +721,24 @@ namespace Leap.Unity.Interaction.PhysicsHands
             }
         }
 
+        private void CalculateBoneOverlaps()
+        {
+
+        }
+
         #endregion
 
         private void UpdateHandStates()
         {
             if (LeftHand.IsTracked)
             {
-                UpdateBoneStats(LeftHand);
                 FindHandState(LeftHand);
                 LeftHand.LateFixedUpdate();
             }
             if (RightHand.IsTracked)
             {
-                UpdateBoneStats(RightHand);
                 FindHandState(RightHand);
                 RightHand.LateFixedUpdate();
-            }
-        }
-
-        private void UpdateBoneStats(PhysicsHand hand)
-        {
-            hand.GetPhysicsHand().palmBone.UpdateBoneDistances();
-            foreach (var bone in hand.GetPhysicsHand().jointBones)
-            {
-                bone.UpdateBoneDistances();
             }
         }
 

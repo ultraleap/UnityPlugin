@@ -18,7 +18,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
             Contact,
             Grasp
         }
-
         public State GraspState { get; private set; } = State.Hover;
 
         public HashSet<PhysicsBone> BoneHash => _boneHash;
@@ -144,10 +143,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
             {
                 for (int j = 0; j < pair.Value.Length; j++)
                 {
-                    foreach (var bone in pair.Value[j])
-                    {
-                        bone.RemoveContacting(_rigid);
-                    }
                     pair.Value[j].Clear();
                 }
             }
@@ -164,8 +159,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
             _graspingCandidates.Remove(hand);
         }
 
-        public void UpdateBones(HashSet<PhysicsBone> bones)
+        internal void UpdateBones(HashSet<PhysicsBone> bones)
         {
+            
             // Remove cooldowns if bone has contacted
             for (int i = 0; i < _boneCooldownItems.Count; i++)
             {
@@ -186,7 +182,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 if (!_boneHash.Contains(bone))
                 {
                     _boneHash.Add(bone);
-                    bone.AddContacting(_rigid);
+                    
                     if (_bones.TryGetValue(bone.Hand, out HashSet<PhysicsBone>[] storedBones))
                     {
                         storedBones[bone.Finger].Add(bone);
@@ -212,7 +208,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
             if (!bones.Contains(bone))
             {
                 int ind = _boneCooldownItems.IndexOf(bone);
-                Debug.DrawLine(bone.transform.position, bone.transform.position + (Vector3.up * 0.01f), Color.green, 0.1f);
                 if (ind != -1)
                 {
                     _boneCooldownTime[ind] = GRAB_COOLDOWNTIME;
@@ -249,8 +244,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         public State UpdateHelper()
         {
-            // Check to see if we no longer have any bones
-            UpdateRemovedBones();
+            UpdateHands();
 
             if (_boneHash.Count == 0 && GraspState != State.Grasp)
             {
@@ -291,6 +285,93 @@ namespace Leap.Unity.Interaction.PhysicsHands
             }
 
             return GraspState;
+        }
+
+        private void UpdateHands()
+        {
+            // Remove bones from the hashset if we're not able to grab with them
+            _boneHash.RemoveWhere(RemoveOldBones);
+
+            // Loop through each hand in our bone array, then the finger, then the bones in that finger
+            // If we're no longer in a grabbing state with that bone we want to add it to the cooldowns
+            foreach (var pair in _bones)
+            {
+                for (int i = 0; i < _bones[pair.Key].Length; i++)
+                {
+                    foreach (var bone in _bones[pair.Key][i])
+                    {
+                        if (!bone.GrabbableObjects.Contains(_rigid))
+                        {
+                            AddBoneToCooldowns(bone);
+                        }
+                    }
+                }
+            }
+
+            foreach (var hand in _graspingCandidates)
+            {
+                foreach (var bone in hand.GetPhysicsHand().jointBones)
+                {
+                    if(bone.GrabbableObjects.Contains(_rigid))
+                    {
+                        _boneHash.Add(bone);
+                        if (_bones.TryGetValue(bone.Hand, out HashSet<PhysicsBone>[] storedBones))
+                        {
+                            storedBones[bone.Finger].Add(bone);
+                            // Make sure we remove the bone from the cooldown if it's good again
+                            RemoveBoneFromCooldowns(bone);
+                        }
+                        else
+                        {
+                            _bones.Add(bone.Hand, new HashSet<PhysicsBone>[PhysicsHand.Hand.FINGERS + 1]);
+                            for (int i = 0; i < _bones[bone.Hand].Length; i++)
+                            {
+                                _bones[bone.Hand][i] = new HashSet<PhysicsBone>();
+                                if (bone.Finger == i)
+                                {
+                                    _bones[bone.Hand][i].Add(bone);
+                                    RemoveBoneFromCooldowns(bone);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            UpdateRemovedBones();
+        }
+
+        private void AddBoneToCooldowns(PhysicsBone bone)
+        {
+            int ind = _boneCooldownItems.IndexOf(bone);
+            // If we've found it then it's already cooling down.
+            if (ind == -1)
+            {
+                _boneCooldownItems.Add(bone);
+                _boneCooldownTime.Add(GRAB_COOLDOWNTIME);
+            }
+        }
+
+        private void RemoveBoneFromCooldowns(PhysicsBone bone)
+        {
+            int ind = _boneCooldownItems.IndexOf(bone);
+            if (ind != -1)
+            {
+                _boneCooldownItems.RemoveAt(ind);
+                _boneCooldownTime.RemoveAt(ind);
+            }
+        }
+
+        private bool RemoveOldBones(PhysicsBone bone)
+        {
+            if (bone.GrabbableObjects.Contains(_rigid))
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
 
         private void GraspingContactCheck()
@@ -397,17 +478,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 {
                     if (_bones.ContainsKey(_boneCooldownItems[i].Hand))
                     {
-                        foreach (var item in _bones[_boneCooldownItems[i].Hand][_boneCooldownItems[i].Finger])
-                        {
-                            if (item == _boneCooldownItems[i])
-                            {
-                                item.RemoveGrasping(_rigid);
-                                break;
-                            }
-                        }
                         _bones[_boneCooldownItems[i].Hand][_boneCooldownItems[i].Finger].Remove(_boneCooldownItems[i]);
                     }
-                    _boneCooldownItems[i].RemoveContacting(_rigid);
                     _boneCooldownItems.RemoveAt(i);
                     _boneCooldownTime.RemoveAt(i);
                     i--;
@@ -482,7 +554,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                         {
                             if (item.Finger == _bones[pair.Key][j].First().Finger)
                             {
-                                item.AddGrasping(_rigid);
+                                item.AddGrabbing(_rigid);
                             }
                         }
                     }
@@ -492,7 +564,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             {
                 foreach (var item in pair.Key.GetPhysicsHand().jointBones)
                 {
-                    item.RemoveGrasping(_rigid);
+                    item.RemoveGrabbing(_rigid);
                 }
             }
         }
