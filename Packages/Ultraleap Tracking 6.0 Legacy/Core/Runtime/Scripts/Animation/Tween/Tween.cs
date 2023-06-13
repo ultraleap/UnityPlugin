@@ -187,7 +187,7 @@ namespace Leap.Unity.Animation
 
             if (_instance.interpolatorCount >= _instance.interpolators.Length)
             {
-                Utils.DoubleCapacity(ref _instance.interpolators);
+                Leap.Unity.Utils.DoubleCapacity(ref _instance.interpolators);
             }
 
             _instance.interpolators[_instance.interpolatorCount++] = interpolator;
