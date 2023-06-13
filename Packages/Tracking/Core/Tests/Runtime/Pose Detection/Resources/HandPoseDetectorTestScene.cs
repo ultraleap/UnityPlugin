@@ -7,10 +7,6 @@ namespace Leap.Testing
 {
     public class HandPoseDetectorTestScene
     {
-        const string POSE_DETECTOR_NAME = "Pose Detector";
-        const string TEST_LEAP_PROVIDER_NAME = "Test Leap Provider";
-        const string POSE_EVENT_LISTENER_NAME = "Pose Event Listener";
-
         private static HandPoseDetector _handPoseDetector;
         private static TestLeapProvider _testLeapProvider;
         private static PoseEventListener _poseEventListener;
@@ -76,7 +72,7 @@ namespace Leap.Testing
             {
                 if (_handPoseDetector == null)
                 {
-                    _handPoseDetector = GetComponentFromGameObject<HandPoseDetector>(POSE_DETECTOR_NAME);
+                    _handPoseDetector = Object.FindObjectOfType<HandPoseDetector>();
                 }
 
                 return _handPoseDetector;
@@ -92,7 +88,7 @@ namespace Leap.Testing
             {
                 if (_testLeapProvider == null)
                 {
-                    _testLeapProvider = GetComponentFromGameObject<TestLeapProvider>(TEST_LEAP_PROVIDER_NAME);
+                    _testLeapProvider = Object.FindObjectOfType<TestLeapProvider>();
                 }
 
                 return _testLeapProvider;
@@ -108,16 +104,11 @@ namespace Leap.Testing
             {
                 if (_poseEventListener == null)
                 {
-                    _poseEventListener = GetComponentFromGameObject<PoseEventListener>(POSE_EVENT_LISTENER_NAME);
+                    _poseEventListener = Object.FindObjectOfType<PoseEventListener>();
                 }
 
                 return _poseEventListener;
             }
-        }
-
-        private static T GetComponentFromGameObject<T>(string gameObjectName)
-        {
-            return GameObject.Find(gameObjectName).GetComponent<T>();
         }
     }
 }

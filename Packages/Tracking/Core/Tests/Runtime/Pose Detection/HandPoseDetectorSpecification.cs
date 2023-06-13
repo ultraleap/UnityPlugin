@@ -3,6 +3,7 @@ using System.IO;
 using Leap.Unity;
 using NUnit.Framework;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
@@ -189,7 +190,31 @@ namespace Leap.Testing
         /// </summary>
         public void SetupScene()
         {
-            SceneManager.LoadScene(SCENE_NAME); 
+            foreach(var buildSettingsScene in EditorBuildSettings.scenes)
+            {
+                if (buildSettingsScene != null && buildSettingsScene.path.Contains(SCENE_NAME))
+                {
+                    // Scene is in build settings, so use that
+                    SceneManager.LoadScene(SCENE_NAME);
+                    return;
+                }
+            }
+
+            // Scene is not in build settings, let's try to load it live
+            string[] availableScenes = Directory.GetFiles(Path.GetFullPath(ROOT_FOLDER), "*.unity", SearchOption.AllDirectories);
+
+            if (availableScenes != null)
+            {
+                foreach(var scenePath in availableScenes)
+                {
+                    if (scenePath.Contains(SCENE_NAME))
+                    {
+                        LoadSceneParameters loadSceneParams = new LoadSceneParameters(LoadSceneMode.Single);
+                        EditorSceneManager.LoadSceneInPlayMode(scenePath, loadSceneParams);
+                        return;
+                    }
+                }
+            }
         }
 
         private HandPoseScriptableObject LoadPoseTarget(string poseDataPath)

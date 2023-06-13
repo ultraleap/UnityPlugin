@@ -18,7 +18,7 @@ namespace Leap.Testing
         [SerializeField]
         private LeapProvider _leapProvider;
 
-        [SerializeField]
+        [SerializeField, TextArea]
         private string _fileDestination;
 
         private SerializableFrame _frame;
@@ -129,14 +129,14 @@ namespace Leap.Testing
         public bool IsLeft;
         public float TimeVisible;
         public SerializableArm Arm;
-        public List<FingerS> Fingers;
-        public SerializableVecotr3 PalmPosition;
-        public SerializableVecotr3 StabilizedPalmPosition;
-        public SerializableVecotr3 PalmVelocity;
-        public SerializableVecotr3 PalmNormal;
+        public List<SerializableFinger> Fingers;
+        public SerializableVector3 PalmPosition;
+        public SerializableVector3 StabilizedPalmPosition;
+        public SerializableVector3 PalmVelocity;
+        public SerializableVector3 PalmNormal;
         public SerializableQuaternion Rotation;
-        public SerializableVecotr3 Direction;
-        public SerializableVecotr3 WristPosition;
+        public SerializableVector3 Direction;
+        public SerializableVector3 WristPosition;
 
         public SerializableHand(long frameID,
                         int id,
@@ -148,14 +148,14 @@ namespace Leap.Testing
                         bool isLeft,
                         float timeVisible,
                         Arm arm,
-                        List<FingerS> fingers,
-                        SerializableVecotr3 palmPosition,
-                        SerializableVecotr3 stabilizedPalmPosition,
-                        SerializableVecotr3 palmVelocity,
-                        SerializableVecotr3 palmNormal,
+                        List<SerializableFinger> fingers,
+                        SerializableVector3 palmPosition,
+                        SerializableVector3 stabilizedPalmPosition,
+                        SerializableVector3 palmVelocity,
+                        SerializableVector3 palmNormal,
                         SerializableQuaternion palmOrientation,
-                        SerializableVecotr3 direction,
-                        SerializableVecotr3 wristPosition)
+                        SerializableVector3 direction,
+                        SerializableVector3 wristPosition)
         {
             FrameId = frameID;
             Id = id;
@@ -177,8 +177,8 @@ namespace Leap.Testing
             WristPosition = wristPosition;
         }
 
-        public static implicit operator SerializableHand(Hand h) => new SerializableHand(h.FrameId, h.Id, h.Confidence, h.GrabStrength, h.PinchStrength, h.PinchDistance, h.PalmWidth, h.IsLeft, h.TimeVisible, h.Arm, FingerS.ConvertFingerList(h.Fingers), h.PalmPosition, h.StabilizedPalmPosition, h.PalmVelocity, h.PalmNormal, h.Rotation, h.Direction, h.WristPosition);
-        public static implicit operator Hand(SerializableHand h) => new Hand(h.FrameId, h.Id, h.Confidence, h.GrabStrength, h.PinchStrength, h.PinchDistance, h.PalmWidth, h.IsLeft, h.TimeVisible, h.Arm, FingerS.ConvertFingerList(h.Fingers), h.PalmPosition, h.StabilizedPalmPosition, h.PalmVelocity, h.PalmNormal, h.Rotation, h.Direction, h.WristPosition);
+        public static implicit operator SerializableHand(Hand h) => new SerializableHand(h.FrameId, h.Id, h.Confidence, h.GrabStrength, h.PinchStrength, h.PinchDistance, h.PalmWidth, h.IsLeft, h.TimeVisible, h.Arm, SerializableFinger.ConvertFingerList(h.Fingers), h.PalmPosition, h.StabilizedPalmPosition, h.PalmVelocity, h.PalmNormal, h.Rotation, h.Direction, h.WristPosition);
+        public static implicit operator Hand(SerializableHand h) => new Hand(h.FrameId, h.Id, h.Confidence, h.GrabStrength, h.PinchStrength, h.PinchDistance, h.PalmWidth, h.IsLeft, h.TimeVisible, h.Arm, SerializableFinger.ConvertFingerList(h.Fingers), h.PalmPosition, h.StabilizedPalmPosition, h.PalmVelocity, h.PalmNormal, h.Rotation, h.Direction, h.WristPosition);
 
         public static List<SerializableHand> ConvertHandList(List<Hand> SerializableHand)
         {
@@ -227,26 +227,25 @@ namespace Leap.Testing
     }
 
     [System.Serializable]
-    public class FingerS
+    public class SerializableFinger
     {
         public FingerType Type;
         public SerializableBone[] bones = new SerializableBone[4];
         public int Id;
         public int HandId;
-        public SerializableVecotr3 TipPosition;
-        public SerializableVecotr3 Direction;
+        public SerializableVector3 TipPosition;
+        public SerializableVector3 Direction;
         public float Width;
         public float Length;
         public bool IsExtended;
         public float TimeVisible;
 
-        //TODO implement serialization class for Fingers
-        public FingerS(long frameId,
+        public SerializableFinger(long frameId,
                          int handId,
                          int fingerId,
                          float timeVisible,
-                         SerializableVecotr3 tipPosition,
-                         SerializableVecotr3 direction,
+                         SerializableVector3 tipPosition,
+                         SerializableVector3 direction,
                          float width,
                          float length,
                          bool isExtended,
@@ -271,12 +270,12 @@ namespace Leap.Testing
             TimeVisible = timeVisible;
         }
 
-        public static implicit operator FingerS(Finger f) => new FingerS(0, f.HandId, (int)f.Type, f.TimeVisible, f.TipPosition, f.Direction, f.Width, f.Length, f.IsExtended, f.Type, f.bones[0], f.bones[1], f.bones[2], f.bones[3]);
-        public static implicit operator Finger(FingerS f) => new Finger(0, f.HandId, (int)f.Type, f.TimeVisible, f.TipPosition, f.Direction, f.Width, f.Length, f.IsExtended, f.Type, f.bones[0], f.bones[1], f.bones[2], f.bones[3]);
+        public static implicit operator SerializableFinger(Finger f) => new SerializableFinger(0, f.HandId, (int)f.Type, f.TimeVisible, f.TipPosition, f.Direction, f.Width, f.Length, f.IsExtended, f.Type, f.bones[0], f.bones[1], f.bones[2], f.bones[3]);
+        public static implicit operator Finger(SerializableFinger f) => new Finger(0, f.HandId, (int)f.Type, f.TimeVisible, f.TipPosition, f.Direction, f.Width, f.Length, f.IsExtended, f.Type, f.bones[0], f.bones[1], f.bones[2], f.bones[3]);
 
-        public static List<FingerS> ConvertFingerList(List<Finger> fingers)
+        public static List<SerializableFinger> ConvertFingerList(List<Finger> fingers)
         {
-            var ret = new List<FingerS>();
+            var ret = new List<SerializableFinger>();
             foreach (var finger in fingers)
             {
                 ret.Add(finger);
@@ -284,7 +283,7 @@ namespace Leap.Testing
             return ret;
         }
 
-        public static List<Finger> ConvertFingerList(List<FingerS> fingers)
+        public static List<Finger> ConvertFingerList(List<SerializableFinger> fingers)
         {
             var ret = new List<Finger>();
             foreach (var finger in fingers)
@@ -298,19 +297,19 @@ namespace Leap.Testing
     [System.Serializable]
     public class SerializableBone
     {
-        public SerializableVecotr3 PrevJoint;
-        public SerializableVecotr3 NextJoint;
-        public SerializableVecotr3 Center;
-        public SerializableVecotr3 Direction;
+        public SerializableVector3 PrevJoint;
+        public SerializableVector3 NextJoint;
+        public SerializableVector3 Center;
+        public SerializableVector3 Direction;
         public SerializableQuaternion Rotation;
         public float Length;
         public float Width;
         public BoneType Type;
 
-        public SerializableBone(SerializableVecotr3 prevJoint,
-                        SerializableVecotr3 nextJoint,
-                        SerializableVecotr3 center,
-                        SerializableVecotr3 direction,
+        public SerializableBone(SerializableVector3 prevJoint,
+                        SerializableVector3 nextJoint,
+                        SerializableVector3 center,
+                        SerializableVector3 direction,
                         float length,
                         float width,
                         BoneType type,
@@ -331,19 +330,19 @@ namespace Leap.Testing
     }
 
     [System.Serializable]
-    public class SerializableVecotr3
+    public class SerializableVector3
     {
         public float x, y, z;
 
-        public SerializableVecotr3(float x, float y, float z)
+        public SerializableVector3(float x, float y, float z)
         {
             this.x = x;
             this.y = y;
             this.z = z;
         }
 
-        public static implicit operator SerializableVecotr3(Vector3 v) => new SerializableVecotr3(v.x, v.y, v.z);
-        public static implicit operator Vector3(SerializableVecotr3 v) => new Vector3(v.x, v.y, v.z);
+        public static implicit operator SerializableVector3(Vector3 v) => new SerializableVector3(v.x, v.y, v.z);
+        public static implicit operator Vector3(SerializableVector3 v) => new Vector3(v.x, v.y, v.z);
     }
 
     [System.Serializable]
@@ -363,5 +362,3 @@ namespace Leap.Testing
         public static implicit operator Quaternion(SerializableQuaternion q) => new Quaternion(q.x, q.y, q.z, q.w);
     }
 }
-
-
