@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (Physics Hands) In-editor readme for example scene
 - (Attachment Hands) Predicted pinch position
 - (LeapServiceProvider) Ability to change the number of Service connection attempts and interval
+- (HandRays) Add methods to invoke handray Frame & State Change in inherited classes
 
 ### Changed
 - (HandUtils) Only cache static Provider and CameraRig references when they are requested
