@@ -1,6 +1,6 @@
-﻿using System;
-using UnityEngine;
+using System;
 using UnityEditor;
+using UnityEngine;
 
 namespace Leap.Unity.Readme
 {

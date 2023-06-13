@@ -29,7 +29,8 @@ namespace Leap.Unity
         }
 
         private CapsuleHandPreset _preset;
-        [SerializeField] public CapsuleHandPreset Preset
+        [SerializeField]
+        public CapsuleHandPreset Preset
         {
             get
             {

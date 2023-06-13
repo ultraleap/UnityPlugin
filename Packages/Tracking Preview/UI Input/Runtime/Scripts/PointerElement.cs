@@ -315,7 +315,7 @@ namespace Leap.Unity.InputModule
                     cursor.gameObject.SetActive(false);
                 }
 
-                if(hadHandLastProcessUpdate)
+                if (hadHandLastProcessUpdate)
                 {
                     CancelAllInput(hand);
                     hadHandLastProcessUpdate = false;
@@ -694,7 +694,7 @@ namespace Leap.Unity.InputModule
         private void ProcessUnityEvents_HandleNoLongerInteracting(Hand hand)
         {
             //If we WERE interacting last frame, but are not this frame...
-            if (hand == null ||  NoLongerInteracting(hand))
+            if (hand == null || NoLongerInteracting(hand))
             {
                 PrevTriggeringInteraction = false;
 
