@@ -190,7 +190,7 @@ namespace Leap.Unity
             if (leapProvider == null)
             {
                 //Try to set the provider for the user
-                leapProvider = FindObjectOfType<LeapProvider>();
+                leapProvider = Hands.Provider;
 
                 if (leapProvider == null)
                 {
@@ -288,14 +288,12 @@ namespace Leap.Unity
                 if (leapProvider == null)
                 {
                     //Try to set the provider for the user
-                    leapProvider = FindObjectOfType<LeapProvider>();
+                    leapProvider = Hands.Provider;
+
                     if (leapProvider == null)
                     {
-                        //If we still have a null hand, construct one manually
-                        if (hand == null)
-                        {
-                            hand = TestHandFactory.MakeTestHand(Handedness == Chirality.Left);
-                        }
+                        //Construct a hand manually
+                        hand = TestHandFactory.MakeTestHand(Handedness == Chirality.Left);
                     }
                     else
                     {

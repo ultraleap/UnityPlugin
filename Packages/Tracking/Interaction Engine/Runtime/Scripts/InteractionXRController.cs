@@ -603,7 +603,7 @@ namespace Leap.Unity.Interaction
             _contactBoneBuffer.Clear();
 
             // Scan for existing colliders and construct contact bones out of them.
-            Utils.FindColliders<Collider>(this.gameObject, _colliderBuffer,
+            Leap.Unity.Utils.FindColliders<Collider>(this.gameObject, _colliderBuffer,
               includeInactiveObjects: true);
 
             foreach (var collider in _colliderBuffer)
