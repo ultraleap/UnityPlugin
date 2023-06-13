@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (LeapXRServiceProvider) When using Default offset, updated values will be used automatically
 - (Utils) All references to Utils in the Plugin specify Leap.Unity.Utils to avoid clashes with other Utils classes
 - (Locomotion) Expose teleport anchor list & last teleported anchor
+- (Locomotion) Moved Jump Gems further away from the arm, to account for sleeves
 
 ### Fixed
 - (OpenXRProvider) Hand `Rotation`, `Direction`, `PalmPosition`, `PalmNormal` and `StabilisedPalmPosition` do not match LeapC when using OpenXR layer 1.4.4
