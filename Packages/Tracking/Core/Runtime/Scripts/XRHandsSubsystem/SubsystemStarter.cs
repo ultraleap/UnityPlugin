@@ -11,9 +11,10 @@ namespace Leap.Unity
         static XRHandSubsystem m_Subsystem = null;
         static XRHandProviderUtility.SubsystemUpdater updater = null;
         static GameObject leapProviderGO = null;
+        static XRHandSubsystemProvider subsystemProvider = null;
 
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-        private static void RunAfterSceneLoad()
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        private static void RunBeforeSceneLoad()
         {
             UltraleapSettings ultraleapSettings = null;
             ultraleapSettings = UltraleapSettings.FindSettingsSO();
@@ -27,18 +28,11 @@ namespace Leap.Unity
             {
                 return;
             }
-            UltraleapSettings.enableUltraleapSubsystem += RunAfterSceneLoad;
+            UltraleapSettings.enableUltraleapSubsystem += RunBeforeSceneLoad;
             UltraleapSettings.disableUltraleapSubsystem += OnQuit;
             Application.quitting += OnQuit;
             LeapProvider leapProvider = Hands.Provider;
-            XRHandSubsystemProvider subsystemProvider = null;
-
-            if(leapProvider == null)
-            {
-                leapProviderGO = new GameObject("LeapXRServiceProvider");
-                leapProvider = (LeapProvider)leapProviderGO.AddComponent<LeapXRServiceProvider>();
-                GameObject.DontDestroyOnLoad(leapProviderGO);
-            }
+            
 
             List<XRHandSubsystemDescriptor> descriptors = new List<XRHandSubsystemDescriptor>();
             SubsystemManager.GetSubsystemDescriptors(descriptors);
@@ -56,15 +50,30 @@ namespace Leap.Unity
                     updater.Start();
                     subsystemProvider = m_Subsystem.GetProvider();
                 }
-
-                if(subsystemProvider != null)
-                {
-                    LeapXRHandProvider leapXRHandProvider = (LeapXRHandProvider)subsystemProvider;
-                    leapXRHandProvider.TrackingProvider = leapProvider;
-                }
             }
         }
-        
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        private static void RunAfterSceneLoad()
+        {
+
+            LeapProvider leapProvider = Hands.Provider;
+
+            if (leapProvider == null)
+            {
+                leapProviderGO = new GameObject("LeapXRServiceProvider");
+                leapProvider = (LeapProvider)leapProviderGO.AddComponent<LeapXRServiceProvider>();
+                GameObject.DontDestroyOnLoad(leapProviderGO);
+            }
+
+            if (subsystemProvider != null)
+            {
+                LeapXRHandProvider leapXRHandProvider = (LeapXRHandProvider)subsystemProvider;
+                leapXRHandProvider.TrackingProvider = leapProvider;
+            }
+        }
+
+
         private static void OnQuit()
         {
             if (m_Subsystem != null)

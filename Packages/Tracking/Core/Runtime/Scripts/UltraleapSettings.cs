@@ -53,7 +53,7 @@ namespace Leap.Unity
         public static event Action enableUltraleapSubsystem;
         public static event Action disableUltraleapSubsystem;
 
-        private bool _leapSubsystemEnabled = false;
+        private bool _leapSubsystemEnabled;
 
         [SerializeField]
         public bool LeapSubsystemEnabled
