@@ -59,7 +59,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [6.8.1] - 19/05/23
 
 ### Added
-- 
+- Runtime unit tests for pose detection
 
 ### Changed
 - Changed OpenXRLeapProvider to calculate a LeapC-style palm width and pinch strength
