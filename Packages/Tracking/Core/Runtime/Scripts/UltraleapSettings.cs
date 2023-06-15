@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using static UnityEditor.Progress;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -99,14 +100,14 @@ namespace Leap.Unity
             {
                 EditorUtility.DisplayDialog("No ultraleap settings file", "There is no settings file available, please try re-importing the plugin.", "Ok");
             }
-
         }
 #endif
 
         public static UltraleapSettings FindSettingsSO()
         {
             UltraleapSettings[] settingsSO = Resources.FindObjectsOfTypeAll(typeof(UltraleapSettings)) as UltraleapSettings[];
-            if (settingsSO[0] != null)
+
+            if (settingsSO != null && settingsSO.Length > 0)
             {
                 return settingsSO[0]; // Assume there is only one settings file
             }
