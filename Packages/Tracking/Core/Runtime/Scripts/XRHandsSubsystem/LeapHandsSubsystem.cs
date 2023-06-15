@@ -29,14 +29,6 @@ namespace Leap.Unity
             }
         }
 
-        public override void Destroy()
-        {
-        }
-
-        public override void GetHandLayout(NativeArray<bool> handJointsInLayout)
-        {
-        }
-
         public override void Start()
         {
         }
@@ -45,9 +37,44 @@ namespace Leap.Unity
         {
         }
 
-        static internal string id { get; private set; }
-        static LeapXRHandProvider() => id = "UL XR Hands";
+        public override void Destroy()
+        {
+        }
 
+        public override void GetHandLayout(NativeArray<bool> handJointsInLayout)
+        {
+            handJointsInLayout[XRHandJointID.Palm.ToIndex()] = true;
+            handJointsInLayout[XRHandJointID.Wrist.ToIndex()] = true;
+
+            handJointsInLayout[XRHandJointID.ThumbMetacarpal.ToIndex()] = true;
+            handJointsInLayout[XRHandJointID.ThumbProximal.ToIndex()] = true;
+            handJointsInLayout[XRHandJointID.ThumbDistal.ToIndex()] = true;
+            handJointsInLayout[XRHandJointID.ThumbTip.ToIndex()] = true;
+
+            handJointsInLayout[XRHandJointID.IndexMetacarpal.ToIndex()] = true;
+            handJointsInLayout[XRHandJointID.IndexProximal.ToIndex()] = true;
+            handJointsInLayout[XRHandJointID.IndexIntermediate.ToIndex()] = true;
+            handJointsInLayout[XRHandJointID.IndexDistal.ToIndex()] = true;
+            handJointsInLayout[XRHandJointID.IndexTip.ToIndex()] = true;
+
+            handJointsInLayout[XRHandJointID.MiddleMetacarpal.ToIndex()] = true;
+            handJointsInLayout[XRHandJointID.MiddleProximal.ToIndex()] = true;
+            handJointsInLayout[XRHandJointID.MiddleIntermediate.ToIndex()] = true;
+            handJointsInLayout[XRHandJointID.MiddleDistal.ToIndex()] = true;
+            handJointsInLayout[XRHandJointID.MiddleTip.ToIndex()] = true;
+
+            handJointsInLayout[XRHandJointID.RingMetacarpal.ToIndex()] = true;
+            handJointsInLayout[XRHandJointID.RingProximal.ToIndex()] = true;
+            handJointsInLayout[XRHandJointID.RingIntermediate.ToIndex()] = true;
+            handJointsInLayout[XRHandJointID.RingDistal.ToIndex()] = true;
+            handJointsInLayout[XRHandJointID.RingTip.ToIndex()] = true;
+
+            handJointsInLayout[XRHandJointID.LittleMetacarpal.ToIndex()] = true;
+            handJointsInLayout[XRHandJointID.LittleProximal.ToIndex()] = true;
+            handJointsInLayout[XRHandJointID.LittleIntermediate.ToIndex()] = true;
+            handJointsInLayout[XRHandJointID.LittleDistal.ToIndex()] = true;
+            handJointsInLayout[XRHandJointID.LittleTip.ToIndex()] = true;
+        }
 
         public override XRHandSubsystem.UpdateSuccessFlags TryUpdateHands(
             XRHandSubsystem.UpdateType updateType, 
@@ -155,6 +182,29 @@ namespace Leap.Unity
             return true;
         }
 
+        static internal string id { get; private set; }
+        static LeapXRHandProvider() => id = "UL XR Hands";
+
+        //This method registers the subsystem descriptor with the SubsystemManager
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void RegisterDescriptor()
+        {
+            UltraleapSettings ultraleapSettings = UltraleapSettings.FindSettingsSO();
+
+            if (ultraleapSettings == null || ultraleapSettings.LeapSubsystemEnabled == false)
+            {
+                return;
+            }
+
+            var handsSubsystemCinfo = new XRHandSubsystemDescriptor.Cinfo
+            {
+                id = id,
+                providerType = typeof(LeapXRHandProvider),
+                subsystemTypeOverride = typeof(LeapHandSubsystem)
+            };
+            XRHandSubsystemDescriptor.Register(handsSubsystemCinfo);
+        }
+
         public static void SetSubsystemTrackingProvider(LeapProvider leapProvider)
         {
             List<LeapHandSubsystem> subsystems = new List<LeapHandSubsystem>();
@@ -175,17 +225,5 @@ namespace Leap.Unity
     // This class defines a hand subsystem
     class LeapHandSubsystem : XRHandSubsystem
     {
-        //This method registers the subsystem descriptor with the SubsystemManager
-       [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-        static void RegisterDescriptor()
-        {
-            var handsSubsystemCinfo = new XRHandSubsystemDescriptor.Cinfo
-            {
-                id = "UL XR Hands",
-                providerType = typeof(LeapXRHandProvider),
-                subsystemTypeOverride = typeof(LeapHandSubsystem)
-            };
-            XRHandSubsystemDescriptor.Register(handsSubsystemCinfo);
-        }
     }
 }
