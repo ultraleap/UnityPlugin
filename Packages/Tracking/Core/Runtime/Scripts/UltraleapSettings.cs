@@ -1,8 +1,8 @@
 using System;
 using UnityEngine;
-using static UnityEditor.Progress;
 #if UNITY_EDITOR
 using UnityEditor;
+using System.IO;
 #endif
 
 namespace Leap.Unity
@@ -113,8 +113,23 @@ namespace Leap.Unity
             }
             else
             {
-                return null;
+                return CreateSettingsSO();
             }
+        }
+
+        static UltraleapSettings CreateSettingsSO()
+        {
+#if UNITY_EDITOR
+            UltraleapSettings newSO = ScriptableObject.CreateInstance<UltraleapSettings>();
+
+            Directory.CreateDirectory(Application.dataPath + "/XR/");
+            Directory.CreateDirectory(Application.dataPath + "/XR/Settings/");
+
+            AssetDatabase.CreateAsset(newSO, "Assets/XR/Settings/Ultraleap Settings.asset");
+
+            return newSO;
+#endif
+            return null;
         }
     }
 }
