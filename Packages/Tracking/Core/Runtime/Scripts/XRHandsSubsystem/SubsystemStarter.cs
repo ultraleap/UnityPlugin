@@ -24,14 +24,13 @@ namespace Leap.Unity
                 return;
             }
 
-            if (ultraleapSettings.LeapSubsystemEnabled == false)
+            if (ultraleapSettings.leapSubsystemEnabled == false)
             {
                 return;
             }
 
-            UltraleapSettings.enableUltraleapSubsystem += RunBeforeSceneLoad;
-            UltraleapSettings.disableUltraleapSubsystem += OnQuit;
-            Application.quitting += OnQuit;            
+            Application.quitting -= OnQuit;
+            Application.quitting += OnQuit;
 
             List<XRHandSubsystemDescriptor> descriptors = new List<XRHandSubsystemDescriptor>();
             SubsystemManager.GetSubsystemDescriptors(descriptors);
@@ -57,7 +56,7 @@ namespace Leap.Unity
         {
             UltraleapSettings ultraleapSettings = UltraleapSettings.FindSettingsSO();
 
-            if (ultraleapSettings == null || ultraleapSettings.LeapSubsystemEnabled == false)
+            if (ultraleapSettings == null || ultraleapSettings.leapSubsystemEnabled == false)
             {
                 return;
             }
@@ -81,13 +80,14 @@ namespace Leap.Unity
 
         private static void OnQuit()
         {
+            Application.quitting -= OnQuit;
+
             if (m_Subsystem != null)
             {
                 updater.Destroy();
                 m_Subsystem.Destroy();
                 GameObject.Destroy(leapProviderGO);
             }
-            UltraleapSettings.disableUltraleapSubsystem -= OnQuit;
         }
     }
 }

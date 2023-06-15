@@ -122,16 +122,21 @@ namespace Leap.Unity
                 return false;
             }
 
-            rootPose = new Pose(leapHand.WristPosition, leapHand.Rotation);
-            Handedness handedness = (Handedness)((int)leapHand.GetChirality() + 1); // +1 as unity has "invalid" handedness while we do not 
+            Pose palmPose = CalculatePalmPose(leapHand);
+            Pose wristPose = CalculateWristPose(leapHand);
+
+            rootPose = wristPose;
+            Handedness handedness = (Handedness)((int)leapHand.GetChirality() + 1); // +1 as unity has "invalid" handedness while we do not
+
             handJoints[0] = XRHandProviderUtility.CreateJoint(handedness,
                         XRHandJointTrackingState.Pose,
                         XRHandJointIDUtility.FromIndex(1),
-                        new Pose(leapHand.WristPosition, leapHand.Rotation));
+                        wristPose);
             handJoints[1] = XRHandProviderUtility.CreateJoint(handedness,
                         XRHandJointTrackingState.Pose,
                         XRHandJointIDUtility.FromIndex(1),
-                        new Pose(leapHand.PalmPosition, leapHand.Rotation));
+                        palmPose);
+
             int jointIndex = 2;
 
             foreach (var finger in leapHand.Fingers)
@@ -148,7 +153,6 @@ namespace Leap.Unity
                             new Pose(bone.PrevJoint, bone.Rotation));
 
                         jointIndex++;
-
                     }
 
                     var distal = finger.Bone(Bone.BoneType.TYPE_DISTAL);
@@ -182,6 +186,31 @@ namespace Leap.Unity
             return true;
         }
 
+        Pose CalculatePalmPose(Hand leapHand)
+        {
+            Pose palmPose = new Pose();
+            palmPose.position = Vector3.Lerp(leapHand.GetMiddle().Bone(Bone.BoneType.TYPE_METACARPAL).PrevJoint,
+                                                leapHand.GetMiddle().Bone(Bone.BoneType.TYPE_PROXIMAL).PrevJoint, 0.5f);
+
+            palmPose.rotation = leapHand.GetMiddle().Bone(Bone.BoneType.TYPE_METACARPAL).Rotation;
+
+            return palmPose;
+        }
+
+        Pose CalculateWristPose(Hand leapHand)
+        {
+            Pose wristPose = new Pose();
+
+            wristPose.position = leapHand.WristPosition;
+
+            Vector3 wristUp = leapHand.GetMiddle().Bone(Bone.BoneType.TYPE_METACARPAL).Rotation * Vector3.up;
+            Vector3 wristForward = leapHand.GetMiddle().Bone(Bone.BoneType.TYPE_METACARPAL).PrevJoint - leapHand.WristPosition;
+
+            wristPose.rotation = Quaternion.LookRotation(wristForward, wristUp);
+
+            return wristPose;
+        }
+
         static internal string id { get; private set; }
         static LeapXRHandProvider() => id = "UL XR Hands";
 
@@ -191,7 +220,7 @@ namespace Leap.Unity
         {
             UltraleapSettings ultraleapSettings = UltraleapSettings.FindSettingsSO();
 
-            if (ultraleapSettings == null || ultraleapSettings.LeapSubsystemEnabled == false)
+            if (ultraleapSettings == null || ultraleapSettings.leapSubsystemEnabled == false)
             {
                 return;
             }

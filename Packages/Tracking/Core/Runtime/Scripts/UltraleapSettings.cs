@@ -22,64 +22,41 @@ namespace Leap.Unity
         private void LeapSubSystemSection()
         {
             EditorGUILayout.Space(10);
-            EditorGUILayout.BeginVertical();
             EditorGUILayout.LabelField("Leap XRHands Subsystem", EditorStyles.boldLabel);
             
-            var readOnlyText = new GUIStyle(EditorStyles.textField);
-            readOnlyText.wordWrap = true;
             EditorGUILayout.HelpBox("The Leap XRHands Subsystem passes hand input directly from the Leap Service to XRHands. " +
                 "If you are using OpenXR for hand input, do not enable this option. " +
                 "Instead, use the Hand Tracking Subsystem option in the OpenXR XR Plug-in Management settings." +
                 "\r\n\nThis option can not be toggled at runtime.", MessageType.Info, true); ;
-            
-            var settingsTarget = target as UltraleapSettings;
-            bool editorBool = settingsTarget.LeapSubsystemEnabled;
-            settingsTarget.LeapSubsystemEnabled = EditorGUILayout.ToggleLeft("Enable the leap subsystem ", editorBool);
-            EditorGUILayout.EndVertical();
+
+            SerializedProperty property = this.serializedObject.FindProperty("leapSubsystemEnabled");
+
+            bool editorBool = property.boolValue;
+            property.boolValue = EditorGUILayout.ToggleLeft("Enable Leap XRHands Subsystem", editorBool);
 
             EditorGUILayout.Space(30);
             if(GUILayout.Button("Reset To Defaults"))
             {
                 if(EditorUtility.DisplayDialog("Reset all settings", "This will reset all settings in this Ultraleap settings file", "Yes", "No"))
                 {
+                    var settingsTarget = target as UltraleapSettings;
                     settingsTarget.ResetToDefaults();
                 }
             }
+
+            this.serializedObject.ApplyModifiedProperties();
         }
     }
 #endif
 
     public class UltraleapSettings : ScriptableObject
     {
-        public static event Action enableUltraleapSubsystem;
-        public static event Action disableUltraleapSubsystem;
-
-        private bool _leapSubsystemEnabled;
-
-        [SerializeField]
-        public bool LeapSubsystemEnabled
-        {
-            get { return _leapSubsystemEnabled; }
-            set
-            {
-                if (value != _leapSubsystemEnabled)
-                {
-                    _leapSubsystemEnabled = value;
-                    if (_leapSubsystemEnabled == false)
-                    {
-                        disableUltraleapSubsystem?.Invoke();
-                    }
-                    else
-                    {
-                        enableUltraleapSubsystem?.Invoke();
-                    }
-                }
-            }
-        }
+        [HideInInspector, SerializeField]
+        public bool leapSubsystemEnabled;
 
         public void ResetToDefaults()
         {
-            LeapSubsystemEnabled = false;
+            leapSubsystemEnabled = false;
         }
 
 #if UNITY_EDITOR
