@@ -12,15 +12,12 @@ using UnityEngine;
 using UnityEditor;
 #endif
 using Leap.Unity;
-using Unity.Collections;
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using Unity.Collections;
 using Unity.Jobs;
 using Unity.Jobs.LowLevel.Unsafe;
-#if UNITY_2022_3_OR_NEWER
-using System.Collections;
-#endif
 
 namespace Leap.Unity.Interaction.PhysicsHands
 {
@@ -30,10 +27,10 @@ namespace Leap.Unity.Interaction.PhysicsHands
         public class Hand
         {
             public const int FINGERS = 5, BONES = 3;
-            public const float HOVER_DISTANCE = 0.02f;
+            public const float HOVER_DISTANCE = 0.04f;
             public const float CONTACT_DISTANCE = 0.002f;
-            public const float CONTACT_ENTER_DISTANCE = 0.0015f, CONTACT_EXIT_DISTANCE = 0.01f;
-            public const float CONTACT_THUMB_ENTER_DISTANCE = 0.0035f, CONTACT_THUMB_EXIT_DISTANCE = 0.018f;
+            public const float CONTACT_ENTER_DISTANCE = 0.004f, CONTACT_EXIT_DISTANCE = 0.012f;
+            public const float CONTACT_THUMB_ENTER_DISTANCE = 0.005f, CONTACT_THUMB_EXIT_DISTANCE = 0.024f;
             // Used as velocity * fixedDeltaTime
             public const float MAXIMUM_PALM_VELOCITY = 300f, MINIMUM_PALM_VELOCITY = 50f, MAXIMUM_FINGER_VELOCITY = 200f, MINIMUM_FINGER_VELOCITY = 50f;
             // Used as angularVelocity * fixedDeltaTime
@@ -126,12 +123,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private const int _overlapsMaxHit = 16;
         private NativeArray<RaycastHit> _overlapsResults;
 #endif
-
-        // Used for distance values on non-palm joints
-        private PhysOverlapJob _distancesJob;
-        private NativeArray<RaycastHit> _distancesResults;
-        // All joints + Thumb + 2nd and 3rd Joints + 2 extra for the tip joint + 1 for the palm
-        private const int DISTANCE_CHECKS = (Hand.FINGERS * Hand.BONES) + Hand.BONES + (Hand.FINGERS * (Hand.BONES - 1)) + (Hand.FINGERS * 2) + 1;
+        private PhysOverlapJob _safetyOverlapJob;
+        private NativeArray<RaycastHit> _safetyOverlapResults;
 
         private float _graspMass = 0;
 
@@ -140,6 +133,15 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         private Leap.Hand _originalLeapHand, _leapHand;
 
+#if UNITY_EDITOR
+        // Debug Vis
+        [SerializeField]
+        private bool _showDistanceVisualisations = false;
+        /// <summary>
+        /// Editor only
+        /// </summary>
+        internal bool ShowDistanceVisualisations => _showDistanceVisualisations;
+#endif
         public Chirality Handedness
         {
             get { return _handedness; }
@@ -185,7 +187,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private float[] _graspingFingerDistance = new float[5];
         private float[] _xForceLimits = new float[Hand.BONES * Hand.FINGERS], _fingerStiffness = new float[Hand.FINGERS];
         private float[] _xDampening = new float[Hand.BONES * Hand.FINGERS];
-        private bool[] _fingerContacting = new bool[5];
 
         private bool _hasGenerated = false;
         private float _timeOnReset = 0;
@@ -200,7 +201,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private bool _wasGrasping = false;
         private bool _isGrasping = false;
         public bool IsGrasping => _isGrasping;
-
 
         private List<IgnoreData> _ignoredData = new List<IgnoreData>();
         private class IgnoreData
@@ -253,7 +253,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
             _physicsHand.gameObject.SetActive(false);
 
             InitJobs();
-
         }
 
         private void InitJobs()
@@ -270,16 +269,17 @@ namespace Leap.Unity.Interaction.PhysicsHands
             };
             _overlapsResults = new NativeArray<RaycastHit>(_physicsHand.jointBones.Length * 2 * _overlapsMaxHit, Allocator.Persistent);
 #endif
-            _distancesJob = new PhysOverlapJob()
+            // Need 2x so we can do different radii at the same time
+            _safetyOverlapJob = new PhysOverlapJob()
             {
-                origins = new NativeArray<Vector3>(DISTANCE_CHECKS, Allocator.Persistent),
-                directions = new NativeArray<Vector3>(DISTANCE_CHECKS, Allocator.Persistent),
-                radii = new NativeArray<float>(DISTANCE_CHECKS, Allocator.Persistent),
-                distances = new NativeArray<float>(DISTANCE_CHECKS, Allocator.Persistent),
-                commands = new NativeArray<SpherecastCommand>(DISTANCE_CHECKS, Allocator.Persistent),
+                origins = new NativeArray<Vector3>(_physicsHand.jointBones.Length * 2, Allocator.Persistent),
+                directions = new NativeArray<Vector3>(_physicsHand.jointBones.Length * 2, Allocator.Persistent),
+                radii = new NativeArray<float>(_physicsHand.jointBones.Length * 2, Allocator.Persistent),
+                distances = new NativeArray<float>(_physicsHand.jointBones.Length * 2, Allocator.Persistent),
+                commands = new NativeArray<SpherecastCommand>(_physicsHand.jointBones.Length * 2, Allocator.Persistent),
                 layerMask = _physicsProvider.InteractionMask
             };
-            _distancesResults = new NativeArray<RaycastHit>(DISTANCE_CHECKS, Allocator.Persistent);
+            _safetyOverlapResults = new NativeArray<RaycastHit>(_physicsHand.jointBones.Length * 2, Allocator.Persistent);
         }
 
         private void DisposeJobs()
@@ -288,8 +288,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
             _overlapsJob.Dispose();
             _overlapsResults.Dispose();
 #endif
-            _distancesJob.Dispose();
-            _distancesResults.Dispose();
+            _safetyOverlapJob.Dispose();
+            _safetyOverlapResults.Dispose();
         }
 
         public void BeginHand(Leap.Hand hand)
@@ -455,7 +455,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             UpdateSettings();
 
-            CalculateContacts();
+            CalculateSafetyOverlaps();
 
             // Reset timer on hand release so hands quickly restore size
             if (!IsGrasping && _wasGrasping)
@@ -563,8 +563,12 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         internal void UpdateHandHeuristics(ref Collider[] colliderCache, ref bool[] foundCache)
         {
+            _physicsHand.palmBone.UpdateBoneWorldSpace();
+            foreach (var bone in _physicsHand.jointBones)
+            {
+                bone.UpdateBoneWorldSpace();
+            }
             UpdateHandOverlaps(ref colliderCache, ref foundCache);
-            UpdateHandDistances();
         }
 
         private void UpdateHandOverlaps(ref Collider[] colliderCache, ref bool[] foundCache)
@@ -616,7 +620,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             for (int i = 0; i < _physicsHand.jointBones.Length * 2; i++)
             {
-                PhysOverlapEnumerator hitEnumerator = new(ref _overlapsResults, i, _overlapsMaxHit);
+                PhysMultiOverlapEnumerator hitEnumerator = new(ref _overlapsResults, i, _overlapsMaxHit);
                 while (hitEnumerator.HasNextHit(out RaycastHit hit))
                 {
                     if (hit.collider == null || hit.rigidbody == null)
@@ -637,9 +641,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             for (int i = 0; i < _physicsHand.jointBones.Length; i++)
             {
-                PhysExts.ToWorldSpaceCapsule(_physicsHand.jointColliders[i], out Vector3 origin, out Vector3 point1, out float radius);
-                _physicsHand.jointBones[i].UpdateBoneCenter((origin + point1) / 2f);
-
                 // Hover
                 count = PhysExts.OverlapCapsuleNonAllocOffset(_physicsHand.jointColliders[i], Vector3.zero, colliderCache, _physicsProvider.InteractionMask, QueryTriggerInteraction.Ignore, extraRadius: _physicsHand.hoverDistance);
                 for (int j = 0; j < count; j++)
@@ -665,135 +666,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
             }
         }
 
-        private void UpdateHandDistances()
-        {
-            float distance, radius;
-            Vector3 position, direction;
-            for (int i = 0; i < DISTANCE_CHECKS; i++)
-            {
-                GetBoneForDistanceCheck(i, out var bone, out var test);
-                
-                if(test == 5)
-                {
-                    BoxCollider palm = (BoxCollider)bone.Collider;
-                    distance = palm.size.z;
-                    radius = palm.size.y / 2f;
-                }
-                else
-                {
-                    CapsuleCollider capsule = (CapsuleCollider)bone.Collider;
-                    distance = capsule.height * 2f;
-                    radius = capsule.radius;
-                }
-
-                // Move forward from center by 25% of the finger so that we're not off the very tip
-                position = bone.Collider.bounds.center + bone.transform.rotation * (Vector3.forward * distance * .25f);
-
-                // If we're on the thumb we want to tilt slightly towards the other fingers
-                direction = bone.Finger == 0 ? Vector3.Lerp(-bone.transform.up, _handedness == Chirality.Left ? -bone.transform.right : bone.transform.right, 0.3f) :
-                Vector3.Lerp(-bone.transform.up, _handedness == Chirality.Left ? bone.transform.right : -bone.transform.right, 0.1f);
-
-                // Position changes
-                switch (test)
-                {
-                    case 2:
-                        // Second set of distance checks closer to the center of the bone
-                        position = bone.Collider.bounds.center + bone.transform.rotation * (Vector3.forward * distance * .15f);
-                        break;
-                    case 3:
-                    case 4:
-                        position = position + bone.transform.rotation * new Vector3(0, radius * .2f, distance * .15f);
-                        break;
-                }
-
-                // Direction and distance changes
-                switch (test)
-                {
-                    case 1:
-                        // Thumb distances closer towards the object, pointing down a bit
-                        direction = Vector3.Lerp(-bone.transform.up, _handedness == Chirality.Left ? bone.transform.right : -bone.transform.right, 0.6f);
-                        break;
-                    case 3:
-                        // Pointing forward a bit for the tip
-                        direction = Vector3.Lerp(direction, bone.transform.forward, 0.6f);
-                        break;
-                    case 4:
-                        // Another one pointing out from the tip to improve button detection
-                        direction = bone.transform.forward;
-                        distance *= 0.5f;
-                        break;
-                }
-
-                _distancesJob.origins[i] = position;
-                _distancesJob.directions[i] = direction;
-                _distancesJob.radii[i] = radius;
-                _distancesJob.distances[i] = distance;
-            }
-
-            JobHandle handle = _distancesJob.ScheduleParallel(DISTANCE_CHECKS, 64, default);
-            int commandsPerJob = Mathf.Max(DISTANCE_CHECKS / JobsUtility.JobWorkerCount, 1);
-            handle = SpherecastCommand.ScheduleBatch(_distancesJob.commands, _distancesResults, commandsPerJob, handle);
-
-            handle.Complete();
-
-            for (int i = 0; i < DISTANCE_CHECKS; i++)
-            {
-                if (_distancesResults[i].colliderInstanceID == 0)
-                    continue;
-
-                GetBoneForDistanceCheck(i, out var bone, out var test);
-
-                bone.UpdateBoneDistances(_distancesResults[i].distance);
-            }
-
-            _physicsHand.palmBone.ProcessBoneDistances();
-            foreach (var bone in _physicsHand.jointBones)
-            {
-                bone.ProcessBoneDistances();
-            }
-        }
-
-        internal void GetBoneForDistanceCheck(int index, out PhysicsBone bone, out int testType)
-        {
-            bone = null;
-            testType = -1;
-            // All joints
-            if (index < Hand.FINGERS * Hand.BONES)
-            {
-                bone = _physicsHand.jointBones[index];
-                testType = 0;
-            }
-            // Thumb
-            else if (index < (Hand.FINGERS * Hand.BONES) + Hand.BONES)
-            {
-                bone = _physicsHand.jointBones[index - (Hand.FINGERS * Hand.BONES)];
-                testType = 1;
-            }
-            // 2nd and 3rd Joints
-            else if (index < (Hand.FINGERS * Hand.BONES) + Hand.BONES + (Hand.FINGERS * (Hand.BONES - 1)))
-            {
-                index -= (Hand.FINGERS * Hand.BONES) + Hand.BONES;
-                index = ((index / 2) * Hand.BONES) + 1 + (index % 2);
-                bone = _physicsHand.jointBones[index];
-                testType = 2;
-            }
-            // 2 extra for the tip joint
-            else if (index < (Hand.FINGERS * Hand.BONES) + Hand.BONES + (Hand.FINGERS * (Hand.BONES - 1)) + (Hand.FINGERS * 2))
-            {
-                index -= (Hand.FINGERS * Hand.BONES) + Hand.BONES + (Hand.FINGERS * (Hand.BONES - 1));
-                int test = index % 2;
-                index = ((index/2) * Hand.BONES) + 2;
-                bone = _physicsHand.jointBones[index];
-                testType = 3 + test;
-            }
-            // Finally the palm
-            else
-            {
-                bone = _physicsHand.palmBone;
-                testType = 5;
-            }
-        }
-
         // Happens after the physics simulation
         internal void LateFixedUpdate()
         {
@@ -805,8 +677,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
                 bool hasFingerGrasped = false;
 
-                _fingerContacting[fingerIndex] = false;
-
                 for (int jointIndex = Hand.BONES - 1; jointIndex >= 0; jointIndex--)
                 {
                     int boneArrayIndex = fingerIndex * Hand.BONES + jointIndex;
@@ -814,11 +684,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     if (_physicsHand.jointBodies[boneArrayIndex].jointPosition.dofCount > 0)
                     {
                         _currentXDrives[boneArrayIndex] = _physicsHand.jointBodies[boneArrayIndex].jointPosition[0] * Mathf.Rad2Deg;
-                    }
-
-                    if (_physicsHand.jointBones[boneArrayIndex].IsBoneContacting || _physicsHand.jointBones[boneArrayIndex].IsGrabbing || _physicsHand.jointBones[boneArrayIndex].IsObjectNearBone)
-                    {
-                        _fingerContacting[fingerIndex] = true;
                     }
 
                     if (_graspingFrames[boneArrayIndex] > 0)
@@ -865,7 +730,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                             _xDampening[boneArrayIndex] = 10f;
                         }
                     }
-                    else if (_physicsHand.jointBones[boneArrayIndex].IsObjectNearBone && _physicsHand.jointBones[boneArrayIndex].ObjectDistance < distanceCheck)
+                    else if (_physicsHand.jointBones[boneArrayIndex].IsBoneHovering && _physicsHand.jointBones[boneArrayIndex].ObjectDistance < distanceCheck)
                     {
                         if (_physicsHand.jointBones[boneArrayIndex].IsGrabbing)
                         {
@@ -891,7 +756,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     if (_wasGraspingBones[boneArrayIndex])
                     {
                         hasFingerGrasped = true;
-                        if (_physicsHand.jointBones[boneArrayIndex].IsObjectNearBone &&
+                        if (_physicsHand.jointBones[boneArrayIndex].IsBoneHovering &&
                             (_physicsHand.jointBones[boneArrayIndex].ObjectDistance < _graspingFingerDistance[fingerIndex] || (_graspingFingerDistance[fingerIndex] == 1 && jointIndex == 0)))
                         {
                             _graspingFingerDistance[fingerIndex] = _physicsHand.jointBones[boneArrayIndex].ObjectDistance;
@@ -905,21 +770,23 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         private void CalculateDisplacements()
         {
-            _physicsHand.palmBone.UpdateBoneDisplacement();
-
             _overallFingerDisplacement = 0f;
             _averageFingerDisplacement = 0f;
             _contactFingerDisplacement = 0f;
 
             int contactingFingers = 0;
 
+            _physicsHand.palmBone.UpdateBoneDisplacement();
+            _overallFingerDisplacement += _physicsHand.palmBone.DisplacementAmount;
+            if (_physicsHand.palmBone.IsBoneContacting)
+            {
+                contactingFingers++;
+            }
+
+            bool contacting;
             for (int fingerIndex = 0; fingerIndex < Hand.FINGERS; fingerIndex++)
             {
-                if (_fingerContacting[fingerIndex])
-                {
-                    contactingFingers++;
-                }
-
+                contacting = false;
                 for (int jointIndex = Hand.BONES - 1; jointIndex >= 0; jointIndex--)
                 {
                     int boneArrayIndex = fingerIndex * Hand.BONES + jointIndex;
@@ -928,13 +795,21 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
                     _physicsHand.jointBones[boneArrayIndex].UpdateBoneDisplacement(bone);
                     _overallFingerDisplacement += _physicsHand.jointBones[boneArrayIndex].DisplacementAmount;
+                    if (_physicsHand.jointBones[boneArrayIndex].IsBoneContacting)
+                    {
+                        contacting = true;
+                    }
+                }
+                if (contacting)
+                {
+                    contactingFingers++;
                 }
             }
 
             _averageFingerDisplacement = _overallFingerDisplacement / (Hand.FINGERS * Hand.BONES);
             if (contactingFingers > 0)
             {
-                _contactFingerDisplacement = _overallFingerDisplacement * (6 - contactingFingers);
+                _contactFingerDisplacement = _overallFingerDisplacement * Mathf.Max(6 - contactingFingers, 1);
             }
         }
 
@@ -959,12 +834,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 return;
             }
             _physicsHand.boneMass = _physicsProvider.PerBoneMass;
-        }
-
-        private void CalculateContacts()
-        {
-            _isContacting = IsAnyObjectInHandRadius(0.001f);
-            _isCloseToObject = IsAnyObjectInHandRadius();
         }
 
         private void DelayedReset()
@@ -1073,41 +942,79 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         #region External Factors Functions
 
-        /// <summary>
-        /// Used to make sure that the hand is not going to make contact with any object within the scene. Adjusting extraRadius will inflate the joints. This prevents hands from attacking objects when they swap back to contacting.
-        /// </summary>
-        public bool IsAnyObjectInHandRadius(float extraRadius = 0.005f)
+        private void CalculateSafetyOverlaps()
         {
-            if (IsAnyObjectInBoneRadius(_physicsHand.palmBone, extraRadius))
+            _isContacting = false;
+            _isCloseToObject = false;
+
+            if (IsAnyObjectInPalmRadius(_physicsHand.palmCollider, _physicsHand.contactDistance))
             {
-                return true;
+                _isContacting = true;
             }
 
-            foreach (var bone in _physicsHand.jointBones)
+            if (IsAnyObjectInPalmRadius(_physicsHand.palmCollider, 0.005f))
             {
-                if (IsAnyObjectInBoneRadius(bone, extraRadius))
+                _isCloseToObject = true;
+            }
+
+            if (_isContacting && _isCloseToObject)
+            {
+                return;
+            }
+
+            for (int i = 0; i < _physicsHand.jointBones.Length * 2; i += 2)
+            {
+                PhysExts.ToWorldSpaceCapsule(_physicsHand.jointColliders[i / 2], out Vector3 point1, out Vector3 origin, out float radius);
+
+                _safetyOverlapJob.origins[i] = origin;
+                _safetyOverlapJob.origins[i + 1] = origin;
+
+                _safetyOverlapJob.directions[i] = (point1 - origin).normalized;
+                _safetyOverlapJob.directions[i + 1] = (point1 - origin).normalized;
+
+                _safetyOverlapJob.radii[i] = radius + _physicsHand.contactDistance;
+                _safetyOverlapJob.radii[i + 1] = radius + 0.005f;
+
+                _safetyOverlapJob.distances[i] = Vector3.Distance(origin, point1);
+                _safetyOverlapJob.distances[i + 1] = Vector3.Distance(origin, point1);
+
+                Debug.DrawRay(_safetyOverlapJob.origins[i], _safetyOverlapJob.directions[i] * _safetyOverlapJob.distances[i], Color.magenta, Time.fixedDeltaTime);
+                Debug.DrawRay(_safetyOverlapJob.origins[i], Vector3.up * 0.2f, Color.magenta, Time.fixedDeltaTime);
+            }
+
+            _safetyOverlapJob.layerMask = _physicsProvider.InteractionMask;
+
+            JobHandle handle = _safetyOverlapJob.ScheduleParallel(_safetyOverlapJob.commands.Length, 64, default);
+            int commandsPerJob = Mathf.Max(_physicsHand.jointBones.Length * 2 / JobsUtility.JobWorkerCount, 1);
+            handle = SpherecastCommand.ScheduleBatch(_safetyOverlapJob.commands, _safetyOverlapResults, commandsPerJob, handle);
+
+            handle.Complete();
+
+            for (int i = 0; i < _safetyOverlapResults.Length; i += 2)
+            {
+                if (_safetyOverlapResults[i].colliderInstanceID == 0 && _safetyOverlapResults[i + 1].colliderInstanceID == 0)
+                    continue;
+
+                if (_isContacting && _isCloseToObject)
+                    break;
+
+                if (!_isContacting && _safetyOverlapResults[i].colliderInstanceID != 0 && WillColliderAffectHand(_safetyOverlapResults[i].collider))
                 {
-                    return true;
+                    _isContacting = true;
+                }
+                if (!_isCloseToObject && _safetyOverlapResults[i + 1].colliderInstanceID != 0 && WillColliderAffectHand(_safetyOverlapResults[i + 1].collider))
+                {
+                    _isCloseToObject = true;
                 }
             }
-
-            return false;
         }
 
         /// <summary>
         /// Used to make sure that a physicsBone is not going to make contact with any object within the scene. Adjusting extraRadius will inflate the joints.
         /// </summary>
-        public bool IsAnyObjectInBoneRadius(PhysicsBone physicsBone, float extraRadius = 0.005f)
+        private bool IsAnyObjectInPalmRadius(BoxCollider palm, float extraRadius = 0.005f)
         {
-            int overlappingColliders;
-            if (physicsBone.Finger == 5)
-            {
-                overlappingColliders = PhysExts.OverlapBoxNonAllocOffset((BoxCollider)physicsBone.Collider, Vector3.zero, _colliderCache, _layerMask, QueryTriggerInteraction.Ignore, extraRadius);
-            }
-            else
-            {
-                overlappingColliders = PhysExts.OverlapCapsuleNonAllocOffset((CapsuleCollider)physicsBone.Collider, Vector3.zero, _colliderCache, _layerMask, QueryTriggerInteraction.Ignore, extraRadius);
-            }
+            int overlappingColliders = PhysExts.OverlapBoxNonAllocOffset(palm, Vector3.zero, _colliderCache, _layerMask, QueryTriggerInteraction.Ignore, extraRadius);
 
             for (int i = 0; i < overlappingColliders; i++)
             {
@@ -1310,6 +1217,12 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     Gizmos.color = _wasGraspingBones[boneArrayIndex] ? Color.green : Color.red;
                     Gizmos.DrawSphere(_physicsHand.jointBones[boneArrayIndex].Collider.bounds.center, 0.005f);
                 }
+            }
+
+            Gizmos.color = Color.yellow;
+            for (int i = 0; i < _safetyOverlapJob.radii.Length; i += 2)
+            {
+                Gizmos.DrawSphere(_safetyOverlapJob.origins[i], _safetyOverlapJob.radii[i]);
             }
         }
     }

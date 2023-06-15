@@ -473,7 +473,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         public static void InterpolateKnucklePosition(ArticulationBody body, PhysicsBone bone, Leap.Hand leapHand, float deltaTime)
         {
-            if (bone != null && bone.ContactingObjects.Count > 0)
+            if (bone != null && bone.ContactObjects.Count > 0)
             {
                 // Stop bones sizing if they're touching things
                 // Has the benefit of stopping small objects falling through bones
@@ -485,7 +485,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         public static void InterpolateBoneSize(ArticulationBody body, PhysicsBone bone, CapsuleCollider collider, Vector3 parentPosition, Quaternion parentRotation, Vector3 childPosition, float width, float length, float deltaTime)
         {
-            if (bone != null && bone.ContactingObjects.Count > 0)
+            if (bone != null && bone.ContactObjects.Count > 0)
             {
                 // Stop bones sizing if they're touching things
                 // Has the benefit of stopping small objects falling through bones
@@ -549,11 +549,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             if(physicsHand.currentPalmWeightInterp > physicsHand.currentPalmWeight)
             {
-                physicsHand.currentPalmWeight = physicsHand.currentPalmWeightInterp;
+                physicsHand.currentPalmWeight = Mathf.Lerp(physicsHand.currentPalmWeight, physicsHand.currentPalmWeightInterp, Time.fixedDeltaTime * (1.0f / 0.025f));
             }
             else
             {
-                physicsHand.currentPalmWeight = Mathf.Lerp(physicsHand.currentPalmWeight, physicsHand.currentPalmWeightInterp, Time.fixedDeltaTime * (1.0f / 0.05f));
+                physicsHand.currentPalmWeight = Mathf.Lerp(physicsHand.currentPalmWeight, physicsHand.currentPalmWeightInterp, Time.fixedDeltaTime * (1.0f / 0.075f));
             }
 
             Vector3 delta = dataHand.PalmPosition - physicsHand.transform.position;

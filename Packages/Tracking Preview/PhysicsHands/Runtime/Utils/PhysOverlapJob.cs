@@ -9,7 +9,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
     /// Used for singular return instances of an Spherecast
     /// </summary>
     [BurstCompile]
-    public struct PhysOverlapJob : IJobFor
+    internal struct PhysOverlapJob : IJobFor
     {
         [ReadOnly]
         public NativeArray<Vector3> origins;

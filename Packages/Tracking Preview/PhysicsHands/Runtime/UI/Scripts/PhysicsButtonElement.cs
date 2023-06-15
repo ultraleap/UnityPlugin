@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Leap.Unity.Interaction.PhysicsHands
@@ -6,7 +7,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
     [RequireComponent(typeof(Rigidbody))]
     [RequireComponent(typeof(ConfigurableJoint))]
     [ExecuteInEditMode]
-    public class PhysicsButtonElement : MonoBehaviour
+    public class PhysicsButtonElement : MonoBehaviour, IPhysicsHandHover, IPhysicsHandContact
     {
         [SerializeField, HideInInspector]
         private PhysicsButton _button = null;
@@ -26,6 +27,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private Collider[] _colliders;
 
         private PhysicsProvider _provider;
+
+        private HashSet<PhysicsHand> _hoveringHands = new HashSet<PhysicsHand>();
+        private HashSet<PhysicsHand> _contactingHands = new HashSet<PhysicsHand>();
+        public bool IsHovered { get; private set; } = false;
+        public bool IsContacting { get; private set; } = false;
 
         private void Awake()
         {
@@ -57,6 +63,30 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     }
                 }
             }
+        }
+
+        public void OnHandHover(PhysicsHand hand)
+        {
+            _hoveringHands.Add(hand);
+            IsHovered = _hoveringHands.Count > 0;
+        }
+
+        public void OnHandHoverExit(PhysicsHand hand)
+        {
+            _hoveringHands.Remove(hand);
+            IsHovered = _hoveringHands.Count > 0;
+        }
+
+        public void OnHandContact(PhysicsHand hand)
+        {
+            _contactingHands.Add(hand);
+            IsContacting = _contactingHands.Count > 0;
+        }
+
+        public void OnHandContactExit(PhysicsHand hand)
+        {
+            _contactingHands.Remove(hand);
+            IsContacting = _contactingHands.Count > 0;
         }
 
         /// <summary>
