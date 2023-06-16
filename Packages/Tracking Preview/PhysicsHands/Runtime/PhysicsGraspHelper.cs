@@ -29,7 +29,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         public List<PhysicsHand> GraspingCandidates => _graspingCandidates;
         private List<PhysicsHand> _graspingCandidates = new List<PhysicsHand>();
-        private List<bool> _graspingCandidatesContact = new List<bool>(); 
+        private List<bool> _graspingCandidatesContact = new List<bool>();
 
         public List<PhysicsHand> GraspingHands => _graspingHands;
         private List<PhysicsHand> _graspingHands = new List<PhysicsHand>();
@@ -136,7 +136,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             _graspingValues.Clear();
 
             // Remove any lingering contact events
-            if(_rigid.TryGetComponent<IPhysicsHandContact>(out var physicsHandContact))
+            if (_rigid.TryGetComponent<IPhysicsHandContact>(out var physicsHandContact))
             {
                 for (int i = 0; i < _graspingCandidatesContact.Count; i++)
                 {
@@ -283,7 +283,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             {
                 foreach (var bone in hand.GetPhysicsHand().jointBones)
                 {
-                    if(bone.GrabbableObjects.Contains(_rigid))
+                    if (bone.GrabbableObjects.Contains(_rigid))
                     {
                         _boneHash.Add(bone);
                         if (_bones.TryGetValue(bone.Hand, out HashSet<PhysicsBone>[] storedBones))
@@ -316,7 +316,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             {
                 if (_graspingCandidatesContact[i] != _graspingCandidates[i].IsContacting)
                 {
-                    if(_rigid.TryGetComponent<IPhysicsHandContact>(out var physicsHandContact))
+                    if (_rigid.TryGetComponent<IPhysicsHandContact>(out var physicsHandContact))
                     {
                         if (_graspingCandidates[i].IsContacting)
                         {
@@ -453,7 +453,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                         _graspingValues[hand].offset = _rigid.position - hand.GetPhysicsHand().palmBone.transform.position;
                         _graspingValues[hand].rotationOffset = Quaternion.Inverse(hand.GetPhysicsHand().palmBone.transform.rotation) * _rigid.rotation;
                         _graspingValues[hand].originalHandRotation = hand.GetPhysicsHand().palmBone.transform.rotation;
-                        if(_rigid.TryGetComponent<IPhysicsHandGrab>(out var physicsHandGrab))
+                        if (_rigid.TryGetComponent<IPhysicsHandGrab>(out var physicsHandGrab))
                         {
                             physicsHandGrab.OnHandGrab(hand);
                         }

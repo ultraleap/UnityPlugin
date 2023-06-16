@@ -335,7 +335,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 state = helper.Value.UpdateHelper();
                 if (state != oldState)
                 {
+#pragma warning disable 0618
                     OnObjectStateChange?.Invoke(helper.Value.Rigidbody, helper.Value);
+#pragma warning restore 0618
                 }
             }
         }
@@ -550,7 +552,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
                         _graspHelpers[rigid].ReleaseObject();
                     }
                     _graspHelpers[rigid].ReleaseHelper();
+#pragma warning disable 0618
                     OnObjectStateChange?.Invoke(rigid, _graspHelpers[rigid]);
+#pragma warning restore 0618
                     _graspHelpers.Remove(rigid);
                 }
                 return true;

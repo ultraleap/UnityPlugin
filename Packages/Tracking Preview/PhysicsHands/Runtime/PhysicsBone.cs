@@ -186,7 +186,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         internal void UpdateBoneWorldSpace()
         {
-            if(Finger == 5)
+            if (Finger == 5)
             {
                 PhysExts.ToWorldSpaceBox(_palmCollider, out Vector3 center, out Vector3 halfExtents, out Quaternion orientation);
                 JointCenter = center;
@@ -377,7 +377,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     tempB = _collider.ClosestPoint(tempMid);
 
                     tempDist = Vector3.Distance(tempA, tempB);
-                    if(tempDist < _objectDistance)
+                    if (tempDist < _objectDistance)
                     {
                         _objectDistance = tempDist;
                         _debugDistanceA = tempA;

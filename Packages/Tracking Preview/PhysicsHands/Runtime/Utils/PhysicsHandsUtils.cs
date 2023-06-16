@@ -547,7 +547,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 physicsHand.currentPalmWeightInterp = 0f;
             }
 
-            if(physicsHand.currentPalmWeightInterp > physicsHand.currentPalmWeight)
+            if (physicsHand.currentPalmWeightInterp > physicsHand.currentPalmWeight)
             {
                 physicsHand.currentPalmWeight = Mathf.Lerp(physicsHand.currentPalmWeight, physicsHand.currentPalmWeightInterp, Time.fixedDeltaTime * (1.0f / 0.025f));
             }

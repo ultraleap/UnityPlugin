@@ -295,7 +295,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     OnHover?.Invoke();
                 }
 
-                if(_buttonElement.IsContacting)
+                if (_buttonElement.IsContacting)
                 {
                     if (!_contact)
                     {
