@@ -64,6 +64,16 @@ namespace Leap.Unity.Interaction.PhysicsHands
         public float GraspedObjectDistance => _graspedObjectDistance;
         private float _objectDistance = -1f, _graspedObjectDistance = -1f;
 
+        /// <summary>
+        /// This value will increase the further away from the palm the joint is.
+        /// E.g. the finger tips will always be a significantly higher value than the knuckles
+        /// </summary>
+        public float DisplacementAmount { get; private set; } = 0;
+        public float DisplacementDistance => _displacementDistance;
+        public float DisplacementRotation => _displacementRotation;
+        private float _displacementDistance = 0f, _displacementRotation = 0f;
+
+
         public Collider Collider => _collider;
         private Collider _collider;
 
@@ -91,6 +101,26 @@ namespace Leap.Unity.Interaction.PhysicsHands
             _hand = GetComponentInParent<PhysicsHand>();
             _body = GetComponent<ArticulationBody>();
             _collider = GetComponent<Collider>();
+        }
+
+        private void OnEnable()
+        {
+            ResetValues();
+        }
+
+        private void OnDisable()
+        {
+            ResetValues();
+        }
+
+        private void ResetValues()
+        {
+            _isObjectNearBone = false;
+            _objectDistance = 0f;
+            _graspedObjectDistance = 0f;
+            DisplacementAmount = 0f;
+            _displacementDistance = 0f;
+            _displacementRotation = 0f;
         }
 
         public void SetBoneIndexes(int finger, int joint)
@@ -133,7 +163,47 @@ namespace Leap.Unity.Interaction.PhysicsHands
             _graspingObjects.Remove(rigid);
         }
 
-        public void UpdateBoneDistances()
+        internal void UpdateBoneDisplacement(Bone bone = null)
+        {
+            _displacementDistance = 0f;
+            _displacementRotation = 0f;
+
+            if (bone == null && Finger != 5)
+            {
+                return;
+            }
+
+            Vector3 bonePos, position;
+            // Palm
+            if (Finger == 5)
+            {
+                bonePos = _hand.GetOriginalLeapHand().PalmPosition;
+                position = transform.position;
+                _displacementRotation = Quaternion.Angle(transform.rotation, _hand.GetOriginalLeapHand().Rotation);
+            }
+            // Fingers
+            else
+            {
+                bonePos = bone.NextJoint;
+                CapsuleCollider capsule = (CapsuleCollider)_collider;
+                capsule.ToWorldSpaceCapsule(out Vector3 tip, out Vector3 temp, out float rad);
+                position = tip;
+
+                if (_body.dofCount > 0)
+                {
+                    _displacementRotation = Mathf.Abs(_body.xDrive.target - _body.jointPosition[0] * Mathf.Rad2Deg);
+                }
+            }
+
+            Debug.DrawLine(position, bonePos, Color.cyan, Time.fixedDeltaTime);
+
+            _displacementDistance = Vector3.Distance(position, bonePos);
+
+            // We want the rotation displacement to be more powerful than the distance
+            DisplacementAmount = ((Mathf.InverseLerp(0.01f, _hand.Provider.HandTeleportDistance, _displacementDistance) * 0.75f) + (Mathf.InverseLerp(5f, 35f, _displacementRotation) * 1.25f)) * (1 + (Joint * 0.5f));
+        }
+
+        internal void UpdateBoneDistances()
         {
             _objectDistance = float.MaxValue;
             _graspedObjectDistance = float.MaxValue;
@@ -168,6 +238,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
             {
                 // Run a second test pointing forward a bit for the tip
                 CalculateJointDistance(position + transform.rotation * new Vector3(0, radius * .2f, height * .15f), Vector3.Lerp(upDirection, transform.forward, 0.6f), radius, height * 2f);
+                // Add a third one for pointing out from the tip to improve button detection
+                CalculateJointDistance(position + transform.rotation * new Vector3(0, radius * .2f, height * .15f), transform.forward, radius, height * 0.5f);
             }
 
             if (Joint > 0)

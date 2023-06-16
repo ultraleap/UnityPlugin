@@ -68,8 +68,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private float _stiffness = 200f;
 
         public float PerBoneMass => _perBoneMass;
-        [SerializeField, Tooltip("The mass of each finger bone; the palm will be 3x this.")]
-        private float _perBoneMass = 0.6f;
+        [SerializeField, Tooltip("The mass of each finger bone; the palm will be 3x this. It is not recommended to modify this too far from the default (0.1)."), Range(0.01f, 0.25f)]
+        private float _perBoneMass = 0.1f;
 
         public float HandTeleportDistance => _handTeleportDistance;
         [SerializeField, Tooltip("The distance between the physics and original data hand can reach before it snaps back to the original hand position."), Range(0.01f, 0.5f)]
@@ -225,6 +225,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
             if (_interactableLayers.Count == 0)
             {
                 _interactableLayers.Add(new SingleLayer() { layerIndex = 0 });
+            }
+
+            if (_interHandCollisions)
+            {
+                _interactableLayers.Add(_handsLayer);
             }
 
             _hoverMask = new LayerMask();
@@ -711,10 +716,18 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         private void UpdateHandStates()
         {
-            UpdateBoneStats(LeftHand);
-            UpdateBoneStats(RightHand);
-            FindHandState(LeftHand);
-            FindHandState(RightHand);
+            if (LeftHand.IsTracked)
+            {
+                UpdateBoneStats(LeftHand);
+                FindHandState(LeftHand);
+                LeftHand.LateFixedUpdate();
+            }
+            if (RightHand.IsTracked)
+            {
+                UpdateBoneStats(RightHand);
+                FindHandState(RightHand);
+                RightHand.LateFixedUpdate();
+            }
         }
 
         private void UpdateBoneStats(PhysicsHand hand)
