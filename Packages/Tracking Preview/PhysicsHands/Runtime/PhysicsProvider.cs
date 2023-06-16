@@ -114,7 +114,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private Dictionary<Rigidbody, HashSet<PhysicsBone>> _boneQueue = new Dictionary<Rigidbody, HashSet<PhysicsBone>>();
 
         // Cache for physics calculations
-        private Vector3 _tempVector = Vector3.zero;
         private Collider[] _resultsCache = new Collider[16];
         private bool[] _resultsFound = new bool[16];
         private int _resultCount = 0;
@@ -129,9 +128,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private LayerMask _interactionMask;
         public LayerMask InteractionMask => _interactionMask;
 
-        [Obsolete("This event has been replaced by the PhysicsInterface calls. Please reference PhysicsInterfaces.cs. " +
+        [Obsolete("This event has been replaced by the PhysicsInterface calls. Please reference SubscribeToStateChanges function and PhysicsInterfaces.cs " +
             "This event will be removed in a future version.")]
         public Action<Rigidbody, PhysicsGraspHelper> OnObjectStateChange;
+
+        private Dictionary<Rigidbody, HashSet<Action<PhysicsGraspHelper>>> _objectStateChanges = new Dictionary<Rigidbody, HashSet<Action<PhysicsGraspHelper>>>();
 
         private int _leftIndex = -1, _rightIndex = -1;
         private Hand _leftOriginalLeap, _rightOriginalLeap;
@@ -338,6 +339,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 #pragma warning disable 0618
                     OnObjectStateChange?.Invoke(helper.Value.Rigidbody, helper.Value);
 #pragma warning restore 0618
+                    SendStates(helper.Value.Rigidbody, helper.Value);
                 }
             }
         }
@@ -555,11 +557,60 @@ namespace Leap.Unity.Interaction.PhysicsHands
 #pragma warning disable 0618
                     OnObjectStateChange?.Invoke(rigid, _graspHelpers[rigid]);
 #pragma warning restore 0618
+                    SendStates(rigid, _graspHelpers[rigid]);
+
                     _graspHelpers.Remove(rigid);
                 }
                 return true;
             }
             return false;
+        }
+
+        /// <summary>
+        /// This allows you to bind to any rigidbody and then listen to events when it's grab state changes.
+        /// Use PhysicsGraspHelper.Rigidbody to access your target.
+        /// </summary>
+        /// <param name="target">The rigidbody you want to listen to.</param>
+        /// <param name="outputFunction">The function you want to be called.</param>
+        public void SubscribeToStateChanges(Rigidbody target, Action<PhysicsGraspHelper> outputFunction)
+        {
+            if (_objectStateChanges.TryGetValue(target, out var hashset))
+            {
+                hashset.Add(outputFunction);
+            }
+            else
+            {
+                _objectStateChanges.Add(target, new HashSet<Action<PhysicsGraspHelper>>() { outputFunction });
+            }
+        }
+
+        /// <summary>
+        /// Removes your target rigidbody and function from being called when a grab state is changed.
+        /// </summary>
+        /// <param name="target">The rigidbody you are lisening to.</param>
+        /// <param name="outputFunction">The function you have being called.</param>
+        public void UnsubscribeFromStateChanges(Rigidbody target, Action<PhysicsGraspHelper> outputFunction)
+        {
+            if (_objectStateChanges.TryGetValue(target, out var hashset))
+            {
+                hashset.Remove(outputFunction);
+                if (hashset.Count == 0)
+                {
+                    _objectStateChanges.Remove(target);
+                }
+            }
+        }
+
+        // Sends out the current grasp helper information to the functions as requested
+        private void SendStates(Rigidbody target, PhysicsGraspHelper helper)
+        {
+            if (_objectStateChanges.TryGetValue(target, out var hashset))
+            {
+                foreach (var action in hashset)
+                {
+                    action?.Invoke(helper);
+                }
+            }
         }
 
         // Simple check to see if we actually find some rigidbodies to interact with
