@@ -9,7 +9,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
     /// Used for singular return instances of an Spherecast
     /// </summary>
     [BurstCompile]
-    internal struct PhysOverlapJob : IJobFor
+    internal struct PhysSpherecastJob : IJobFor
     {
         [ReadOnly]
         public NativeArray<Vector3> origins;
@@ -34,8 +34,13 @@ namespace Leap.Unity.Interaction.PhysicsHands
             Vector3 direction = this.directions[index];
             float distance = this.distances[index];
             float radius = this.radii[index];
+#if UNITY_2022_3_OR_NEWER
+            this.commands[index] = new SpherecastCommand(
+                origin, radius, direction, new QueryParameters(layerMask: layerMask, hitTriggers: QueryTriggerInteraction.Ignore), distance: distance);
+#else
             this.commands[index] = new SpherecastCommand(
                 origin, radius, direction, distance: distance, layerMask: layerMask);
+#endif
         }
 
         internal void Dispose()
@@ -48,7 +53,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         }
     }
 
-    public struct PhysMultiOverlapEnumerator
+    public struct PhysMultiRaycastHitEnumerator
     {
         private readonly NativeArray<RaycastHit> results;
         private readonly int startingIndex;
@@ -56,7 +61,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         private int localIndex;
 
-        public PhysMultiOverlapEnumerator(ref NativeArray<RaycastHit> results, int raycastIndex, int maxHits)
+        public PhysMultiRaycastHitEnumerator(ref NativeArray<RaycastHit> results, int raycastIndex, int maxHits)
         {
             this.results = results;
             this.startingIndex = raycastIndex * maxHits;
@@ -90,9 +95,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
     }
 
 #if UNITY_2022_3_OR_NEWER
-    // TODO: Convert to work with 2022+ maxhit values.
     [BurstCompile]
-    public struct PhysMultiOverlapJob : IJobFor
+    public struct PhysMultiSpherecastJob : IJobFor
     {
         [ReadOnly]
         public NativeArray<Vector3> origins;
@@ -118,7 +122,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             float distance = this.distances[index];
             float radius = this.radii[index];
             this.commands[index] = new SpherecastCommand(
-                origin, radius, direction, distance: distance, layerMask: layerMask);
+                origin, radius, direction, new QueryParameters(layerMask: layerMask, hitMultipleFaces: true, hitTriggers: QueryTriggerInteraction.Ignore), distance: distance);
         }
 
         internal void Dispose()
@@ -131,7 +135,81 @@ namespace Leap.Unity.Interaction.PhysicsHands
         }
     }
 
+    [BurstCompile]
+    public struct PhysMultiOverlapJob : IJobFor
+    {
+        [ReadOnly]
+        public NativeArray<Vector3> point0;
+
+        [ReadOnly]
+        public NativeArray<Vector3> point1;
+
+        [ReadOnly]
+        public NativeArray<float> radii;
+
+        [NativeDisableParallelForRestriction]
+        public NativeArray<OverlapCapsuleCommand> commands;
+
+        public int layerMask;
+
+        public void Execute(int index)
+        {
+            Vector3 point0 = this.point0[index];
+            Vector3 point1 = this.point1[index];
+            float radius = this.radii[index];
+            this.commands[index] = new OverlapCapsuleCommand(
+                point0, point1, radius, new QueryParameters(layerMask: layerMask, hitMultipleFaces: true, hitTriggers: QueryTriggerInteraction.Ignore));
+        }
+
+        internal void Dispose()
+        {
+            point0.Dispose();
+            point1.Dispose();
+            radii.Dispose();
+            commands.Dispose();
+        }
+    }
+
+    public struct PhysMultiColliderHitEnumerator
+    {
+        private readonly NativeArray<ColliderHit> results;
+        private readonly int startingIndex;
+        private readonly int maxHits;
+
+        private int localIndex;
+
+        public PhysMultiColliderHitEnumerator(ref NativeArray<ColliderHit> results, int raycastIndex, int maxHits)
+        {
+            this.results = results;
+            this.startingIndex = raycastIndex * maxHits;
+            this.maxHits = maxHits;
+
+            this.localIndex = 0;
+        }
+
+        public bool HasNextHit(out ColliderHit hit)
+        {
+            if (this.localIndex >= this.maxHits)
+            {
+                // Reached the end
+                hit = default;
+                return false;
+            }
+
+            int hitIndex = this.startingIndex + this.localIndex;
+            hit = this.results[hitIndex];
+            if (hit.instanceID == 0)
+            {
+                // Documentation says that iteration should stop as soon as a collider is null
+                return false;
+            }
+
+            // Move to next
+            ++this.localIndex;
+
+            return true;
+        }
+    }
+
 #endif
-
-
 }

@@ -38,7 +38,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             [Tooltip("The distance that bones will have their radius inflated by when calculating if an object is hovered.")]
             public float hoverDistance = HOVER_DISTANCE;
-            [Tooltip("The distance that bones will have their radius inflated by when calculating if an object is grabbed.")]
+            [Tooltip("The distance that bones will have their radius inflated by when calculating if an object is grabbed. " +
+                "If you increase this value too much, you may result in physics errors.")]
             public float contactDistance = CONTACT_DISTANCE;
             // You can change this to reduce the overall speed of the hands
             [Tooltip("The velocity at which the hand will move when not contacting or grabbing any object. Reducing this number may result in additional hand latency.")]
@@ -119,11 +120,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
 #if UNITY_2022_3_OR_NEWER
         // Used for doing the overlaps for the non-palm joints
-        private PhysOverlapJob _overlapsJob;
+        private PhysMultiOverlapJob _overlapsJob;
         private const int _overlapsMaxHit = 16;
-        private NativeArray<RaycastHit> _overlapsResults;
+        private NativeArray<ColliderHit> _overlapsResults;
 #endif
-        private PhysOverlapJob _safetyOverlapJob;
+        private PhysSpherecastJob _safetyOverlapJob;
         private NativeArray<RaycastHit> _safetyOverlapResults;
 
         private float _graspMass = 0;
@@ -258,19 +259,18 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private void InitJobs()
         {
 #if UNITY_2022_3_OR_NEWER
-            _overlapsJob = new PhysOverlapJob()
+            _overlapsJob = new PhysMultiOverlapJob()
             {
-                origins = new NativeArray<Vector3>(_physicsHand.jointBones.Length * 2, Allocator.Persistent),
-                directions = new NativeArray<Vector3>(_physicsHand.jointBones.Length * 2, Allocator.Persistent),
+                point0 = new NativeArray<Vector3>(_physicsHand.jointBones.Length * 2, Allocator.Persistent),
+                point1 = new NativeArray<Vector3>(_physicsHand.jointBones.Length * 2, Allocator.Persistent),
                 radii = new NativeArray<float>(_physicsHand.jointBones.Length * 2, Allocator.Persistent),
-                distances = new NativeArray<float>(_physicsHand.jointBones.Length * 2, Allocator.Persistent),
-                commands = new NativeArray<SpherecastCommand>(_physicsHand.jointBones.Length * 2, Allocator.Persistent),
+                commands = new NativeArray<OverlapCapsuleCommand>(_physicsHand.jointBones.Length * 2, Allocator.Persistent),
                 layerMask = _physicsProvider.InteractionMask
             };
-            _overlapsResults = new NativeArray<RaycastHit>(_physicsHand.jointBones.Length * 2 * _overlapsMaxHit, Allocator.Persistent);
+            _overlapsResults = new NativeArray<ColliderHit>(_physicsHand.jointBones.Length * 2 * _overlapsMaxHit, Allocator.Persistent);
 #endif
             // Need 2x so we can do different radii at the same time
-            _safetyOverlapJob = new PhysOverlapJob()
+            _safetyOverlapJob = new PhysSpherecastJob()
             {
                 origins = new NativeArray<Vector3>(_physicsHand.jointBones.Length * 2, Allocator.Persistent),
                 directions = new NativeArray<Vector3>(_physicsHand.jointBones.Length * 2, Allocator.Persistent),
@@ -591,43 +591,37 @@ namespace Leap.Unity.Interaction.PhysicsHands
             }
 
 #if UNITY_2022_3_OR_NEWER
+            PhysicsBone overlapBone;
             for (int i = 0; i < _physicsHand.jointBones.Length * 2; i += 2)
             {
-                PhysExts.ToWorldSpaceCapsule(_physicsHand.jointColliders[i / 2], out Vector3 origin, out Vector3 point1, out float radius);
-                _physicsHand.jointBones[i / 2].UpdateBoneCenter((origin + point1) / 2f);
+                overlapBone = _physicsHand.jointBones[i / 2];
+                _overlapsJob.point0[i] = overlapBone.JointBase;
+                _overlapsJob.point0[i + 1] = overlapBone.JointBase;
 
-                _overlapsJob.origins[i] = origin;
-                _overlapsJob.origins[i + 1] = origin;
+                _overlapsJob.point1[i] = overlapBone.JointTip;
+                _overlapsJob.point1[i + 1] = overlapBone.JointTip;
 
-                _overlapsJob.directions[i] = (point1 - origin).normalized;
-                _overlapsJob.directions[i + 1] = (point1 - origin).normalized;
-
-                Debug.DrawRay(origin, _overlapsJob.directions[i] * Vector3.Distance(origin, point1), Color.green, Time.fixedDeltaTime);
-
-                _overlapsJob.radii[i] = radius + _physicsHand.hoverDistance;
-                _overlapsJob.radii[i + 1] = radius + _physicsHand.contactDistance;
-
-                _overlapsJob.distances[i] = Vector3.Distance(origin, point1);
-                _overlapsJob.distances[i + 1] = Vector3.Distance(origin, point1);
+                _overlapsJob.radii[i] = overlapBone.JointRadius + _physicsHand.hoverDistance;
+                _overlapsJob.radii[i + 1] = overlapBone.JointRadius + _physicsHand.contactDistance;
             }
 
             JobHandle handle = _overlapsJob.ScheduleParallel(_overlapsJob.commands.Length, 64, default);
             int commandsPerJob = Mathf.Max(_physicsHand.jointBones.Length * 2 / JobsUtility.JobWorkerCount, 1);
-            handle = SpherecastCommand.ScheduleBatch(_overlapsJob.commands, _overlapsResults, commandsPerJob, handle);
+            handle = OverlapCapsuleCommand.ScheduleBatch(_overlapsJob.commands, _overlapsResults, commandsPerJob, _overlapsMaxHit, handle);
 
             // We complete here so we get the results
             handle.Complete();
 
             for (int i = 0; i < _physicsHand.jointBones.Length * 2; i++)
             {
-                PhysMultiOverlapEnumerator hitEnumerator = new(ref _overlapsResults, i, _overlapsMaxHit);
-                while (hitEnumerator.HasNextHit(out RaycastHit hit))
+                PhysMultiColliderHitEnumerator hitEnumerator = new(ref _overlapsResults, i, _overlapsMaxHit);
+                while (hitEnumerator.HasNextHit(out ColliderHit hit))
                 {
-                    if (hit.collider == null || hit.rigidbody == null)
+                    if (hit.collider == null || hit.collider.attachedRigidbody == null)
                         continue;
 
                     // Are we using the contact or hover radius?
-                    if(i % 2 == 0)
+                    if (i % 2 == 0)
                     {
                         _physicsHand.jointBones[i / 2].QueueHoverCollider(hit.collider);
                     }
@@ -977,9 +971,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
                 _safetyOverlapJob.distances[i] = Vector3.Distance(origin, point1);
                 _safetyOverlapJob.distances[i + 1] = Vector3.Distance(origin, point1);
-
-                Debug.DrawRay(_safetyOverlapJob.origins[i], _safetyOverlapJob.directions[i] * _safetyOverlapJob.distances[i], Color.magenta, Time.fixedDeltaTime);
-                Debug.DrawRay(_safetyOverlapJob.origins[i], Vector3.up * 0.2f, Color.magenta, Time.fixedDeltaTime);
             }
 
             _safetyOverlapJob.layerMask = _physicsProvider.InteractionMask;
@@ -1118,7 +1109,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 {
                     int boneArrayIndex = fingerIndex * Hand.BONES + jointIndex;
 
-                    // Skip finger if a bone's contacting
+                    // Skip finger if a overlapBone's contacting
                     if (_physicsHand.jointBones[boneArrayIndex].IsBoneContacting)
                     {
                         break;
@@ -1136,7 +1127,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                         return true;
                     }
 
-                    // If the bone's meant to be pretty flat
+                    // If the overlapBone's meant to be pretty flat
                     float delta = Mathf.DeltaAngle(angle, body.xDrive.target);
                     if (Mathf.Abs(body.xDrive.target) < eulerThreshold / 2f && delta > eulerThreshold)
                     {
