@@ -1,6 +1,3 @@
-using Leap.Unity;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -11,9 +8,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
     {
         [SerializeField]
         private PhysicsHand _physicsHand;
+        public PhysicsHand PhysicsHand => _physicsHand;
 
         [SerializeField]
         private HandModelBase _handModel;
+        public HandModelBase HandModel => _handModel;
 
         [SerializeField]
         private float _alpha = 0.02f;
@@ -30,6 +29,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
         {
             _renderer = GetComponentInChildren<Renderer>(true);
             _renderer.material.SetColor("_MainColor", Color.clear);
+        }
+
+        public void SetPhysicsHand(PhysicsHand hand)
+        {
+            _physicsHand = hand;
         }
 
         void Update()
