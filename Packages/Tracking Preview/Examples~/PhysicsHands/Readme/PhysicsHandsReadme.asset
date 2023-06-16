@@ -17,6 +17,18 @@ MonoBehaviour:
   scene: {fileID: 102900000, guid: 1a70a889c083dac4480e0dd4c4a547d8, type: 3}
   sections:
   - heading: 
+    text: Please note that Physics Hands only works in Unity 2021 or later.This scene
+      may open in other versions, however, it will not work.
+    linkText: 
+    url: 
+    pingSceneElement: 
+    settingsPage: 
+    assetLinkText: 
+    assetLink: {fileID: 0}
+    assetLinkOpens: 0
+    image: {fileID: 0}
+    imageHeight: 0
+  - heading: 
     text: If you're looking for a more feature rich Physics Hands demo, check out
       our Physics Hands Playground project on Github.
     linkText: Physics Hands Playground
@@ -77,9 +89,9 @@ MonoBehaviour:
     text: 'Set your <b>Gravity</b> to <b>X: 0, Y: -4.905, Z: 0</b> \nReduce the <b>Default
       Max Depenetration Velocity</b> To <b>1</b> \nReduce the <b>Sleep Threshold</b>
       to <b>0.001</b> \nSet <b>Contacts Generation</b> to <b>Persistent Contact Manifold</b>
-      \nChange the <b>Friction Type</b> to <b>Two Directional Fricton</b> \nEnable
-      <b>Enchanced Determinism</b> \nChange the <b>Solver Type</b> to <b>Temporal
-      Gauss Seidel</b>'
+      \nChange the <b>Friction Type</b> to <b>Patch Fricton Type</b> \nEnable <b>Enchanced
+      Determinism</b> \nEnable <b>Improved Patch Friction</b> \nChange the <b>Solver
+      Type</b> to <b>Temporal Gauss Seidel</b>'
     linkText: 
     url: 
     pingSceneElement: 

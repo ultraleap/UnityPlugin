@@ -7,7 +7,9 @@
  ******************************************************************************/
 
 using Leap.Unity.Interaction;
+#if UNITY_2021_1_OR_NEWER
 using Leap.Unity.Interaction.PhysicsHands;
+#endif
 using Leap.Unity.Preview.HandRays;
 using System.Collections.Generic;
 using UnityEngine;
@@ -66,20 +68,23 @@ namespace Leap.Unity.Preview.Locomotion
                 // Ignore any grasped objects 
                 _layerMask ^= interactionManager.interactionNoContactLayer.layerMask;
             }
-
+#if UNITY_2021_1_OR_NEWER
             PhysicsProvider physicsProvider = FindObjectOfType<PhysicsProvider>();
             if (physicsProvider != null)
             {
                 _layerMask ^= physicsProvider.HandsLayer.layerMask;
                 _layerMask ^= physicsProvider.HandsResetLayer.layerMask;
             }
+#endif
 
             FarFieldLayerManager farFieldLayerManager = FindObjectOfType<FarFieldLayerManager>();
+#if UNITY_2021_1_OR_NEWER
             if (physicsProvider != null)
             {
                 _layerMask ^= farFieldLayerManager.FarFieldObjectLayer.layerMask;
                 _layerMask ^= farFieldLayerManager.FloorLayer.layerMask;
             }
+#endif
 
             foreach (var layers in _layersToIgnore)
             {

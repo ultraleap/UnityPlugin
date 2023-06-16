@@ -1,11 +1,10 @@
 {
-    "name": "Ultraleap.Tracking.PhysicsHands",
+    "name": "Ultraleap.Tracking.PhysicsHands.Example",
     "rootNamespace": "",
     "references": [
-        "GUID:2ee0542102ac1084e8d9a910885c1e81",
-        "GUID:cec9848704c49724192ff47f9b3e9156",
-        "GUID:3a12b97a7afaf6b47bfe53cf1f942886",
-        "GUID:2665a8d13d1b3f18800f46e256720795"
+        "GUID:6055be8ebefd69e48b49212b09b47b2f",
+        "GUID:75469ad4d38634e559750d17036d5f7c",
+        "GUID:a3f8d628d2d27f049908570fb6d4c60e"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
