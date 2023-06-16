@@ -16,7 +16,7 @@ namespace Leap.Unity
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void RunBeforeSceneLoad()
         {
-            UltraleapSettings ultraleapSettings = UltraleapSettings.FindSettingsSO();
+            UltraleapSettings ultraleapSettings = UltraleapSettings.Instance;
 
             if (ultraleapSettings == null)
             {
@@ -54,7 +54,7 @@ namespace Leap.Unity
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void RunAfterSceneLoad()
         {
-            UltraleapSettings ultraleapSettings = UltraleapSettings.FindSettingsSO();
+            UltraleapSettings ultraleapSettings = UltraleapSettings.Instance;
 
             if (ultraleapSettings == null || ultraleapSettings.leapSubsystemEnabled == false)
             {
@@ -84,9 +84,13 @@ namespace Leap.Unity
 
             if (m_Subsystem != null)
             {
-                updater.Destroy();
-                m_Subsystem.Destroy();
-                GameObject.Destroy(leapProviderGO);
+                updater?.Destroy();
+                m_Subsystem?.Destroy();
+
+                if (leapProviderGO != null)
+                {
+                    GameObject.Destroy(leapProviderGO);
+                }
             }
         }
     }

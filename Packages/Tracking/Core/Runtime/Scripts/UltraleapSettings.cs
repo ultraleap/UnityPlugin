@@ -27,15 +27,24 @@ namespace Leap.Unity
             EditorGUILayout.HelpBox("The Leap XRHands Subsystem passes hand input directly from the Leap Service to XRHands. " +
                 "If you are using OpenXR for hand input, do not enable this option. " +
                 "Instead, use the Hand Tracking Subsystem option in the OpenXR XR Plug-in Management settings." +
-                "\r\n\nThis option can not be toggled at runtime.", MessageType.Info, true); ;
+                "\r\n\nThis option can not be toggled at runtime.", MessageType.Info, true);
 
-            SerializedProperty property = this.serializedObject.FindProperty("leapSubsystemEnabled");
+            EditorGUILayout.Space(10);
 
-            bool editorBool = property.boolValue;
-            property.boolValue = EditorGUILayout.ToggleLeft("Enable Leap XRHands Subsystem", editorBool);
+            SerializedProperty leapSubsystemEnabledProperty = this.serializedObject.FindProperty("leapSubsystemEnabled");
+            leapSubsystemEnabledProperty.boolValue = EditorGUILayout.ToggleLeft("Enable Leap XRHands Subsystem", leapSubsystemEnabledProperty.boolValue);
+
+            EditorGUILayout.Space(10);
+
+            SerializedProperty updateLeapInputSystemProperty = this.serializedObject.FindProperty("updateLeapInputSystem");
+            updateLeapInputSystemProperty.boolValue = EditorGUILayout.ToggleLeft("Update Leap Input System", updateLeapInputSystemProperty.boolValue);
+
+            SerializedProperty updateMetaInputSystemProperty = this.serializedObject.FindProperty("updateMetaInputSystem");
+            updateMetaInputSystemProperty.boolValue = EditorGUILayout.ToggleLeft("Update Meta Aim Input System", updateMetaInputSystemProperty.boolValue);
 
             EditorGUILayout.Space(30);
-            if(GUILayout.Button("Reset To Defaults"))
+
+            if (GUILayout.Button("Reset To Defaults"))
             {
                 if(EditorUtility.DisplayDialog("Reset all settings", "This will reset all settings in this Ultraleap settings file", "Yes", "No"))
                 {
@@ -51,12 +60,28 @@ namespace Leap.Unity
 
     public class UltraleapSettings : ScriptableObject
     {
+        static UltraleapSettings instance;
+        public static UltraleapSettings Instance
+        { 
+            get { return FindSettingsSO(); }
+            set { instance = value; }
+        }
+
+
         [HideInInspector, SerializeField]
         public bool leapSubsystemEnabled;
+
+        [HideInInspector, SerializeField]
+        public bool updateLeapInputSystem;
+
+        [HideInInspector, SerializeField]
+        public bool updateMetaInputSystem;
 
         public void ResetToDefaults()
         {
             leapSubsystemEnabled = false;
+            updateLeapInputSystem = false;
+            updateMetaInputSystem = false;
         }
 
 #if UNITY_EDITOR
@@ -80,33 +105,35 @@ namespace Leap.Unity
         }
 #endif
 
-        public static UltraleapSettings FindSettingsSO()
+        private static UltraleapSettings FindSettingsSO()
         {
             UltraleapSettings[] settingsSO = Resources.FindObjectsOfTypeAll(typeof(UltraleapSettings)) as UltraleapSettings[];
 
             if (settingsSO != null && settingsSO.Length > 0)
             {
-                return settingsSO[0]; // Assume there is only one settings file
+                instance = settingsSO[0]; // Assume there is only one settings file
             }
             else
             {
-                return CreateSettingsSO();
+                instance = CreateSettingsSO();
             }
+
+            return instance;
         }
 
         static UltraleapSettings CreateSettingsSO()
         {
+            UltraleapSettings newSO = null;
 #if UNITY_EDITOR
-            UltraleapSettings newSO = ScriptableObject.CreateInstance<UltraleapSettings>();
+            newSO = ScriptableObject.CreateInstance<UltraleapSettings>();
 
             Directory.CreateDirectory(Application.dataPath + "/XR/");
             Directory.CreateDirectory(Application.dataPath + "/XR/Settings/");
 
             AssetDatabase.CreateAsset(newSO, "Assets/XR/Settings/Ultraleap Settings.asset");
 
-            return newSO;
 #endif
-            return null;
+            return newSO;
         }
     }
 }

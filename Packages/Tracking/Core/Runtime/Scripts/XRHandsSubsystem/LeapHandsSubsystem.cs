@@ -218,7 +218,7 @@ namespace Leap.Unity
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         static void RegisterDescriptor()
         {
-            UltraleapSettings ultraleapSettings = UltraleapSettings.FindSettingsSO();
+            UltraleapSettings ultraleapSettings = UltraleapSettings.Instance;
 
             if (ultraleapSettings == null || ultraleapSettings.leapSubsystemEnabled == false)
             {
