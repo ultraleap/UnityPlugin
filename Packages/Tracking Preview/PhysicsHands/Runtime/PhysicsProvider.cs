@@ -64,12 +64,13 @@ namespace Leap.Unity.Interaction.PhysicsHands
         [SerializeField, Tooltip("Allows the hands to collide with one another.")]
         private bool _interHandCollisions = false;
 
-        private float _forceLimit = 1000f;
-        private float _stiffness = 200f;
-
         public float PerBoneMass => _perBoneMass;
         [SerializeField, Tooltip("The mass of each finger bone; the palm will be 3x this. It is not recommended to modify this too far from the default (0.1)."), Range(0.01f, 0.25f)]
         private float _perBoneMass = 0.1f;
+
+        public PhysicsHand.HandParameters HandParameters => _handParameters;
+        [SerializeField]
+        private PhysicsHand.HandParameters _handParameters = new PhysicsHand.HandParameters();
 
         public float HandTeleportDistance => _handTeleportDistance;
         [SerializeField, Tooltip("The distance between the physics and original data hand can reach before it snaps back to the original hand position."), Range(0.01f, 0.5f)]
@@ -155,6 +156,22 @@ namespace Leap.Unity.Interaction.PhysicsHands
             base.OnEnable();
             _waitForFixedUpdate = new WaitForFixedUpdate();
             StartCoroutine(LateFixedFrameProcess());
+        }
+
+        private void Reset()
+        {
+            PhysicsHand[] existingHands = GetComponentsInChildren<PhysicsHand>(true);
+            foreach (PhysicsHand hand in existingHands)
+            {
+                if (Application.isPlaying)
+                {
+                    Destroy(hand.gameObject);
+                }
+                else
+                {
+                    DestroyImmediate(hand.gameObject);
+                }
+            }
         }
 
         #region Layer Generation
@@ -274,8 +291,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         public void GenerateHands()
         {
-            LeftHand = PhysicsHandsUtils.GenerateHand(Chirality.Left, _perBoneMass, _forceLimit, _stiffness, _handsLayer, gameObject);
-            RightHand = PhysicsHandsUtils.GenerateHand(Chirality.Right, _perBoneMass, _forceLimit, _stiffness, _handsLayer, gameObject);
+            LeftHand = PhysicsHandsUtils.GenerateHand(Chirality.Left, _handParameters, _handsLayer, gameObject);
+            RightHand = PhysicsHandsUtils.GenerateHand(Chirality.Right, _handParameters, _handsLayer, gameObject);
         }
 
         #endregion

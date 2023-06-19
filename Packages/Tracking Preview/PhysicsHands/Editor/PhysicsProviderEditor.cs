@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
@@ -24,7 +22,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         SerializedProperty _inputProvider;
 
-        GUIContent _physicsLayersText, _solverPresetText, _projectSolverText, _projectSolverVelocityText;
+        GUIContent _physicsLayersText, _solverPresetText, _projectSolverText, _projectSolverVelocityText, _advancedHandParams;
 
         SerializedProperty _defaultLayer;
         SerializedProperty _interactableLayers;
@@ -34,8 +32,14 @@ namespace Leap.Unity.Interaction.PhysicsHands
         SerializedProperty _handsLayer, _handsResetLayer;
 
         SerializedProperty _interHandCollisions;
-        SerializedProperty _perBoneMass;
-        SerializedProperty _handTeleportDistance;
+        SerializedProperty _handParameters;
+
+        // Safe Parameters
+        SerializedProperty _hoverDistance, _contactDistance, _teleportDistance;
+
+        SerializedProperty _maxPalmVel, _minPalmVel, _maxPalmAngularVel, _minPalmAngularVel, _maxFingerVel, _minFingerVel;
+        SerializedProperty _boneMass, _boneStiffness, _boneForceLimit;
+
         SerializedProperty _handSolverIterations, _handSolverVelocityIterations;
 
         SerializedProperty _enableHelpers;
@@ -52,6 +56,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             _projectSolverText = new GUIContent("Project Solver Iterations", "The solver iterations of the physics simulation used throughout your project. This can be different to your hands.");
             _projectSolverVelocityText = new GUIContent("Project Solver Velocity Iterations", "The solver iterations of the physics simulation for calculating velocity used throughout your project. This can be different to your hands.");
+
+            _advancedHandParams = new GUIContent("Advanced Hand Parameters", "These advanced settings should not be changed unless absolutely necessary.");
         }
 
         private void GetProperties()
@@ -69,10 +75,24 @@ namespace Leap.Unity.Interaction.PhysicsHands
             _handsResetLayer = serializedObject.FindProperty("_handsResetLayer");
 
             _interHandCollisions = serializedObject.FindProperty("_interHandCollisions");
-            _perBoneMass = serializedObject.FindProperty("_perBoneMass");
-            _handTeleportDistance = serializedObject.FindProperty("_handTeleportDistance");
             _handSolverIterations = serializedObject.FindProperty("_handSolverIterations");
             _handSolverVelocityIterations = serializedObject.FindProperty("_handSolverVelocityIterations");
+
+            _handParameters = serializedObject.FindProperty("_handParameters");
+            _hoverDistance = _handParameters.FindPropertyRelative("hoverDistance");
+            _contactDistance = _handParameters.FindPropertyRelative("contactDistance");
+            _teleportDistance = _handParameters.FindPropertyRelative("teleportDistance");
+
+            _boneMass = _handParameters.FindPropertyRelative("boneMass");
+            _boneStiffness = _handParameters.FindPropertyRelative("boneStiffness"); 
+            _boneForceLimit = _handParameters.FindPropertyRelative("boneForceLimit");
+
+            _maxPalmVel = _handParameters.FindPropertyRelative("maximumPalmVelocity");
+            _minPalmVel = _handParameters.FindPropertyRelative("minimumPalmVelocity");
+            _maxPalmAngularVel = _handParameters.FindPropertyRelative("maximumPalmAngularVelocity");
+            _minPalmAngularVel = _handParameters.FindPropertyRelative("minimumPalmAngularVelocity");
+            _maxFingerVel = _handParameters.FindPropertyRelative("maximumFingerVelocity");
+            _minFingerVel = _handParameters.FindPropertyRelative("minimumFingerVelocity");
 
             _enableHelpers = serializedObject.FindProperty("_enableHelpers");
             _helperMovesObjects = serializedObject.FindProperty("_helperMovesObjects");
@@ -106,6 +126,14 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         private void WarningsSection()
         {
+            // Provider
+            if(_inputProvider.objectReferenceValue == null)
+            {
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.HelpBox($"You will need to assign an Input Leap Provider otherwise you will not have any hands.", MessageType.Warning);
+                EditorGUILayout.EndHorizontal();
+            }
+
             // Timestep
             if (Time.fixedDeltaTime > RECOMMENDED_TIMESTEP)
             {
@@ -179,6 +207,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 {
                     _physicsProvider.GenerateHands();
                     serializedObject.Update();
+                    EditorGUIUtility.ExitGUI();
                 }
                 else
                 {
@@ -195,6 +224,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                         _physicsProvider.GenerateHands();
 
                         serializedObject.Update();
+                        EditorGUIUtility.ExitGUI();
                     }
                 }
 
@@ -285,11 +315,37 @@ namespace Leap.Unity.Interaction.PhysicsHands
             {
                 EditorGUILayout.BeginVertical(EditorStyles.helpBox);
                 EditorGUILayout.PropertyField(_interHandCollisions);
-                EditorGUILayout.PropertyField(_perBoneMass);
-                EditorGUILayout.PropertyField(_handTeleportDistance);
+                ShowHandParameters();
                 EditorGUILayout.EndVertical();
             }
             EditorGUILayout.EndFoldoutHeaderGroup();
+        }
+
+        public void ShowHandParameters()
+        {
+            EditorGUILayout.PropertyField(_hoverDistance);
+            EditorGUILayout.PropertyField(_contactDistance);
+            EditorGUILayout.PropertyField(_teleportDistance);
+
+            EditorGUILayout.Space();
+
+            EditorGUI.indentLevel++;
+            bool advanced = !EditorGUILayout.Foldout(!_handParameters.isExpanded, _advancedHandParams, true);
+            _handParameters.isExpanded = advanced;
+            EditorGUI.indentLevel--;
+
+            if (!advanced)
+            {
+                EditorGUILayout.PropertyField(_boneMass);
+                EditorGUILayout.PropertyField(_boneStiffness);
+                EditorGUILayout.PropertyField(_boneForceLimit);
+                EditorGUILayout.PropertyField(_maxPalmVel);
+                EditorGUILayout.PropertyField(_minPalmVel);
+                EditorGUILayout.PropertyField(_maxPalmAngularVel);
+                EditorGUILayout.PropertyField(_minPalmAngularVel);
+                EditorGUILayout.PropertyField(_maxFingerVel);
+                EditorGUILayout.PropertyField(_minFingerVel);
+            }
         }
 
         private void SolverSection()
