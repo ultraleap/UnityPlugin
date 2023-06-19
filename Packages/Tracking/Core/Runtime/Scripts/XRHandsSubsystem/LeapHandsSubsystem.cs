@@ -98,13 +98,19 @@ namespace Leap.Unity
 
             XRHandSubsystem.UpdateSuccessFlags updateSuccessFlags = XRHandSubsystem.UpdateSuccessFlags.None;
 
-            if (PopulateXRHandFromLeap(currentFrame.GetHand(Chirality.Left), ref leftHandRootPose, ref leftHandJoints))
+            // keep a safe copy of the arrays
+            XRHandJoint[] leftHandJointsCopy = new XRHandJoint[leftHandJoints.Length];
+            leftHandJoints.CopyTo(leftHandJointsCopy);
+            XRHandJoint[] rightHandJointsCopy = new XRHandJoint[rightHandJoints.Length];
+            rightHandJoints.CopyTo(rightHandJointsCopy);
+
+            if (PopulateXRHandFromLeap(currentFrame.GetHand(Chirality.Left), ref leftHandRootPose, ref leftHandJointsCopy))
             {
                 updateSuccessFlags |= XRHandSubsystem.UpdateSuccessFlags.LeftHandRootPose;
                 updateSuccessFlags |= XRHandSubsystem.UpdateSuccessFlags.LeftHandJoints;
             }
 
-            if (PopulateXRHandFromLeap(currentFrame.GetHand(Chirality.Right), ref rightHandRootPose, ref rightHandJoints))
+            if (PopulateXRHandFromLeap(currentFrame.GetHand(Chirality.Right), ref rightHandRootPose, ref rightHandJointsCopy))
             {
                 updateSuccessFlags |= XRHandSubsystem.UpdateSuccessFlags.RightHandRootPose;
                 updateSuccessFlags |= XRHandSubsystem.UpdateSuccessFlags.RightHandJoints;
@@ -112,10 +118,14 @@ namespace Leap.Unity
 
             trackingProviderAvailableLastFrame = true;
 
+            // Apply the modified data back to the source
+            leftHandJoints.CopyFrom(leftHandJointsCopy);
+            rightHandJoints.CopyFrom(rightHandJointsCopy);
+
             return updateSuccessFlags;
         }
 
-        bool PopulateXRHandFromLeap(Hand leapHand, ref Pose rootPose, ref NativeArray<XRHandJoint> handJoints)
+        bool PopulateXRHandFromLeap(Hand leapHand, ref Pose rootPose, ref XRHandJoint[] handJoints)
         {
             if (leapHand == null)
             {
