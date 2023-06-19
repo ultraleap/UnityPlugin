@@ -50,9 +50,7 @@ namespace Leap.Unity.Preview.Locomotion
 
         private void Awake()
         {
-            initialPosition = transform.position;
-            initialRotation = transform.rotation;
-            initialRotationIndicatorsRotation = _rotationIndicators.rotation;
+            UpdateInitialPositions();
 
             Material material = _markerMesh.sharedMaterial;
             if (material != null)
@@ -71,6 +69,16 @@ namespace Leap.Unity.Preview.Locomotion
         public virtual void OnDisable()
         {
             ResetPoint();
+        }
+
+        /// <summary>
+        /// Saves the current position and rotation, which is used to reset the anchor point to its initial position and rotation
+        /// </summary>
+        public void UpdateInitialPositions()
+        {
+            initialPosition = transform.position;
+            initialRotation = transform.rotation;
+            initialRotationIndicatorsRotation = _rotationIndicators.rotation;
         }
 
         /// <summary>
