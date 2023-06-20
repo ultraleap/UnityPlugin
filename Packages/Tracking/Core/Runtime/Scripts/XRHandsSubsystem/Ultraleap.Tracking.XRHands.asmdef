@@ -16,13 +16,19 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [
-        "XR_XRHAND_ENABLED"
+        "XR_XRHAND_ENABLED",
+        "INPUT_SYSTEM"
     ],
     "versionDefines": [
         {
             "name": "com.unity.xr.hands",
             "expression": "1.1.0",
             "define": "XR_XRHAND_ENABLED"
+        },
+        {
+            "name": "com.unity.inputsystem",
+            "expression": "1.5.0",
+            "define": "INPUT_SYSTEM"
         }
     ],
     "noEngineReferences": false
