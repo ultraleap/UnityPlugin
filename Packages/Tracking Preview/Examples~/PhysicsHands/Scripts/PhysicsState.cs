@@ -16,6 +16,7 @@ namespace Leap.Unity.Interaction.PhysicsHands.Example
     /// <summary>
     /// Example script that listens to object state changes, fired by the Physics Provider.
     /// This event allows you to easily bind your own custom logic.
+    /// It is designed for use when using either a specific or numerous rigidbodies.
     /// </summary>
     public class PhysicsState : MonoBehaviour
     {

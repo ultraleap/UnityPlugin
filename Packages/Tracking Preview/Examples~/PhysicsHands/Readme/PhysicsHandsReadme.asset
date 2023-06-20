@@ -128,3 +128,39 @@ MonoBehaviour:
     assetLinkOpens: 0
     image: {fileID: 0}
     imageHeight: 0
+  - heading: Coding for Physics Hands
+    text: Physics Hands has two different types of events that you can use. Either
+      through an action based setup that lets you see events for specific rigidbodies,
+      or by using interfaces to receive specific events from either the hand or the
+      bone for your current rigidbody.
+    linkText: 
+    url: 
+    pingSceneElement: 
+    settingsPage: 
+    assetLinkText: 
+    assetLink: {fileID: 0}
+    assetLinkOpens: 0
+    image: {fileID: 0}
+    imageHeight: 0
+  - heading: 
+    text: You can find the example action based code here.
+    linkText: 
+    url: 
+    pingSceneElement: 
+    settingsPage: 
+    assetLinkText: 
+    assetLink: {fileID: 11500000, guid: 2a1425feabac99c429faf0f586eb2059, type: 3}
+    assetLinkOpens: 1
+    image: {fileID: 0}
+    imageHeight: 0
+  - heading: 
+    text: You can find the example interface based code here.
+    linkText: 
+    url: 
+    pingSceneElement: 
+    settingsPage: 
+    assetLinkText: 
+    assetLink: {fileID: 11500000, guid: e285d0ead7ee6d24797a11e20c48b8d3, type: 3}
+    assetLinkOpens: 1
+    image: {fileID: 0}
+    imageHeight: 0

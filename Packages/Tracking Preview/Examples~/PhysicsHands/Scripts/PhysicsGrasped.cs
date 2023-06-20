@@ -16,6 +16,8 @@ namespace Leap.Unity.Interaction.PhysicsHands.Example
     /// <summary>
     /// Example script to test whether an object is being grasped or not.
     /// This function helps you ensure you're doing something when the user is or isn't grasping your object.
+    /// It is designed for use when you quickly want events for a single rigidbody only.
+    /// Please reference PhysicsInterfaces.cs for more information.
     /// </summary>
     public class PhysicsGrasped : MonoBehaviour, IPhysicsHandGrab
     {
