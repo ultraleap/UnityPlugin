@@ -109,6 +109,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
         /// Will only report values for the palm
         /// </summary>
         public Vector3 JointHalfExtents { get; private set; }
+
+        private Vector3 _grabDirection, _grabCenterDirection, _grabPositionCenter, _grabPositionBase;
         #endregion
 
         public Collider Collider => _collider;
@@ -194,6 +196,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 JointBase = center + (orientation * (Vector3.back * halfExtents.z));
                 JointTip = center + (orientation * (Vector3.forward * halfExtents.z));
                 JointDistance = Vector3.Distance(JointBase, JointTip);
+                _grabPositionBase = JointBase - (-transform.up * (JointHalfExtents.y * 0.25f));
+                _grabPositionCenter = JointCenter - (transform.up * (JointHalfExtents.y * 0.25f));
+
             }
             else
             {
@@ -203,7 +208,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 JointRadius = radius;
                 JointDistance = Vector3.Distance(bottom, tip);
                 JointCenter = (bottom + tip) / 2f;
+                _grabPositionBase = JointBase - (-transform.up * (JointRadius * 0.25f));
+                _grabPositionCenter = JointCenter - (transform.up * (JointRadius * 0.25f));
             }
+            _grabDirection = Finger == 0 ? Vector3.Lerp(Hand.Handedness == Chirality.Left ? -transform.right : transform.right, -transform.up, 0.75f) : -transform.up;
+            _grabCenterDirection = Joint == 2 ? Vector3.Lerp(_grabDirection, transform.forward, Finger == 0 ? 0.45f : 0.25f) : _grabDirection;
         }
 
         internal void QueueHoverCollider(Collider collider)
@@ -352,7 +361,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             foreach (var collider in colliders)
             {
                 // Center and the base of the bone
-                if (Vector3.Dot(-transform.up, (collider.ClosestPoint(JointCenter) - JointCenter).normalized) > 0.25f || Vector3.Dot(-transform.up, (collider.ClosestPoint(transform.position) - transform.position).normalized) > 0.25f)
+                if (Vector3.Dot(_grabCenterDirection, (collider.ClosestPoint(_grabPositionCenter) - _grabPositionCenter).normalized) > 0.18f || Vector3.Dot(_grabDirection, (collider.ClosestPoint(_grabPositionBase) - _grabPositionBase).normalized) > 0.2f)
                 {
                     return true;
                 }

@@ -246,10 +246,15 @@ namespace Leap.Unity.Interaction.PhysicsHands
         }
 
         public float FingerDisplacement => _overallFingerDisplacement;
+        /// <summary>
+        /// Contact displacement will return zero if grabbed
+        /// </summary>
         public float FingerContactDisplacement => _contactFingerDisplacement;
         public float FingerDisplacementAverage => _averageFingerDisplacement;
 
-        private float _overallFingerDisplacement = -1, _averageFingerDisplacement = -1, _contactFingerDisplacement = -1;
+        private float _overallFingerDisplacement = 0, _averageFingerDisplacement = 0, _contactFingerDisplacement = 0;
+        // Interpolate back in displacement values after the hand has just released
+        private float _displacementGrabCooldown = 0.25f, _displacementGrabCooldownCurrent = 0f;
 
         private void Start()
         {
@@ -816,10 +821,28 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 }
             }
 
+            if (_isGrasping)
+            {
+                _displacementGrabCooldownCurrent = _displacementGrabCooldown;
+            }
+
             _averageFingerDisplacement = _overallFingerDisplacement / (Hand.FINGERS * Hand.BONES);
             if (contactingFingers > 0)
             {
                 _contactFingerDisplacement = _overallFingerDisplacement * Mathf.Max(6 - contactingFingers, 1);
+                if (_isGrasping)
+                {
+                    _contactFingerDisplacement = 0f;
+                }
+                else if(_displacementGrabCooldown > 0)
+                {
+                    _displacementGrabCooldownCurrent -= Time.fixedDeltaTime;
+                    if(_displacementGrabCooldownCurrent <= 0)
+                    {
+                        _displacementGrabCooldownCurrent = 0f;
+                    }
+                    _contactFingerDisplacement = Mathf.Lerp(_contactFingerDisplacement, 0, Mathf.InverseLerp(0.5f, 1.0f, (_displacementGrabCooldownCurrent / _displacementGrabCooldown).EaseOut()));
+                }
             }
         }
 
