@@ -9,10 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fcf7219bab7fe46a1ad266029b2fee19, type: 3}
+  m_Script: {fileID: 11500000, guid: ad28329456aa1fd458c2c03f72d79e52, type: 3}
   m_Name: PhysicsHandsReadme
   m_EditorClassIdentifier: 
-  icon: {fileID: 2800000, guid: 34f556d724b1bbf4097ca6220db2c581, type: 3}
+  icon: {fileID: 2800000, guid: 27247312d0008d4498c9606f91df8e90, type: 3}
   title: Physics Hands Example
   scene: {fileID: 102900000, guid: 1a70a889c083dac4480e0dd4c4a547d8, type: 3}
   sections:

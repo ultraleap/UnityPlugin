@@ -36,7 +36,7 @@ namespace Leap.Unity
 
         public static bool IsPrefab(Component component)
         {
-            return Utils.IsObjectPartOfPrefabAsset(component.gameObject);
+            return Leap.Unity.Utils.IsObjectPartOfPrefabAsset(component.gameObject);
         }
 
         /// <summary>

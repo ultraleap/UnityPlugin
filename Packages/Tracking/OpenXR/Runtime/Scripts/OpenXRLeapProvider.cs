@@ -34,14 +34,14 @@ namespace Ultraleap.Tracking.OpenXR
 
         // Magic numbers for palm width and PinchStrength calculation
         private static readonly float[] DefaultMetacarpalLengths = { 0, 0.06812f, 0.06460f, 0.05800f, 0.05369f };
-        
+
         // Correction for the 0th thumb bone rotation offsets to match LeapC
         private static readonly Quaternion[] ThumbMetacarpalRotationOffset =
         {
             Quaternion.Euler(0, +25.9f, -63.45f),
             Quaternion.Euler(0, -25.9f, +63.45f),
         };
-        
+
         // Correction for the Palm position & rotation to match LeapC. Also used for the hand rotation.
         private static readonly Pose[] PalmOffset =
         {
@@ -283,7 +283,7 @@ namespace Ultraleap.Tracking.OpenXR
                     hand.GetFingerStrength(fingerIndex) < 0.4, // Fixed for now
                     (Finger.FingerType)fingerIndex);
             }
-            
+
             // Populate the whole hand information.
             // NOTE: Ordering is important as some of the `Calculate*` functions requires some of this data to be set.
             float handScale = CalculateHandScale(ref hand); // Requires fingers to be set.
@@ -295,7 +295,7 @@ namespace Ultraleap.Tracking.OpenXR
             hand.TimeVisible = timeVisible;
             hand.PalmVelocity = _joints[(int)HandJoint.Palm].LinearVelocity;
             hand.WristPosition = _joints[(int)HandJoint.Wrist].Pose.position;
-            
+
             // Calculate adjusted palm position, rotation and direction.
             hand.Rotation = _joints[(int)HandJoint.Palm].Pose.rotation * PalmOffset[hand.IsLeft ? 0 : 1].rotation;
             hand.PalmPosition = _joints[(int)HandJoint.Palm].Pose.position + hand.Rotation * PalmOffset[hand.IsLeft ? 0 : 1].position;
