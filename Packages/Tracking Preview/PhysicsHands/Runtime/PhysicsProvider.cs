@@ -574,7 +574,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 #pragma warning disable 0618
                     OnObjectStateChange?.Invoke(rigid, _graspHelpers[rigid]);
 #pragma warning restore 0618
-                    SendStates(rigid, _graspHelpers[rigid]);
+                    SendStates(rigid, null);
 
                     _graspHelpers.Remove(rigid);
                 }
@@ -586,11 +586,17 @@ namespace Leap.Unity.Interaction.PhysicsHands
         /// <summary>
         /// This allows you to bind to any rigidbody and then listen to events when it's grab state changes.
         /// Use PhysicsGraspHelper.Rigidbody to access your target.
+        /// You will at times receive a null result to your function, signifying the unhover event for the object.
         /// </summary>
         /// <param name="target">The rigidbody you want to listen to.</param>
         /// <param name="outputFunction">The function you want to be called.</param>
         public void SubscribeToStateChanges(Rigidbody target, Action<PhysicsGraspHelper> outputFunction)
         {
+            if (target == null || outputFunction == null)
+            {
+                Debug.LogWarning("Target object or output function cannot be null when subscribing to state changes.");
+                return;
+            }
             if (_objectStateChanges.TryGetValue(target, out var hashset))
             {
                 hashset.Add(outputFunction);
@@ -608,6 +614,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
         /// <param name="outputFunction">The function you have being called.</param>
         public void UnsubscribeFromStateChanges(Rigidbody target, Action<PhysicsGraspHelper> outputFunction)
         {
+            if (target == null || outputFunction == null)
+            {
+                Debug.LogWarning("Target object or output function cannot be null when unsubscribing from state changes.");
+                return;
+            }
             if (_objectStateChanges.TryGetValue(target, out var hashset))
             {
                 hashset.Remove(outputFunction);
@@ -664,6 +675,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                         PhysicsGraspHelper helper = new PhysicsGraspHelper(_resultsCache[i].attachedRigidbody, this);
                         helper.AddHand(hand);
                         _graspHelpers.Add(_resultsCache[i].attachedRigidbody, helper);
+                        SendStates(_resultsCache[i].attachedRigidbody, helper);
                     }
                 }
             }

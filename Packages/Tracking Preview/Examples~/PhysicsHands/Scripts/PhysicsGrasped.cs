@@ -17,28 +17,37 @@ namespace Leap.Unity.Interaction.PhysicsHands.Example
     /// Example script to test whether an object is being grasped or not.
     /// This function helps you ensure you're doing something when the user is or isn't grasping your object.
     /// </summary>
-    public class PhysicsGrasped : MonoBehaviour
+    public class PhysicsGrasped : MonoBehaviour, IPhysicsHandGrab
     {
         private TextMeshPro _text;
-        private Rigidbody _rigid;
 
         [SerializeField]
         private string _prefix = "Object Grasped?\n";
 
-        private PhysicsProvider _physicsProvider;
+        private HashSet<PhysicsHand> _grabbedHands = new HashSet<PhysicsHand>();
 
         private void Start()
         {
             _text = GetComponentInChildren<TextMeshPro>(true);
-            _rigid = GetComponent<Rigidbody>();
-            _physicsProvider = FindObjectOfType<PhysicsProvider>(true);
         }
 
-        private void FixedUpdate()
+        public void OnHandGrab(PhysicsHand hand)
         {
-            if (_rigid != null && _physicsProvider != null)
+            _grabbedHands.Add(hand);
+            UpdateText();
+        }
+
+        public void OnHandGrabExit(PhysicsHand hand)
+        {
+            _grabbedHands.Remove(hand);
+            UpdateText();
+        }
+
+        private void UpdateText()
+        {
+            if (_grabbedHands.Count > 0)
             {
-                _text.text = _prefix + (_physicsProvider.IsGraspingObject(_rigid) ? "Yes" : "No");
+                _text.text = _prefix + "Yes";
             }
         }
     }

@@ -136,7 +136,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             _graspingValues.Clear();
 
             // Remove any lingering contact events
-            if (_rigid.TryGetComponent<IPhysicsHandContact>(out var physicsHandContact))
+            if (_rigid != null && _rigid.TryGetComponent<IPhysicsHandContact>(out var physicsHandContact))
             {
                 for (int i = 0; i < _graspingCandidatesContact.Count; i++)
                 {
@@ -148,7 +148,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             }
 
             // Remove any lingering hover events
-            if (_rigid.TryGetComponent<IPhysicsHandHover>(out var physicsHandHover))
+            if (_rigid != null && _rigid.TryGetComponent<IPhysicsHandHover>(out var physicsHandHover))
             {
                 foreach (var hand in _graspingCandidates)
                 {
