@@ -110,6 +110,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         /// </summary>
         public Vector3 JointHalfExtents { get; private set; }
 
+        // Computed so that we can move the grab positions/directions back a bit to improve coverage
         private Vector3 _grabDirection, _grabCenterDirection, _grabPositionCenter, _grabPositionBase;
         #endregion
 
@@ -198,7 +199,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 JointDistance = Vector3.Distance(JointBase, JointTip);
                 _grabPositionBase = JointBase - (-transform.up * (JointHalfExtents.y * 0.25f));
                 _grabPositionCenter = JointCenter - (transform.up * (JointHalfExtents.y * 0.25f));
-
             }
             else
             {
