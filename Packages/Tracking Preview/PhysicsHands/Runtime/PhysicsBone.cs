@@ -28,6 +28,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private Dictionary<Rigidbody, HashSet<Collider>> _hoverObjects = new Dictionary<Rigidbody, HashSet<Collider>>();
         public Dictionary<Rigidbody, HashSet<Collider>> HoverObjects => _hoverObjects;
 
+        [field:SerializeField, Tooltip("Is the bone hovering an object? The hover distances are set in the Physics Provider.")]
         public bool IsBoneHovering { get; private set; } = false;
         public bool IsBoneHoveringRigid(Rigidbody rigid)
         {
@@ -36,6 +37,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         private Dictionary<Rigidbody, HashSet<Collider>> _contactObjects = new Dictionary<Rigidbody, HashSet<Collider>>();
         public Dictionary<Rigidbody, HashSet<Collider>> ContactObjects => _contactObjects;
+        [field: SerializeField, Tooltip("Is the bone contacting with an object? The contact distances are set in the Physics Provider.")]
         public bool IsBoneContacting { get; private set; } = false;
 
         public bool IsBoneContactingRigid(Rigidbody rigid)
@@ -48,6 +50,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         /// Objects that *can* be grabbed, not ones that are
         /// </summary>
         public HashSet<Rigidbody> GrabbableObjects => _grabObjects;
+        [field: SerializeField, Tooltip("Is the bone ready to grab an object that sits in front of it?")]
         public bool IsBoneReadyToGrab { get; private set; } = false;
 
         private HashSet<Rigidbody> _grabbedObjects = new HashSet<Rigidbody>();
@@ -59,7 +62,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
         /// Whether the grasp helper has reported that this bone is grabbing.
         /// If a bone further towards the tip is reported as grabbing, then this bone will also be.
         /// </summary>
-        public bool IsGrabbing { get; private set; } = false;
+        [field: SerializeField, Tooltip("Is the bone currently being used to grab an object via a grasp helper? If a bone further towards the tip is reported as grabbing, then this bone will also be.")]
+        public bool IsBoneGrabbing { get; private set; } = false;
 
         [SerializeField, HideInInspector]
         private ArticulationBody _body;
@@ -80,16 +84,19 @@ namespace Leap.Unity.Interaction.PhysicsHands
         /// Will report float.MaxValue if IsHovering is false
         /// </summary>
         public float ObjectDistance => _objectDistance;
+        [SerializeField, Tooltip("The distance between the edge of the bone collider and the nearest object. Will report float.MaxValue if IsHovering is false.")]
         private float _objectDistance = float.MaxValue;
 
         /// <summary>
         /// This value will increase the further away from the palm the joint is.
         /// E.g. the finger tips will always be a significantly higher value than the knuckles
         /// </summary>
+        [field: SerializeField, Tooltip("This value will increase the further away from the palm the joint is. E.g. the finger tips will always be a significantly higher value than the knuckles")]
         public float DisplacementAmount { get; private set; } = 0;
         public float DisplacementDistance => _displacementDistance;
         public float DisplacementRotation => _displacementRotation;
-        private float _displacementDistance = 0f, _displacementRotation = 0f;
+        private float _displacementDistance = 0f;
+        private float _displacementRotation = 0f;
 
         #region World Space Joint Info
         // Computed once so that it can be re-used
@@ -178,13 +185,13 @@ namespace Leap.Unity.Interaction.PhysicsHands
         internal void AddGrabbing(Rigidbody rigid)
         {
             _grabbedObjects.Add(rigid);
-            IsGrabbing = _grabbedObjects.Count > 0;
+            IsBoneGrabbing = _grabbedObjects.Count > 0;
         }
 
         internal void RemoveGrabbing(Rigidbody rigid)
         {
             _grabbedObjects.Remove(rigid);
-            IsGrabbing = _grabbedObjects.Count > 0;
+            IsBoneGrabbing = _grabbedObjects.Count > 0;
         }
 
         internal void UpdateBoneWorldSpace()

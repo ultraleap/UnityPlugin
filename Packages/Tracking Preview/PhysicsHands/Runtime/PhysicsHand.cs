@@ -747,7 +747,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     }
                     else if (_physicsHand.jointBones[boneArrayIndex].IsBoneHovering && _physicsHand.jointBones[boneArrayIndex].ObjectDistance < distanceCheck)
                     {
-                        if (_physicsHand.jointBones[boneArrayIndex].IsGrabbing)
+                        if (_physicsHand.jointBones[boneArrayIndex].IsBoneGrabbing)
                         {
                             if (!_wasGraspingBones[boneArrayIndex])
                             {
