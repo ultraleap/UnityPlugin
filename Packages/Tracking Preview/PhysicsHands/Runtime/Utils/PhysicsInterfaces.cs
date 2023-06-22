@@ -36,8 +36,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
     /// </summary>
     public interface IPhysicsBoneContact
     {
-        void OnBoneContact(PhysicsBone contact);
-        void OnBoneContactExit(PhysicsBone contact);
+        void OnBoneContact(PhysicsBone bone);
+        void OnBoneContactExit(PhysicsBone bone);
     }
 
     /// <summary>

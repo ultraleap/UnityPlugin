@@ -6,8 +6,14 @@ namespace Leap.Unity.Interaction.PhysicsHands
     [CustomEditor(typeof(PhysicsIgnoreHelpers)), CanEditMultipleObjects]
     public class PhysicsIgnoreHelpersEditor : Editor
     {
+        SerializedProperty _disableAllHandCollisions;
+        SerializedProperty _disableSpecificHandCollisions;
+        SerializedProperty _disabledHandedness;
+
         public override void OnInspectorGUI()
         {
+            GetProperties();
+
             EditorGUILayout.HelpBox("This script will prevent the physics hands helpers from being applied to your object.\n" +
                 "This allows you to easily prevent important objects from being affected by the player.", MessageType.Info);
 
@@ -15,9 +21,20 @@ namespace Leap.Unity.Interaction.PhysicsHands
             EditorGUILayout.PropertyField(serializedObject.FindProperty("m_Script"), true, new GUILayoutOption[0]);
             GUI.enabled = true;
 
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("DisableHandCollisions"));
-
+            EditorGUILayout.PropertyField(_disableAllHandCollisions);
+            EditorGUILayout.PropertyField(_disableSpecificHandCollisions);
+            if (_disableSpecificHandCollisions.boolValue)
+            {
+                EditorGUILayout.PropertyField(_disabledHandedness);
+            }
             serializedObject.ApplyModifiedProperties();
+        }
+
+        private void GetProperties()
+        {
+            _disableAllHandCollisions = serializedObject.FindProperty("DisableAllHandCollisions");
+            _disableSpecificHandCollisions = serializedObject.FindProperty("DisableSpecificHandCollisions");
+            _disabledHandedness = serializedObject.FindProperty("DisabledHandedness");
         }
     }
 }

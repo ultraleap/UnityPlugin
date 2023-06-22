@@ -290,6 +290,12 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 }
                 else
                 {
+                    // Make sure we respect ignored objects
+                    if(newContact.attachedRigidbody.TryGetComponent<PhysicsIgnoreHelpers>(out var physicsIgnoreHelpers))
+                    {
+                        if (physicsIgnoreHelpers.IsThisBoneIgnored(this))
+                            continue;
+                    }
                     _contactObjects.Add(newContact.attachedRigidbody, new HashSet<Collider>() { newContact });
                     if (newContact.attachedRigidbody.TryGetComponent<IPhysicsBoneContact>(out var physicsHandGrab))
                     {

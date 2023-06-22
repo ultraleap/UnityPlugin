@@ -29,10 +29,23 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private Rigidbody _rigidbody = null;
         [SerializeField, Tooltip("The element used to hold button specific components.")]
         private PhysicsButtonElement _buttonElement = null;
+        [SerializeField, HideInInspector]
+        private PhysicsIgnoreHelpers _ignoreHelper = null;
 
         [SerializeField, Tooltip("Tells the PhysicsButtonElement to ignore all collision between itself and objects in the scene that are not on the hand layers.")]
-        private bool _handsOnly = false;
+        private bool _handsOnly = true;
         public bool HandsOnly => _handsOnly;
+
+        [SerializeField, Tooltip("Reduces press events to only listen to the index finger.")]
+        private bool _fingerTipsOnly = false;
+        public bool FingerTipsOnly => _fingerTipsOnly;
+
+        [SerializeField, Tooltip("Allows the left hand to press the button.")]
+        private bool _allowLeftHand = true;
+        public bool AllowLeftHand => _allowLeftHand;
+        [SerializeField, Tooltip("Allows the right hand to press the button.")]
+        private bool _allowRightHand = true;
+        public bool AllowRightHand => _allowRightHand;
 
         [Header("Motion Configuration")]
         /// <summary>
@@ -248,6 +261,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             }
 
             SetupButton();
+            UpdateIgnores();
 
             _provider = FindObjectOfType<PhysicsProvider>(true);
 
@@ -305,7 +319,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                         _contactReleaseTime = 10;
                     }
                     // Ensure that we only allow hands to press the button
-                    if (_handsOnly)
+                    if (_handsOnly && (!_fingerTipsOnly || (_fingerTipsOnly && _buttonElement.IsTipContacting)))
                     {
                         PressValidation();
                     }
@@ -457,6 +471,34 @@ namespace Leap.Unity.Interaction.PhysicsHands
             _buttonElement.Joint.targetPosition = Vector3.down * heightLimit;
         }
 
+        private void UpdateIgnores()
+        {
+            if (_ignoreHelper != null)
+            {
+                if (!_allowLeftHand && !_allowRightHand)
+                {
+                    _ignoreHelper.DisableAllHandCollisions = true;
+                }
+                else if (!_allowLeftHand)
+                {
+                    _ignoreHelper.DisableAllHandCollisions = false;
+                    _ignoreHelper.DisableSpecificHandCollisions = true;
+                    _ignoreHelper.DisabledHandedness = Chirality.Left;
+                }
+                else if (!_allowRightHand)
+                {
+                    _ignoreHelper.DisableAllHandCollisions = false;
+                    _ignoreHelper.DisableSpecificHandCollisions = true;
+                    _ignoreHelper.DisabledHandedness = Chirality.Right;
+                }
+                else
+                {
+                    _ignoreHelper.DisableAllHandCollisions = false;
+                    _ignoreHelper.DisableSpecificHandCollisions = false;
+                }
+            }
+        }
+
         #endregion
 
         #region Public Functions
@@ -510,6 +552,13 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 _buttonElement = GetComponentInChildren<PhysicsButtonElement>(true);
             }
 
+            if (_buttonElement != null && _ignoreHelper == null)
+            {
+                _ignoreHelper = GetComponentInChildren<PhysicsIgnoreHelpers>(true);
+            }
+
+            UpdateIgnores();
+
             if (isToggleable)
             {
                 if (buttonToggleHeightLimit > buttonHeightLimit)
@@ -523,10 +572,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 }
             }
 
-            if (_buttonElement != null)
-            {
-                SetupButton();
-            }
+            SetupButton();
         }
 
         #endregion

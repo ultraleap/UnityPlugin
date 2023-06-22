@@ -7,7 +7,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
     [RequireComponent(typeof(Rigidbody))]
     [RequireComponent(typeof(ConfigurableJoint))]
     [ExecuteInEditMode]
-    public class PhysicsButtonElement : MonoBehaviour, IPhysicsHandHover, IPhysicsHandContact
+    public class PhysicsButtonElement : MonoBehaviour, IPhysicsHandHover, IPhysicsHandContact, IPhysicsBoneContact
     {
         [SerializeField, HideInInspector]
         private PhysicsButton _button = null;
@@ -32,6 +32,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private HashSet<PhysicsHand> _contactingHands = new HashSet<PhysicsHand>();
         public bool IsHovered { get; private set; } = false;
         public bool IsContacting { get; private set; } = false;
+
+        private HashSet<PhysicsBone> _tipBones = new HashSet<PhysicsBone>();
+        public bool IsTipContacting { get; private set; } = false;
 
         private void Awake()
         {
@@ -67,26 +70,87 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         public void OnHandHover(PhysicsHand hand)
         {
-            _hoveringHands.Add(hand);
-            IsHovered = _hoveringHands.Count > 0;
+            if (ValidateHand(hand))
+            {
+                _hoveringHands.Add(hand);
+                IsHovered = _hoveringHands.Count > 0;
+            }
+            
         }
 
         public void OnHandHoverExit(PhysicsHand hand)
         {
-            _hoveringHands.Remove(hand);
-            IsHovered = _hoveringHands.Count > 0;
+            if (ValidateHand(hand))
+            {
+                _hoveringHands.Remove(hand);
+                IsHovered = _hoveringHands.Count > 0;
+            }
         }
 
         public void OnHandContact(PhysicsHand hand)
         {
-            _contactingHands.Add(hand);
-            IsContacting = _contactingHands.Count > 0;
+            if (ValidateHand(hand))
+            {
+                _contactingHands.Add(hand);
+                IsContacting = _contactingHands.Count > 0;
+            }
         }
 
         public void OnHandContactExit(PhysicsHand hand)
         {
-            _contactingHands.Remove(hand);
-            IsContacting = _contactingHands.Count > 0;
+            if (ValidateHand(hand))
+            {
+                _contactingHands.Remove(hand);
+                IsContacting = _contactingHands.Count > 0;
+            }
+        }
+
+        public void OnBoneContact(PhysicsBone contact)
+        {
+            if (ValidateBone(contact))
+            {
+                _tipBones.Add(contact);
+                IsTipContacting = _tipBones.Count > 0;
+            }
+        }
+
+        public void OnBoneContactExit(PhysicsBone contact)
+        {
+            if (ValidateBone(contact))
+            {
+                _tipBones.Remove(contact);
+                IsTipContacting = _tipBones.Count > 0;
+            }
+        }
+
+        private bool ValidateHand(PhysicsHand hand)
+        {
+            if (!_button.AllowLeftHand && hand.Handedness == Chirality.Left)
+            {
+                return false;
+            }
+            if (!_button.AllowRightHand && hand.Handedness == Chirality.Right)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        private bool ValidateBone(PhysicsBone bone)
+        {
+            if (!_button.AllowLeftHand && bone.Hand.Handedness == Chirality.Left)
+            {
+                return false;
+            }
+            if (!_button.AllowRightHand && bone.Hand.Handedness == Chirality.Right)
+            {
+                return false;
+            }
+            if (_button.FingerTipsOnly && bone.Joint != 2)
+            {
+                return false;
+            }
+            return true;
         }
 
         /// <summary>
