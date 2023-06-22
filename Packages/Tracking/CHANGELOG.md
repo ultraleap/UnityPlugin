@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (Hand Pose) Removed unnecessary Hand Pose scriptable context menu option
 
 ### Fixed
+- (Preview) CPU performance issues on PICO when re-connecting tracking device
 
 ### Known issues 
 - Use of the LeapCSharp Config class is unavailable with v5.X tracking service
