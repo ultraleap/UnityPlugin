@@ -82,15 +82,13 @@ namespace Leap.Unity
         {
             Application.quitting -= OnQuit;
 
-            if (m_Subsystem != null)
-            {
-                updater?.Destroy();
-                m_Subsystem?.Destroy();
+            updater?.Destroy();
+            m_Subsystem?.Destroy();
+            subsystemProvider?.Destroy();
 
-                if (leapProviderGO != null)
-                {
-                    GameObject.Destroy(leapProviderGO);
-                }
+            if (leapProviderGO != null)
+            {
+                GameObject.Destroy(leapProviderGO);
             }
         }
     }
