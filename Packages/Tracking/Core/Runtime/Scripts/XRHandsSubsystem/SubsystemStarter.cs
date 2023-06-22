@@ -16,23 +16,21 @@ namespace Leap.Unity
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void RunBeforeSceneLoad()
         {
-            UltraleapSettings ultraleapSettings = null;
-            ultraleapSettings = UltraleapSettings.FindSettingsSO();
+            UltraleapSettings ultraleapSettings = UltraleapSettings.FindSettingsSO();
+
             if (ultraleapSettings == null)
             {
                 Debug.Log("There is no Ultraleap Settings object in the package. Subsystem will not be used.");
                 return;
             }
 
-            if (ultraleapSettings.LeapSubsystemEnabled == false)
+            if (ultraleapSettings.leapSubsystemEnabled == false)
             {
                 return;
             }
-            UltraleapSettings.enableUltraleapSubsystem += RunBeforeSceneLoad;
-            UltraleapSettings.disableUltraleapSubsystem += OnQuit;
+
+            Application.quitting -= OnQuit;
             Application.quitting += OnQuit;
-            LeapProvider leapProvider = Hands.Provider;
-            
 
             List<XRHandSubsystemDescriptor> descriptors = new List<XRHandSubsystemDescriptor>();
             SubsystemManager.GetSubsystemDescriptors(descriptors);
@@ -56,11 +54,18 @@ namespace Leap.Unity
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void RunAfterSceneLoad()
         {
+            UltraleapSettings ultraleapSettings = UltraleapSettings.FindSettingsSO();
+
+            if (ultraleapSettings == null || ultraleapSettings.leapSubsystemEnabled == false)
+            {
+                return;
+            }
 
             LeapProvider leapProvider = Hands.Provider;
 
             if (leapProvider == null)
             {
+                Debug.Log("There are no Leap Providers in the scene, automatically assigning one for use with Leap XRHands");
                 leapProviderGO = new GameObject("LeapXRServiceProvider");
                 leapProvider = (LeapProvider)leapProviderGO.AddComponent<LeapXRServiceProvider>();
                 GameObject.DontDestroyOnLoad(leapProviderGO);
@@ -73,19 +78,16 @@ namespace Leap.Unity
             }
         }
 
-
         private static void OnQuit()
         {
+            Application.quitting -= OnQuit;
+
             if (m_Subsystem != null)
             {
-                m_Subsystem.Stop();
-                updater.Stop();
+                updater.Destroy();
                 m_Subsystem.Destroy();
                 GameObject.Destroy(leapProviderGO);
             }
-            UltraleapSettings.disableUltraleapSubsystem -= OnQuit;
         }
-
-        
     }
 }
