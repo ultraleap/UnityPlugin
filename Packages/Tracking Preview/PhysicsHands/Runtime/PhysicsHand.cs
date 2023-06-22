@@ -80,7 +80,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             public const float HOVER_DISTANCE = 0.04f;
             public const float CONTACT_DISTANCE = 0.002f;
             public const float CONTACT_ENTER_DISTANCE = 0.004f, CONTACT_EXIT_DISTANCE = 0.012f;
-            public const float CONTACT_THUMB_ENTER_DISTANCE = 0.005f, CONTACT_THUMB_EXIT_DISTANCE = 0.024f;
+            public const float CONTACT_THUMB_ENTER_DISTANCE = 0.005f, CONTACT_THUMB_EXIT_DISTANCE = 0.02f;
             // Used as velocity * fixedDeltaTime
             public const float MAXIMUM_PALM_VELOCITY = 300f, MINIMUM_PALM_VELOCITY = 50f, MAXIMUM_FINGER_VELOCITY = 200f, MINIMUM_FINGER_VELOCITY = 50f;
             // Used as angularVelocity * fixedDeltaTime
