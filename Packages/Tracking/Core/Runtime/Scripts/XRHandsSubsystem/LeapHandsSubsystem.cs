@@ -130,7 +130,7 @@ namespace Leap.Unity
 
             handJoints[0] = XRHandProviderUtility.CreateJoint(handedness,
                         XRHandJointTrackingState.Pose,
-                        XRHandJointIDUtility.FromIndex(1),
+                        XRHandJointIDUtility.FromIndex(0),
                         wristPose);
             handJoints[1] = XRHandProviderUtility.CreateJoint(handedness,
                         XRHandJointTrackingState.Pose,
@@ -244,22 +244,6 @@ namespace Leap.Unity
             }
 
             return false;
-        }
-
-        public static void SetSubsystemTrackingProvider(LeapProvider leapProvider)
-        {
-            List<XRHandSubsystem> subsystems = new List<XRHandSubsystem>();
-            SubsystemManager.GetSubsystems(subsystems);
-
-            if(subsystems.Count > 0)
-            {
-                LeapXRHandProvider subsystemProvider = subsystems[0].GetProvider() as LeapXRHandProvider;
-                subsystemProvider.TrackingProvider = leapProvider;
-            }
-            else
-            {
-                Debug.LogWarning("No LeapHandSubsystem found, LeapProvider could not be set.");
-            }
         }
     }
 }

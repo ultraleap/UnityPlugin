@@ -36,29 +36,33 @@ namespace Leap.Unity
             SubsystemManager.GetSubsystems(subsystems);
             foreach (var subsystem in subsystems)
             {
-                m_Subsystem = subsystem;
-                break;
+                subsystem.Stop();
+                subsystem.Destroy();
+                subsystem.GetProvider().Stop();
+                subsystem.GetProvider().Destroy();
             }
 
-            if(m_Subsystem == null)
+            List<XRHandSubsystemDescriptor> descriptors = new List<XRHandSubsystemDescriptor>();
+            SubsystemManager.GetSubsystemDescriptors(descriptors);
+            foreach (var descriptor in descriptors)
             {
-                List<XRHandSubsystemDescriptor> descriptors = new List<XRHandSubsystemDescriptor>();
-                SubsystemManager.GetSubsystemDescriptors(descriptors);
-                foreach (var descriptor in descriptors)
+                if (descriptor.id == "UL XR Hands")
                 {
-                    if (descriptor.id == "UL XR Hands")
-                    {
-                        m_Subsystem = descriptor.Create();
-                        break;
-                    }
+                    m_Subsystem = descriptor.Create();
+                    break;
                 }
             }
 
             if (m_Subsystem != null)
             {
-                m_Subsystem.Start();
-                updater = new XRHandProviderUtility.SubsystemUpdater(m_Subsystem);
-                updater.Start();
+                if(!m_Subsystem.running)
+                {
+                    m_Subsystem.Start();
+
+                    updater = new XRHandProviderUtility.SubsystemUpdater(m_Subsystem);
+                    updater.Start();
+                }
+
                 subsystemProvider = m_Subsystem.GetProvider();
             }
             else
@@ -101,21 +105,26 @@ namespace Leap.Unity
             List<LeapHandsSubsystem> subsystems = new List<LeapHandsSubsystem>();
             SubsystemManager.GetSubsystems(subsystems);
 
-            if (subsystems.Count > 0)
+            foreach (var subsystem in subsystems)
             {
-                foreach (var subsystem in subsystems)
-                {
-                    subsystem.Destroy();
-                    subsystem.GetProvider().Destroy();
-                }
+                subsystem.Stop();
+                subsystem.Destroy();
+                subsystem.GetProvider().Stop();
+                subsystem.GetProvider().Destroy();
             }
 
+            updater?.Stop();
             updater?.Destroy();
 
             if (leapProviderGO != null)
             {
                 GameObject.Destroy(leapProviderGO);
             }
+
+            m_Subsystem = null;
+            updater = null;
+            leapProviderGO = null;
+            subsystemProvider = null;
         }
     }
 }

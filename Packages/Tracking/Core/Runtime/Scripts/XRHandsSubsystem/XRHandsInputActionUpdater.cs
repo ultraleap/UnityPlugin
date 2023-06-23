@@ -34,8 +34,6 @@ namespace Leap.Unity.Preview.InputActions
         {
             ultraleapSettings = UltraleapSettings.Instance;
 
-            return;
-
             if (ultraleapSettings == null || 
                 (ultraleapSettings.updateLeapInputSystem == false && ultraleapSettings.updateMetaInputSystem == false))
             {
@@ -271,7 +269,7 @@ namespace Leap.Unity.Preview.InputActions
 
         static Vector3 GetAimPosition(XRHand hand)
         {
-            return GetPredictedPinchPosition(hand);
+            return GetStablePinchPosition(hand);
         }
 
         static Quaternion GetAimDirection(XRHand hand)
@@ -281,14 +279,14 @@ namespace Leap.Unity.Preview.InputActions
 
         static Vector3 GetPinchPosition(XRHand hand)
         {
-            return GetPredictedPinchPosition(hand);
+            return GetStablePinchPosition(hand);
         }
 
         static Quaternion GetPinchDirection(XRHand hand)
         {
             if(hand.GetJoint(XRHandJointID.IndexProximal).TryGetPose(out Pose proximalPose))
             {
-                return Quaternion.LookRotation(GetPredictedPinchPosition(hand) - proximalPose.position).normalized;
+                return Quaternion.LookRotation(GetStablePinchPosition(hand) - proximalPose.position).normalized;
             }
 
             return Quaternion.identity;
@@ -574,49 +572,15 @@ namespace Leap.Unity.Preview.InputActions
             return Mathf.Clamp01((Mathf.Sqrt(minDistanceSquared) - distanceZero) / (distanceOne - distanceZero));
         }
 
-        static Vector3 GetPredictedPinchPosition(XRHand hand)
+        static Vector3 GetStablePinchPosition(XRHand hand)
         {
             Vector3 indexTip = Vector3.zero;
             Vector3 thumbTip = Vector3.zero;
 
-            if (hand.GetJoint(XRHandJointID.IndexTip).TryGetPose(out Pose indexTipPose)) indexTip = indexTipPose.position;
-            if (hand.GetJoint(XRHandJointID.ThumbTip).TryGetPose(out Pose thumbTipPose)) thumbTip = thumbTipPose.position;
+            if (hand.GetJoint(XRHandJointID.IndexDistal).TryGetPose(out Pose indexTipPose)) indexTip = indexTipPose.position;
+            if (hand.GetJoint(XRHandJointID.ThumbDistal).TryGetPose(out Pose thumbTipPose)) thumbTip = thumbTipPose.position;
 
-            // The predicted pinch point is a rigid point in hand-space linearly offset by the
-            // index finger knuckle position, scaled by the index finger's length, and lightly
-            // influenced by the actual thumb and index tip positions.
-            Vector3 indexKnuckle = Vector3.zero;// hand.Fingers[1].bones[1].PrevJoint;
-
-            if (hand.GetJoint(XRHandJointID.IndexProximal).TryGetPose(out Pose indexProximalPose)) indexKnuckle = indexProximalPose.position;
-
-            float indexLength = CalculateFingerLength(hand, 1);
-            Vector3 radialAxis = GetHandRadialAxis(hand);
-            float thumbInfluence = Vector3.Dot((thumbTip - indexKnuckle).normalized, radialAxis).Map(0F, 1F, 0.5F, 0F);
-            Vector3 predictedPinchPoint = indexKnuckle + GetHandPalmerAxis(hand) * indexLength * 0.85F
-                                                       + GetHandDistalAxis(hand) * indexLength * 0.20F
-                                                       + radialAxis * indexLength * 0.20F;
-            predictedPinchPoint = Vector3.Lerp(predictedPinchPoint, thumbTip, thumbInfluence);
-            predictedPinchPoint = Vector3.Lerp(predictedPinchPoint, indexTip, 0.15F);
-
-            return predictedPinchPoint;
-        }
-
-        static Vector3 GetStablePinchPosition(XRHand hand)
-        {
-            // The stable pinch point is a rigid point in hand-space linearly offset by the
-            // index finger knuckle position and scaled by the index finger's length
-
-            if(hand.GetJoint(XRHandJointID.IndexProximal).TryGetPose(out Pose indexKnuckle))
-            {
-                float indexLength = CalculateFingerLength(hand, 1);
-                Vector3 radialAxis = GetHandRadialAxis(hand);
-                Vector3 stablePinchPoint = indexKnuckle.position + GetHandPalmerAxis(hand) * indexLength * 0.85F
-                                                           + GetHandDistalAxis(hand) * indexLength * 0.20F
-                                                           + radialAxis * indexLength * 0.20F;
-                return stablePinchPoint;
-            }
-
-            return hand.rootPose.position;
+            return Vector3.Lerp(indexTip, thumbTip, 0.75f);
         }
 
         static float CalculateFingerLength(XRHand hand, int fingerIndex)
@@ -685,8 +649,7 @@ namespace Leap.Unity.Preview.InputActions
             {
                 length += (intermediate.position - proximal.position).magnitude;
                 length += (distal.position - intermediate.position).magnitude;
-                length += (tip.position - proximal.position).magnitude;
-                length += (intermediate.position - proximal.position).magnitude;
+                length += (tip.position - distal.position).magnitude;
             }
 
             return length;
