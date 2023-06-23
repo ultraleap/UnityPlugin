@@ -67,8 +67,21 @@ namespace Leap.Unity
             {
                 Debug.Log("There are no Leap Providers in the scene, automatically assigning one for use with Leap XRHands");
                 leapProviderGO = new GameObject("LeapXRServiceProvider");
-                leapProvider = (LeapProvider)leapProviderGO.AddComponent<LeapXRServiceProvider>();
+                LeapXRServiceProvider leapXRServiceProvider = leapProviderGO.AddComponent<LeapXRServiceProvider>();
+                leapXRServiceProvider.useCameraTransformForHands = false;
+                leapProvider = (LeapProvider)leapXRServiceProvider;
                 GameObject.DontDestroyOnLoad(leapProviderGO);
+            }
+            else
+            {
+                if (leapProvider is LeapXRServiceProvider)
+                {
+                    LeapXRServiceProvider leapXRServiceProvider = (LeapXRServiceProvider)leapProvider;
+                    if (leapXRServiceProvider.useCameraTransformForHands)
+                    {
+                        Debug.Log("If using a Leap XR Service provider, please set 'use camera transform for hands' to false");
+                    }
+                }
             }
 
             if (subsystemProvider != null)

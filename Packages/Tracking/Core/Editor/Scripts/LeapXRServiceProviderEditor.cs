@@ -70,6 +70,7 @@ namespace Leap.Unity
             addPropertyToFoldout("_deviceOffsetMode", "Advanced Options");
             addPropertyToFoldout("_temporalWarpingMode", "Advanced Options");
             addPropertyToFoldout("_customWarpAdjustment", "Advanced Options");
+            addPropertyToFoldout("_useCameraTransformForHands", "Advanced Options");
             addPropertyToFoldout("_deviceOffsetYAxis", "Advanced Options");
             addPropertyToFoldout("_deviceOffsetZAxis", "Advanced Options");
             addPropertyToFoldout("_deviceTiltXAxis", "Advanced Options");
