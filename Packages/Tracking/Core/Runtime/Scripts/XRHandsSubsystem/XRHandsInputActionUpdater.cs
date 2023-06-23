@@ -34,6 +34,8 @@ namespace Leap.Unity.Preview.InputActions
         {
             ultraleapSettings = UltraleapSettings.Instance;
 
+            return;
+
             if (ultraleapSettings == null || 
                 (ultraleapSettings.updateLeapInputSystem == false && ultraleapSettings.updateMetaInputSystem == false))
             {
@@ -42,8 +44,11 @@ namespace Leap.Unity.Preview.InputActions
 
             List<XRHandSubsystem> availableSubsystems = new List<XRHandSubsystem>();
             SubsystemManager.GetSubsystems(availableSubsystems);
+
             if (availableSubsystems == null || availableSubsystems.Count == 0)
+            {
                 return;
+            }
 
             m_Subsystem = availableSubsystems[0];
 
@@ -72,16 +77,19 @@ namespace Leap.Unity.Preview.InputActions
 
             m_Subsystem.updatedHands -= UpdateHands;
 
-            if (MetaAimHand.left != null)
+            if (ultraleapSettings.updateMetaInputSystem)
             {
-                InputSystem.RemoveDevice(MetaAimHand.left);
-                MetaAimHand.left = null;
-            }
+                if (MetaAimHand.left != null)
+                {
+                    InputSystem.RemoveDevice(MetaAimHand.left);
+                    MetaAimHand.left = null;
+                }
 
-            if (MetaAimHand.right != null)
-            {
-                InputSystem.RemoveDevice(MetaAimHand.right);
-                MetaAimHand.right = null;
+                if (MetaAimHand.right != null)
+                {
+                    InputSystem.RemoveDevice(MetaAimHand.right);
+                    MetaAimHand.right = null;
+                }
             }
         }
 

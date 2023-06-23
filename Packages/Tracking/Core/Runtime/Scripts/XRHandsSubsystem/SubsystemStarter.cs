@@ -32,22 +32,38 @@ namespace Leap.Unity
             Application.quitting -= OnQuit;
             Application.quitting += OnQuit;
 
-            List<XRHandSubsystemDescriptor> descriptors = new List<XRHandSubsystemDescriptor>();
-            SubsystemManager.GetSubsystemDescriptors(descriptors);
-            foreach (var descriptor in descriptors)
+            List<LeapHandsSubsystem> subsystems = new List<LeapHandsSubsystem>();
+            SubsystemManager.GetSubsystems(subsystems);
+            foreach (var subsystem in subsystems)
             {
-                if (descriptor.id == "UL XR Hands")
-                {
-                    m_Subsystem = descriptor.Create();
-                }
+                m_Subsystem = subsystem;
+                break;
+            }
 
-                if (m_Subsystem != null)
+            if(m_Subsystem == null)
+            {
+                List<XRHandSubsystemDescriptor> descriptors = new List<XRHandSubsystemDescriptor>();
+                SubsystemManager.GetSubsystemDescriptors(descriptors);
+                foreach (var descriptor in descriptors)
                 {
-                    m_Subsystem.Start();
-                    updater = new XRHandProviderUtility.SubsystemUpdater(m_Subsystem);
-                    updater.Start();
-                    subsystemProvider = m_Subsystem.GetProvider();
+                    if (descriptor.id == "UL XR Hands")
+                    {
+                        m_Subsystem = descriptor.Create();
+                        break;
+                    }
                 }
+            }
+
+            if (m_Subsystem != null)
+            {
+                m_Subsystem.Start();
+                updater = new XRHandProviderUtility.SubsystemUpdater(m_Subsystem);
+                updater.Start();
+                subsystemProvider = m_Subsystem.GetProvider();
+            }
+            else
+            {
+                Debug.Log("Hands Subsystem could not be started as it does not exist");
             }
         }
 
@@ -82,9 +98,19 @@ namespace Leap.Unity
         {
             Application.quitting -= OnQuit;
 
+            List<LeapHandsSubsystem> subsystems = new List<LeapHandsSubsystem>();
+            SubsystemManager.GetSubsystems(subsystems);
+
+            if (subsystems.Count > 0)
+            {
+                foreach (var subsystem in subsystems)
+                {
+                    subsystem.Destroy();
+                    subsystem.GetProvider().Destroy();
+                }
+            }
+
             updater?.Destroy();
-            m_Subsystem?.Destroy();
-            subsystemProvider?.Destroy();
 
             if (leapProviderGO != null)
             {
