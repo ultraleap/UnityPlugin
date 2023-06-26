@@ -177,8 +177,6 @@ namespace Leap.Unity.Preview.InputActions
                 .WithManufacturer("Ultraleap")
                 .WithProduct("^(Leap Hand)")
                 );
-
-            InputSystem.settings.SetInternalFeatureFlag("USE_OPTIMIZED_CONTROLS", true);
         }
     }
 }
