@@ -1,10 +1,8 @@
 ## Summary
 
-_Summary of the purpose of this merge request._
+_Add a Summary here._
 
 ## Contributor Tasks
-
-_These tasks are for the merge request creator to tick off when creating a merge request._
 
 - [ ] Create or edit test cases [here](https://ultrahaptics.atlassian.net/projects/UNITY?selectedItem=com.atlassian.plugins.atlassian-connect-plugin:com.kanoah.test-manager__main-project-page#!/v2/testCases?projectId=15189)
 - [ ] Check any relevant CHANGELOG files have been updated.
@@ -32,7 +30,7 @@ _If this MR closes any JIRA issues list them below in the form `Closes PROJECT-#
 
 ## Pull Request Templates
 
-Switch template by going to preview and clicking the link - note it not work if you've made any changes to the description.
+Switch template by going to preview and clicking the link - note it will not work if you've made any changes to the description.
 
 - [default.md](?expand=1) - for contributions to stable packages.
 - [release.md](?expand=1&template=release.md) - for release merge requests.

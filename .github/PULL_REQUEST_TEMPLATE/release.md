@@ -1,7 +1,5 @@
 ## Release Tasks
 
-_These tasks are for the merge request creator to tick off when creating a merge request._
-
 [Pre-release](https://ultrahaptics.atlassian.net/wiki/spaces/SV/pages/3665625233/Unity+Plugin+Development+Release+Process#Pre-release-Steps)
 - [ ] Update JIRA release version number
 - [ ] Update client library versions in changelog
@@ -18,7 +16,7 @@ _These tasks are for the merge request creator to tick off when creating a merge
 
 ## JIRA Release
 
-_Link to the Jira release for this version. See the [releases page](https://ultrahaptics.atlassian.net/projects/UNITY?selectedItem=com.atlassian.jira.jira-projects-plugin:release-page)._
+_See the [releases page](https://ultrahaptics.atlassian.net/projects/UNITY?selectedItem=com.atlassian.jira.jira-projects-plugin:release-page)._
 
 ## Pull Request Templates
 
