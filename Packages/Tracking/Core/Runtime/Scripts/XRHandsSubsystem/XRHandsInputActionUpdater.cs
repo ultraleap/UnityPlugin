@@ -43,12 +43,20 @@ namespace Leap.Unity.Preview.InputActions
             List<XRHandSubsystem> availableSubsystems = new List<XRHandSubsystem>();
             SubsystemManager.GetSubsystems(availableSubsystems);
 
-            if (availableSubsystems == null || availableSubsystems.Count == 0)
+            foreach(var subsystem in availableSubsystems)
             {
-                return;
+                if(subsystem != null && subsystem.running)
+                {
+                    m_Subsystem = subsystem;
+                    break;
+                }
             }
 
-            m_Subsystem = availableSubsystems[0];
+            if(m_Subsystem == null)
+            {
+                Debug.LogWarning("Unable to update InputActions, no Subsystem available.");
+                return;
+            }
 
             Application.quitting -= OnQuit;
             Application.quitting += OnQuit;
