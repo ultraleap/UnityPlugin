@@ -5,11 +5,10 @@ _Add a Summary here._
 ## Contributor Tasks
 
 - [ ] Create or edit test cases [here](https://ultrahaptics.atlassian.net/projects/UNITY?selectedItem=com.atlassian.plugins.atlassian-connect-plugin:com.kanoah.test-manager__main-project-page#!/v2/testCases?projectId=15189)
-- [ ] Check any relevant CHANGELOG files have been updated.
+- [ ] Add a CHANGELOG entry for this change.
 - [ ] Ensure documentation requirements are met e.g., public API is commented.
 - [ ] Consider any licensing/other legal implications for this MR e.g. notices required by any new libraries.
 - [ ] Add any relevant labels such as `breaking` to this MR.
-- [ ] If this MR closes a Jira issue, make sure the fix version on the JIRA issue is set to the correct one.
 
 ## Reviewer Tasks
 
@@ -20,9 +19,8 @@ _Add any instructions or tasks for the reviewer such as specific test considerat
 - [ ] Run all tests associated with the ticket.
 - [ ] Code reviewed.
 - [ ] Non-code assets e.g. Unity assets/scenes reviewed.
-- [ ] Documentation has been reviewed. Includes checking documentation requirements are met and not missing e.g., public API is commented.
-- [ ] Checked and agree with release testing considerations added to MR for the next release.
-- [ ] Approve with a comment of any additional tests that were run or any observations
+- [ ] Documentation has been reviewed.
+- [ ] Approve with a comment of any additional tests run or any observations.
 
 ## Closes JIRA Issue
 
