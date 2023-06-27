@@ -225,6 +225,10 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private void OnEnable()
         {
             SetupButton();
+            if (isToggleable)
+            {
+                UpdateToggleJoint();
+            }
         }
 
         protected void OnDisable()
