@@ -8,7 +8,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
     /// <summary>
     /// Used for singular return instances of an Spherecast
     /// </summary>
+#if BURST_AVAILABLE
     [BurstCompile]
+#endif
     internal struct PhysSpherecastJob : IJobFor
     {
         [ReadOnly]
@@ -95,7 +97,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
     }
 
 #if UNITY_2022_3_OR_NEWER
+#if BURST_AVAILABLE
     [BurstCompile]
+#endif
     public struct PhysMultiSpherecastJob : IJobFor
     {
         [ReadOnly]

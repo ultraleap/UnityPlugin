@@ -130,7 +130,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5dfdc811f6b2f964f9839cad8ceba7ed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DisableHandCollisions: 0
+  DisableAllHandCollisions: 0
+  DisableSpecificHandCollisions: 0
+  DisabledHandedness: 0
 --- !u!153 &2287780628418418854
 ConfigurableJoint:
   m_ObjectHideFlags: 0
@@ -562,7 +564,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _rigidbody: {fileID: 7298562659095329044}
   _buttonElement: {fileID: 6928925247276963121}
+  _ignoreHelper: {fileID: 882061857553901806}
   _handsOnly: 0
+  _fingerTipsOnly: 0
+  _allowLeftHand: 1
+  _allowRightHand: 1
   buttonHeightLimit: 0.02
   _springForce: 100
   _springDampening: 5

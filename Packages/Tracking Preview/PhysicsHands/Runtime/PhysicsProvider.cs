@@ -145,6 +145,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         private void Awake()
         {
+#if !BURST_AVAILABLE
+            Debug.LogWarning("Please install the Unity Burst package, otherwise PhysicsHands performance will be degraded.", this);
+#endif
             _leftOriginalLeap = new Hand();
             _rightOriginalLeap = new Hand();
             GenerateLayers();

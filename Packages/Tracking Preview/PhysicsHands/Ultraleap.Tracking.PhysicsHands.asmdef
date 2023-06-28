@@ -16,6 +16,12 @@
     "defineConstraints": [
         "UNITY_2021_1_OR_NEWER"
     ],
-    "versionDefines": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.burst",
+            "expression": "",
+            "define": "BURST_AVAILABLE"
+        }
+    ],
     "noEngineReferences": false
 }

@@ -146,6 +146,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 }
                 EditorGUILayout.EndHorizontal();
             }
+
             // Solver iterations
             if (Physics.defaultSolverIterations < RECOMMENDED_SOLVER_ITERATIONS)
             {
@@ -158,6 +159,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 }
                 EditorGUILayout.EndHorizontal();
             }
+
             // Solver iterations
             if (Physics.defaultSolverVelocityIterations < RECOMMENDED_SOLVER_VELOCITY_ITERATIONS)
             {
@@ -170,6 +172,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 }
                 EditorGUILayout.EndHorizontal();
             }
+
             // Gravity
             if (Physics.gravity.y < RECOMMENDED_GRAVITY)
             {
@@ -193,6 +196,17 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 }
                 EditorGUILayout.EndHorizontal();
             }
+
+#if !BURST_AVAILABLE
+            // Burst Compute
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.HelpBox($"Please install the Unity Burst package, otherwise overall performance will be impacted.", MessageType.Warning);
+            if (GUILayout.Button("Install Package", GUILayout.Width(100)))
+            {
+                UnityEditor.PackageManager.Client.Add("com.unity.burst");
+            }
+            EditorGUILayout.EndHorizontal();
+#endif
         }
 
         private void SetupSection()
