@@ -12,13 +12,29 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private const float MINIMUM_STRENGTH = 0.25f, MINIMUM_THUMB_STRENGTH = 0.2f;
         private const float REQUIRED_ENTRY_STRENGTH = 0.15f, REQUIRED_EXIT_STRENGTH = 0.05f, REQUIRED_THUMB_EXIT_STRENGTH = 0.1f, REQUIRED_PINCH_DISTANCE = 0.012f;
 
+        /// <summary>
+        /// The current state of the grasp helper.
+        /// </summary>
         public enum State
         {
+            /// <summary>
+            /// Idle will only ever be set when the helper is deleted, and is skipped during creation. This is because a helper is created when a hand is hovered.
+            /// </summary>
+            Idle,
+            /// <summary>
+            /// Hover will be set when any <b>hand</b> is currently hovering the object.
+            /// </summary>
             Hover,
+            /// <summary>
+            /// Contact will be set when any <b>bone</b> is touching the object.
+            /// </summary>
             Contact,
+            /// <summary>
+            /// Grasp will be set when the <b>object</b> is currently being held or moved.
+            /// </summary>
             Grasp
         }
-        public State GraspState { get; private set; } = State.Hover;
+        public State GraspState { get; private set; } = State.Idle;
 
         public HashSet<PhysicsBone> BoneHash => _boneHash;
         private HashSet<PhysicsBone> _boneHash = new HashSet<PhysicsBone>();
@@ -132,7 +148,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 SetBoneGrasping(item, false);
 
             }
-            GraspState = State.Hover;
+            GraspState = State.Idle;
             _graspingValues.Clear();
 
             // Remove any lingering contact events
@@ -172,6 +188,10 @@ namespace Leap.Unity.Interaction.PhysicsHands
         {
             if (!_graspingCandidates.Contains(hand))
             {
+                if(GraspState == State.Idle)
+                {
+                    GraspState = State.Hover;
+                }
                 _graspingCandidates.Add(hand);
                 _graspingCandidatesContact.Add(false);
                 if (_rigid.TryGetComponent<IPhysicsHandHover>(out var physicsHandHover))

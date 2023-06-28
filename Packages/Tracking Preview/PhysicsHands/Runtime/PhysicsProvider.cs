@@ -574,7 +574,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 #pragma warning disable 0618
                     OnObjectStateChange?.Invoke(rigid, _graspHelpers[rigid]);
 #pragma warning restore 0618
-                    SendStates(rigid, null);
+                    SendStates(rigid, _graspHelpers[rigid]);
 
                     _graspHelpers.Remove(rigid);
                 }
@@ -585,8 +585,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         /// <summary>
         /// This allows you to bind to any rigidbody and then listen to events when it's grab state changes.
-        /// Use PhysicsGraspHelper.Rigidbody to access your target.
-        /// You will at times receive a null result to your function, signifying the unhover event for the object.
+        /// Use <b>PhysicsGraspHelper.GraspState</b> to access the state.
+        /// Use <b>PhysicsGraspHelper.Rigidbody</b> to access your target.
+        /// You will at times receive an <b>Idle</b> state, signifying the unhover of the object.
         /// </summary>
         /// <param name="target">The rigidbody you want to listen to.</param>
         /// <param name="outputFunction">The function you want to be called.</param>
