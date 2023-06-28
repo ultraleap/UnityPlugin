@@ -21,12 +21,17 @@ namespace Leap.Unity.Interaction.PhysicsHands
             EditorGUILayout.PropertyField(serializedObject.FindProperty("m_Script"), true, new GUILayoutOption[0]);
             GUI.enabled = true;
 
+            GUI.enabled = !_disableSpecificHandCollisions.boolValue;
             EditorGUILayout.PropertyField(_disableAllHandCollisions);
+            GUI.enabled = true;
+
+            GUI.enabled = !_disableAllHandCollisions.boolValue;
             EditorGUILayout.PropertyField(_disableSpecificHandCollisions);
             if (_disableSpecificHandCollisions.boolValue)
             {
                 EditorGUILayout.PropertyField(_disabledHandedness);
             }
+            GUI.enabled = true;
             serializedObject.ApplyModifiedProperties();
         }
 

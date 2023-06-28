@@ -481,7 +481,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         /// <summary>
         /// Uses a pre-defined _resultCount and _resultsCache to determine if overlaps have happened and handles the result by ignoring collisions between the hand and the foundBodies
         /// </summary>
-        void HandleOverlaps(PhysicsHand hand)
+        private void HandleOverlaps(PhysicsHand hand)
         {
             HashSet<int> foundBodies = new HashSet<int>();
 
