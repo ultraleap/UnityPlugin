@@ -243,6 +243,11 @@ namespace Leap.Unity
             Vector3 mergedPalmPos = hands[0].PalmPosition * handConfidences[0];
             Quaternion mergedPalmRot = hands[0].Rotation;
 
+            // Simple solution to fixing GenericHand_Arm models and other hand meshes requiring arms
+            // TODO: currently shows offset using capsule hands, will need to aggregate based off
+            //       hand confidence as Arm doesn't seem to include confidence values natively
+            Arm firstArm = hands[0].Arm;
+
             for (int hands_idx = 1; hands_idx < hands.Count; hands_idx++)
             {
                 // position
@@ -276,6 +281,9 @@ namespace Leap.Unity
             // visualize the joint merge:
             if (debugJointOrigins && isLeft && debugHandLeft != null) VisualizeMergedJoints(debugHandLeft, jointConfidences);
             else if (debugJointOrigins && !isLeft && debugHandRight != null) VisualizeMergedJoints(debugHandRight, jointConfidences);
+
+            // simple solution to Arm issue
+            mergedHand.Arm = firstArm;
 
             return mergedHand;
         }
