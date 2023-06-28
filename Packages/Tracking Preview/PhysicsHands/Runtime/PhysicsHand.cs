@@ -34,23 +34,15 @@ namespace Leap.Unity.Interaction.PhysicsHands
             [HideInInspector]
             public HandParameters parameters = new HandParameters();
 
-            [HideInInspector]
             internal float currentPalmVelocity, currentPalmAngularVelocity;
-            [HideInInspector]
             internal float currentPalmVelocityInterp = 0f;
-            [HideInInspector]
             internal float currentPalmWeightInterp = 0f, currentPalmWeight = 0f;
 
-            [HideInInspector]
             internal Vector3 oldPosition;
             public GameObject gameObject, rootObject;
-            [HideInInspector]
             internal Vector3 previousDataPosition, computedPhysicsPosition;
-            [HideInInspector]
             internal Vector3 elbowPosition;
-            [HideInInspector]
             internal float computedHandDistance;
-            [HideInInspector]
             internal Quaternion previousDataRotation, computedPhysicsRotation;
             public Transform transform;
 
@@ -61,16 +53,12 @@ namespace Leap.Unity.Interaction.PhysicsHands
             public PhysicsBone[] jointBones;
             public ArticulationBody[] jointBodies;
             public CapsuleCollider[] jointColliders;
-            [HideInInspector]
             internal int[] overRotationFrameCount;
 
-            [HideInInspector]
             internal Quaternion[] defaultRotations;
 
-            [HideInInspector]
             internal bool justGhosted = false;
 
-            [HideInInspector]
             internal PhysicMaterial physicMaterial;
         }
 
@@ -279,28 +267,30 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         private void InitJobs()
         {
+            int jobLength = _physicsHand.jointBones.Length * 2;
+
 #if UNITY_2022_3_OR_NEWER
             _overlapsJob = new PhysMultiOverlapJob()
             {
-                point0 = new NativeArray<Vector3>(_physicsHand.jointBones.Length * 2, Allocator.Persistent),
-                point1 = new NativeArray<Vector3>(_physicsHand.jointBones.Length * 2, Allocator.Persistent),
-                radii = new NativeArray<float>(_physicsHand.jointBones.Length * 2, Allocator.Persistent),
-                commands = new NativeArray<OverlapCapsuleCommand>(_physicsHand.jointBones.Length * 2, Allocator.Persistent),
+                point0 = new NativeArray<Vector3>(jobLength, Allocator.Persistent),
+                point1 = new NativeArray<Vector3>(jobLength, Allocator.Persistent),
+                radii = new NativeArray<float>(jobLength, Allocator.Persistent),
+                commands = new NativeArray<OverlapCapsuleCommand>(jobLength, Allocator.Persistent),
                 layerMask = _physicsProvider.InteractionMask
             };
-            _overlapsResults = new NativeArray<ColliderHit>(_physicsHand.jointBones.Length * 2 * _overlapsMaxHit, Allocator.Persistent);
+            _overlapsResults = new NativeArray<ColliderHit>(jobLength * _overlapsMaxHit, Allocator.Persistent);
 #endif
             // Need 2x so we can do different radii at the same time
             _safetyOverlapJob = new PhysSpherecastJob()
             {
-                origins = new NativeArray<Vector3>(_physicsHand.jointBones.Length * 2, Allocator.Persistent),
-                directions = new NativeArray<Vector3>(_physicsHand.jointBones.Length * 2, Allocator.Persistent),
-                radii = new NativeArray<float>(_physicsHand.jointBones.Length * 2, Allocator.Persistent),
-                distances = new NativeArray<float>(_physicsHand.jointBones.Length * 2, Allocator.Persistent),
-                commands = new NativeArray<SpherecastCommand>(_physicsHand.jointBones.Length * 2, Allocator.Persistent),
+                origins = new NativeArray<Vector3>(jobLength, Allocator.Persistent),
+                directions = new NativeArray<Vector3>(jobLength, Allocator.Persistent),
+                radii = new NativeArray<float>(jobLength, Allocator.Persistent),
+                distances = new NativeArray<float>(jobLength, Allocator.Persistent),
+                commands = new NativeArray<SpherecastCommand>(jobLength, Allocator.Persistent),
                 layerMask = _physicsProvider.InteractionMask
             };
-            _safetyOverlapResults = new NativeArray<RaycastHit>(_physicsHand.jointBones.Length * 2, Allocator.Persistent);
+            _safetyOverlapResults = new NativeArray<RaycastHit>(jobLength, Allocator.Persistent);
         }
 
         private void DisposeJobs()
