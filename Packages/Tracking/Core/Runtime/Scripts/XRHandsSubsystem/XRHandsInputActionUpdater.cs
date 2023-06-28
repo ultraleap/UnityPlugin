@@ -43,9 +43,9 @@ namespace Leap.Unity.Preview.InputActions
             List<XRHandSubsystem> availableSubsystems = new List<XRHandSubsystem>();
             SubsystemManager.GetSubsystems(availableSubsystems);
 
-            foreach(var subsystem in availableSubsystems)
+            foreach (var subsystem in availableSubsystems)
             {
-                if(subsystem != null && subsystem.running)
+                if (subsystem != null)
                 {
                     m_Subsystem = subsystem;
                     break;
