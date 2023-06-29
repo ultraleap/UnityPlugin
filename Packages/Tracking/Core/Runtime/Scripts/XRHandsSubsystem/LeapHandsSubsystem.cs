@@ -1,7 +1,14 @@
+/******************************************************************************
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
+ *                                                                            *
+ * Use subject to the terms of the Apache License 2.0 available at            *
+ * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
+ * between Ultraleap and you, your company or other organization.             *
+ ******************************************************************************/
+
 using System.Collections.Generic;
 using Unity.Collections;
 using UnityEngine;
-using UnityEngine.SubsystemsImplementation.Extensions;
 using UnityEngine.XR.Hands;
 using UnityEngine.XR.Hands.ProviderImplementation;
 
@@ -130,7 +137,7 @@ namespace Leap.Unity
 
             handJoints[0] = XRHandProviderUtility.CreateJoint(handedness,
                         XRHandJointTrackingState.Pose,
-                        XRHandJointIDUtility.FromIndex(1),
+                        XRHandJointIDUtility.FromIndex(0),
                         wristPose);
             handJoints[1] = XRHandProviderUtility.CreateJoint(handedness,
                         XRHandJointTrackingState.Pose,
@@ -151,7 +158,6 @@ namespace Leap.Unity
                             XRHandJointTrackingState.Pose,
                             XRHandJointIDUtility.FromIndex(jointIndex),
                             new Pose(bone.PrevJoint, bone.Rotation));
-
                         jointIndex++;
                     }
 
@@ -161,7 +167,6 @@ namespace Leap.Unity
                         XRHandJointIDUtility.FromIndex(jointIndex),
                         new Pose(distal.NextJoint, distal.Rotation));
                     jointIndex++;
-
                 }
                 else
                 {
@@ -199,13 +204,11 @@ namespace Leap.Unity
 
         Pose CalculateWristPose(Hand leapHand)
         {
-            Pose wristPose = new Pose();
-
-            wristPose.position = leapHand.WristPosition;
-
             Vector3 wristUp = leapHand.GetMiddle().Bone(Bone.BoneType.TYPE_METACARPAL).Rotation * Vector3.up;
             Vector3 wristForward = leapHand.GetMiddle().Bone(Bone.BoneType.TYPE_METACARPAL).PrevJoint - leapHand.WristPosition;
 
+            Pose wristPose = new Pose();
+            wristPose.position = leapHand.WristPosition;
             wristPose.rotation = Quaternion.LookRotation(wristForward, wristUp);
 
             return wristPose;
@@ -218,9 +221,9 @@ namespace Leap.Unity
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         static void RegisterDescriptor()
         {
-            UltraleapSettings ultraleapSettings = UltraleapSettings.FindSettingsSO();
+            UltraleapSettings ultraleapSettings = UltraleapSettings.Instance;
 
-            if (ultraleapSettings == null || ultraleapSettings.leapSubsystemEnabled == false)
+            if (ultraleapSettings == null || ultraleapSettings.leapSubsystemEnabled == false || DoesDescriptorExist())
             {
                 return;
             }
@@ -229,30 +232,30 @@ namespace Leap.Unity
             {
                 id = id,
                 providerType = typeof(LeapXRHandProvider),
-                subsystemTypeOverride = typeof(LeapHandSubsystem)
+                subsystemTypeOverride = typeof(LeapHandsSubsystem)
             };
+
             XRHandSubsystemDescriptor.Register(handsSubsystemCinfo);
         }
 
-        public static void SetSubsystemTrackingProvider(LeapProvider leapProvider)
+        static bool DoesDescriptorExist()
         {
-            List<LeapHandSubsystem> subsystems = new List<LeapHandSubsystem>();
-            SubsystemManager.GetSubsystems(subsystems);
+            List<XRHandSubsystemDescriptor> descriptors = new List<XRHandSubsystemDescriptor>();
+            SubsystemManager.GetSubsystemDescriptors(descriptors);
+            foreach (var descriptor in descriptors)
+            {
+                if (descriptor.id == "UL XR Hands")
+                {
+                    return true;
+                }
+            }
 
-            if(subsystems.Count > 0)
-            {
-                LeapXRHandProvider subsystemProvider = subsystems[0].GetProvider() as LeapXRHandProvider;
-                subsystemProvider.TrackingProvider = leapProvider;
-            }
-            else
-            {
-                Debug.LogWarning("No LeapHandSubsystem found, LeapProvider could not be set.");
-            }
+            return false;
         }
     }
+}
 
-    // This class defines a hand subsystem
-    class LeapHandSubsystem : XRHandSubsystem
-    {
-    }
+public class LeapHandsSubsystem : XRHandSubsystem
+{
+
 }
