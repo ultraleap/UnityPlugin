@@ -24,17 +24,17 @@ namespace Leap.Unity
             EditorGUILayout.Space(10);
             EditorGUILayout.LabelField("Leap XRHands Subsystem", EditorStyles.boldLabel);
             
-            EditorGUILayout.HelpBox("The Leap XRHands Subsystem passes hand input directly from the Leap Service to XRHands. " +
-                "If you are using OpenXR for hand input, do not enable this option. " +
-                "Instead, use the Hand Tracking Subsystem option in the OpenXR XR Plug-in Management settings." +
+            EditorGUILayout.HelpBox("If using OpenXR for hand input, use the Hand Tracking Subsystem in XR Plug-in Management/OpenXR. Do not enable both subsystems." +
                 "\r\n\nThis option can not be toggled at runtime.", MessageType.Info, true);
 
-            EditorGUILayout.Space(10);
+            EditorGUILayout.Space(5);
 
             SerializedProperty leapSubsystemEnabledProperty = this.serializedObject.FindProperty("leapSubsystemEnabled");
             leapSubsystemEnabledProperty.boolValue = EditorGUILayout.ToggleLeft("Enable Leap XRHands Subsystem", leapSubsystemEnabledProperty.boolValue);
 
             EditorGUILayout.Space(10);
+            EditorGUILayout.LabelField("Input Actions", EditorStyles.boldLabel);
+            EditorGUILayout.Space(5);
 
             SerializedProperty updateLeapInputSystemProperty = this.serializedObject.FindProperty("updateLeapInputSystem");
             updateLeapInputSystemProperty.boolValue = EditorGUILayout.ToggleLeft("Update Leap Input System", updateLeapInputSystemProperty.boolValue);
@@ -63,10 +63,15 @@ namespace Leap.Unity
         static UltraleapSettings instance;
         public static UltraleapSettings Instance
         { 
-            get { return FindSettingsSO(); }
+            get
+            {
+                if (instance != null)
+                    return instance;
+                else
+                    return instance = FindSettingsSO();
+            }
             set { instance = value; }
         }
-
 
         [HideInInspector, SerializeField]
         public bool leapSubsystemEnabled;

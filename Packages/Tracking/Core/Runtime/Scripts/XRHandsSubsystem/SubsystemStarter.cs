@@ -1,3 +1,11 @@
+/******************************************************************************
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
+ *                                                                            *
+ * Use subject to the terms of the Apache License 2.0 available at            *
+ * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
+ * between Ultraleap and you, your company or other organization.             *
+ ******************************************************************************/
+
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.Hands;
@@ -32,6 +40,7 @@ namespace Leap.Unity
             Application.quitting -= OnQuit;
             Application.quitting += OnQuit;
 
+            // Stop all existing subsystems and produce a new one
             List<LeapHandsSubsystem> subsystems = new List<LeapHandsSubsystem>();
             SubsystemManager.GetSubsystems(subsystems);
             foreach (var subsystem in subsystems)

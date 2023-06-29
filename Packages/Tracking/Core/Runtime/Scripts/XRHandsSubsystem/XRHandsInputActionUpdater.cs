@@ -6,15 +6,13 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Analytics;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Layouts;
 using UnityEngine.XR.Hands;
 
-namespace Leap.Unity.Preview.InputActions
+namespace Leap.Unity.InputActions
 {
     /// <summary>
     /// Updates Ultraleap Input Actions with the latest available hand data
@@ -26,7 +24,7 @@ namespace Leap.Unity.Preview.InputActions
 
         private static InputDevice leftDevice, rightDevice;
 
-        static XRHandSubsystem m_Subsystem;
+        static XRHandSubsystem currentSubsystem;
         static UltraleapSettings ultraleapSettings;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
@@ -34,12 +32,14 @@ namespace Leap.Unity.Preview.InputActions
         {
             ultraleapSettings = UltraleapSettings.Instance;
 
+            // only start if requested
             if (ultraleapSettings == null || 
                 (ultraleapSettings.updateLeapInputSystem == false && ultraleapSettings.updateMetaInputSystem == false))
             {
                 return;
             }
 
+            // Find the first available subsystem
             List<XRHandSubsystem> availableSubsystems = new List<XRHandSubsystem>();
             SubsystemManager.GetSubsystems(availableSubsystems);
 
@@ -47,23 +47,26 @@ namespace Leap.Unity.Preview.InputActions
             {
                 if (subsystem != null)
                 {
-                    m_Subsystem = subsystem;
+                    currentSubsystem = subsystem;
                     break;
                 }
             }
 
-            if(m_Subsystem == null)
+            if(currentSubsystem == null)
             {
                 Debug.LogWarning("Unable to update InputActions, no Subsystem available.");
                 return;
             }
 
+            // Set up events
+
             Application.quitting -= OnQuit;
             Application.quitting += OnQuit;
 
-            m_Subsystem.updatedHands -= UpdateHands;
-            m_Subsystem.updatedHands += UpdateHands;
+            currentSubsystem.updatedHands -= UpdateHands;
+            currentSubsystem.updatedHands += UpdateHands;
 
+            // Create meta hands if required
             if (ultraleapSettings.updateMetaInputSystem)
             {
                 MetaAimHand.left = MetaAimHand.CreateHand(UnityEngine.XR.InputDeviceCharacteristics.Left);
@@ -81,7 +84,7 @@ namespace Leap.Unity.Preview.InputActions
 
             Application.quitting -= OnQuit;
 
-            m_Subsystem.updatedHands -= UpdateHands;
+            currentSubsystem.updatedHands -= UpdateHands;
 
             if (ultraleapSettings.updateMetaInputSystem)
             {
@@ -174,13 +177,9 @@ namespace Leap.Unity.Preview.InputActions
 
         private static void SendMetaAimStateUpdate(LeapHandState state, XRHand hand)
         {
-            MetaAimHand metaAimHand = new MetaAimHand();
+            MetaAimHand metaAimHand = MetaAimHand.left;
 
-            if (hand.handedness == Handedness.Left)
-            {
-                metaAimHand = MetaAimHand.left;
-            }
-            else
+            if (hand.handedness == Handedness.Right)
             {
                 metaAimHand = MetaAimHand.right;
             }
@@ -209,12 +208,11 @@ namespace Leap.Unity.Preview.InputActions
         #region Default State Getters
 
         /// <summary>
-        /// Set each of the default "Getters" to their relevant delegate
+        /// Set each of the default "Getters" to their relevant delegate. Delegates can be overridden via <LeapHandStateDelegates>
         /// </summary>
         static void SetupDefaultStateGetters()
         {
             // only set them up if they are already null
-
             leftHandStateDelegates.trackedDelegate ??= GetTrackedState;
             leftHandStateDelegates.selectDelegate ??= GetSelecting;
             leftHandStateDelegates.activateDelegate ??= GetActvating;
@@ -347,7 +345,6 @@ namespace Leap.Unity.Preview.InputActions
                 MetaAimHand.CreateHand(UnityEngine.XR.InputDeviceCharacteristics.Left);
                 MetaAimHand.CreateHand(UnityEngine.XR.InputDeviceCharacteristics.Right);
             }
-
 
             if (ultraleapSettings.updateLeapInputSystem)
             {
@@ -497,15 +494,15 @@ namespace Leap.Unity.Preview.InputActions
             float xy = rotation.x * ys, xz = rotation.x * zs;
             float yy = rotation.y * ys, zz = rotation.z * zs;
 
-            Vector3 _xBasis = new Vector3(1.0f - (yy + zz), xy + wz, xz - wy);
+            Vector3 xBasis = new Vector3(1.0f - (yy + zz), xy + wz, xz - wy);
 
             if(hand.handedness == Handedness.Left)
             {
-                return _xBasis;
+                return xBasis;
             }
             else
             {
-                return -_xBasis;
+                return -xBasis;
             }
         }
 
@@ -519,22 +516,8 @@ namespace Leap.Unity.Preview.InputActions
             float xx = rotation.x * xs, xz = rotation.x * zs;
             float yy = rotation.y * ys, yz = rotation.y * zs;
 
-            Vector3 _zBasis = new Vector3(xz + wy, yz - wx, 1.0f - (xx + yy));
-            return _zBasis;
-        }
-
-        static Vector3 GetHandPalmerAxis(XRHand hand)
-        {
-            Quaternion rotation = hand.rootPose.rotation;
-            float d = rotation.x * rotation.x + rotation.y * rotation.y + rotation.z * rotation.z + rotation.w * rotation.w;
-            float s = 2.0f / d;
-            float xs = rotation.x * s, ys = rotation.y * s, zs = rotation.z * s;
-            float wx = rotation.w * xs, wz = rotation.w * zs;
-            float xx = rotation.x * xs, xy = rotation.x * ys;
-            float yz = rotation.y * zs, zz = rotation.z * zs;
-
-            Vector3 _yBasis = new Vector3(xy - wz, 1.0f - (xx + zz), yz + wx);
-            return -_yBasis;
+            Vector3 zBasis = new Vector3(xz + wy, yz - wx, 1.0f - (xx + yy));
+            return zBasis;
         }
 
         static float CalculatePinchStrength(XRHand hand, float handScale)
@@ -544,12 +527,12 @@ namespace Leap.Unity.Preview.InputActions
             if (hand.GetJoint(XRHandJointID.ThumbTip).TryGetPose(out Pose thumbTipPose)) thumbTip = thumbTipPose.position;
 
             // Compute the distance midpoints between the thumb and the each finger and find the smallest.
-            var minDistanceSquared = float.MaxValue;
+            float minDistanceSquared = float.MaxValue;
 
             // Iterate through the fingers, skipping the thumb.
             for (var i = 1; i < 5; ++i)
             {
-                Pose fingerTipPose = new Pose();
+                Pose fingerTipPose;
                 Vector3 fingerTip = Vector3.zero;
 
                 switch (i)
@@ -570,7 +553,7 @@ namespace Leap.Unity.Preview.InputActions
                         break;
                 }
 
-                var distanceSquared = (fingerTip - thumbTip).sqrMagnitude;
+                float distanceSquared = (fingerTip - thumbTip).sqrMagnitude;
                 minDistanceSquared = Mathf.Min(distanceSquared, minDistanceSquared);
             }
 
@@ -589,78 +572,6 @@ namespace Leap.Unity.Preview.InputActions
             if (hand.GetJoint(XRHandJointID.ThumbDistal).TryGetPose(out Pose thumbTipPose)) thumbTip = thumbTipPose.position;
 
             return Vector3.Lerp(indexTip, thumbTip, 0.75f);
-        }
-
-        static float CalculateFingerLength(XRHand hand, int fingerIndex)
-        {
-            float length = 0;
-
-            Pose proximal = new Pose();
-            Pose intermediate = new Pose();
-            Pose distal = new Pose();
-            Pose tip = new Pose();
-
-            bool positionsValid = false;
-
-            switch(fingerIndex)
-            {
-                case 0:
-                    if (hand.GetJoint(XRHandJointID.ThumbProximal).TryGetPose(out proximal) &&
-                        hand.GetJoint(XRHandJointID.ThumbProximal).TryGetPose(out intermediate) &&
-                        hand.GetJoint(XRHandJointID.ThumbDistal).TryGetPose(out distal) &&
-                        hand.GetJoint(XRHandJointID.ThumbTip).TryGetPose(out tip))
-                    {
-                        positionsValid = true;
-                    }
-                    break;
-                case 1:
-                    if (hand.GetJoint(XRHandJointID.IndexProximal).TryGetPose(out proximal) &&
-                        hand.GetJoint(XRHandJointID.IndexIntermediate).TryGetPose(out intermediate) &&
-                        hand.GetJoint(XRHandJointID.IndexDistal).TryGetPose(out distal) &&
-                        hand.GetJoint(XRHandJointID.IndexTip).TryGetPose(out tip))
-                    {
-                        positionsValid = true;
-                    }
-                    break;
-                case 2:
-                    if (hand.GetJoint(XRHandJointID.MiddleProximal).TryGetPose(out proximal) &&
-                        hand.GetJoint(XRHandJointID.MiddleIntermediate).TryGetPose(out intermediate) &&
-                        hand.GetJoint(XRHandJointID.MiddleDistal).TryGetPose(out distal) &&
-                        hand.GetJoint(XRHandJointID.MiddleTip).TryGetPose(out tip))
-                    {
-                        positionsValid = true;
-                    }
-                    break;
-                case 3:
-                    if (hand.GetJoint(XRHandJointID.RingProximal).TryGetPose(out proximal) &&
-                        hand.GetJoint(XRHandJointID.RingIntermediate).TryGetPose(out intermediate) &&
-                        hand.GetJoint(XRHandJointID.RingDistal).TryGetPose(out distal) &&
-                        hand.GetJoint(XRHandJointID.RingTip).TryGetPose(out tip))
-                    {
-                        positionsValid = true;
-                    }
-                    break;
-                case 4:
-                    if (hand.GetJoint(XRHandJointID.LittleProximal).TryGetPose(out proximal) &&
-                        hand.GetJoint(XRHandJointID.LittleIntermediate).TryGetPose(out intermediate) &&
-                        hand.GetJoint(XRHandJointID.LittleDistal).TryGetPose(out distal) &&
-                        hand.GetJoint(XRHandJointID.LittleTip).TryGetPose(out tip))
-                    {
-                        positionsValid = true;
-                    }
-                    break;
-                default:
-                    break;
-            }
-
-            if (positionsValid)
-            {
-                length += (intermediate.position - proximal.position).magnitude;
-                length += (distal.position - intermediate.position).magnitude;
-                length += (tip.position - distal.position).magnitude;
-            }
-
-            return length;
         }
 
         static float GetMetacarpalLength(XRHand hand, int fingerIndex)
@@ -728,7 +639,6 @@ namespace Leap.Unity.Preview.InputActions
 
             // Magic numbers for default metacarpal lengths
             //{ 0, 0.06812f, 0.06460f, 0.05800f, 0.05369f }
-
             scale += (GetMetacarpalLength(hand, 1) / 0.06812f) / 4.0f;
             scale += (GetMetacarpalLength(hand, 2) / 0.06460f) / 4.0f;
             scale += (GetMetacarpalLength(hand, 3) / 0.05800f) / 4.0f;
