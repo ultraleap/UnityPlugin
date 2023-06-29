@@ -1,3 +1,11 @@
+/******************************************************************************
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
+ *                                                                            *
+ * Use subject to the terms of the Apache License 2.0 available at            *
+ * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
+ * between Ultraleap and you, your company or other organization.             *
+ ******************************************************************************/
+
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.Hands;
@@ -16,7 +24,7 @@ namespace Leap.Unity
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void RunBeforeSceneLoad()
         {
-            UltraleapSettings ultraleapSettings = UltraleapSettings.FindSettingsSO();
+            UltraleapSettings ultraleapSettings = UltraleapSettings.Instance;
 
             if (ultraleapSettings == null)
             {
@@ -32,6 +40,17 @@ namespace Leap.Unity
             Application.quitting -= OnQuit;
             Application.quitting += OnQuit;
 
+            // Stop all existing subsystems and produce a new one
+            List<LeapHandsSubsystem> subsystems = new List<LeapHandsSubsystem>();
+            SubsystemManager.GetSubsystems(subsystems);
+            foreach (var subsystem in subsystems)
+            {
+                subsystem.Stop();
+                subsystem.Destroy();
+                subsystem.GetProvider().Stop();
+                subsystem.GetProvider().Destroy();
+            }
+
             List<XRHandSubsystemDescriptor> descriptors = new List<XRHandSubsystemDescriptor>();
             SubsystemManager.GetSubsystemDescriptors(descriptors);
             foreach (var descriptor in descriptors)
@@ -39,22 +58,32 @@ namespace Leap.Unity
                 if (descriptor.id == "UL XR Hands")
                 {
                     m_Subsystem = descriptor.Create();
+                    break;
                 }
+            }
 
-                if (m_Subsystem != null)
+            if (m_Subsystem != null)
+            {
+                if(!m_Subsystem.running)
                 {
                     m_Subsystem.Start();
+
                     updater = new XRHandProviderUtility.SubsystemUpdater(m_Subsystem);
                     updater.Start();
-                    subsystemProvider = m_Subsystem.GetProvider();
                 }
+
+                subsystemProvider = m_Subsystem.GetProvider();
+            }
+            else
+            {
+                Debug.Log("Hands Subsystem could not be started as it does not exist");
             }
         }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void RunAfterSceneLoad()
         {
-            UltraleapSettings ultraleapSettings = UltraleapSettings.FindSettingsSO();
+            UltraleapSettings ultraleapSettings = UltraleapSettings.Instance;
 
             if (ultraleapSettings == null || ultraleapSettings.leapSubsystemEnabled == false)
             {
@@ -82,12 +111,29 @@ namespace Leap.Unity
         {
             Application.quitting -= OnQuit;
 
-            if (m_Subsystem != null)
+            List<LeapHandsSubsystem> subsystems = new List<LeapHandsSubsystem>();
+            SubsystemManager.GetSubsystems(subsystems);
+
+            foreach (var subsystem in subsystems)
             {
-                updater.Destroy();
-                m_Subsystem.Destroy();
+                subsystem.Stop();
+                subsystem.Destroy();
+                subsystem.GetProvider().Stop();
+                subsystem.GetProvider().Destroy();
+            }
+
+            updater?.Stop();
+            updater?.Destroy();
+
+            if (leapProviderGO != null)
+            {
                 GameObject.Destroy(leapProviderGO);
             }
+
+            m_Subsystem = null;
+            updater = null;
+            leapProviderGO = null;
+            subsystemProvider = null;
         }
     }
 }
