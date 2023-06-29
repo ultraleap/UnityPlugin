@@ -246,19 +246,18 @@ namespace Leap.Unity
             }
         }
 
-        [Tooltip("Use the mainCamera parent to transfrom the warped positions so the player can move around when not using the leap subsystem for XRHands. \n\n" +
-            "This should be turned off when using the leap subsystem for xrHands")]
+        [Tooltip("Should the device location be relative to the Main Camera of the scene.  \n\n")]
         [SerializeField]
-        private bool _useCameraTransformForHands = true;
+        private bool _positionDeviceRelativeToMainCamera = true;
         /// <summary>
         /// Allows for the manual placement of the Tracking Hardware.
         /// This device offset mode is incompatible with Temporal Warping.
         /// This is only used if the deviceOffsetMode is 'Transform'.
         /// </summary>
-        public bool useCameraTransformForHands
+        public bool PositionDeviceRelativeToMainCamera
         {
-            get { return _useCameraTransformForHands; }
-            set { _useCameraTransformForHands = value; }
+            get { return _positionDeviceRelativeToMainCamera; }
+            set { _positionDeviceRelativeToMainCamera = value; }
         }
 
         // Pre-cull Latching
@@ -633,8 +632,9 @@ namespace Leap.Unity
                     break;
             }
 
+
             // Use the mainCamera parent to transfrom the warped positions so the player can move around
-            if (mainCamera.transform.parent != null && _useCameraTransformForHands)
+            if (mainCamera.transform.parent != null && _positionDeviceRelativeToMainCamera)
             {
                 leapTransform = new LeapTransform(
                   mainCamera.transform.parent.TransformPoint(warpedPosition),

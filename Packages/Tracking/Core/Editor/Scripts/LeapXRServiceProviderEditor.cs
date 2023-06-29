@@ -8,7 +8,6 @@
 
 using UnityEditor;
 using UnityEngine;
-
 namespace Leap.Unity
 {
 
@@ -70,7 +69,7 @@ namespace Leap.Unity
             addPropertyToFoldout("_deviceOffsetMode", "Advanced Options");
             addPropertyToFoldout("_temporalWarpingMode", "Advanced Options");
             addPropertyToFoldout("_customWarpAdjustment", "Advanced Options");
-            addPropertyToFoldout("_useCameraTransformForHands", "Advanced Options");
+            addPropertyToFoldout("_positionDeviceRelativeToMainCamera", "Advanced Options");
             addPropertyToFoldout("_deviceOffsetYAxis", "Advanced Options");
             addPropertyToFoldout("_deviceOffsetZAxis", "Advanced Options");
             addPropertyToFoldout("_deviceTiltXAxis", "Advanced Options");
@@ -80,13 +79,9 @@ namespace Leap.Unity
             addPropertyToFoldout("_autoCreateTrackedPoseDriver", "Advanced Options");
             hideField("_trackingOptimization");
 
-            targetTransform = (target as LeapXRServiceProvider).transform;
-
-            if (targetTransform != null)
-            {
-                targetTransform.hideFlags = HideFlags.NotEditable;
-            }
         }
+
+        
 
         void OnDisable()
         {
