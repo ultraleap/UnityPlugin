@@ -645,9 +645,9 @@ namespace Leap.Unity
             else if(mainCamera.transform.parent != null && !_positionDeviceRelativeToMainCamera)
             {
                 leapTransform = new LeapTransform(
-                    this.transform.parent.TransformPoint(warpedPosition),
-                    this.transform.parent.TransformRotation(warpedRotation),
-                    this.transform.parent.lossyScale
+                    this.transform.TransformPoint(warpedPosition),
+                    this.transform.TransformRotation(warpedRotation),
+                    this.transform.lossyScale
                     );
             }
             else
