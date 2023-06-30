@@ -96,30 +96,27 @@ namespace Leap.Unity
             if (leapProvider == null)
             {
                 Debug.Log("There are no Leap Providers in the scene, automatically assigning one for use with Leap XRHands");
-                leapProviderGO = new GameObject("LeapXRServiceProvider");
-                LeapXRServiceProvider leapXRServiceProvider = leapProviderGO.AddComponent<LeapXRServiceProvider>();
-                leapXRServiceProvider.PositionDeviceRelativeToMainCamera = false;
-                leapProvider = (LeapProvider)leapXRServiceProvider;
-                GameObject.DontDestroyOnLoad(leapProviderGO);
             }
             else
             {
-                Debug.LogWarning("We recommend that you do not add a Leap Provider to scenes using the Leap Subsystem for XR Hands. This can cause unwanted behaviour.");
+                Debug.LogWarning("We recommend that you do not add a Leap Provider to scenes using the Leap Subsystem for XR Hands. This can cause unwanted behaviour. \n A new leap provider has been created which the subsystem will use.");
             }
 
-            if(leapProvider is LeapXRServiceProvider)
-            {
-                LeapXRServiceProvider leapXRServiceProvider = (LeapXRServiceProvider)leapProvider;
+            leapProviderGO = new GameObject("LeapXRServiceProvider");
+            LeapXRServiceProvider leapXRServiceProvider = leapProviderGO.AddComponent<LeapXRServiceProvider>();
+            leapXRServiceProvider.PositionDeviceRelativeToMainCamera = false;
+            leapProvider = (LeapProvider)leapXRServiceProvider;
+            GameObject.DontDestroyOnLoad(leapProviderGO);
 
-                if(leapXRServiceProvider.PositionDeviceRelativeToMainCamera == true)
-                {
-                    leapXRServiceProvider.PositionDeviceRelativeToMainCamera = false;
-                    leapProvider.transform.position = Vector3.zero;
-                    leapProvider.transform.rotation = Quaternion.identity;
-                    leapProvider.transform.localScale = Vector3.one;
-                    leapXRServiceProvider.deviceOffsetMode = LeapXRServiceProvider.DeviceOffsetMode.Transform;
-                    leapXRServiceProvider.deviceOrigin = leapProvider.transform;
-                }
+
+            if(leapXRServiceProvider.PositionDeviceRelativeToMainCamera == true)
+            {
+                leapXRServiceProvider.PositionDeviceRelativeToMainCamera = false;
+                leapProvider.transform.position = Vector3.zero;
+                leapProvider.transform.rotation = Quaternion.identity;
+                leapProvider.transform.localScale = Vector3.one;
+                leapXRServiceProvider.deviceOffsetMode = LeapXRServiceProvider.DeviceOffsetMode.Transform;
+                leapXRServiceProvider.deviceOrigin = leapProvider.transform;
             }
 
             if (subsystemProvider != null)

@@ -246,13 +246,13 @@ namespace Leap.Unity
             }
         }
 
-        [Tooltip("Should the device location be relative to the Main Camera of the scene.  \n\n")]
+        [Tooltip("Should the device location be relative to the Main Camera of the scene.")]
         [SerializeField]
         private bool _positionDeviceRelativeToMainCamera = true;
+
         /// <summary>
         /// Allows for the manual placement of the Tracking Hardware.
-        /// This device offset mode is incompatible with Temporal Warping.
-        /// This is only used if the deviceOffsetMode is 'Transform'.
+        /// If used with deviceOffsetMode set to anything other than 'Transform', you may get additional offsets.
         /// </summary>
         public bool PositionDeviceRelativeToMainCamera
         {
@@ -641,6 +641,14 @@ namespace Leap.Unity
                   mainCamera.transform.parent.TransformRotation(warpedRotation),
                   mainCamera.transform.parent.lossyScale
                   );
+            }
+            else if(mainCamera.transform.parent != null && !_positionDeviceRelativeToMainCamera)
+            {
+                leapTransform = new LeapTransform(
+                    this.transform.parent.TransformPoint(warpedPosition),
+                    this.transform.parent.TransformRotation(warpedRotation),
+                    this.transform.parent.lossyScale
+                    );
             }
             else
             {
