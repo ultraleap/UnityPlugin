@@ -442,7 +442,6 @@ namespace Leap.Unity
 
         protected virtual void onPreCull(Camera preCullingCamera)
         {
-
             if (preCullingCamera != mainCamera)
             {
                 return;
@@ -453,7 +452,6 @@ namespace Leap.Unity
             {
                 return;
             }
-
 #endif
 
             if (mainCamera == null || _leapController == null)
@@ -470,16 +468,23 @@ namespace Leap.Unity
             if (_deviceOffsetMode == DeviceOffsetMode.Default
                 || _deviceOffsetMode == DeviceOffsetMode.ManualHeadOffset)
             {
-                if (mainCamera.transform.parent != null)
+                if (_positionDeviceRelativeToMainCamera)
                 {
-                    var position = mainCamera.transform.parent.InverseTransformPoint(mainCamera.transform.position);
-                    var rotation = mainCamera.transform.parent.InverseTransformRotation(mainCamera.transform.rotation);
+                    if (mainCamera.transform.parent != null)
+                    {
+                        var position = mainCamera.transform.parent.InverseTransformPoint(mainCamera.transform.position);
+                        var rotation = mainCamera.transform.parent.InverseTransformRotation(mainCamera.transform.rotation);
 
-                    trackedPose = new Pose(position, rotation);
+                        trackedPose = new Pose(position, rotation);
+                    }
+                    else
+                    {
+                        trackedPose = mainCamera.transform.ToLocalPose();
+                    }
                 }
                 else
                 {
-                    trackedPose = mainCamera.transform.ToLocalPose();
+                    trackedPose = transform.ToPose();
                 }
 
             }
@@ -641,14 +646,6 @@ namespace Leap.Unity
                   mainCamera.transform.parent.TransformRotation(warpedRotation),
                   mainCamera.transform.parent.lossyScale
                   );
-            }
-            else if(mainCamera.transform.parent != null && !_positionDeviceRelativeToMainCamera)
-            {
-                leapTransform = new LeapTransform(
-                    this.transform.TransformPoint(warpedPosition),
-                    this.transform.TransformRotation(warpedRotation),
-                    this.transform.lossyScale
-                    );
             }
             else
             {
