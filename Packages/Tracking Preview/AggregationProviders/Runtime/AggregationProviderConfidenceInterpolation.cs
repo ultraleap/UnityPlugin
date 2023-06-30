@@ -94,6 +94,9 @@ namespace Leap.Unity
             List<Hand> leftHands = new List<Hand>();
             List<Hand> rightHands = new List<Hand>();
 
+            List<Arm> leftArms = new List<Arm>();
+            List<Arm> rightArms = new List<Arm>();
+
             List<float> leftHandConfidences = new List<float>();
             List<float> rightHandConfidences = new List<float>();
 
@@ -104,9 +107,6 @@ namespace Leap.Unity
             {
                 SetupJointOcclusion();
             }
-
-
-
 
             // make lists of all left and right hands found in each frame and also make a list of their confidences
             for (int frame_idx = 0; frame_idx < frames.Length; frame_idx++)
@@ -120,6 +120,9 @@ namespace Leap.Unity
                     {
                         leftHands.Add(hand);
 
+                        if (hand.Arm != null)
+                            leftArms.Add(hand.Arm);
+
                         float handConfidence = CalculateHandConfidence(frame_idx, hand);
                         float[] jointConfidences = CalculateJointConfidence(frame_idx, hand);
 
@@ -131,6 +134,9 @@ namespace Leap.Unity
                     else
                     {
                         rightHands.Add(hand);
+
+                        if (hand.Arm != null)
+                            rightArms.Add(hand.Arm);
 
                         float handConfidence = CalculateHandConfidence(frame_idx, hand);
                         float[] jointConfidences = CalculateJointConfidence(frame_idx, hand);
@@ -211,19 +217,27 @@ namespace Leap.Unity
                 }
             }
 
-
-
             // combine hands using their confidences
             List<Hand> mergedHands = new List<Hand>();
 
             if (leftHands.Count > 0)
             {
-                mergedHands.Add(MergeHands(leftHands, leftHandConfidences, leftJointConfidences));
+                Arm leftArm = averageArms(leftArms);
+                Hand leftHand = MergeHands(leftHands, leftHandConfidences, leftJointConfidences);
+                leftArm.Center = Vector3.Lerp(leftHand.WristPosition, leftArm.Direction * leftArm.Length, 0.5f);
+                leftArm.Rotation = leftHand.Rotation;
+                leftHand.Arm = leftArm;
+                mergedHands.Add(leftHand);
             }
 
             if (rightHands.Count > 0)
             {
-                mergedHands.Add(MergeHands(rightHands, rightHandConfidences, rightJointConfidences));
+                Arm rightArm = averageArms(rightArms);
+                Hand rightHand = MergeHands(rightHands, rightHandConfidences, rightJointConfidences);
+                rightArm.Center = Vector3.Lerp(rightHand.WristPosition, rightArm.Direction * rightArm.Length, 0.5f);
+                rightArm.Rotation = rightHand.Rotation;
+                rightHand.Arm = rightArm;
+                mergedHands.Add(rightHand);
             }
 
             // create new frame and add merged hands to it
@@ -232,6 +246,17 @@ namespace Leap.Unity
 
             return mergedFrame;
 
+        }
+
+
+        /// <summary>
+        /// Positions the arm elbow length away from the wrist at the rotational distance away
+        /// </summary>
+        Arm positionedArm(Arm arm, Hand hand)
+        {
+            Vector3 center = Vector3.Lerp(hand.WristPosition, arm.Direction * arm.Length, 0.5f);
+            arm.Center = center;
+            return arm;
         }
 
         /// <summary>
@@ -283,7 +308,7 @@ namespace Leap.Unity
             else if (debugJointOrigins && !isLeft && debugHandRight != null) VisualizeMergedJoints(debugHandRight, jointConfidences);
 
             // simple solution to Arm issue
-            mergedHand.Arm = firstArm;
+            //mergedHand.Arm = firstArm;
 
             return mergedHand;
         }
@@ -632,6 +657,100 @@ namespace Leap.Unity
             }
 
             return confidences;
+        }
+
+        #endregion
+
+        #region Arm Helpers
+
+        /// <summary>
+        /// Takes the average of the elbow position and the wrist position of each tracked arm and returns an
+        /// average arm
+        /// </summary>
+        Arm averageArms(List<Arm> arms)
+        {
+            List<Vector3> elbowPositions = new List<Vector3>();
+            List<Vector3> wristPositions = new List<Vector3>();
+            List<Vector3> centers = new List<Vector3>();
+            List<Vector3> directions = new List<Vector3>();
+            List<float> lengths = new List<float>();
+            List<float> widths = new List<float>();
+            List<Quaternion> rotations = new List<Quaternion>();
+
+            foreach (Arm arm in arms)
+            {
+                if (arm.ElbowPosition != null)
+                    elbowPositions.Add(arm.ElbowPosition);
+                if (arm.WristPosition != null)
+                    wristPositions.Add(arm.WristPosition);
+                if (arm.Center != null)
+                    centers.Add(arm.Center);
+                if (arm.Direction != null)
+                    directions.Add(arm.Direction);
+                if (arm.Length > 0f)
+                    lengths.Add(arm.Length);
+                if (arm.Width > 0f)
+                    widths.Add(arm.Width);
+                if (arm.Rotation != null)
+                    rotations.Add(arm.Rotation);
+            }
+
+            if (elbowPositions.Count == 0 || wristPositions.Count == 0)
+                return null;
+
+            Vector3 sumVector = Vector3.zero;
+            foreach (Vector3 _elbowPosition in elbowPositions)
+                sumVector += _elbowPosition;
+            Vector3 elbow = sumVector / elbowPositions.Count;
+
+            sumVector = Vector3.zero;
+            foreach (Vector3 _wristPosition in wristPositions)
+                sumVector += _wristPosition;
+            Vector3 wrist = sumVector / wristPositions.Count;
+
+            sumVector = Vector3.zero;
+            foreach (Vector3 _center in centers)
+                sumVector += _center;
+            Vector3 center = sumVector / centers.Count;
+
+            sumVector = Vector3.zero;
+            foreach (Vector3 _direction in directions)
+                sumVector += _direction;
+            Vector3 direction = sumVector / directions.Count;
+
+            float sumFloat = 0f;
+            foreach (float _length in lengths)
+                sumFloat += _length;
+            float length = sumFloat / lengths.Count;
+
+            sumFloat = 0f;
+            foreach (float _width in widths)
+                sumFloat += _width;
+            float width = sumFloat / widths.Count;
+
+            Vector4 sumQuaternion = Vector4.zero;
+            if (rotations.Count > 1)
+                Debug.Log($"quats:>");
+            foreach (Quaternion _rot in rotations)
+            {
+                if (rotations.Count > 1)
+                    Debug.Log($"quat {_rot} | breakdown {_rot.x},{_rot.y},{_rot.z},{_rot.w} ");
+                Vector4 _rotVec = new Vector4(_rot.x, _rot.y, _rot.z, _rot.w);
+                sumQuaternion += _rotVec;
+            }
+            Vector4 avgRot = sumQuaternion / rotations.Count;
+            Quaternion aRot = Quaternion.FromToRotation(wrist, elbow) ;
+            Quaternion bRot = Quaternion.Slerp(Quaternion.identity, aRot, length);
+            Quaternion rotation = new Quaternion(avgRot.x, avgRot.y, avgRot.z, avgRot.w);
+
+            /*
+                        Vector3 center = Vector3.Lerp(wrist, elbow, 0.5f);
+                        Vector3 direction = wrist - elbow;
+                        float lenght = Vector3.Distance(wrist, elbow);
+                        float width = 0.05f;
+                        Quaternion rotation = Quaternion.FromToRotation(wrist, elbow);
+                        *///Arm (Vector3 elbow, Vector3 wrist, Vector3 center, Vector3 direction, float length, float width, Quaternion rotation)
+            return new Arm(elbow, wrist, center, direction, length, width, bRot);
         }
 
         #endregion
