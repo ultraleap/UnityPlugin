@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - (Hand Pose) Removed unnecessary Hand Pose scriptable context menu option
+- (Multi device aggregation) Added wrist and arm to ConfidenceInterpolation aggregator
 
 ### Fixed
 - (Preview) CPU performance issues on PICO when re-connecting tracking device
