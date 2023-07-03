@@ -98,7 +98,7 @@ namespace Leap.Unity
 
         private static void SelectUlSettings(bool silent = false)
         {
-            UltraleapSettings ulSettings = FindSettingsSO();
+            UltraleapSettings ulSettings = Instance;
             if (ulSettings != null)
             {
                 Selection.activeObject = ulSettings;
@@ -132,10 +132,9 @@ namespace Leap.Unity
 #if UNITY_EDITOR
             newSO = ScriptableObject.CreateInstance<UltraleapSettings>();
 
-            Directory.CreateDirectory(Application.dataPath + "/XR/");
-            Directory.CreateDirectory(Application.dataPath + "/XR/Settings/");
+            Directory.CreateDirectory(Application.dataPath + "/Resources/");
 
-            AssetDatabase.CreateAsset(newSO, "Assets/XR/Settings/Ultraleap Settings.asset");
+            AssetDatabase.CreateAsset(newSO, "Assets/Resources/Ultraleap Settings.asset");
 
 #endif
             return newSO;
