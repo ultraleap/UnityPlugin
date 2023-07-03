@@ -282,6 +282,12 @@ namespace Leap.Unity
         [SerializeField]
         public bool _useInterpolation = true;
 
+        [SerializeField, Min(-1), Tooltip("The maximum number of attempts to connect to the service. Infinite attempts if -1.")]
+        public int _reconnectionAttempts = MAX_RECONNECTION_ATTEMPTS;
+
+        [SerializeField, Min(1), Tooltip("The interval in frames between service connection attempts.")]
+        public int _reconnectionInterval = RECONNECTION_INTERVAL;
+
         #endregion
 
         #region Internal Settings & Memory
@@ -1012,17 +1018,17 @@ namespace Leap.Unity
                 _numberOfReconnectionAttempts = 0;
                 return true;
             }
-            else if (_numberOfReconnectionAttempts < MAX_RECONNECTION_ATTEMPTS)
+            else if (_numberOfReconnectionAttempts < _reconnectionAttempts || _reconnectionAttempts == -1)
             {
                 _framesSinceServiceConnectionChecked++;
 
-                if (_framesSinceServiceConnectionChecked > RECONNECTION_INTERVAL)
+                if (_framesSinceServiceConnectionChecked > _reconnectionInterval)
                 {
                     _framesSinceServiceConnectionChecked = 0;
                     _numberOfReconnectionAttempts++;
 
                     Debug.LogWarning("Leap Service not connected; attempting to reconnect for try " +
-                                     _numberOfReconnectionAttempts + "/" + MAX_RECONNECTION_ATTEMPTS +
+                                     _numberOfReconnectionAttempts + "/" + _reconnectionAttempts +
                                      "...", this);
                     destroyController();
                     createController();

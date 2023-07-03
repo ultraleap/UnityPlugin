@@ -37,9 +37,9 @@ namespace Leap.Unity.Controllers
             switch (inputMethodType)
             {
                 case InputMethodType.LeapHand:
-                    if (_provider.Get(hand) != null)
+                    if (_provider.GetHand(hand) != null)
                     {
-                        angle = Vector3.Angle(_provider.Get(hand).Direction, Vector3.down);
+                        angle = Vector3.Angle(_provider.GetHand(hand).Direction, Vector3.down);
                         return true;
                     }
                     break;

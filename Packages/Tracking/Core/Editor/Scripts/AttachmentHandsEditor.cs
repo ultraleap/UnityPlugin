@@ -39,7 +39,7 @@ namespace Leap.Unity.Attachments
             EditorGUILayout.LabelField("Attachment Transforms", EditorStyles.boldLabel);
 
             // Determine whether the target object is a prefab. AttachmentPoints cannot be edited on prefabs.
-            var isTargetPrefab = Utils.IsObjectPartOfPrefabAsset(target.gameObject);
+            var isTargetPrefab = Leap.Unity.Utils.IsObjectPartOfPrefabAsset(target.gameObject);
 
             if (isTargetPrefab)
             {
@@ -96,6 +96,8 @@ namespace Leap.Unity.Attachments
             makeAttachmentPointsToggle("PinkyMiddleJoint", new Vector2(0.340F, -0.050F));
             makeAttachmentPointsToggle("PinkyDistalJoint", new Vector2(0.380F, -0.130F));
             makeAttachmentPointsToggle("PinkyTip", new Vector2(0.410F, -0.210F));
+
+            makeAttachmentPointsToggle("PinchPoint", new Vector2(-0.235F, -0.135F));
 
             EditorGUI.EndDisabledGroup();
 

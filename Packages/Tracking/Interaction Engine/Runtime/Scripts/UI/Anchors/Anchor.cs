@@ -217,7 +217,7 @@ namespace Leap.Unity.Interaction
                 {
                     continue;
                 }
-                Utils.DrawCircle(pos, dir, radius, AnchorGizmoColor, quality: 24, depthTest: true);
+                Leap.Unity.Utils.DrawCircle(pos, dir, radius, AnchorGizmoColor, quality: 24, depthTest: true);
             }
         }
 
@@ -229,7 +229,7 @@ namespace Leap.Unity.Interaction
             for (int i = 0; i < numCircles; i++)
             {
                 float curTheta = (dTheta * i) + halfTheta;
-                Utils.DrawCircle(pos + poleDir * Mathf.Cos(curTheta * Mathf.Deg2Rad) * radius, poleDir, Mathf.Sin(curTheta * Mathf.Deg2Rad) * radius, AnchorGizmoColor, quality: 16, depthTest: true);
+                Leap.Unity.Utils.DrawCircle(pos + poleDir * Mathf.Cos(curTheta * Mathf.Deg2Rad) * radius, poleDir, Mathf.Sin(curTheta * Mathf.Deg2Rad) * radius, AnchorGizmoColor, quality: 16, depthTest: true);
             }
         }
 
