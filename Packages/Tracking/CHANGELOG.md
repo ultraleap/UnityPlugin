@@ -8,7 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [NEXT] - xx/xx/xx
 
+This release was tested against Unity 2021.3 LTS and 2022.3 LTS
+
 ### Added
+- (XRHands) Direct Leap XRHands Subsystem
+- (UlrealeapSettings) Ultraleap Settings ScriptableObject to toggle features
+- (InputSystem) A XRHands to Leap InputActions and Meta Aim InputActions converter
 
 ### Changed
 - (Hand Pose) Removed unnecessary Hand Pose scriptable context menu option
@@ -25,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 	- A workaround is to right click on \ThirdParty\Ultraleap\Tracking\OpenXR\Runtime\Scripts\HandTrackingFeature.cs and select 'Reimport'
 - After using Ultraleap OpenXR in Unity Editor, the tracking mode of device 0 will be set to HMD until the Unity Editor session ends. This can stop the testing of non-XR scenes until the Unity Editor is re-opened
 - The OpenXR Leap Provider palm can be in unexpected position when using pre-1.4.3 OpenXR Layer. A workaround is to ensure you use 1.4.3 or newer - installed by the 5.12.0 or newer Tracking Service Installer
+- Running both the Ultraleap XRHands Subsystem and another XRHands Subsystem at the same time causes unstable results. Only enable one at a time.
 
 ## [6.9.0] - 08/06/23
 
