@@ -139,7 +139,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
         }
     }
 
+#if BURST_AVAILABLE
     [BurstCompile]
+#endif
     public struct PhysMultiOverlapJob : IJobFor
     {
         [ReadOnly]
