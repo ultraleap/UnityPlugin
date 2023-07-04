@@ -188,7 +188,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         {
             if (!_graspingCandidates.Contains(hand))
             {
-                if(GraspState == State.Idle)
+                if (GraspState == State.Idle)
                 {
                     GraspState = State.Hover;
                 }
@@ -207,7 +207,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             {
                 _graspingCandidatesContact.RemoveAt(_graspingCandidates.IndexOf(hand));
                 _graspingCandidates.Remove(hand);
-                if (_rigid.TryGetComponent<IPhysicsHandHover>(out var physicsHandHover))
+                if (_rigid != null && _rigid.TryGetComponent<IPhysicsHandHover>(out var physicsHandHover))
                 {
                     physicsHandHover.OnHandHoverExit(hand);
                 }
