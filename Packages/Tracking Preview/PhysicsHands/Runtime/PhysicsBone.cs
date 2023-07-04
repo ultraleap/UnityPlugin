@@ -298,7 +298,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             foreach (var oldRigid in badKeys)
             {
                 _hoverObjects.Remove(oldRigid);
-                if (oldRigid.TryGetComponent<IPhysicsBoneHover>(out var physicsHandGrab))
+                if (oldRigid != null && oldRigid.TryGetComponent<IPhysicsBoneHover>(out var physicsHandGrab))
                 {
                     physicsHandGrab.OnBoneHoverExit(this);
                 }
@@ -342,7 +342,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             foreach (var oldRigid in badKeys)
             {
                 _contactObjects.Remove(oldRigid);
-                if (oldRigid.TryGetComponent<IPhysicsBoneContact>(out var physicsHandGrab))
+                if (oldRigid != null && oldRigid.TryGetComponent<IPhysicsBoneContact>(out var physicsHandGrab))
                 {
                     physicsHandGrab.OnBoneContactExit(this);
                 }
