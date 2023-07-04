@@ -18,6 +18,7 @@ This release was tested against Unity 2021.3 LTS and 2022.3 LTS
 ### Changed
 - (Hand Pose) Removed unnecessary Hand Pose scriptable context menu option
 - (Multi device aggregation) Added wrist and arm to ConfidenceInterpolation aggregator
+- (Preview XRI) Removed XRI content from Preview Package in favour of XRHands+XRI content in Tracking Package. Follow the Ultraleap [XR Docs](https://docs.ultraleap.com/unity-api/The-Examples/XR/index.html) for XRI and XRHands to get started
 
 ### Fixed
 - (Preview) CPU performance issues on PICO when re-connecting tracking device
