@@ -472,10 +472,10 @@ namespace Leap.Unity
                 {
                     if (mainCamera.transform.parent != null)
                     {
-                        var position = mainCamera.transform.parent.InverseTransformPoint(mainCamera.transform.position);
-                        var rotation = mainCamera.transform.parent.InverseTransformRotation(mainCamera.transform.rotation);
+                        var cameraSpacePosition = mainCamera.transform.parent.InverseTransformPoint(mainCamera.transform.position);
+                        var cameraSpaceRotation = mainCamera.transform.parent.InverseTransformRotation(mainCamera.transform.rotation);
 
-                        trackedPose = new Pose(position, rotation);
+                        trackedPose = new Pose(cameraSpacePosition, cameraSpaceRotation);
                     }
                     else
                     {

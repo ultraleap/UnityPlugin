@@ -104,20 +104,9 @@ namespace Leap.Unity
 
             leapProviderGO = new GameObject("LeapXRServiceProvider");
             LeapXRServiceProvider leapXRServiceProvider = leapProviderGO.AddComponent<LeapXRServiceProvider>();
-            leapXRServiceProvider.PositionDeviceRelativeToMainCamera = false;
+            leapXRServiceProvider.PositionDeviceRelativeToMainCamera = true;
             leapProvider = (LeapProvider)leapXRServiceProvider;
             GameObject.DontDestroyOnLoad(leapProviderGO);
-
-
-            if(leapXRServiceProvider.PositionDeviceRelativeToMainCamera == true)
-            {
-                leapXRServiceProvider.PositionDeviceRelativeToMainCamera = false;
-                leapProvider.transform.position = Vector3.zero;
-                leapProvider.transform.rotation = Quaternion.identity;
-                leapProvider.transform.localScale = Vector3.one;
-                leapXRServiceProvider.deviceOffsetMode = LeapXRServiceProvider.DeviceOffsetMode.Transform;
-                leapXRServiceProvider.deviceOrigin = leapProvider.transform;
-            }
 
             if (subsystemProvider != null)
             {

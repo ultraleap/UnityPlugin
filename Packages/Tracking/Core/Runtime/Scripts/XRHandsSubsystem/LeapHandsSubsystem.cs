@@ -129,8 +129,19 @@ namespace Leap.Unity
                 return false;
             }
 
+            if (Camera.main.transform != null)
+            {
+                var camPos = Camera.main.transform.parent.position;
+                var camRot = Camera.main.transform.parent.rotation;
+                leapHand.Transform(-camPos, Quaternion.Inverse(camRot));
+
+            }
+
+
             Pose palmPose = CalculatePalmPose(leapHand);
             Pose wristPose = CalculateWristPose(leapHand);
+
+            
 
             rootPose = wristPose;
             Handedness handedness = (Handedness)((int)leapHand.GetChirality() + 1); // +1 as unity has "invalid" handedness while we do not
@@ -230,7 +241,7 @@ namespace Leap.Unity
 
             var handsSubsystemCinfo = new XRHandSubsystemDescriptor.Cinfo
             {
-                id = id,
+                id = "UL XR Hands",
                 providerType = typeof(LeapXRHandProvider),
                 subsystemTypeOverride = typeof(LeapHandsSubsystem)
             };
