@@ -8,9 +8,9 @@
 
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SubsystemsImplementation.Extensions;
 using UnityEngine.XR.Hands;
 using UnityEngine.XR.Hands.ProviderImplementation;
-using UnityEngine.SubsystemsImplementation.Extensions;
 
 namespace Leap.Unity
 {
@@ -64,7 +64,7 @@ namespace Leap.Unity
 
             if (m_Subsystem != null)
             {
-                if(!m_Subsystem.running)
+                if (!m_Subsystem.running)
                 {
                     m_Subsystem.Start();
 

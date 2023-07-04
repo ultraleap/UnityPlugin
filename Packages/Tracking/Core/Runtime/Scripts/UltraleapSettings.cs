@@ -62,7 +62,7 @@ namespace Leap.Unity
     {
         static UltraleapSettings instance;
         public static UltraleapSettings Instance
-        { 
+        {
             get
             {
                 if (instance != null)
@@ -115,7 +115,7 @@ namespace Leap.Unity
             // Try to directly load the asset
             UltraleapSettings ultraleapSettings = Resources.Load<UltraleapSettings>("Ultraleap Settings");
 
-            if(ultraleapSettings != null)
+            if (ultraleapSettings != null)
             {
                 instance = ultraleapSettings;
                 return instance;
