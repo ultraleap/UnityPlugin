@@ -17,6 +17,7 @@ This release was tested against Unity 2021.3 LTS and 2022.3 LTS
 
 ### Changed
 - (Hand Pose) Removed unnecessary Hand Pose scriptable context menu option
+- (Multi device aggregation) Added wrist and arm to ConfidenceInterpolation aggregator
 
 ### Fixed
 - (Preview) CPU performance issues on PICO when re-connecting tracking device
