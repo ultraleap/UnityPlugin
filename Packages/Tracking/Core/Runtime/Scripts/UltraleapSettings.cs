@@ -112,6 +112,15 @@ namespace Leap.Unity
 
         private static UltraleapSettings FindSettingsSO()
         {
+            // Try to directly load the asset
+            UltraleapSettings ultraleapSettings = Resources.Load<UltraleapSettings>("Ultraleap Settings");
+
+            if(ultraleapSettings != null)
+            {
+                instance = ultraleapSettings;
+                return instance;
+            }
+
             UltraleapSettings[] settingsSO = Resources.FindObjectsOfTypeAll(typeof(UltraleapSettings)) as UltraleapSettings[];
 
             if (settingsSO != null && settingsSO.Length > 0)
