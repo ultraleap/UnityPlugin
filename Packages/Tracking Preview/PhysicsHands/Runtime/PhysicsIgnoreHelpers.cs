@@ -15,7 +15,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
     public class PhysicsIgnoreHelpers : MonoBehaviour
     {
-        [Tooltip("This prevents the object from being collided with all Physics Hands.")]
+        [Tooltip("This prevents the object from being collided with all Physics Hands."), UnityEngine.Serialization.FormerlySerializedAsAttribute("DisableHandCollisions")]
         public bool DisableAllHandCollisions = false;
         [Tooltip("This prevents the object from being collided with a specific Physics Hands.")]
         public bool DisableSpecificHandCollisions = false;
