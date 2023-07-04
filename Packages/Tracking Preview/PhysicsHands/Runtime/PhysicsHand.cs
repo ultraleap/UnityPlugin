@@ -824,10 +824,10 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 {
                     _contactFingerDisplacement = 0f;
                 }
-                else if(_displacementGrabCooldown > 0)
+                else if (_displacementGrabCooldown > 0)
                 {
                     _displacementGrabCooldownCurrent -= Time.fixedDeltaTime;
-                    if(_displacementGrabCooldownCurrent <= 0)
+                    if (_displacementGrabCooldownCurrent <= 0)
                     {
                         _displacementGrabCooldownCurrent = 0f;
                     }
@@ -1012,6 +1012,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             for (int i = 0; i < _safetyOverlapResults.Length; i += 2)
             {
+#if UNITY_2021_3_OR_NEWER
                 if (_safetyOverlapResults[i].colliderInstanceID == 0 && _safetyOverlapResults[i + 1].colliderInstanceID == 0)
                     continue;
 
@@ -1026,6 +1027,22 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 {
                     _isCloseToObject = true;
                 }
+#else
+                if (_safetyOverlapResults[i].collider == null && _safetyOverlapResults[i + 1].collider == null)
+                    continue;
+
+                if (_isContacting && _isCloseToObject)
+                    break;
+
+                if (!_isContacting && _safetyOverlapResults[i].collider != null && WillColliderAffectHand(_safetyOverlapResults[i].collider))
+                {
+                    _isContacting = true;
+                }
+                if (!_isCloseToObject && _safetyOverlapResults[i + 1].collider != null && WillColliderAffectHand(_safetyOverlapResults[i + 1].collider))
+                {
+                    _isCloseToObject = true;
+                }
+#endif
             }
         }
 

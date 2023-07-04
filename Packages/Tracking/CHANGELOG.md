@@ -16,9 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - (Hand Pose) Removed unnecessary Hand Pose scriptable context menu option
-- (Physics Hands) Moved to Unity 2021+ only, due to the utilisation of Burst compute
-    - Burst compute is now used to improve certain physics calculation performance
-    - In Unity 2021+ this is used for "hand is colliding" functions only
+- (Physics Hands) Burst compute is now used to improve certain physics calculation performance
+    - In Unity 2020+ this is used for "hand is colliding" functions only
 	- In Unity 2022+ all collision functions are handled by Burst
 - (Physics Hands) Parameters of the hand (e.g. contact distance) are now controlled at the provider level and have adjusted defaults for better interactions
 - (Physics Hands) OnObjectStateChange event has been replaced with SubscribeToStateChanges

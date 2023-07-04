@@ -55,6 +55,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         }
     }
 
+#if UNITY_2021_3_OR_NEWER
     public struct PhysMultiRaycastHitEnumerator
     {
         private readonly NativeArray<RaycastHit> results;
@@ -95,6 +96,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             return true;
         }
     }
+#endif
 
 #if UNITY_2022_3_OR_NEWER
 #if BURST_AVAILABLE

@@ -402,7 +402,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         private void SetupButton()
         {
-            if (_buttonElement == null)
+            if (_buttonElement == null || _buttonElement.Rigid == null)
                 return;
 
             _rigidbody.mass = 1f;

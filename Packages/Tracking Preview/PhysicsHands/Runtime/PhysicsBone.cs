@@ -132,7 +132,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         public void Awake()
         {
+#if UNITY_2021_3_OR_NEWER
+            _hand = GetComponentInParent<PhysicsHand>(true);
+#else
             _hand = GetComponentInParent<PhysicsHand>();
+#endif
             _body = GetComponent<ArticulationBody>();
             _collider = GetComponent<Collider>();
             if (_collider.GetType() == typeof(BoxCollider))
@@ -157,6 +161,15 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         private void ResetValues()
         {
+            // Ensure we have the hand
+            if (_hand == null)
+            {
+#if UNITY_2021_3_OR_NEWER
+                _hand = GetComponentInParent<PhysicsHand>(true);
+#else
+                _hand = GetComponentInParent<PhysicsHand>();
+#endif
+            }
             _objectDistance = float.MaxValue;
             DisplacementAmount = 0f;
             _displacementDistance = 0f;
@@ -174,7 +187,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
             }
             if (_hand == null)
             {
+#if UNITY_2021_3_OR_NEWER
                 _hand = GetComponentInParent<PhysicsHand>(true);
+#else
+                _hand = GetComponentInParent<PhysicsHand>();
+#endif
             }
             if (_body != null)
             {
