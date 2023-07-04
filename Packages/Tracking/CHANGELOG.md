@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
 
-## [NEXT] - xx/xx/xx
+## [6.10.0] - 05/07/23
 
 This release was tested against Unity 2021.3 LTS and 2022.3 LTS
 
