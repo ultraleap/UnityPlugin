@@ -9,12 +9,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [NEXT] - xx/xx/xx
 
 ### Added
+- (Physics Hands) Finger displacement values to each finger
+- (Physics Hands) Interface based events for easier development
+    - Please see the updated scripts in the Physics Hands example scene for more information
+
 
 ### Changed
 - (Hand Pose) Removed unnecessary Hand Pose scriptable context menu option
+- (Physics Hands) Burst compute is now used to improve certain physics calculation performance
+    - In Unity 2020+ this is used for "hand is colliding" functions only
+	- In Unity 2022+ all collision functions are handled by Burst
+- (Physics Hands) Parameters of the hand (e.g. contact distance) are now controlled at the provider level and have adjusted defaults for better interactions
+- (Physics Hands) OnObjectStateChange event has been replaced with SubscribeToStateChanges
+    - This is tailored to handle specific Rigidbodies and will only fire when your subscribed Rigidbody is affected
+- (Physics Hands) Hand and bone states have been improved and are more consistent with expectations
+- (Physics Hands) Updated example scene with new events and better visuals
+
 
 ### Fixed
 - (Preview) CPU performance issues on PICO when re-connecting tracking device
+- (Physics Hands) Hand forces are reduced when pushing into objects with fingers
+
 
 ### Known issues 
 - Use of the LeapCSharp Config class is unavailable with v5.X tracking service

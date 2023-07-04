@@ -29,10 +29,23 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private Rigidbody _rigidbody = null;
         [SerializeField, Tooltip("The element used to hold button specific components.")]
         private PhysicsButtonElement _buttonElement = null;
+        [SerializeField, HideInInspector]
+        private PhysicsIgnoreHelpers _ignoreHelper = null;
 
         [SerializeField, Tooltip("Tells the PhysicsButtonElement to ignore all collision between itself and objects in the scene that are not on the hand layers.")]
-        private bool _handsOnly = false;
+        private bool _handsOnly = true;
         public bool HandsOnly => _handsOnly;
+
+        [SerializeField, Tooltip("Reduces press events to only listen to the index finger.")]
+        private bool _fingerTipsOnly = false;
+        public bool FingerTipsOnly => _fingerTipsOnly;
+
+        [SerializeField, Tooltip("Allows the left hand to press the button.")]
+        private bool _allowLeftHand = true;
+        public bool AllowLeftHand => _allowLeftHand;
+        [SerializeField, Tooltip("Allows the right hand to press the button.")]
+        private bool _allowRightHand = true;
+        public bool AllowRightHand => _allowRightHand;
 
         [Header("Motion Configuration")]
         /// <summary>
@@ -212,6 +225,10 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private void OnEnable()
         {
             SetupButton();
+            if (isToggleable)
+            {
+                UpdateToggleJoint();
+            }
         }
 
         protected void OnDisable()
@@ -248,6 +265,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             }
 
             SetupButton();
+            UpdateIgnores();
 
             _provider = FindObjectOfType<PhysicsProvider>(true);
 
@@ -272,9 +290,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         private void ResetOnBadState()
         {
-            if (Mathf.Abs(_buttonElement.transform.localRotation.eulerAngles.x) > 0.005f ||
-                Mathf.Abs(_buttonElement.transform.localRotation.eulerAngles.y) > 0.005f ||
-                Mathf.Abs(_buttonElement.transform.localRotation.eulerAngles.z) > 0.005f)
+            if (Mathf.Abs(_buttonElement.transform.localRotation.eulerAngles.x) > 0.002f ||
+                Mathf.Abs(_buttonElement.transform.localRotation.eulerAngles.y) > 0.002f ||
+                Mathf.Abs(_buttonElement.transform.localRotation.eulerAngles.z) > 0.002f)
             {
                 _buttonElement.transform.localRotation = Quaternion.identity;
             }
@@ -287,7 +305,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         private void ProcessPhysicsEvents()
         {
-            if (_provider.IsObjectHovered(_buttonElement.Rigid))
+            if (_buttonElement.IsHovered)
             {
                 if (!_hovered)
                 {
@@ -295,33 +313,28 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     OnHover?.Invoke();
                 }
 
-                if (_provider.GetObjectState(_buttonElement.Rigid, out var state))
+                if (_buttonElement.IsContacting)
                 {
-                    switch (state)
+                    if (!_contact)
                     {
-                        case PhysicsGraspHelper.State.Hover:
-                            _contactReleaseTime = Mathf.Clamp(--_contactReleaseTime, 0, 100);
-                            if (_contact && _contactReleaseTime == 0)
-                            {
-                                _contact = false;
-                                OnUncontact?.Invoke();
-                            }
-                            break;
-                        case PhysicsGraspHelper.State.Contact:
-                        case PhysicsGraspHelper.State.Grasp:
-                            if (!_contact)
-                            {
-                                _contact = true;
-                                OnContact?.Invoke();
-                                // Small wait to reduce erroneous uncontact events
-                                _contactReleaseTime = 10;
-                            }
-                            // Ensure that we only allow hands to press the button
-                            if (_handsOnly)
-                            {
-                                PressValidation();
-                            }
-                            break;
+                        _contact = true;
+                        OnContact?.Invoke();
+                        // Small wait to reduce erroneous uncontact events
+                        _contactReleaseTime = 10;
+                    }
+                    // Ensure that we only allow hands to press the button
+                    if (_handsOnly && (!_fingerTipsOnly || (_fingerTipsOnly && _buttonElement.IsTipContacting)))
+                    {
+                        PressValidation();
+                    }
+                }
+                else
+                {
+                    _contactReleaseTime = Mathf.Clamp(--_contactReleaseTime, 0, 100);
+                    if (_contact && _contactReleaseTime == 0)
+                    {
+                        _contact = false;
+                        OnUncontact?.Invoke();
                     }
                 }
             }
@@ -389,7 +402,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         private void SetupButton()
         {
-            if (_buttonElement == null)
+            if (_buttonElement == null || _buttonElement.Rigid == null)
                 return;
 
             _rigidbody.mass = 1f;
@@ -462,6 +475,34 @@ namespace Leap.Unity.Interaction.PhysicsHands
             _buttonElement.Joint.targetPosition = Vector3.down * heightLimit;
         }
 
+        private void UpdateIgnores()
+        {
+            if (_ignoreHelper != null)
+            {
+                if (!_allowLeftHand && !_allowRightHand)
+                {
+                    _ignoreHelper.DisableAllHandCollisions = true;
+                }
+                else if (!_allowLeftHand)
+                {
+                    _ignoreHelper.DisableAllHandCollisions = false;
+                    _ignoreHelper.DisableSpecificHandCollisions = true;
+                    _ignoreHelper.DisabledHandedness = Chirality.Left;
+                }
+                else if (!_allowRightHand)
+                {
+                    _ignoreHelper.DisableAllHandCollisions = false;
+                    _ignoreHelper.DisableSpecificHandCollisions = true;
+                    _ignoreHelper.DisabledHandedness = Chirality.Right;
+                }
+                else
+                {
+                    _ignoreHelper.DisableAllHandCollisions = false;
+                    _ignoreHelper.DisableSpecificHandCollisions = false;
+                }
+            }
+        }
+
         #endregion
 
         #region Public Functions
@@ -515,6 +556,13 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 _buttonElement = GetComponentInChildren<PhysicsButtonElement>(true);
             }
 
+            if (_buttonElement != null && _ignoreHelper == null)
+            {
+                _ignoreHelper = GetComponentInChildren<PhysicsIgnoreHelpers>(true);
+            }
+
+            UpdateIgnores();
+
             if (isToggleable)
             {
                 if (buttonToggleHeightLimit > buttonHeightLimit)
@@ -528,11 +576,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 }
             }
 
-            if (_buttonElement != null)
-            {
-                SetupButton();
-            }
+            SetupButton();
         }
+
         #endregion
     }
 }

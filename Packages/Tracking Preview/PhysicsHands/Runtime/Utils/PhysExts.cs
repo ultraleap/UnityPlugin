@@ -112,6 +112,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
         {
             return Mathf.Max(v.x, Mathf.Max(v.y, v.z));
         }
+
+        public static bool ContainsRange<T>(this T[] arr, T value, int maxIndex)
+        {
+            return System.Array.IndexOf(arr, value,0, maxIndex) != -1;
+        }
     }
 
 }

@@ -64,12 +64,13 @@ namespace Leap.Unity.Interaction.PhysicsHands
         [SerializeField, Tooltip("Allows the hands to collide with one another.")]
         private bool _interHandCollisions = false;
 
-        private float _forceLimit = 1000f;
-        private float _stiffness = 200f;
-
         public float PerBoneMass => _perBoneMass;
         [SerializeField, Tooltip("The mass of each finger bone; the palm will be 3x this. It is not recommended to modify this too far from the default (0.1)."), Range(0.01f, 0.25f)]
         private float _perBoneMass = 0.1f;
+
+        public PhysicsHand.HandParameters HandParameters => _handParameters;
+        [SerializeField]
+        private PhysicsHand.HandParameters _handParameters = new PhysicsHand.HandParameters();
 
         public float HandTeleportDistance => _handTeleportDistance;
         [SerializeField, Tooltip("The distance between the physics and original data hand can reach before it snaps back to the original hand position."), Range(0.01f, 0.5f)]
@@ -114,9 +115,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private Dictionary<Rigidbody, HashSet<PhysicsBone>> _boneQueue = new Dictionary<Rigidbody, HashSet<PhysicsBone>>();
 
         // Cache for physics calculations
+        private Collider[] _resultsCache = new Collider[16];
+        private bool[] _resultsFound = new bool[16];
         private int _resultCount = 0;
-        private Collider[] _resultsCache = new Collider[64];
-        private Vector3 _tempVector = Vector3.zero;
 
         private HashSet<Rigidbody> _graspLayerRigid = new HashSet<Rigidbody>();
         private HashSet<Rigidbody> _hoveredItems = new HashSet<Rigidbody>();
@@ -125,19 +126,14 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private Dictionary<PhysicsHand, float[]> _fingerStrengths = new Dictionary<PhysicsHand, float[]>();
         public Dictionary<PhysicsHand, float[]> FingerStrengths => _fingerStrengths;
 
-        private LayerMask _hoverMask, _interactionMask;
+        private LayerMask _interactionMask;
         public LayerMask InteractionMask => _interactionMask;
 
-        // These events are place holders
-        public Action<Rigidbody> OnHover, OnHoverExit;
-
-        public Action<Rigidbody> OnContact, OnContactExit;
-
-        public Action<Rigidbody> OnGrasp, OnGraspExit;
-
-        public Action<Rigidbody> OnGraspedPinch, OnGraspedUnpinch;
-
+        [Obsolete("This event has been replaced by the PhysicsInterface calls. Please reference SubscribeToStateChanges function and PhysicsInterfaces.cs " +
+            "This event will be removed in a future version.")]
         public Action<Rigidbody, PhysicsGraspHelper> OnObjectStateChange;
+
+        private Dictionary<Rigidbody, HashSet<Action<PhysicsGraspHelper>>> _objectStateChanges = new Dictionary<Rigidbody, HashSet<Action<PhysicsGraspHelper>>>();
 
         private int _leftIndex = -1, _rightIndex = -1;
         private Hand _leftOriginalLeap, _rightOriginalLeap;
@@ -149,6 +145,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         private void Awake()
         {
+#if !BURST_AVAILABLE
+            Debug.LogWarning("Please install the Unity Burst package, otherwise PhysicsHands performance will be degraded.", this);
+#endif
             _leftOriginalLeap = new Hand();
             _rightOriginalLeap = new Hand();
             GenerateLayers();
@@ -160,6 +159,22 @@ namespace Leap.Unity.Interaction.PhysicsHands
             base.OnEnable();
             _waitForFixedUpdate = new WaitForFixedUpdate();
             StartCoroutine(LateFixedFrameProcess());
+        }
+
+        private void Reset()
+        {
+            PhysicsHand[] existingHands = GetComponentsInChildren<PhysicsHand>(true);
+            foreach (PhysicsHand hand in existingHands)
+            {
+                if (Application.isPlaying)
+                {
+                    Destroy(hand.gameObject);
+                }
+                else
+                {
+                    DestroyImmediate(hand.gameObject);
+                }
+            }
         }
 
         #region Layer Generation
@@ -232,11 +247,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 _interactableLayers.Add(_handsLayer);
             }
 
-            _hoverMask = new LayerMask();
             _interactionMask = new LayerMask();
             for (int i = 0; i < _interactableLayers.Count; i++)
             {
-                _hoverMask = _hoverMask | _interactableLayers[i].layerMask;
                 _interactionMask = _interactionMask | _interactableLayers[i].layerMask;
             }
 
@@ -281,8 +294,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         public void GenerateHands()
         {
-            LeftHand = PhysicsHandsUtils.GenerateHand(Chirality.Left, _perBoneMass, _forceLimit, _stiffness, _handsLayer, gameObject);
-            RightHand = PhysicsHandsUtils.GenerateHand(Chirality.Right, _perBoneMass, _forceLimit, _stiffness, _handsLayer, gameObject);
+            LeftHand = PhysicsHandsUtils.GenerateHand(Chirality.Left, _handParameters, _handsLayer, gameObject);
+            RightHand = PhysicsHandsUtils.GenerateHand(Chirality.Right, _handParameters, _handsLayer, gameObject);
         }
 
         #endregion
@@ -343,7 +356,10 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 state = helper.Value.UpdateHelper();
                 if (state != oldState)
                 {
+#pragma warning disable 0618
                     OnObjectStateChange?.Invoke(helper.Value.Rigidbody, helper.Value);
+#pragma warning restore 0618
+                    SendStates(helper.Value.Rigidbody, helper.Value);
                 }
             }
         }
@@ -401,7 +417,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             }
         }
 
-        private void FixedUpdate()
+        private void LateUpdate()
         {
             PostUpdateOverlapCheck(LeftHand);
             PostUpdateOverlapCheck(RightHand);
@@ -423,14 +439,15 @@ namespace Leap.Unity.Interaction.PhysicsHands
             // Apply Layers
             ApplyHoverLayers();
 
-            // Check Contacts
-            foreach (var hand in _hoveringHands)
+            if (LeftHand.IsTracked)
             {
-                PhysicsOverlapsForHand(hand);
+                LeftHand.UpdateHandHeuristics(ref _resultsCache, ref _resultsFound);
             }
 
-            // Send those bones to the helpers
-            ApplyGraspBones();
+            if (RightHand.IsTracked)
+            {
+                RightHand.UpdateHandHeuristics(ref _resultsCache, ref _resultsFound);
+            }
         }
 
         /// <summary>
@@ -467,7 +484,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         /// <summary>
         /// Uses a pre-defined _resultCount and _resultsCache to determine if overlaps have happened and handles the result by ignoring collisions between the hand and the foundBodies
         /// </summary>
-        void HandleOverlaps(PhysicsHand hand)
+        private void HandleOverlaps(PhysicsHand hand)
         {
             HashSet<int> foundBodies = new HashSet<int>();
 
@@ -535,10 +552,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
         {
             foreach (var rigid in _hoveredItems)
             {
-                if (!_graspLayerRigid.Contains(rigid))
-                {
-                    OnHover?.Invoke(rigid);
-                }
                 _graspLayerRigid.Add(rigid);
             }
             _graspLayerRigid.RemoveWhere(ValidateUnhoverRigids);
@@ -549,7 +562,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
         {
             if (!_hoveredItems.Contains(rigid))
             {
-                OnHoverExit?.Invoke(rigid);
                 if (_boneQueue.ContainsKey(rigid))
                 {
                     _boneQueue.Remove(rigid);
@@ -560,15 +572,77 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     {
                         // Ensure we release the object first
                         _graspHelpers[rigid].ReleaseObject();
-                        OnGraspExit?.Invoke(rigid);
                     }
                     _graspHelpers[rigid].ReleaseHelper();
+#pragma warning disable 0618
                     OnObjectStateChange?.Invoke(rigid, _graspHelpers[rigid]);
+#pragma warning restore 0618
+                    SendStates(rigid, _graspHelpers[rigid]);
+
                     _graspHelpers.Remove(rigid);
                 }
                 return true;
             }
             return false;
+        }
+
+        /// <summary>
+        /// This allows you to bind to any rigidbody and then listen to events when it's grab state changes.
+        /// Use <b>PhysicsGraspHelper.GraspState</b> to access the state.
+        /// Use <b>PhysicsGraspHelper.Rigidbody</b> to access your target.
+        /// You will at times receive an <b>Idle</b> state, signifying the unhover of the object.
+        /// </summary>
+        /// <param name="target">The rigidbody you want to listen to.</param>
+        /// <param name="outputFunction">The function you want to be called.</param>
+        public void SubscribeToStateChanges(Rigidbody target, Action<PhysicsGraspHelper> outputFunction)
+        {
+            if (target == null || outputFunction == null)
+            {
+                Debug.LogWarning("Target object or output function cannot be null when subscribing to state changes.");
+                return;
+            }
+            if (_objectStateChanges.TryGetValue(target, out var hashset))
+            {
+                hashset.Add(outputFunction);
+            }
+            else
+            {
+                _objectStateChanges.Add(target, new HashSet<Action<PhysicsGraspHelper>>() { outputFunction });
+            }
+        }
+
+        /// <summary>
+        /// Removes your target rigidbody and function from being called when a grab state is changed.
+        /// </summary>
+        /// <param name="target">The rigidbody you are lisening to.</param>
+        /// <param name="outputFunction">The function you have being called.</param>
+        public void UnsubscribeFromStateChanges(Rigidbody target, Action<PhysicsGraspHelper> outputFunction)
+        {
+            if (target == null || outputFunction == null)
+            {
+                Debug.LogWarning("Target object or output function cannot be null when unsubscribing from state changes.");
+                return;
+            }
+            if (_objectStateChanges.TryGetValue(target, out var hashset))
+            {
+                hashset.Remove(outputFunction);
+                if (hashset.Count == 0)
+                {
+                    _objectStateChanges.Remove(target);
+                }
+            }
+        }
+
+        // Sends out the current grasp helper information to the functions as requested
+        private void SendStates(Rigidbody target, PhysicsGraspHelper helper)
+        {
+            if (_objectStateChanges.TryGetValue(target, out var hashset))
+            {
+                foreach (var action in hashset)
+                {
+                    action?.Invoke(helper);
+                }
+            }
         }
 
         // Simple check to see if we actually find some rigidbodies to interact with
@@ -584,10 +658,10 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 lerp = _fingerStrengths[hand].Skip(1).Min();
             }
 
-            _resultCount = Physics.OverlapCapsuleNonAlloc(pH.transform.position + (-pH.transform.up * 0.025f) + (pH.transform.forward * 0.02f),
+            _resultCount = Physics.OverlapCapsuleNonAlloc(pH.transform.position + (-pH.transform.up * 0.025f) + ((hand.Handedness == Chirality.Left ? pH.transform.right : -pH.transform.right) * 0.015f),
                 // Interpolate the tip position so we keep it relative to the straightest finger
-                pH.transform.position + (-pH.transform.up * Mathf.Lerp(0.025f, 0.07f, lerp)) + (pH.transform.forward * Mathf.Lerp(0.08f, 0.04f, lerp)),
-                0.075f, _resultsCache, _hoverMask);
+                pH.transform.position + (-pH.transform.up * Mathf.Lerp(0.025f, 0.07f, lerp)) + (pH.transform.forward * Mathf.Lerp(0.06f, 0.02f, lerp)),
+                0.1f, _resultsCache, _interactionMask);
 
             PhysicsGraspHelper tempHelper;
             for (int i = 0; i < _resultCount; i++)
@@ -605,6 +679,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                         PhysicsGraspHelper helper = new PhysicsGraspHelper(_resultsCache[i].attachedRigidbody, this);
                         helper.AddHand(hand);
                         _graspHelpers.Add(_resultsCache[i].attachedRigidbody, helper);
+                        SendStates(_resultsCache[i].attachedRigidbody, helper);
                     }
                 }
             }
@@ -623,119 +698,19 @@ namespace Leap.Unity.Interaction.PhysicsHands
             }
         }
 
-        private void PhysicsOverlapsForHand(PhysicsHand hand)
-        {
-            PhysicsHand.Hand pH = hand.GetPhysicsHand();
-
-            _tempVector.x = 0;
-            _tempVector.y = -pH.triggerDistance;
-            _resultCount = PhysExts.OverlapBoxNonAllocOffset(pH.palmCollider, _tempVector, _resultsCache, _interactionMask);
-            for (int i = 0; i < _resultCount; i++)
-            {
-                if (_resultsCache[i].attachedRigidbody != null)
-                {
-                    if (_boneQueue.ContainsKey(_resultsCache[i].attachedRigidbody))
-                    {
-                        _boneQueue[_resultsCache[i].attachedRigidbody].Add(pH.palmBone);
-                    }
-                    else
-                    {
-                        _boneQueue.Add(_resultsCache[i].attachedRigidbody, new HashSet<PhysicsBone>() { pH.palmBone });
-                    }
-                }
-            }
-
-            for (int i = 0; i < pH.jointColliders.Length; i++)
-            {
-                // Skip the first bone as we don't need it for grasping
-                if (pH.jointBones[i].Joint == 0)
-                    continue;
-
-                float radius = pH.jointColliders[i].radius;
-                // Move the thumb closer to the palm
-                if (pH.jointBones[i].Finger == 0)
-                {
-                    _tempVector.x = -pH.triggerDistance / 2f;
-                    _tempVector.z = pH.triggerDistance / 2f;
-                    radius *= 0.3f;
-                }
-                else
-                {
-                    // Inflate the bones slightly
-                    _tempVector.x = 0;
-                    _tempVector.z = 0;
-                    radius *= 0.12f;
-                }
-                // Move the finger tips forward a tad
-                if (pH.jointBones[i].Joint == 2)
-                {
-                    _tempVector.z += pH.triggerDistance / 2f;
-                }
-
-#if UNITY_EDITOR
-                if (Selection.activeGameObject == gameObject)
-                {
-                    pH.jointColliders[i].ToWorldSpaceCapsuleOffset(_tempVector, out var point0, out var point1, out var radiusOut);
-                    Debug.DrawLine(point0, point1, Color.magenta, Time.fixedDeltaTime);
-                }
-#endif
-
-                _resultCount = PhysExts.OverlapCapsuleNonAllocOffset(pH.jointColliders[i], _tempVector, _resultsCache, _interactionMask, extraRadius: radius);
-                for (int j = 0; j < _resultCount; j++)
-                {
-                    if (_resultsCache[j].attachedRigidbody != null)
-                    {
-                        // Stop the bone from repeatedly being added
-                        if (_boneQueue.ContainsKey(_resultsCache[j].attachedRigidbody))
-                        {
-                            _boneQueue[_resultsCache[j].attachedRigidbody].Add(pH.jointBones[i]);
-                        }
-                        else
-                        {
-                            _boneQueue.Add(_resultsCache[j].attachedRigidbody, new HashSet<PhysicsBone>() { pH.jointBones[i] });
-                        }
-                    }
-                }
-            }
-        }
-
-        private void ApplyGraspBones()
-        {
-            PhysicsGraspHelper pghTemp;
-            foreach (var hashset in _boneQueue)
-            {
-                if (_graspHelpers.TryGetValue(hashset.Key, out pghTemp))
-                {
-                    pghTemp.UpdateBones(hashset.Value);
-                }
-                hashset.Value.Clear();
-            }
-        }
-
         #endregion
 
         private void UpdateHandStates()
         {
             if (LeftHand.IsTracked)
             {
-                UpdateBoneStats(LeftHand);
                 FindHandState(LeftHand);
                 LeftHand.LateFixedUpdate();
             }
             if (RightHand.IsTracked)
             {
-                UpdateBoneStats(RightHand);
                 FindHandState(RightHand);
                 RightHand.LateFixedUpdate();
-            }
-        }
-
-        private void UpdateBoneStats(PhysicsHand hand)
-        {
-            hand.GetPhysicsHand().palmBone.UpdateBoneDistances();
-            foreach (var bone in hand.GetPhysicsHand().jointBones)
-            {
-                bone.UpdateBoneDistances();
             }
         }
 
