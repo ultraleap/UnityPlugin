@@ -190,9 +190,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private bool _isToggled = false;
         public bool IsToggled => _isToggled;
 
-        private PhysicsProvider _provider;
-        public PhysicsProvider Provider => _provider;
-
         private Vector3 _elementScale = Vector3.zero;
 
         #endregion
@@ -267,8 +264,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
             SetupButton();
             UpdateIgnores();
 
-            _provider = FindObjectOfType<PhysicsProvider>(true);
-
             OnPress += _OnPress.Invoke;
             OnUnpress += _OnUnpress.Invoke;
             OnHover += _OnHover.Invoke;
@@ -281,11 +276,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         protected void FixedUpdate()
         {
-            if (_provider != null)
-            {
-                ResetOnBadState();
-                ProcessPhysicsEvents();
-            }
+            ResetOnBadState();
+            ProcessPhysicsEvents();
         }
 
         private void ResetOnBadState()
