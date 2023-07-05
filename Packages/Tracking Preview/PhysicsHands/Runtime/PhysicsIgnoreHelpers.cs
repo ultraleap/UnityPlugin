@@ -33,6 +33,17 @@ namespace Leap.Unity.Interaction.PhysicsHands
             return false;
         }
 
+        public bool IsThisHandIgnored(PhysicsHand hand)
+        {
+            if(hand == null)
+                return false;
+            if (DisableAllHandCollisions)
+                return true;
+            if(DisableSpecificHandCollisions && DisabledHandedness == hand.Handedness)
+                return true;
+            return false;
+        }
+
         private void OnCollisionEnter(Collision collision)
         {
             if (DisableAllHandCollisions || DisableSpecificHandCollisions)
