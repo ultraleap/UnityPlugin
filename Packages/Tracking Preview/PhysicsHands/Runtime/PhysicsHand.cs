@@ -1084,7 +1084,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         private bool WillColliderAffectHand(Collider collider)
         {
-            if (collider.attachedRigidbody != null && collider.attachedRigidbody.TryGetComponent<PhysicsIgnoreHelpers>(out var temp) && temp.DisableAllHandCollisions)
+            if (collider.attachedRigidbody != null && collider.attachedRigidbody.TryGetComponent<PhysicsIgnoreHelpers>(out var temp) && temp.IsThisHandIgnored(this))
             {
                 return false;
             }
