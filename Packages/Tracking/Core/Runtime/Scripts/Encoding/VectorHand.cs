@@ -188,7 +188,7 @@ namespace Leap.Unity.Encoding
                       prevJoint: prevJoint,
                       nextJoint: nextJoint,
                       center: ((nextJoint + prevJoint) / 2f),
-                      direction: (palmRot * Vector3.forward),
+                      direction: (nextJoint - prevJoint).normalized,
                       length: (prevJoint - nextJoint).magnitude,
                       width: 0.01f,
                       type: (Bone.BoneType)jointIdx,
@@ -200,7 +200,7 @@ namespace Leap.Unity.Encoding
                   fingerId: fingerIdx,
                   timeVisible: 10f,// Time.time, <- This is unused and main thread only
                   tipPosition: nextJoint,
-                  direction: (boneRot * Vector3.forward),
+                  direction: (nextJoint - prevJoint).normalized,
                   width: 1f,
                   length: 1f,
                   isExtended: true,
