@@ -1,6 +1,6 @@
-﻿using UnityEngine;
 using UnityEditor;
 using UnityEditor.SceneManagement;
+using UnityEngine;
 
 namespace Leap.Unity.Readme
 {
@@ -74,7 +74,7 @@ namespace Leap.Unity.Readme
                     }
                 }
             }
-            if(!silent && !found)
+            if (!silent && !found)
             {
                 EditorUtility.DisplayDialog("No Readme for Scene", "This scene does not currently have a readme associated to it.", "Ok");
             }
@@ -142,7 +142,7 @@ namespace Leap.Unity.Readme
                         );
                         for (int i = 0; i < lines.Length; i++)
                         {
-                            if(i > 0)
+                            if (i > 0)
                             {
                                 GUILayout.Space(miniSpace);
                             }
@@ -162,7 +162,7 @@ namespace Leap.Unity.Readme
                             }
                         }
                     }
-                    if(section.assetLink != null)
+                    if (section.assetLink != null)
                     {
                         GUILayout.Space(miniSpace);
                         string pingText;

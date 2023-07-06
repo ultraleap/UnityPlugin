@@ -45,7 +45,7 @@ namespace Leap.Unity.Attachments
         PinkyMiddleJoint = 1 << 19,
         PinkyDistalJoint = 1 << 20,
         PinkyTip = 1 << 21,
-        
+
         PinchPoint = 1 << 22
     }
 

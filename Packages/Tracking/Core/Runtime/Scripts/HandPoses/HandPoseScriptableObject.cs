@@ -33,7 +33,7 @@ namespace Leap.Unity
     }
 #endif
 
-    [CreateAssetMenu(fileName = "HandPose", menuName = "ScriptableObjects/HandPose")]
+    //[CreateAssetMenu(fileName = "HandPose", menuName = "ScriptableObjects/HandPose")]
     public class HandPoseScriptableObject : ScriptableObject
     {
         [System.Serializable]
