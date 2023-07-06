@@ -55,7 +55,7 @@ namespace Leap.Unity.Preview.HandRays
 
         protected override Vector3 CalculateAimPosition()
         {
-            return aimPositionFilter.Filter(transformToFollow == null ? handRayDirection.Hand.GetStablePinchPosition() : transformToFollow.position, Time.time);
+            return aimPositionFilter.Filter(transformToFollow == null ? handRayDirection.Hand.GetStablePinchPosition() : transformToFollow.position);
         }
 
         protected override Vector3 CalculateDirection()
@@ -92,7 +92,7 @@ namespace Leap.Unity.Preview.HandRays
 
             _interpolatedDirection = Vector3.Lerp(_interpolatedDirection, currentDirection, Time.deltaTime * (1.0f / _interpCurrentTime));
 
-            return _interpolatedDirection;
+            return _interpolatedDirection.normalized;
         }
     }
 }
