@@ -71,6 +71,13 @@ namespace Leap.Unity.Encoding
             }
         }
 
+        // Correction for the 0th thumb bone rotation offsets to match LeapC
+        private static readonly Quaternion[] ThumbMetacarpalRotationOffset =
+        {
+            Quaternion.Euler(0, +25.9f, -63.45f),
+            Quaternion.Euler(0, -25.9f, +63.45f),
+        };
+
         #endregion
 
         /// <summary>
@@ -183,6 +190,11 @@ namespace Leap.Unity.Encoding
                     nextJoint = ToWorld(nextJoint, palmPos, palmRot);
                     prevJoint = ToWorld(prevJoint, palmPos, palmRot);
                     boneRot = palmRot * boneRot;
+
+                    if(fingerIdx == 0 && boneIdx == 0)
+                    {
+                        boneRot *= ThumbMetacarpalRotationOffset[intoHand.IsLeft ? 0 : 1];
+                    }
 
                     intoHand.GetBone(boneIdx).Fill(
                       prevJoint: prevJoint,
