@@ -22,7 +22,7 @@ namespace Leap.Unity
         public LeapProvider TrackingProvider
         {
             get
-            { 
+            {
                 if (trackingProvider == null)
                 {
                     trackingProvider = Hands.Provider;
@@ -32,7 +32,7 @@ namespace Leap.Unity
             }
             set
             {
-                trackingProvider = value; 
+                trackingProvider = value;
             }
         }
 
@@ -84,15 +84,15 @@ namespace Leap.Unity
         }
 
         public override XRHandSubsystem.UpdateSuccessFlags TryUpdateHands(
-            XRHandSubsystem.UpdateType updateType, 
-            ref Pose leftHandRootPose, 
-            NativeArray<XRHandJoint> leftHandJoints, 
-            ref Pose rightHandRootPose, 
+            XRHandSubsystem.UpdateType updateType,
+            ref Pose leftHandRootPose,
+            NativeArray<XRHandJoint> leftHandJoints,
+            ref Pose rightHandRootPose,
             NativeArray<XRHandJoint> rightHandJoints)
         {
-            if(TrackingProvider == null)
+            if (TrackingProvider == null)
             {
-                if(trackingProviderAvailableLastFrame)
+                if (trackingProviderAvailableLastFrame)
                 {
                     Debug.LogWarning("Leap XRHands Tracking Provider has been lost. Without a LeapProvider in your scene, you will not receive Leap XRHands.");
                     trackingProviderAvailableLastFrame = false;
@@ -141,7 +141,7 @@ namespace Leap.Unity
             Pose palmPose = CalculatePalmPose(leapHand);
             Pose wristPose = CalculateWristPose(leapHand);
 
-            
+
 
             rootPose = wristPose;
             Handedness handedness = (Handedness)((int)leapHand.GetChirality() + 1); // +1 as unity has "invalid" handedness while we do not

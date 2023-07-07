@@ -33,7 +33,7 @@ namespace Leap.Unity.InputActions
             ultraleapSettings = UltraleapSettings.Instance;
 
             // only start if requested
-            if (ultraleapSettings == null || 
+            if (ultraleapSettings == null ||
                 (ultraleapSettings.updateLeapInputSystem == false && ultraleapSettings.updateMetaInputSystem == false))
             {
                 return;
@@ -52,7 +52,7 @@ namespace Leap.Unity.InputActions
                 }
             }
 
-            if(currentSubsystem == null)
+            if (currentSubsystem == null)
             {
                 Debug.LogWarning("Unable to update InputActions, no Subsystem available.");
                 return;
@@ -255,7 +255,7 @@ namespace Leap.Unity.InputActions
 
         static Vector3 GetPalmPosition(XRHand hand)
         {
-            if(hand.GetJoint(XRHandJointID.Palm).TryGetPose(out Pose palmPose))
+            if (hand.GetJoint(XRHandJointID.Palm).TryGetPose(out Pose palmPose))
             {
                 return palmPose.position;
             }
@@ -263,7 +263,7 @@ namespace Leap.Unity.InputActions
             return Vector3.zero;
         }
 
-        static  Quaternion GetPalmDirection(XRHand hand)
+        static Quaternion GetPalmDirection(XRHand hand)
         {
             if (hand.GetJoint(XRHandJointID.Palm).TryGetPose(out Pose palmPose))
             {
@@ -290,7 +290,7 @@ namespace Leap.Unity.InputActions
 
         static Quaternion GetPinchDirection(XRHand hand)
         {
-            if(hand.GetJoint(XRHandJointID.IndexProximal).TryGetPose(out Pose proximalPose))
+            if (hand.GetJoint(XRHandJointID.IndexProximal).TryGetPose(out Pose proximalPose))
             {
                 return Quaternion.LookRotation(GetStablePinchPosition(hand) - proximalPose.position).normalized;
             }
@@ -300,7 +300,7 @@ namespace Leap.Unity.InputActions
 
         static Vector3 GetPokePosition(XRHand hand)
         {
-            if(hand.GetJoint(XRHandJointID.IndexTip).TryGetPose(out Pose indexTip))
+            if (hand.GetJoint(XRHandJointID.IndexTip).TryGetPose(out Pose indexTip))
             {
                 return indexTip.position;
             }
@@ -338,7 +338,7 @@ namespace Leap.Unity.InputActions
 
         #region Adding and removing devices
 
-        private static  void OnDeviceAdded()
+        private static void OnDeviceAdded()
         {
             if (ultraleapSettings.updateMetaInputSystem)
             {
@@ -418,7 +418,7 @@ namespace Leap.Unity.InputActions
 
             public PositionFromHandDelegate palmPositionDelegate;
             public RotationFromHandDelegate palmDirectionDelegate;
-            
+
             public PositionFromHandDelegate aimPositionDelegate;
             public RotationFromHandDelegate aimDirectionDelegate;
 
@@ -474,7 +474,7 @@ namespace Leap.Unity.InputActions
 
         static Vector3 FingerDirection(XRHandJoint midJoint)
         {
-            if(midJoint.TryGetPose(out Pose midJointPose))
+            if (midJoint.TryGetPose(out Pose midJointPose))
             {
                 return midJointPose.forward;
             }
@@ -496,7 +496,7 @@ namespace Leap.Unity.InputActions
 
             Vector3 xBasis = new Vector3(1.0f - (yy + zz), xy + wz, xz - wy);
 
-            if(hand.handedness == Handedness.Left)
+            if (hand.handedness == Handedness.Left)
             {
                 return xBasis;
             }
@@ -583,7 +583,7 @@ namespace Leap.Unity.InputActions
 
             bool positionsValid = false;
 
-            switch(fingerIndex)
+            switch (fingerIndex)
             {
                 case 0:
                     if (hand.GetJoint(XRHandJointID.ThumbProximal).TryGetPose(out proximal) &&
