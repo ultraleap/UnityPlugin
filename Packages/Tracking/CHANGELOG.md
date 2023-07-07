@@ -34,6 +34,7 @@ This release was tested against Unity 2021.3 LTS and 2022.3 LTS
 
 ### Fixed
 - (Preview) CPU performance issues on PICO when re-connecting tracking device
+- (Locomotion) Jump gems could occasionally break and not show their ray
 - (Physics Hands) Hand forces are reduced when pushing into objects with fingers
 
 
