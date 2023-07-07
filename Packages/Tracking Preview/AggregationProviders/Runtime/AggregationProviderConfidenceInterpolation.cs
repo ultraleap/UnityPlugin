@@ -77,9 +77,6 @@ namespace Leap.Unity
         Dictionary<LeapProvider, HandConfidenceHistory> handConfidenceHistoriesLeft = new Dictionary<LeapProvider, HandConfidenceHistory>();
         Dictionary<LeapProvider, HandConfidenceHistory> handConfidenceHistoriesRight = new Dictionary<LeapProvider, HandConfidenceHistory>();
 
-
-
-
         protected override Frame MergeFrames(Frame[] frames)
         {
             if (jointConfidences == null || confidences_jointRot == null || confidences_jointPalmRot == null || confidences_jointOcclusion == null)
@@ -105,9 +102,6 @@ namespace Leap.Unity
                 SetupJointOcclusion();
             }
 
-
-
-
             // make lists of all left and right hands found in each frame and also make a list of their confidences
             for (int frame_idx = 0; frame_idx < frames.Length; frame_idx++)
             {
@@ -125,7 +119,6 @@ namespace Leap.Unity
 
                         leftHandConfidences.Add(handConfidence);
                         leftJointConfidences.Add(jointConfidences);
-                        //leftJointConfidences.Add(jointConfidences.Select(x => x * handConfidence).ToArray());
                     }
 
                     else
@@ -137,11 +130,9 @@ namespace Leap.Unity
 
                         rightHandConfidences.Add(handConfidence);
                         rightJointConfidences.Add(jointConfidences);
-                        //rightJointConfidences.Add(jointConfidences.Select(x => x * handConfidence).ToArray());
                     }
                 }
             }
-
 
             // normalize hand confidences:
             float sum = leftHandConfidences.Sum();
@@ -211,8 +202,6 @@ namespace Leap.Unity
                 }
             }
 
-
-
             // combine hands using their confidences
             List<Hand> mergedHands = new List<Hand>();
 
@@ -231,7 +220,6 @@ namespace Leap.Unity
             mergedFrame.Hands = mergedHands;
 
             return mergedFrame;
-
         }
 
         /// <summary>
@@ -243,14 +231,24 @@ namespace Leap.Unity
             Vector3 mergedPalmPos = hands[0].PalmPosition * handConfidences[0];
             Quaternion mergedPalmRot = hands[0].Rotation;
 
+            Vector3 mergedArmPos = hands[0].Arm.Center * handConfidences[0];
+            Vector3 mergedArmElbow = hands[0].Arm.ElbowPosition * handConfidences[0];
+            Quaternion mergedArmRot = hands[0].Arm.Rotation;
+
+            Vector3 mergedWristPos = hands[0].WristPosition * handConfidences[0];
+
             for (int hands_idx = 1; hands_idx < hands.Count; hands_idx++)
             {
                 // position
                 mergedPalmPos += hands[hands_idx].PalmPosition * handConfidences[hands_idx];
+                mergedArmPos += hands[hands_idx].Arm.Center * handConfidences[hands_idx];
+                mergedArmElbow += hands[hands_idx].Arm.ElbowPosition * handConfidences[hands_idx];
+                mergedWristPos += hands[hands_idx].Arm.WristPosition * handConfidences[hands_idx];
 
                 // rotation
                 float lerpValue = handConfidences.Take(hands_idx).Sum() / handConfidences.Take(hands_idx + 1).Sum();
                 mergedPalmRot = Quaternion.Lerp(hands[hands_idx].Rotation, mergedPalmRot, lerpValue);
+                mergedArmRot = Quaternion.Lerp(hands[hands_idx].Arm.Rotation, mergedArmRot, lerpValue);
             }
 
             // joints
@@ -273,13 +271,16 @@ namespace Leap.Unity
             Hand mergedHand = new Hand();
             new VectorHand(isLeft, mergedPalmPos, mergedPalmRot, mergedJointPositions).Decode(mergedHand);
 
+            mergedHand.WristPosition = mergedWristPos;
+
+            mergedHand.Arm = new Arm(mergedArmElbow, mergedHand.WristPosition, mergedArmPos, mergedArmRot * Vector3.forward, hands[0].Arm.Length, hands[0].Arm.Width, mergedArmRot);
+
             // visualize the joint merge:
             if (debugJointOrigins && isLeft && debugHandLeft != null) VisualizeMergedJoints(debugHandLeft, jointConfidences);
             else if (debugJointOrigins && !isLeft && debugHandRight != null) VisualizeMergedJoints(debugHandRight, jointConfidences);
 
             return mergedHand;
         }
-
 
         /// <summary>
         /// combine different confidence functions to get an overall confidence for the given hand
@@ -301,7 +302,6 @@ namespace Leap.Unity
             {
                 confidence = confidence * Confidence_TimeSinceHandFirstVisible(providers[frame_idx], hand.IsLeft);
             }
-
 
             // average out new hand confidence with that of the last few frames
             if (hand.IsLeft)
@@ -325,7 +325,6 @@ namespace Leap.Unity
 
             return confidence;
         }
-
 
         /// <summary>
         /// Combine different confidence functions to get an overall confidence for each joint in the given hand
@@ -403,8 +402,6 @@ namespace Leap.Unity
 
             return jointConfidences[idx];
         }
-
-
 
         #region Hand Confidence Methods
 

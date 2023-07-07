@@ -13,9 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (Physics Hands) Interface based events for easier development
     - Please see the updated scripts in the Physics Hands example scene for more information
 
-
 ### Changed
-- (Hand Pose) Removed unnecessary Hand Pose scriptable context menu option
 - (Physics Hands) Burst compute is now used to improve certain physics calculation performance
     - In Unity 2020+ this is used for "hand is colliding" functions only
 	- In Unity 2022+ all collision functions are handled by Burst
@@ -25,11 +23,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (Physics Hands) Hand and bone states have been improved and are more consistent with expectations
 - (Physics Hands) Updated example scene with new events and better visuals
 
-
 ### Fixed
-- (Preview) CPU performance issues on PICO when re-connecting tracking device
 - (Physics Hands) Hand forces are reduced when pushing into objects with fingers
-
 
 ### Known issues 
 - Use of the LeapCSharp Config class is unavailable with v5.X tracking service
@@ -40,6 +35,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 	- A workaround is to right click on \ThirdParty\Ultraleap\Tracking\OpenXR\Runtime\Scripts\HandTrackingFeature.cs and select 'Reimport'
 - After using Ultraleap OpenXR in Unity Editor, the tracking mode of device 0 will be set to HMD until the Unity Editor session ends. This can stop the testing of non-XR scenes until the Unity Editor is re-opened
 - The OpenXR Leap Provider palm can be in unexpected position when using pre-1.4.3 OpenXR Layer. A workaround is to ensure you use 1.4.3 or newer - installed by the 5.12.0 or newer Tracking Service Installer
+- Running both the Ultraleap XRHands Subsystem and another XRHands Subsystem at the same time causes unstable results. Only enable one at a time.
+
+## [6.10.0] - 05/07/23
+
+This release was tested against Unity 2021.3 LTS and 2022.3 LTS
+
+### Added
+- (XRHands) Direct Leap XRHands Subsystem
+- (UltraleapSettings) Ultraleap Settings ScriptableObject to toggle features
+- (InputSystem) A XRHands to Leap InputActions and Meta Aim InputActions converter
+
+### Changed
+- (Hand Pose) Removed unnecessary Hand Pose scriptable context menu option
+- (Multi device aggregation) Added wrist and arm to ConfidenceInterpolation aggregator
+- (Preview XRI) Removed XRI content from Preview Package in favour of XRHands+XRI content in Tracking Package. Follow the Ultraleap [XR Docs](https://docs.ultraleap.com/unity-api/The-Examples/XR/index.html) for XRI and XRHands to get started
+
+### Fixed
+- (Preview) CPU performance issues on PICO when re-connecting tracking device
+- (Locomotion) Jump gems could occasionally break and not show their ray
+
+### Known issues 
+- Use of the LeapCSharp Config class is unavailable with v5.X tracking service
+- Repeatedly opening scenes can cause memory use increase
+- Currently the Ultraleap Hand Tracking feature for OpenXR requires the New and Legacy input systems to be enabled, to simultaneously use OpenXR and the Ultraleap Unity Plugin's features.
+- The OpenXR Leap Provider does not currently support the `Confidence` hand property (and will return fixed values)
+- If using OpenXR when using Unity 2020 and Ultraleap Tracking Plugin via .unitypackage, an error will appear on import relating to HandTrackingFeature. This has been fixed by Unity on Unity 2021
+	- A workaround is to right click on \ThirdParty\Ultraleap\Tracking\OpenXR\Runtime\Scripts\HandTrackingFeature.cs and select 'Reimport'
+- After using Ultraleap OpenXR in Unity Editor, the tracking mode of device 0 will be set to HMD until the Unity Editor session ends. This can stop the testing of non-XR scenes until the Unity Editor is re-opened
+- The OpenXR Leap Provider palm can be in unexpected position when using pre-1.4.3 OpenXR Layer. A workaround is to ensure you use 1.4.3 or newer - installed by the 5.12.0 or newer Tracking Service Installer
+- Running both the Ultraleap XRHands Subsystem and another XRHands Subsystem at the same time causes unstable results. Only enable one at a time.
 
 ## [6.9.0] - 08/06/23
 

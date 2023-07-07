@@ -9,85 +9,14 @@
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
-using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.Controls;
 using UnityEngine.InputSystem.Layouts;
 using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.InputSystem.Utilities;
-using UnityEngine.InputSystem.XR;
 
-namespace Leap.Unity.Preview.InputActions
+namespace Leap.Unity.InputActions
 {
-
-    #region Leap Bone structure
-
-    // "Leap Bone" is Not currently required as we are not sending full data
-    //public struct LeapBone
-    //{
-    //    public uint parentBoneIndex { get; set; }
-    //    public Vector3 position { get; set; }
-    //    public Quaternion rotation { get; set; }
-    //    public float length { get; set; }
-    //    public float width { get; set; }
-    //}
-
-    //public class LeapBoneControl : InputControl<LeapBone>
-    //{
-    //    // The values NEED offsets otherwise the float values will NOT be reported correctly
-
-    //    [InputControl(offset = 0, displayName = "parentBoneIndex")]
-    //    public IntegerControl parentBoneIndex { get; private set; }
-
-    //    [InputControl(offset = 4, displayName = "position", noisy = true)]
-    //    public Vector3Control position { get; private set; }
-
-    //    [InputControl(offset = 16, displayName = "rotation", noisy = true)]
-    //    public QuaternionControl rotation { get; private set; }
-
-    //    [InputControl(offset = 32, displayName = "length", noisy = true)]
-    //    public AxisControl length { get; private set; }
-
-    //    [InputControl(offset = 36, displayName = "width", noisy = true)]
-    //    public AxisControl width { get; private set; }
-
-
-    //    protected override void FinishSetup()
-    //    {
-    //        parentBoneIndex = GetChildControl<IntegerControl>("parentBoneIndex");
-    //        position = GetChildControl<Vector3Control>("position");
-    //        rotation = GetChildControl<QuaternionControl>("rotation");
-    //        length = GetChildControl<AxisControl>("length");
-    //        width = GetChildControl<AxisControl>("width");
-
-    //        base.FinishSetup();
-    //    }
-
-    //    public override unsafe LeapBone ReadUnprocessedValueFromState(void* statePtr)
-    //    {
-    //        return new LeapBone()
-    //        {
-    //            parentBoneIndex = (uint)parentBoneIndex.ReadUnprocessedValueFromState(statePtr),
-    //            position = position.ReadUnprocessedValueFromState(statePtr),
-    //            rotation = rotation.ReadUnprocessedValueFromState(statePtr),
-    //            length = length.ReadUnprocessedValueFromState(statePtr),
-    //            width = width.ReadUnprocessedValueFromState(statePtr)
-    //        };
-    //    }
-
-    //    public override unsafe void WriteValueIntoState(LeapBone value, void* statePtr)
-    //    {
-    //        parentBoneIndex.WriteValueIntoState((int)value.parentBoneIndex, statePtr);
-    //        position.WriteValueIntoState(value.position, statePtr);
-    //        rotation.WriteValueIntoState(value.rotation, statePtr);
-    //        length.WriteValueIntoState(value.length, statePtr);
-    //        width.WriteValueIntoState(value.width, statePtr);
-    //    }
-    //}
-
-    #endregion
-
     /// <summary>
     /// The structure used to pass hand data to InputDevices
     /// </summary>
@@ -152,21 +81,16 @@ namespace Leap.Unity.Preview.InputActions
         public static LeapHandInput leftHand => InputSystem.GetDevice<LeapHandInput>(CommonUsages.LeftHand);
         public static LeapHandInput rightHand => InputSystem.GetDevice<LeapHandInput>(CommonUsages.RightHand);
 
-        protected override void FinishSetup()
-        {
-            base.FinishSetup();
-        }
-
-        static LeapHandInput()
-        {
-            Initialize();
-        }
-
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Initialize()
         {
-            // "Leap Bone" is Not currently required as we are not sending full data
-            // InputSystem.RegisterLayout<LeapBoneControl>("Leap Bone");
+            UltraleapSettings ultraleapSettings = UltraleapSettings.Instance;
+
+            if (ultraleapSettings == null ||
+                ultraleapSettings.updateLeapInputSystem == false)
+            {
+                return;
+            }
 
             // RegisterLayout() adds a "Control layout" to the system.
             // These can be layouts for individual Controls (like sticks)

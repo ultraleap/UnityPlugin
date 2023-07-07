@@ -246,6 +246,20 @@ namespace Leap.Unity
             }
         }
 
+        [Tooltip("Should the device location be relative to the Main Camera of the scene.")]
+        [SerializeField]
+        private bool _positionDeviceRelativeToMainCamera = true;
+
+        /// <summary>
+        /// Allows for the manual placement of the Tracking Hardware.
+        /// If used with deviceOffsetMode set to anything other than 'Transform', you may get additional offsets.
+        /// </summary>
+        public bool PositionDeviceRelativeToMainCamera
+        {
+            get { return _positionDeviceRelativeToMainCamera; }
+            set { _positionDeviceRelativeToMainCamera = value; }
+        }
+
         // Pre-cull Latching
 
         [Tooltip("Pass updated transform matrices to hands with materials that utilize the "
@@ -428,7 +442,6 @@ namespace Leap.Unity
 
         protected virtual void onPreCull(Camera preCullingCamera)
         {
-
             if (preCullingCamera != mainCamera)
             {
                 return;
@@ -439,7 +452,6 @@ namespace Leap.Unity
             {
                 return;
             }
-
 #endif
 
             if (mainCamera == null || _leapController == null)
@@ -456,16 +468,23 @@ namespace Leap.Unity
             if (_deviceOffsetMode == DeviceOffsetMode.Default
                 || _deviceOffsetMode == DeviceOffsetMode.ManualHeadOffset)
             {
-                if (mainCamera.transform.parent != null)
+                if (_positionDeviceRelativeToMainCamera)
                 {
-                    var position = mainCamera.transform.parent.InverseTransformPoint(mainCamera.transform.position);
-                    var rotation = mainCamera.transform.parent.InverseTransformRotation(mainCamera.transform.rotation);
+                    if (mainCamera.transform.parent != null)
+                    {
+                        var cameraSpacePosition = mainCamera.transform.parent.InverseTransformPoint(mainCamera.transform.position);
+                        var cameraSpaceRotation = mainCamera.transform.parent.InverseTransformRotation(mainCamera.transform.rotation);
 
-                    trackedPose = new Pose(position, rotation);
+                        trackedPose = new Pose(cameraSpacePosition, cameraSpaceRotation);
+                    }
+                    else
+                    {
+                        trackedPose = mainCamera.transform.ToLocalPose();
+                    }
                 }
                 else
                 {
-                    trackedPose = mainCamera.transform.ToLocalPose();
+                    trackedPose = transform.ToPose();
                 }
 
             }
@@ -618,8 +637,9 @@ namespace Leap.Unity
                     break;
             }
 
+
             // Use the mainCamera parent to transfrom the warped positions so the player can move around
-            if (mainCamera.transform.parent != null)
+            if (mainCamera.transform.parent != null && _positionDeviceRelativeToMainCamera)
             {
                 leapTransform = new LeapTransform(
                   mainCamera.transform.parent.TransformPoint(warpedPosition),
