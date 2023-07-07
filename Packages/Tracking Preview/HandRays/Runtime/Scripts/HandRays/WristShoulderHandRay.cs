@@ -134,16 +134,14 @@ namespace Leap.Unity.Preview.HandRays
 
         protected override Vector3 CalculateAimPosition()
         {
-            return aimPositionFilter.Filter(handRayDirection.Hand.GetStablePinchPosition(), Time.time);
+            return aimPositionFilter.Filter(handRayDirection.Hand.GetStablePinchPosition());
         }
 
         protected override Vector3 CalculateRayOrigin()
         {
             int index = handRayDirection.Hand.IsLeft ? 0 : 1;
+            return rayOriginFilter.Filter(GetRayOrigin(handRayDirection.Hand, inferredBodyPositions.ShoulderPositions[index]));
 
-            return rayOriginFilter.Filter(
-                GetRayOrigin(handRayDirection.Hand, inferredBodyPositions.ShoulderPositions[index]),
-                Time.time);
         }
 
         protected virtual Vector3 GetRayOrigin(Hand hand, Vector3 shoulderPosition)
