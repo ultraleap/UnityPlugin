@@ -8,7 +8,6 @@
 
 using UnityEditor;
 using UnityEngine;
-
 namespace Leap.Unity
 {
 
@@ -16,8 +15,6 @@ namespace Leap.Unity
     public class LeapXRServiceProviderEditor : LeapServiceProviderEditor
     {
         SerializedProperty _mainCamera;
-
-        Transform targetTransform;
 
         string[] testHandPoses = new string[] { "HeadMountedA", "HeadMountedB" };
 
@@ -70,6 +67,7 @@ namespace Leap.Unity
             addPropertyToFoldout("_deviceOffsetMode", "Advanced Options");
             addPropertyToFoldout("_temporalWarpingMode", "Advanced Options");
             addPropertyToFoldout("_customWarpAdjustment", "Advanced Options");
+            addPropertyToFoldout("_positionDeviceRelativeToMainCamera", "Advanced Options");
             addPropertyToFoldout("_deviceOffsetYAxis", "Advanced Options");
             addPropertyToFoldout("_deviceOffsetZAxis", "Advanced Options");
             addPropertyToFoldout("_deviceTiltXAxis", "Advanced Options");
@@ -79,25 +77,10 @@ namespace Leap.Unity
             addPropertyToFoldout("_autoCreateTrackedPoseDriver", "Advanced Options");
             hideField("_trackingOptimization");
 
-            targetTransform = (target as LeapXRServiceProvider).transform;
-
-            if (targetTransform != null)
-            {
-                targetTransform.hideFlags = HideFlags.NotEditable;
-            }
-
             // Ensure the default values are up to date by re-firing the property setter
             if ((target as LeapXRServiceProvider).deviceOffsetMode == LeapXRServiceProvider.DeviceOffsetMode.Default)
             {
                 (target as LeapXRServiceProvider).deviceOffsetMode = LeapXRServiceProvider.DeviceOffsetMode.Default;
-            }
-        }
-
-        void OnDisable()
-        {
-            if (targetTransform != null)
-            {
-                targetTransform.hideFlags = HideFlags.None;
             }
         }
 
