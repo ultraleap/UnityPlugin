@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (Physics Hands) Finger displacement values to each finger
 - (Physics Hands) Interface based events for easier development
     - Please see the updated scripts in the Physics Hands example scene for more information
+- (HandRays) Add methods to invoke handray Frame & State Change in inherited classes
 
 ### Changed
 - (Physics Hands) Burst compute is now used to improve certain physics calculation performance
@@ -22,9 +23,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - This is tailored to handle specific Rigidbodies and will only fire when your subscribed Rigidbody is affected
 - (Physics Hands) Hand and bone states have been improved and are more consistent with expectations
 - (Physics Hands) Updated example scene with new events and better visuals
+- (Locomotion) Expose teleport anchor list & last teleported anchor
+- (Locomotion) Moved Jump Gems further away from the arm, to account for sleeves
+- (Locomotion) Added functionality to update the initial position and rotations of the TP anchor after the first Awake
 
 ### Fixed
 - (Physics Hands) Hand forces are reduced when pushing into objects with fingers
+- (Locomotion) Jump Gems look for audio sources in their children, even if the audio source was set
+- (Locomotion) If pinched gem was null, jump gem teleport could still be in a selected state
+- (Locomotion) Teleport ray did not change to an invalid colour when no colliders were hit
 
 ### Known issues 
 - Use of the LeapCSharp Config class is unavailable with v5.X tracking service
@@ -73,6 +80,7 @@ This release was tested against Unity 2021.3 LTS and 2022.3 LTS
 - (Attachment Hands) Predicted pinch position
 - (LeapServiceProvider) Ability to change the number of Service connection attempts and interval
 
+
 ### Changed
 - (HandUtils) Only cache static Provider and CameraRig references when they are requested
 - (HandUtils) Mark Provider-dependant methods as obsolete and point to suitable replacements
@@ -86,7 +94,7 @@ This release was tested against Unity 2021.3 LTS and 2022.3 LTS
 - (OpenXRProvider) Finger `Direction` is incorrectly set to the tip bone direction rather than the intermediate
 - (OpenXRProvider) Hand `GrabStrength` is computed before all required information is available
 - (UIInput) When hand lost or leaves canvas near hovered button, button stays hovered
-- (Jump Gem Locomotion) Jump Gems look for audio sources in their children, even if the audio source was set
+
 
 ### Known issues 
 - Use of the LeapCSharp Config class is unavailable with v5.X tracking service
