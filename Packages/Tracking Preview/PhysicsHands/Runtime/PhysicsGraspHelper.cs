@@ -1,4 +1,5 @@
 using Leap.Interaction.Internal.InteractionEngineUtility;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -11,6 +12,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private const float GRAB_COOLDOWNTIME = 0.025f;
         private const float MINIMUM_STRENGTH = 0.25f, MINIMUM_THUMB_STRENGTH = 0.2f;
         private const float REQUIRED_ENTRY_STRENGTH = 0.15f, REQUIRED_EXIT_STRENGTH = 0.05f, REQUIRED_THUMB_EXIT_STRENGTH = 0.1f, REQUIRED_PINCH_DISTANCE = 0.012f;
+        private const float GRABBABLE_DIRECTIONS_DOT = -0.7f;
 
         /// <summary>
         /// The current state of the grasp helper.
@@ -82,6 +84,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         public bool Ignored { get { return _ignored != null; } }
         private PhysicsIgnoreHelpers _ignored = null;
+
+        private bool _bonesFacingEachOther = false;
 
         // Check we got thumb or palm and at least one finger
         private bool Grasped(PhysicsHand hand)
@@ -391,6 +395,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
             {
                 if (_graspingHands.Contains(hand))
                 {
+                    //TODO: don't repeat this check!
+                    _bonesFacingEachOther = AreGraspingBonesFacingEachOther();
                     continue;
                 }
 
@@ -454,7 +460,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
                             c++;
                         }
                     }
-                    if (c >= 2)
+
+                    _bonesFacingEachOther = AreGraspingBonesFacingEachOther();
+                    if (c >= 2 || AreGraspingBonesFacingEachOther())
                     {
                         if (Manager.HelperMovesObjects && !Ignored && _graspingHands.Count == 0)
                         {
@@ -479,7 +487,56 @@ namespace Leap.Unity.Interaction.PhysicsHands
                         }
                     }
                 }
+                else
+                {
+                    _bonesFacingEachOther = false;
+                }
             }
+        }
+
+        private bool AreGraspingBonesFacingEachOther()
+        {
+            HashSet<Tuple<int, int>> checkedPairs = new HashSet<Tuple<int, int>>();
+
+            foreach (PhysicsBone b1 in BoneHash)
+            {
+                if (b1.GrabbableDirections.TryGetValue(_rigid, out List<Vector3> grabbableDirectionsA))
+                {
+                    int idB1 = b1.GetInstanceID();
+                    foreach (PhysicsBone b2 in BoneHash)
+                    {
+                        // Don't compare against the same bone
+                        if (b1 == b2) continue;
+
+                        int idB2 = b2.GetInstanceID();
+
+                        Tuple<int, int> idPair1 = new Tuple<int, int>(idB1, idB2);
+                        Tuple<int, int> idPair2 = new Tuple<int, int>(idB2, idB1);
+
+                        // Don't compare against a pair that has already been compared against
+                        if (checkedPairs.Contains(idPair1) || checkedPairs.Contains(idPair2)) continue;
+
+                        // Register this pair of bones as checked, so that we don't check against it again
+                        checkedPairs.Add(idPair1);
+
+                        if (b2.GrabbableDirections.TryGetValue(_rigid, out List<Vector3> grabbableDirectionsB))
+                        {
+                            for (int i = 0; i < grabbableDirectionsA.Count; i++)
+                            {
+                                for (int j = 0; j < grabbableDirectionsB.Count; j++)
+                                {
+                                    float dot = Vector3.Dot(grabbableDirectionsA[i], grabbableDirectionsB[j]);
+                                    if (dot < GRABBABLE_DIRECTIONS_DOT)
+                                    {
+                                        return true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return false;
         }
 
         private void UpdateRemovedBones()
@@ -539,7 +596,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     }
                 }
 
-                if (c >= 2)
+                if (c >= 2 || _bonesFacingEachOther)
                 {
                     SetBoneGrasping(fist, true);
                     continue;

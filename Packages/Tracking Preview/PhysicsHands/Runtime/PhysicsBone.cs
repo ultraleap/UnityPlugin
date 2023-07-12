@@ -47,6 +47,13 @@ namespace Leap.Unity.Interaction.PhysicsHands
         }
 
         private HashSet<Rigidbody> _grabObjects = new HashSet<Rigidbody>();
+        
+        ///<summary>
+        /// Dictionary of the dot products associated with grabbable objects
+        ///</summary>
+        public Dictionary<Rigidbody, List<Vector3>> GrabbableDirections { get { return _grabbableDirections; } }
+        private Dictionary<Rigidbody, List<Vector3>> _grabbableDirections = new Dictionary<Rigidbody, List<Vector3>>();        
+        
         /// <summary>
         /// Objects that *can* be grabbed, not ones that are
         /// </summary>
@@ -355,13 +362,18 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             foreach (var key in _contactObjects.Keys)
             {
-                if (IsObjectGrabbable(_contactObjects[key]))
+                if (IsObjectGrabbable(_contactObjects[key], out List<Vector3> grabbableDirections))
                 {
                     _grabObjects.Add(key);
+                    if(!_grabbableDirections.TryAdd(key, grabbableDirections))
+                    {
+                        _grabbableDirections[key] = grabbableDirections;
+                    }
                 }
                 else
                 {
                     _grabObjects.Remove(key);
+                    _grabbableDirections.Remove(key);
                 }
             }
 
@@ -400,12 +412,28 @@ namespace Leap.Unity.Interaction.PhysicsHands
             return true;
         }
 
-        private bool IsObjectGrabbable(HashSet<Collider> colliders)
+        private bool IsObjectGrabbable(HashSet<Collider> colliders, out List<Vector3> grabbableDirections)
         {
+            grabbableDirections = new List<Vector3>();
+
             foreach (var collider in colliders)
             {
                 // Center and the base of the bone
-                if (Vector3.Dot(_grabDirectionCenter, (collider.ClosestPoint(_grabPositionCenter) - _grabPositionCenter).normalized) > 0.18f || Vector3.Dot(_grabDirection, (collider.ClosestPoint(_grabPositionBase) - _grabPositionBase).normalized) > 0.2f)
+
+                Vector3 grabbableDirectionCentre = (collider.ClosestPoint(_grabPositionCenter) - _grabPositionCenter).normalized;
+                Vector3 grabbableDirectionBase = (collider.ClosestPoint(_grabPositionBase) - _grabPositionBase).normalized;
+
+                if (Vector3.Dot(_grabDirectionCenter, grabbableDirectionCentre) > 0.18f)
+                {
+                    grabbableDirections.Add(grabbableDirectionCentre);
+                }
+
+                if (Vector3.Dot(_grabDirection, grabbableDirectionBase) > 0.2f)
+                {
+                    grabbableDirections.Add(grabbableDirectionBase);
+                }
+
+                if (grabbableDirections.Count > 0)
                 {
                     return true;
                 }
