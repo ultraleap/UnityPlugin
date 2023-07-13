@@ -413,8 +413,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
             IsBoneHovering = _hoverObjects.Count > 0;
             IsBoneContacting = _contactObjects.Count > 0;
             IsBoneReadyToGrab = _grabObjects.Count > 0;
-
-
         }
 
         private bool RemoveHoverQueue(Collider collider)

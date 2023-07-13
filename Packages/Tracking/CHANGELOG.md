@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - This is tailored to handle specific Rigidbodies and will only fire when your subscribed Rigidbody is affected
 - (Physics Hands) Hand and bone states have been improved and are more consistent with expectations
 - (Physics Hands) Updated example scene with new events and better visuals
+- (Physics Hands) Updated Grasp Helper algorithm to account for grasps from fingers facing opposite directions
 - (Locomotion) Expose teleport anchor list & last teleported anchor
 - (Locomotion) Moved Jump Gems further away from the arm, to account for sleeves
 - (Locomotion) Added functionality to update the initial position and rotations of the TP anchor after the first Awake
