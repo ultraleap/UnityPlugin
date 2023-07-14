@@ -27,8 +27,8 @@ namespace Leap.Unity
 
         #region Inspector
         // Manual Device Offset
-        private const float DEFAULT_DEVICE_OFFSET_Y_AXIS = 0f;
-        private const float DEFAULT_DEVICE_OFFSET_Z_AXIS = 0.48f;
+        private const float DEFAULT_DEVICE_OFFSET_Y_AXIS = -0.1f;
+        private const float DEFAULT_DEVICE_OFFSET_Z_AXIS = 0.2f;
         private const float DEFAULT_DEVICE_TILT_X_AXIS = 0f;
 
         /// <summary>
@@ -246,6 +246,20 @@ namespace Leap.Unity
             }
         }
 
+        [Tooltip("Should the device location be relative to the Main Camera of the scene.")]
+        [SerializeField]
+        private bool _positionDeviceRelativeToMainCamera = true;
+
+        /// <summary>
+        /// Allows for the manual placement of the Tracking Hardware.
+        /// If used with deviceOffsetMode set to anything other than 'Transform', you may get additional offsets.
+        /// </summary>
+        public bool PositionDeviceRelativeToMainCamera
+        {
+            get { return _positionDeviceRelativeToMainCamera; }
+            set { _positionDeviceRelativeToMainCamera = value; }
+        }
+
         // Pre-cull Latching
 
         [Tooltip("Pass updated transform matrices to hands with materials that utilize the "
@@ -400,10 +414,10 @@ namespace Leap.Unity
             }
 
             // Update Image Warping
-            Vector3 pastPosition; Quaternion pastRotation;
+            Quaternion pastRotation;
             transformHistory.SampleTransform(imageTimeStamp
                                                - (long)(warpingAdjustment * 1000f),
-                                             out pastPosition, out pastRotation);
+                                             out _, out pastRotation);
 
             // Use _tweenImageWarping
             var currCenterRotation = XRSupportUtil.GetXRNodeCenterEyeLocalRotation();
@@ -428,7 +442,6 @@ namespace Leap.Unity
 
         protected virtual void onPreCull(Camera preCullingCamera)
         {
-
             if (preCullingCamera != mainCamera)
             {
                 return;
@@ -439,7 +452,6 @@ namespace Leap.Unity
             {
                 return;
             }
-
 #endif
 
             if (mainCamera == null || _leapController == null)
@@ -456,16 +468,23 @@ namespace Leap.Unity
             if (_deviceOffsetMode == DeviceOffsetMode.Default
                 || _deviceOffsetMode == DeviceOffsetMode.ManualHeadOffset)
             {
-                if (mainCamera.transform.parent != null)
+                if (_positionDeviceRelativeToMainCamera)
                 {
-                    var position = mainCamera.transform.parent.InverseTransformPoint(mainCamera.transform.position);
-                    var rotation = mainCamera.transform.parent.InverseTransformRotation(mainCamera.transform.rotation);
+                    if (mainCamera.transform.parent != null)
+                    {
+                        var cameraSpacePosition = mainCamera.transform.parent.InverseTransformPoint(mainCamera.transform.position);
+                        var cameraSpaceRotation = mainCamera.transform.parent.InverseTransformRotation(mainCamera.transform.rotation);
 
-                    trackedPose = new Pose(position, rotation);
+                        trackedPose = new Pose(cameraSpacePosition, cameraSpaceRotation);
+                    }
+                    else
+                    {
+                        trackedPose = mainCamera.transform.ToLocalPose();
+                    }
                 }
                 else
                 {
-                    trackedPose = mainCamera.transform.ToLocalPose();
+                    trackedPose = transform.ToPose();
                 }
 
             }
@@ -557,24 +576,20 @@ namespace Leap.Unity
                 return LeapTransform.Identity;
             }
 
-            LeapTransform leapTransform = new LeapTransform();
+            //return LeapTransform.Identity;
 
             // If temporal warping is turned off
             if (_temporalWarpingMode == TemporalWarpingMode.Off)
             {
-                //Calculate the Current Pose
-                Pose currentPose = Pose.identity;
                 if (_deviceOffsetMode == DeviceOffsetMode.Transform && deviceOrigin != null)
                 {
-                    currentPose = deviceOrigin.ToPose();
+                    warpedPosition = deviceOrigin.position;
+                    warpedRotation = deviceOrigin.rotation;
                 }
                 else
                 {
-                    transformHistory.SampleTransform(timestamp, out currentPose.position, out currentPose.rotation);
+                    transformHistory.SampleTransform(timestamp, out warpedPosition, out warpedRotation);
                 }
-
-                warpedPosition = currentPose.position;
-                warpedRotation = currentPose.rotation;
             }
             //Calculate a Temporally Warped Pose
             else if (updateTemporalCompensation)
@@ -587,13 +602,14 @@ namespace Leap.Unity
             // Normalize the rotation Quaternion.
             warpedRotation = warpedRotation.ToNormalized();
 
-switch (_deviceOffsetMode)
+            switch (_deviceOffsetMode)
             {
                 case DeviceOffsetMode.Default:
                     if (_currentDevice != null)
                     {
                         if (_currentDevice.DevicePose != Pose.identity)
                         {
+                            //warpedRotation *= Quaternion.Euler(-90f, 180f, 0f); // If using Leap co-ordinate space matrix, use this.
                             warpedPosition += warpedRotation * _currentDevice.DevicePose.position;
                             warpedRotation *= _currentDevice.DevicePose.rotation;
                         }
@@ -602,7 +618,6 @@ switch (_deviceOffsetMode)
                             warpedPosition += warpedRotation * Vector3.up * deviceOffsetYAxis
                                             + warpedRotation * Vector3.forward * deviceOffsetZAxis;
                             warpedRotation *= Quaternion.Euler(deviceTiltXAxis, 0f, 0f);
-
                             warpedRotation *= Quaternion.Euler(-90f, 180f, 0f);
                         }
                     }
@@ -619,8 +634,10 @@ switch (_deviceOffsetMode)
                     break;
             }
 
+            LeapTransform leapTransform = new LeapTransform();
+
             // Use the mainCamera parent to transfrom the warped positions so the player can move around
-            if (mainCamera.transform.parent != null)
+            if (mainCamera.transform.parent != null && _positionDeviceRelativeToMainCamera)
             {
                 leapTransform = new LeapTransform(
                   mainCamera.transform.parent.TransformPoint(warpedPosition),
