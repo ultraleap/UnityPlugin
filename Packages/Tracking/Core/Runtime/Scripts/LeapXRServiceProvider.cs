@@ -417,6 +417,7 @@ namespace Leap.Unity
             Vector3 pastPosition; Quaternion pastRotation;
             transformHistory.SampleTransform(imageTimeStamp
                                                - (long)(warpingAdjustment * 1000f),
+                                               _useInterpolation,
                                              out pastPosition, out pastRotation);
 
             // Use _tweenImageWarping
@@ -589,7 +590,7 @@ namespace Leap.Unity
                 }
                 else
                 {
-                    transformHistory.SampleTransform(timestamp, out currentPose.position, out currentPose.rotation);
+                    transformHistory.SampleTransform(timestamp, _useInterpolation, out currentPose.position, out currentPose.rotation);
                 }
 
                 warpedPosition = currentPose.position;
@@ -600,7 +601,7 @@ namespace Leap.Unity
             {
                 var imageAdjustment = _temporalWarpingMode == TemporalWarpingMode.Images ? -20000 : 0;
                 var sampleTimestamp = timestamp - (long)(warpingAdjustment * 1000f) - imageAdjustment;
-                transformHistory.SampleTransform(sampleTimestamp, out warpedPosition, out warpedRotation);
+                transformHistory.SampleTransform(sampleTimestamp, _useInterpolation, out warpedPosition, out warpedRotation);
             }
 
             // Normalize the rotation Quaternion.

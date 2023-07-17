@@ -32,6 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (Locomotion) Jump Gems look for audio sources in their children, even if the audio source was set
 - (Locomotion) If pinched gem was null, jump gem teleport could still be in a selected state
 - (Locomotion) Teleport ray did not change to an invalid colour when no colliders were hit
+- (Core) Fixed hands juddering in XR when interpolation is turned off on the LeapXRServiceProvider. Turning off interpolation now turns off head pose interpolation
 
 ### Known issues 
 - Use of the LeapCSharp Config class is unavailable with v5.X tracking service
