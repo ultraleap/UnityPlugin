@@ -500,7 +500,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             foreach (PhysicsBone b1 in BoneHash)
             {
-                if (b1.GrabbableDirections.TryGetValue(_rigid, out Dictionary<Collider, Vector3> grabbableDirectionsA))
+                if (b1.GrabbableDirections.TryGetValue(_rigid, out var grabbableDirectionsA))
                 {
                     int idB1 = b1.GetInstanceID();
                     foreach (PhysicsBone b2 in BoneHash)
@@ -519,13 +519,13 @@ namespace Leap.Unity.Interaction.PhysicsHands
                         // Register this pair of bones as checked, so that we don't check against it again
                         checkedPairs.Add(idPair1);
 
-                        if (b2.GrabbableDirections.TryGetValue(_rigid, out Dictionary<Collider, Vector3> grabbableDirectionsB))
+                        if (b2.GrabbableDirections.TryGetValue(_rigid, out var grabbableDirectionsB))
                         {
-                            foreach(var directionPairA in grabbableDirectionsA)
+                            foreach (var directionPairA in grabbableDirectionsA)
                             {
-                                foreach(var directionPairB in grabbableDirectionsB)
+                                foreach (var directionPairB in grabbableDirectionsB)
                                 {
-                                    float dot = Vector3.Dot(directionPairA.Value, directionPairB.Value);
+                                    float dot = Vector3.Dot(directionPairA.Value.direction, directionPairB.Value.direction);
                                     if (dot < GRABBABLE_DIRECTIONS_DOT)
                                     {
                                         return true;
