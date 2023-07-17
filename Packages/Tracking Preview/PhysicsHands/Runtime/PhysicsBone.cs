@@ -146,8 +146,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
         /// </summary>
         public Vector3 JointHalfExtents { get; private set; }
 
-        // Computed so that we can move the grab positions/directions back a bit to improve coverage
-        private Vector3 _grabDirection, _grabDirectionCenter, _grabPositionCenter, _grabPositionBase;
         #endregion
 
         public Collider Collider => _collider;
@@ -250,8 +248,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 JointBase = center + (orientation * (Vector3.back * halfExtents.z));
                 JointTip = center + (orientation * (Vector3.forward * halfExtents.z));
                 JointDistance = Vector3.Distance(JointBase, JointTip);
-                _grabPositionBase = JointBase - (-transform.up * (JointHalfExtents.y * 0.25f));
-                _grabPositionCenter = JointCenter - (transform.up * (JointHalfExtents.y * 0.25f));
             }
             else
             {
@@ -261,22 +257,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 JointRadius = radius;
                 JointDistance = Vector3.Distance(bottom, tip);
                 JointCenter = (bottom + tip) / 2f;
-                _grabPositionBase = JointBase - (-transform.up * (JointRadius * 0.25f));
-                _grabPositionCenter = JointCenter - (transform.up * (JointRadius * 0.25f));
             }
-            switch (Finger)
-            {
-                case 0:
-                    _grabDirection = Vector3.Lerp(Hand.Handedness == Chirality.Left ? -transform.right : transform.right, -transform.up, Joint == 2 ? 0.55f : 0.75f);
-                    break;
-                case 1:
-                    _grabDirection = Vector3.Lerp(Hand.Handedness == Chirality.Left ? transform.right : -transform.right, -transform.up, Joint == 2 ? 0.65f : 0.85f);
-                    break;
-                default:
-                    _grabDirection = -transform.up;
-                    break;
-            }
-            _grabDirectionCenter = Joint == 2 ? Vector3.Lerp(_grabDirection, transform.forward, Finger == 0 ? 0.45f : 0.25f) : _grabDirection;
         }
 
         internal void QueueHoverCollider(Collider collider)
@@ -522,15 +503,39 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         private bool IsObjectGrabbable(Rigidbody rigidbody)
         {
-            if(_hoverDirections.TryGetValue(rigidbody, out var hoveredColliders))
+            if (_hoverDirections.TryGetValue(rigidbody, out var hoveredColliders))
             {
+                Vector3 bonePosCenter, closestPoint, boneCenterToColliderDirection, jointDirection;
                 foreach (var hoveredColliderDirection in hoveredColliders)
                 {
-                    Vector3 bonePosCentre = transform.TransformPoint(0, transform.InverseTransformPoint(hoveredColliderDirection.Value.bonePos).y, 0);
-                    Vector3 closestPoint = hoveredColliderDirection.Key.ClosestPoint(bonePosCentre);
-                    Vector3 boneCentreToColliderDirection = (closestPoint - bonePosCentre).normalized;
+                    bonePosCenter = transform.TransformPoint(0, 0, transform.InverseTransformPoint(hoveredColliderDirection.Value.bonePos).z);
 
-                    if (Vector3.Dot(boneCentreToColliderDirection, transform.forward) > 0.18f)
+                    closestPoint = hoveredColliderDirection.Key.ClosestPoint(bonePosCenter);
+                    boneCenterToColliderDirection = (closestPoint - bonePosCenter).normalized;
+
+                    if (Joint == 2)
+                    {
+                        // Rotate the direction forward if the contact is closer to the tip
+                        jointDirection = Quaternion.Euler(0, 0, Mathf.InverseLerp(JointDistance, 0, Vector3.Distance(bonePosCenter, JointTip)) * 60f) * -transform.up;
+                    }
+                    else
+                    {
+                        jointDirection = -transform.up;
+                    }
+
+                    switch (Finger)
+                    {
+                        case 0:
+                            // Point the thumb closer to the index
+                            jointDirection = Quaternion.Euler(0, Hand.Handedness == Chirality.Left ? 35f : -35f, 0) * jointDirection;
+                            break;
+                        case 1:
+                            // Point the index closer to the thumb
+                            jointDirection = Quaternion.Euler(0, Hand.Handedness == Chirality.Left ? -20f : 20f, 0) * jointDirection;
+                            break;
+                    }
+
+                    if (Vector3.Dot(boneCenterToColliderDirection, jointDirection) > 0.18f)
                     {
                         return true;
                     }
