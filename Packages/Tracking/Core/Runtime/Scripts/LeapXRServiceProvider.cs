@@ -27,8 +27,8 @@ namespace Leap.Unity
 
         #region Inspector
         // Manual Device Offset
-        private const float DEFAULT_DEVICE_OFFSET_Y_AXIS = -0.1f;
-        private const float DEFAULT_DEVICE_OFFSET_Z_AXIS = 0.2f;
+        private const float DEFAULT_DEVICE_OFFSET_Y_AXIS = 0f;
+        private const float DEFAULT_DEVICE_OFFSET_Z_AXIS = 0.08f;
         private const float DEFAULT_DEVICE_TILT_X_AXIS = 0f;
 
         /// <summary>
