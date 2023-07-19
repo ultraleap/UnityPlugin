@@ -74,7 +74,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private Vector3 _newPosition;
         private Quaternion _newRotation;
 
-        private bool _oldKinematic, _oldGravity;
+        private bool _oldKinematic;
         private float _originalMass = 1f;
         public float OriginalMass => _originalMass;
 
@@ -228,8 +228,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 {
                     // Only ever unset the rigidbody values here otherwise outside logic will get confused
                     _rigid.isKinematic = _oldKinematic;
-                    _rigid.useGravity = _oldGravity;
-                    _rigid.mass = _originalMass;
                 }
                 if (Manager.EnhanceThrowing && !Ignored)
                 {
@@ -468,14 +466,12 @@ namespace Leap.Unity.Interaction.PhysicsHands
                         {
                             // Store the original rigidbody variables
                             _oldKinematic = _rigid.isKinematic;
-                            _oldGravity = _rigid.useGravity;
-                            _rigid.useGravity = false;
                             _rigid.isKinematic = false;
                         }
                         _graspingHands.Add(hand);
                         if (_graspingHands.Count > 0)
                         {
-                            _rigid.mass = 1f;
+                            //_rigid.mass = 1f;
                             GraspState = State.Grasp;
                         }
                         _graspingValues[hand].offset = _rigid.position - hand.GetPhysicsHand().palmBone.transform.position;
@@ -780,10 +776,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
             if (_rigid.isKinematic)
             {
                 _rigid.isKinematic = false;
-            }
-            if (_rigid.useGravity)
-            {
-                _rigid.useGravity = false;
             }
             PhysicsMovement(_newPosition, _newRotation, _rigid);
         }

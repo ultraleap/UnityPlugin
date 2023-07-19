@@ -516,7 +516,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     if (Joint == 2)
                     {
                         // Rotate the direction forward if the contact is closer to the tip
-                        jointDirection = Quaternion.Euler(0, 0, Mathf.InverseLerp(JointDistance, 0, Vector3.Distance(bonePosCenter, JointTip)) * 60f) * -transform.up;
+                        jointDirection = Quaternion.AngleAxis(Mathf.InverseLerp(JointDistance, 0, Vector3.Distance(bonePosCenter, JointTip)) * 45f, -transform.right) * -transform.up;
                     }
                     else
                     {
@@ -527,15 +527,15 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     {
                         case 0:
                             // Point the thumb closer to the index
-                            jointDirection = Quaternion.Euler(0, Hand.Handedness == Chirality.Left ? 35f : -35f, 0) * jointDirection;
+                            jointDirection = Quaternion.AngleAxis(Hand.Handedness == Chirality.Left ? -45f : 45f, transform.forward) * jointDirection;
                             break;
                         case 1:
                             // Point the index closer to the thumb
-                            jointDirection = Quaternion.Euler(0, Hand.Handedness == Chirality.Left ? -20f : 20f, 0) * jointDirection;
+                            jointDirection = Quaternion.AngleAxis(Hand.Handedness == Chirality.Left ? 25f : -25f, transform.forward) * jointDirection;
                             break;
                     }
 
-                    if (Vector3.Dot(boneCenterToColliderDirection, jointDirection) > 0.18f)
+                    if (Vector3.Dot(boneCenterToColliderDirection, jointDirection) > (Finger == 0 ? 0.04f : 0.18f))
                     {
                         return true;
                     }
