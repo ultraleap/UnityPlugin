@@ -62,11 +62,12 @@ namespace Leap.Unity.Interaction.PhysicsHands
         {
             public float[] fingerStrength = new float[5];
             public float[] originalFingerStrength = new float[5];
+            public float fistStrength;
+            public float squeezeValue = 0f, deltaMultiplier = 0f;
             public Vector3[] tipPositions = new Vector3[5];
             public Matrix4x4 mat;
-            public Vector3 offset;
-            public Quaternion originalHandRotation, rotationOffset;
-
+            public Vector3 offset, newPosition;
+            public Quaternion originalHandRotation, rotationOffset, newRotation;
 
             /// <summary>
             /// The hand is grabbing the object
@@ -469,10 +470,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
                                     }
                                 }
                             }
-                            if (c > 0)
-                            {
-                                break;
-                            }
                         }
                         if (_graspingValues[hand].fingerStrength[i] > _graspingValues[hand].originalFingerStrength[i] + ((1 - _graspingValues[hand].originalFingerStrength[i]) * REQUIRED_ENTRY_STRENGTH))
                         {
@@ -572,9 +569,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             if (_graspingHands.Count > 0)
             {
-                //_rigid.mass = 1f;
                 GraspState = State.Grasp;
             }
+            _graspingValues[hand].fistStrength = hand.GetOriginalLeapHand().GetFistStrength();
             _graspingValues[hand].offset = _rigid.position - hand.GetPhysicsHand().palmBone.transform.position;
             _graspingValues[hand].rotationOffset = Quaternion.Inverse(hand.GetPhysicsHand().palmBone.transform.rotation) * _rigid.rotation;
             _graspingValues[hand].originalHandRotation = hand.GetPhysicsHand().palmBone.transform.rotation;
@@ -582,7 +579,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
             {
                 physicsHandGrab.OnHandGrab(hand);
             }
-
         }
 
         private void UpdateRemovedBones()
@@ -605,8 +601,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         private void UpdateGraspingValues()
         {
-            foreach (var graspedHand in _graspingValues)
+            for (int i = 0; i < _graspingValues.Count; i++)
             {
+                KeyValuePair<PhysicsHand, GraspValues> graspedHand = _graspingValues.ElementAt(i);
                 if (_graspingHands.Count > 1
                     && !graspedHand.Value.handGrabbing
                     && !graspedHand.Value.facingOppositeHand
@@ -618,11 +615,13 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     {
                         physicsHandGrab.OnHandGrabExit(graspedHand.Key);
                     }
+                    UpdateOffsets();
+                    i--;
                     continue;
                 }
 
                 int c = 0;
-                for (int i = 0; i < 5; i++)
+                for (int j = 0; j < 5; j++)
                 {
                     if (graspedHand.Value.fingerStrength[i] == -1)
                     {
@@ -655,12 +654,19 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
                 if (!data)
                 {
-                    SetBoneGrasping(graspedHand, false);
-                    _graspingHands.Remove(graspedHand.Key);
-                    if (_rigid.TryGetComponent<IPhysicsHandGrab>(out var physicsHandGrab))
+                    if(_graspingHands.Contains(graspedHand.Key))
                     {
-                        physicsHandGrab.OnHandGrabExit(graspedHand.Key);
+                        SetBoneGrasping(graspedHand, false);
+                        _graspingHands.Remove(graspedHand.Key);
+                        if (_rigid.TryGetComponent<IPhysicsHandGrab>(out var physicsHandGrab))
+                        {
+                            physicsHandGrab.OnHandGrabExit(graspedHand.Key);
+                        }
+                        _graspingValues.Remove(graspedHand.Key);
+                        UpdateOffsets();
+                        i--;
                     }
+                    
                 }
                 else
                 {
@@ -693,6 +699,17 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 {
                     item.RemoveGrabbing(_rigid);
                 }
+            }
+        }
+
+        private void UpdateOffsets()
+        {
+            for (int i = 0; i < _graspingValues.Count; i++)
+            {
+                KeyValuePair<PhysicsHand, GraspValues> fist = _graspingValues.ElementAt(i);
+                fist.Value.offset = _rigid.position - fist.Key.GetPhysicsHand().palmBone.transform.position;
+                fist.Value.rotationOffset = Quaternion.Inverse(fist.Key.GetPhysicsHand().palmBone.transform.rotation) * _rigid.rotation;
+                fist.Value.originalHandRotation = fist.Key.GetPhysicsHand().palmBone.transform.rotation;
             }
         }
 
@@ -786,14 +803,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
         {
             if (_graspingHands.Count > 0)
             {
-                /*
-                 * Grasp priority
-                 * Last hand to grab object
-                 * Otherwise, last hand to be adding to graspingHands
-                 */
+                // take the last hand as the priority
 
                 PhysicsHand hand = null;
-
+                PhysicsHand.Hand pHand = null;
+                float totalSqueeze = 0f;
                 for (int i = _graspingHands.Count - 1; i > 0; i--)
                 {
                     if (!_graspingValues[_graspingHands[i]].handGrabbing)
@@ -802,17 +816,31 @@ namespace Leap.Unity.Interaction.PhysicsHands
                         break;
                     }
                 }
-
-                if (hand == null)
+                for (int i = 0; i < _graspingHands.Count; i++)
                 {
-                    hand = _graspingHands[_graspingHands.Count - 1];
+                    hand = _graspingHands[i];
+                    pHand = hand.GetPhysicsHand();
+                    _graspingValues[hand].squeezeValue = Mathf.InverseLerp(_graspingValues[hand].fistStrength, 1, hand.GetOriginalLeapHand().GetFistStrength());
+                    totalSqueeze += _graspingValues[hand].squeezeValue;
+                    _graspingValues[hand].newPosition = pHand.palmBone.transform.position + (pHand.palmBody.velocity * Time.fixedDeltaTime) + (pHand.palmBone.transform.rotation * Quaternion.Inverse(_graspingValues[hand].originalHandRotation) * _graspingValues[hand].offset);
+                    _graspingValues[hand].newRotation = pHand.palmBone.transform.rotation * Quaternion.Euler(pHand.palmBody.angularVelocity * Time.fixedDeltaTime) * _graspingValues[hand].rotationOffset;
                 }
 
-                if (hand.GetOriginalLeapHand() != null)
+                Vector3 deltaPos = Vector3.zero;
+                Quaternion deltaRot = Quaternion.identity;
+
+                for (int i = 0; i < _graspingHands.Count; i++)
                 {
-                    PhysicsHand.Hand pHand = hand.GetPhysicsHand();
-                    _newPosition = pHand.palmBone.transform.position + (pHand.palmBody.velocity * Time.fixedDeltaTime) + (pHand.palmBone.transform.rotation * Quaternion.Inverse(_graspingValues[hand].originalHandRotation) * _graspingValues[hand].offset);
-                    _newRotation = pHand.palmBone.transform.rotation * Quaternion.Euler(pHand.palmBody.angularVelocity * Time.fixedDeltaTime) * _graspingValues[hand].rotationOffset;
+                    hand = _graspingHands[i];
+                    _graspingValues[hand].deltaMultiplier = Mathf.InverseLerp(0, totalSqueeze, _graspingValues[hand].squeezeValue);
+                    deltaPos += (_graspingValues[hand].newPosition - _rigid.transform.position) * _graspingValues[hand].deltaMultiplier;
+                    deltaRot *= Quaternion.Slerp(Quaternion.identity, Quaternion.Inverse(_rigid.transform.rotation) * _graspingValues[hand].newRotation, _graspingValues[hand].deltaMultiplier);
+                }
+
+                if (hand != null && pHand != null && hand.GetOriginalLeapHand() != null)
+                {
+                    _newPosition = _rigid.transform.position + deltaPos;
+                    _newRotation = _rigid.transform.rotation * deltaRot;
                 }
             }
         }
