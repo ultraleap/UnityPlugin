@@ -66,7 +66,16 @@ namespace Leap.Unity.Interaction.PhysicsHands
             public Matrix4x4 mat;
             public Vector3 offset;
             public Quaternion originalHandRotation, rotationOffset;
-            public bool facingOppositeBone = false;
+
+
+            /// <summary>
+            /// The hand is grabbing the object
+            /// </summary>
+            public bool handGrabbing = false;
+            /// <summary>
+            /// the bones in this hand are facing other grasping applicable bones in a different hand 
+            /// </summary>
+            public bool facingOppositeHand = false;
         }
 
         public PhysicsProvider Manager { get; private set; }
@@ -396,6 +405,13 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         private void GraspingContactCheck()
         {
+            //Reset grab bools
+            foreach (var graspValue in _graspingValues)
+            {
+                graspValue.Value.handGrabbing = false;
+                graspValue.Value.facingOppositeHand = false;
+            }
+
             foreach (var hand in _graspingCandidates)
             {
                 if (_graspingHands.Contains(hand))
@@ -466,6 +482,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
                     if (c >= 2)
                     {
+                        _graspingValues[hand].handGrabbing = true;
                         RegisterGraspingHand(hand);
                     }
                 }
@@ -477,11 +494,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private void CheckForBonesFacingEachOther()
         {
             HashSet<Tuple<int, int>> checkedPairs = new HashSet<Tuple<int, int>>();
-
-            foreach(var graspValue in  _graspingValues)
-            {
-                graspValue.Value.facingOppositeBone = false;
-            }
 
             foreach (PhysicsBone b1 in BoneHash)
             {
@@ -513,8 +525,18 @@ namespace Leap.Unity.Interaction.PhysicsHands
                                     float dot = Vector3.Dot(directionPairA.Value.direction, directionPairB.Value.direction);
                                     if (dot < GRABBABLE_DIRECTIONS_DOT)
                                     {
-                                        _graspingValues[b1.Hand].facingOppositeBone = true;
-                                        _graspingValues[b2.Hand].facingOppositeBone = true;
+
+                                        if(b1.Hand == b2.Hand)
+                                        {
+                                            _graspingValues[b1.Hand].handGrabbing = true;
+                                            _graspingValues[b2.Hand].handGrabbing = true;
+                                        }
+                                        else
+                                        {
+                                            _graspingValues[b1.Hand].facingOppositeHand = true;
+                                            _graspingValues[b2.Hand].facingOppositeHand = true;
+                                        }
+
 
                                         if (!_graspingHands.Contains(b1.Hand))
                                         {
@@ -586,7 +608,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
             foreach (var graspedHand in _graspingValues)
             {
                 if (_graspingHands.Count > 1
-                    && !graspedHand.Value.facingOppositeBone
+                    && !graspedHand.Value.handGrabbing
+                    && !graspedHand.Value.facingOppositeHand
                     && (_rigid.position - graspedHand.Key.GetPhysicsHand().palmBone.transform.position).sqrMagnitude > graspedHand.Value.offset.sqrMagnitude * 1.5f)
                 {
                     SetBoneGrasping(graspedHand, false);
@@ -622,7 +645,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     }
                 }
 
-                if (c >= 2 || graspedHand.Value.facingOppositeBone)
+                if (c >= 2 || graspedHand.Value.handGrabbing || graspedHand.Value.facingOppositeHand)
                 {
                     SetBoneGrasping(graspedHand, true);
                     continue;
@@ -763,8 +786,28 @@ namespace Leap.Unity.Interaction.PhysicsHands
         {
             if (_graspingHands.Count > 0)
             {
-                // take the last hand as the priority
-                PhysicsHand hand = _graspingHands[_graspingHands.Count - 1];
+                /*
+                 * Grasp priority
+                 * Last hand to grab object
+                 * Otherwise, last hand to be adding to graspingHands
+                 */
+
+                PhysicsHand hand = null;
+
+                for (int i = _graspingHands.Count - 1; i > 0; i--)
+                {
+                    if (!_graspingValues[_graspingHands[i]].handGrabbing)
+                    {
+                        hand = _graspingHands[i];
+                        break;
+                    }
+                }
+
+                if (hand == null)
+                {
+                    hand = _graspingHands[_graspingHands.Count - 1];
+                }
+
                 if (hand.GetOriginalLeapHand() != null)
                 {
                     PhysicsHand.Hand pHand = hand.GetPhysicsHand();
