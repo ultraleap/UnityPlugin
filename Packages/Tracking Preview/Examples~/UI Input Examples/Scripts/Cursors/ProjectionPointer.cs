@@ -1,4 +1,4 @@
-﻿using Leap;
+using Leap;
 using Leap.Unity;
 using Leap.Unity.InputModule;
 using UnityEditor;

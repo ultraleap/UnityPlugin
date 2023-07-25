@@ -119,6 +119,13 @@ namespace Leap.Unity.Preview.Locomotion
                     _pinchedGem = null;
                 }
             }
+            else
+            {
+                if (IsSelected)
+                {
+                    SelectTeleport(false);
+                }
+            }
         }
 
         /// <summary>

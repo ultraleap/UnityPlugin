@@ -4,7 +4,8 @@
     "references": [
         "GUID:2ee0542102ac1084e8d9a910885c1e81",
         "GUID:cec9848704c49724192ff47f9b3e9156",
-        "GUID:3a12b97a7afaf6b47bfe53cf1f942886"
+        "GUID:3a12b97a7afaf6b47bfe53cf1f942886",
+        "GUID:2665a8d13d1b3f18800f46e256720795"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -13,6 +14,12 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.burst",
+            "expression": "",
+            "define": "BURST_AVAILABLE"
+        }
+    ],
     "noEngineReferences": false
 }

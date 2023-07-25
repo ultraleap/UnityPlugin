@@ -119,7 +119,7 @@ public class JointOcclusion : MonoBehaviour
 
         if (hand == null)
         {
-            return Utils.Fill(confidences, 0);
+            return Leap.Unity.Utils.Fill(confidences, 0);
         }
 
         // draw a cube where the palm is, so that joints cannot be seen 'through' the palm

@@ -66,7 +66,6 @@ namespace Leap.Unity.Preview.Locomotion
                 // Ignore any grasped objects 
                 _layerMask ^= interactionManager.interactionNoContactLayer.layerMask;
             }
-
             PhysicsProvider physicsProvider = FindObjectOfType<PhysicsProvider>();
             if (physicsProvider != null)
             {

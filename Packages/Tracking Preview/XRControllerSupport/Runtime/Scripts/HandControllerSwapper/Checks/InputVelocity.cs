@@ -46,9 +46,9 @@ namespace Leap.Unity.Controllers
             switch (inputMethodType)
             {
                 case InputMethodType.LeapHand:
-                    if (_provider.Get(hand) != null)
+                    if (_provider.GetHand(hand) != null)
                     {
-                        vel = _provider.Get(hand).PalmPosition;
+                        vel = _provider.GetHand(hand).PalmPosition;
                         return true;
                     }
                     break;

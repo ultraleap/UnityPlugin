@@ -25,7 +25,7 @@ namespace Leap.Unity
             get { return _inputLeapProvider; }
             set
             {
-                if (Application.isPlaying && _inputLeapProvider != null)
+                if (_inputLeapProvider != null)
                 {
                     _inputLeapProvider.OnFixedFrame -= processFixedFrame;
                     _inputLeapProvider.OnUpdateFrame -= processUpdateFrame;
@@ -34,7 +34,7 @@ namespace Leap.Unity
                 _inputLeapProvider = value;
                 validateInput();
 
-                if (Application.isPlaying && _inputLeapProvider != null)
+                if (_inputLeapProvider != null)
                 {
                     _inputLeapProvider.OnFixedFrame -= processFixedFrame; // safeguard double-subscription
                     _inputLeapProvider.OnFixedFrame += processFixedFrame;

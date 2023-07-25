@@ -175,7 +175,12 @@ namespace Leap.Unity.Preview.Locomotion
             }
 
             _jumpGemTeleport = FindObjectOfType<JumpGemTeleport>(true);
-            _audioSource = GetComponentInChildren<AudioSource>(true);
+
+            if (_audioSource == null)
+            {
+                _audioSource = GetComponentInChildren<AudioSource>(true);
+            }
+
             _attachmentHand = GetComponentInParent<AttachmentHand>();
             _head = Camera.main.transform;
 

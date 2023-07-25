@@ -84,7 +84,7 @@ namespace Leap.Unity.Animation.Internal
         {
             if (_runningCount >= _runningTweens.Length)
             {
-                Utils.DoubleCapacity(ref _runningTweens);
+                Leap.Unity.Utils.DoubleCapacity(ref _runningTweens);
             }
 
             instance.runnerIndex = _runningCount;
