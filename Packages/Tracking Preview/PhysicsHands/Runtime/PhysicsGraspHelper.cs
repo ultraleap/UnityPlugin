@@ -615,6 +615,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     {
                         physicsHandGrab.OnHandGrabExit(graspedHand.Key);
                     }
+                    _graspingValues.Remove(graspedHand.Key);
                     UpdateOffsets();
                     i--;
                     continue;
@@ -623,22 +624,22 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 int c = 0;
                 for (int j = 0; j < 5; j++)
                 {
-                    if (graspedHand.Value.fingerStrength[i] == -1)
+                    if (graspedHand.Value.fingerStrength[j] == -1)
                     {
-                        if (Manager.FingerStrengths[graspedHand.Key][i] > (i == 0 ? MINIMUM_THUMB_STRENGTH : MINIMUM_STRENGTH) && Grasped(graspedHand.Key, i))
+                        if (Manager.FingerStrengths[graspedHand.Key][j] > (j == 0 ? MINIMUM_THUMB_STRENGTH : MINIMUM_STRENGTH) && Grasped(graspedHand.Key, j))
                         {
-                            graspedHand.Value.fingerStrength[i] = Manager.FingerStrengths[graspedHand.Key][i];
+                            graspedHand.Value.fingerStrength[j] = Manager.FingerStrengths[graspedHand.Key][j];
                         }
                     }
                     else
                     {
-                        if (Manager.FingerStrengths[graspedHand.Key][i] < (i == 0 ? MINIMUM_THUMB_STRENGTH : MINIMUM_STRENGTH) || graspedHand.Value.fingerStrength[i] * (1 - (i == 0 ? REQUIRED_THUMB_EXIT_STRENGTH : REQUIRED_EXIT_STRENGTH)) >= Manager.FingerStrengths[graspedHand.Key][i])
+                        if (Manager.FingerStrengths[graspedHand.Key][j] < (j == 0 ? MINIMUM_THUMB_STRENGTH : MINIMUM_STRENGTH) || graspedHand.Value.fingerStrength[j] * (1 - (j == 0 ? REQUIRED_THUMB_EXIT_STRENGTH : REQUIRED_EXIT_STRENGTH)) >= Manager.FingerStrengths[graspedHand.Key][j])
                         {
-                            graspedHand.Value.fingerStrength[i] = -1;
+                            graspedHand.Value.fingerStrength[j] = -1;
                         }
                     }
 
-                    if (graspedHand.Value.fingerStrength[i] != -1)
+                    if (graspedHand.Value.fingerStrength[j] != -1)
                     {
                         c++;
                     }
@@ -666,7 +667,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
                         UpdateOffsets();
                         i--;
                     }
-                    
                 }
                 else
                 {
@@ -832,7 +832,14 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 for (int i = 0; i < _graspingHands.Count; i++)
                 {
                     hand = _graspingHands[i];
-                    _graspingValues[hand].deltaMultiplier = Mathf.InverseLerp(0, totalSqueeze, _graspingValues[hand].squeezeValue);
+                    if(totalSqueeze == 0)
+                    {
+                        _graspingValues[hand].deltaMultiplier = 1f / _graspingHands.Count;
+                    }
+                    else
+                    {
+                        _graspingValues[hand].deltaMultiplier = Mathf.InverseLerp(0, totalSqueeze, _graspingValues[hand].squeezeValue);
+                    }
                     deltaPos += (_graspingValues[hand].newPosition - _rigid.transform.position) * _graspingValues[hand].deltaMultiplier;
                     deltaRot *= Quaternion.Slerp(Quaternion.identity, Quaternion.Inverse(_rigid.transform.rotation) * _graspingValues[hand].newRotation, _graspingValues[hand].deltaMultiplier);
                 }
