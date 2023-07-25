@@ -42,6 +42,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private HashSet<PhysicsBone> _boneHash = new HashSet<PhysicsBone>();
         public int TotalBones { get { return _boneHash.Count; } }
 
+        /// <summary>
+        /// Bones is a hand indexed dictionary, of eligible to grasp physics bone hashsets of the hand's fingers 
+        /// </summary>
         public Dictionary<PhysicsHand, HashSet<PhysicsBone>[]> Bones => _bones;
         private Dictionary<PhysicsHand, HashSet<PhysicsBone>[]> _bones = new Dictionary<PhysicsHand, HashSet<PhysicsBone>[]>();
 
@@ -63,6 +66,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             public Matrix4x4 mat;
             public Vector3 offset;
             public Quaternion originalHandRotation, rotationOffset;
+            public bool facingOppositeBone = false;
         }
 
         public PhysicsProvider Manager { get; private set; }
@@ -85,9 +89,12 @@ namespace Leap.Unity.Interaction.PhysicsHands
         public bool Ignored { get { return _ignored != null; } }
         private PhysicsIgnoreHelpers _ignored = null;
 
-        private bool _bonesFacingEachOther = false;
-
-        // Check we got thumb or palm and at least one finger
+        /// <summary>
+        /// Returns true if the provided hand is grasping an object.
+        /// Requires thumb or palm grasping, and at least one (non-thumb) finger
+        /// </summary>
+        /// <param name="hand">The hand to check</param>
+        /// <returns>If the provided hand is grasping</returns>
         private bool Grasped(PhysicsHand hand)
         {
             if (_bones.TryGetValue(hand, out var bones))
@@ -393,8 +400,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
             {
                 if (_graspingHands.Contains(hand))
                 {
-                    //TODO: don't repeat this check!
-                    _bonesFacingEachOther = AreGraspingBonesFacingEachOther();
                     continue;
                 }
 
@@ -459,40 +464,24 @@ namespace Leap.Unity.Interaction.PhysicsHands
                         }
                     }
 
-                    _bonesFacingEachOther = AreGraspingBonesFacingEachOther();
-                    if (c >= 2 || AreGraspingBonesFacingEachOther())
+                    if (c >= 2)
                     {
-                        if (Manager.HelperMovesObjects && !Ignored && _graspingHands.Count == 0)
-                        {
-                            // Store the original rigidbody variables
-                            _oldKinematic = _rigid.isKinematic;
-                            _rigid.isKinematic = false;
-                        }
-                        _graspingHands.Add(hand);
-                        if (_graspingHands.Count > 0)
-                        {
-                            //_rigid.mass = 1f;
-                            GraspState = State.Grasp;
-                        }
-                        _graspingValues[hand].offset = _rigid.position - hand.GetPhysicsHand().palmBone.transform.position;
-                        _graspingValues[hand].rotationOffset = Quaternion.Inverse(hand.GetPhysicsHand().palmBone.transform.rotation) * _rigid.rotation;
-                        _graspingValues[hand].originalHandRotation = hand.GetPhysicsHand().palmBone.transform.rotation;
-                        if (_rigid.TryGetComponent<IPhysicsHandGrab>(out var physicsHandGrab))
-                        {
-                            physicsHandGrab.OnHandGrab(hand);
-                        }
+                        RegisterGraspingHand(hand);
                     }
                 }
-                else
-                {
-                    _bonesFacingEachOther = false;
-                }
             }
+
+            CheckForBonesFacingEachOther();
         }
 
-        private bool AreGraspingBonesFacingEachOther()
+        private void CheckForBonesFacingEachOther()
         {
             HashSet<Tuple<int, int>> checkedPairs = new HashSet<Tuple<int, int>>();
+
+            foreach(var graspValue in  _graspingValues)
+            {
+                graspValue.Value.facingOppositeBone = false;
+            }
 
             foreach (PhysicsBone b1 in BoneHash)
             {
@@ -524,7 +513,19 @@ namespace Leap.Unity.Interaction.PhysicsHands
                                     float dot = Vector3.Dot(directionPairA.Value.direction, directionPairB.Value.direction);
                                     if (dot < GRABBABLE_DIRECTIONS_DOT)
                                     {
-                                        return true;
+                                        _graspingValues[b1.Hand].facingOppositeBone = true;
+                                        _graspingValues[b2.Hand].facingOppositeBone = true;
+
+                                        if (!_graspingHands.Contains(b1.Hand))
+                                        {
+                                            RegisterGraspingHand(b1.Hand);
+                                        }
+
+                                        if (!_graspingHands.Contains(b2.Hand))
+                                        {
+                                            RegisterGraspingHand(b2.Hand);
+                                        }
+                                        return;
                                     }
                                 }
                             }
@@ -532,7 +533,34 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     }
                 }
             }
-            return false;
+        }
+
+        private void RegisterGraspingHand(PhysicsHand hand)
+        {
+            if (_graspingHands.Contains(hand)) return;
+
+            if (Manager.HelperMovesObjects && !Ignored && _graspingHands.Count == 0)
+            {
+                // Store the original rigidbody variables
+                _oldKinematic = _rigid.isKinematic;
+                _rigid.isKinematic = false;
+            }
+
+            _graspingHands.Add(hand);
+
+            if (_graspingHands.Count > 0)
+            {
+                //_rigid.mass = 1f;
+                GraspState = State.Grasp;
+            }
+            _graspingValues[hand].offset = _rigid.position - hand.GetPhysicsHand().palmBone.transform.position;
+            _graspingValues[hand].rotationOffset = Quaternion.Inverse(hand.GetPhysicsHand().palmBone.transform.rotation) * _rigid.rotation;
+            _graspingValues[hand].originalHandRotation = hand.GetPhysicsHand().palmBone.transform.rotation;
+            if (_rigid.TryGetComponent<IPhysicsHandGrab>(out var physicsHandGrab))
+            {
+                physicsHandGrab.OnHandGrab(hand);
+            }
+
         }
 
         private void UpdateRemovedBones()
@@ -555,15 +583,17 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         private void UpdateGraspingValues()
         {
-            foreach (var fist in _graspingValues)
+            foreach (var graspedHand in _graspingValues)
             {
-                if (_graspingHands.Count > 1 && (_rigid.position - fist.Key.GetPhysicsHand().palmBone.transform.position).sqrMagnitude > fist.Value.offset.sqrMagnitude * 1.5f)
+                if (_graspingHands.Count > 1
+                    && !graspedHand.Value.facingOppositeBone
+                    && (_rigid.position - graspedHand.Key.GetPhysicsHand().palmBone.transform.position).sqrMagnitude > graspedHand.Value.offset.sqrMagnitude * 1.5f)
                 {
-                    SetBoneGrasping(fist, false);
-                    _graspingHands.Remove(fist.Key);
+                    SetBoneGrasping(graspedHand, false);
+                    _graspingHands.Remove(graspedHand.Key);
                     if (_rigid.TryGetComponent<IPhysicsHandGrab>(out var physicsHandGrab))
                     {
-                        physicsHandGrab.OnHandGrabExit(fist.Key);
+                        physicsHandGrab.OnHandGrabExit(graspedHand.Key);
                     }
                     continue;
                 }
@@ -571,47 +601,47 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 int c = 0;
                 for (int i = 0; i < 5; i++)
                 {
-                    if (fist.Value.fingerStrength[i] == -1)
+                    if (graspedHand.Value.fingerStrength[i] == -1)
                     {
-                        if (Manager.FingerStrengths[fist.Key][i] > (i == 0 ? MINIMUM_THUMB_STRENGTH : MINIMUM_STRENGTH) && Grasped(fist.Key, i))
+                        if (Manager.FingerStrengths[graspedHand.Key][i] > (i == 0 ? MINIMUM_THUMB_STRENGTH : MINIMUM_STRENGTH) && Grasped(graspedHand.Key, i))
                         {
-                            fist.Value.fingerStrength[i] = Manager.FingerStrengths[fist.Key][i];
+                            graspedHand.Value.fingerStrength[i] = Manager.FingerStrengths[graspedHand.Key][i];
                         }
                     }
                     else
                     {
-                        if (Manager.FingerStrengths[fist.Key][i] < (i == 0 ? MINIMUM_THUMB_STRENGTH : MINIMUM_STRENGTH) || fist.Value.fingerStrength[i] * (1 - (i == 0 ? REQUIRED_THUMB_EXIT_STRENGTH : REQUIRED_EXIT_STRENGTH)) >= Manager.FingerStrengths[fist.Key][i])
+                        if (Manager.FingerStrengths[graspedHand.Key][i] < (i == 0 ? MINIMUM_THUMB_STRENGTH : MINIMUM_STRENGTH) || graspedHand.Value.fingerStrength[i] * (1 - (i == 0 ? REQUIRED_THUMB_EXIT_STRENGTH : REQUIRED_EXIT_STRENGTH)) >= Manager.FingerStrengths[graspedHand.Key][i])
                         {
-                            fist.Value.fingerStrength[i] = -1;
+                            graspedHand.Value.fingerStrength[i] = -1;
                         }
                     }
 
-                    if (fist.Value.fingerStrength[i] != -1)
+                    if (graspedHand.Value.fingerStrength[i] != -1)
                     {
                         c++;
                     }
                 }
 
-                if (c >= 2 || _bonesFacingEachOther)
+                if (c >= 2 || graspedHand.Value.facingOppositeBone)
                 {
-                    SetBoneGrasping(fist, true);
+                    SetBoneGrasping(graspedHand, true);
                     continue;
                 }
 
-                bool data = DataHandIntersection(fist.Key);
+                bool data = DataHandIntersection(graspedHand.Key);
 
                 if (!data)
                 {
-                    SetBoneGrasping(fist, false);
-                    _graspingHands.Remove(fist.Key);
+                    SetBoneGrasping(graspedHand, false);
+                    _graspingHands.Remove(graspedHand.Key);
                     if (_rigid.TryGetComponent<IPhysicsHandGrab>(out var physicsHandGrab))
                     {
-                        physicsHandGrab.OnHandGrabExit(fist.Key);
+                        physicsHandGrab.OnHandGrabExit(graspedHand.Key);
                     }
                 }
                 else
                 {
-                    SetBoneGrasping(fist, true);
+                    SetBoneGrasping(graspedHand, true);
                 }
             }
         }
@@ -624,11 +654,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 {
                     if (_bones[pair.Key][j].Count > 0)
                     {
-                        foreach (var item in pair.Key.GetPhysicsHand().jointBones)
+                        foreach (var bone in pair.Key.GetPhysicsHand().jointBones)
                         {
-                            if (item.Finger == _bones[pair.Key][j].First().Finger)
+                            if (bone.Finger == _bones[pair.Key][j].First().Finger)
                             {
-                                item.AddGrabbing(_rigid);
+                                bone.AddGrabbing(_rigid);
                             }
                         }
                     }
