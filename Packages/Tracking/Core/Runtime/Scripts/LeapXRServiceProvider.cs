@@ -609,7 +609,7 @@ namespace Leap.Unity
                     {
                         if (_currentDevice.DevicePose != Pose.identity)
                         {
-                            //warpedRotation *= Quaternion.Euler(-90f, 180f, 0f); // If using Leap co-ordinate space matrix, use this.
+                            warpedRotation *= Quaternion.Euler(-90f, 180f, 0f); // If using Leap co-ordinate space matrix, use this
                             warpedPosition += warpedRotation * _currentDevice.DevicePose.position;
                             warpedRotation *= _currentDevice.DevicePose.rotation;
                         }

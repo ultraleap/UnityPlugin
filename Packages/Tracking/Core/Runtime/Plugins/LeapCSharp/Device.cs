@@ -266,72 +266,38 @@ namespace Leap
                 float[] data = new float[16];
                 eLeapRS result = LeapC.GetDeviceTransform(Handle, data);
 
-                if (result != eLeapRS.eLeapRS_Success)
+                if (result != eLeapRS.eLeapRS_Success || data == null)
                 {
-                    devicePose = new Pose(Vector3.forward + Vector3.up, Quaternion.identity);
-                    return devicePose;
+                    return Pose.identity;
                 }
 
-                if (data == null)
-                {
-                    devicePose = new Pose(Vector3.forward + Vector3.down, Quaternion.identity);
-                    return devicePose;
-                }
-
-                // #1 TEST USING LEAP COORDINATES
+                // Using the LEAP->OPENXR device transform matrix
 
                 //var deviceTransform = new System.Numerics.Matrix4x4(
-                //                                            1, 0, 0, 0,
-                //                                            0, 1, 0, 75,
-                //                                            0, 0, 1, 0,
-                //                                            0, 0, 0, 1);
-
-                //deviceTransform = deviceTransform * System.Numerics.Matrix4x4.CreateScale(CopyFromLeapCExtensions.MM_TO_M);
-
-                // #1 END
-
-                // #2 TEST USING THE LEAP->OPENXR MATRIX
-
-                var deviceTransform = new System.Numerics.Matrix4x4(
-                                            data[0], data[4], data[8], data[12],
-                                            data[1], data[5], data[9], data[13],
-                                            data[2], data[6], data[10], data[14],
-                                            data[3], data[7], data[11], data[15]);
+                //                            data[0], data[4], data[8], data[12],
+                //                            data[1], data[5], data[9], data[13],
+                //                            data[2], data[6], data[10], data[14],
+                //                            data[3], data[7], data[11], data[15]);
 
                 // Manual entry for testing
-                //var deviceTransform = new System.Numerics.Matrix4x4(
-                //                            -0.001f, 0, 0, 0,
-                //                            0, 0, -0.001f, 0.025f,
-                //                            0, -0.001f, 0, -0.075f,
-                //                            0, 0, 0, 1);
-
-                var removeMtoMMScaleMatrix = new System.Numerics.Matrix4x4(
-                                            1000, 0, 0, 0,
-                                            0, 1000, 0, 0f,
-                                            0, 0, 1000, 0f,
+                var deviceTransform = new System.Numerics.Matrix4x4(
+                                            -0.001f, 0, 0, 0,
+                                            0, 0, -0.001f, 0.035f,
+                                            0, -0.001f, 0, -0.075f,
                                             0, 0, 0, 1);
 
-                deviceTransform = deviceTransform * removeMtoMMScaleMatrix;
+                // Reverts to Leap - but kees M units to avoid re-converting later.
+                var openXRToLeap = new System.Numerics.Matrix4x4(
+                                            -1, 0, 0, 0,
+                                            0, 0, -1, 0f,
+                                            0, -1, 0, 0f,
+                                            0, 0, 0, 1);
 
-                System.Numerics.Matrix4x4 zFlip = new System.Numerics.Matrix4x4(
-                                                            1, 0, 0, 0,
-                                                            0, 1, 0, 0,
-                                                            0, 0, -1, 0,
-                                                            0, 0, 0, 1);
+                deviceTransform = openXRToLeap * deviceTransform;
 
-                // https://en.wikipedia.org/wiki/Change_of_basis:
-                // B = Basis transform Matrix
-                // M = Existing Matrix
-                // You do B^-1 * M * B
-                System.Numerics.Matrix4x4 invertedZFlip;
-                System.Numerics.Matrix4x4.Invert(zFlip, out invertedZFlip);
-                deviceTransform = invertedZFlip * deviceTransform * zFlip;
-
-                // #2 END
-
+                // Get the suitable values for translation and rotation from the matrix
+                Vector3 outputPosition = new Vector3(deviceTransform.M14, deviceTransform.M24, deviceTransform.M34);
                 System.Numerics.Quaternion numericsRotation = System.Numerics.Quaternion.CreateFromRotationMatrix(deviceTransform);
-
-                Vector3 outputPosition = new Vector3(deviceTransform.Translation.X, deviceTransform.Translation.Y, deviceTransform.Translation.Z);
                 Quaternion outputRotation = new Quaternion(numericsRotation.X, numericsRotation.Y, numericsRotation.Z, numericsRotation.W).normalized;
 
                 devicePose = new Pose(outputPosition, outputRotation);
