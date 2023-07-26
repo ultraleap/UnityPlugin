@@ -19,7 +19,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         // If not you should be running this from the PhysicsProvider through the editor script, and having the scene store your hands.
         // We need to uncheck the "Compute Parent Anchors" checkbox in pre 2021.2 which can only be done automatically through editor scripts.
         // In 2021.2 and above it's called matchAnchors and can be called through code.
-        public static PhysicsHand GenerateHand(Chirality handedness, float boneMass, float forceLimit, float stiffness, SingleLayer layer, GameObject parent = null)
+        public static PhysicsHand GenerateHand(Chirality handedness, PhysicsHand.HandParameters parameters, SingleLayer layer, GameObject parent = null)
         {
             GameObject rootObject = new GameObject($"{(handedness == Chirality.Left ? "Left" : "Right")} Hand", typeof(PhysicsHand));
             rootObject.layer = layer;
@@ -54,9 +54,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 gameObject = palmGameObject,
                 transform = palmTransform,
                 rootObject = rootObject,
-                boneMass = boneMass,
-                forceLimit = forceLimit,
-                stiffness = stiffness,
+                parameters = parameters,
                 physicMaterial = CreateHandPhysicsMaterial()
             };
 
@@ -72,7 +70,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             SetupPalmCollider(physicsHand.palmCollider, leapHand, physicsHand.physicMaterial);
 
             physicsHand.palmBody = palmGameObject.GetComponent<ArticulationBody>();
-            SetupPalmBody(physicsHand.palmBody, boneMass * 3f);
+            SetupPalmBody(physicsHand.palmBody, parameters.boneMass * 3f);
 
             physicsHand.palmBone = palmGameObject.AddComponent<PhysicsBone>();
             physicsHand.palmBone.SetBoneIndexes(5, 0);
@@ -123,20 +121,20 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     SetupBoneCollider(physicsHand.jointColliders[boneArrayIndex], bone, physicsHand.physicMaterial);
 
                     physicsHand.jointBodies[boneArrayIndex] = capsuleGameObject.AddComponent<ArticulationBody>();
-                    SetupBoneBody(physicsHand.jointBodies[boneArrayIndex], boneMass);
+                    SetupBoneBody(physicsHand.jointBodies[boneArrayIndex], parameters.boneMass);
 
                     physicsHand.jointBones[boneArrayIndex] = capsuleGameObject.AddComponent<PhysicsBone>();
                     physicsHand.jointBones[boneArrayIndex].SetBoneIndexes(fingerIndex, jointIndex);
 
                     if (jointIndex == 0)
                     {
-                        SetupKnuckleDrives(physicsHand.jointBodies[boneArrayIndex], leapHand.IsLeft, fingerIndex, stiffness, physicsHand.maximumPalmVelocity);
+                        SetupKnuckleDrives(physicsHand.jointBodies[boneArrayIndex], leapHand.IsLeft, fingerIndex, parameters.boneStiffness, physicsHand.parameters.maximumPalmVelocity);
 
                         physicsHand.defaultRotations[fingerIndex] = knuckleBone.Rotation;
                     }
                     else
                     {
-                        SetupBoneDrives(physicsHand.jointBodies[boneArrayIndex], stiffness, physicsHand.maximumPalmVelocity);
+                        SetupBoneDrives(physicsHand.jointBodies[boneArrayIndex], parameters.boneStiffness, physicsHand.parameters.maximumPalmVelocity);
                     }
                     lastTransform = capsuleGameObject.transform;
                 }
@@ -175,7 +173,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             SetupPalmCollider(physicsHand.palmCollider, leapHand, physicsHand.physicMaterial);
 
-            SetupPalmBody(physicsHand.palmBody, physicsHand.boneMass * 3f, solverIterations: solverIterations, solverVelocity: solverVelocity);
+            SetupPalmBody(physicsHand.palmBody, physicsHand.parameters.boneMass * 3f, solverIterations: solverIterations, solverVelocity: solverVelocity);
             physicsHand.palmBone.SetBoneIndexes(5, 0);
             physicsHand.palmBody.WakeUp();
 
@@ -217,11 +215,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
                     SetupBoneCollider(physicsHand.jointColliders[boneArrayIndex], bone, physicsHand.physicMaterial);
 
-                    SetupBoneBody(physicsHand.jointBodies[boneArrayIndex], physicsHand.boneMass, solverIterations: solverIterations, solverVelocity: solverVelocity);
+                    SetupBoneBody(physicsHand.jointBodies[boneArrayIndex], physicsHand.parameters.boneMass, solverIterations: solverIterations, solverVelocity: solverVelocity);
 
                     if (jointIndex == 0)
                     {
-                        SetupKnuckleDrives(physicsHand.jointBodies[boneArrayIndex], leapHand.IsLeft, fingerIndex, physicsHand.stiffness, physicsHand.maximumPalmVelocity);
+                        SetupKnuckleDrives(physicsHand.jointBodies[boneArrayIndex], leapHand.IsLeft, fingerIndex, physicsHand.parameters.boneStiffness, physicsHand.parameters.maximumPalmVelocity);
 
                         physicsHand.jointBodies[boneArrayIndex].parentAnchorPosition = InverseTransformPoint(leapHand.PalmPosition, leapHand.Rotation, knuckleBone.NextJoint);
                         if (fingerIndex == 0)
@@ -231,7 +229,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     }
                     else
                     {
-                        SetupBoneDrives(physicsHand.jointBodies[boneArrayIndex], physicsHand.stiffness, physicsHand.maximumPalmVelocity);
+                        SetupBoneDrives(physicsHand.jointBodies[boneArrayIndex], physicsHand.parameters.boneStiffness, physicsHand.parameters.maximumPalmVelocity);
 
                         physicsHand.jointBodies[boneArrayIndex].parentAnchorPosition = InverseTransformPoint(prevBone.PrevJoint, prevBone.Rotation, bone.PrevJoint);
                         physicsHand.jointBodies[boneArrayIndex].parentAnchorRotation = Quaternion.identity;
@@ -473,7 +471,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         public static void InterpolateKnucklePosition(ArticulationBody body, PhysicsBone bone, Leap.Hand leapHand, float deltaTime)
         {
-            if (bone != null && bone.ContactingObjects.Count > 0)
+            if (bone != null && bone.ContactObjects.Count > 0)
             {
                 // Stop bones sizing if they're touching things
                 // Has the benefit of stopping small objects falling through bones
@@ -485,7 +483,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         public static void InterpolateBoneSize(ArticulationBody body, PhysicsBone bone, CapsuleCollider collider, Vector3 parentPosition, Quaternion parentRotation, Vector3 childPosition, float width, float length, float deltaTime)
         {
-            if (bone != null && bone.ContactingObjects.Count > 0)
+            if (bone != null && bone.ContactObjects.Count > 0)
             {
                 // Stop bones sizing if they're touching things
                 // Has the benefit of stopping small objects falling through bones
@@ -513,23 +511,23 @@ namespace Leap.Unity.Interaction.PhysicsHands
             }
         }
 
-        public static void UpdatePhysicsPalm(ref PhysicsHand.Hand physicsHand, Leap.Hand dataHand, float maximumDistance, bool isContacting, bool isGrasping, float graspingWeight, float maximumWeight)
+        public static void UpdatePhysicsPalm(ref PhysicsHand.Hand physicsHand, Leap.Hand dataHand, float maximumDistance, bool isContacting, bool isGrasping, float graspingWeight, float maximumWeight, float fingerDisplacement)
         {
             if (isContacting || isGrasping)
             {
                 // Reduce the hand velocity if we're pushing through an object
                 physicsHand.currentPalmVelocityInterp = Mathf.InverseLerp(maximumDistance * 0.2f, maximumDistance * 0.95f, physicsHand.computedHandDistance).EaseOut();
                 physicsHand.currentPalmVelocity = Mathf.Lerp(physicsHand.currentPalmVelocity,
-                    Mathf.Lerp(physicsHand.maximumPalmVelocity, physicsHand.minimumPalmVelocity, physicsHand.currentPalmVelocityInterp),
-                    Time.fixedDeltaTime * (1.0f / 0.05f));
+                    Mathf.Lerp(physicsHand.parameters.maximumPalmVelocity, physicsHand.parameters.minimumPalmVelocity, physicsHand.currentPalmVelocityInterp),
+                    Time.fixedDeltaTime * (1.0f / 0.025f));
                 physicsHand.currentPalmAngularVelocity = Mathf.Lerp(physicsHand.currentPalmAngularVelocity,
-                    Mathf.Lerp(physicsHand.maximumPalmAngularVelocity, physicsHand.minimumPalmAngularVelocity, physicsHand.currentPalmVelocityInterp),
-                    Time.fixedDeltaTime * (1.0f / 0.05f));
+                    Mathf.Lerp(physicsHand.parameters.maximumPalmAngularVelocity, physicsHand.parameters.minimumPalmAngularVelocity, physicsHand.currentPalmVelocityInterp),
+                    Time.fixedDeltaTime * (1.0f / 0.025f));
             }
             else
             {
-                physicsHand.currentPalmVelocity = Mathf.Lerp(physicsHand.currentPalmVelocity, physicsHand.maximumPalmVelocity, Time.fixedDeltaTime * (1.0f / 0.05f));
-                physicsHand.currentPalmAngularVelocity = Mathf.Lerp(physicsHand.currentPalmAngularVelocity, physicsHand.maximumPalmAngularVelocity, Time.fixedDeltaTime * (1.0f / 0.05f));
+                physicsHand.currentPalmVelocity = Mathf.Lerp(physicsHand.currentPalmVelocity, physicsHand.parameters.maximumPalmVelocity, Time.fixedDeltaTime * (1.0f / 0.025f));
+                physicsHand.currentPalmAngularVelocity = Mathf.Lerp(physicsHand.currentPalmAngularVelocity, physicsHand.parameters.maximumPalmAngularVelocity, Time.fixedDeltaTime * (1.0f / 0.025f));
                 physicsHand.currentPalmVelocityInterp = 0f;
             }
 
@@ -538,23 +536,33 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 // Reduce the overall delta amount when the weight is heigher
                 physicsHand.currentPalmWeightInterp = Mathf.InverseLerp(Mathf.Min(maximumWeight * 0.1f, 1f), maximumWeight, graspingWeight).EaseOut();
             }
+            else if (fingerDisplacement > 0.8f)
+            {
+                physicsHand.currentPalmWeightInterp = Mathf.InverseLerp(0.8f, 8f, fingerDisplacement).EaseOut();
+            }
             else
             {
                 physicsHand.currentPalmWeightInterp = 0f;
             }
 
-            physicsHand.currentPalmWeight = Mathf.Lerp(physicsHand.currentPalmWeight, physicsHand.currentPalmWeightInterp, Time.fixedDeltaTime * (1.0f / 0.15f));
+            if (physicsHand.currentPalmWeightInterp > physicsHand.currentPalmWeight)
+            {
+                physicsHand.currentPalmWeight = Mathf.Lerp(physicsHand.currentPalmWeight, physicsHand.currentPalmWeightInterp, Time.fixedDeltaTime * (1.0f / 0.025f));
+            }
+            else
+            {
+                physicsHand.currentPalmWeight = Mathf.Lerp(physicsHand.currentPalmWeight, physicsHand.currentPalmWeightInterp, Time.fixedDeltaTime * (1.0f / 0.075f));
+            }
 
             Vector3 delta = dataHand.PalmPosition - physicsHand.transform.position;
 
-            physicsHand.palmBody.velocity = Vector3.ClampMagnitude(Vector3.MoveTowards(physicsHand.palmBody.velocity, delta * Mathf.Lerp(1.0f, 0.1f, physicsHand.currentPalmWeight) / Time.fixedDeltaTime, 15f), physicsHand.currentPalmVelocity * Time.fixedDeltaTime);
+            physicsHand.palmBody.velocity = Vector3.ClampMagnitude(Vector3.MoveTowards(physicsHand.palmBody.velocity, delta * Mathf.Lerp(1.0f, 0.05f, physicsHand.currentPalmWeight) / Time.fixedDeltaTime, 15f), physicsHand.currentPalmVelocity * Time.fixedDeltaTime);
 
-            Quaternion rotationDelta = Quaternion.Slerp(physicsHand.transform.rotation, dataHand.Rotation, Mathf.Lerp(1.0f, 0.1f, physicsHand.currentPalmWeight)) * Quaternion.Inverse(physicsHand.transform.rotation);
+            Quaternion rotationDelta = Quaternion.Normalize(Quaternion.Slerp(Quaternion.identity, dataHand.Rotation * Quaternion.Inverse(physicsHand.transform.rotation), Mathf.Lerp(1.0f, 0.1f, physicsHand.currentPalmWeight)));
 
-            Vector3 angularVelocity = Vector3.ClampMagnitude((new Vector3(
-                Mathf.DeltaAngle(0, rotationDelta.eulerAngles.x),
-                Mathf.DeltaAngle(0, rotationDelta.eulerAngles.y),
-                Mathf.DeltaAngle(0, rotationDelta.eulerAngles.z)) / Time.fixedDeltaTime) * Mathf.Deg2Rad, physicsHand.currentPalmAngularVelocity * Time.fixedDeltaTime);
+            rotationDelta.ToAngleAxis(out float angleInDeg, out Vector3 rotationAxis);
+
+            Vector3 angularVelocity = Vector3.ClampMagnitude((rotationAxis * angleInDeg * Mathf.Deg2Rad) / Time.fixedDeltaTime, physicsHand.currentPalmAngularVelocity * Time.fixedDeltaTime);
 
             if (angularVelocity.IsValid())
             {
@@ -635,12 +643,14 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             leapHand.WristPosition = physicsHand.transform.position - (physicsHand.transform.rotation * Quaternion.Inverse(originalHand.Rotation) * (originalHand.PalmPosition - originalHand.WristPosition));
 
-            leapHand.Arm.PrevJoint = Vector3.Lerp(physicsHand.elbowPosition, originalHand.Arm.PrevJoint, Mathf.Lerp(1.0f, 0.1f, physicsHand.currentPalmWeight));
+            Vector3 direction = Vector3.Lerp(leapHand.Arm.Direction, originalHand.Arm.Direction, Mathf.Lerp(1.0f, 0.1f, physicsHand.currentPalmWeight));
+
+            leapHand.Arm.PrevJoint = leapHand.WristPosition + (-originalHand.Arm.Length * direction);
             leapHand.Arm.NextJoint = leapHand.WristPosition;
             leapHand.Arm.Center = (leapHand.Arm.PrevJoint + leapHand.Arm.NextJoint) / 2f;
             leapHand.Arm.Length = Vector3.Distance(leapHand.Arm.PrevJoint, leapHand.Arm.NextJoint);
             leapHand.Arm.Direction = (leapHand.WristPosition - leapHand.Arm.PrevJoint).normalized;
-            leapHand.Arm.Rotation = Quaternion.LookRotation(leapHand.Arm.Direction, -leapHand.PalmNormal);
+            leapHand.Arm.Rotation = Quaternion.LookRotation(leapHand.Arm.Direction, -originalHand.PalmNormal);
             leapHand.Arm.Width = originalHand.Arm.Width;
 
             leapHand.PalmWidth = physicsHand.palmCollider.size.y;

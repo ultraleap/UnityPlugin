@@ -128,12 +128,12 @@ namespace Leap.Unity.Preview.HandRays
 
         protected override Vector3 CalculateAimPosition()
         {
-            return aimPositionFilter.Filter(handRayDirection.Hand.GetPredictedPinchPosition(), Time.time);
+            return aimPositionFilter.Filter(handRayDirection.Hand.GetPredictedPinchPosition());
         }
 
         protected override Vector3 CalculateRayOrigin()
         {
-            return rayOriginFilter.Filter(GetRayOrigin(), Time.time);
+            return rayOriginFilter.Filter(GetRayOrigin());
         }
 
         protected override Vector3 CalculateDirection()

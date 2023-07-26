@@ -290,18 +290,18 @@ namespace Leap.Unity.Interaction
                 // Draw Horizontal Max Restriction
                 Vector3 centerPosition = _head.position;
                 centerPosition.y = Mathf.Clamp(grabBallInteractionBehaviour.transform.position.y, _head.position.y + minHeightFromHead, _head.position.y + maxHeightFromHead);
-                Utils.DrawCircle(centerPosition, normal, maxHorizontalDistanceFromHead, grabBallRestrictionStatus.horizontalMax ? Color.green : Color.gray);
+                Leap.Unity.Utils.DrawCircle(centerPosition, normal, maxHorizontalDistanceFromHead, grabBallRestrictionStatus.horizontalMax ? Color.green : Color.gray);
 
                 //Draw Horizontal Min Restriction
-                Utils.DrawCircle(centerPosition, normal, minHorizontalDistanceFromHead, grabBallRestrictionStatus.horizontalMin ? Color.green : Color.gray);
+                Leap.Unity.Utils.DrawCircle(centerPosition, normal, minHorizontalDistanceFromHead, grabBallRestrictionStatus.horizontalMin ? Color.green : Color.gray);
 
                 //Draw Height Max Restriction
                 centerPosition.y = _head.position.y + maxHeightFromHead;
-                Utils.DrawCircle(centerPosition, normal, maxHorizontalDistanceFromHead, grabBallRestrictionStatus.heightMax ? Color.green : Color.gray);
+                Leap.Unity.Utils.DrawCircle(centerPosition, normal, maxHorizontalDistanceFromHead, grabBallRestrictionStatus.heightMax ? Color.green : Color.gray);
 
                 //Draw Height Min Restriction
                 centerPosition.y = _head.position.y + minHeightFromHead;
-                Utils.DrawCircle(centerPosition, normal, maxHorizontalDistanceFromHead, grabBallRestrictionStatus.heightMin ? Color.green : Color.gray);
+                Leap.Unity.Utils.DrawCircle(centerPosition, normal, maxHorizontalDistanceFromHead, grabBallRestrictionStatus.heightMin ? Color.green : Color.gray);
             }
         }
     }

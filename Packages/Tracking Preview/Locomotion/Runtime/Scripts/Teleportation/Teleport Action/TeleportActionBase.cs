@@ -47,6 +47,7 @@ namespace Leap.Unity.Preview.Locomotion
 
         protected TeleportAnchor _currentAnchor { get { return _currentAnchorVal; } private set { _currentAnchorVal = value; } }
         protected List<TeleportAnchor> _teleportAnchors = new List<TeleportAnchor>();
+        public List<TeleportAnchor> TeleportAnchors => _teleportAnchors;
 
         protected Vector3 _currentPosition { get; private set; }
         protected Quaternion _currentRotation { get; private set; }
@@ -63,6 +64,7 @@ namespace Leap.Unity.Preview.Locomotion
         protected bool _currentTeleportAnchorLocked = false;
 
         private TeleportAnchor _lastHighlightedAnchor;
+        public TeleportAnchor LastTeleportedAnchor => _lastTeleportedAnchor;
         private TeleportAnchor _lastTeleportedAnchor;
         private TeleportAnchor _currentAnchorVal;
 
@@ -241,6 +243,7 @@ namespace Leap.Unity.Preview.Locomotion
                 {
                     _lastHighlightedAnchor.SetHighlighted(false);
                 }
+                handRayRenderer.SetValid(IsValid);
                 return;
             }
 

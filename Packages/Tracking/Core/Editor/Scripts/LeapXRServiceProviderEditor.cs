@@ -8,7 +8,6 @@
 
 using UnityEditor;
 using UnityEngine;
-
 namespace Leap.Unity
 {
 
@@ -16,8 +15,6 @@ namespace Leap.Unity
     public class LeapXRServiceProviderEditor : LeapServiceProviderEditor
     {
         SerializedProperty _mainCamera;
-
-        Transform targetTransform;
 
         string[] testHandPoses = new string[] { "HeadMountedA", "HeadMountedB" };
 
@@ -70,6 +67,7 @@ namespace Leap.Unity
             addPropertyToFoldout("_deviceOffsetMode", "Advanced Options");
             addPropertyToFoldout("_temporalWarpingMode", "Advanced Options");
             addPropertyToFoldout("_customWarpAdjustment", "Advanced Options");
+            addPropertyToFoldout("_positionDeviceRelativeToMainCamera", "Advanced Options");
             addPropertyToFoldout("_deviceOffsetYAxis", "Advanced Options");
             addPropertyToFoldout("_deviceOffsetZAxis", "Advanced Options");
             addPropertyToFoldout("_deviceTiltXAxis", "Advanced Options");
@@ -79,19 +77,10 @@ namespace Leap.Unity
             addPropertyToFoldout("_autoCreateTrackedPoseDriver", "Advanced Options");
             hideField("_trackingOptimization");
 
-            targetTransform = (target as LeapXRServiceProvider).transform;
-
-            if (targetTransform != null)
+            // Ensure the default values are up to date by re-firing the property setter
+            if ((target as LeapXRServiceProvider).deviceOffsetMode == LeapXRServiceProvider.DeviceOffsetMode.Default)
             {
-                targetTransform.hideFlags = HideFlags.NotEditable;
-            }
-        }
-
-        void OnDisable()
-        {
-            if (targetTransform != null)
-            {
-                targetTransform.hideFlags = HideFlags.None;
+                (target as LeapXRServiceProvider).deviceOffsetMode = LeapXRServiceProvider.DeviceOffsetMode.Default;
             }
         }
 
@@ -100,27 +89,5 @@ namespace Leap.Unity
             property.enumValueIndex = EditorGUILayout.Popup("Edit Time Pose", property.enumValueIndex, testHandPoses);
             serializedObject.ApplyModifiedProperties();
         }
-
-
-        private void decorateAllowManualTimeAlignment(SerializedProperty property)
-        {
-            bool pcOrAndroidPlatformDetected = false;
-            string targetPlatform = "";
-#if UNITY_STANDALONE
-            pcOrAndroidPlatformDetected = true;
-            targetPlatform = "Standalone (Desktop)";
-#elif UNITY_ANDROID
-      pcOrAndroidPlatformDetected = true;
-      targetPlatform = "Android";
-#endif
-
-            if (pcOrAndroidPlatformDetected && property.boolValue)
-            {
-                EditorGUILayout.HelpBox(targetPlatform + " target platform detected; "
-                                      + "manual time alignment should not be enabled under most "
-                                      + "circumstances.", MessageType.Warning);
-            }
-        }
-
     }
 }

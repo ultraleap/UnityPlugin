@@ -94,12 +94,12 @@ namespace Leap.Unity.Geometry
             if (idx0 == idx1) { return this[idx0]; }
 
             int row0 = getRow(idx0), row1 = getRow(idx1);
-            if (row0 > row1) { Utils.Swap(ref row0, ref row1); }
+            if (row0 > row1) { Leap.Unity.Utils.Swap(ref row0, ref row1); }
             var rowStart = getRow(idx0);
             var numMergedRows = 1 + (row1 - row0);
 
             int col0 = getCol(idx0), col1 = getCol(idx1);
-            if (col0 > col1) { Utils.Swap(ref col0, ref col1); }
+            if (col0 > col1) { Leap.Unity.Utils.Swap(ref col0, ref col1); }
             var colStart = getCol(idx0);
             var numMergedCols = 1 + (col1 - col0);
 
@@ -197,9 +197,9 @@ namespace Leap.Unity.Geometry
             {
                 int idx0 = subGridBegin, idx1 = subGridEnd;
                 int row0 = grid.getRow(idx0), row1 = grid.getRow(idx1);
-                if (row0 > row1) { Utils.Swap(ref row0, ref row1); }
+                if (row0 > row1) { Leap.Unity.Utils.Swap(ref row0, ref row1); }
                 int col0 = grid.getCol(idx0), col1 = grid.getCol(idx1);
-                if (col0 > col1) { Utils.Swap(ref col0, ref col1); }
+                if (col0 > col1) { Leap.Unity.Utils.Swap(ref col0, ref col1); }
                 _col0 = col0; _col1 = col1;
 
                 _lastIndex = Mathf.Max(subGridBegin, subGridEnd);

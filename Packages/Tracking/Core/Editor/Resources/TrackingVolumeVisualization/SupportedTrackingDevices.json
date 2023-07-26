@@ -23,6 +23,14 @@
       "MinDistance": 10,
       "OptimalDistance": 75,
       "MaxDistance": 100
+    },
+    {
+      "Name": "Leap Motion Controller 2",
+      "HorizontalFOV": 165,
+      "VerticalFOV": 165,
+      "MinDistance": 10,
+      "OptimalDistance": 75,
+      "MaxDistance": 100
     }
   ]
 }

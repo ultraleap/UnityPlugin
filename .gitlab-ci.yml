@@ -76,6 +76,16 @@ check-formatting:
           }
       }
     
+    # Make sure uses of Utils specify the Leap.Unity namespace
+    - |
+      Get-ChildItem -Path "$PACKAGES_PATH/" -Filter *.cs -Recurse -File -Name | ForEach-Object {
+          $ScriptContent = Get-Content -Path "$PACKAGES_PATH/$_";
+          if ($ScriptContent -match 'using Leap.Unity' -or $ScriptContent -match 'namespace Leap.Unity') {
+              $ScriptContent = $ScriptContent -replace ' Utils\.', ' Leap.Unity.Utils.';
+              $ScriptContent -Join "`n" | Set-Content -NoNewline "$PACKAGES_PATH/$_";
+          }
+      }
+    
     # git diff so we can see the changes needed to be made
     - $linter_errors = git --no-pager diff --name-only "*.cs";
 

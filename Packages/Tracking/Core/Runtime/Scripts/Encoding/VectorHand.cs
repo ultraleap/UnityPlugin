@@ -71,6 +71,13 @@ namespace Leap.Unity.Encoding
             }
         }
 
+        // Correction for the 0th thumb bone rotation offsets to match LeapC
+        private static readonly Quaternion[] ThumbMetacarpalRotationOffset =
+        {
+            Quaternion.Euler(0, +25.9f, -63.45f),
+            Quaternion.Euler(0, -25.9f, +63.45f),
+        };
+
         #endregion
 
         /// <summary>
@@ -184,11 +191,16 @@ namespace Leap.Unity.Encoding
                     prevJoint = ToWorld(prevJoint, palmPos, palmRot);
                     boneRot = palmRot * boneRot;
 
+                    if(fingerIdx == 0 && boneIdx == 0)
+                    {
+                        boneRot *= ThumbMetacarpalRotationOffset[intoHand.IsLeft ? 0 : 1];
+                    }
+
                     intoHand.GetBone(boneIdx).Fill(
                       prevJoint: prevJoint,
                       nextJoint: nextJoint,
                       center: ((nextJoint + prevJoint) / 2f),
-                      direction: (palmRot * Vector3.forward),
+                      direction: (nextJoint - prevJoint).normalized,
                       length: (prevJoint - nextJoint).magnitude,
                       width: 0.01f,
                       type: (Bone.BoneType)jointIdx,
@@ -200,7 +212,7 @@ namespace Leap.Unity.Encoding
                   fingerId: fingerIdx,
                   timeVisible: 10f,// Time.time, <- This is unused and main thread only
                   tipPosition: nextJoint,
-                  direction: (boneRot * Vector3.forward),
+                  direction: (nextJoint - prevJoint).normalized,
                   width: 1f,
                   length: 1f,
                   isExtended: true,
@@ -290,7 +302,7 @@ namespace Leap.Unity.Encoding
                                BitConverterNonAlloc.ToInt16(bytes, ref offset))
                              / 4096f;
             }
-            palmRot = Utils.DecompressBytesToQuat(bytes, ref offset);
+            palmRot = Leap.Unity.Utils.DecompressBytesToQuat(bytes, ref offset);
 
             // Palm-local bone joint positions.
             for (int i = 0; i < NUM_JOINT_POSITIONS; i++)
@@ -338,7 +350,7 @@ namespace Leap.Unity.Encoding
             }
 
             // Palm rotation.
-            Utils.CompressQuatToBytes(palmRot, bytesToFill, ref offset);
+            Leap.Unity.Utils.CompressQuatToBytes(palmRot, bytesToFill, ref offset);
 
             // Joint positions.
             for (int j = 0; j < NUM_JOINT_POSITIONS; j++)
