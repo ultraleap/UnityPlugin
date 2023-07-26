@@ -5,7 +5,9 @@
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
         "LeapMotion.LeapCSharp",
-        "Ultraleap.Tracking.Core"
+        "Ultraleap.Tracking.Core",
+        "Ultraleap.Tracking.XRHands",
+        "Unity.XR.Hands"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
