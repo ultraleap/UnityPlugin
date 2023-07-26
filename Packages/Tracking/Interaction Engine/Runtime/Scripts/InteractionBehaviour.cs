@@ -1772,7 +1772,7 @@ namespace Leap.Unity.Interaction
         /// </summary>
         public void RefreshInteractionColliders()
         {
-            Utils.FindColliders<Collider>(this.gameObject, _interactionColliders,
+            Leap.Unity.Utils.FindColliders<Collider>(this.gameObject, _interactionColliders,
                                           includeInactiveObjects: false);
 
             _interactionColliders.RemoveAll(

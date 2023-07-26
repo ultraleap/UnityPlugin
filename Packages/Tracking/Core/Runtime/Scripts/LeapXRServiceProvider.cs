@@ -414,10 +414,11 @@ namespace Leap.Unity
             }
 
             // Update Image Warping
-            Quaternion pastRotation;
+            Vector3 pastPosition; Quaternion pastRotation;
             transformHistory.SampleTransform(imageTimeStamp
                                                - (long)(warpingAdjustment * 1000f),
-                                             out _, out pastRotation);
+                                               _useInterpolation,
+                                             out pastPosition, out pastRotation);
 
             // Use _tweenImageWarping
             var currCenterRotation = XRSupportUtil.GetXRNodeCenterEyeLocalRotation();
@@ -576,27 +577,31 @@ namespace Leap.Unity
                 return LeapTransform.Identity;
             }
 
-            //return LeapTransform.Identity;
+            LeapTransform leapTransform = new LeapTransform();
 
             // If temporal warping is turned off
             if (_temporalWarpingMode == TemporalWarpingMode.Off)
             {
+                //Calculate the Current Pose
+                Pose currentPose = Pose.identity;
                 if (_deviceOffsetMode == DeviceOffsetMode.Transform && deviceOrigin != null)
                 {
-                    warpedPosition = deviceOrigin.position;
-                    warpedRotation = deviceOrigin.rotation;
+                    currentPose = deviceOrigin.ToPose();
                 }
                 else
                 {
-                    transformHistory.SampleTransform(timestamp, out warpedPosition, out warpedRotation);
+                    transformHistory.SampleTransform(timestamp, _useInterpolation, out currentPose.position, out currentPose.rotation);
                 }
+
+                warpedPosition = currentPose.position;
+                warpedRotation = currentPose.rotation;
             }
             //Calculate a Temporally Warped Pose
             else if (updateTemporalCompensation)
             {
                 var imageAdjustment = _temporalWarpingMode == TemporalWarpingMode.Images ? -20000 : 0;
                 var sampleTimestamp = timestamp - (long)(warpingAdjustment * 1000f) - imageAdjustment;
-                transformHistory.SampleTransform(sampleTimestamp, out warpedPosition, out warpedRotation);
+                transformHistory.SampleTransform(sampleTimestamp, _useInterpolation, out warpedPosition, out warpedRotation);
             }
 
             // Normalize the rotation Quaternion.
@@ -618,9 +623,9 @@ namespace Leap.Unity
                             warpedPosition += warpedRotation * Vector3.up * deviceOffsetYAxis
                                             + warpedRotation * Vector3.forward * deviceOffsetZAxis;
                             warpedRotation *= Quaternion.Euler(deviceTiltXAxis, 0f, 0f);
-                            warpedRotation *= Quaternion.Euler(-90f, 180f, 0f);
                         }
                     }
+                    warpedRotation *= Quaternion.Euler(-90f, 180f, 0f);
                     break;
                 case DeviceOffsetMode.ManualHeadOffset:
                     warpedPosition += warpedRotation * Vector3.up * deviceOffsetYAxis
@@ -634,7 +639,6 @@ namespace Leap.Unity
                     break;
             }
 
-            LeapTransform leapTransform = new LeapTransform();
 
             // Use the mainCamera parent to transfrom the warped positions so the player can move around
             if (mainCamera.transform.parent != null && _positionDeviceRelativeToMainCamera)

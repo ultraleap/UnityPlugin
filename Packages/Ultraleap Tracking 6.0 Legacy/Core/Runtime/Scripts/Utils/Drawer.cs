@@ -60,7 +60,7 @@ namespace Leap.Unity.Drawing
         //private static Drawer _hyperMegaDrawer;
         //private static Leap.Unity.HyperMegaStuff.HyperMegaLines _hyperMegaLines;
         //public static Drawer HyperMegaDrawer { get {
-        //  var drawer = Utils.Require(ref _hyperMegaDrawer);
+        //  var drawer = Leap.Unity.Utils.Require(ref _hyperMegaDrawer);
         //  if (_hyperMegaLines == null) {
         //    _hyperMegaLines = HyperMegaStuff.HyperMegaLines.drawer;
         //  }
@@ -80,7 +80,7 @@ namespace Leap.Unity.Drawing
         {
             get
             {
-                var drawer = Utils.Require(ref _unityDebugDrawer);
+                var drawer = Leap.Unity.Utils.Require(ref _unityDebugDrawer);
                 // Debug Lines are cleared on Update, don't use in edit mode
                 drawer.isActiveAndEnabled = Application.isPlaying;
                 drawer.implDrawLine = (a, b) =>
@@ -102,7 +102,7 @@ namespace Leap.Unity.Drawing
         {
             get
             {
-                var drawer = Utils.Require(ref _unityGizmoDrawer);
+                var drawer = Leap.Unity.Utils.Require(ref _unityGizmoDrawer);
                 drawer.isActiveAndEnabled = true;
                 drawer.implDrawLine = (a, b) =>
                 {
@@ -129,7 +129,7 @@ namespace Leap.Unity.Drawing
         {
             get
             {
-                var drawer = Utils.Require(ref _unityGizmoHandlesDrawer);
+                var drawer = Leap.Unity.Utils.Require(ref _unityGizmoHandlesDrawer);
                 drawer.isActiveAndEnabled = true;
                 drawer.implDrawLine = (a, b) =>
                 {
@@ -181,7 +181,7 @@ namespace Leap.Unity.Drawing
         {
             get
             {
-                return Utils.Require(ref _b_drawLineAction, () => (a, b) => Line(a, b));
+                return Leap.Unity.Utils.Require(ref _b_drawLineAction, () => (a, b) => Line(a, b));
             }
         }
         private Action<Vector3, Vector3> _b_drawLineAction;
@@ -276,7 +276,7 @@ namespace Leap.Unity.Drawing
                 yColor = yColor.ShiftHue(hueShift);
                 zColor = zColor.ShiftHue(hueShift);
             }
-            Utils.Require(ref _basisColors, 3);
+            Leap.Unity.Utils.Require(ref _basisColors, 3);
             _basisColors[0] = xColor;
             _basisColors[1] = yColor;
             _basisColors[2] = zColor;
@@ -316,7 +316,7 @@ namespace Leap.Unity.Drawing
                 zColor = zColor.ShiftHue((float)useHueShift);
             }
 
-            Utils.Require(ref _basisColors, 3);
+            Leap.Unity.Utils.Require(ref _basisColors, 3);
             _basisColors[0] = xColor;
             _basisColors[1] = yColor;
             _basisColors[2] = zColor;

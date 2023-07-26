@@ -88,6 +88,9 @@ namespace Leap.Unity.Attachments
         [HideInInspector]
         public AttachmentPointBehaviour pinkyTip;
 
+        [HideInInspector]
+        public AttachmentPointBehaviour pinchPoint;
+
         #endregion
 
         /// <summary>
@@ -181,6 +184,8 @@ namespace Leap.Unity.Attachments
                 case AttachmentPointFlags.PinkyMiddleJoint: behaviour = pinkyMiddleJoint; break;
                 case AttachmentPointFlags.PinkyDistalJoint: behaviour = pinkyDistalJoint; break;
                 case AttachmentPointFlags.PinkyTip: behaviour = pinkyTip; break;
+
+                case AttachmentPointFlags.PinchPoint: behaviour = pinchPoint; break;
             }
 
             return behaviour;
@@ -260,7 +265,8 @@ namespace Leap.Unity.Attachments
         private void initializeAttachmentPointFlagConstants()
         {
             Array flagConstants = Enum.GetValues(typeof(AttachmentPointFlags));
-            if (_attachmentPointFlagConstants == null || _attachmentPointFlagConstants.Length == 0)
+            if (_attachmentPointFlagConstants == null || _attachmentPointFlagConstants.Length == 0
+                || _attachmentPointFlagConstants.Length != flagConstants.Length)
             {
                 _attachmentPointFlagConstants = new AttachmentPointFlags[flagConstants.Length];
             }
@@ -303,6 +309,8 @@ namespace Leap.Unity.Attachments
                 case AttachmentPointFlags.PinkyMiddleJoint: pinkyMiddleJoint = behaviour; break;
                 case AttachmentPointFlags.PinkyDistalJoint: pinkyDistalJoint = behaviour; break;
                 case AttachmentPointFlags.PinkyTip: pinkyTip = behaviour; break;
+
+                case AttachmentPointFlags.PinchPoint: pinchPoint = behaviour; break;
             }
 
 #if UNITY_EDITOR

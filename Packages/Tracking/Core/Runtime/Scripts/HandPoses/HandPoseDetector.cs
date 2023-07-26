@@ -270,17 +270,21 @@ namespace Leap.Unity
             bool poseDetectedOnEitherHand = false;
             validationDatas.Clear();
             poseRulesForValidator.Clear();
-            foreach (var activePlayerHand in leapProvider.CurrentFrame.Hands)
+
+            if (leapProvider != null && leapProvider.CurrentFrame != null)
             {
-                if ((checkBothHands || activePlayerHand.GetChirality() == chiralityToCheck))
+                foreach (var activePlayerHand in leapProvider.CurrentFrame.Hands)
                 {
-                    foreach (HandPoseScriptableObject pose in posesToDetect)
+                    if ((checkBothHands || activePlayerHand.GetChirality() == chiralityToCheck))
                     {
-                        bool poseDetectedThisFrame = ComparePoseToHand(pose, activePlayerHand);
-                        if (poseDetectedThisFrame)
+                        foreach (HandPoseScriptableObject pose in posesToDetect)
                         {
-                            detectedPose = pose;
-                            poseDetectedOnEitherHand = true;
+                            bool poseDetectedThisFrame = ComparePoseToHand(pose, activePlayerHand);
+                            if (poseDetectedThisFrame)
+                            {
+                                detectedPose = pose;
+                                poseDetectedOnEitherHand = true;
+                            }
                         }
                     }
                 }

@@ -170,7 +170,12 @@ namespace Leap.Unity
                     return;
                 }
 
+                // We pass Image.CameraType.LEFT here as we want to index into the start of the data buffer
+                // which contains the left then right image. Note the LeapC data buffer starts at the top
+                // of the image, when this is written to the texture buffer it effectively flips the IR image,
+                // the first byte being at the bottom left pixel
                 byte[] data = image.Data(Image.CameraType.LEFT);
+
                 if (_hideLeapDebugInfo && controller != null)
                 {
                     Device[] devices = controller.Devices.ActiveDevices.ToArray();
@@ -183,6 +188,7 @@ namespace Leap.Unity
                             case Device.DeviceType.TYPE_RIGEL:
                             case Device.DeviceType.TYPE_SIR170:
                             case Device.DeviceType.TYPE_3DI:
+                            case Device.DeviceType.TYPE_LMC2:
                                 for (int i = 0; i < image.Width; i++)
                                     data[i] = 0x00;
                                 for (int i = (int)image.NumBytes - image.Width; i < image.NumBytes; i++)
@@ -199,6 +205,8 @@ namespace Leap.Unity
                     return;
                 }
 
+                // Note, the image in the texture is a stacked pair of (fisheye) IR images: Cam0 is the lower image, with Cam1 above it.
+                // Writing the raw buffer data into the texture results in the images in the texture becoming upside down.
                 _combinedTexture.LoadRawTextureData(data);
                 _combinedTexture.Apply();
 
@@ -266,6 +274,7 @@ namespace Leap.Unity
 
                 addDistortionData(image, colorArray, 0);
 
+                // Write the distortion data to the texture, the bottom left pixel contains the start of the array data
                 _combinedTexture.SetPixels32(colorArray);
                 _combinedTexture.Apply();
 
@@ -290,10 +299,16 @@ namespace Leap.Unity
 
             private void addDistortionData(Image image, Color32[] colors, int startIndex)
             {
+                // Concatinates two floating point arrays containing the distortion data for the
+                // left, then right image into a single array. These become stacked when written to the texture
                 float[] distortionData = image.Distortion(Image.CameraType.LEFT).
                                                Concat(image.Distortion(Image.CameraType.RIGHT)).
                                                ToArray();
 
+                // The distortion data buffer contains adjacent x,y values. We pack this pair of values
+                // into a single 32bit value, which is written as a pixel in the distortion texture
+                // The pixel value is unpacked by the shader (see LeapGetUndistortedUVWithOffset) into a pair of
+                // floats, representing the X,Y location in the source (fisheye) image
                 for (int i = 0; i < distortionData.Length; i += 2)
                 {
                     byte b0, b1, b2, b3;

@@ -67,16 +67,8 @@ namespace Leap.Unity
                 handPosition = handLocation.position;
             }
 
-            if (posedHand.IsLeft)
-            {
-                posedHand.SetTransform(handPosition, posedHand.Rotation * handLocation.rotation);
-                mirroredHand.SetTransform(handPosition, posedHand.Rotation * handLocation.rotation);
-            }
-            else
-            {
-                posedHand.SetTransform(handPosition, posedHand.Rotation * handLocation.rotation);
-                mirroredHand.SetTransform(handPosition, posedHand.Rotation * handLocation.rotation);
-            }
+            posedHand.SetTransform(handPosition, posedHand.Rotation * handLocation.rotation);
+            mirroredHand.SetTransform(handPosition, posedHand.Rotation * handLocation.rotation);
 
             currentHandsAndPosedObjects.Add(new Tuple<Hand, HandPoseScriptableObject>(posedHand, handPose));
             currentHandsAndPosedObjects.Add(new Tuple<Hand, HandPoseScriptableObject>(mirroredHand, handPose));
