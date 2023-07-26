@@ -6,9 +6,9 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
+using Leap.Interaction.Internal.InteractionEngineUtility;
 using Leap.Unity.Attributes;
 using Leap.Unity.Interaction.Internal;
-
 using Leap.Unity.RuntimeGizmos;
 using System;
 using System.Collections.Generic;
@@ -29,6 +29,18 @@ namespace Leap.Unity.Interaction
         [SerializeField]
         private LeapProvider _leapProvider;
 
+        [SerializeField]
+        GrabProfile _grabProfile;
+        GrabProfile GrabProfile 
+        { 
+            get { return _grabProfile; }
+            set 
+            {
+                _grabProfile = value;
+                SetHeuristicGrabClassifier();
+            }  
+        }
+
         [Header("Hand Configuration")]
 
         [Tooltip("Should the data for the underlying Leap hand come from the player's left "
@@ -37,6 +49,8 @@ namespace Leap.Unity.Interaction
                + "users only).")]
         [SerializeField, EditTimeOnly]
         private HandDataMode _handDataMode;
+
+
 
         /// <summary>
         /// Should the data for the underlying Leap hand come from the player's left hand or their right hand? Alternatively, you can set this mode to Custom to specify accessor functions manually via script (recommended for advanced users only).
@@ -767,10 +781,36 @@ namespace Leap.Unity.Interaction
         {
             get
             {
-                if (_grabClassifier == null) _grabClassifier = new HeuristicGrabClassifier(this);
+                if (GrabProfile != null)
+                {
+                    if (_grabClassifier == null) _grabClassifier = new HeuristicGrabClassifier(
+                        this, GrabProfile.fingerStickiness, GrabProfile.thumbStickiness, GrabProfile.maxCurl,
+                        GrabProfile.minCurl, GrabProfile.fingerRadius, GrabProfile.thumbRadius, GrabProfile.grabCooldown,
+                        GrabProfile.maxCurlVel, GrabProfile.grabbedMaxCurlVel, GrabProfile.maxGrabDistance, GrabProfile.layerMask);
+                }
+                else
+                {
+                    if (_grabClassifier == null) _grabClassifier = new HeuristicGrabClassifier(this);
+                }
                 return _grabClassifier;
+
             }
         }
+
+        private void SetHeuristicGrabClassifier()
+        {
+            grabClassifier._defaultGrabParams = new GrabClassifierHeuristics.ClassifierParameters(
+              GrabProfile.fingerStickiness, GrabProfile.thumbStickiness, GrabProfile.maxCurl, GrabProfile.minCurl, GrabProfile.fingerRadius,
+              GrabProfile.thumbRadius, GrabProfile.grabCooldown, GrabProfile.maxCurlVel, GrabProfile.grabbedMaxCurlVel, GrabProfile.maxGrabDistance,
+              GrabProfile.layerMask == 0 ? this.manager.GetInteractionLayerMask() : GrabProfile.layerMask,
+              QueryTriggerInteraction.UseGlobal);
+            grabClassifier._scaledGrabParams = new GrabClassifierHeuristics.ClassifierParameters(
+              GrabProfile.fingerStickiness, GrabProfile.thumbStickiness, GrabProfile.maxCurl, GrabProfile.minCurl, GrabProfile.fingerRadius,
+              GrabProfile.thumbRadius, GrabProfile.grabCooldown, GrabProfile.maxCurlVel, GrabProfile.grabbedMaxCurlVel, GrabProfile.maxGrabDistance,
+              GrabProfile.layerMask == 0 ? this.manager.GetInteractionLayerMask() : GrabProfile.layerMask,
+              QueryTriggerInteraction.UseGlobal);
+        }
+
 
         private Vector3[] _fingertipPositionsBuffer = new Vector3[5];
 
@@ -859,7 +899,16 @@ namespace Leap.Unity.Interaction
 
         protected override bool checkShouldRelease(out IInteractionBehaviour objectToRelease)
         {
-            return grabClassifier.FixedUpdateClassifierRelease(out objectToRelease);
+            if (_shouldReleaseGrab)
+            {
+
+                return grabClassifier.FixedUpdateClassifierRelease(out objectToRelease);
+            }
+            else 
+            { 
+                objectToRelease = null;
+                return false; 
+            }
         }
 
         protected override bool checkShouldGrasp(out IInteractionBehaviour objectToGrasp)

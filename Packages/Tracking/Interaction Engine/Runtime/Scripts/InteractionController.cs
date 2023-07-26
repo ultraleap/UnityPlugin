@@ -128,6 +128,17 @@ namespace Leap.Unity.Interaction
             }
         }
 
+        [Header("Grab Variables")]
+
+        [SerializeField]
+        public bool _shouldReleaseGrab = true;
+
+        public void ToggleShouldReleaseGrab()
+        {
+            _shouldReleaseGrab = !_shouldReleaseGrab;
+        }
+
+
         #endregion
 
         #region Public API
@@ -1946,6 +1957,11 @@ namespace Leap.Unity.Interaction
         /// </summary>
         public bool ReleaseGrasp()
         {
+            if (!_shouldReleaseGrab)
+            {
+                return false;
+            }
+
             if (_graspedObject == null)
             {
                 return false;

@@ -23,7 +23,7 @@ namespace Leap.Unity.Interaction.Internal
 
         private Dictionary<IInteractionBehaviour, GrabClassifierHeuristics.GrabClassifier> _classifiers
           = new Dictionary<IInteractionBehaviour, GrabClassifierHeuristics.GrabClassifier>();
-        private GrabClassifierHeuristics.ClassifierParameters _defaultGrabParams, _scaledGrabParams;
+        public GrabClassifierHeuristics.ClassifierParameters _defaultGrabParams, _scaledGrabParams;
         private Collider[][] _collidingCandidates = new Collider[6][];
         private int[] _numberOfColliders = new int[6];
         private Vector3[] _fingerTipPositions = new Vector3[5];

@@ -1604,6 +1604,15 @@ namespace Leap.Unity.Interaction
         /// </summary>
         public void EndGrasp(List<InteractionController> controllers)
         {
+            foreach (var controller in _graspingControllers)
+            {
+                if(!controller._shouldReleaseGrab)
+                {
+                    return;
+                }
+            }
+
+
             if (_graspingControllers.Count == controllers.Count && isSuspended)
             {
                 // No grasped hands: Should not be suspended any more;
