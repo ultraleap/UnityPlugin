@@ -28,9 +28,10 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1580682090112394}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.062061895, y: -0.011319593, z: -0.205}
   m_LocalScale: {x: 0.078, y: 0.078, z: 0.078}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4791178211233417329}
   - {fileID: 7235532975267603808}
@@ -58,9 +59,17 @@ BoxCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1580682090112394}
   m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
   m_IsTrigger: 0
+  m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
+  serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &54989536721116318
@@ -70,10 +79,21 @@ Rigidbody:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1580682090112394}
-  serializedVersion: 2
+  serializedVersion: 4
   m_Mass: 1
   m_Drag: 0
   m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 1
@@ -145,7 +165,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rbody: {fileID: 54989536721116318}
-  maximumMagneticPullDistance: 0.02
+  maximumMagneticPullDistance: 0.005
   minimumMagneticPullDistance: 0.001
   magneticPullStrength: 5
 --- !u!1 &644501774784187369
@@ -175,6 +195,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4299111203110852}
   m_RootOrder: 9
@@ -192,6 +213,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maximumAttachedMagnets: 4
+  parentMagneticObject: {fileID: 0}
 --- !u!1 &1340414016648033753
 GameObject:
   m_ObjectHideFlags: 0
@@ -219,6 +241,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.5, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4299111203110852}
   m_RootOrder: 14
@@ -236,6 +259,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maximumAttachedMagnets: 4
+  parentMagneticObject: {fileID: 0}
 --- !u!1 &3260291350460919484
 GameObject:
   m_ObjectHideFlags: 0
@@ -263,6 +287,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.5, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4299111203110852}
   m_RootOrder: 13
@@ -280,6 +305,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maximumAttachedMagnets: 4
+  parentMagneticObject: {fileID: 0}
 --- !u!1 &6765381334903520938
 GameObject:
   m_ObjectHideFlags: 0
@@ -307,6 +333,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4299111203110852}
   m_RootOrder: 11
@@ -324,6 +351,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maximumAttachedMagnets: 4
+  parentMagneticObject: {fileID: 0}
 --- !u!1 &7235532974032543377
 GameObject:
   m_ObjectHideFlags: 0
@@ -351,6 +379,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.5, y: 0.5, z: -0.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4299111203110852}
   m_RootOrder: 4
@@ -368,6 +397,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maximumAttachedMagnets: 4
+  parentMagneticObject: {fileID: 0}
 --- !u!1 &7235532974411029513
 GameObject:
   m_ObjectHideFlags: 0
@@ -395,6 +425,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.5, y: -0.5, z: 0.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4299111203110852}
   m_RootOrder: 5
@@ -412,6 +443,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maximumAttachedMagnets: 4
+  parentMagneticObject: {fileID: 0}
 --- !u!1 &7235532974415868740
 GameObject:
   m_ObjectHideFlags: 0
@@ -439,6 +471,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.5, y: -0.5, z: -0.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4299111203110852}
   m_RootOrder: 7
@@ -456,6 +489,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maximumAttachedMagnets: 4
+  parentMagneticObject: {fileID: 0}
 --- !u!1 &7235532974588208070
 GameObject:
   m_ObjectHideFlags: 0
@@ -483,6 +517,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.5, y: -0.5, z: 0.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4299111203110852}
   m_RootOrder: 6
@@ -500,6 +535,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maximumAttachedMagnets: 4
+  parentMagneticObject: {fileID: 0}
 --- !u!1 &7235532974959532540
 GameObject:
   m_ObjectHideFlags: 0
@@ -527,6 +563,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.5, y: 0.5, z: -0.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4299111203110852}
   m_RootOrder: 3
@@ -544,6 +581,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maximumAttachedMagnets: 4
+  parentMagneticObject: {fileID: 0}
 --- !u!1 &7235532975267603809
 GameObject:
   m_ObjectHideFlags: 0
@@ -571,6 +609,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.5, y: 0.5, z: 0.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4299111203110852}
   m_RootOrder: 1
@@ -588,6 +627,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maximumAttachedMagnets: 4
+  parentMagneticObject: {fileID: 0}
 --- !u!1 &7235532975431509897
 GameObject:
   m_ObjectHideFlags: 0
@@ -615,6 +655,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.5, y: 0.5, z: 0.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4299111203110852}
   m_RootOrder: 2
@@ -632,6 +673,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maximumAttachedMagnets: 4
+  parentMagneticObject: {fileID: 0}
 --- !u!1 &7235532976073692052
 GameObject:
   m_ObjectHideFlags: 0
@@ -659,6 +701,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.5, y: -0.5, z: -0.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4299111203110852}
   m_RootOrder: 8
@@ -676,6 +719,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maximumAttachedMagnets: 4
+  parentMagneticObject: {fileID: 0}
 --- !u!1 &8241322722812795895
 GameObject:
   m_ObjectHideFlags: 0
@@ -703,6 +747,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: -0.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4299111203110852}
   m_RootOrder: 10
@@ -720,6 +765,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maximumAttachedMagnets: 4
+  parentMagneticObject: {fileID: 0}
 --- !u!1 &9124319031518598324
 GameObject:
   m_ObjectHideFlags: 0
@@ -747,6 +793,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: -0.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4299111203110852}
   m_RootOrder: 12
@@ -764,11 +811,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maximumAttachedMagnets: 4
+  parentMagneticObject: {fileID: 0}
 --- !u!1001 &506404253484540779
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 4299111203110852}
     m_Modifications:
     - target: {fileID: -5178661895559278292, guid: ffbd7d9cd70540c43b3a3236199124f0, type: 3}
@@ -828,14 +877,17 @@ PrefabInstance:
       value: UHI_Cube_Interactable
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ffbd7d9cd70540c43b3a3236199124f0, type: 3}
---- !u!23 &7789574680157621950 stripped
-MeshRenderer:
-  m_CorrespondingSourceObject: {fileID: -1504981713932161579, guid: ffbd7d9cd70540c43b3a3236199124f0, type: 3}
-  m_PrefabInstance: {fileID: 506404253484540779}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &4791178211233417329 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -4216859302048453862, guid: ffbd7d9cd70540c43b3a3236199124f0, type: 3}
+  m_PrefabInstance: {fileID: 506404253484540779}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &7789574680157621950 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -1504981713932161579, guid: ffbd7d9cd70540c43b3a3236199124f0, type: 3}
   m_PrefabInstance: {fileID: 506404253484540779}
   m_PrefabAsset: {fileID: 0}

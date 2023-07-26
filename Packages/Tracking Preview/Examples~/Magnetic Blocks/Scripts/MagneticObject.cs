@@ -14,8 +14,6 @@ namespace Leap.Unity.Interaction
 {
     public class MagneticObject : MonoBehaviour
     {
-        const float NEARBY_MAGNETICS_RADIUS = 0.02f;
-
         Magnet[] magneticPoints;
         public Rigidbody rbody;
 
@@ -55,7 +53,7 @@ namespace Leap.Unity.Interaction
 
             foreach (var magnet in magneticPoints)
             {
-                var nearbyColliders = Physics.OverlapSphere(magnet.transform.position, NEARBY_MAGNETICS_RADIUS);
+                var nearbyColliders = Physics.OverlapSphere(magnet.transform.position, maximumMagneticPullDistance);
 
                 foreach (var collider in nearbyColliders)
                 {

@@ -56,7 +56,7 @@ namespace Leap.Unity.Interaction
         /// </summary>
         public void AddAttachment(ConfigurableJoint _joint, Magnet _magnet)
         {
-            for(int i = 0; i < attachedMagnets.Length; i++)
+            for (int i = 0; i < attachedMagnets.Length; i++)
             {
                 if (attachedMagnets[i].Item1 == null)
                 {
