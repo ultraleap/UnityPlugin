@@ -1,15 +1,15 @@
 using UnityEngine;
-//#if UNITY_EDITOR
+#if UNITY_EDITOR
 using System.IO;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.PackageManager.UI;
 using System.Linq;
-//#endif
+#endif
 
 namespace Leap.Unity
 {
-    //#if UNITY_EDITOR
+    #if UNITY_EDITOR
     [InitializeOnLoad]
     public class RunOnStart
     {
@@ -27,8 +27,6 @@ namespace Leap.Unity
             EditorPrefs.SetBool("ShowUpdatePopup", true);
             SessionState.SetBool("FirstInitDone", false);
 
-
-
             if (ExampleImportHelper.TrackingPackageInstalled() ||
             ExampleImportHelper.TrackingPreviewPackageInstalled()) // If either package exists
             {
@@ -38,17 +36,16 @@ namespace Leap.Unity
                     if (!SessionState.GetBool("FirstInitDone", false) && (EditorPrefs.GetBool("ShowImportPopup")))
                     {
                         ImportExamplesPopupWindow window = EditorWindow.GetWindow<ImportExamplesPopupWindow>();
-                        if(window == null ) 
+                        if(window == null) 
                         {
                             window = new ImportExamplesPopupWindow();
                         }
 
                         window.name = "Ultraleap Examples";
-                        window.position = new Rect(Screen.width / 2, Screen.height / 2, 400, 150);
+                        window.titleContent = new GUIContent("Ultraleap Examples");
+                        window.position = new Rect(Screen.width / 2, Screen.height / 2, 400, 400); 
                         window.ShowUtility();
                         popupDone = true;
-
-
                     }
                 }
             }
@@ -76,15 +73,12 @@ namespace Leap.Unity
                             }
 
                             window.name = "Ultraleap Examples Update";
-                            window.position = new Rect(Screen.width / 2, Screen.height / 2, 400, 150);
+                            window.titleContent = new GUIContent("Ultraleap Examples");
+                            window.position = new Rect(Screen.width / 2, Screen.height / 2, 400, 400);
                             window.ShowUtility();
-
-
                         }
                     }
-
                 }
-                
             }
             SessionState.SetBool("FirstInitDone", true);
         }
@@ -94,13 +88,16 @@ namespace Leap.Unity
     {
         private void OnGUI()
         {
+            Texture _handTex = Resources.Load<Texture2D>("Ultraleap_Logo");
+            GUI.DrawTexture(new Rect(0, 0, EditorGUIUtility.currentViewWidth, EditorGUIUtility.currentViewWidth * ((float)_handTex.height / (float)_handTex.width)), _handTex, ScaleMode.ScaleToFit);
+
+            GUILayout.Space(EditorGUIUtility.currentViewWidth * ((float)_handTex.height / (float)_handTex.width));
+            GUILayout.Space(20);
+
             EditorGUILayout.LabelField("It looks like you have older ultraleap examples than your package version, would you like to update them? \n " +
                 "WARNING! This will overwrite any changes you have made to the example scripts and scenes.", EditorStyles.wordWrappedLabel);
 
-            bool showAgain = !GUILayout.Toggle(EditorPrefs.GetBool("ShowUpdatePopup"), "Do not show this again?");
-
-            EditorPrefs.SetBool("ShowUpdatePopup", showAgain);
-
+            GUILayout.Space(20);
             GUILayout.BeginHorizontal();
             if (!ExampleImportHelper.TrackingExamplesUpToDate())
             {
@@ -120,7 +117,6 @@ namespace Leap.Unity
 
             if (!ExampleImportHelper.TrackingPreviewExamplesUpToDate())
             {
-
                 if (GUILayout.Button("Update Preview Examples"))
                 {
                     ExampleImportHelper.UpdatePackageExamples("com.ultraleap.tracking.preview", "Assets/Samples/Ultraleap Tracking Preview");
@@ -135,7 +131,7 @@ namespace Leap.Unity
                 GUI.enabled = true;
             }
             GUILayout.EndHorizontal();
-
+            GUILayout.Space(20);
             if (ExampleImportHelper.TrackingPreviewExamplesExist() && ExampleImportHelper.TrackingExamplesExist())
             {
                 if (GUILayout.Button("Close this window."))
@@ -150,6 +146,8 @@ namespace Leap.Unity
                     this.Close();
                 }
             }
+            bool showAgain = !GUILayout.Toggle(EditorPrefs.GetBool("ShowUpdatePopup"), "Do not show this again?");
+            EditorPrefs.SetBool("ShowUpdatePopup", showAgain);
         }
     }
 
@@ -157,6 +155,12 @@ namespace Leap.Unity
     {
         private void OnGUI()
         {
+            Texture _handTex = Resources.Load<Texture2D>("Ultraleap_Logo");
+            GUI.DrawTexture(new Rect(0, 0, EditorGUIUtility.currentViewWidth, EditorGUIUtility.currentViewWidth * ((float)_handTex.height / (float)_handTex.width)), _handTex, ScaleMode.ScaleToFit);
+
+            GUILayout.Space(EditorGUIUtility.currentViewWidth * ((float)_handTex.height / (float)_handTex.width));
+            GUILayout.Space(20);
+
             if (ExampleImportHelper.TrackingPackageInstalledAndExamplesExist() && ExampleImportHelper.TrackingPreviewPackageInstalledAndExamplesExist()) // both packages installed and both examples exist
             {
                 EditorGUILayout.LabelField("All Examples are now imported, you can find them in 'Assets/Samples'", EditorStyles.wordWrappedLabel);
@@ -174,11 +178,6 @@ namespace Leap.Unity
                 EditorGUILayout.LabelField("We've noticed you dont have our examples imported in this project, would you like to import them now?", EditorStyles.wordWrappedLabel);
             }
             GUILayout.Space(20);
-
-            bool showAgain = !GUILayout.Toggle(EditorPrefs.GetBool("ShowImportPopup"), "Do not show this again?");
-
-            EditorPrefs.SetBool("ShowImportPopup", showAgain);
-
             GUILayout.BeginHorizontal();
             if (!ExampleImportHelper.TrackingExamplesExist() && ExampleImportHelper.GetPackageInfo("com.ultraleap.tracking") != null)
             {
@@ -213,6 +212,7 @@ namespace Leap.Unity
             }
             GUILayout.EndHorizontal();
 
+            GUILayout.Space(20);
             if (ExampleImportHelper.TrackingPreviewExamplesExist() && ExampleImportHelper.TrackingExamplesExist())
             {
                 if (GUILayout.Button("Close this window."))
@@ -227,11 +227,11 @@ namespace Leap.Unity
                     this.Close();
                 }
             }
-
+            bool showAgain = !GUILayout.Toggle(EditorPrefs.GetBool("ShowUpdatePopup"), "Do not show this again?");
+            EditorPrefs.SetBool("ShowUpdatePopup", showAgain);
         }
-
     }
-    //#endif
+    #endif
 
     public static class ExampleImportHelper
     {
@@ -293,7 +293,10 @@ namespace Leap.Unity
                 .Select(AssetDatabase.GUIDToAssetPath).Where(x => AssetDatabase.LoadAssetAtPath<TextAsset>(x) != null)
                 .Select(UnityEditor.PackageManager.PackageInfo.FindForAssetPath).ToList();
 
-            return packageJsons.FirstOrDefault(x => x.name == packageName);
+            if(packageJsons == null) 
+                return null;
+
+            return packageJsons.FirstOrDefault(x => x?.name == packageName); 
         }
 
         public static bool ImportPackageExamples(string packageName)
@@ -329,7 +332,4 @@ namespace Leap.Unity
             return false;
         }
     }
-
-
 }
-
