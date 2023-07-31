@@ -12,7 +12,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private const float GRAB_COOLDOWNTIME = 0.025f;
         private const float MINIMUM_STRENGTH = 0.25f, MINIMUM_THUMB_STRENGTH = 0.2f;
         private const float REQUIRED_ENTRY_STRENGTH = 0.15f, REQUIRED_EXIT_STRENGTH = 0.05f, REQUIRED_THUMB_EXIT_STRENGTH = 0.1f, REQUIRED_PINCH_DISTANCE = 0.012f;
-        private const float GRABBABLE_DIRECTIONS_DOT = -0.7f;
+        private const float GRABBABLE_DIRECTIONS_DOT = -0.7f, FORWARD_DIRECTION_DOT = 0.5f;
 
         /// <summary>
         /// The current state of the grasp helper.
@@ -518,12 +518,12 @@ namespace Leap.Unity.Interaction.PhysicsHands
                             foreach (var directionPairB1 in grabbableDirectionsB1)
                             {
                                 //If the grabbable direction is facing away from the bone forward direction, disregard it
-                                if (Vector3.Dot(directionPairB1.Value.direction, b1.transform.forward) < 0.5f) continue;
+                                if (Vector3.Dot(directionPairB1.Value.direction, b1.transform.forward) < FORWARD_DIRECTION_DOT) continue;
 
                                 foreach (var directionPairB2 in grabbableDirectionsB2)
                                 {
                                     //If the grabbable direction is facing away from the bone forward direction, disregard it
-                                    if (Vector3.Dot(directionPairB2.Value.direction, b2.transform.forward) < 0.5f) continue;
+                                    if (Vector3.Dot(directionPairB2.Value.direction, b2.transform.forward) < FORWARD_DIRECTION_DOT) continue;
                                     
                                     float dot = Vector3.Dot(directionPairB1.Value.direction, directionPairB2.Value.direction);
                                     
