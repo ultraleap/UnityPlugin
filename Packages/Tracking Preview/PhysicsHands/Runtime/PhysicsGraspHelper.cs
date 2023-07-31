@@ -494,7 +494,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             foreach (PhysicsBone b1 in BoneHash)
             {
-                if (b1.GrabbableDirections.TryGetValue(_rigid, out var grabbableDirectionsA))
+                if (b1.GrabbableDirections.TryGetValue(_rigid, out var grabbableDirectionsB1))
                 {
                     int idB1 = b1.GetInstanceID();
                     foreach (PhysicsBone b2 in BoneHash)
@@ -513,17 +513,24 @@ namespace Leap.Unity.Interaction.PhysicsHands
                         // Register this pair of bones as checked, so that we don't check against it again
                         checkedPairs.Add(idPair1);
 
-                        if (b2.GrabbableDirections.TryGetValue(_rigid, out var grabbableDirectionsB))
+                        if (b2.GrabbableDirections.TryGetValue(_rigid, out var grabbableDirectionsB2))
                         {
-                            foreach (var directionPairA in grabbableDirectionsA)
+                            foreach (var directionPairB1 in grabbableDirectionsB1)
                             {
-                                foreach (var directionPairB in grabbableDirectionsB)
+                                //If the grabbable direction is facing away from the bone forward direction, disregard it
+                                if (Vector3.Dot(directionPairB1.Value.direction, b1.transform.forward) < 0.5f) continue;
+
+                                foreach (var directionPairB2 in grabbableDirectionsB2)
                                 {
-                                    float dot = Vector3.Dot(directionPairA.Value.direction, directionPairB.Value.direction);
+                                    //If the grabbable direction is facing away from the bone forward direction, disregard it
+                                    if (Vector3.Dot(directionPairB2.Value.direction, b2.transform.forward) < 0.5f) continue;
+                                    
+                                    float dot = Vector3.Dot(directionPairB1.Value.direction, directionPairB2.Value.direction);
+                                    
+                                    //If the two bones are facing opposite directions (i.e. pushing towards each other), they're grabbing
                                     if (dot < GRABBABLE_DIRECTIONS_DOT)
                                     {
-
-                                        if(b1.Hand == b2.Hand)
+                                        if (b1.Hand == b2.Hand)
                                         {
                                             _graspingValues[b1.Hand].handGrabbing = true;
                                             _graspingValues[b2.Hand].handGrabbing = true;
@@ -655,7 +662,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
                 if (!data)
                 {
-                    if(_graspingHands.Contains(graspedHand.Key))
+                    if (_graspingHands.Contains(graspedHand.Key))
                     {
                         SetBoneGrasping(graspedHand, false);
                         _graspingHands.Remove(graspedHand.Key);
@@ -832,7 +839,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 for (int i = 0; i < _graspingHands.Count; i++)
                 {
                     hand = _graspingHands[i];
-                    if(totalSqueeze == 0)
+                    if (totalSqueeze == 0)
                     {
                         _graspingValues[hand].deltaMultiplier = 1f / _graspingHands.Count;
                     }
