@@ -85,11 +85,14 @@ namespace Leap.Unity.Interaction.PhysicsHands
         public Rigidbody Rigidbody => _rigid;
         private List<Collider> _colliders = new List<Collider>();
 
+        private Vector3 _interpMidPoint, _oldMidPoint;
+        private Quaternion _interpMidRotation, _oldMidRotation;
+
         private Vector3 _newPosition;
         private Quaternion _newRotation;
 
         private bool _oldKinematic;
-        private float _originalMass = 1f;
+        private float _originalMass = 1f, _originalDepenetrationVel = 1f;
         public float OriginalMass => _originalMass;
 
         // This means we can have bones stay "attached" for a small amount of time
@@ -152,6 +155,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         {
             _rigid = rigid;
             _originalMass = _rigid.mass;
+            _originalDepenetrationVel = _rigid.maxDepenetrationVelocity;
             // Doing this prevents objects from misaligning during rotation
             if (_rigid.maxAngularVelocity < 100f)
             {
@@ -246,6 +250,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     // Only ever unset the rigidbody values here otherwise outside logic will get confused
                     _rigid.isKinematic = _oldKinematic;
                 }
+                _rigid.maxDepenetrationVelocity = _originalDepenetrationVel;
                 if (Manager.EnhanceThrowing && !Ignored)
                 {
                     ThrowingOnRelease();
@@ -586,6 +591,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
             {
                 physicsHandGrab.OnHandGrab(hand);
             }
+
+            CalculateMidPoints();
         }
 
         private void UpdateRemovedBones()
@@ -814,7 +821,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
                 PhysicsHand hand = null;
                 PhysicsHand.Hand pHand = null;
-                float totalSqueeze = 0f;
+                float totalSqueeze = 0f, averageSqueeze;
                 for (int i = _graspingHands.Count - 1; i > 0; i--)
                 {
                     if (!_graspingValues[_graspingHands[i]].handGrabbing)
@@ -832,6 +839,10 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     _graspingValues[hand].newPosition = pHand.palmBone.transform.position + (pHand.palmBody.velocity * Time.fixedDeltaTime) + (pHand.palmBone.transform.rotation * Quaternion.Inverse(_graspingValues[hand].originalHandRotation) * _graspingValues[hand].offset);
                     _graspingValues[hand].newRotation = pHand.palmBone.transform.rotation * Quaternion.Euler(pHand.palmBody.angularVelocity * Time.fixedDeltaTime) * _graspingValues[hand].rotationOffset;
                 }
+
+                averageSqueeze = totalSqueeze / _graspingHands.Count;
+
+                CalculateMidPoints();
 
                 Vector3 deltaPos = Vector3.zero;
                 Quaternion deltaRot = Quaternion.identity;
@@ -851,11 +862,46 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     deltaRot *= Quaternion.Slerp(Quaternion.identity, Quaternion.Inverse(_rigid.transform.rotation) * _graspingValues[hand].newRotation, _graspingValues[hand].deltaMultiplier);
                 }
 
+                if(_graspingHands.Count > 1)
+                {
+                    _rigid.maxDepenetrationVelocity = 0.001f;
+                    deltaPos = Vector3.Lerp(deltaPos, _interpMidPoint, averageSqueeze);
+                    deltaRot = Quaternion.Slerp(deltaRot, _interpMidRotation, averageSqueeze);
+                }
+                else
+                {
+                    _rigid.maxDepenetrationVelocity = _originalDepenetrationVel;
+                }
+
                 if (hand != null && pHand != null && hand.GetOriginalLeapHand() != null)
                 {
                     _newPosition = _rigid.transform.position + deltaPos;
                     _newRotation = _rigid.transform.rotation * deltaRot;
                 }
+            }
+        }
+
+        private void CalculateMidPoints()
+        {
+            if (_graspingHands.Count > 1)
+            {
+                Vector3 dir = Vector3.zero;
+                Vector3 pos = Vector3.zero;
+
+                pos += _graspingHands[0].GetPhysicsHand().palmBone.transform.position;
+                for (int i = 1; i < _graspingHands.Count; i++)
+                {
+                    dir += (_graspingHands[i - 1].GetPhysicsHand().palmBone.transform.position - _graspingHands[i].GetPhysicsHand().palmBone.transform.position).normalized;
+                    pos += _graspingHands[i].GetPhysicsHand().palmBone.transform.position;
+                }
+                dir /= _graspingHands.Count;
+                pos /= _graspingHands.Count;
+
+                _interpMidPoint = _oldMidPoint - pos;
+                _interpMidRotation = Quaternion.Inverse(_oldMidRotation) * Quaternion.LookRotation(dir, Vector3.up);
+
+                _oldMidRotation = Quaternion.LookRotation(dir, Vector3.up);
+                _oldMidPoint = pos;
             }
         }
 
