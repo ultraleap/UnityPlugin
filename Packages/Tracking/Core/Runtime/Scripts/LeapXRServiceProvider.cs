@@ -614,7 +614,6 @@ namespace Leap.Unity
                     {
                         if (_currentDevice.DevicePose != Pose.identity)
                         {
-                            warpedRotation *= Quaternion.Euler(-90f, 180f, 0f); // If using Leap co-ordinate space matrix, use this
                             warpedPosition += warpedRotation * _currentDevice.DevicePose.position;
                             warpedRotation *= _currentDevice.DevicePose.rotation;
                         }
@@ -625,20 +624,17 @@ namespace Leap.Unity
                             warpedRotation *= Quaternion.Euler(deviceTiltXAxis, 0f, 0f);
                         }
                     }
-                    warpedRotation *= Quaternion.Euler(-90f, 180f, 0f);
                     break;
                 case DeviceOffsetMode.ManualHeadOffset:
                     warpedPosition += warpedRotation * Vector3.up * deviceOffsetYAxis
                                     + warpedRotation * Vector3.forward * deviceOffsetZAxis;
                     warpedRotation *= Quaternion.Euler(deviceTiltXAxis, 0f, 0f);
-
-                    warpedRotation *= Quaternion.Euler(-90f, 180f, 0f);
-                    break;
-                case DeviceOffsetMode.Transform:
-                    warpedRotation *= Quaternion.Euler(-90f, 90f, 90f);
                     break;
             }
 
+            // Convert to unity co-ordinate space from leap co-ordinate space
+            // (apart from Z mirroring which happened in CopyFromLeapCExtensions.TransformToUnityUnits)
+            warpedRotation *= Quaternion.Euler(-90f, 180f, 0f);
 
             // Use the mainCamera parent to transfrom the warped positions so the player can move around
             if (mainCamera.transform.parent != null && _positionDeviceRelativeToMainCamera)

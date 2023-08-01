@@ -268,25 +268,33 @@ namespace Leap
 
                 if (result != eLeapRS.eLeapRS_Success || data == null)
                 {
+                    devicePose = Pose.identity;
+                    poseSet = true;
                     return Pose.identity;
                 }
 
                 // Using the LEAP->OPENXR device transform matrix
-
-                //var deviceTransform = new System.Numerics.Matrix4x4(
-                //                            data[0], data[4], data[8], data[12],
-                //                            data[1], data[5], data[9], data[13],
-                //                            data[2], data[6], data[10], data[14],
-                //                            data[3], data[7], data[11], data[15]);
-
-                // Manual entry for testing
                 var deviceTransform = new System.Numerics.Matrix4x4(
-                                            -0.001f, 0, 0, 0,
-                                            0, 0, -0.001f, 0.035f,
-                                            0, -0.001f, 0, -0.075f,
-                                            0, 0, 0, 1);
+                                            data[0], data[4], data[8], data[12],
+                                            data[1], data[5], data[9], data[13],
+                                            data[2], data[6], data[10], data[14],
+                                            data[3], data[7], data[11], data[15]);
 
-                // Reverts to Leap - but kees M units to avoid re-converting later.
+                if(deviceTransform == System.Numerics.Matrix4x4.Identity)
+                {
+                    devicePose = Pose.identity;
+                    poseSet = true;
+                    return Pose.identity;
+                }
+
+                //// Manual entry for testing
+                //var deviceTransform = new System.Numerics.Matrix4x4(
+                //                            -0.001f, 0, 0, 0,
+                //                            0, 0, -0.001f, 0,
+                //                            0, -0.001f, 0, -0.08f,
+                //                            0, 0, 0, 1);
+
+                // Reverts to Leap - but keeps M units to avoid re-converting later.
                 var openXRToLeap = new System.Numerics.Matrix4x4(
                                             -1, 0, 0, 0,
                                             0, 0, -1, 0f,
@@ -296,7 +304,7 @@ namespace Leap
                 deviceTransform = openXRToLeap * deviceTransform;
 
                 // Get the suitable values for translation and rotation from the matrix
-                Vector3 outputPosition = new Vector3(deviceTransform.M14, deviceTransform.M24, deviceTransform.M34);
+                Vector3 outputPosition = new Vector3(deviceTransform.M14, deviceTransform.M24, -deviceTransform.M34); // Use negative Z to reflect CopyFromLeapCExtensions.TransformToUnityUnits
                 System.Numerics.Quaternion numericsRotation = System.Numerics.Quaternion.CreateFromRotationMatrix(deviceTransform);
                 Quaternion outputRotation = new Quaternion(numericsRotation.X, numericsRotation.Y, numericsRotation.Z, numericsRotation.W).normalized;
 
