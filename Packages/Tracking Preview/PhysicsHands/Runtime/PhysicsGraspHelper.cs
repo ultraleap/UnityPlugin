@@ -578,7 +578,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             if (_graspingHands.Count > 0)
             {
-                //_rigid.mass = 1f;
                 GraspState = State.Grasp;
             }
             _graspingValues[hand].offset = _rigid.position - hand.GetPhysicsHand().palmBone.transform.position;
