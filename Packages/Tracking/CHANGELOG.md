@@ -25,12 +25,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (Physics Hands) Updated example scene with new events and better visuals
 - (Physics Hands) Updated Grasp Helper algorithm to account for grasps from fingers facing opposite directions
 - (Physics Hands) Updated PhysicsBone IsObjectGrabbable calculations to use the closest point on the bone to the hovered object
+- (Physics Hands) Improved Physics Hands grasp helpers to take into account grabs where bones are facing each other
 - (Locomotion) Expose teleport anchor list & last teleported anchor
 - (Locomotion) Moved Jump Gems further away from the arm, to account for sleeves
 - (Locomotion) Added functionality to update the initial position and rotations of the TP anchor after the first Awake
 
 ### Fixed
 - (Physics Hands) Hand forces are reduced when pushing into objects with fingers
+- (Physics Hands) Stopped physics buttons from rotating incorrectly
 - (Locomotion) Jump Gems look for audio sources in their children, even if the audio source was set
 - (Locomotion) If pinched gem was null, jump gem teleport could still be in a selected state
 - (Locomotion) Teleport ray did not change to an invalid colour when no colliders were hit
