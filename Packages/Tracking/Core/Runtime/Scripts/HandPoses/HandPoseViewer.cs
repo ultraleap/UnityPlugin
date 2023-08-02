@@ -67,8 +67,8 @@ namespace Leap.Unity
                 handPosition = handLocation.position;
             }
 
-            posedHand.SetTransform(handPosition, posedHand.Rotation * handLocation.rotation);
-            mirroredHand.SetTransform(handPosition, posedHand.Rotation * handLocation.rotation);
+            posedHand.SetTransform(handPosition, handLocation.rotation);
+            mirroredHand.SetTransform(handPosition, handLocation.rotation);
 
             currentHandsAndPosedObjects.Add(new Tuple<Hand, HandPoseScriptableObject>(posedHand, handPose));
             currentHandsAndPosedObjects.Add(new Tuple<Hand, HandPoseScriptableObject>(mirroredHand, handPose));
