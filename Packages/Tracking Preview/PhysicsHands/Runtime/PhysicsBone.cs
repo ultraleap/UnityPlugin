@@ -471,7 +471,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     {
                         _hoverDirections[hoverPairs.Key][hoveredCollider].direction = direction;
                         _hoverDirections[hoverPairs.Key][hoveredCollider].bonePos = bonePos;
-                        _hoverDirections[hoverPairs.Key][hoveredCollider].colliderPos = colliderPos;
                     }
                     else
                     {
