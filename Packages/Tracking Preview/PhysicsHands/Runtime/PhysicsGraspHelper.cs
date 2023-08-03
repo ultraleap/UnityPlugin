@@ -616,6 +616,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 if (_graspingHands.Count > 1
                     && !graspedHand.Value.handGrabbing
                     && !graspedHand.Value.facingOppositeHand
+                    // Hand has moved significantly far away from the object
                     && (_rigid.position - graspedHand.Key.GetPhysicsHand().palmBone.transform.position).sqrMagnitude > graspedHand.Value.offset.sqrMagnitude * 1.5f)
                 {
                     SetBoneGrasping(graspedHand, false);
@@ -630,15 +631,18 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 int c = 0;
                 for (int i = 0; i < 5; i++)
                 {
+                    // Was the finger not contacting before?
                     if (graspedHand.Value.fingerStrength[i] == -1)
                     {
                         if (Manager.FingerStrengths[graspedHand.Key][i] > (i == 0 ? MINIMUM_THUMB_STRENGTH : MINIMUM_STRENGTH) && Grasped(graspedHand.Key, i))
                         {
+                            // Store the strength value on contact
                             graspedHand.Value.fingerStrength[i] = Manager.FingerStrengths[graspedHand.Key][i];
                         }
                     }
                     else
                     {
+                        // If the finger was contacting but has uncurled by the exit percentage then it is no longer "grabbed"
                         if (Manager.FingerStrengths[graspedHand.Key][i] < (i == 0 ? MINIMUM_THUMB_STRENGTH : MINIMUM_STRENGTH) || graspedHand.Value.fingerStrength[i] * (1 - (i == 0 ? REQUIRED_THUMB_EXIT_STRENGTH : REQUIRED_EXIT_STRENGTH)) >= Manager.FingerStrengths[graspedHand.Key][i])
                         {
                             graspedHand.Value.fingerStrength[i] = -1;
@@ -651,12 +655,14 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     }
                 }
 
+                // If we've got two fingers curled, the hand was grabbing in the grab contact checks, or the hand is facing the other, then we grab
                 if (c >= 2 || graspedHand.Value.handGrabbing || graspedHand.Value.facingOppositeHand)
                 {
                     SetBoneGrasping(graspedHand, true);
                     continue;
                 }
 
+                // One final check to see if the original data hand has bones inside of the object to retain grasping during physics updates
                 bool data = DataHandIntersection(graspedHand.Key);
 
                 if (!data)
