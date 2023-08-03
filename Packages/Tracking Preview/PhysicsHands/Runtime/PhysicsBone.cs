@@ -29,10 +29,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
             /// </summary>
             public Vector3 bonePos = Vector3.zero;
             /// <summary>
-            /// The closest position on the hovered collider
-            /// </summary>
-            public Vector3 colliderPos = Vector3.zero;
-            /// <summary>
             /// The direction from the closest pos on the bone to the closest pos on the collider
             /// </summary>
             public Vector3 direction = Vector3.zero;
@@ -484,7 +480,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
                             new ClosestObjectDirection()
                             {
                                 bonePos = bonePos,
-                                colliderPos = colliderPos,
                                 direction = direction
                             }
                         );
