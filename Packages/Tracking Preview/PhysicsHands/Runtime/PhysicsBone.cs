@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -21,6 +20,18 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 }
                 return _body;
             }
+        }
+
+        public class ClosestObjectDirection
+        {
+            /// <summary>
+            /// The closest position on the hovering bone
+            /// </summary>
+            public Vector3 bonePos = Vector3.zero;
+            /// <summary>
+            /// The direction from the closest pos on the bone to the closest pos on the collider
+            /// </summary>
+            public Vector3 direction = Vector3.zero;
         }
 
         private Collider[] _hoverQueue = new Collider[32], _contactQueue = new Collider[32];
@@ -47,6 +58,19 @@ namespace Leap.Unity.Interaction.PhysicsHands
         }
 
         private HashSet<Rigidbody> _grabObjects = new HashSet<Rigidbody>();
+
+        ///<summary>
+        /// Dictionary of dictionaries of the directions from this bone to a hovered object's colliders
+        ///</summary>
+        public Dictionary<Rigidbody, Dictionary<Collider, ClosestObjectDirection>> HoverDirections => _hoverDirections;
+        private Dictionary<Rigidbody, Dictionary<Collider, ClosestObjectDirection>> _hoverDirections = new Dictionary<Rigidbody, Dictionary<Collider, ClosestObjectDirection>>();
+
+        ///<summary>
+        /// Dictionary of dictionaries of the directions from this bone to a grabbable object's colliders
+        ///</summary>
+        public Dictionary<Rigidbody, Dictionary<Collider, ClosestObjectDirection>> GrabbableDirections => _grabbableDirections;
+        private Dictionary<Rigidbody, Dictionary<Collider, ClosestObjectDirection>> _grabbableDirections = new Dictionary<Rigidbody, Dictionary<Collider, ClosestObjectDirection>>();
+
         /// <summary>
         /// Objects that *can* be grabbed, not ones that are
         /// </summary>
@@ -118,8 +142,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
         /// </summary>
         public Vector3 JointHalfExtents { get; private set; }
 
-        // Computed so that we can move the grab positions/directions back a bit to improve coverage
-        private Vector3 _grabDirection, _grabDirectionCenter, _grabPositionCenter, _grabPositionBase;
         #endregion
 
         public Collider Collider => _collider;
@@ -222,8 +244,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 JointBase = center + (orientation * (Vector3.back * halfExtents.z));
                 JointTip = center + (orientation * (Vector3.forward * halfExtents.z));
                 JointDistance = Vector3.Distance(JointBase, JointTip);
-                _grabPositionBase = JointBase - (-transform.up * (JointHalfExtents.y * 0.25f));
-                _grabPositionCenter = JointCenter - (transform.up * (JointHalfExtents.y * 0.25f));
             }
             else
             {
@@ -233,22 +253,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 JointRadius = radius;
                 JointDistance = Vector3.Distance(bottom, tip);
                 JointCenter = (bottom + tip) / 2f;
-                _grabPositionBase = JointBase - (-transform.up * (JointRadius * 0.25f));
-                _grabPositionCenter = JointCenter - (transform.up * (JointRadius * 0.25f));
             }
-            switch (Finger)
-            {
-                case 0:
-                    _grabDirection = Vector3.Lerp(Hand.Handedness == Chirality.Left ? -transform.right : transform.right, -transform.up, Joint == 2 ? 0.55f : 0.75f);
-                    break;
-                case 1:
-                    _grabDirection = Vector3.Lerp(Hand.Handedness == Chirality.Left ? transform.right : -transform.right, -transform.up, Joint == 2 ? 0.65f : 0.85f);
-                    break;
-                default:
-                    _grabDirection = -transform.up;
-                    break;
-            }
-            _grabDirectionCenter = Joint == 2 ? Vector3.Lerp(_grabDirection, transform.forward, Finger == 0 ? 0.45f : 0.25f) : _grabDirection;
         }
 
         internal void QueueHoverCollider(Collider collider)
@@ -274,21 +279,38 @@ namespace Leap.Unity.Interaction.PhysicsHands
             // Add new hovers
             for (int i = 0; i < _hoverQueueCount; i++)
             {
-                if (_hoverObjects.TryGetValue(_hoverQueue[i].attachedRigidbody, out var temp))
+                Rigidbody rb = _hoverQueue[i].attachedRigidbody;
+
+                if (_hoverObjects.TryGetValue(rb, out var temp))
                 {
-                    if (!_hoverObjects[_hoverQueue[i].attachedRigidbody].Contains(_hoverQueue[i]))
+                    if (!_hoverObjects[rb].Contains(_hoverQueue[i]))
                     {
-                        _hoverObjects[_hoverQueue[i].attachedRigidbody].Add(_hoverQueue[i]);
+                        _hoverObjects[rb].Add(_hoverQueue[i]);
                     }
                 }
                 else
                 {
-                    _hoverObjects.Add(_hoverQueue[i].attachedRigidbody, new HashSet<Collider>() { _hoverQueue[i] });
-                    if (_hoverQueue[i].attachedRigidbody.TryGetComponent<IPhysicsBoneHover>(out var physicsBoneHover))
+                    _hoverObjects.Add(rb, new HashSet<Collider>() { _hoverQueue[i] });
+
+                    if (rb.TryGetComponent<IPhysicsBoneHover>(out var physicsBoneHover))
                     {
                         physicsBoneHover.OnBoneHover(this);
                     }
                 }
+
+                if (_hoverDirections.ContainsKey(rb))
+                {
+                    if (!_hoverDirections[rb].ContainsKey(_hoverQueue[i]))
+                    {
+                        _hoverDirections[rb].Add(_hoverQueue[i], new ClosestObjectDirection());
+                    }
+                }
+                else
+                {
+                    _hoverDirections.Add(rb, new Dictionary<Collider, ClosestObjectDirection>());
+                    _hoverDirections[rb].Add(_hoverQueue[i], new ClosestObjectDirection());
+                }
+
             }
 
             // Remove empty entries
@@ -298,6 +320,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
             foreach (var oldRigid in badKeys)
             {
                 _hoverObjects.Remove(oldRigid);
+                _hoverDirections.Remove(oldRigid);
+
                 if (oldRigid != null && oldRigid.TryGetComponent<IPhysicsBoneHover>(out var physicsHandGrab))
                 {
                     physicsHandGrab.OnBoneHoverExit(this);
@@ -350,27 +374,38 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             _contactQueueCount = 0;
 
+            // Update our distances once all the colliders are ok for the bone
+            UpdateBoneHoverDistances();
+
             // Remove the grabbed objects where they're no longer contacting
             _grabObjects.RemoveWhere(RemoveGrabQueue);
 
             foreach (var key in _contactObjects.Keys)
             {
-                if (IsObjectGrabbable(_contactObjects[key]))
+                if (IsObjectGrabbable(key))
                 {
+                    // add to grabbable rb dicts
                     _grabObjects.Add(key);
+
+                    if (_grabbableDirections.ContainsKey(key))
+                    {
+                        _grabbableDirections[key] = _hoverDirections[key];
+                    }
+                    else
+                    {
+                        _grabbableDirections.Add(key, _hoverDirections[key]);
+                    }
                 }
                 else
                 {
                     _grabObjects.Remove(key);
+                    _grabbableDirections.Remove(key);
                 }
             }
 
             IsBoneHovering = _hoverObjects.Count > 0;
             IsBoneContacting = _contactObjects.Count > 0;
             IsBoneReadyToGrab = _grabObjects.Count > 0;
-
-            // Update our distances once all the colliders are ok for the bone
-            UpdateBoneHoverDistances();
         }
 
         private bool RemoveHoverQueue(Collider collider)
@@ -378,6 +413,14 @@ namespace Leap.Unity.Interaction.PhysicsHands
             if (_hoverQueue.ContainsRange(collider, _hoverQueueCount))
             {
                 return false;
+            }
+
+            if (collider.attachedRigidbody != null)
+            {
+                if (_hoverDirections.ContainsKey(collider.attachedRigidbody))
+                {
+                    _hoverDirections.Remove(collider.attachedRigidbody);
+                }
             }
             return true;
         }
@@ -400,44 +443,99 @@ namespace Leap.Unity.Interaction.PhysicsHands
             return true;
         }
 
-        private bool IsObjectGrabbable(HashSet<Collider> colliders)
-        {
-            foreach (var collider in colliders)
-            {
-                // Center and the base of the bone
-                if (Vector3.Dot(_grabDirectionCenter, (collider.ClosestPoint(_grabPositionCenter) - _grabPositionCenter).normalized) > 0.18f || Vector3.Dot(_grabDirection, (collider.ClosestPoint(_grabPositionBase) - _grabPositionBase).normalized) > 0.2f)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
+
 
         private void UpdateBoneHoverDistances()
         {
             _objectDistance = float.MaxValue;
 
-            float tempDist;
-            Vector3 tempA, tempB, tempMid;
+            float distance;
+            Vector3 colliderPos, bonePos, midPoint, direction;
             foreach (var hoverPairs in _hoverObjects)
             {
-                foreach (var collider in hoverPairs.Value)
+                foreach (var hoveredCollider in hoverPairs.Value)
                 {
-                    tempA = collider.ClosestPoint(_collider.transform.position);
-                    tempB = _collider.ClosestPoint(collider.transform.position);
-                    tempMid = tempA + (tempB - tempA) / 2f;
-                    tempA = collider.ClosestPoint(tempMid);
-                    tempB = _collider.ClosestPoint(tempMid);
+                    colliderPos = hoveredCollider.ClosestPoint(_collider.transform.position);
+                    bonePos = _collider.ClosestPoint(hoveredCollider.transform.position);
 
-                    tempDist = Vector3.Distance(tempA, tempB);
-                    if (tempDist < _objectDistance)
+                    midPoint = colliderPos + (bonePos - colliderPos) / 2f;
+
+                    colliderPos = hoveredCollider.ClosestPoint(midPoint);
+                    bonePos = _collider.ClosestPoint(midPoint);
+
+
+                    distance = Vector3.Distance(colliderPos, bonePos);
+                    direction = (colliderPos - bonePos).normalized;
+
+                    if (_hoverDirections[hoverPairs.Key].ContainsKey(hoveredCollider))
                     {
-                        _objectDistance = tempDist;
-                        _debugDistanceA = tempA;
-                        _debugDistanceB = tempB;
+                        _hoverDirections[hoverPairs.Key][hoveredCollider].direction = direction;
+                        _hoverDirections[hoverPairs.Key][hoveredCollider].bonePos = bonePos;
+                    }
+                    else
+                    {
+                        _hoverDirections[hoverPairs.Key].Add(
+                            hoveredCollider,
+                            new ClosestObjectDirection()
+                            {
+                                bonePos = bonePos,
+                                direction = direction
+                            }
+                        );
+                    }
+
+                    if (distance < _objectDistance)
+                    {
+                        _objectDistance = distance;
+                        _debugDistanceA = colliderPos;
+                        _debugDistanceB = bonePos;
                     }
                 }
             }
+        }
+
+        private bool IsObjectGrabbable(Rigidbody rigidbody)
+        {
+            if (_hoverDirections.TryGetValue(rigidbody, out var hoveredColliders))
+            {
+                Vector3 bonePosCenter, closestPoint, boneCenterToColliderDirection, jointDirection;
+                foreach (var hoveredColliderDirection in hoveredColliders)
+                {
+                    bonePosCenter = transform.TransformPoint(0, 0, transform.InverseTransformPoint(hoveredColliderDirection.Value.bonePos).z);
+
+                    closestPoint = hoveredColliderDirection.Key.ClosestPoint(bonePosCenter);
+                    boneCenterToColliderDirection = (closestPoint - bonePosCenter).normalized;
+
+                    if (Joint == 2)
+                    {
+                        // Rotate the direction forward if the contact is closer to the tip
+                        jointDirection = Quaternion.AngleAxis(Mathf.InverseLerp(JointDistance, 0, Vector3.Distance(bonePosCenter, JointTip)) * 45f, -transform.right) * -transform.up;
+                    }
+                    else
+                    {
+                        jointDirection = -transform.up;
+                    }
+
+                    switch (Finger)
+                    {
+                        case 0:
+                            // Point the thumb closer to the index
+                            jointDirection = Quaternion.AngleAxis(Hand.Handedness == Chirality.Left ? -45f : 45f, transform.forward) * jointDirection;
+                            break;
+                        case 1:
+                            // Point the index closer to the thumb
+                            jointDirection = Quaternion.AngleAxis(Hand.Handedness == Chirality.Left ? 25f : -25f, transform.forward) * jointDirection;
+                            break;
+                    }
+
+                    if (Vector3.Dot(boneCenterToColliderDirection, jointDirection) > (Finger == 0 ? 0.04f : 0.18f))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         internal void UpdateBoneDisplacement(Bone bone = null)
@@ -487,7 +585,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 if (IsBoneHovering)
                 {
                     Gizmos.DrawLine(_debugDistanceA, _debugDistanceB);
-                    Gizmos.DrawSphere(_debugDistanceA, JointRadius / 2f);
+                    Gizmos.DrawSphere(_debugDistanceA, JointRadius / 4f);
                 }
             }
         }
