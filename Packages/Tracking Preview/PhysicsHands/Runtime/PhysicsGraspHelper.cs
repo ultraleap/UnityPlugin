@@ -610,8 +610,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         private void UpdateGraspingValues()
         {
-            foreach (var graspedHand in _graspingValues)
+            foreach (KeyValuePair<PhysicsHand, GraspValues> graspedHand in _graspingValues)
             {
+                // Check if this hand was grasping and is now not grasping
                 if (_graspingHands.Count > 1
                     && !graspedHand.Value.handGrabbing
                     && !graspedHand.Value.facingOppositeHand
@@ -794,7 +795,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 /*
                  * Grasp priority
                  * Last hand to grab object
-                 * Otherwise, last hand to be adding to graspingHands
+                 * Otherwise, last hand to be added to graspingHands
                  */
 
                 PhysicsHand hand = null;

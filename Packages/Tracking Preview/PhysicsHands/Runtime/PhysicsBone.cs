@@ -22,7 +22,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             }
         }
 
-        public class ClosestHoverDirection
+        public class ClosestObjectDirection
         {
             /// <summary>
             /// The closest position on the hovering bone
@@ -66,14 +66,14 @@ namespace Leap.Unity.Interaction.PhysicsHands
         ///<summary>
         /// Dictionary of dictionaries of the directions from this bone to a hovered object's colliders
         ///</summary>
-        public Dictionary<Rigidbody, Dictionary<Collider, ClosestHoverDirection>> HoverDirections => _hoverDirections;
-        private Dictionary<Rigidbody, Dictionary<Collider, ClosestHoverDirection>> _hoverDirections = new Dictionary<Rigidbody, Dictionary<Collider, ClosestHoverDirection>>();
+        public Dictionary<Rigidbody, Dictionary<Collider, ClosestObjectDirection>> HoverDirections => _hoverDirections;
+        private Dictionary<Rigidbody, Dictionary<Collider, ClosestObjectDirection>> _hoverDirections = new Dictionary<Rigidbody, Dictionary<Collider, ClosestObjectDirection>>();
 
         ///<summary>
         /// Dictionary of dictionaries of the directions from this bone to a grabbable object's colliders
         ///</summary>
-        public Dictionary<Rigidbody, Dictionary<Collider, ClosestHoverDirection>> GrabbableDirections => _grabbableDirections;
-        private Dictionary<Rigidbody, Dictionary<Collider, ClosestHoverDirection>> _grabbableDirections = new Dictionary<Rigidbody, Dictionary<Collider, ClosestHoverDirection>>();
+        public Dictionary<Rigidbody, Dictionary<Collider, ClosestObjectDirection>> GrabbableDirections => _grabbableDirections;
+        private Dictionary<Rigidbody, Dictionary<Collider, ClosestObjectDirection>> _grabbableDirections = new Dictionary<Rigidbody, Dictionary<Collider, ClosestObjectDirection>>();
 
         /// <summary>
         /// Objects that *can* be grabbed, not ones that are
@@ -306,13 +306,13 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 {
                     if (!_hoverDirections[rb].ContainsKey(_hoverQueue[i]))
                     {
-                        _hoverDirections[rb].Add(_hoverQueue[i], new ClosestHoverDirection());
+                        _hoverDirections[rb].Add(_hoverQueue[i], new ClosestObjectDirection());
                     }
                 }
                 else
                 {
-                    _hoverDirections.Add(rb, new Dictionary<Collider, ClosestHoverDirection>());
-                    _hoverDirections[rb].Add(_hoverQueue[i], new ClosestHoverDirection());
+                    _hoverDirections.Add(rb, new Dictionary<Collider, ClosestObjectDirection>());
+                    _hoverDirections[rb].Add(_hoverQueue[i], new ClosestObjectDirection());
                 }
 
             }
@@ -386,7 +386,6 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             foreach (var key in _contactObjects.Keys)
             {
-                //if (IsObjectGrabbable(_contactObjects[key]))
                 if (IsObjectGrabbable(key))
                 {
                     // add to grabbable rb dicts
@@ -454,8 +453,8 @@ namespace Leap.Unity.Interaction.PhysicsHands
         {
             _objectDistance = float.MaxValue;
 
-            float tempDist;
-            Vector3 colliderPos, bonePos, tempMid, direction;
+            float distance;
+            Vector3 colliderPos, bonePos, midPoint, direction;
             foreach (var hoverPairs in _hoverObjects)
             {
                 foreach (var hoveredCollider in hoverPairs.Value)
@@ -463,13 +462,13 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     colliderPos = hoveredCollider.ClosestPoint(_collider.transform.position);
                     bonePos = _collider.ClosestPoint(hoveredCollider.transform.position);
 
-                    tempMid = colliderPos + (bonePos - colliderPos) / 2f;
+                    midPoint = colliderPos + (bonePos - colliderPos) / 2f;
 
-                    colliderPos = hoveredCollider.ClosestPoint(tempMid);
-                    bonePos = _collider.ClosestPoint(tempMid);
+                    colliderPos = hoveredCollider.ClosestPoint(midPoint);
+                    bonePos = _collider.ClosestPoint(midPoint);
 
 
-                    tempDist = Vector3.Distance(colliderPos, bonePos);
+                    distance = Vector3.Distance(colliderPos, bonePos);
                     direction = (colliderPos - bonePos).normalized;
 
                     if (_hoverDirections[hoverPairs.Key].ContainsKey(hoveredCollider))
@@ -482,7 +481,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                     {
                         _hoverDirections[hoverPairs.Key].Add(
                             hoveredCollider,
-                            new ClosestHoverDirection()
+                            new ClosestObjectDirection()
                             {
                                 bonePos = bonePos,
                                 colliderPos = colliderPos,
@@ -491,9 +490,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
                         );
                     }
 
-                    if (tempDist < _objectDistance)
+                    if (distance < _objectDistance)
                     {
-                        _objectDistance = tempDist;
+                        _objectDistance = distance;
                         _debugDistanceA = colliderPos;
                         _debugDistanceB = bonePos;
                     }
