@@ -24,16 +24,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - This is tailored to handle specific Rigidbodies and will only fire when your subscribed Rigidbody is affected
 - (Physics Hands) Hand and bone states have been improved and are more consistent with expectations
 - (Physics Hands) Updated example scene with new events and better visuals
+- (Physics Hands) Updated PhysicsBone IsObjectGrabbable calculations to use the closest point on the bone to the hovered object
+- (Physics Hands) Improved Physics Hands grasp helpers to take into account grabs where bones are facing each other
 - (Locomotion) Expose teleport anchor list & last teleported anchor
 - (Locomotion) Moved Jump Gems further away from the arm, to account for sleeves
 - (Locomotion) Added functionality to update the initial position and rotations of the TP anchor after the first Awake
 
 ### Fixed
 - (Physics Hands) Hand forces are reduced when pushing into objects with fingers
+- (Physics Hands) Stopped physics buttons from rotating incorrectly
 - (Locomotion) Jump Gems look for audio sources in their children, even if the audio source was set
 - (Locomotion) If pinched gem was null, jump gem teleport could still be in a selected state
 - (Locomotion) Teleport ray did not change to an invalid colour when no colliders were hit
 - (Core) Fixed hands juddering in XR when interpolation is turned off on the LeapXRServiceProvider. Turning off interpolation now turns off head pose interpolation
+- (PoseViewer) Pose viewer rotation does not match the targets rotation
 
 ### Known issues 
 - Use of the LeapCSharp Config class is unavailable with v5.X tracking service
