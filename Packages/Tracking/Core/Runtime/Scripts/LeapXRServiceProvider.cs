@@ -614,7 +614,8 @@ namespace Leap.Unity
                     {
                         if (_currentDevice.DevicePose != Pose.identity)
                         {
-                            warpedPosition += warpedRotation * _currentDevice.DevicePose.position;
+                            warpedPosition += warpedRotation * Vector3.up * _currentDevice.DevicePose.position.y
+                                            + warpedRotation * Vector3.forward * _currentDevice.DevicePose.position.z;
                             warpedRotation *= _currentDevice.DevicePose.rotation;
                         }
                         else // Fall back to the consts if we are given a Pose.identity as it is assumed to be false
@@ -622,6 +623,7 @@ namespace Leap.Unity
                             warpedPosition += warpedRotation * Vector3.up * deviceOffsetYAxis
                                             + warpedRotation * Vector3.forward * deviceOffsetZAxis;
                             warpedRotation *= Quaternion.Euler(deviceTiltXAxis, 0f, 0f);
+                            warpedRotation *= Quaternion.Euler(-90f, 180f, 0f);
                         }
                     }
                     break;
@@ -629,12 +631,12 @@ namespace Leap.Unity
                     warpedPosition += warpedRotation * Vector3.up * deviceOffsetYAxis
                                     + warpedRotation * Vector3.forward * deviceOffsetZAxis;
                     warpedRotation *= Quaternion.Euler(deviceTiltXAxis, 0f, 0f);
+                    warpedRotation *= Quaternion.Euler(-90f, 180f, 0f);
+                    break;
+                case DeviceOffsetMode.Transform:
+                    warpedRotation *= Quaternion.Euler(-90f, 90f, 90f);
                     break;
             }
-
-            // Convert to unity co-ordinate space from leap co-ordinate space
-            // (apart from Z mirroring which happened in CopyFromLeapCExtensions.TransformToUnityUnits)
-            warpedRotation *= Quaternion.Euler(-90f, 180f, 0f);
 
             // Use the mainCamera parent to transfrom the warped positions so the player can move around
             if (mainCamera.transform.parent != null && _positionDeviceRelativeToMainCamera)

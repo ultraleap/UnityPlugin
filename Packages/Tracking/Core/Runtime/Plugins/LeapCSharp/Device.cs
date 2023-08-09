@@ -280,33 +280,32 @@ namespace Leap
                                             data[2], data[6], data[10], data[14],
                                             data[3], data[7], data[11], data[15]);
 
-                if(deviceTransform == System.Numerics.Matrix4x4.Identity)
+                if (deviceTransform == System.Numerics.Matrix4x4.Identity)
                 {
                     devicePose = Pose.identity;
                     poseSet = true;
                     return Pose.identity;
                 }
 
-                //// Manual entry for testing
+                // Manual entry for testing
                 //var deviceTransform = new System.Numerics.Matrix4x4(
                 //                            -0.001f, 0, 0, 0,
                 //                            0, 0, -0.001f, 0,
                 //                            0, -0.001f, 0, -0.08f,
                 //                            0, 0, 0, 1);
 
-                // Reverts to Leap - but keeps M units to avoid re-converting later.
-                var openXRToLeap = new System.Numerics.Matrix4x4(
-                                            -1, 0, 0, 0,
-                                            0, 0, -1, 0f,
-                                            0, -1, 0, 0f,
+                System.Numerics.Matrix4x4 openXrToUnity = new System.Numerics.Matrix4x4(
+                                            1, 0, 0, 0,
+                                            0, 1, 0, 0,
+                                            0, 0, -1, 0,
                                             0, 0, 0, 1);
 
-                deviceTransform = openXRToLeap * deviceTransform;
+                deviceTransform = openXrToUnity * deviceTransform;
 
                 // Get the suitable values for translation and rotation from the matrix
-                Vector3 outputPosition = new Vector3(deviceTransform.M14, deviceTransform.M24, -deviceTransform.M34); // Use negative Z to reflect CopyFromLeapCExtensions.TransformToUnityUnits
+                Vector3 outputPosition = new Vector3(deviceTransform.M14, deviceTransform.M24, deviceTransform.M34);
                 System.Numerics.Quaternion numericsRotation = System.Numerics.Quaternion.CreateFromRotationMatrix(deviceTransform);
-                Quaternion outputRotation = new Quaternion(numericsRotation.X, numericsRotation.Y, numericsRotation.Z, numericsRotation.W).normalized;
+                Quaternion outputRotation = new Quaternion(numericsRotation.X, numericsRotation.Y, numericsRotation.Z, numericsRotation.W);
 
                 devicePose = new Pose(outputPosition, outputRotation);
                 poseSet = true;
