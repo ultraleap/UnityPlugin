@@ -251,8 +251,6 @@ namespace Leap
         private bool poseSet = false;
         private Pose devicePose = Pose.identity;
 
-        public Matrix4x4 resultMatrix;
-
         /// <summary>
         /// The transform to world coordinates from 3D Leap coordinates.
         /// </summary>
