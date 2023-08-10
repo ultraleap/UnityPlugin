@@ -251,6 +251,8 @@ namespace Leap
         private bool poseSet = false;
         private Pose devicePose = Pose.identity;
 
+        public Matrix4x4 resultMatrix;
+
         /// <summary>
         /// The transform to world coordinates from 3D Leap coordinates.
         /// </summary>
@@ -274,42 +276,43 @@ namespace Leap
                 }
 
                 // Using the LEAP->OPENXR device transform matrix
-                var deviceTransform = new System.Numerics.Matrix4x4(
-                                            data[0], data[4], data[8], data[12],
-                                            data[1], data[5], data[9], data[13],
-                                            data[2], data[6], data[10], data[14],
-                                            data[3], data[7], data[11], data[15]);
+                // Unitys matrices are generated as 4 columns:
+                Matrix4x4 deviceTransform = new Matrix4x4(
+                                                    new Vector4(data[0], data[4], data[8], data[12]),
+                                                    new Vector4(data[1], data[5], data[9], data[13]),
+                                                    new Vector4(data[2], data[6], data[10], data[14]),
+                                                    new Vector4(data[3], data[7], data[11], data[15]));
 
-                if (deviceTransform == System.Numerics.Matrix4x4.Identity)
+
+                // An example of the expected matrix if it were 8cm forward from the head origin
+                // Unitys matrices are generated as 4 columns:
+                //Matrix4x4 deviceTransform = new Matrix4x4(
+                //                                    new Vector4(-0.001f, 0, 0, 0),
+                //                                    new Vector4(0, 0, -0.001f, 0),
+                //                                    new Vector4(0, -0.001f, 0, 0),
+                //                                    new Vector4(0, 0, -0.08f, 1));
+
+                if (deviceTransform == Matrix4x4.identity)
                 {
                     devicePose = Pose.identity;
                     poseSet = true;
                     return Pose.identity;
                 }
 
-                // Manual entry for testing
-                //var deviceTransform = new System.Numerics.Matrix4x4(
-                //                            -0.001f, 0, 0, 0,
-                //                            0, 0, -0.001f, 0,
-                //                            0, -0.001f, 0, -0.08f,
-                //                            0, 0, 0, 1);
+                Matrix4x4 openXRToUnity = new Matrix4x4(
+                                                    new Vector4(1f, 0, 0, 0),
+                                                    new Vector4(0, 1f, 0, 0),
+                                                    new Vector4(0, 0, -1f, 0),
+                                                    new Vector4(0, 0, 0, 1));
 
-                System.Numerics.Matrix4x4 openXrToUnity = new System.Numerics.Matrix4x4(
-                                            1, 0, 0, 0,
-                                            0, 1, 0, 0,
-                                            0, 0, -1, 0,
-                                            0, 0, 0, 1);
+                deviceTransform = openXRToUnity * deviceTransform;
 
-                deviceTransform = openXrToUnity * deviceTransform;
+                Vector3 outputPos = deviceTransform.GetPosition();
+                //Quaternion outputRot = deviceTransform.rotation; // Note: the matrices we receive are not rotatrion matrices. This produces unexpected results
 
-                // Get the suitable values for translation and rotation from the matrix
-                Vector3 outputPosition = new Vector3(deviceTransform.M14, deviceTransform.M24, deviceTransform.M34);
-                System.Numerics.Quaternion numericsRotation = System.Numerics.Quaternion.CreateFromRotationMatrix(deviceTransform);
-                Quaternion outputRotation = new Quaternion(numericsRotation.X, numericsRotation.Y, numericsRotation.Z, numericsRotation.W);
+                devicePose = new Pose(outputPos, Quaternion.identity);
 
-                devicePose = new Pose(outputPosition, outputRotation);
                 poseSet = true;
-                // Return a valid pose.
                 return devicePose;
             }
         }
