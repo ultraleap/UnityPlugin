@@ -614,10 +614,7 @@ namespace Leap.Unity
                     {
                         if (_currentDevice.DevicePose != Pose.identity)
                         {
-                            warpedPosition += warpedRotation * Vector3.right * _currentDevice.DevicePose.position.x
-                                            + warpedRotation * Vector3.up * _currentDevice.DevicePose.position.y
-                                            + warpedRotation * Vector3.forward * _currentDevice.DevicePose.position.z;
-
+                            warpedPosition += warpedRotation * _currentDevice.DevicePose.position;
                             //warpedRotation *= _currentDevice.DevicePose.rotation; // This causes unexpected results, fall back to the below for leap -> openxr rotation
                             warpedRotation *= Quaternion.Euler(-90f, 180f, 0f);
                         }
