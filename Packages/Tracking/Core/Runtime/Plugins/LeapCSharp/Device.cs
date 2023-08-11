@@ -276,10 +276,10 @@ namespace Leap
                 // Using the LEAP->OPENXR device transform matrix
                 // Unitys matrices are generated as 4 columns:
                 Matrix4x4 deviceTransform = new Matrix4x4(
-                                                    new Vector4(data[0], data[4], data[8], data[12]),
-                                                    new Vector4(data[1], data[5], data[9], data[13]),
-                                                    new Vector4(data[2], data[6], data[10], data[14]),
-                                                    new Vector4(data[3], data[7], data[11], data[15]));
+                                                    new Vector4(data[0], data[1], data[2], data[3]),
+                                                    new Vector4(data[4], data[5], data[6], data[7]),
+                                                    new Vector4(data[8], data[9], data[10], data[11]),
+                                                    new Vector4(data[12], data[13], data[14], data[15]));
 
 
                 // An example of the expected matrix if it were 8cm forward from the head origin
