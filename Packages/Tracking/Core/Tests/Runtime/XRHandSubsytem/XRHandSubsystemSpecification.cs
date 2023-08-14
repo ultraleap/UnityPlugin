@@ -1,9 +1,9 @@
 using Leap.Unity;
 using NUnit.Framework;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -26,6 +26,37 @@ namespace Leap.Testing
         const string SCENE_NAME = "HandVisualizer";
 
         private static TestLeapProvider _testLeapProvider;
+
+        private Dictionary<XRHandJointID, Tuple<Finger.FingerType, Bone.BoneType>> jointDict = new Dictionary<XRHandJointID, Tuple<Finger.FingerType, Bone.BoneType>>() {
+            { XRHandJointID.ThumbTip, new Tuple<Finger.FingerType, Bone.BoneType>(Finger.FingerType.TYPE_THUMB, Bone.BoneType.TYPE_DISTAL) },
+            { XRHandJointID.ThumbDistal, new Tuple<Finger.FingerType, Bone.BoneType>(Finger.FingerType.TYPE_THUMB, Bone.BoneType.TYPE_DISTAL) },
+            { XRHandJointID.ThumbProximal, new Tuple<Finger.FingerType, Bone.BoneType>(Finger.FingerType.TYPE_THUMB, Bone.BoneType.TYPE_PROXIMAL) },
+            { XRHandJointID.ThumbMetacarpal, new Tuple<Finger.FingerType, Bone.BoneType>(Finger.FingerType.TYPE_THUMB, Bone.BoneType.TYPE_INTERMEDIATE) },
+
+            { XRHandJointID.IndexTip, new Tuple<Finger.FingerType, Bone.BoneType>(Finger.FingerType.TYPE_INDEX, Bone.BoneType.TYPE_DISTAL) },
+            { XRHandJointID.IndexDistal, new Tuple<Finger.FingerType, Bone.BoneType>(Finger.FingerType.TYPE_INDEX, Bone.BoneType.TYPE_DISTAL) },
+            { XRHandJointID.IndexIntermediate, new Tuple<Finger.FingerType, Bone.BoneType>(Finger.FingerType.TYPE_INDEX, Bone.BoneType.TYPE_INTERMEDIATE) },
+            { XRHandJointID.IndexProximal, new Tuple<Finger.FingerType, Bone.BoneType>(Finger.FingerType.TYPE_INDEX, Bone.BoneType.TYPE_PROXIMAL) },
+            { XRHandJointID.IndexMetacarpal, new Tuple<Finger.FingerType, Bone.BoneType>(Finger.FingerType.TYPE_INDEX, Bone.BoneType.TYPE_METACARPAL) },
+
+            { XRHandJointID.MiddleTip, new Tuple<Finger.FingerType, Bone.BoneType>(Finger.FingerType.TYPE_MIDDLE, Bone.BoneType.TYPE_DISTAL) },
+            { XRHandJointID.MiddleDistal, new Tuple<Finger.FingerType, Bone.BoneType>(Finger.FingerType.TYPE_MIDDLE, Bone.BoneType.TYPE_DISTAL) },
+            { XRHandJointID.MiddleIntermediate, new Tuple<Finger.FingerType, Bone.BoneType>(Finger.FingerType.TYPE_MIDDLE, Bone.BoneType.TYPE_INTERMEDIATE) },
+            { XRHandJointID.MiddleProximal, new Tuple<Finger.FingerType, Bone.BoneType>(Finger.FingerType.TYPE_MIDDLE, Bone.BoneType.TYPE_PROXIMAL) },
+            { XRHandJointID.MiddleMetacarpal, new Tuple<Finger.FingerType, Bone.BoneType>(Finger.FingerType.TYPE_MIDDLE, Bone.BoneType.TYPE_METACARPAL) },
+
+            { XRHandJointID.RingTip, new Tuple<Finger.FingerType, Bone.BoneType>(Finger.FingerType.TYPE_RING, Bone.BoneType.TYPE_DISTAL) },
+            { XRHandJointID.RingDistal, new Tuple<Finger.FingerType, Bone.BoneType>(Finger.FingerType.TYPE_RING, Bone.BoneType.TYPE_DISTAL) },
+            { XRHandJointID.RingIntermediate, new Tuple<Finger.FingerType, Bone.BoneType>(Finger.FingerType.TYPE_RING, Bone.BoneType.TYPE_INTERMEDIATE) },
+            { XRHandJointID.RingProximal, new Tuple<Finger.FingerType, Bone.BoneType>(Finger.FingerType.TYPE_RING, Bone.BoneType.TYPE_PROXIMAL) },
+            { XRHandJointID.RingMetacarpal, new Tuple<Finger.FingerType, Bone.BoneType>(Finger.FingerType.TYPE_RING, Bone.BoneType.TYPE_METACARPAL) },
+
+            { XRHandJointID.LittleTip, new Tuple<Finger.FingerType, Bone.BoneType>(Finger.FingerType.TYPE_PINKY, Bone.BoneType.TYPE_DISTAL) },
+            { XRHandJointID.LittleDistal, new Tuple<Finger.FingerType, Bone.BoneType>(Finger.FingerType.TYPE_PINKY, Bone.BoneType.TYPE_DISTAL) },
+            { XRHandJointID.LittleIntermediate, new Tuple<Finger.FingerType, Bone.BoneType>(Finger.FingerType.TYPE_PINKY, Bone.BoneType.TYPE_INTERMEDIATE) },
+            { XRHandJointID.LittleProximal, new Tuple<Finger.FingerType, Bone.BoneType>(Finger.FingerType.TYPE_PINKY, Bone.BoneType.TYPE_PROXIMAL) },
+            { XRHandJointID.LittleMetacarpal, new Tuple<Finger.FingerType, Bone.BoneType>(Finger.FingerType.TYPE_PINKY, Bone.BoneType.TYPE_METACARPAL) },
+        };
 
         [UnityTest]
         public IEnumerator XRHandSubsystemSpecificationWithEnumeratorPasses()
@@ -56,6 +87,63 @@ namespace Leap.Testing
 
             Vector3 xrHandleftIndexTip = GameObject.Find("L_IndexTip").transform.position;
             Assert.AreEqual(leapleapLeftHandIndexTip, xrHandLeftIndexTipPoseTransformed.position);
+
+            //Iterate over the hands and joints
+            /*foreach (Chirality chirality in Enum.GetValues(typeof(Chirality)))
+            {
+                Hand leapHand = TestLeapProvider.CurrentFrame.GetHand(chirality);
+                XRHand xrHand = (chirality == Chirality.Left) ? GetXRHandSubsystem().leftHand : GetXRHandSubsystem().rightHand;
+
+                foreach (XRHandJointID xrHandJointID in jointDict.Keys)
+                {
+                    Finger.FingerType leapFingerType = jointDict[xrHandJointID].Item1;
+                    Bone.BoneType leapBoneType = jointDict[xrHandJointID].Item2;
+
+                    List<XRHandJointID> thumbJoints = new List<XRHandJointID>(){
+                        XRHandJointID.ThumbTip,
+                        XRHandJointID.ThumbDistal,
+                        XRHandJointID.ThumbProximal,
+                        XRHandJointID.ThumbMetacarpal
+                    };
+
+                    List<XRHandJointID> metacarpalJoints = new List<XRHandJointID>(){
+                        XRHandJointID.IndexMetacarpal,
+                        XRHandJointID.MiddleMetacarpal,
+                        XRHandJointID.RingMetacarpal,
+                        XRHandJointID.LittleMetacarpal
+                    };
+
+                    //Handle thumb separately
+                    if (thumbJoints.Contains(xrHandJointID))
+                    {
+                        //Check thumb joints
+                    }
+                    //Handle metacarpal joints separately
+                    else if (thumbJoints.Contains(xrHandJointID))
+                    {
+                        //Check metacarpal joints
+                        Vector3 leapHandJoint = leapHand.Fingers[(int)leapFingerType].Bone(leapBoneType).PrevJoint;
+                        Debug.Log(leapHandJoint.ToString());
+
+                        Pose xrHandPose = new Pose();
+                        xrHand.GetJoint(xrHandJointID).TryGetPose(out xrHandPose);
+                        Pose xrHandPoseTransformed = xrHandPose.GetTransformedBy(new Pose(Camera.main.transform.parent.position, Camera.main.transform.parent.transform.rotation));
+                        Debug.Log(xrHandPoseTransformed.position);
+                    }
+                    else
+                    {
+                        //Check other joints
+                        Vector3 leapHandJoint = leapHand.Fingers[(int)leapFingerType].Bone(leapBoneType).NextJoint;
+                        Debug.Log(leapHandJoint.ToString());
+
+                        Pose xrHandPose = new Pose();
+                        xrHand.GetJoint(xrHandJointID).TryGetPose(out xrHandPose);
+                        Pose xrHandPoseTransformed = xrHandPose.GetTransformedBy(new Pose(Camera.main.transform.parent.position, Camera.main.transform.parent.transform.rotation));
+                        Debug.Log(xrHandPoseTransformed.position);
+
+                    }
+                }
+            }*/
             yield return null;
         }
 
@@ -153,7 +241,7 @@ namespace Leap.Testing
             {
                 if (_testLeapProvider == null)
                 {
-                    _testLeapProvider = Object.FindObjectOfType<TestLeapProvider>();
+                    _testLeapProvider = UnityEngine.Object.FindObjectOfType<TestLeapProvider>();
                 }
 
                 return _testLeapProvider;
