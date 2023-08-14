@@ -47,21 +47,16 @@ namespace Leap.Testing
             leapXRHandProvider.TrackingProvider = TestLeapProvider;
             yield return new WaitForFixedUpdate();
 
-            for(int i = 0; i < 10; i++)
-            {
-                Hand leapLeftHand = TestLeapProvider.CurrentFrame.GetHand(Chirality.Left);
-                Debug.Log(leapLeftHand.Fingers[(int)Finger.FingerType.TYPE_INDEX].Bone(Bone.BoneType.TYPE_DISTAL).NextJoint.ToString());
+            Hand leapLeftHand = TestLeapProvider.CurrentFrame.GetHand(Chirality.Left);
+            Vector3 leapleapLeftHandIndexTip = leapLeftHand.Fingers[(int)Finger.FingerType.TYPE_INDEX].Bone(Bone.BoneType.TYPE_DISTAL).NextJoint;
 
-                Pose xrHandLeftIndexTipPose = new Pose();
-                GetXRHandSubsystem().leftHand.GetJoint(XRHandJointID.IndexTip).TryGetPose(out xrHandLeftIndexTipPose);
-                Pose xrHandLeftIndexTipPoseTransformed = xrHandLeftIndexTipPose.GetTransformedBy(new Pose(Camera.main.transform.parent.position, Camera.main.transform.parent.transform.rotation));
-                Debug.Log(xrHandLeftIndexTipPoseTransformed.position);
+            Pose xrHandLeftIndexTipPose = new Pose();
+            GetXRHandSubsystem().leftHand.GetJoint(XRHandJointID.IndexTip).TryGetPose(out xrHandLeftIndexTipPose);
+            Pose xrHandLeftIndexTipPoseTransformed = xrHandLeftIndexTipPose.GetTransformedBy(new Pose(Camera.main.transform.parent.position, Camera.main.transform.parent.transform.rotation));
 
-
-                Vector3 xrHandleftIndexTip = GameObject.Find("L_IndexTip").transform.position;
-                Debug.Log(xrHandleftIndexTip.ToString());
-                yield return new WaitForSeconds(0.01f);
-            }
+            Vector3 xrHandleftIndexTip = GameObject.Find("L_IndexTip").transform.position;
+            Assert.AreEqual(leapleapLeftHandIndexTip, xrHandLeftIndexTipPoseTransformed.position);
+            yield return null;
         }
 
         /// <summary>
