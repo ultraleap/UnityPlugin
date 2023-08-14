@@ -19,58 +19,49 @@ namespace Leap.Testing
 
         // Hand tracking test data
         const string FRAME_FILE_REPOSITORY = FRAME_ROOT_FOLDER + "Resources/ReferenceHandFrames/";
-        const string THUMBS_UP_FRAME_FILE_NAME = "rightThumbsUp.dat";
-        const string FIST_FRAME_FILE_NAME = "rightFist.dat";
-        const string HORNS_FRAME_FILE_NAME = "rightHorns.dat";
-        const string OK_FRAME_FILE_NAME = "rightOK.dat";
         const string OPEN_PALM_FRAME_FILE_NAME = "leftPalmUp.dat";
-        const string POINT_FRAME_FILE_NAME = "rightPoint.dat";
 
 
         const string ROOT_FOLDER = "Assets/Samples/XR Hands/1.2.1/HandVisualizer/";
         const string SCENE_NAME = "HandVisualizer";
 
+        private static TestLeapProvider _testLeapProvider;
+
         [UnityTest]
         public IEnumerator XRHandSubsystemSpecificationWithEnumeratorPasses()
         {
             SetupScene();
-            yield return new WaitForSeconds(10);
-
-            List<XRHandSubsystem> xrHandSubsystems = new List<XRHandSubsystem>();
-            SubsystemManager.GetSubsystems(xrHandSubsystems);
-            XRHandSubsystem leapXRHandSubsystem = new XRHandSubsystem();
-            foreach(XRHandSubsystem subsystem in xrHandSubsystems)
-            {
-                if("UL XR Hands".Equals(subsystem.subsystemDescriptor.id))
-                {
-                    leapXRHandSubsystem = subsystem;
-                }
-            }
-            LeapXRHandProvider leapXRHandProvider = (LeapXRHandProvider)leapXRHandSubsystem.GetProvider();
+            yield return new WaitForFixedUpdate();
+            LeapXRHandProvider leapXRHandProvider = (LeapXRHandProvider)GetXRHandSubsystem().GetProvider();
             
             GameObject testLeapProviderGO = new GameObject("Test Leap Provider");
-            TestLeapProvider testLeapProvider = testLeapProviderGO.AddComponent<TestLeapProvider>();
-            LeapXRServiceProvider  leapXRServiceProvider= GameObject.FindAnyObjectByType<LeapXRServiceProvider>();
+            testLeapProviderGO.AddComponent<TestLeapProvider>();
+
+            LeapXRServiceProvider  leapXRServiceProvider = GameObject.FindAnyObjectByType<LeapXRServiceProvider>();
             leapXRServiceProvider.mainCamera = Camera.main;
-            testLeapProvider.inputLeapProvider = leapXRServiceProvider;
-            testLeapProvider.FrameFileRepository = FRAME_FILE_REPOSITORY;
-            testLeapProvider.FrameFileName = OPEN_PALM_FRAME_FILE_NAME;
+
+            TestLeapProvider.inputLeapProvider = leapXRServiceProvider;
+            FrameDataSource = FRAME_FILE_REPOSITORY;
+            CurrentHandFrame = OPEN_PALM_FRAME_FILE_NAME;
             
-            leapXRHandProvider.TrackingProvider = testLeapProvider;
-            yield return new WaitForSeconds(2);
+            leapXRHandProvider.TrackingProvider = TestLeapProvider;
+            yield return new WaitForFixedUpdate();
 
-            Hand leapLeftHand = testLeapProvider.CurrentFrame.GetHand(Chirality.Left);
-            Debug.Log(leapLeftHand.Fingers[(int)Finger.FingerType.TYPE_INDEX].Bone(Bone.BoneType.TYPE_DISTAL).NextJoint.ToString());
+            for(int i = 0; i < 10; i++)
+            {
+                Hand leapLeftHand = TestLeapProvider.CurrentFrame.GetHand(Chirality.Left);
+                Debug.Log(leapLeftHand.Fingers[(int)Finger.FingerType.TYPE_INDEX].Bone(Bone.BoneType.TYPE_DISTAL).NextJoint.ToString());
 
-            Pose xrHandLeftIndexTipPose = new Pose();
-            leapXRHandSubsystem.leftHand.GetJoint(XRHandJointID.IndexTip).TryGetPose(out xrHandLeftIndexTipPose);
-            Pose xrHandLeftIndexTipPoseTransformed = xrHandLeftIndexTipPose.GetTransformedBy(new Pose(Camera.main.transform.parent.position, Camera.main.transform.parent.transform.rotation));
-            Debug.Log(xrHandLeftIndexTipPoseTransformed.position);
+                Pose xrHandLeftIndexTipPose = new Pose();
+                GetXRHandSubsystem().leftHand.GetJoint(XRHandJointID.IndexTip).TryGetPose(out xrHandLeftIndexTipPose);
+                Pose xrHandLeftIndexTipPoseTransformed = xrHandLeftIndexTipPose.GetTransformedBy(new Pose(Camera.main.transform.parent.position, Camera.main.transform.parent.transform.rotation));
+                Debug.Log(xrHandLeftIndexTipPoseTransformed.position);
 
 
-            Vector3 xrHandleftIndexTip = GameObject.Find("L_IndexTip").transform.position;
-            Debug.Log(xrHandleftIndexTip.ToString());
-            yield return new WaitForSeconds(10);
+                Vector3 xrHandleftIndexTip = GameObject.Find("L_IndexTip").transform.position;
+                Debug.Log(xrHandleftIndexTip.ToString());
+                yield return new WaitForSeconds(0.01f);
+            }
         }
 
         /// <summary>
@@ -102,6 +93,75 @@ namespace Leap.Testing
                         return;
                     }
                 }
+            }
+        }
+
+        public XRHandSubsystem GetXRHandSubsystem()
+        {
+            List<XRHandSubsystem> xrHandSubsystems = new List<XRHandSubsystem>();
+            SubsystemManager.GetSubsystems(xrHandSubsystems);
+            XRHandSubsystem leapXRHandSubsystem = new XRHandSubsystem();
+            foreach (XRHandSubsystem subsystem in xrHandSubsystems)
+            {
+                if ("UL XR Hands".Equals(subsystem.subsystemDescriptor.id))
+                {
+                    return subsystem;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Sets the  file name for the current tracking hand frame data. The FrameDataSource should be set to the folder that contains the file
+        /// </summary>
+        public static string CurrentHandFrame
+        {
+            set
+            {
+                if (FrameDataSource != null)
+                {
+                    TestLeapProvider.FrameFileName = value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Sets the location for the frame data
+        /// </summary>
+        public static string FrameDataSource
+        {
+            get
+            {
+                if (TestLeapProvider != null)
+                {
+                    return TestLeapProvider.FrameFileRepository;
+                }
+
+                return string.Empty;
+            }
+
+            set
+            {
+                if (TestLeapProvider != null)
+                {
+                    TestLeapProvider.FrameFileRepository = value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Returns the TestLeapProvider in the scene
+        /// </summary>
+        public static TestLeapProvider TestLeapProvider
+        {
+            get
+            {
+                if (_testLeapProvider == null)
+                {
+                    _testLeapProvider = Object.FindObjectOfType<TestLeapProvider>();
+                }
+
+                return _testLeapProvider;
             }
         }
     }
