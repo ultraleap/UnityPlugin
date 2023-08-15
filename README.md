@@ -49,8 +49,7 @@ To use this plugin you will need the following:
 
 1. The latest Ultraleap Hand Tracking Software. You can get this [here][developer-site-tracking-software].
 2. An Ultraleap Hand Tracking Camera - follow setup process [here][developer-site-setup-camera].
-3. Unity 2020.3 LTS or newer. UnityPlugin packages have been tested to work against 2020.3 LTS and 2021.3 LTS.
-4. Windows® 10, 64-bit
+3. Unity 2021.3 LTS or newer. UnityPlugin packages have been tested to work against 2021.3 LTS and 2022.3 LTS.
 5. Follow one of the Installation workflows listed below.
 
 **Please note:**
@@ -287,8 +286,6 @@ Our Tracking Preview package gives you early access to additional functionality 
   - Enables the ability to easily retrofit Unity canvases for support of direct and/or indirect hand interaction.
 - XR Controller Support
   - Allows XR controller input to drive our hand data, and unlocks the ability to seamlessly swap between controller data and real hands.
-- XR Interaction Toolkit Integration
-  - Provides support for Ultraleap hand data in Unity's XR Interaction Toolkit.
 - Physics Hands
   - Physically simulated hand interactions. A new way to interact with objects, without having the hand pass through colliders.
 - Hand Aggregation

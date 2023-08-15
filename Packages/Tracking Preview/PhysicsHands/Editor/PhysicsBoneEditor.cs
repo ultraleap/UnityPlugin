@@ -22,10 +22,10 @@ namespace Leap.Unity.Interaction.PhysicsHands
             EditorGUILayout.PropertyField(serializedObject.FindProperty("m_Script"), true, new GUILayoutOption[0]);
 
             GUI.enabled = true;
-            EditorGUILayout.LabelField("Bone States",EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("Bone States", EditorStyles.boldLabel);
             GUI.enabled = false;
             EditorGUILayout.PropertyField(_isBoneHovering);
-            EditorGUILayout.PropertyField (_isBoneContacting);
+            EditorGUILayout.PropertyField(_isBoneContacting);
             EditorGUILayout.PropertyField(_isBoneGrabbable);
             EditorGUILayout.PropertyField(_isBoneGrabbing);
 
