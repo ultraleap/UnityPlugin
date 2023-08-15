@@ -10,8 +10,10 @@ This approach relies heavily on the physics simulation and will work with any ri
   - It also makes use of the newer physics solver within Unity.
 
 ## Setup
+_Note that the Readme within the example scene will provide a more involved setup process._
 - Setup your scene with hands as you normally would.
 - Place the PhysicsProvider in your scene.
+- Accept or account for the warnings present on the PhysicsProvider.
 - Re-assign the other hands within your scene to have the PhysicsProvider as their Leap Provider.
 - Change your physics settings to the following:
   - Solver Type: Temporal Gauss Seidel

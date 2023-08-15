@@ -24,7 +24,7 @@ namespace Leap.Unity.Preview.HandRays
 
         protected override Vector3 CalculateAimPosition()
         {
-            return aimPositionFilter.Filter(handRayDirection.Hand.PalmPosition, Time.time);
+            return aimPositionFilter.Filter(handRayDirection.Hand.PalmPosition);
         }
 
         protected override Vector3 GetWristOffsetPosition(Hand hand)
