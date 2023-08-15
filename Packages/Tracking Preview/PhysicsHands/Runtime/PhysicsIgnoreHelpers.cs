@@ -24,9 +24,9 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         public bool IsThisBoneIgnored(PhysicsBone bone)
         {
-            if(bone == null)
+            if (bone == null)
                 return false;
-            if(DisableAllHandCollisions)
+            if (DisableAllHandCollisions)
                 return true;
             if (DisableSpecificHandCollisions && DisabledHandedness == bone.Hand.Handedness)
                 return true;
@@ -35,11 +35,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         public bool IsThisHandIgnored(PhysicsHand hand)
         {
-            if(hand == null)
+            if (hand == null)
                 return false;
             if (DisableAllHandCollisions)
                 return true;
-            if(DisableSpecificHandCollisions && DisabledHandedness == hand.Handedness)
+            if (DisableSpecificHandCollisions && DisabledHandedness == hand.Handedness)
                 return true;
             return false;
         }
@@ -56,7 +56,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         {
             if (collision.gameObject != null && collision.gameObject.TryGetComponent<PhysicsBone>(out var temp))
             {
-                if(!IsThisBoneIgnored(temp))
+                if (!IsThisBoneIgnored(temp))
                 {
                     return;
                 }
