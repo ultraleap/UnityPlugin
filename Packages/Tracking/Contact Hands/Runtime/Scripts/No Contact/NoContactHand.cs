@@ -6,6 +6,22 @@ namespace Leap.Unity.ContactHands
 {
     public class NoContactHand : ContactHand
     {
+        protected override void ProcessOutputHand()
+        {
+            // Don't need to modify the hand
+        }
+
+        internal override void BeginHand(Hand hand)
+        {
+            modifiedHand.CopyFrom(hand);
+            tracked = true;
+        }
+
+        internal override void FinishHand()
+        {
+            tracked = false;
+        }
+
         internal override void GenerateHand()
         {
             GenerateHandObjects(typeof(NoContactBone));
@@ -17,7 +33,8 @@ namespace Leap.Unity.ContactHands
 
         internal override void UpdateHand(Hand hand)
         {
-            bones[bones.Length - 1].UpdatePalmBone(hand);
+            modifiedHand.CopyFrom(hand);
+            palmBone.UpdatePalmBone(hand);
             ContactBone tempBone;
             for (int i = 0; i < bones.Length - 1; i++)
             {

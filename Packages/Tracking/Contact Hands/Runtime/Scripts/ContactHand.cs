@@ -9,19 +9,57 @@ namespace Leap.Unity.ContactHands
         public const int FINGERS = 5, FINGER_BONES = 3;
 
         public ContactBone[] bones;
+        public ContactBone palmBone;
 
         public Chirality handedness = Chirality.Left;
 
+        internal Hand modifiedHand = new Hand();
+        internal bool tracked = false;
+
         private void Awake()
         {
-            // Plus one for palm
-            bones = new ContactBone[(FINGERS * FINGER_BONES) + 1];
+            bones = new ContactBone[(FINGERS * FINGER_BONES)];
         }
 
+        /// <summary>
+        /// Called on initial awake of the ContactParent. Should generate the structure of your hand.
+        /// </summary>
         internal abstract void GenerateHand();
 
+        /// <summary>
+        /// When the original data hand starts being tracked. You can keep calling this instead of update by manually changing tracked to true later on.
+        /// </summary>
+        /// <param name="hand">The original data hand coming from the input frame</param>
+        internal abstract void BeginHand(Hand hand);
+
+        /// <summary>
+        /// Every other frame that the hand needs to update when the hand reports tracked as true.
+        /// </summary>
+        /// <param name="hand">The original data hand coming from the input frame</param>
         internal abstract void UpdateHand(Hand hand);
 
+        /// <summary>
+        /// When the original data hand has lost tracking.
+        /// </summary>
+        internal abstract void FinishHand();
+
+        protected abstract void ProcessOutputHand();
+
+        internal Hand OutputHand()
+        {
+            if (tracked)
+            {
+                return modifiedHand;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Any logic that needs to occur after the physics simulation has run, but before update.
+        /// </summary>
         internal abstract void PostFixedUpdateHand();
 
         /// <summary>
@@ -30,16 +68,15 @@ namespace Leap.Unity.ContactHands
         /// <param name="boneType"></param>
         internal void GenerateHandObjects(System.Type boneType)
         {
-            if(boneType.BaseType != typeof(ContactBone))
+            if (boneType.BaseType != typeof(ContactBone))
             {
                 Debug.LogError("Bone type must extend from ContactBone. Hand has not been generated.", this);
                 return;
             }
 
             Leap.Hand leapHand = TestHandFactory.MakeTestHand(isLeft: handedness == Chirality.Left ? true : false, pose: TestHandFactory.TestHandPose.HeadMountedB);
-            bones[bones.Length - 1] = new GameObject($"{(handedness == Chirality.Left ? "Left" : "Right")} Palm", boneType).GetComponent<ContactBone>();
+            palmBone = new GameObject($"{(handedness == Chirality.Left ? "Left" : "Right")} Palm", boneType).GetComponent<ContactBone>();
 
-            ContactBone palmBone = bones[bones.Length - 1];
             palmBone.transform.SetParent(transform);
             palmBone.transform.position = leapHand.PalmPosition;
             palmBone.transform.rotation = leapHand.Rotation;
@@ -53,7 +90,7 @@ namespace Leap.Unity.ContactHands
 
             for (int fingerIndex = 0; fingerIndex < FINGERS; fingerIndex++)
             {
-                lastTransform = bones[bones.Length - 1].transform;
+                lastTransform = palmBone.transform;
                 knuckleBone = leapHand.Fingers[fingerIndex].Bone((Bone.BoneType)(0));
 
                 for (int jointIndex = 0; jointIndex < FINGER_BONES; jointIndex++)
@@ -62,7 +99,7 @@ namespace Leap.Unity.ContactHands
 
                     boneArrayIndex = fingerIndex * FINGER_BONES + jointIndex;
 
-                    bones[boneArrayIndex] = new GameObject($"{ContactUtils.IndexToFinger(fingerIndex)} {ContactUtils.IndexToJoint(jointIndex)}",boneType).GetComponent<ContactBone>();
+                    bones[boneArrayIndex] = new GameObject($"{ContactUtils.IndexToFinger(fingerIndex)} {ContactUtils.IndexToJoint(jointIndex)}", boneType).GetComponent<ContactBone>();
                     bone = bones[boneArrayIndex];
                     bone.transform.SetParent(lastTransform);
 
@@ -91,6 +128,17 @@ namespace Leap.Unity.ContactHands
                     lastTransform = bone.transform;
                 }
             }
+        }
+
+        /// <summary>
+        /// Helper function to obtain a specific bone of the hand.
+        /// </summary>
+        /// <param name="fingerIndex">0-4 starting from the thumb</param>
+        /// <param name="jointIndex">0-2 starting from the proximal</param>
+        /// <returns></returns>
+        public ContactBone GetBone(int fingerIndex, int jointIndex)
+        {
+            return bones[fingerIndex * FINGER_BONES + jointIndex];
         }
     }
 }

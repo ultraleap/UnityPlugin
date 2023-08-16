@@ -4,9 +4,11 @@ using UnityEngine;
 
 namespace Leap.Unity.ContactHands
 {
-
-    public class ContactManager : PostProcessProvider
+    public class ContactManager : LeapProvider
     {
+
+        [SerializeField] private LeapProvider _inputProvider;
+
         public ContactParent contactHands;
 
         private WaitForFixedUpdate _postFixedUpdateWait = null;
@@ -14,13 +16,26 @@ namespace Leap.Unity.ContactHands
         internal Leap.Hand _leftDataHand = new Hand(), _rightDataHand = new Hand();
         internal int _leftHandIndex, _rightHandIndex;
 
+        private Frame _modifiedFrame = new Frame();
+
+        public override Frame CurrentFrame => _modifiedFrame;
+
+        public override Frame CurrentFixedFrame => _modifiedFrame;
+
         private void Awake()
         {
             contactHands = GetComponentInChildren<ContactParent>(true);
         }
 
-        public override void ProcessFrame(ref Frame inputFrame)
+        private void ProcessFrame(Frame inputFrame)
         {
+            if (!Application.isPlaying)
+            {
+                return;
+            }
+
+            _modifiedFrame.CopyFrom(inputFrame);
+
             _leftHandIndex = inputFrame.Hands.FindIndex(x => x.IsLeft);
             if (_leftHandIndex != -1)
             {
@@ -34,34 +49,62 @@ namespace Leap.Unity.ContactHands
             }
 
             contactHands?.UpdateFrame();
+
+            // Output the frame on update
+            if (!Time.inFixedTimeStep)
+            {
+                contactHands?.OutputFrame(ref _modifiedFrame);
+                DispatchUpdateFrameEvent(_modifiedFrame);
+            }
         }
 
-        protected override void OnEnable()
+        private void OnEnable()
         {
-            base.OnEnable();
+            if (_inputProvider != null)
+            {
+                _inputProvider.OnUpdateFrame -= ProcessFrame;
+                _inputProvider.OnUpdateFrame += ProcessFrame;
+                _inputProvider.OnFixedFrame -= ProcessFrame;
+                _inputProvider.OnFixedFrame += ProcessFrame;
 
-            StartCoroutine(PostFixedUpdate());
+                StartCoroutine(PostFixedUpdate());
+            }
+        }
+
+        private void OnDisable()
+        {
+            if (_inputProvider != null)
+            {
+                _inputProvider.OnUpdateFrame -= ProcessFrame;
+                _inputProvider.OnFixedFrame -= ProcessFrame;
+            }
         }
 
         private IEnumerator PostFixedUpdate()
         {
-            if(_postFixedUpdateWait == null)
+            if (_postFixedUpdateWait == null)
             {
                 _postFixedUpdateWait = new WaitForFixedUpdate();
             }
-            for(; ; )
+            // Need to wait one frame to prevent early execution
+            yield return null;
+            for (; ; )
             {
                 contactHands?.PostFixedUpdateFrame();
+                // Output the frame after physics update is complete
+                contactHands?.OutputFrame(ref _modifiedFrame);
+                DispatchFixedFrameEvent(_modifiedFrame);
                 yield return _postFixedUpdateWait;
             }
         }
 
-        protected override void OnValidate()
+        private void OnValidate()
         {
-            base.OnValidate();
-            dataUpdateMode = DataUpdateMode.UpdateAndFixedUpdate;
+            if (contactHands == null)
+            {
+                contactHands = GetComponentInChildren<ContactParent>(true);
+            }
         }
-
     }
 
 }

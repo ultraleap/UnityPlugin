@@ -19,15 +19,59 @@ namespace Leap.Unity.ContactHands
         internal abstract void GenerateHands();
 
         internal void UpdateFrame()
-        {            
-            if(contactManager._leftHandIndex != -1)
-            {
-                leftHand.UpdateHand(contactManager._leftDataHand);
-            }
+        {
+            UpdateHand(contactManager._leftHandIndex, leftHand, contactManager._leftDataHand);
+            UpdateHand(contactManager._rightHandIndex, rightHand, contactManager._rightDataHand);
+        }
 
-            if(contactManager._rightHandIndex != -1)
+        private void UpdateHand(int index, ContactHand hand, Hand dataHand)
+        {
+            if (index != -1)
             {
-                rightHand.UpdateHand(contactManager._rightDataHand);
+                if (!hand.tracked)
+                {
+                    hand.BeginHand(dataHand);
+                }
+                else
+                {
+                    hand.UpdateHand(dataHand);
+                }
+            }
+            else
+            {
+                if(hand.tracked)
+                {
+                    hand.FinishHand();
+                }
+            }
+        }
+
+        internal void OutputFrame(ref Frame inputFrame)
+        {
+            OutputHand(contactManager._leftHandIndex, leftHand, ref inputFrame);
+            contactManager._rightHandIndex = inputFrame.Hands.FindIndex(x => x.IsRight);
+            OutputHand(contactManager._rightHandIndex, rightHand, ref inputFrame);
+        }
+
+        private void OutputHand(int index, ContactHand hand, ref Frame inputFrame)
+        {
+            if(index == -1)
+            {
+                if (hand.tracked)
+                {
+                    inputFrame.Hands.Add(hand.OutputHand());
+                }
+            }
+            else
+            {
+                if (hand.tracked)
+                {
+                    inputFrame.Hands[index].CopyFrom(hand.OutputHand());
+                }
+                else
+                {
+                    inputFrame.Hands.RemoveAt(index);
+                }
             }
         }
 
@@ -41,6 +85,14 @@ namespace Leap.Unity.ContactHands
         internal void ProcessHandOverlaps()
         {
 
+        }
+
+        protected virtual void OnValidate()
+        {
+            if (contactManager == null)
+            {
+                contactManager = GetComponentInParent<ContactManager>();
+            }
         }
     }
 }
