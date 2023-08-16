@@ -13,8 +13,8 @@ namespace Leap.Unity.ContactHands
         public int Bone => joint;
         public bool IsPalm => isPalm;
 
-        internal float width, length;
-        internal Vector3 tipPosition;
+        internal float width = 0f, length = 0f, palmThickness = 0f;
+        internal Vector3 tipPosition = Vector3.zero;
         #endregion
 
         #region Physics Data

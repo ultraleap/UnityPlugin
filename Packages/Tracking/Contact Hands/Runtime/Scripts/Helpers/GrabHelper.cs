@@ -10,6 +10,8 @@ namespace Leap.Unity.ContactHands
         public LeapProvider dataProvider;
         public ContactManager contactManager;
 
+        private Collider[] _colliderCache = new Collider[10];
+
         private void OnEnable()
         {
             if (contactManager != null)
@@ -26,9 +28,40 @@ namespace Leap.Unity.ContactHands
             }
         }
 
-        private void OnFixedFrame(Frame obj)
+        private void OnFixedFrame(Frame frame)
         {
-            
+            UpdateHandHeuristics(dataProvider == null ? contactManager.InputProvider.CurrentFixedFrame : dataProvider.CurrentFixedFrame, frame);
+        }
+
+        private void UpdateHandHeuristics(Frame dataFrame, Frame modifiedFrame)
+        {
+
+        }
+        
+        private void UpdateHandOverlaps()
+        {
+
+        }
+
+        private void PalmOverlaps()
+        {
+
+        }
+
+        private void JointOverlaps()
+        {
+
+        }
+
+        // Unity 2022+
+        private void PalmOverlapJobs()
+        {
+
+        }
+
+        private void JointOverlapJobs()
+        {
+
         }
 
         private void OnValidate()

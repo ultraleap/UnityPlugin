@@ -11,6 +11,7 @@ namespace Leap.Unity.ContactHands
             transform.position = hand.PalmPosition;
             transform.rotation = hand.Rotation;
             width = hand.PalmWidth;
+            palmThickness = hand.Fingers[2].Bone(0).Width;
             length = Vector3.Distance(hand.CalculateAverageKnucklePosition(), hand.WristPosition);
         }
 
