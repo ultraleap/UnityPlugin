@@ -123,6 +123,7 @@ namespace Leap.Unity
 
         [HideInInspector]
         public bool SetIndividualSphereColors = false;
+
         public Color[] SphereColors
         {
             get
@@ -269,6 +270,7 @@ namespace Leap.Unity
         }
 
 #if UNITY_EDITOR
+
         private void OnValidate()
         {
             _meshMap.Clear();
