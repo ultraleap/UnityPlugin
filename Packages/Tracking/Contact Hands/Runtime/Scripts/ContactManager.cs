@@ -58,7 +58,7 @@ namespace Leap.Unity.ContactHands
         private WaitForFixedUpdate _postFixedUpdateWait = null;
 
         internal Leap.Hand _leftDataHand = new Hand(), _rightDataHand = new Hand();
-        internal int _leftHandIndex, _rightHandIndex;
+        internal int _leftHandIndex = -1, _rightHandIndex = -1;
 
         private Frame _modifiedFrame = new Frame();
 

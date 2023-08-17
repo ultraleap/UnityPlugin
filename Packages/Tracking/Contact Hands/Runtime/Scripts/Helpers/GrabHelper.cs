@@ -35,22 +35,59 @@ namespace Leap.Unity.ContactHands
 
         private void UpdateHandHeuristics(Frame dataFrame, Frame modifiedFrame)
         {
-
+            if (contactManager.contactHands.leftHand.tracked)
+            {
+                UpdateHandOverlaps(contactManager.contactHands.leftHand);
+            }
+            if (contactManager.contactHands.rightHand.tracked)
+            {
+                UpdateHandOverlaps(contactManager.contactHands.rightHand);
+            }
         }
         
-        private void UpdateHandOverlaps()
+        private void UpdateHandOverlaps(ContactHand hand)
         {
-
+            PalmOverlaps(hand.palmBone);
+            for (int i = 0; i < hand.bones.Length; i++)
+            {
+                JointOverlaps(hand.bones[i]);
+            }
         }
 
-        private void PalmOverlaps()
+        private void PalmOverlaps(ContactBone palmBone)
         {
+            int count = PhysExts.OverlapBoxNonAllocOffset(palmBone.palmCollider, Vector3.zero, _colliderCache, contactManager.InteractionMask, QueryTriggerInteraction.Ignore, extraRadius: contactManager.HoverDistance);
+            for (int i = 0; i < count; i++)
+            {
+                if (_colliderCache[i] != null && _colliderCache[i].attachedRigidbody != null)
+                    palmBone.QueueHoverCollider(_colliderCache[i]);
+            }
 
+            // Contact
+            count = PhysExts.OverlapBoxNonAllocOffset(palmBone.palmCollider, Vector3.zero, _colliderCache, contactManager.InteractionMask, QueryTriggerInteraction.Ignore, extraRadius: contactManager.ContactDistance);
+            for (int i = 0; i < count; i++)
+            {
+                if (_colliderCache[i] != null && _colliderCache[i].attachedRigidbody != null)
+                    palmBone.QueueContactCollider(_colliderCache[i]);
+            }
         }
 
-        private void JointOverlaps()
+        private void JointOverlaps(ContactBone bone)
         {
+            int count = PhysExts.OverlapCapsuleNonAllocOffset(bone.boneCollider, Vector3.zero, _colliderCache, contactManager.InteractionMask, QueryTriggerInteraction.Ignore, extraRadius: contactManager.HoverDistance);
+            for (int i = 0; i < count; i++)
+            {
+                if (_colliderCache[i] != null && _colliderCache[i].attachedRigidbody != null)
+                    bone.QueueHoverCollider(_colliderCache[i]);
+            }
 
+            // Contact
+            count = PhysExts.OverlapCapsuleNonAllocOffset(bone.boneCollider, Vector3.zero, _colliderCache, contactManager.InteractionMask, QueryTriggerInteraction.Ignore, extraRadius: contactManager.ContactDistance);
+            for (int i = 0; i < count; i++)
+            {
+                if (_colliderCache[i] != null && _colliderCache[i].attachedRigidbody != null)
+                    bone.QueueContactCollider(_colliderCache[i]);
+            }
         }
 
         // Unity 2022+

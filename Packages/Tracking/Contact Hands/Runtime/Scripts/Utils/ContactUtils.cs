@@ -14,6 +14,33 @@ namespace Leap.Unity.ContactHands
                 hand.Fingers[4].bones[0].NextJoint) / 4;
         }
 
+        public static Vector3 CalculatePalmSize(Hand hand)
+        {
+            return new Vector3(hand.PalmWidth, hand.Fingers[2].Bone(0).Width, Vector3.Distance(CalculateAverageKnucklePosition(hand), hand.WristPosition));
+        }
+
+        public static void SetupPalmCollider(BoxCollider collider, Hand hand, PhysicMaterial material = null)
+        {
+            collider.center = new Vector3(0f, 0f, -0.015f);
+            collider.size = CalculatePalmSize(hand);
+            if (material != null)
+            {
+                collider.material = material;
+            }
+        }
+
+        public static void SetupBoneCollider(CapsuleCollider collider, Bone bone, PhysicMaterial material = null)
+        {
+            collider.direction = 2;
+            collider.radius = bone.Width * 0.5f;
+            collider.height = bone.Length + bone.Width;
+            collider.center = new Vector3(0f, 0f, bone.Length / 2f);
+            if (material != null)
+            {
+                collider.material = material;
+            }
+        }
+
         #region Names
         public static string IndexToFinger(int fingerIndex)
         {

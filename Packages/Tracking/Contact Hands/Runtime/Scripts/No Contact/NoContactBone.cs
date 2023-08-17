@@ -12,7 +12,10 @@ namespace Leap.Unity.ContactHands
             transform.rotation = hand.Rotation;
             width = hand.PalmWidth;
             palmThickness = hand.Fingers[2].Bone(0).Width;
-            length = Vector3.Distance(hand.CalculateAverageKnucklePosition(), hand.WristPosition);
+            tipPosition = hand.CalculateAverageKnucklePosition();
+            wristPosition = hand.WristPosition;
+            length = Vector3.Distance(tipPosition, wristPosition);
+            ContactUtils.SetupPalmCollider(palmCollider, hand);
         }
 
         internal override void UpdateBone(Bone bone)
@@ -22,6 +25,7 @@ namespace Leap.Unity.ContactHands
             tipPosition = bone.NextJoint;
             width = bone.Width;
             length = bone.Length;
+            ContactUtils.SetupBoneCollider(boneCollider, bone);
         }
 
         internal override void PostFixedUpdateBone()

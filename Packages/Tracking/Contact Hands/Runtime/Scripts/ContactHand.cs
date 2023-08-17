@@ -16,6 +16,8 @@ namespace Leap.Unity.ContactHands
         internal Hand modifiedHand = new Hand();
         internal bool tracked = false;
 
+        internal ContactParent contactParent = null;
+
         private void Awake()
         {
             bones = new ContactBone[(FINGERS * FINGER_BONES)];
@@ -24,7 +26,12 @@ namespace Leap.Unity.ContactHands
         /// <summary>
         /// Called on initial awake of the ContactParent. Should generate the structure of your hand.
         /// </summary>
-        internal abstract void GenerateHand();
+        internal void GenerateHand()
+        {
+            contactParent = GetComponentInParent<ContactParent>();
+            GenerateHandLogic();
+        }
+        internal abstract void GenerateHandLogic();
 
         /// <summary>
         /// When the original data hand starts being tracked. You can keep calling this instead of update by manually changing tracked to true later on.
@@ -75,13 +82,16 @@ namespace Leap.Unity.ContactHands
             }
 
             Leap.Hand leapHand = TestHandFactory.MakeTestHand(isLeft: handedness == Chirality.Left ? true : false, pose: TestHandFactory.TestHandPose.HeadMountedB);
-            palmBone = new GameObject($"{(handedness == Chirality.Left ? "Left" : "Right")} Palm", boneType).GetComponent<ContactBone>();
+            palmBone = new GameObject($"{(handedness == Chirality.Left ? "Left" : "Right")} Palm", boneType, typeof(BoxCollider)).GetComponent<ContactBone>();
 
             palmBone.transform.SetParent(transform);
             palmBone.transform.position = leapHand.PalmPosition;
             palmBone.transform.rotation = leapHand.Rotation;
             palmBone.isPalm = true;
             palmBone.finger = 5;
+
+            palmBone.palmCollider = palmBone.GetComponent<BoxCollider>();
+            ContactUtils.SetupPalmCollider(palmBone.palmCollider, leapHand);
 
             Transform lastTransform;
             Bone knuckleBone, prevBone;
@@ -99,12 +109,15 @@ namespace Leap.Unity.ContactHands
 
                     boneArrayIndex = fingerIndex * FINGER_BONES + jointIndex;
 
-                    bones[boneArrayIndex] = new GameObject($"{ContactUtils.IndexToFinger(fingerIndex)} {ContactUtils.IndexToJoint(jointIndex)}", boneType).GetComponent<ContactBone>();
+                    bones[boneArrayIndex] = new GameObject($"{ContactUtils.IndexToFinger(fingerIndex)} {ContactUtils.IndexToJoint(jointIndex)}", boneType, typeof(CapsuleCollider)).GetComponent<ContactBone>();
                     bone = bones[boneArrayIndex];
                     bone.transform.SetParent(lastTransform);
 
                     bone.finger = fingerIndex;
                     bone.joint = jointIndex;
+
+                    bone.boneCollider = bone.GetComponent<CapsuleCollider>();
+                    ContactUtils.SetupBoneCollider(bone.boneCollider, leapHand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex + 1)));
 
                     if (jointIndex == 0)
                     {

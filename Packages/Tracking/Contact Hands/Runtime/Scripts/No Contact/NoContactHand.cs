@@ -22,9 +22,14 @@ namespace Leap.Unity.ContactHands
             tracked = false;
         }
 
-        internal override void GenerateHand()
+        internal override void GenerateHandLogic()
         {
             GenerateHandObjects(typeof(NoContactBone));
+            foreach(Transform t in transform)
+            {
+                // We don't want to be in contact with anything
+                t.gameObject.layer = contactParent.contactManager.HandsResetLayer;
+            }
         }
 
         internal override void PostFixedUpdateHand()
