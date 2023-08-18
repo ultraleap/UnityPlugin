@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -66,6 +67,11 @@ namespace Leap.Unity.ContactHands
 
         public override Frame CurrentFixedFrame => _modifiedFrame;
 
+        /// <summary>
+        /// Happens in the execution order just before any hands are changed or updated
+        /// </summary>
+        public Action OnPrePhysicsUpdate;
+
         private void Awake()
         {
             contactHands = GetComponentInChildren<ContactParent>(true);
@@ -99,6 +105,11 @@ namespace Leap.Unity.ContactHands
             if (!Application.isPlaying)
             {
                 return;
+            }
+
+            if (Time.inFixedTimeStep)
+            {
+                OnPrePhysicsUpdate?.Invoke();
             }
 
             _modifiedFrame.CopyFrom(inputFrame);

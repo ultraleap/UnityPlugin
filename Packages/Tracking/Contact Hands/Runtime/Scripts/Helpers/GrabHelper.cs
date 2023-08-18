@@ -12,10 +12,26 @@ namespace Leap.Unity.ContactHands
 
         private Collider[] _colliderCache = new Collider[10];
 
+        private bool _jobsCreated = false;
+        private PhysCastJob _safetyCastJob;
+
+        private void Start()
+        {
+            InitJobs();
+        }
+
+        private void OnDestroy()
+        {
+            DisposeJobs();
+        }
+
         private void OnEnable()
         {
             if (contactManager != null)
             {
+                contactManager.OnPrePhysicsUpdate -= OnPrePhysicsUpdate;
+                contactManager.OnPrePhysicsUpdate += OnPrePhysicsUpdate;
+                contactManager.OnFixedFrame -= OnFixedFrame;
                 contactManager.OnFixedFrame += OnFixedFrame;
             }
         }
@@ -28,6 +44,27 @@ namespace Leap.Unity.ContactHands
             }
         }
 
+        private void InitJobs()
+        {
+            // Two sets of jobs because of two hands, two repetitions because of inside hand and close to hand
+            _safetyCastJob = new PhysCastJob(2, ContactHand.FINGERS * ContactHand.FINGER_BONES * 2, 2, contactManager.InteractionMask.value);
+
+            _jobsCreated = true;
+        }
+
+        private void DisposeJobs()
+        {
+            if (_jobsCreated)
+            {
+                _safetyCastJob.Dispose();
+            }
+        }
+
+        private void OnPrePhysicsUpdate()
+        {
+            UpdateSafetyOverlaps();
+        }
+
         private void OnFixedFrame(Frame frame)
         {
             UpdateHandHeuristics(dataProvider == null ? contactManager.InputProvider.CurrentFixedFrame : dataProvider.CurrentFixedFrame, frame);
@@ -38,20 +75,27 @@ namespace Leap.Unity.ContactHands
             if (contactManager.contactHands.leftHand.tracked)
             {
                 UpdateHandOverlaps(contactManager.contactHands.leftHand);
+                UpdateBoneQueues(contactManager.contactHands.leftHand);
             }
             if (contactManager.contactHands.rightHand.tracked)
             {
                 UpdateHandOverlaps(contactManager.contactHands.rightHand);
+                UpdateBoneQueues(contactManager.contactHands.rightHand);
             }
         }
         
         private void UpdateHandOverlaps(ContactHand hand)
         {
+#if UNITY_2022_3_OR_NEWER
+
+#else
+            // Pre 2022 overlaps
             PalmOverlaps(hand.palmBone);
             for (int i = 0; i < hand.bones.Length; i++)
             {
                 JointOverlaps(hand.bones[i]);
             }
+#endif
         }
 
         private void PalmOverlaps(ContactBone palmBone)
@@ -90,6 +134,12 @@ namespace Leap.Unity.ContactHands
             }
         }
 
+        // Unity 2021+
+        private void UpdateSafetyOverlaps()
+        {
+            // run the safety cast job logic here
+        }
+
         // Unity 2022+
         private void PalmOverlapJobs()
         {
@@ -99,6 +149,15 @@ namespace Leap.Unity.ContactHands
         private void JointOverlapJobs()
         {
 
+        }
+
+        private void UpdateBoneQueues(ContactHand hand)
+        {
+            hand.palmBone.ProcessColliderQueue();
+            for (int i = 0; i < hand.bones.Length; i++)
+            {
+                hand.bones[i].ProcessColliderQueue();
+            }
         }
 
         private void OnValidate()

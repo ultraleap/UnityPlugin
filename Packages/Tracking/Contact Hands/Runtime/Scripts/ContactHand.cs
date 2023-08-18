@@ -18,6 +18,10 @@ namespace Leap.Unity.ContactHands
 
         internal ContactParent contactParent = null;
 
+        #region Interaction Data
+        internal bool isContacting = false, isCloseToObject = false;
+        #endregion
+
         private void Awake()
         {
             bones = new ContactBone[(FINGERS * FINGER_BONES)];
@@ -92,6 +96,7 @@ namespace Leap.Unity.ContactHands
 
             palmBone.palmCollider = palmBone.GetComponent<BoxCollider>();
             ContactUtils.SetupPalmCollider(palmBone.palmCollider, leapHand);
+            palmBone.contactHand = this;
 
             Transform lastTransform;
             Bone knuckleBone, prevBone;
@@ -118,6 +123,7 @@ namespace Leap.Unity.ContactHands
 
                     bone.boneCollider = bone.GetComponent<CapsuleCollider>();
                     ContactUtils.SetupBoneCollider(bone.boneCollider, leapHand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex + 1)));
+                    bone.contactHand = this;
 
                     if (jointIndex == 0)
                     {
