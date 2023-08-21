@@ -6,28 +6,52 @@ using UnityEngine;
 namespace Leap.Unity.ContactHands
 {
     /// <summary>
-    /// Used for singular return instances of an Spherecast
+    /// Used for singular raycast based returns, iterates over each repetition then hands.
     /// </summary>
 #if BURST_AVAILABLE
     [BurstCompile]
 #endif
     internal struct PhysCastJob : IJobFor
     {
+        /// <summary>
+        /// Tracked status of the hand
+        /// </summary>
+        [ReadOnly]
+        public NativeArray<bool> tracked;
+
+        /// <summary>
+        /// Origins of all casts
+        /// </summary>
         [ReadOnly]
         public NativeArray<Vector3> origins;
 
+        /// <summary>
+        /// Directions of all casts
+        /// </summary>
         [ReadOnly]
         public NativeArray<Vector3> directions;
 
-        [ReadOnly]
-        public NativeArray<float> radii;
-
+        /// <summary>
+        /// Distances of all casts
+        /// </summary>
         [ReadOnly]
         public NativeArray<float> distances;
 
+        /// <summary>
+        /// Radius of the spherecasts
+        /// </summary>
+        [ReadOnly]
+        public NativeArray<float> radii;
+
+        /// <summary>
+        /// Orientations of the boxcasts
+        /// </summary>
         [ReadOnly]
         public NativeArray<Quaternion> orientations;
 
+        /// <summary>
+        /// Half extents of the boxcasts
+        /// </summary>
         [ReadOnly]
         public NativeArray<Vector3> halfExtents;
 
@@ -37,60 +61,93 @@ namespace Leap.Unity.ContactHands
         [NativeDisableParallelForRestriction]
         public NativeArray<BoxcastCommand> boxCommands;
 
-        public int palmJobs, jointJobs, repetitions;
+        public int palmJobs, jointJobs, repetitions, hands, totalPalmJobs, totalJointJobs;
 
         public int layerMask;
 
-        public PhysCastJob(int palmJobs, int jointJobs, int repetitions, int layerMask)
+        public PhysCastJob(int palmJobs, int jointJobs, int repetitions, int hands, LayerMask layerMask)
         {
-            origins = new NativeArray<Vector3>(palmJobs + jointJobs, Allocator.Persistent);
-            directions = new NativeArray<Vector3>(palmJobs + jointJobs, Allocator.Persistent);
-            distances = new NativeArray<float>(palmJobs + jointJobs, Allocator.Persistent);
+            tracked = new NativeArray<bool>(hands, Allocator.Persistent);
 
-            radii = new NativeArray<float>(jointJobs * repetitions, Allocator.Persistent);
-            sphereCommands = new NativeArray<SpherecastCommand>(jointJobs * repetitions, Allocator.Persistent);
+            origins = new NativeArray<Vector3>((palmJobs + jointJobs) * hands, Allocator.Persistent);
+            directions = new NativeArray<Vector3>((palmJobs + jointJobs) * hands, Allocator.Persistent);
+            distances = new NativeArray<float>((palmJobs + jointJobs) * hands, Allocator.Persistent);
 
-            orientations = new NativeArray<Quaternion>(palmJobs, Allocator.Persistent);
-            halfExtents = new NativeArray<Vector3>(palmJobs * repetitions, Allocator.Persistent);
-            boxCommands = new NativeArray<BoxcastCommand>(palmJobs * repetitions, Allocator.Persistent);
+            radii = new NativeArray<float>(jointJobs * repetitions * hands, Allocator.Persistent);
+            sphereCommands = new NativeArray<SpherecastCommand>(jointJobs * repetitions * hands, Allocator.Persistent);
+
+            orientations = new NativeArray<Quaternion>(hands, Allocator.Persistent);
+
+            halfExtents = new NativeArray<Vector3>(palmJobs * repetitions * hands, Allocator.Persistent);
+            boxCommands = new NativeArray<BoxcastCommand>(palmJobs * repetitions * hands, Allocator.Persistent);
 
             this.palmJobs = palmJobs;
             this.jointJobs = jointJobs;
+            this.totalPalmJobs = palmJobs * repetitions * hands;
+            this.totalJointJobs = jointJobs * repetitions * hands;
             this.repetitions = repetitions;
-            this.layerMask = layerMask;
+            this.hands = hands;
+            this.layerMask = layerMask.value;
         }
 
         public void Execute(int index)
         {
-            int localIndex = index % repetitions;
-            int localRepetition = index / repetitions;
+            // Get the current repetition
+            int localRep = index / (palmJobs + jointJobs) % repetitions;
+
+            // Get the current hand
+            int localHand = index / ((palmJobs + jointJobs) * repetitions) % hands;
+
+            if (!tracked[localHand])
+            {
+                return;
+            }
+
+            // Get the current index within the cycle
+            int localIndex = index % (palmJobs + jointJobs);
+            // Get what the current cycle is
+            int currentCycle = (localRep * repetitions) + localHand;
 
             Vector3 origin, direction;
             float distance;
             if (localIndex < palmJobs)
             {
-                int palmIndex = (palmJobs * repetitions) + localIndex;
-                origin = this.origins[localIndex];
-                direction = this.directions[localIndex];
-                distance = this.distances[localIndex];
-                Quaternion orientation = this.orientations[palmIndex];
-                Vector3 halfExtents = this.halfExtents[palmIndex];
+                // Get the palm index relative to the cycle
+                int localPalmIndex = Mathf.Clamp(localIndex, 0, palmJobs - 1);
+                // Get the global palm index over all cycles
+                int globalPalmIndex = (currentCycle * palmJobs) + localPalmIndex;
 
-                this.boxCommands[palmIndex] = new BoxcastCommand(
+                origin = this.origins[localPalmIndex];
+                direction = this.directions[localPalmIndex];
+                distance = this.distances[localPalmIndex];
+                Quaternion orientation = this.orientations[localHand];
+                Vector3 halfExtents = this.halfExtents[globalPalmIndex];
+
+#if UNITY_2022_3_OR_NEWER
+                this.commands[index] = new BoxcastCommand(
+                    origin, halfExtents, orientation, direction, new QueryParameters(layerMask: layerMask, hitTriggers: QueryTriggerInteraction.Ignore), distance: distance);
+#else
+                this.boxCommands[globalPalmIndex] = new BoxcastCommand(
                     origin, halfExtents, orientation, direction, distance: distance, layerMask: layerMask);
+#endif
             }
             else
             {
-                int jointIndex = (jointJobs * repetitions) + (localIndex - palmJobs);
-                origin = this.origins[localIndex];
-                direction = this.directions[localIndex];
-                distance = this.distances[localIndex];
-                float radius = this.radii[jointIndex];
+                // Get the joint index relative to the cycle
+                int localJointIndex = Mathf.Clamp(localIndex - palmJobs, 0, jointJobs - 1);
+                // Get the global palm index over all cycles
+                int globalJointIndex = (currentCycle * jointJobs) + localJointIndex;
+
+                origin = this.origins[localJointIndex];
+                direction = this.directions[localJointIndex];
+                distance = this.distances[localJointIndex];
+                float radius = this.radii[globalJointIndex];
+
 #if UNITY_2022_3_OR_NEWER
-            this.commands[index] = new SpherecastCommand(
-                origin, radius, direction, new QueryParameters(layerMask: layerMask, hitTriggers: QueryTriggerInteraction.Ignore), distance: distance);
+                this.sphereCommands[index] = new SpherecastCommand(
+                    origin, radius, direction, new QueryParameters(layerMask: layerMask, hitTriggers: QueryTriggerInteraction.Ignore), distance: distance);
 #else
-                this.sphereCommands[jointIndex] = new SpherecastCommand(
+                this.sphereCommands[globalJointIndex] = new SpherecastCommand(
                     origin, radius, direction, distance: distance, layerMask: layerMask);
 #endif
             }
@@ -98,6 +155,7 @@ namespace Leap.Unity.ContactHands
 
         internal void Dispose()
         {
+            tracked.Dispose();
             origins.Dispose();
             directions.Dispose();
             radii.Dispose();
