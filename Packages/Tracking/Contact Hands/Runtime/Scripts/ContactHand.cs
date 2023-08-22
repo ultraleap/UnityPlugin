@@ -13,7 +13,7 @@ namespace Leap.Unity.ContactHands
 
         public Chirality handedness = Chirality.Left;
 
-        internal Hand modifiedHand = new Hand();
+        internal Hand modifiedHand = new Hand(), dataHand = new Hand();
         internal bool tracked = false;
 
         internal ContactParent contactParent = null;
@@ -22,6 +22,10 @@ namespace Leap.Unity.ContactHands
         public bool isContacting = false, isCloseToObject = false;
         public bool IsContacting => isContacting;
         public bool IsCloseToObject => isCloseToObject;
+
+        protected Vector3 _velocity, _angularVelocity;
+        public Vector3 Velocity => _velocity;
+        public Vector3 AngularVelocity => _angularVelocity;
         #endregion
 
         private void Awake()

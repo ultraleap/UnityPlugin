@@ -6,6 +6,9 @@ namespace Leap.Unity.ContactHands
 {
     public class NoContactHand : ContactHand
     {
+        private Vector3 _oldPosition;
+        private Quaternion _oldRotation;
+
         protected override void ProcessOutputHand()
         {
             // Don't need to modify the hand
@@ -15,6 +18,10 @@ namespace Leap.Unity.ContactHands
         {
             gameObject.SetActive(true);
             modifiedHand.CopyFrom(hand);
+            _oldPosition = hand.PalmPosition;
+            _oldRotation = hand.Rotation;
+            _velocity = Vector3.zero;
+            _angularVelocity = Vector3.zero;
             tracked = true;
         }
 
@@ -49,6 +56,8 @@ namespace Leap.Unity.ContactHands
                 tempBone = bones[i];
                 tempBone.UpdateBone(hand.Fingers[tempBone.Finger].bones[tempBone.joint + 1]);
             }
+            _velocity = ContactUtils.ToLinearVelocity(_oldPosition, hand.PalmPosition, Time.fixedDeltaTime);
+            _angularVelocity = ContactUtils.ToAngularVelocity(_oldRotation, hand.Rotation, Time.fixedDeltaTime);
         }
     }
 }

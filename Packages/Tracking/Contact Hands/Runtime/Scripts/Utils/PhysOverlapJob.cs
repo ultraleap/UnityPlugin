@@ -257,7 +257,6 @@ namespace Leap.Unity.ContactHands
             distance = halfExtents.y;
             halfExtents.y /= 2f;
             direction = transform.up;
-            ExtDebug.DrawBoxCastBox(origin, halfExtents, orientation, direction, distance, Color.red);
         }
 
         private void UpdateJointSafetyCasts(ContactHand hand, ref Vector3 origin, ref Vector3 tip, ref float radius)

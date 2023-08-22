@@ -11,7 +11,7 @@ namespace Leap.Unity.ContactHands
         internal int finger, joint;
         internal bool isPalm = false;
         public int Finger => finger;
-        public int Bone => joint;
+        public int Joint => joint;
         public bool IsPalm => isPalm;
 
         internal float width = 0f, length = 0f, palmThickness = 0f;

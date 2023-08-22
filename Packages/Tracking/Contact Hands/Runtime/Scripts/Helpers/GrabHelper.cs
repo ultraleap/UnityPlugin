@@ -21,6 +21,11 @@ namespace Leap.Unity.ContactHands
         private float[] _safetyCheckDistances;
         #endregion
 
+        #region Interaction Data
+        private Dictionary<ContactHand, float[]> _fingerStrengths = new Dictionary<ContactHand, float[]>();
+        public Dictionary<ContactHand, float[]> FingerStrengths => _fingerStrengths;
+        #endregion
+
 
         private void Start()
         {
@@ -83,11 +88,13 @@ namespace Leap.Unity.ContactHands
             {
                 UpdateHandOverlaps(contactManager.contactHands.leftHand);
                 UpdateBoneQueues(contactManager.contactHands.leftHand);
+                UpdateHandStatistics(contactManager.contactHands.leftHand);
             }
             if (contactManager.contactHands.rightHand.tracked)
             {
                 UpdateHandOverlaps(contactManager.contactHands.rightHand);
                 UpdateBoneQueues(contactManager.contactHands.rightHand);
+                UpdateHandStatistics(contactManager.contactHands.rightHand);
             }
         }
 
@@ -364,6 +371,19 @@ namespace Leap.Unity.ContactHands
             for (int i = 0; i < hand.bones.Length; i++)
             {
                 hand.bones[i].ProcessColliderQueue();
+            }
+        }
+
+        private void UpdateHandStatistics(ContactHand hand)
+        {
+            if (!_fingerStrengths.ContainsKey(hand))
+            {
+                _fingerStrengths.Add(hand, new float[5]);
+            }
+            Leap.Hand lHand = hand.dataHand;
+            for (int i = 0; i < 5; i++)
+            {
+                _fingerStrengths[hand][i] = lHand.GetFingerStrength(i);
             }
         }
 

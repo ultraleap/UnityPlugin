@@ -28,6 +28,7 @@ namespace Leap.Unity.ContactHands
         {
             if (index != -1)
             {
+                hand.dataHand.CopyFrom(dataHand);
                 if (!hand.tracked)
                 {
                     hand.BeginHand(dataHand);
