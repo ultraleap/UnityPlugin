@@ -76,6 +76,7 @@ namespace Leap.Unity.ContactHands
         {
             contactHands = GetComponentInChildren<ContactParent>(true);
             GenerateLayers();
+            SetupAutomaticCollisionLayers();
         }
 
         private void OnEnable()

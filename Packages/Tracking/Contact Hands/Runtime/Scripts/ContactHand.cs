@@ -19,7 +19,9 @@ namespace Leap.Unity.ContactHands
         internal ContactParent contactParent = null;
 
         #region Interaction Data
-        internal bool isContacting = false, isCloseToObject = false;
+        public bool isContacting = false, isCloseToObject = false;
+        public bool IsContacting => isContacting;
+        public bool IsCloseToObject => isCloseToObject;
         #endregion
 
         private void Awake()
@@ -88,6 +90,7 @@ namespace Leap.Unity.ContactHands
             Leap.Hand leapHand = TestHandFactory.MakeTestHand(isLeft: handedness == Chirality.Left ? true : false, pose: TestHandFactory.TestHandPose.HeadMountedB);
             palmBone = new GameObject($"{(handedness == Chirality.Left ? "Left" : "Right")} Palm", boneType, typeof(BoxCollider)).GetComponent<ContactBone>();
 
+            palmBone.gameObject.layer = contactParent.contactManager.HandsResetLayer;
             palmBone.transform.SetParent(transform);
             palmBone.transform.position = leapHand.PalmPosition;
             palmBone.transform.rotation = leapHand.Rotation;
@@ -116,6 +119,7 @@ namespace Leap.Unity.ContactHands
 
                     bones[boneArrayIndex] = new GameObject($"{ContactUtils.IndexToFinger(fingerIndex)} {ContactUtils.IndexToJoint(jointIndex)}", boneType, typeof(CapsuleCollider)).GetComponent<ContactBone>();
                     bone = bones[boneArrayIndex];
+                    bone.gameObject.layer = contactParent.contactManager.HandsResetLayer;
                     bone.transform.SetParent(lastTransform);
 
                     bone.finger = fingerIndex;

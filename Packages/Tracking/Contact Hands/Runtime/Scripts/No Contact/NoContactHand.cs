@@ -13,6 +13,7 @@ namespace Leap.Unity.ContactHands
 
         internal override void BeginHand(Hand hand)
         {
+            gameObject.SetActive(true);
             modifiedHand.CopyFrom(hand);
             tracked = true;
         }
@@ -20,6 +21,7 @@ namespace Leap.Unity.ContactHands
         internal override void FinishHand()
         {
             tracked = false;
+            gameObject.SetActive(false);
         }
 
         internal override void GenerateHandLogic()
@@ -30,6 +32,7 @@ namespace Leap.Unity.ContactHands
                 // We don't want to be in contact with anything
                 t.gameObject.layer = contactParent.contactManager.HandsResetLayer;
             }
+            gameObject.SetActive(false);
         }
 
         internal override void PostFixedUpdateHand()

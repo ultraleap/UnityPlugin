@@ -36,7 +36,7 @@ namespace Leap.Unity.ContactHands
         private void OnDrawGizmos()
         {
             
-            Debug.DrawLine(transform.position,tipPosition,Color.cyan);
+            //Debug.DrawLine(transform.position,tipPosition,Color.cyan);
         }
     }
 }

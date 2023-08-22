@@ -10,7 +10,7 @@ namespace Leap.Unity.ContactHands
 
         public ContactManager contactManager;
 
-        private void Awake()
+        private void Start()
         {
             contactManager = GetComponentInParent<ContactManager>();
             GenerateHands();

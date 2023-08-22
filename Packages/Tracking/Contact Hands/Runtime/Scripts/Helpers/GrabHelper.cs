@@ -15,13 +15,12 @@ namespace Leap.Unity.ContactHands
 
         private Collider[] _colliderCache = new Collider[10];
 
+        #region Safety Overlap Data
         private bool _jobsCreated = false;
-        private JobHandle _safetySphereJob, _safetyBoxJob;
-        private int _safetyCastJobCount;
-        private PhysCastJob _safetyCastJob;
-        private NativeArray<RaycastHit> _palmSafetyResults, _jointSafetyResults;
+        private const int SAFETY_CYCLES = 2;
+        private float[] _safetyCheckDistances;
+        #endregion
 
-        private const int SAFETY_CAST_REPS = 2;
 
         private void Start()
         {
@@ -55,10 +54,8 @@ namespace Leap.Unity.ContactHands
         private void InitJobs()
         {
             // Two sets of jobs because of two hands, two repetitions because of inside hand and close to hand
-            _safetyCastJob = new PhysCastJob(1, ContactHand.FINGERS * ContactHand.FINGER_BONES, 2, SAFETY_CAST_REPS, contactManager.InteractionMask);
-            _palmSafetyResults = new NativeArray<RaycastHit>(_safetyCastJob.totalPalmJobs, Allocator.Persistent);
-            _jointSafetyResults = new NativeArray<RaycastHit>(_safetyCastJob.totalJointJobs, Allocator.Persistent);
-
+            _safetyCheckDistances = new float[] { 0.005f, contactManager.ContactDistance };
+            
             _jobsCreated = true;
         }
 
@@ -66,10 +63,7 @@ namespace Leap.Unity.ContactHands
         {
             if (_jobsCreated)
             {
-                _palmSafetyResults.Dispose();
-                _jointSafetyResults.Dispose();
-
-                _safetyCastJob.Dispose();
+                
             }
         }
 
@@ -80,10 +74,10 @@ namespace Leap.Unity.ContactHands
 
         private void OnFixedFrame(Frame frame)
         {
-            UpdateHandHeuristics(dataProvider == null ? contactManager.InputProvider.CurrentFixedFrame : dataProvider.CurrentFixedFrame, frame);
+            UpdateHandHeuristics();
         }
 
-        private void UpdateHandHeuristics(Frame dataFrame, Frame modifiedFrame)
+        private void UpdateHandHeuristics()
         {
             if (contactManager.contactHands.leftHand.tracked)
             {
@@ -147,97 +141,198 @@ namespace Leap.Unity.ContactHands
             }
         }
 
-        // Unity 2021+
+        // Unity 2021
         private void UpdateSafetyOverlaps()
         {
+#if UNITY_2022_3_OR_NEWER
 
-            Vector3 origin = Vector3.zero, halfExtents = Vector3.zero, direction = Vector3.zero;
-            Quaternion orientation = Quaternion.identity;
-
-            int overallOffset = 0, handOffset = 0, palmOffset = 0, jointOffset = 0;
-            float distance = 0;
-
-            _safetyCastJob.tracked[0] = contactManager.contactHands.leftHand.tracked;
-            _safetyCastJob.tracked[1] = contactManager.contactHands.rightHand.tracked;
-
-            if (_safetyCastJob.tracked[0])
-            {
-                UpdatePalmSafetyCasts(contactManager.contactHands.leftHand, overallOffset, handOffset, palmOffset, ref origin, ref halfExtents, ref direction, ref orientation, ref distance);
-                overallOffset++;
-                UpdateJointSafetyCasts(contactManager.contactHands.leftHand, overallOffset, jointOffset, ref origin, tip: ref direction, radius: ref distance);
-            }
-
-            handOffset = 1;
-            palmOffset = SAFETY_CAST_REPS;
-            jointOffset = SAFETY_CAST_REPS * ContactHand.FINGERS * ContactHand.FINGER_BONES;
-            overallOffset = 1 + (ContactHand.FINGERS * ContactHand.FINGER_BONES);
-
-            if (_safetyCastJob.tracked[1])
-            {
-                UpdatePalmSafetyCasts(contactManager.contactHands.rightHand, overallOffset, handOffset, palmOffset, ref origin, ref halfExtents, ref direction, ref orientation, ref distance);
-                overallOffset++;
-                UpdateJointSafetyCasts(contactManager.contactHands.leftHand, overallOffset, jointOffset, ref origin, tip: ref direction, radius: ref distance);
-            }
-
-            _safetySphereJob = _safetyCastJob.ScheduleParallel(_safetyCastJob.sphereCommands.Length, 64, default);
-            _safetyCastJobCount = Mathf.Max(_safetyCastJob.sphereCommands.Length / JobsUtility.JobWorkerCount, 1);
-            _safetySphereJob = SpherecastCommand.ScheduleBatch(_safetyCastJob.sphereCommands, _jointSafetyResults, _safetyCastJobCount, _safetySphereJob);
-
-            _safetyBoxJob = _safetyCastJob.ScheduleParallel(_safetyCastJob.boxCommands.Length, 64, _safetySphereJob);
-            _safetyCastJobCount = Mathf.Max(_safetyCastJob.boxCommands.Length / JobsUtility.JobWorkerCount, 1);
-            _safetyBoxJob = BoxcastCommand.ScheduleBatch(_safetyCastJob.boxCommands, _palmSafetyResults, _safetyCastJobCount, _safetyBoxJob);
-
-            _safetyBoxJob.Complete();
-
-            // now we "just" have to process the results......
+#else
+            // Pre 2022 overlaps
+            HandSafetyOverlaps(contactManager.contactHands.leftHand);
+            HandSafetyOverlaps(contactManager.contactHands.rightHand);
+#endif
         }
 
-        private void UpdatePalmSafetyCasts(ContactHand hand, int overallOffset, int handOffset, int palmOffset, ref Vector3 origin, ref Vector3 halfExtents, ref Vector3 direction, ref Quaternion orientation, ref float distance)
+        private void HandSafetyOverlaps(ContactHand hand)
         {
-            GetPalmBoxCastParams(hand.palmBone.transform, hand.palmBone.palmCollider,
-                    out origin, out halfExtents, out orientation, out direction, out distance);
-
-            _safetyCastJob.origins[overallOffset] = origin;
-            _safetyCastJob.directions[overallOffset] = direction;
-            _safetyCastJob.distances[overallOffset] = distance;
-
-            _safetyCastJob.orientations[handOffset] = orientation;
-
-            // Inside palm?
-            _safetyCastJob.halfExtents[palmOffset] = halfExtents;
-            // Slightly larger for is close check
-            _safetyCastJob.halfExtents[palmOffset + 1] = halfExtents + Vector3.one * contactManager.ContactDistance;
-        }
-
-        private void GetPalmBoxCastParams(Transform transform, BoxCollider collider, out Vector3 origin, out Vector3 halfExtents, out Quaternion orientation, out Vector3 direction, out float distance)
-        {
-            distance = (Vector3.Scale(PhysExts.AbsVec3(transform.lossyScale), collider.size) * 0.25f).y;
-            PhysExts.ToWorldSpaceBoxOffset(collider, -Vector3.up * distance,
-                out origin, out halfExtents, out orientation);
-            distance = halfExtents.y;
-            halfExtents.y /= 2f;
-            direction = transform.up;
-        }
-
-        private void UpdateJointSafetyCasts(ContactHand hand, int overallOffset, int jointOffset, ref Vector3 origin, ref Vector3 tip, ref float radius)
-        {
-            // First iteration for inside hand/core base values
-            for (int i = 0; i < hand.bones.Length; i++)
+            hand.isCloseToObject = false;
+            hand.isContacting = false;
+            if (hand.tracked)
             {
-                PhysExts.ToWorldSpaceCapsule(hand.bones[i].boneCollider, out origin, out tip, out radius);
+                PalmSafetyOverlaps(hand.palmBone);
 
-                _safetyCastJob.origins[overallOffset] = origin;
-                _safetyCastJob.directions[overallOffset] = (tip - origin).normalized;
-                _safetyCastJob.distances[overallOffset] = Vector3.Distance(tip, origin);
+                if (hand.isCloseToObject && hand.isContacting)
+                    return;
 
-                _safetyCastJob.radii[overallOffset] = radius;
-
-                _safetyCastJob.radii[overallOffset + (ContactHand.FINGERS * ContactHand.FINGER_BONES)] = radius + contactManager.ContactDistance;
-
-                overallOffset++;
-                jointOffset++;
+                for (int i = 0; i < hand.bones.Length; i++)
+                {
+                    JointSafetyOverlaps(hand.bones[i]);
+                }
             }
         }
+
+        private void PalmSafetyOverlaps(ContactBone palmBone)
+        {
+            int count = PhysExts.OverlapBoxNonAllocOffset(palmBone.palmCollider, Vector3.zero, _colliderCache, contactManager.InteractionMask, QueryTriggerInteraction.Ignore, extraRadius: _safetyCheckDistances[0]);
+            for (int i = 0; i < count; i++)
+            {
+                if (_colliderCache[i] != null && WillColliderAffectHand(_colliderCache[i]))
+                {
+                    palmBone.contactHand.isCloseToObject = true;
+                    break;
+                }
+            }
+
+            // Contact
+            count = PhysExts.OverlapBoxNonAllocOffset(palmBone.palmCollider, Vector3.zero, _colliderCache, contactManager.InteractionMask, QueryTriggerInteraction.Ignore, extraRadius: _safetyCheckDistances[1]);
+            for (int i = 0; i < count; i++)
+            {
+                if (_colliderCache[i] != null && WillColliderAffectHand(_colliderCache[i]))
+                {
+                    palmBone.contactHand.isContacting = true;
+                    break;
+                }
+            }
+        }
+
+        private void JointSafetyOverlaps(ContactBone bone)
+        {
+            int count = PhysExts.OverlapCapsuleNonAllocOffset(bone.boneCollider, Vector3.zero, _colliderCache, contactManager.InteractionMask, QueryTriggerInteraction.Ignore, extraRadius: _safetyCheckDistances[0]);
+            for (int i = 0; i < count; i++)
+            {
+                if (_colliderCache[i] != null && WillColliderAffectHand(_colliderCache[i]))
+                {
+                    bone.contactHand.isCloseToObject = true;
+                    break;
+                }
+            }
+
+            // Contact
+            count = PhysExts.OverlapCapsuleNonAllocOffset(bone.boneCollider, Vector3.zero, _colliderCache, contactManager.InteractionMask, QueryTriggerInteraction.Ignore, extraRadius: _safetyCheckDistances[1]);
+            for (int i = 0; i < count; i++)
+            {
+                if (_colliderCache[i] != null && WillColliderAffectHand(_colliderCache[i]))
+                {
+                    bone.contactHand.isContacting = true;
+                    break;
+                }
+            }
+        }
+
+#if UNITY_2022_3_OR_NEWER
+        private void UpdateSafetyOverlapJobs()
+        {
+            JobHandle combinedHandle = default;
+
+            contactManager.contactHands.leftHand.isContacting = false;
+            contactManager.contactHands.leftHand.isCloseToObject = false;
+
+            contactManager.contactHands.rightHand.isContacting = false;
+            contactManager.contactHands.rightHand.isCloseToObject = false;
+
+            int trackedSwitch = 0;
+            if(contactManager.contactHands.leftHand.tracked)
+            {
+                _leftSafetyCasts.UpdateHand(contactManager.contactHands.leftHand);
+                _leftSafetyCasts.ScheduleJobs(out combinedHandle);
+                trackedSwitch++;
+            }
+            if (contactManager.contactHands.rightHand.tracked)
+            {
+                _rightSafetyCasts.UpdateHand(contactManager.contactHands.rightHand);
+                _rightSafetyCasts.ScheduleJobs(out JobHandle secondHandle);
+                if(trackedSwitch == 1)
+                {
+                    combinedHandle = JobHandle.CombineDependencies(combinedHandle, secondHandle);
+                }
+                else
+                {
+                    combinedHandle = secondHandle;
+                }
+                trackedSwitch += 2;
+            }
+
+            if(trackedSwitch > 0)
+            {
+                combinedHandle.Complete();
+                switch (trackedSwitch)
+                {
+                    // Left tracked
+                    case 1:
+                        ProcessSafetyResults(contactManager.contactHands.leftHand, ref _leftSafetyCasts);
+                        break;
+                    // Right tracked
+                    case 2:
+                        ProcessSafetyResults(contactManager.contactHands.rightHand, ref _rightSafetyCasts);
+                        break;
+                    // Both tracked
+                    case 3:
+                        // Do the right one because it's dependant on the left hands
+                        ProcessSafetyResults(contactManager.contactHands.leftHand, ref _leftSafetyCasts);
+                        ProcessSafetyResults(contactManager.contactHands.rightHand, ref _rightSafetyCasts);
+                        break;
+                }
+            }
+        }
+
+        private void ProcessSafetyResults(ContactHand contactHand, ref HandCastJob castJob)
+        {
+            RaycastHit tempHit;
+            int cycle;
+            for (int i = 0; i < castJob.palmResults.Length; i++)
+            {
+                if (contactHand.isCloseToObject && contactHand.isContacting)
+                    break;
+
+                tempHit = castJob.palmResults[i];
+                if (tempHit.colliderInstanceID == 0)
+                    continue;
+
+                cycle = i / castJob.palmJobsPerCycle;
+
+                if (WillColliderAffectHand(tempHit.collider))
+                {
+                    switch (cycle)
+                    {
+                        case 0:
+                            contactHand.isCloseToObject = true;
+                            break;
+                        case 1:
+                            contactHand.isContacting = true;
+                            break;
+                    }
+                }
+            }
+
+            if (contactHand.isCloseToObject && contactHand.isContacting)
+                return;
+
+            for (int i = 0; i < castJob.jointResults.Length; i++)
+            {
+                if (contactHand.isCloseToObject && contactHand.isContacting)
+                    break;
+
+                tempHit = castJob.jointResults[i];
+                if (tempHit.colliderInstanceID == 0)
+                    continue;
+
+                cycle = i / castJob.jointJobsPerCycle;
+
+                if (WillColliderAffectHand(tempHit.collider))
+                {
+                    switch (cycle)
+                    {
+                        case 0:
+                            contactHand.isCloseToObject = true;
+                            break;
+                        case 1:
+                            contactHand.isContacting = true;
+                            break;
+                    }
+                }
+            }
+        }
+#endif
 
         // Unity 2022+
         private void PalmOverlapJobs()
@@ -248,6 +343,19 @@ namespace Leap.Unity.ContactHands
         private void JointOverlapJobs()
         {
 
+        }
+
+        private bool WillColliderAffectHand(Collider collider)
+        {
+            if (collider.gameObject.TryGetComponent<ContactBone>(out var bone)/* && collider.attachedRigidbody.TryGetComponent<PhysicsIgnoreHelpers>(out var temp) && temp.IsThisHandIgnored(this)*/)
+            {
+                return false;
+            }
+            if (collider.attachedRigidbody != null || collider != null)
+            {
+                return true;
+            }
+            return false;
         }
 
         private void UpdateBoneQueues(ContactHand hand)

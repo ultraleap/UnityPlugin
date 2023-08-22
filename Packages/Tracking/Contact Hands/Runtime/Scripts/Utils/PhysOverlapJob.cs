@@ -1,24 +1,17 @@
+#if UNITY_2022_3_OR_NEWER
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Jobs;
+using Unity.Jobs.LowLevel.Unsafe;
 using UnityEngine;
 
 namespace Leap.Unity.ContactHands
 {
-    /// <summary>
-    /// Used for singular raycast based returns, iterates over each repetition then hands.
-    /// </summary>
 #if BURST_AVAILABLE
     [BurstCompile]
 #endif
-    internal struct PhysCastJob : IJobFor
+    internal struct PhysSphereCastJob : IJobFor
     {
-        /// <summary>
-        /// Tracked status of the hand
-        /// </summary>
-        [ReadOnly]
-        public NativeArray<bool> tracked;
-
         /// <summary>
         /// Origins of all casts
         /// </summary>
@@ -43,6 +36,81 @@ namespace Leap.Unity.ContactHands
         [ReadOnly]
         public NativeArray<float> radii;
 
+        [NativeDisableParallelForRestriction]
+        public NativeArray<SpherecastCommand> commands;
+
+        public int cycleCount, jobsPerCycle, totalJobs;
+
+        public int layerMask;
+
+        /// <summary>
+        /// Takes a set of origins, directions, and distances, and then applies them to a configurable amount of jobs. 
+        /// Radii is always unique and will need to be assigned as such.
+        /// </summary>
+        /// <param name="cycleCount">How many times the jobs should repeat.</param>
+        /// <param name="jobsPerCycle">How many individual and unique elements do you want to process.</param>
+        public PhysSphereCastJob(int cycleCount, int jobsPerCycle, LayerMask layerMask)
+        {
+            this.cycleCount = cycleCount;
+            this.jobsPerCycle = jobsPerCycle;
+            this.totalJobs = cycleCount * jobsPerCycle;
+
+            origins = new NativeArray<Vector3>(this.jobsPerCycle, Allocator.Persistent);
+            directions = new NativeArray<Vector3>(this.jobsPerCycle, Allocator.Persistent);
+            distances = new NativeArray<float>(this.jobsPerCycle, Allocator.Persistent);
+            radii = new NativeArray<float>(this.totalJobs, Allocator.Persistent);
+            commands = new NativeArray<SpherecastCommand>(this.totalJobs, Allocator.Persistent);
+
+            this.layerMask = layerMask.value;
+        }
+
+        public void Execute(int index)
+        {
+            int baseIndex = index % jobsPerCycle;
+
+            Vector3 origin = this.origins[baseIndex];
+            Vector3 direction = this.directions[baseIndex];
+            float distance = this.distances[baseIndex];
+            float radius = this.radii[index];
+
+
+                this.sphereCommands[index] = new SpherecastCommand(
+                    origin, radius, direction, new QueryParameters(layerMask: layerMask, hitTriggers: QueryTriggerInteraction.Ignore), distance: distance);
+        }
+
+        public void Dispose()
+        {
+            origins.Dispose();
+            directions.Dispose();
+            distances.Dispose();
+            radii.Dispose();
+            commands.Dispose();
+        }
+    }
+
+#if BURST_AVAILABLE
+    [BurstCompile]
+#endif
+    internal struct PhysBoxCastJob : IJobFor
+    {
+        /// <summary>
+        /// Origins of all casts
+        /// </summary>
+        [ReadOnly]
+        public NativeArray<Vector3> origins;
+
+        /// <summary>
+        /// Directions of all casts
+        /// </summary>
+        [ReadOnly]
+        public NativeArray<Vector3> directions;
+
+        /// <summary>
+        /// Distances of all casts
+        /// </summary>
+        [ReadOnly]
+        public NativeArray<float> distances;
+
         /// <summary>
         /// Orientations of the boxcasts
         /// </summary>
@@ -56,116 +124,186 @@ namespace Leap.Unity.ContactHands
         public NativeArray<Vector3> halfExtents;
 
         [NativeDisableParallelForRestriction]
-        public NativeArray<SpherecastCommand> sphereCommands;
+        public NativeArray<BoxcastCommand> commands;
 
-        [NativeDisableParallelForRestriction]
-        public NativeArray<BoxcastCommand> boxCommands;
-
-        public int palmJobs, jointJobs, repetitions, hands, totalPalmJobs, totalJointJobs;
+        public int cycleCount, jobsPerCycle, totalJobs;
 
         public int layerMask;
 
-        public PhysCastJob(int palmJobs, int jointJobs, int repetitions, int hands, LayerMask layerMask)
+        /// <summary>
+        /// Takes a set of origins, directions, and distances, and then applies them to a configurable amount of jobs. 
+        /// Radii is always unique and will need to be assigned as such.
+        /// </summary>
+        /// <param name="cycleCount">How many times the jobs should repeat.</param>
+        /// <param name="jobsPerCycle">How many individual and unique elements do you want to process.</param>
+        public PhysBoxCastJob(int cycleCount, int jobsPerCycle, LayerMask layerMask)
         {
-            tracked = new NativeArray<bool>(hands, Allocator.Persistent);
+            this.cycleCount = cycleCount;
+            this.jobsPerCycle = jobsPerCycle;
+            this.totalJobs = cycleCount * jobsPerCycle;
 
-            origins = new NativeArray<Vector3>((palmJobs + jointJobs) * hands, Allocator.Persistent);
-            directions = new NativeArray<Vector3>((palmJobs + jointJobs) * hands, Allocator.Persistent);
-            distances = new NativeArray<float>((palmJobs + jointJobs) * hands, Allocator.Persistent);
+            origins = new NativeArray<Vector3>(this.jobsPerCycle, Allocator.Persistent);
+            directions = new NativeArray<Vector3>(this.jobsPerCycle, Allocator.Persistent);
+            distances = new NativeArray<float>(this.jobsPerCycle, Allocator.Persistent);
+            orientations = new NativeArray<Quaternion>(this.jobsPerCycle, Allocator.Persistent);
+            halfExtents = new NativeArray<Vector3>(this.totalJobs, Allocator.Persistent);
+            commands = new NativeArray<BoxcastCommand>(this.totalJobs, Allocator.Persistent);
 
-            radii = new NativeArray<float>(jointJobs * repetitions * hands, Allocator.Persistent);
-            sphereCommands = new NativeArray<SpherecastCommand>(jointJobs * repetitions * hands, Allocator.Persistent);
-
-            orientations = new NativeArray<Quaternion>(hands, Allocator.Persistent);
-
-            halfExtents = new NativeArray<Vector3>(palmJobs * repetitions * hands, Allocator.Persistent);
-            boxCommands = new NativeArray<BoxcastCommand>(palmJobs * repetitions * hands, Allocator.Persistent);
-
-            this.palmJobs = palmJobs;
-            this.jointJobs = jointJobs;
-            this.totalPalmJobs = palmJobs * repetitions * hands;
-            this.totalJointJobs = jointJobs * repetitions * hands;
-            this.repetitions = repetitions;
-            this.hands = hands;
             this.layerMask = layerMask.value;
         }
 
         public void Execute(int index)
         {
-            // Get the current repetition
-            int localRep = index / (palmJobs + jointJobs) % repetitions;
+            int baseIndex = index % jobsPerCycle;
 
-            // Get the current hand
-            int localHand = index / ((palmJobs + jointJobs) * repetitions) % hands;
+            Vector3 origin = this.origins[baseIndex];
+            Vector3 direction = this.directions[baseIndex];
+            float distance = this.distances[baseIndex];
+            Quaternion orientation = this.orientations[baseIndex];
+            Vector3 halfExtents = this.halfExtents[index];
 
-            if (!tracked[localHand])
-            {
-                return;
-            }
-
-            // Get the current index within the cycle
-            int localIndex = index % (palmJobs + jointJobs);
-            // Get what the current cycle is
-            int currentCycle = (localRep * repetitions) + localHand;
-
-            Vector3 origin, direction;
-            float distance;
-            if (localIndex < palmJobs)
-            {
-                // Get the palm index relative to the cycle
-                int localPalmIndex = Mathf.Clamp(localIndex, 0, palmJobs - 1);
-                // Get the global palm index over all cycles
-                int globalPalmIndex = (currentCycle * palmJobs) + localPalmIndex;
-
-                origin = this.origins[localPalmIndex];
-                direction = this.directions[localPalmIndex];
-                distance = this.distances[localPalmIndex];
-                Quaternion orientation = this.orientations[localHand];
-                Vector3 halfExtents = this.halfExtents[globalPalmIndex];
-
-#if UNITY_2022_3_OR_NEWER
-                this.commands[index] = new BoxcastCommand(
-                    origin, halfExtents, orientation, direction, new QueryParameters(layerMask: layerMask, hitTriggers: QueryTriggerInteraction.Ignore), distance: distance);
-#else
-                this.boxCommands[globalPalmIndex] = new BoxcastCommand(
-                    origin, halfExtents, orientation, direction, distance: distance, layerMask: layerMask);
-#endif
-            }
-            else
-            {
-                // Get the joint index relative to the cycle
-                int localJointIndex = Mathf.Clamp(localIndex - palmJobs, 0, jointJobs - 1);
-                // Get the global palm index over all cycles
-                int globalJointIndex = (currentCycle * jointJobs) + localJointIndex;
-
-                origin = this.origins[localJointIndex];
-                direction = this.directions[localJointIndex];
-                distance = this.distances[localJointIndex];
-                float radius = this.radii[globalJointIndex];
 
 #if UNITY_2022_3_OR_NEWER
                 this.sphereCommands[index] = new SpherecastCommand(
                     origin, radius, direction, new QueryParameters(layerMask: layerMask, hitTriggers: QueryTriggerInteraction.Ignore), distance: distance);
 #else
-                this.sphereCommands[globalJointIndex] = new SpherecastCommand(
-                    origin, radius, direction, distance: distance, layerMask: layerMask);
+            this.commands[index] = new BoxcastCommand(
+                origin, halfExtents, orientation, direction, distance: distance, layerMask: layerMask);
 #endif
+        }
+
+        public void Dispose()
+        {
+            origins.Dispose();
+            directions.Dispose();
+            distances.Dispose();
+            halfExtents.Dispose();
+            orientations.Dispose();
+            commands.Dispose();
+        }
+    }
+
+    /// <summary>
+    /// Helper struct to do most of the hand overlaps automatically with customisable radius amounts
+    /// </summary>
+    internal struct HandCastJob
+    {
+        public int palmJobCount, jointJobCount;
+        public PhysBoxCastJob palmJob;
+        public PhysSphereCastJob jointJob;
+        public NativeArray<RaycastHit> palmResults, jointResults;
+
+        public int cycles, palmJobsPerCycle, jointJobsPerCycle;
+        public float[] extraRadius;
+
+        public HandCastJob(int cycleCount, int palmJobsPerCycle, int jointJobsPerCycle, LayerMask layerMask, float[] extraRadius = null)
+        {
+            this.cycles = cycleCount;
+            this.palmJobsPerCycle = palmJobsPerCycle;
+            this.jointJobsPerCycle = jointJobsPerCycle;
+
+            palmJob = new PhysBoxCastJob(cycleCount, palmJobsPerCycle, layerMask);
+            palmResults = new NativeArray<RaycastHit>(cycleCount * palmJobsPerCycle, Allocator.Persistent);
+            palmJobCount = Mathf.Max(cycleCount * palmJobsPerCycle / JobsUtility.JobWorkerCount, 1);
+
+            jointJob = new PhysSphereCastJob(cycleCount, jointJobsPerCycle, layerMask);
+            jointResults = new NativeArray<RaycastHit>(cycleCount * jointJobsPerCycle, Allocator.Persistent);
+            jointJobCount = Mathf.Max(cycleCount * jointJobsPerCycle / JobsUtility.JobWorkerCount, 1);
+
+            this.extraRadius = extraRadius;
+        }
+
+        public void UpdateHand(ContactHand hand)
+        {
+            Vector3 origin = Vector3.zero, halfExtents = Vector3.zero, direction = Vector3.zero;
+            Quaternion orientation = Quaternion.identity;
+            float distance = 0;
+
+            UpdatePalm(hand, ref origin, ref halfExtents, ref direction, ref orientation, ref distance);
+            UpdateJointSafetyCasts(hand, ref origin, tip: ref direction, radius: ref distance);
+        }
+
+        private void UpdatePalm(ContactHand hand, ref Vector3 origin, ref Vector3 halfExtents, ref Vector3 direction, ref Quaternion orientation, ref float distance)
+        {
+            GetPalmBoxCastParams(hand.palmBone.transform, hand.palmBone.palmCollider,
+                    out origin, out halfExtents, out orientation, out direction, out distance);
+
+            for (int i = 0; i < cycles * palmJobsPerCycle; i++)
+            {
+                if (i < palmJobsPerCycle)
+                {
+                    palmJob.origins[i] = origin;
+                    palmJob.directions[i] = direction;
+                    palmJob.distances[i] = distance;
+                    palmJob.orientations[i] = orientation;
+                }
+
+                if (extraRadius != null && extraRadius.Length > i / palmJobsPerCycle)
+                {
+                    palmJob.halfExtents[i] = halfExtents + (Vector3.one * extraRadius[i / palmJobsPerCycle]);
+                }
+                else
+                {
+                    palmJob.halfExtents[i] = halfExtents;
+                }
             }
         }
 
-        internal void Dispose()
+        private void GetPalmBoxCastParams(Transform transform, BoxCollider collider, out Vector3 origin, out Vector3 halfExtents, out Quaternion orientation, out Vector3 direction, out float distance)
         {
-            tracked.Dispose();
-            origins.Dispose();
-            directions.Dispose();
-            radii.Dispose();
-            distances.Dispose();
-            orientations.Dispose();
-            halfExtents.Dispose();
-            sphereCommands.Dispose();
-            boxCommands.Dispose();
+            distance = (Vector3.Scale(PhysExts.AbsVec3(transform.lossyScale), collider.size) * 0.25f).y;
+            PhysExts.ToWorldSpaceBoxOffset(collider, -Vector3.up * distance,
+                out origin, out halfExtents, out orientation);
+            distance = halfExtents.y;
+            halfExtents.y /= 2f;
+            direction = transform.up;
+            ExtDebug.DrawBoxCastBox(origin, halfExtents, orientation, direction, distance, Color.red);
+        }
+
+        private void UpdateJointSafetyCasts(ContactHand hand, ref Vector3 origin, ref Vector3 tip, ref float radius)
+        {
+            for (int i = 0; i < cycles * jointJobsPerCycle; i++)
+            {
+                PhysExts.ToWorldSpaceCapsule(hand.bones[i % jointJobsPerCycle].boneCollider, out origin, out tip, out radius);
+
+                if (i < jointJobsPerCycle)
+                {
+                    jointJob.origins[i] = origin;
+                    jointJob.directions[i] = (tip - origin).normalized;
+                    jointJob.distances[i] = Vector3.Distance(origin, tip);
+                    Debug.DrawRay(origin, jointJob.directions[i] * jointJob.distances[i], Color.red);
+                }
+
+                if(extraRadius != null && extraRadius.Length > i / jointJobsPerCycle)
+                {
+                    jointJob.radii[i] = radius + extraRadius[i / jointJobsPerCycle];
+                }
+                else
+                {
+                    jointJob.radii[i] = radius;
+                }
+            }
+        }
+
+        public void ScheduleJobs(out JobHandle handle)
+        {
+            JobHandle palmHandle = palmJob.ScheduleParallel(palmJob.commands.Length, 64, default);
+            palmHandle = BoxcastCommand.ScheduleBatch(palmJob.commands, palmResults, palmJobCount, palmHandle);
+
+            handle = jointJob.ScheduleParallel(jointJob.commands.Length, 64, palmHandle);
+            handle = SpherecastCommand.ScheduleBatch(jointJob.commands, jointResults, jointJobCount, handle);
+        }
+
+        public void Dispose()
+        {
+            palmJob.Dispose();
+            palmResults.Dispose();
+
+            jointJob.Dispose();
+            jointResults.Dispose();
         }
     }
+
 
 #if UNITY_2021_3_OR_NEWER
     public struct PhysMultiRaycastHitEnumerator
@@ -210,7 +348,6 @@ namespace Leap.Unity.ContactHands
     }
 #endif
 
-#if UNITY_2022_3_OR_NEWER
 #if BURST_AVAILABLE
     [BurstCompile]
 #endif
@@ -330,6 +467,5 @@ namespace Leap.Unity.ContactHands
             return true;
         }
     }
-
-#endif
 }
+#endif
