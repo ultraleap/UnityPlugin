@@ -129,12 +129,9 @@ namespace Leap.Unity.ContactHands
 
             contactHands?.UpdateFrame();
 
-            // Output the frame on update
-            if (!Time.inFixedTimeStep)
-            {
-                contactHands?.OutputFrame(ref _modifiedFrame);
-                DispatchUpdateFrameEvent(_modifiedFrame);
-            }
+            // Output the frame on each update
+            contactHands?.OutputFrame(ref _modifiedFrame);
+            DispatchUpdateFrameEvent(_modifiedFrame);
         }
 
         private IEnumerator PostFixedUpdate()

@@ -685,7 +685,7 @@ namespace Leap.Unity.ContactHands
                         {
                             if (bone.Finger == _bones[pair.Key][j].First().Finger)
                             {
-                                //bone.AddGrabbing(_rigid);
+                                bone.AddGrabbing(_rigid);
                             }
                         }
                     }
@@ -695,7 +695,7 @@ namespace Leap.Unity.ContactHands
             {
                 foreach (var item in pair.Key.bones)
                 {
-                    //item.RemoveGrabbing(_rigid);
+                    item.RemoveGrabbing(_rigid);
                 }
             }
         }

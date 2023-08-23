@@ -390,6 +390,19 @@ namespace Leap.Unity.ContactHands
 
             return false;
         }
+
+        internal void AddGrabbing(Rigidbody rigid)
+        {
+            _grabbedObjects.Add(rigid);
+            IsBoneGrabbing = _grabbedObjects.Count > 0;
+        }
+
+        internal void RemoveGrabbing(Rigidbody rigid)
+        {
+            _grabbedObjects.Remove(rigid);
+            IsBoneGrabbing = _grabbedObjects.Count > 0;
+        }
+
         #endregion
     }
 }

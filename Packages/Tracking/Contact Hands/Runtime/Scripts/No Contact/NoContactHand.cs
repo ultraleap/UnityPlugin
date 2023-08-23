@@ -58,6 +58,8 @@ namespace Leap.Unity.ContactHands
             }
             _velocity = ContactUtils.ToLinearVelocity(_oldPosition, hand.PalmPosition, Time.fixedDeltaTime);
             _angularVelocity = ContactUtils.ToAngularVelocity(_oldRotation, hand.Rotation, Time.fixedDeltaTime);
+            _oldPosition = hand.PalmPosition;
+            _oldRotation = hand.Rotation;
         }
     }
 }

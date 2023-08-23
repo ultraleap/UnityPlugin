@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Collections;
 using Unity.Jobs;
 using Unity.Jobs.LowLevel.Unsafe;
@@ -13,7 +14,13 @@ namespace Leap.Unity.ContactHands
         public LeapProvider dataProvider;
         public ContactManager contactManager;
 
-        private Collider[] _colliderCache = new Collider[10];
+        private bool _leftGoodState { get { return contactManager.contactHands.leftHand.InGoodState; } }
+        private bool _rightGoodState { get { return contactManager.contactHands.rightHand.InGoodState; } }
+
+        private ContactHand _leftContactHand { get { return contactManager.contactHands.leftHand; } }
+        private ContactHand _rightContactHand { get { return contactManager.contactHands.rightHand; } }
+
+        private Collider[] _colliderCache = new Collider[32];
 
         #region Safety Overlap Data
         private bool _jobsCreated = false;
@@ -24,6 +31,12 @@ namespace Leap.Unity.ContactHands
         #region Interaction Data
         private Dictionary<ContactHand, float[]> _fingerStrengths = new Dictionary<ContactHand, float[]>();
         public Dictionary<ContactHand, float[]> FingerStrengths => _fingerStrengths;
+
+        // Helpers
+        private Dictionary<Rigidbody, GrabHelperObject> _grabHelpers = new Dictionary<Rigidbody, GrabHelperObject>();
+        private HashSet<Rigidbody> _grabRigids = new HashSet<Rigidbody>();
+        private HashSet<Rigidbody> _hoveredItems = new HashSet<Rigidbody>();
+        private HashSet<ContactHand> _hoveringHands = new HashSet<ContactHand>();
         #endregion
 
 
@@ -80,29 +93,50 @@ namespace Leap.Unity.ContactHands
         private void OnFixedFrame(Frame frame)
         {
             UpdateHandHeuristics();
+            UpdateHelpers();
         }
 
+        #region Hand Updating
         private void UpdateHandHeuristics()
         {
-            if (contactManager.contactHands.leftHand.tracked)
+            if (_leftGoodState)
             {
-                UpdateHandOverlaps(contactManager.contactHands.leftHand);
-                UpdateBoneQueues(contactManager.contactHands.leftHand);
-                UpdateHandStatistics(contactManager.contactHands.leftHand);
+                UpdateHandStatistics(_leftContactHand);
+                UpdateHandOverlaps(_leftContactHand);
             }
-            if (contactManager.contactHands.rightHand.tracked)
+            else
             {
-                UpdateHandOverlaps(contactManager.contactHands.rightHand);
-                UpdateBoneQueues(contactManager.contactHands.rightHand);
-                UpdateHandStatistics(contactManager.contactHands.rightHand);
+                UntrackedHand(_leftContactHand);
+            }
+            if (_rightGoodState)
+            {
+                UpdateHandStatistics(_rightContactHand);
+                UpdateHandOverlaps(_rightContactHand);   
+            }
+            else
+            {
+                UntrackedHand(_rightContactHand);
+            }
+
+            // do the 22 jobs running here once all the batches have been created
+
+            if (_leftGoodState)
+            {
+                UpdateBoneQueues(_leftContactHand);
+            }
+            
+            if (_rightGoodState)
+            {
+                UpdateBoneQueues(_rightContactHand);
             }
         }
 
         private void UpdateHandOverlaps(ContactHand hand)
         {
 #if UNITY_2022_3_OR_NEWER
-
+            // batch the jobs here
 #else
+            HandOverlaps(hand);
             // Pre 2022 overlaps
             PalmOverlaps(hand.palmBone);
             for (int i = 0; i < hand.bones.Length; i++)
@@ -110,6 +144,53 @@ namespace Leap.Unity.ContactHands
                 JointOverlaps(hand.bones[i]);
             }
 #endif
+        }
+
+        private void UntrackedHand(ContactHand hand)
+        {
+            foreach (var helper in _grabHelpers)
+            {
+                helper.Value.RemoveHand(hand);
+            }
+        }
+
+        /// <summary>
+        /// Used to create helper objects.
+        /// </summary>
+        private void HandOverlaps(ContactHand hand)
+        {
+            float lerp = 0;
+            if (_fingerStrengths.ContainsKey(hand))
+            {
+                // Get the least curled finger excluding the thumb
+                lerp = _fingerStrengths[hand].Skip(1).Min();
+            }
+
+            int results = Physics.OverlapCapsuleNonAlloc(hand.palmBone.transform.position + (-hand.palmBone.transform.up * 0.025f) + ((hand.handedness == Chirality.Left ? hand.palmBone.transform.right : -hand.palmBone.transform.right) * 0.015f),
+                // Interpolate the tip position so we keep it relative to the straightest finger
+                hand.palmBone.transform.position + (-hand.palmBone.transform.up * Mathf.Lerp(0.025f, 0.07f, lerp)) + (hand.palmBone.transform.forward * Mathf.Lerp(0.06f, 0.02f, lerp)),
+                0.1f, _colliderCache, contactManager.InteractionMask);
+
+            GrabHelperObject tempHelper;
+            for (int i = 0; i < results; i++)
+            {
+                if (_colliderCache[i].attachedRigidbody != null)
+                {
+                    _hoveringHands.Add(hand);
+                    _hoveredItems.Add(_colliderCache[i].attachedRigidbody);
+                    if (_grabHelpers.TryGetValue(_colliderCache[i].attachedRigidbody, out tempHelper))
+                    {
+                        tempHelper.AddHand(hand);
+                    }
+                    else
+                    {
+                        GrabHelperObject helper = new GrabHelperObject(_colliderCache[i].attachedRigidbody, this);
+                        helper.AddHand(hand);
+                        _grabHelpers.Add(_colliderCache[i].attachedRigidbody, helper);
+                        //SendStates(_colliderCache[i].attachedRigidbody, helper);
+                    }
+                }
+            }
         }
 
         private void PalmOverlaps(ContactBone palmBone)
@@ -155,8 +236,8 @@ namespace Leap.Unity.ContactHands
 
 #else
             // Pre 2022 overlaps
-            HandSafetyOverlaps(contactManager.contactHands.leftHand);
-            HandSafetyOverlaps(contactManager.contactHands.rightHand);
+            HandSafetyOverlaps(_leftContactHand);
+            HandSafetyOverlaps(_rightContactHand);
 #endif
         }
 
@@ -386,6 +467,58 @@ namespace Leap.Unity.ContactHands
                 _fingerStrengths[hand][i] = lHand.GetFingerStrength(i);
             }
         }
+        #endregion
+
+        #region Helper Updating
+        private void UpdateHelpers()
+        {
+            ApplyHovers();
+
+            GrabHelperObject.State oldState, state;
+
+            foreach (var helper in _grabHelpers)
+            {
+                // Removed ignore check here and moved into the helper so we can still get state information
+                oldState = helper.Value.GraspState;
+                state = helper.Value.UpdateHelper();
+                if (state != oldState)
+                {
+                    //SendStates(helper.Value.Rigidbody, helper.Value);
+                }
+            }
+        }
+
+        private void ApplyHovers()
+        {
+            foreach (var rigid in _hoveredItems)
+            {
+                _grabRigids.Add(rigid);
+            }
+            _grabRigids.RemoveWhere(ValidateUnhoverRigids);
+            _hoveredItems.Clear();
+        }
+
+        private bool ValidateUnhoverRigids(Rigidbody rigid)
+        {
+            if (!_hoveredItems.Contains(rigid))
+            {
+                if (_grabHelpers.ContainsKey(rigid))
+                {
+                    if (_grabHelpers[rigid].GraspState == GrabHelperObject.State.Grasp)
+                    {
+                        // Ensure we release the object first
+                        _grabHelpers[rigid].ReleaseObject();
+                    }
+                    _grabHelpers[rigid].ReleaseHelper();
+//                    SendStates(rigid, _grabHelpers[rigid]);
+
+                    _grabHelpers.Remove(rigid);
+                }
+                return true;
+            }
+            return false;
+        }
+        #endregion
 
         private void OnValidate()
         {

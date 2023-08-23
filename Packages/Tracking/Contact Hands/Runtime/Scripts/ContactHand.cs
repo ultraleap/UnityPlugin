@@ -14,7 +14,19 @@ namespace Leap.Unity.ContactHands
         public Chirality handedness = Chirality.Left;
 
         internal Hand modifiedHand = new Hand(), dataHand = new Hand();
-        internal bool tracked = false;
+        internal bool tracked = false, ghosted = false;
+        /// <summary>
+        /// Is the hand tracked from a visual sense?
+        /// </summary>
+        public bool Tracked => tracked;
+        /// <summary>
+        /// Is the hand able to interact with the physic simulation, or is it in a reset state?
+        /// </summary>
+        public bool Ghosted => ghosted;
+        /// <summary>
+        /// Is the hand both tracked and not resetting due to physics interactions?
+        /// </summary>
+        public bool InGoodState { get { return tracked && !ghosted; } }
 
         internal ContactParent contactParent = null;
 
@@ -23,6 +35,9 @@ namespace Leap.Unity.ContactHands
         public bool IsContacting => isContacting;
         public bool IsCloseToObject => isCloseToObject;
 
+        /// <summary>
+        /// These values will need to be manually calculated if there are no rigidbodies on the bones.
+        /// </summary>
         protected Vector3 _velocity, _angularVelocity;
         public Vector3 Velocity => _velocity;
         public Vector3 AngularVelocity => _angularVelocity;
