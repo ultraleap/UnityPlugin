@@ -39,24 +39,28 @@ namespace Leap.Unity
             EditorGUILayout.Space(10);
             EditorGUILayout.LabelField("Leap XRHands Subsystem", EditorStyles.boldLabel);
             
+            EditorGUILayout.Space(5);
             EditorGUILayout.HelpBox("If using OpenXR for hand input, use the Hand Tracking Subsystem in XR Plug-in Management/OpenXR. Do not enable both subsystems." +
                 "\r\n\nThis option can not be toggled at runtime.", MessageType.Info, true);
 
             EditorGUILayout.Space(5);
 
-            SerializedProperty leapSubsystemEnabledProperty = settings.FindProperty("leapSubsystemEnabled");
-            leapSubsystemEnabledProperty.boolValue = EditorGUILayout.ToggleLeft("Enable Leap XRHands Subsystem", leapSubsystemEnabledProperty.boolValue);
-
+            using (new EditorGUI.IndentLevelScope())
+            {
+                SerializedProperty leapSubsystemEnabledProperty = settings.FindProperty("leapSubsystemEnabled");
+                leapSubsystemEnabledProperty.boolValue = EditorGUILayout.ToggleLeft("Enable Leap XRHands Subsystem", leapSubsystemEnabledProperty.boolValue);
+            }
             EditorGUILayout.Space(10);
             EditorGUILayout.LabelField("Input Actions", EditorStyles.boldLabel);
             EditorGUILayout.Space(5);
+            using (new EditorGUI.IndentLevelScope())
+            {
+                SerializedProperty updateLeapInputSystemProperty = settings.FindProperty("updateLeapInputSystem");
+                updateLeapInputSystemProperty.boolValue = EditorGUILayout.ToggleLeft("Update Leap Input System", updateLeapInputSystemProperty.boolValue);
 
-            SerializedProperty updateLeapInputSystemProperty = settings.FindProperty("updateLeapInputSystem");
-            updateLeapInputSystemProperty.boolValue = EditorGUILayout.ToggleLeft("Update Leap Input System", updateLeapInputSystemProperty.boolValue);
-
-            SerializedProperty updateMetaInputSystemProperty = settings.FindProperty("updateMetaInputSystem");
-            updateMetaInputSystemProperty.boolValue = EditorGUILayout.ToggleLeft("Update Meta Aim Input System", updateMetaInputSystemProperty.boolValue);
-
+                SerializedProperty updateMetaInputSystemProperty = settings.FindProperty("updateMetaInputSystem");
+                updateMetaInputSystemProperty.boolValue = EditorGUILayout.ToggleLeft("Update Meta Aim Input System", updateMetaInputSystemProperty.boolValue);
+            }
             EditorGUILayout.Space(30);
 
             if (GUILayout.Button("Reset To Defaults"))
