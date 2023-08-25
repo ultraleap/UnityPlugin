@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -79,6 +80,39 @@ namespace Leap.Unity.ContactHands
         public static bool IsValid(this Vector3 v)
         {
             return !(float.IsNaN(v.x) || float.IsNaN(v.y) || float.IsNaN(v.z)) && !(float.IsInfinity(v.x) || float.IsInfinity(v.y) || float.IsInfinity(v.z));
+        }
+
+        /// <summary>
+        /// Checks whether any of the following are currently inside an object:
+        /// - tip of the bone
+        /// - centre of the bone
+        /// - midpoint of tip & centre
+        /// - midpoint of centre & base
+        /// 
+        /// To take into account width, pass in the bone width
+        /// </summary>
+        /// <param name="bone">The bone to check if it is in</param>
+        /// <param name="colliders">A list of colliders representing the object to check</param>
+        /// <param name="boneWidth">Optional width of the bone - if not passed, will default to 0</param>
+        /// <returns></returns>
+        public static bool IsBoneWithinObject(this Leap.Bone bone, List<Collider> colliders, float boneWidth = 0)
+        {
+            for (int i = 0; i < colliders.Count; i++)
+            {
+                if (colliders[i] == null)
+                {
+                    continue;
+                }
+                if (colliders[i].IsSphereWithinCollider(bone.NextJoint, boneWidth)
+                    || colliders[i].IsSphereWithinCollider(bone.Center, boneWidth)
+                    || colliders[i].IsSphereWithinCollider(Vector3.Lerp(bone.Center, bone.NextJoint, 0.5f), boneWidth)
+                    || colliders[i].IsSphereWithinCollider(Vector3.Lerp(bone.Center, bone.PrevJoint, 0.5f), boneWidth)
+                    )
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         #region Names

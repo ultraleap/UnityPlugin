@@ -115,7 +115,40 @@ namespace Leap.Unity.ContactHands
 
         public static bool ContainsRange<T>(this T[] arr, T value, int maxIndex)
         {
-            return System.Array.IndexOf(arr, value,0, maxIndex) != -1;
+            return System.Array.IndexOf(arr, value, 0, maxIndex) != -1;
+        }
+
+        /// <summary>
+        /// Checks if a point is within a collider
+        /// </summary>
+        /// <param name="collider">The collider to check</param>
+        /// <param name="point">The point to check</param>
+        /// <returns></returns>
+        public static bool IsPointWithinCollider(this Collider collider, Vector3 point)
+        {
+            return collider.IsSphereWithinCollider(point, 0);
+        }
+
+        /// <summary>
+        /// Checks if a sphere intersects with a collider
+        /// </summary>
+        /// <param name="collider">The collider to check</param>
+        /// <param name="centre">The centre of the sphere</param>
+        /// <param name="radius">The radius of the sphere, in meters</param>
+        /// <returns></returns>
+        public static bool IsSphereWithinCollider(this Collider collider, Vector3 centre, float radius)
+        {
+            Vector3 closestPoint = collider.ClosestPoint(centre);
+            bool isPointWithinCollider = closestPoint == centre;
+
+            if (isPointWithinCollider)
+            {
+                return true;
+            }
+            else
+            {
+                return Vector3.Distance(centre, closestPoint) < radius;
+            }
         }
     }
 

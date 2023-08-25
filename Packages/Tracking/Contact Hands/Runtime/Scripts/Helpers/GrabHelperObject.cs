@@ -700,6 +700,7 @@ namespace Leap.Unity.ContactHands
             }
         }
 
+        //TODO try the bone within object checks WITH width passed in
         private bool DataHandIntersection(ContactHand hand)
         {
             bool thumb = false, otherFinger = false;
@@ -728,14 +729,14 @@ namespace Leap.Unity.ContactHands
                             if (thumb)
                                 continue;
 
-                            if (IsBoneWithinObject(lHand.Fingers[bone.Finger].bones[bone.Joint]))
+                            if (lHand.Fingers[bone.Finger].bones[bone.Joint].IsBoneWithinObject(_colliders))
                             {
                                 thumb = true;
                                 earlyQuit = true;
                             }
                             break;
                         case 1: // index
-                            if (IsBoneWithinObject(lHand.Fingers[bone.Finger].bones[bone.Joint]))
+                            if (lHand.Fingers[bone.Finger].bones[bone.Joint].IsBoneWithinObject(_colliders))
                             {
                                 otherFinger = true;
                                 earlyQuit = true;
@@ -744,7 +745,7 @@ namespace Leap.Unity.ContactHands
                         case 2: // middle
                         case 3: // ring
                         case 4: // pinky
-                            if (bone.Joint == 2 && IsBoneWithinObject(lHand.Fingers[bone.Finger].bones[bone.Joint]))
+                            if (bone.Joint == 2 && lHand.Fingers[bone.Finger].bones[bone.Joint].IsBoneWithinObject(_colliders))
                             {
                                 otherFinger = true;
                                 earlyQuit = true;
@@ -763,27 +764,6 @@ namespace Leap.Unity.ContactHands
                 }
             }
             return thumb && otherFinger;
-        }
-
-        private bool IsBoneWithinObject(Leap.Bone bone)
-        {
-            for (int i = 0; i < _colliders.Count; i++)
-            {
-                if (_colliders[i] == null)
-                {
-                    continue;
-                }
-                if (IsPointWithinCollider(_colliders[i], bone.NextJoint) || IsPointWithinCollider(_colliders[i], bone.Center))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        private bool IsPointWithinCollider(Collider collider, Vector3 point)
-        {
-            return collider.ClosestPoint(point) == point;
         }
 
         private void UpdateHandPositions()

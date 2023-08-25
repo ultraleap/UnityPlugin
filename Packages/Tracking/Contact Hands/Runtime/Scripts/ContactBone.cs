@@ -356,6 +356,12 @@ namespace Leap.Unity.ContactHands
                 {
                     bonePosCenter = transform.TransformPoint(0, 0, transform.InverseTransformPoint(hoveredColliderDirection.Value.bonePos).z);
 
+                    bool boneInsideCollider = hoveredColliderDirection.Key.IsSphereWithinCollider(bonePosCenter, width);
+                    if (boneInsideCollider)
+                    {
+                        return true;
+                    }
+
                     closestPoint = hoveredColliderDirection.Key.ClosestPoint(bonePosCenter);
                     boneCenterToColliderDirection = (closestPoint - bonePosCenter).normalized;
 
