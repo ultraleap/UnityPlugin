@@ -73,7 +73,7 @@ namespace Leap.Unity.MRTK
                 // query for the single joint.
                 if (!AlreadyFullQueried)
                 {
-                    Leap.Hand currentHand = provider.GetHand(handChirality);
+                    Leap.Hand currentHand = provider?.GetHand(handChirality);
 
                     if (currentHand == null)
                     {
@@ -98,7 +98,7 @@ namespace Leap.Unity.MRTK
 
             private void TryCalculateEntireHand()
             {
-                Leap.Hand currentHand = provider.GetHand(handChirality);
+                Leap.Hand currentHand = provider?.GetHand(handChirality);
 
                 if (currentHand == null)
                 {
