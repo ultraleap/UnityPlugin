@@ -6,11 +6,18 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
+using LeapInternal;
+using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using UnityEditor.VersionControl;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Layouts;
+using UnityEngine.SubsystemsImplementation.Extensions;
 using UnityEngine.XR.Hands;
+using UnityEngine.XR.Hands.ProviderImplementation;
+using UnityEngine.XR.Hands.Processing;
 
 namespace Leap.Unity.InputActions
 {
@@ -106,10 +113,36 @@ namespace Leap.Unity.InputActions
         {
             if (Application.isPlaying)
             {
-                UpdateStateWithLeapHand(leftDevice, subsystem.leftHand, ref leftState);
-                UpdateStateWithLeapHand(rightDevice, subsystem.rightHand, ref rightState);
+                var camPos = Camera.main.transform.parent.position;
+                var camRot = Camera.main.transform.parent.rotation;
+
+                // TODO This does not copy the data, need to get all of the individual joints and copy them. Alternatively, mem copy
+
+                XRHand rightHand = subsystem.rightHand;
+                XRHand leftHand = subsystem.leftHand;
+
+
+                ConvertRootToWorldSpace(camPos, camRot, subsystem, subsystem.rightHand, out Pose rightRootPose);
+                ConvertRootToWorldSpace(camPos, camRot, subsystem, subsystem.leftHand, out Pose leftRootPose);
+                
+                rightHand.SetRootPose(rightRootPose);
+                leftHand.SetRootPose(leftRootPose);
+                
+                UpdateStateWithLeapHand(rightDevice, rightHand, ref rightState);
+                UpdateStateWithLeapHand(leftDevice, leftHand, ref leftState);
             }
         }
+
+
+        private static void ConvertRootToWorldSpace(Vector3 camPos, Quaternion camRot, XRHandSubsystem subsystem, XRHand subsystemXrHand, out Pose pose)
+        {
+            pose = new Pose(camPos, camRot);
+
+            pose.position = subsystemXrHand.rootPose.position + camPos;
+            pose.rotation = camRot * subsystemXrHand.rootPose.rotation;
+
+        }
+
 
         /// <summary>
         /// Handles updating the inputDevice with chosen data from the hand using the cached handState structure as a base
