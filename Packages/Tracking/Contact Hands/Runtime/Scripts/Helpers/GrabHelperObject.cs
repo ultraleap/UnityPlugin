@@ -66,6 +66,10 @@ namespace Leap.Unity.ContactHands
             public Vector3 offset;
             public Quaternion originalHandRotation, rotationOffset;
 
+            /// <summary>
+            /// True while hand pinching on contact
+            /// </summary>
+            public bool waitingForInitialUnpinch = false;
 
             /// <summary>
             /// The hand is grabbing the object
@@ -415,6 +419,15 @@ namespace Leap.Unity.ContactHands
                 if (!_graspingValues.ContainsKey(hand))
                 {
                     _graspingValues.Add(hand, new GraspValues());
+
+                    for (int j = 1; j < 5; j++)
+                    {
+                        if (hand.dataHand.GetFingerPinchDistance(j) <= REQUIRED_PINCH_DISTANCE)
+                        {
+                            _graspingValues[hand].waitingForInitialUnpinch = true;
+                            break;
+                        }
+                    }
                 }
 
                 for (int i = 0; i < 5; i++)
@@ -445,10 +458,20 @@ namespace Leap.Unity.ContactHands
 
                         if (i == 0)
                         {
+                            bool unpinched = true;
                             for (int j = 1; j < 5; j++)
                             {
+
+                                //dont allow if pinching on enter
+
                                 if (hand.dataHand.GetFingerPinchDistance(j) <= REQUIRED_PINCH_DISTANCE)
                                 {
+                                    if (_graspingValues[hand].waitingForInitialUnpinch)
+                                    {
+                                        unpinched = false;
+                                        continue;
+                                    }
+
                                     // Make very small pinches more sticky
                                     _graspingValues[hand].fingerStrength[j] *= 0.85f;
                                     if (c == 0)
@@ -462,11 +485,21 @@ namespace Leap.Unity.ContactHands
                                     }
                                 }
                             }
-                            if (c > 0)
+
+                            if (unpinched)
+                            {
+                                _graspingValues[hand].waitingForInitialUnpinch = false;
+                            }
+
+                            if (c > 0 || _graspingValues[hand].waitingForInitialUnpinch)
                             {
                                 break;
                             }
                         }
+
+                        // if waiting for ungrab AND no contact 
+                        // ungrab == required ungrab strength 2
+
                         if (_graspingValues[hand].fingerStrength[i] > _graspingValues[hand].originalFingerStrength[i] + ((1 - _graspingValues[hand].originalFingerStrength[i]) * REQUIRED_ENTRY_STRENGTH))
                         {
                             c++;
@@ -660,6 +693,7 @@ namespace Leap.Unity.ContactHands
                 if (!data)
                 {
                     SetBoneGrasping(graspedHand, false);
+                    _graspingValues[graspedHand.Key].waitingForInitialUnpinch = true;
                     _graspingHands.Remove(graspedHand.Key);
                     //if (_rigid.TryGetComponent<IContactHandGrab>(out var ContactHandGrab))
                     //{
