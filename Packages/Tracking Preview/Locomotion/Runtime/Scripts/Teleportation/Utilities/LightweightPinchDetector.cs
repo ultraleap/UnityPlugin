@@ -17,10 +17,21 @@ namespace Leap.Unity.Preview.Locomotion
     /// </summary>
     public class LightweightPinchDetector : MonoBehaviour
     {
+        public enum PinchableFingerType
+        {
+            INDEX = Finger.FingerType.TYPE_INDEX,
+            MIDDLE = Finger.FingerType.TYPE_MIDDLE,
+            RING = Finger.FingerType.TYPE_RING,
+            PINKY = Finger.FingerType.TYPE_PINKY,
+        }
+
         public LeapProvider leapProvider;
         public Chirality chirality;
 
-        public Leap.Finger.FingerType fingerType = Finger.FingerType.TYPE_INDEX;
+        /// <summary>
+        /// The finger to check for pinches against the thumb
+        /// </summary>
+        public PinchableFingerType fingerType = PinchableFingerType.INDEX;
 
         [Header("Pinch Activation Settings")]
         [Tooltip("The distance between fingertip and thumb at which to enter the pinching state.")]
