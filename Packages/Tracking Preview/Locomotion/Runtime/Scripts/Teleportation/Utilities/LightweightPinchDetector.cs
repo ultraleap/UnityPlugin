@@ -13,17 +13,19 @@ namespace Leap.Unity.Preview.Locomotion
 {
     /// <summary>
     /// A lightweight Pinch Detector, that calculates a pinch value based on the distance between the 
-    /// index tip and the thumb tip. Utilises hysteresis in order to have different pinch and unpinch thresholds.
+    /// provided finger tip and the thumb tip. Utilises hysteresis in order to have different pinch and unpinch thresholds.
     /// </summary>
     public class LightweightPinchDetector : MonoBehaviour
     {
         public LeapProvider leapProvider;
         public Chirality chirality;
 
+        public Leap.Finger.FingerType fingerType = Finger.FingerType.TYPE_INDEX;
+
         [Header("Pinch Activation Settings")]
-        [Tooltip("The distance between index and thumb at which to enter the pinching state.")]
+        [Tooltip("The distance between fingertip and thumb at which to enter the pinching state.")]
         public float activateDistance = 0.018f;
-        [Tooltip("The distance between index and thumb at which to leave the pinching state.")]
+        [Tooltip("The distance between fingertip and thumb at which to leave the pinching state.")]
         public float deactivateDistance = 0.024f;
 
         public Action<Hand> OnPinch, OnUnpinch, OnPinching;
@@ -67,7 +69,7 @@ namespace Leap.Unity.Preview.Locomotion
             }
 
             // Convert from mm to m
-            float pinchDistance = hand.PinchDistance * 0.001f;
+            float pinchDistance = hand.GetFingerPinchDistance((int)fingerType) * 0.001f;
 
             if (pinchDistance < activateDistance)
             {
