@@ -68,9 +68,7 @@ namespace Leap.Unity.Preview.Locomotion
                 return;
             }
 
-            // Convert from mm to m
-            float pinchDistance = hand.GetFingerPinchDistance((int)fingerType) * 0.001f;
-
+            float pinchDistance = hand.GetFingerPinchDistance((int)fingerType);
             if (pinchDistance < activateDistance)
             {
                 if (!IsPinching)
