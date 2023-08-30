@@ -1,5 +1,5 @@
+using System;
 using UnityEngine;
-using System.Collections.Generic;
 #if UNITY_EDITOR
 using UnityEditor;
 using System.IO;
@@ -8,34 +8,19 @@ using System.IO;
 namespace Leap.Unity
 {
 #if UNITY_EDITOR
-    static class UltraleapProjectSettings
+    [CustomEditor(typeof(UltraleapSettings))]
+    public class UltraleapSettingsDrawer : Editor
     {
-        [SettingsProvider]
-        public static SettingsProvider CreateUltraleapSettingsProvider()
+
+        public override void OnInspectorGUI()
         {
-            // First parameter is the path in the Settings window.
-            // Second parameter is the scope of this setting: it only appears in the Project Settings window.
-            var provider = new SettingsProvider("Project/Ultraleap", SettingsScope.Project)
-            {
-                // By default the last token of the path is used as display name if no label is provided.
-                label = "Ultraleap",
-                // Create the SettingsProvider and initialize its drawing (IMGUI) function in place:
-                guiHandler = (searchContext) =>
-                {
-                    LeapSubSystemSection();
-                },
+            base.OnInspectorGUI();
 
-                // Populate the search keywords to enable smart search filtering and label highlighting:
-                keywords = new HashSet<string>(new[] { "XRHands", "Leap", "Leap Input System", "Meta Aim System", "Subsystem" })
-            };
-
-            return provider;
+            LeapSubSystemSection();
         }
 
-        private static void LeapSubSystemSection()
+        private void LeapSubSystemSection()
         {
-            var settings = UltraleapSettings.GetSerializedSettings();
-
             EditorGUILayout.Space(10);
             EditorGUILayout.LabelField("Leap XRHands Subsystem", EditorStyles.boldLabel);
             
@@ -44,17 +29,17 @@ namespace Leap.Unity
 
             EditorGUILayout.Space(5);
 
-            SerializedProperty leapSubsystemEnabledProperty = settings.FindProperty("leapSubsystemEnabled");
+            SerializedProperty leapSubsystemEnabledProperty = this.serializedObject.FindProperty("leapSubsystemEnabled");
             leapSubsystemEnabledProperty.boolValue = EditorGUILayout.ToggleLeft("Enable Leap XRHands Subsystem", leapSubsystemEnabledProperty.boolValue);
 
             EditorGUILayout.Space(10);
             EditorGUILayout.LabelField("Input Actions", EditorStyles.boldLabel);
             EditorGUILayout.Space(5);
 
-            SerializedProperty updateLeapInputSystemProperty = settings.FindProperty("updateLeapInputSystem");
+            SerializedProperty updateLeapInputSystemProperty = this.serializedObject.FindProperty("updateLeapInputSystem");
             updateLeapInputSystemProperty.boolValue = EditorGUILayout.ToggleLeft("Update Leap Input System", updateLeapInputSystemProperty.boolValue);
 
-            SerializedProperty updateMetaInputSystemProperty = settings.FindProperty("updateMetaInputSystem");
+            SerializedProperty updateMetaInputSystemProperty = this.serializedObject.FindProperty("updateMetaInputSystem");
             updateMetaInputSystemProperty.boolValue = EditorGUILayout.ToggleLeft("Update Meta Aim Input System", updateMetaInputSystemProperty.boolValue);
 
             EditorGUILayout.Space(30);
@@ -63,12 +48,12 @@ namespace Leap.Unity
             {
                 if(EditorUtility.DisplayDialog("Reset all settings", "This will reset all settings in this Ultraleap settings file", "Yes", "No"))
                 {
-                    UltraleapSettings.Instance.ResetToDefaults();
+                    var settingsTarget = target as UltraleapSettings;
+                    settingsTarget.ResetToDefaults();
                 }
             }
 
-            settings.ApplyModifiedPropertiesWithoutUndo();
-
+            this.serializedObject.ApplyModifiedProperties();
         }
     }
 #endif
@@ -108,7 +93,20 @@ namespace Leap.Unity
         [MenuItem("Ultraleap/Open Ultraleap Settings")]
         private static void SelectULSettingsDropdown()
         {
-            SettingsService.OpenProjectSettings("Project/Ultraleap");
+            SelectUlSettings();
+        }
+
+        private static void SelectUlSettings(bool silent = false)
+        {
+            UltraleapSettings ulSettings = Instance;
+            if (ulSettings != null)
+            {
+                Selection.activeObject = ulSettings;
+            }
+            else
+            {
+                EditorUtility.DisplayDialog("No ultraleap settings file", "There is no settings file available, please try re-importing the plugin.", "Ok");
+            }
         }
 #endif
 
@@ -149,11 +147,6 @@ namespace Leap.Unity
 
 #endif
             return newSO;
-        }
-
-        internal static SerializedObject GetSerializedSettings()
-        {
-            return new SerializedObject(FindSettingsSO());
         }
     }
 }
