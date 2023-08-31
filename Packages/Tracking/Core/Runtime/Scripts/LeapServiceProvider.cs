@@ -269,6 +269,11 @@ namespace Leap.Unity
         [SerializeField]
         protected bool _preventInitializingTrackingMode;
 
+        [Tooltip("[DEPRECATED] Which Leap Service API Endpoint to connect to.  This is configured on the service with the 'api_namespace' argument.")]
+        [SerializeField]
+        [EditTimeOnly]
+        protected string _serverNameSpace = "Leap Service";
+
         [Tooltip("The IP address on which the Tracking service listens to. This is configured on the service with 'ip_address' in the 'leap_server_config' session of 'ServerConfig.json'")]
         [SerializeField]
         [EditTimeOnly]
@@ -893,9 +898,9 @@ namespace Leap.Unity
 
             string serialNumber = _multipleDeviceMode != MultipleDeviceMode.Disabled ? SpecificSerialNumber : "";
 
-            string serverNameSpace = $"{{\"tracking_server_ip\": \"{_serviceIP}\", \"tracking_server_port\": {_servicePort}}}";
+            _serverNameSpace = $"{{\"tracking_server_ip\": \"{_serviceIP}\", \"tracking_server_port\": {_servicePort}}}";
 
-            _leapController = new Controller(serialNumber.GetHashCode(), serverNameSpace, _multipleDeviceMode != MultipleDeviceMode.Disabled);
+            _leapController = new Controller(serialNumber.GetHashCode(), _serverNameSpace, _multipleDeviceMode != MultipleDeviceMode.Disabled);
 
             _leapController.Device += (s, e) =>
             {
@@ -1073,9 +1078,9 @@ namespace Leap.Unity
                 return _trackingSource;
             }
 #endif
-            string serverNameSpace = $"{{\"tracking_server_ip\": \"{_serviceIP}\", \"tracking_server_port\": {_servicePort}}}";
+            _serverNameSpace = $"{{\"tracking_server_ip\": \"{_serviceIP}\", \"tracking_server_port\": {_servicePort}}}";
 
-            if (LeapInternal.Connection.IsConnectionAvailable(serverNameSpace))
+            if (LeapInternal.Connection.IsConnectionAvailable(_serverNameSpace))
             {
                 _trackingSource = TrackingSource.LEAPC;
             }
