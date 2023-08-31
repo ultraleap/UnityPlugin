@@ -909,7 +909,7 @@ namespace Leap
         protected virtual long CalculateInterpolationTime(bool endOfFrame = false)
         {
 #if UNITY_ANDROID && !UNITY_EDITOR
-      return _leapController.Now() - 16000;
+            return _leapController.Now() - 16000;
 #else
             if (_leapController != null)
             {
@@ -943,7 +943,10 @@ namespace Leap
                 return;
             }
 
-            _serverNameSpace = $"{{\"tracking_server_ip\": \"{_serviceIP}\", \"tracking_server_port\": {_servicePort}}}";
+            if (_serverNameSpace == "Leap Service")
+            {
+                _serverNameSpace = $"{{\"tracking_server_ip\": \"{_serviceIP}\", \"tracking_server_port\": {_servicePort}}}";
+            }
 
             if (_multipleDeviceMode == MultipleDeviceMode.Disabled)
             {
@@ -1131,7 +1134,10 @@ namespace Leap
                 return _trackingSource;
             }
 
-            _serverNameSpace = $"{{\"tracking_server_ip\": \"{_serviceIP}\", \"tracking_server_port\": {_servicePort}}}";
+            if (_serverNameSpace == "Leap Service")
+            {
+                _serverNameSpace = $"{{\"tracking_server_ip\": \"{_serviceIP}\", \"tracking_server_port\": {_servicePort}}}";
+            }
 
             if (LeapInternal.Connection.IsConnectionAvailable(_serverNameSpace))
             {
