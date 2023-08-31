@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -  
 
 ### Changed
-- 
+- (Service Provider) Expose service IP and port as user settable variables
 
 ### Fixed
 - 
