@@ -271,10 +271,15 @@ namespace Leap
         [SerializeField]
         protected bool _preventInitializingTrackingMode;
 
-        [Tooltip("Which Leap Service API Endpoint to connect to.  This is configured on the service with the 'api_namespace' argument.")]
+        [Tooltip("The IP address on which the Tracking service listens to. This is configured on the service with 'ip_address' in the 'leap_server_config' session of 'ServerConfig.json'")]
         [SerializeField]
         [EditTimeOnly]
-        protected string _serverNameSpace = "Leap Service";
+        protected string _serviceIP = "127.0.0.1";
+
+        [Tooltip("The port on which the Tracking service listens to. This is configured on the service with 'port' in the 'leap_server_config' session of 'ServerConfig.json'")]
+        [SerializeField]
+        [EditTimeOnly]
+        protected string _servicePort = "12345";
 
         public override TrackingSource TrackingDataSource { get { return CheckLeapServiceAvailable(); } }
 
@@ -933,13 +938,15 @@ namespace Leap
                 return;
             }
 
+            string serverNameSpace = $"{{\"tracking_server_ip\": \"{_serviceIP}\", \"tracking_server_port\": {_servicePort}}}";
+
             if (_multipleDeviceMode == MultipleDeviceMode.Disabled)
             {
-                _leapController = new Controller(0, _serverNameSpace, true, _trackFiducialMarkers);
+                _leapController = new Controller(0, serverNameSpace, true, _trackFiducialMarkers);
             }
             else
             {
-                _leapController = new Controller(SpecificSerialNumber.GetHashCode(), _serverNameSpace, true, _trackFiducialMarkers);
+                _leapController = new Controller(SpecificSerialNumber.GetHashCode(), serverNameSpace, true, _trackFiducialMarkers);
             }
 
             _leapController.Device += (s, e) =>
@@ -1116,6 +1123,18 @@ namespace Leap
             if (HandTrackingSourceUtility.LeapCTrackingAvailable)
             {
                 _trackingSource = TrackingSource.LEAPC;
+                return _trackingSource;
+            }
+
+            string serverNameSpace = $"{{\"tracking_server_ip\": \"{_serviceIP}\", \"tracking_server_port\": {_servicePort}}}";
+
+            if (LeapInternal.Connection.IsConnectionAvailable(serverNameSpace))
+            {
+                _trackingSource = TrackingSource.LEAPC;
+            }
+            else
+            {
+                _trackingSource = TrackingSource.NONE;
             }
 
             return _trackingSource;
