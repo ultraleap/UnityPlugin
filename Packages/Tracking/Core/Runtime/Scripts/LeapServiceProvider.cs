@@ -898,7 +898,10 @@ namespace Leap.Unity
 
             string serialNumber = _multipleDeviceMode != MultipleDeviceMode.Disabled ? SpecificSerialNumber : "";
 
-            _serverNameSpace = $"{{\"tracking_server_ip\": \"{_serviceIP}\", \"tracking_server_port\": {_servicePort}}}";
+            if (_serverNameSpace == "Leap Service")
+            {
+                _serverNameSpace = $"{{\"tracking_server_ip\": \"{_serviceIP}\", \"tracking_server_port\": {_servicePort}}}";
+            }
 
             _leapController = new Controller(serialNumber.GetHashCode(), _serverNameSpace, _multipleDeviceMode != MultipleDeviceMode.Disabled);
 
@@ -1078,7 +1081,10 @@ namespace Leap.Unity
                 return _trackingSource;
             }
 #endif
-            _serverNameSpace = $"{{\"tracking_server_ip\": \"{_serviceIP}\", \"tracking_server_port\": {_servicePort}}}";
+            if (_serverNameSpace == "Leap Service")
+            {
+                _serverNameSpace = $"{{\"tracking_server_ip\": \"{_serviceIP}\", \"tracking_server_port\": {_servicePort}}}";
+            }
 
             if (LeapInternal.Connection.IsConnectionAvailable(_serverNameSpace))
             {
