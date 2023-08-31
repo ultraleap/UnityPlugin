@@ -271,6 +271,11 @@ namespace Leap
         [SerializeField]
         protected bool _preventInitializingTrackingMode;
 
+        [Tooltip("[DEPRECATED] Which Leap Service API Endpoint to connect to.  This is configured on the service with the 'api_namespace' argument.")]
+        [SerializeField]
+        [EditTimeOnly]
+        protected string _serverNameSpace = "Leap Service";
+
         [Tooltip("The IP address on which the Tracking service listens to. This is configured on the service with 'ip_address' in the 'leap_server_config' session of 'ServerConfig.json'")]
         [SerializeField]
         [EditTimeOnly]
@@ -938,7 +943,7 @@ namespace Leap
                 return;
             }
 
-            string serverNameSpace = $"{{\"tracking_server_ip\": \"{_serviceIP}\", \"tracking_server_port\": {_servicePort}}}";
+            _serverNameSpace = $"{{\"tracking_server_ip\": \"{_serviceIP}\", \"tracking_server_port\": {_servicePort}}}";
 
             if (_multipleDeviceMode == MultipleDeviceMode.Disabled)
             {
@@ -1126,9 +1131,9 @@ namespace Leap
                 return _trackingSource;
             }
 
-            string serverNameSpace = $"{{\"tracking_server_ip\": \"{_serviceIP}\", \"tracking_server_port\": {_servicePort}}}";
+            _serverNameSpace = $"{{\"tracking_server_ip\": \"{_serviceIP}\", \"tracking_server_port\": {_servicePort}}}";
 
-            if (LeapInternal.Connection.IsConnectionAvailable(serverNameSpace))
+            if (LeapInternal.Connection.IsConnectionAvailable(_serverNameSpace))
             {
                 _trackingSource = TrackingSource.LEAPC;
             }
