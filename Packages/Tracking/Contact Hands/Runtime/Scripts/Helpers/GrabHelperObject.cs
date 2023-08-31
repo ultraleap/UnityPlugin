@@ -420,14 +420,6 @@ namespace Leap.Unity.ContactHands
                 {
                     _graspingValues.Add(hand, new GraspValues());
 
-                    for (int j = 1; j < 5; j++)
-                    {
-                        if (hand.dataHand.GetFingerPinchDistance(j) <= REQUIRED_PINCH_DISTANCE)
-                        {
-                            _graspingValues[hand].waitingForInitialUnpinch = true;
-                            break;
-                        }
-                    }
                 }
 
                 for (int i = 0; i < 5; i++)
@@ -442,6 +434,10 @@ namespace Leap.Unity.ContactHands
                     }
                     else
                     {
+                        if (hand.dataHand.GetFingerPinchDistance(i) <= REQUIRED_PINCH_DISTANCE)
+                        {
+                            _graspingValues[hand].waitingForInitialUnpinch = true;
+                        }
                         _graspingValues[hand].originalFingerStrength[i] = -1;
                         _graspingValues[hand].fingerStrength[i] = -1;
                     }
@@ -737,6 +733,9 @@ namespace Leap.Unity.ContactHands
         //TODO try the bone within object checks WITH width passed in
         private bool DataHandIntersection(ContactHand hand)
         {
+            if (!hand.isHandPhysical)
+                return false;
+
             bool thumb = false, otherFinger = false;
             bool earlyQuit;
 

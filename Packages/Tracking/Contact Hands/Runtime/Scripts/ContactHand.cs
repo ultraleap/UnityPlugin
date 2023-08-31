@@ -15,6 +15,7 @@ namespace Leap.Unity.ContactHands
 
         internal Hand modifiedHand = new Hand(), dataHand = new Hand();
         internal bool tracked = false, ghosted = false;
+        internal bool isHandPhysical = true;
         /// <summary>
         /// Is the hand tracked from a visual sense?
         /// </summary>
@@ -27,6 +28,11 @@ namespace Leap.Unity.ContactHands
         /// Is the hand both tracked and not resetting due to physics interactions?
         /// </summary>
         public bool InGoodState { get { return tracked && !ghosted; } }
+
+        /// <summary>
+        /// Is the hand going to apply physics forces or should it pass through objects?
+        /// </summary>
+        public bool IsHandPhysical => isHandPhysical;
 
         internal ContactParent contactParent = null;
 

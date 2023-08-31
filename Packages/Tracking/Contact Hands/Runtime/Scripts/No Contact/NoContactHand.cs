@@ -40,6 +40,7 @@ namespace Leap.Unity.ContactHands
                 t.gameObject.layer = contactParent.contactManager.HandsResetLayer;
             }
             gameObject.SetActive(false);
+            isHandPhysical = false;
         }
 
         internal override void PostFixedUpdateHand()
