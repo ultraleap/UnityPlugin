@@ -45,7 +45,6 @@ namespace Leap.Unity.MRTK
             public LeapHandContainer(XRNode handNode) : base(handNode)
             {
                 handChirality = handNode == XRNode.LeftHand ? Chirality.Left : Chirality.Right;
-                provider = Hands.Provider;
             }
 
             Chirality handChirality;
@@ -198,7 +197,7 @@ namespace Leap.Unity.MRTK
         [Preserve]
         private class LeapMRTKProvider : Provider, IHandsSubsystem
         {
-            private Dictionary<XRNode, LeapHandContainer> hands = null;
+            private static Dictionary<XRNode, LeapHandContainer> hands = null;
 
             /// <inheritdoc/>
             public override void Start()
@@ -220,6 +219,41 @@ namespace Leap.Unity.MRTK
                 InputSystem.onBeforeUpdate -= ResetHands;
                 base.Stop();
             }
+
+            [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+            private static void RunAfterSceneLoad()
+            {
+                var leapMRTKSubsystem = XRSubsystemHelpers.GetFirstRunningSubsystem<LeapMRTKSubsystem>();
+
+                if (leapMRTKSubsystem == null)
+                {
+                    return;
+                }
+
+                LeapProvider leapProvider = Hands.Provider;
+
+                // If there is no leap provider in the scene
+                if (leapProvider == null)
+                {
+                    Debug.Log("There are no Leap Providers in the scene, automatically assigning one for use with MRTK subsystems");
+                }
+                else
+                {
+                    Debug.LogWarning("We recommend that you do not add a Leap Provider to scenes using the Leap Subsystem for MRTK. This can cause unwanted behaviour.");
+                }
+
+                GameObject leapProviderGO = new GameObject("LeapXRServiceProvider");
+                LeapXRServiceProvider leapXRServiceProvider = leapProviderGO.AddComponent<LeapXRServiceProvider>();
+                leapXRServiceProvider.PositionDeviceRelativeToMainCamera = true;
+                leapProvider = (LeapProvider)leapXRServiceProvider;
+                GameObject.DontDestroyOnLoad(leapProviderGO);
+
+                foreach (var hand in hands)
+                {
+                    hand.Value.provider = leapProvider;
+                }
+            }
+
 
             private void ResetHands()
             {

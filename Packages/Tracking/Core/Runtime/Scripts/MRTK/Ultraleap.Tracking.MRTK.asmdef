@@ -7,7 +7,9 @@
         "GUID:e40ba710768534012815d3193fa296cb",
         "GUID:ce522b6ed64c8be4c989a1d26d0e3275",
         "GUID:cec9848704c49724192ff47f9b3e9156",
-        "GUID:75469ad4d38634e559750d17036d5f7c"
+        "GUID:75469ad4d38634e559750d17036d5f7c",
+        "GUID:d59347cf3d47ac148925927618efb1b5",
+        "GUID:56255bd5d851a6243b63cb370cfc40b1"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -27,7 +29,7 @@
         },
         {
             "name": "org.mixedrealitytoolkit.input",
-            "expression": "3.0.0",
+            "expression": "3.0.0-Development",
             "define": "MRTK_INPUT"
         }
     ],
