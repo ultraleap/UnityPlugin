@@ -8,17 +8,7 @@ namespace Leap.Unity.ContactHands
     {
         internal override void GenerateHands()
         {
-            GameObject handObject = new GameObject("Left No Contact Hand", typeof(NoContactHand));
-            handObject.transform.parent = transform;
-            leftHand = handObject.GetComponent<NoContactHand>();
-            leftHand.handedness = Chirality.Left;
-            leftHand.GenerateHand();
-
-            handObject = new GameObject("Right No Contact Hand", typeof(NoContactHand));
-            handObject.transform.parent = transform;
-            rightHand = handObject.GetComponent<NoContactHand>();
-            rightHand.handedness = Chirality.Right;
-            rightHand.GenerateHand();
+            GenerateHandsObjects(typeof(NoContactHand));
         }
 
         internal override void PostFixedUpdateFrame()

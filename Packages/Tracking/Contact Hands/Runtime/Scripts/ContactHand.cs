@@ -14,7 +14,7 @@ namespace Leap.Unity.ContactHands
         public Chirality handedness = Chirality.Left;
 
         internal Hand modifiedHand = new Hand(), dataHand = new Hand();
-        internal bool tracked = false, ghosted = false;
+        internal bool tracked = false, resetting = false, ghosted = false;
         internal bool isHandPhysical = true;
         /// <summary>
         /// Is the hand tracked from a visual sense?
@@ -27,7 +27,7 @@ namespace Leap.Unity.ContactHands
         /// <summary>
         /// Is the hand both tracked and not resetting due to physics interactions?
         /// </summary>
-        public bool InGoodState { get { return tracked && !ghosted; } }
+        public bool InGoodState { get { return tracked && !resetting && !ghosted; } }
 
         /// <summary>
         /// Is the hand going to apply physics forces or should it pass through objects?
@@ -35,11 +35,15 @@ namespace Leap.Unity.ContactHands
         public bool IsHandPhysical => isHandPhysical;
 
         internal ContactParent contactParent = null;
+        internal ContactManager contactManager => contactParent.contactManager;
 
         #region Interaction Data
         public bool isContacting = false, isCloseToObject = false;
         public bool IsContacting => isContacting;
         public bool IsCloseToObject => isCloseToObject;
+
+        protected Vector3 _oldDataPosition;
+        protected Quaternion _oldDataRotation;
 
         /// <summary>
         /// These values will need to be manually calculated if there are no rigidbodies on the bones.
@@ -61,6 +65,7 @@ namespace Leap.Unity.ContactHands
         {
             contactParent = GetComponentInParent<ContactParent>();
             GenerateHandLogic();
+            gameObject.SetActive(false);
         }
         internal abstract void GenerateHandLogic();
 
@@ -70,11 +75,24 @@ namespace Leap.Unity.ContactHands
         /// <param name="hand">The original data hand coming from the input frame</param>
         internal abstract void BeginHand(Hand hand);
 
+
+        internal void UpdateHand(Hand hand)
+        {
+            dataHand.CopyFrom(hand);
+            UpdateHandLogic(hand);
+            // Update the bones
+            palmBone.UpdatePalmBone(hand);
+            for (int i = 0; i < bones.Length - 1; i++)
+            {
+                bones[i].UpdateBone(hand.Fingers[bones[i].Finger].bones[bones[i].joint + 1]);
+            }
+            CacheHandData(dataHand);
+        }
         /// <summary>
-        /// Every other frame that the hand needs to update when the hand reports tracked as true.
+        /// Every other frame that the hand needs to update when the hand reports tracked as true. This happens before the bones are updated.
         /// </summary>
         /// <param name="hand">The original data hand coming from the input frame</param>
-        internal abstract void UpdateHand(Hand hand);
+        protected abstract void UpdateHandLogic(Hand hand);
 
         /// <summary>
         /// When the original data hand has lost tracking.
@@ -187,6 +205,24 @@ namespace Leap.Unity.ContactHands
         public ContactBone GetBone(int fingerIndex, int jointIndex)
         {
             return bones[fingerIndex * FINGER_BONES + jointIndex];
+        }
+
+        protected void CacheHandData(Hand dataHand)
+        {
+            _velocity = ContactUtils.ToLinearVelocity(_oldDataPosition, modifiedHand.PalmPosition, Time.fixedDeltaTime);
+            _angularVelocity = ContactUtils.ToAngularVelocity(_oldDataRotation, modifiedHand.Rotation, Time.fixedDeltaTime);
+            _oldDataPosition = dataHand.PalmPosition;
+            _oldDataRotation = dataHand.Rotation;
+        }
+
+        protected void ChangeHandLayer(SingleLayer layer)
+        {
+            gameObject.layer = layer;
+            palmBone.gameObject.layer = layer;
+            for (int i = 0; i < bones.Length; i++)
+            {
+                bones[i].gameObject.layer = layer;
+            }
         }
     }
 }
