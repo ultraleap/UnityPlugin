@@ -17,76 +17,6 @@ namespace Leap.Unity.ContactHands
         private float overRotationCount;
         private bool wasGrabbingBone;
 
-        internal override void PostFixedUpdateBone()
-        {
-        }
-
-        internal override void UpdateBone(Bone prevBone, Bone bone)
-        {
-            UpdateBoneSizes(prevBone, bone);
-
-            UpdateBoneAngle(prevBone, bone);
-        }
-
-        internal override void UpdatePalmBone(Hand hand)
-        {
-            if (contactHand.isContacting || contactHand.isGrabbing)
-            {
-                // Reduce the hand velocity if we're pushing through an object
-                hardContactHand.currentPalmVelocityInterp = Mathf.InverseLerp(hardContactParent.maximumDistance * 0.2f, hardContactParent.maximumDistance * 0.95f, hardContactHand.computedHandDistance).EaseOut();
-                hardContactHand.currentPalmVelocity = Mathf.Lerp(hardContactHand.currentPalmVelocity,
-                    Mathf.Lerp(hardContactParent.maximumPalmVelocity, hardContactParent.minimumPalmVelocity, hardContactHand.currentPalmVelocityInterp),
-                    Time.fixedDeltaTime * (1.0f / 0.025f));
-                hardContactHand.currentPalmAngularVelocity = Mathf.Lerp(hardContactHand.currentPalmAngularVelocity,
-                    Mathf.Lerp(hardContactParent.maximumPalmAngularVelocity, hardContactParent.minimumPalmAngularVelocity, hardContactHand.currentPalmVelocityInterp),
-                    Time.fixedDeltaTime * (1.0f / 0.025f));
-            }
-            else
-            {
-                hardContactHand.currentPalmVelocity = Mathf.Lerp(hardContactHand.currentPalmVelocity, hardContactParent.maximumPalmVelocity, Time.fixedDeltaTime * (1.0f / 0.025f));
-                hardContactHand.currentPalmAngularVelocity = Mathf.Lerp(hardContactHand.currentPalmAngularVelocity, hardContactParent.maximumPalmAngularVelocity, Time.fixedDeltaTime * (1.0f / 0.025f));
-                hardContactHand.currentPalmVelocityInterp = 0f;
-            }
-
-            if (contactHand.isGrabbing)
-            {
-                // Reduce the overall delta amount when the weight is heigher
-                hardContactHand.currentPalmWeightInterp = Mathf.InverseLerp(Mathf.Min(hardContactParent.maximumWeight * 0.1f, 1f), hardContactParent.maximumWeight, hardContactHand.graspingWeight).EaseOut();
-            }
-            else if (hardContactHand.fingerDisplacement > 0.8f)
-            {
-                hardContactHand.currentPalmWeightInterp = Mathf.InverseLerp(0.8f, 8f, hardContactHand.fingerDisplacement).EaseOut();
-            }
-            else
-            {
-                hardContactHand.currentPalmWeightInterp = 0f;
-            }
-
-            if (hardContactHand.currentPalmWeightInterp > hardContactHand.currentPalmWeight)
-            {
-                hardContactHand.currentPalmWeight = Mathf.Lerp(hardContactHand.currentPalmWeight, hardContactHand.currentPalmWeightInterp, Time.fixedDeltaTime * (1.0f / 0.025f));
-            }
-            else
-            {
-                hardContactHand.currentPalmWeight = Mathf.Lerp(hardContactHand.currentPalmWeight, hardContactHand.currentPalmWeightInterp, Time.fixedDeltaTime * (1.0f / 0.075f));
-            }
-
-            Vector3 delta = hand.PalmPosition - contactHand.transform.position;
-
-            articulationBody.velocity = Vector3.ClampMagnitude(Vector3.MoveTowards(articulationBody.velocity, delta * Mathf.Lerp(1.0f, 0.05f, hardContactHand.currentPalmWeight) / Time.fixedDeltaTime, 15f), hardContactHand.currentPalmVelocity * Time.fixedDeltaTime);
-
-            Quaternion rotationDelta = Quaternion.Normalize(Quaternion.Slerp(Quaternion.identity, hand.Rotation * Quaternion.Inverse(contactHand.transform.rotation), Mathf.Lerp(1.0f, 0.1f, hardContactHand.currentPalmWeight)));
-
-            rotationDelta.ToAngleAxis(out float angleInDeg, out Vector3 rotationAxis);
-
-            Vector3 angularVelocity = Vector3.ClampMagnitude((rotationAxis * angleInDeg * Mathf.Deg2Rad) / Time.fixedDeltaTime, hardContactHand.currentPalmAngularVelocity * Time.fixedDeltaTime);
-
-            if (angularVelocity.IsValid())
-            {
-                articulationBody.angularVelocity = angularVelocity;
-            }
-        }
-
         #region Setup
         internal void SetupBoneBody()
         {
@@ -115,12 +45,11 @@ namespace Leap.Unity.ContactHands
             articulationBody.immovable = false;
             articulationBody.matchAnchors = false;
 
-            // TODO: replace below elements with dynamic settings
-            articulationBody.mass = 1.8f;
-            articulationBody.solverIterations = 50;
-            articulationBody.solverVelocityIterations = 20;
-            articulationBody.angularDamping = 50f;
+            articulationBody.mass = hardContactParent.boneMass * 3f;
+            articulationBody.solverIterations = hardContactParent.useProjectPhysicsIterations ? Physics.defaultSolverIterations : hardContactParent.handSolverIterations;
+            articulationBody.solverVelocityIterations = hardContactParent.useProjectPhysicsIterations ? Physics.defaultSolverVelocityIterations : hardContactParent.handSolverVelocityIterations;
 
+            articulationBody.angularDamping = 50f;
             articulationBody.linearDamping = 0f;
             articulationBody.useGravity = false;
             articulationBody.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
@@ -133,13 +62,12 @@ namespace Leap.Unity.ContactHands
             articulationBody.anchorRotation = Quaternion.identity;
             articulationBody.matchAnchors = false;
 
-            // TODO: replace below elements with dynamic settings
-            articulationBody.mass = 0.6f;
-            articulationBody.solverIterations = 50;
-            articulationBody.solverVelocityIterations = 20;
+            articulationBody.mass = hardContactParent.boneMass;
+            articulationBody.solverIterations = hardContactParent.useProjectPhysicsIterations ? Physics.defaultSolverIterations : hardContactParent.handSolverIterations;
+            articulationBody.solverVelocityIterations = hardContactParent.useProjectPhysicsIterations ? Physics.defaultSolverVelocityIterations : hardContactParent.handSolverVelocityIterations;
+
             articulationBody.maxAngularVelocity = 1.75f;
             articulationBody.maxDepenetrationVelocity = 3f;
-
             articulationBody.useGravity = false;
             articulationBody.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
             articulationBody.maxDepenetrationVelocity = 0.001f;
@@ -216,6 +144,76 @@ namespace Leap.Unity.ContactHands
         #endregion
 
         #region Updating
+        internal override void PostFixedUpdateBone()
+        {
+        }
+
+        internal override void UpdateBone(Bone prevBone, Bone bone)
+        {
+            UpdateBoneSizes(prevBone, bone);
+
+            UpdateBoneAngle(prevBone, bone);
+        }
+
+        internal override void UpdatePalmBone(Hand hand)
+        {
+            if (contactHand.isContacting || contactHand.isGrabbing)
+            {
+                // Reduce the hand velocity if we're pushing through an object
+                hardContactHand.currentPalmVelocityInterp = Mathf.InverseLerp(hardContactParent.teleportDistance * 0.2f, hardContactParent.teleportDistance * 0.95f, hardContactHand.computedHandDistance).EaseOut();
+                hardContactHand.currentPalmVelocity = Mathf.Lerp(hardContactHand.currentPalmVelocity,
+                    Mathf.Lerp(hardContactParent.maxPalmVelocity, hardContactParent.minPalmVelocity, hardContactHand.currentPalmVelocityInterp),
+                    Time.fixedDeltaTime * (1.0f / 0.025f));
+                hardContactHand.currentPalmAngularVelocity = Mathf.Lerp(hardContactHand.currentPalmAngularVelocity,
+                    Mathf.Lerp(hardContactParent.maxPalmAngularVelocity, hardContactParent.minPalmAngularVelocity, hardContactHand.currentPalmVelocityInterp),
+                    Time.fixedDeltaTime * (1.0f / 0.025f));
+            }
+            else
+            {
+                hardContactHand.currentPalmVelocity = Mathf.Lerp(hardContactHand.currentPalmVelocity, hardContactParent.maxPalmVelocity, Time.fixedDeltaTime * (1.0f / 0.025f));
+                hardContactHand.currentPalmAngularVelocity = Mathf.Lerp(hardContactHand.currentPalmAngularVelocity, hardContactParent.maxPalmAngularVelocity, Time.fixedDeltaTime * (1.0f / 0.025f));
+                hardContactHand.currentPalmVelocityInterp = 0f;
+            }
+
+            if (contactHand.isGrabbing)
+            {
+                // Reduce the overall delta amount when the weight is heigher
+                hardContactHand.currentPalmWeightInterp = Mathf.InverseLerp(Mathf.Min(hardContactParent.maxWeight * 0.1f, 1f), hardContactParent.maxWeight, hardContactHand.graspingWeight).EaseOut();
+            }
+            else if (hardContactHand.fingerDisplacement > 0.8f)
+            {
+                hardContactHand.currentPalmWeightInterp = Mathf.InverseLerp(0.8f, 8f, hardContactHand.fingerDisplacement).EaseOut();
+            }
+            else
+            {
+                hardContactHand.currentPalmWeightInterp = 0f;
+            }
+
+            if (hardContactHand.currentPalmWeightInterp > hardContactHand.currentPalmWeight)
+            {
+                hardContactHand.currentPalmWeight = Mathf.Lerp(hardContactHand.currentPalmWeight, hardContactHand.currentPalmWeightInterp, Time.fixedDeltaTime * (1.0f / 0.025f));
+            }
+            else
+            {
+                hardContactHand.currentPalmWeight = Mathf.Lerp(hardContactHand.currentPalmWeight, hardContactHand.currentPalmWeightInterp, Time.fixedDeltaTime * (1.0f / 0.075f));
+            }
+
+            Vector3 delta = hand.PalmPosition - contactHand.transform.position;
+
+            articulationBody.velocity = Vector3.ClampMagnitude(Vector3.MoveTowards(articulationBody.velocity, delta * Mathf.Lerp(1.0f, 0.05f, hardContactHand.currentPalmWeight) / Time.fixedDeltaTime, 15f), hardContactHand.currentPalmVelocity * Time.fixedDeltaTime);
+
+            Quaternion rotationDelta = Quaternion.Normalize(Quaternion.Slerp(Quaternion.identity, hand.Rotation * Quaternion.Inverse(contactHand.transform.rotation), Mathf.Lerp(1.0f, 0.1f, hardContactHand.currentPalmWeight)));
+
+            rotationDelta.ToAngleAxis(out float angleInDeg, out Vector3 rotationAxis);
+
+            Vector3 angularVelocity = Vector3.ClampMagnitude((rotationAxis * angleInDeg * Mathf.Deg2Rad) / Time.fixedDeltaTime, hardContactHand.currentPalmAngularVelocity * Time.fixedDeltaTime);
+
+            if (angularVelocity.IsValid())
+            {
+                articulationBody.angularVelocity = angularVelocity;
+            }
+        }
+
         private void UpdateBoneSizes(Bone prevBone, Bone bone)
         {
             if (IsBoneContacting)
@@ -240,7 +238,7 @@ namespace Leap.Unity.ContactHands
 
             xDampening = Mathf.Lerp(xDampening, 2f, Time.fixedDeltaTime * (1.0f / 0.1f));
 
-            if (hardContactHand.grabbingFingerDistances[finger] != 1 && hardContactHand.grabbingFingerDistances[finger] > (finger == 0 ? HardContactParent.CONTACT_THUMB_ENTER_DISTANCE : HardContactParent.CONTACT_ENTER_DISTANCE) && xTargetAngle > grabbingXDrive)
+            if (hardContactHand.grabbingFingerDistances[finger] != 1 && hardContactHand.grabbingFingerDistances[finger] > (finger == 0 ? hardContactParent.contactThumbEnterDistance : hardContactParent.contactEnterDistance) && xTargetAngle > grabbingXDrive)
             {
                 grabbingXDrive = Mathf.Clamp(Mathf.Lerp(grabbingXDrive, xTargetAngle, Time.fixedDeltaTime * (1.0f / 0.25f)),
                     originalXDriveLower, originalXDriveUpper);
@@ -249,12 +247,12 @@ namespace Leap.Unity.ContactHands
             if (hardContactHand.currentPalmVelocityInterp > 0)
             {
                 xForceLimit = Mathf.Lerp(xForceLimit,
-                    Mathf.Lerp(hardContactParent.maximumFingerVelocity, hardContactParent.minimumFingerVelocity, hardContactHand.currentPalmVelocityInterp),
+                    Mathf.Lerp(hardContactParent.maxFingerVelocity, hardContactParent.minFingerVelocity, hardContactHand.currentPalmVelocityInterp),
                     Time.fixedDeltaTime * (1.0f / 0.05f));
             }
             else
             {
-                xForceLimit = Mathf.Lerp(xForceLimit, hardContactParent.maximumFingerVelocity, Time.fixedDeltaTime * (1.0f / 0.5f));
+                xForceLimit = Mathf.Lerp(xForceLimit, hardContactParent.maxFingerVelocity, Time.fixedDeltaTime * (1.0f / 0.5f));
             }
 
             ArticulationDrive xDrive = articulationBody.xDrive;
@@ -267,12 +265,12 @@ namespace Leap.Unity.ContactHands
 
             if (joint == 0)
             {
-                float yTargetAngle = CalculateYJointAngle(prevBone.Rotation, bone.Rotation);
+                yTargetAngle = CalculateYJointAngle(prevBone.Rotation, bone.Rotation);
 
                 ArticulationDrive yDrive = articulationBody.yDrive;
                 yDrive.damping = xDampening * .75f;
                 yDrive.stiffness = hardContactParent.boneStiffness;
-                yDrive.forceLimit = hardContactParent.maximumPalmVelocity * Time.fixedDeltaTime;
+                yDrive.forceLimit = hardContactParent.maxPalmVelocity * Time.fixedDeltaTime;
                 yDrive.target = yTargetAngle;
                 articulationBody.yDrive = yDrive;
             }

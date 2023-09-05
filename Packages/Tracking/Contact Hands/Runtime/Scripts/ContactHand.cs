@@ -55,6 +55,23 @@ namespace Leap.Unity.ContactHands
         public Vector3 AngularVelocity => _angularVelocity;
         #endregion
 
+        #region Physics Data
+        private List<IgnoreData> _ignoredData = new List<IgnoreData>();
+        private class IgnoreData
+        {
+            public Rigidbody rigid;
+            public Collider[] colliders;
+            public float timeout = 0;
+            public float radius = 0;
+
+            public IgnoreData(Rigidbody rigid, Collider[] colliders)
+            {
+                this.rigid = rigid;
+                this.colliders = colliders;
+            }
+        }
+        #endregion
+
         private void Awake()
         {
             bones = new ContactBone[(FINGERS * FINGER_BONES)];
@@ -89,6 +106,10 @@ namespace Leap.Unity.ContactHands
                 bones[i].UpdateBone(hand.Fingers[bones[i].Finger].bones[bones[i].joint], hand.Fingers[bones[i].Finger].bones[bones[i].joint + 1]);
             }
             CacheHandData(dataHand);
+            if (Time.inFixedTimeStep)
+            {
+                HandleIgnoredObjects();
+            }
         }
         /// <summary>
         /// Every other frame that the hand needs to update when the hand reports tracked as true. This happens before the bones are updated.
@@ -224,6 +245,80 @@ namespace Leap.Unity.ContactHands
             for (int i = 0; i < bones.Length; i++)
             {
                 bones[i].gameObject.layer = layer;
+            }
+        }
+
+        private void HandleIgnoredObjects()
+        {
+            if (_ignoredData.Count > 0)
+            {
+                for (int i = 0; i < _ignoredData.Count; i++)
+                {
+                    // Handle destroyed objects
+                    if (_ignoredData[i].rigid == null)
+                    {
+                        _ignoredData.RemoveAt(i);
+                        continue;
+                    }
+
+                    if (_ignoredData[i].timeout >= 0)
+                    {
+                        _ignoredData[i].timeout -= Time.fixedDeltaTime;
+                    }
+
+                    // TODO: Batch call the ignored objects to see if they appear in the hand data
+                    if (_ignoredData[i].timeout <= 0 /* && !IsObjectInHandRadius(_ignoredData[i].rigid, _ignoredData[i].radius)*/)
+                    {
+                        TogglePhysicsIgnore(_ignoredData[i].rigid, false);
+                        i--;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Disables all collisions between a rigidbody and hand. Will automatically handle all colliders on the rigidbody. Timeout lets you specify a minimum time to ignore collisions for.
+        /// </summary>
+        public void IgnoreCollision(Rigidbody rigid, float timeout = 0, float radius = 0)
+        {
+            TogglePhysicsIgnore(rigid, true, timeout, radius);
+        }
+
+        private void TogglePhysicsIgnore(Rigidbody rigid, bool ignore, float timeout = 0, float radius = 0)
+        {
+            // If the rigid has been destroyed we can't do anything
+            if (rigid == null)
+            {
+                return;
+            }
+            Collider[] colliders = rigid.GetComponentsInChildren<Collider>(true);
+            foreach (var collider in colliders)
+            {
+                Physics.IgnoreCollision(collider, palmBone.palmCollider, ignore);
+                foreach (var bone in bones)
+                {
+                    Physics.IgnoreCollision(collider, bone.boneCollider, ignore);
+                }
+            }
+            int ind = _ignoredData.FindIndex(x => x.rigid == rigid);
+            if (ignore)
+            {
+                if (ind == -1)
+                {
+                    _ignoredData.Add(new IgnoreData(rigid, colliders) { timeout = timeout, radius = radius });
+                }
+                else
+                {
+                    _ignoredData[ind].timeout = timeout;
+                    _ignoredData[ind].radius = radius;
+                }
+            }
+            else
+            {
+                if (ind != -1)
+                {
+                    _ignoredData.RemoveAt(ind);
+                }
             }
         }
     }

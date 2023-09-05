@@ -50,8 +50,11 @@ namespace Leap.Unity.ContactHands
         #endregion
 
         #region Hand Settings
+        [SerializeField, Tooltip("The distance that bones will have their radius inflated by when calculating if an object is hovered.")]
         private float _hoverDistance = 0.04f;
         public float HoverDistance => _hoverDistance;
+        [SerializeField, Tooltip("The distance that bones will have their radius inflated by when calculating if an object is grabbed. " +
+                "If you increase this value too much, you may cause physics errors.")]
         private float _contactDistance = 0.002f;
         public float ContactDistance => _contactDistance;
         #endregion

@@ -7,7 +7,7 @@ namespace Leap.Unity.ContactHands
 {
     public class HardContactHand : ContactHand
     {
-        private const int RESET_FRAME_COUNT = 2, TELEPORT_FRAME_COUNT = 10;
+        private const int RESET_FRAME_COUNT = 2, TELEPORT_FRAME_COUNT = 5, RESET_FRAME_TELEPORT_COUNT = 10;
 
         private HardContactParent hardContactParent => contactParent as HardContactParent;
 
@@ -40,7 +40,7 @@ namespace Leap.Unity.ContactHands
                 _resetCounter = RESET_FRAME_COUNT;
                 _hasReset = false;
                 resetting = true;
-                _teleportFrameCount = TELEPORT_FRAME_COUNT;
+                _teleportFrameCount = RESET_FRAME_TELEPORT_COUNT;
                 ghosted = true;
                 for (int i = 0; i < 32; i++)
                 {
@@ -62,6 +62,7 @@ namespace Leap.Unity.ContactHands
             tracked = false;
             resetting = false;
             gameObject.SetActive(false);
+            ResetHardContactHand(false);
         }
 
         private void ResetHardContactHand(bool active)
