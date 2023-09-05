@@ -115,8 +115,26 @@ namespace Leap.Unity.InputActions
             {
                 // TODO This does not copy the data, need to get all of the individual joints and copy them. Alternatively, mem copy
 
+
                 XRHand rightHand = subsystem.rightHand;
                 XRHand leftHand = subsystem.leftHand;
+
+                if (subsystem.subsystemDescriptor.id == "UL XR Hands")
+
+                {
+                    var camPos = Camera.main.transform.parent.position;
+                    var camRot = Camera.main.transform.parent.rotation;
+
+                    ConvertRootToWorldSpace(camPos, camRot, subsystem, subsystem.rightHand, out Pose rightRootPose);
+                    ConvertRootToWorldSpace(camPos, camRot, subsystem, subsystem.leftHand, out Pose leftRootPose);
+
+                    rightHand.SetRootPose(rightRootPose);
+                    leftHand.SetRootPose(leftRootPose);
+                }
+
+
+
+
 
                 rightHand.SetRootPose(rightHand.rootPose);
                 leftHand.SetRootPose(leftHand.rootPose);
