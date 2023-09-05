@@ -15,6 +15,13 @@ namespace Leap.Unity.ContactHands
         private int _resetCounter = 2, _teleportFrameCount = 10;
         private int _layerMask = 0;
 
+        private bool _wasGrabbing;
+        private float _timeOnReset;
+
+        private float _overallFingerDisplacement = 0f, _averageFingerDisplacement = 0f, _contactFingerDisplacement = 0f;
+        // Interpolate back in displacement values after the hand has just released
+        private float _displacementGrabCooldown = 0.25f, _displacementGrabCooldownCurrent = 0f;
+
         #region Settings
 
         internal float currentPalmVelocity, currentPalmAngularVelocity;
@@ -153,6 +160,70 @@ namespace Leap.Unity.ContactHands
 
         internal override void PostFixedUpdateHand()
         {
+            CalculateDisplacements();
+        }
+
+        private void CalculateDisplacements()
+        {
+            _overallFingerDisplacement = 0f;
+            _averageFingerDisplacement = 0f;
+            _contactFingerDisplacement = 0f;
+
+            int contactingFingers = 0;
+
+            ((HardContactBone)palmBone).UpdateBoneDisplacement();
+            _overallFingerDisplacement += ((HardContactBone)palmBone).DisplacementAmount;
+            if (palmBone.IsBoneContacting)
+            {
+                contactingFingers++;
+            }
+
+            bool contacting;
+            for (int fingerIndex = 0; fingerIndex < FINGERS; fingerIndex++)
+            {
+                contacting = false;
+                for (int jointIndex = FINGER_BONES - 1; jointIndex >= 0; jointIndex--)
+                {
+                    int boneArrayIndex = fingerIndex * FINGER_BONES + jointIndex;
+
+                    Bone bone = dataHand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex + 1));
+
+                    ((HardContactBone)bones[boneArrayIndex]).UpdateBoneDisplacement(bone);
+                    _overallFingerDisplacement += ((HardContactBone)bones[boneArrayIndex]).DisplacementAmount;
+                    if (bones[boneArrayIndex].IsBoneContacting)
+                    {
+                        contacting = true;
+                    }
+                }
+                if (contacting)
+                {
+                    contactingFingers++;
+                }
+            }
+
+            if (IsGrabbing)
+            {
+                _displacementGrabCooldownCurrent = _displacementGrabCooldown;
+            }
+
+            _averageFingerDisplacement = _overallFingerDisplacement / (FINGERS * FINGER_BONES);
+            if (contactingFingers > 0)
+            {
+                _contactFingerDisplacement = _overallFingerDisplacement * Mathf.Max(6 - contactingFingers, 1);
+                if (IsGrabbing)
+                {
+                    _contactFingerDisplacement = 0f;
+                }
+                else if (_displacementGrabCooldown > 0)
+                {
+                    _displacementGrabCooldownCurrent -= Time.fixedDeltaTime;
+                    if (_displacementGrabCooldownCurrent <= 0)
+                    {
+                        _displacementGrabCooldownCurrent = 0f;
+                    }
+                    _contactFingerDisplacement = Mathf.Lerp(_contactFingerDisplacement, 0, Mathf.InverseLerp(0.5f, 1.0f, (_displacementGrabCooldownCurrent / _displacementGrabCooldown).EaseOut()));
+                }
+            }
         }
 
         protected override void UpdateHandLogic(Hand hand)

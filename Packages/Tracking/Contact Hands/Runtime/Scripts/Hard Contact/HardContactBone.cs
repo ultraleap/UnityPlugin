@@ -11,11 +11,18 @@ namespace Leap.Unity.ContactHands
         private HardContactParent hardContactParent => contactParent as HardContactParent;
         private HardContactHand hardContactHand => contactHand as HardContactHand;
 
-        private float xTargetAngle, xForceLimit, xDampening, grabbingXDrive;
-        private float yTargetAngle;
-        private float originalXDriveLower, originalXDriveUpper;
-        private float overRotationCount;
-        private bool wasGrabbingBone;
+        private float _xTargetAngle, _xForceLimit, _xDampening, _currentXDrive, _grabbingXDrive;
+        private float _yTargetAngle;
+        private float _originalXDriveLower, _originalXDriveUpper;
+        private float _overRotationCount;
+        private int _grabbingFrames;
+        private bool _wasGrabbingBone;
+
+        private float _displacementDistance = 0f;
+        private float _displacementRotation = 0f;
+        public float DisplacementAmount { get; private set; } = 0;
+        public float DisplacementDistance => _displacementDistance;
+        public float DisplacementRotation => _displacementRotation;
 
         #region Setup
         internal void SetupBoneBody()
@@ -97,8 +104,8 @@ namespace Leap.Unity.ContactHands
             }
 
             articulationBody.xDrive = xDrive;
-            originalXDriveLower = xDrive.lowerLimit;
-            originalXDriveUpper = xDrive.upperLimit;
+            _originalXDriveLower = xDrive.lowerLimit;
+            _originalXDriveUpper = xDrive.upperLimit;
 
             ArticulationDrive yDrive = new ArticulationDrive()
             {
@@ -138,8 +145,8 @@ namespace Leap.Unity.ContactHands
             };
 
             articulationBody.xDrive = xDrive;
-            originalXDriveLower = xDrive.lowerLimit;
-            originalXDriveUpper = xDrive.upperLimit;
+            _originalXDriveLower = xDrive.lowerLimit;
+            _originalXDriveUpper = xDrive.upperLimit;
         }
         #endregion
 
@@ -234,46 +241,83 @@ namespace Leap.Unity.ContactHands
 
         private void UpdateBoneAngle(Bone prevBone, Bone bone)
         {
-            xTargetAngle = CalculateXJointAngle(prevBone.Rotation, bone.Direction);
+            _xTargetAngle = CalculateXJointAngle(prevBone.Rotation, bone.Direction);
 
-            xDampening = Mathf.Lerp(xDampening, 2f, Time.fixedDeltaTime * (1.0f / 0.1f));
+            _xDampening = Mathf.Lerp(_xDampening, 2f, Time.fixedDeltaTime * (1.0f / 0.1f));
 
-            if (hardContactHand.grabbingFingerDistances[finger] != 1 && hardContactHand.grabbingFingerDistances[finger] > (finger == 0 ? hardContactParent.contactThumbEnterDistance : hardContactParent.contactEnterDistance) && xTargetAngle > grabbingXDrive)
+            if (hardContactHand.grabbingFingerDistances[finger] != 1 && hardContactHand.grabbingFingerDistances[finger] > (finger == 0 ? hardContactParent.contactThumbEnterDistance : hardContactParent.contactEnterDistance) && _xTargetAngle > _grabbingXDrive)
             {
-                grabbingXDrive = Mathf.Clamp(Mathf.Lerp(grabbingXDrive, xTargetAngle, Time.fixedDeltaTime * (1.0f / 0.25f)),
-                    originalXDriveLower, originalXDriveUpper);
+                _grabbingXDrive = Mathf.Clamp(Mathf.Lerp(_grabbingXDrive, _xTargetAngle, Time.fixedDeltaTime * (1.0f / 0.25f)),
+                    _originalXDriveLower, _originalXDriveUpper);
             }
 
             if (hardContactHand.currentPalmVelocityInterp > 0)
             {
-                xForceLimit = Mathf.Lerp(xForceLimit,
+                _xForceLimit = Mathf.Lerp(_xForceLimit,
                     Mathf.Lerp(hardContactParent.maxFingerVelocity, hardContactParent.minFingerVelocity, hardContactHand.currentPalmVelocityInterp),
                     Time.fixedDeltaTime * (1.0f / 0.05f));
             }
             else
             {
-                xForceLimit = Mathf.Lerp(xForceLimit, hardContactParent.maxFingerVelocity, Time.fixedDeltaTime * (1.0f / 0.5f));
+                _xForceLimit = Mathf.Lerp(_xForceLimit, hardContactParent.maxFingerVelocity, Time.fixedDeltaTime * (1.0f / 0.5f));
             }
 
             ArticulationDrive xDrive = articulationBody.xDrive;
             xDrive.stiffness = hardContactParent.boneStiffness;
-            xDrive.damping = xDampening;
-            xDrive.forceLimit = xForceLimit * Time.fixedDeltaTime;
-            xDrive.upperLimit = hardContactHand.grabbingFingers[finger] >= joint ? grabbingXDrive : originalXDriveUpper;
-            xDrive.target = wasGrabbingBone ? Mathf.Clamp(xTargetAngle, articulationBody.xDrive.lowerLimit, grabbingXDrive) : xTargetAngle;
+            xDrive.damping = _xDampening;
+            xDrive.forceLimit = _xForceLimit * Time.fixedDeltaTime;
+            xDrive.upperLimit = hardContactHand.grabbingFingers[finger] >= joint ? _grabbingXDrive : _originalXDriveUpper;
+            xDrive.target = _wasGrabbingBone ? Mathf.Clamp(_xTargetAngle, articulationBody.xDrive.lowerLimit, _grabbingXDrive) : _xTargetAngle;
             articulationBody.xDrive = xDrive;
 
             if (joint == 0)
             {
-                yTargetAngle = CalculateYJointAngle(prevBone.Rotation, bone.Rotation);
+                _yTargetAngle = CalculateYJointAngle(prevBone.Rotation, bone.Rotation);
 
                 ArticulationDrive yDrive = articulationBody.yDrive;
-                yDrive.damping = xDampening * .75f;
+                yDrive.damping = _xDampening * .75f;
                 yDrive.stiffness = hardContactParent.boneStiffness;
                 yDrive.forceLimit = hardContactParent.maxPalmVelocity * Time.fixedDeltaTime;
-                yDrive.target = yTargetAngle;
+                yDrive.target = _yTargetAngle;
                 articulationBody.yDrive = yDrive;
             }
+        }
+
+        internal void UpdateBoneDisplacement(Bone bone = null)
+        {
+            _displacementDistance = 0f;
+            _displacementRotation = 0f;
+
+            if (bone == null && Finger != 5)
+            {
+                return;
+            }
+
+            Vector3 bonePos, position;
+            // Palm
+            if (Finger == 5)
+            {
+                bonePos = contactHand.dataHand.PalmPosition;
+                position = transform.position;
+                _displacementRotation = Quaternion.Angle(transform.rotation, contactHand.dataHand.Rotation);
+            }
+            // Fingers
+            else
+            {
+                bonePos = bone.NextJoint;
+                boneCollider.ToWorldSpaceCapsule(out Vector3 tip, out Vector3 temp, out float rad);
+                position = tip;
+
+                if (articulationBody.dofCount > 0)
+                {
+                    _displacementRotation = Mathf.Abs(articulationBody.xDrive.target - articulationBody.jointPosition[0] * Mathf.Rad2Deg);
+                }
+            }
+
+            _displacementDistance = Vector3.Distance(position, bonePos);
+
+            // We want the rotation displacement to be more powerful than the distance
+            DisplacementAmount = ((Mathf.InverseLerp(0.01f, hardContactParent.teleportDistance, _displacementDistance) * 0.75f) + (Mathf.InverseLerp(5f, 35f, _displacementRotation) * 1.25f)) * (1 + (Joint * 0.5f));
         }
         #endregion
 
