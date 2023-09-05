@@ -14,6 +14,23 @@ namespace Leap.Unity.ContactHands
         private HardContactHand leftHardContactHand => leftHand as HardContactHand;
         private HardContactHand rightHardContactHand => rightHand as HardContactHand;
 
+        #region Settings
+        [SerializeField]
+        internal float minimumPalmVelocity, maximumPalmVelocity;
+        [SerializeField]
+        internal float minimumPalmAngularVelocity, maximumPalmAngularVelocity;
+        [SerializeField]
+        internal float minimumFingerVelocity, maximumFingerVelocity;
+        [SerializeField]
+        internal float maximumDistance, maximumWeight;
+        [SerializeField]
+        internal float boneStiffness;
+
+
+        public const float CONTACT_ENTER_DISTANCE = 0.004f, CONTACT_EXIT_DISTANCE = 0.012f;
+        public const float CONTACT_THUMB_ENTER_DISTANCE = 0.005f, CONTACT_THUMB_EXIT_DISTANCE = 0.02f;
+        #endregion
+
         internal override void GenerateHands()
         {
             _physicsMaterial = CreateHandPhysicsMaterial();

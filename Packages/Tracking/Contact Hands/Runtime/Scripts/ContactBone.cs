@@ -23,6 +23,7 @@ namespace Leap.Unity.ContactHands
         protected Collider Collider { get { return IsPalm ? palmCollider : boneCollider; } }
 
         internal ContactHand contactHand;
+        internal ContactParent contactParent => contactHand.contactParent;
         #endregion
 
         #region Physics Data
@@ -107,7 +108,7 @@ namespace Leap.Unity.ContactHands
         #endregion
 
         internal abstract void UpdatePalmBone(Hand hand);
-        internal abstract void UpdateBone(Bone bone);
+        internal abstract void UpdateBone(Bone prevBone, Bone bone);
 
         internal abstract void PostFixedUpdateBone();
 

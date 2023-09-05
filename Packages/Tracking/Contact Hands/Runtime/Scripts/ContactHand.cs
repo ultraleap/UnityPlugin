@@ -38,9 +38,11 @@ namespace Leap.Unity.ContactHands
         internal ContactManager contactManager => contactParent.contactManager;
 
         #region Interaction Data
-        public bool isContacting = false, isCloseToObject = false;
+        internal bool isContacting = false, isCloseToObject = false, isGrabbing = false;
         public bool IsContacting => isContacting;
         public bool IsCloseToObject => isCloseToObject;
+
+        public bool IsGrabbing => isGrabbing;
 
         protected Vector3 _oldDataPosition;
         protected Quaternion _oldDataRotation;
@@ -84,7 +86,7 @@ namespace Leap.Unity.ContactHands
             palmBone.UpdatePalmBone(hand);
             for (int i = 0; i < bones.Length - 1; i++)
             {
-                bones[i].UpdateBone(hand.Fingers[bones[i].Finger].bones[bones[i].joint + 1]);
+                bones[i].UpdateBone(hand.Fingers[bones[i].Finger].bones[bones[i].joint], hand.Fingers[bones[i].Finger].bones[bones[i].joint + 1]);
             }
             CacheHandData(dataHand);
         }
