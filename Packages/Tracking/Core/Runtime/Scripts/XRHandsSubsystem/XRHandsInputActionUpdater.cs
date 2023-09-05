@@ -113,20 +113,13 @@ namespace Leap.Unity.InputActions
         {
             if (Application.isPlaying)
             {
-                var camPos = Camera.main.transform.parent.position;
-                var camRot = Camera.main.transform.parent.rotation;
-
                 // TODO This does not copy the data, need to get all of the individual joints and copy them. Alternatively, mem copy
 
                 XRHand rightHand = subsystem.rightHand;
                 XRHand leftHand = subsystem.leftHand;
 
-
-                ConvertRootToWorldSpace(camPos, camRot, subsystem, subsystem.rightHand, out Pose rightRootPose);
-                ConvertRootToWorldSpace(camPos, camRot, subsystem, subsystem.leftHand, out Pose leftRootPose);
-                
-                rightHand.SetRootPose(rightRootPose);
-                leftHand.SetRootPose(leftRootPose);
+                rightHand.SetRootPose(rightHand.rootPose);
+                leftHand.SetRootPose(leftHand.rootPose);
                 
                 UpdateStateWithLeapHand(rightDevice, rightHand, ref rightState);
                 UpdateStateWithLeapHand(leftDevice, leftHand, ref leftState);
@@ -362,7 +355,7 @@ namespace Leap.Unity.InputActions
             direction += Camera.main.transform.right * (hand.handedness == Handedness.Left ? -0.1f : 0.1f);
 
             // Use the shoulder position to determine an aim direction
-            direction = (GetStablePinchPosition(hand) - direction).normalized;
+            direction = (GetStablePinchWorldPosition(hand) - direction).normalized;
 
             return Quaternion.LookRotation(direction);
         }
@@ -603,7 +596,16 @@ namespace Leap.Unity.InputActions
 
             if (hand.GetJoint(XRHandJointID.IndexDistal).TryGetPose(out Pose indexTipPose)) indexTip = indexTipPose.position;
             if (hand.GetJoint(XRHandJointID.ThumbDistal).TryGetPose(out Pose thumbTipPose)) thumbTip = thumbTipPose.position;
+            return Vector3.Lerp(indexTip, thumbTip, 0.75f);
+        }
 
+        static Vector3 GetStablePinchWorldPosition(XRHand hand)
+        {
+            Vector3 indexTip = Vector3.zero;
+            Vector3 thumbTip = Vector3.zero;
+
+            if (hand.GetJoint(XRHandJointID.IndexDistal).TryGetPose(out Pose indexTipPose)) indexTip = indexTipPose.position + Camera.main.transform.parent.position;
+            if (hand.GetJoint(XRHandJointID.ThumbDistal).TryGetPose(out Pose thumbTipPose)) thumbTip = thumbTipPose.position + Camera.main.transform.parent.position;
             return Vector3.Lerp(indexTip, thumbTip, 0.75f);
         }
 
