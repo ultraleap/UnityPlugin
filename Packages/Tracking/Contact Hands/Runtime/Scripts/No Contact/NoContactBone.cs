@@ -18,7 +18,7 @@ namespace Leap.Unity.ContactHands
             ContactUtils.SetupPalmCollider(palmCollider, hand);
         }
 
-        internal override void UpdateBone(Bone bone)
+        internal override void UpdateBone(Bone prevBone, Bone bone)
         {
             transform.position = bone.PrevJoint;
             transform.rotation = bone.Rotation;
