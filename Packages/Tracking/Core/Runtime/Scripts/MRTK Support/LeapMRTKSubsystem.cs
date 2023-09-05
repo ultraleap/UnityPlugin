@@ -246,7 +246,7 @@ namespace Leap.Unity.MRTK
                 }
                 else
                 {
-                    Debug.LogWarning("Ultraleap Subsystem for MRTK is using the existing LeapXRServiceProvider found in the current scene");
+                    Debug.Log("Ultraleap Subsystem for MRTK is using the existing LeapXRServiceProvider found in the current scene");
                 }
 
                 foreach (var hand in hands)
