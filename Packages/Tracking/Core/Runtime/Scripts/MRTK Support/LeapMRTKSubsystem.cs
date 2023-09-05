@@ -14,7 +14,7 @@ namespace Leap.Unity.MRTK
     [Preserve]
     [MRTKSubsystem(
         Name = "com.ultraleap.mrtkhands",
-        DisplayName = "Subsystem for Ultraleap MRTK hands",
+        DisplayName = "Subsystem for Ultraleap Hands API (Non-OpenXR)",
         Author = "Ultraleap",
         ProviderType = typeof(LeapMRTKProvider),
         SubsystemTypeOverride = typeof(LeapMRTKSubsystem),
@@ -24,9 +24,12 @@ namespace Leap.Unity.MRTK
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void Register()
         {
-            // TODO: Only do this if the check box in the MRTK Settings for LeapMRTKSubsystem is enabled
+            bool subsystemEnabled = MRTKProfile.Instance.LoadedSubsystems.Contains(typeof(LeapMRTKSubsystem));
 
-            // TODO: Instantiate a LeapXRServiceProvider so there doesn't need to be one in the scene already
+            if(!subsystemEnabled)
+            {
+                return;
+            }
 
             // Fetch subsystem metadata from the attribute.
             var cinfo = XRSubsystemHelpers.ConstructCinfo<LeapMRTKSubsystem, HandsSubsystemCinfo>();
@@ -205,10 +208,10 @@ namespace Leap.Unity.MRTK
                 base.Start();
 
                 hands ??= new Dictionary<XRNode, LeapHandContainer>
-            {
-                { XRNode.LeftHand, new LeapHandContainer(XRNode.LeftHand) },
-                { XRNode.RightHand, new LeapHandContainer(XRNode.RightHand) }
-            };
+                {
+                    { XRNode.LeftHand, new LeapHandContainer(XRNode.LeftHand) },
+                    { XRNode.RightHand, new LeapHandContainer(XRNode.RightHand) }
+                };
 
                 InputSystem.onBeforeUpdate += ResetHands;
             }
@@ -223,30 +226,28 @@ namespace Leap.Unity.MRTK
             [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
             private static void RunAfterSceneLoad()
             {
-                var leapMRTKSubsystem = XRSubsystemHelpers.GetFirstRunningSubsystem<LeapMRTKSubsystem>();
+                LeapMRTKSubsystem leapMRTKSubsystem = XRSubsystemHelpers.GetFirstRunningSubsystem<LeapMRTKSubsystem>();
 
                 if (leapMRTKSubsystem == null)
                 {
                     return;
                 }
 
-                LeapProvider leapProvider = Hands.Provider;
+                LeapXRServiceProvider leapProvider = GameObject.FindAnyObjectByType<LeapXRServiceProvider>();
 
                 // If there is no leap provider in the scene
                 if (leapProvider == null)
                 {
-                    Debug.Log("There are no Leap Providers in the scene, automatically assigning one for use with MRTK subsystems");
+                    Debug.Log("There are no LeapXRServiceProviders in the scene, automatically assigning one for use with Ultraleap Subsystem for MRTK");
+
+                    GameObject leapProviderGO = new GameObject("LeapXRServiceProvider");
+                    leapProvider = leapProviderGO.AddComponent<LeapXRServiceProvider>();
+                    GameObject.DontDestroyOnLoad(leapProviderGO);
                 }
                 else
                 {
-                    Debug.LogWarning("We recommend that you do not add a Leap Provider to scenes using the Leap Subsystem for MRTK. This can cause unwanted behaviour.");
+                    Debug.LogWarning("Ultraleap Subsystem for MRTK is using the existing LeapXRServiceProvider found in the current scene");
                 }
-
-                GameObject leapProviderGO = new GameObject("LeapXRServiceProvider");
-                LeapXRServiceProvider leapXRServiceProvider = leapProviderGO.AddComponent<LeapXRServiceProvider>();
-                leapXRServiceProvider.PositionDeviceRelativeToMainCamera = true;
-                leapProvider = (LeapProvider)leapXRServiceProvider;
-                GameObject.DontDestroyOnLoad(leapProviderGO);
 
                 foreach (var hand in hands)
                 {
