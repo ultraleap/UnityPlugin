@@ -98,7 +98,17 @@ namespace Leap.Unity.ContactHands
             }
         }
 
-        internal abstract void PostFixedUpdateFrame();
+        internal void PostFixedUpdateFrame()
+        {
+            PostFixedUpdateFrameLogic();
+            leftHand.PostFixedUpdateHand();
+            rightHand.PostFixedUpdateHand();
+        }
+
+        /// <summary>
+        /// Happens before the hands update is called.
+        /// </summary>
+        internal abstract void PostFixedUpdateFrameLogic();
 
         internal void ProcessHandIntersection()
         {

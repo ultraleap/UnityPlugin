@@ -14,6 +14,7 @@ namespace Leap.Unity.ContactHands
         private bool _hasReset = false;
         private int _resetCounter = 2, _teleportFrameCount = 10;
         private int _layerMask = 0;
+        private int _lastFrameTeleport;
 
         private bool _wasGrabbing;
         private float _timeOnReset;
@@ -21,6 +22,8 @@ namespace Leap.Unity.ContactHands
         private float _overallFingerDisplacement = 0f, _averageFingerDisplacement = 0f, _contactFingerDisplacement = 0f;
         // Interpolate back in displacement values after the hand has just released
         private float _displacementGrabCooldown = 0.25f, _displacementGrabCooldownCurrent = 0f;
+
+        private Vector3 _elbowPosition;
 
         #region Settings
 
@@ -33,7 +36,7 @@ namespace Leap.Unity.ContactHands
         internal float currentResetLerp;
 
         internal int[] grabbingFingers;
-        internal float[] grabbingFingerDistances;
+        internal float[] grabbingFingerDistances, fingerStiffness;
         #endregion
 
         protected override void ProcessOutputHand()
@@ -42,12 +45,14 @@ namespace Leap.Unity.ContactHands
 
         internal override void BeginHand(Hand hand)
         {
+            dataHand.CopyFrom(hand);
             if(!resetting)
             {
                 _resetCounter = RESET_FRAME_COUNT;
                 _hasReset = false;
                 resetting = true;
                 _teleportFrameCount = RESET_FRAME_TELEPORT_COUNT;
+                
                 ghosted = true;
                 for (int i = 0; i < 32; i++)
                 {
@@ -60,7 +65,16 @@ namespace Leap.Unity.ContactHands
             }
             else
             {
-
+                _resetCounter--;
+                switch (_resetCounter)
+                {
+                    case 1:
+                        ResetHardContactHand();
+                        break;
+                    case 0:
+                        CompleteReset();
+                        break;
+                }
             }
         }
 
@@ -68,20 +82,15 @@ namespace Leap.Unity.ContactHands
         {
             tracked = false;
             resetting = false;
+            ResetHardContactHand();
             gameObject.SetActive(false);
-            ResetHardContactHand(false);
-        }
-
-        private void ResetHardContactHand(bool active)
-        {
-            ChangeHandLayer(contactManager.HandsResetLayer);
-
         }
 
         internal override void GenerateHandLogic()
         {
             grabbingFingerDistances = new float[FINGERS];
             grabbingFingers = new int[FINGERS];
+            fingerStiffness = new float[FINGERS];
 
             GenerateHandObjects(typeof(HardContactBone));
 
@@ -102,68 +111,45 @@ namespace Leap.Unity.ContactHands
             }
         }
 
-        private void ResetHand()
+        private void ResetHardContactHand()
         {
-            ContactUtils.SetupPalmCollider(palmBone.palmCollider, dataHand);
-
-            for (int fingerIndex = 0; fingerIndex < FINGERS; fingerIndex++)
+            _lastFrameTeleport = Time.frameCount;
+            ghosted = true;
+            ChangeHandLayer(contactManager.HandsResetLayer);
+            if (gameObject.activeInHierarchy)
             {
-                Bone knuckleBone = dataHand.Fingers[fingerIndex].Bone(0);
+                ((HardContactBone)palmBone).ResetPalm();
 
-                for (int jointIndex = 0; jointIndex < FINGER_BONES; jointIndex++)
+                for (int fingerIndex = 0; fingerIndex < FINGERS; fingerIndex++)
                 {
-                    Bone prevBone = dataHand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex));
-                    Bone bone = dataHand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex + 1)); // +1 to skip first bone.
-
-                    int boneArrayIndex = fingerIndex * FINGER_BONES + jointIndex;
-
-                    if (jointIndex == 0)
+                    fingerStiffness[fingerIndex] = hardContactParent.boneStiffness;
+                    for (int jointIndex = 0; jointIndex < FINGER_BONES; jointIndex++)
                     {
-                        bones[boneArrayIndex].transform.position = fingerIndex == 0 ? knuckleBone.PrevJoint : knuckleBone.NextJoint;
-                    }
-                    else
-                    {
-                        bones[boneArrayIndex].transform.localPosition = transform.InverseTransformPoint(prevBone.PrevJoint);
-                    }
+                        Bone prevBone = dataHand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex));
+                        Bone bone = dataHand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex + 1)); // +1 to skip first bone.
 
-                    bones[boneArrayIndex].transform.rotation = knuckleBone.Rotation;
+                        int boneArrayIndex = fingerIndex * FINGER_BONES + jointIndex;
 
-                    if (bones[boneArrayIndex].transform.parent != null)
-                    {
-                        bones[boneArrayIndex].transform.localScale = new Vector3(
-                            1f / bones[boneArrayIndex].transform.parent.lossyScale.x,
-                            1f / bones[boneArrayIndex].transform.parent.lossyScale.y,
-                            1f / bones[boneArrayIndex].transform.parent.lossyScale.z);
-                    }
-
-                    ContactUtils.SetupBoneCollider(bones[boneArrayIndex].boneCollider, bone);
-
-                    // Move the anchor positions to account for hand sizes
-                    if (jointIndex > 0)
-                    {
-                        ((HardContactBone)bones[boneArrayIndex]).articulationBody.parentAnchorPosition = ContactUtils.InverseTransformPoint(prevBone.PrevJoint, prevBone.Rotation, bone.PrevJoint);
-                        ((HardContactBone)bones[boneArrayIndex]).articulationBody.parentAnchorRotation = Quaternion.identity;
-                    }
-                    else
-                    {
-                        ((HardContactBone)bones[boneArrayIndex]).articulationBody.parentAnchorPosition = ContactUtils.InverseTransformPoint(dataHand.PalmPosition, dataHand.Rotation, knuckleBone.NextJoint);
-                        if (fingerIndex == 0)
-                        {
-                            ((HardContactBone)bones[boneArrayIndex]).articulationBody.parentAnchorRotation = Quaternion.Euler(0,
-                                dataHand.IsLeft ? ContactUtils.HAND_ROTATION_OFFSET_Y : -ContactUtils.HAND_ROTATION_OFFSET_Y,
-                                dataHand.IsLeft ? ContactUtils.HAND_ROTATION_OFFSET_Z : -ContactUtils.HAND_ROTATION_OFFSET_Z);
-                        }
+                        ((HardContactBone)bones[boneArrayIndex]).ResetBone(prevBone, bone);
                     }
                 }
             }
         }
 
-        internal override void PostFixedUpdateHand()
+        private void CompleteReset()
         {
-            CalculateDisplacements();
+            _timeOnReset = Time.time;
+            UpdateIterations();
+            resetting = false;
+            tracked = true;
         }
 
-        private void CalculateDisplacements()
+        internal override void PostFixedUpdateHand()
+        {
+            CalculateDisplacementsAndLimits();
+        }
+
+        private void CalculateDisplacementsAndLimits()
         {
             _overallFingerDisplacement = 0f;
             _averageFingerDisplacement = 0f;
@@ -179,9 +165,17 @@ namespace Leap.Unity.ContactHands
             }
 
             bool contacting;
+            bool hasFingerGrasped;
             for (int fingerIndex = 0; fingerIndex < FINGERS; fingerIndex++)
             {
                 contacting = false;
+
+                hasFingerGrasped = false;
+
+                grabbingFingerDistances[fingerIndex] = 1f;
+
+                grabbingFingers[fingerIndex] = -1;
+
                 for (int jointIndex = FINGER_BONES - 1; jointIndex >= 0; jointIndex--)
                 {
                     int boneArrayIndex = fingerIndex * FINGER_BONES + jointIndex;
@@ -194,6 +188,8 @@ namespace Leap.Unity.ContactHands
                     {
                         contacting = true;
                     }
+
+                    hasFingerGrasped = ((HardContactBone)bones[boneArrayIndex]).CalculateGrabbingLimits(hasFingerGrasped);
                 }
                 if (contacting)
                 {
@@ -223,6 +219,15 @@ namespace Leap.Unity.ContactHands
                     }
                     _contactFingerDisplacement = Mathf.Lerp(_contactFingerDisplacement, 0, Mathf.InverseLerp(0.5f, 1.0f, (_displacementGrabCooldownCurrent / _displacementGrabCooldown).EaseOut()));
                 }
+            }
+        }
+
+        private void UpdateIterations()
+        {
+            ((HardContactBone)palmBone).UpdateIterations();
+            for (int i = 0; i < bones.Length; i++)
+            {
+                ((HardContactBone)bones[i]).UpdateIterations();
             }
         }
 

@@ -16,7 +16,7 @@ namespace Leap.Unity.ContactHands
         private float _originalXDriveLower, _originalXDriveUpper;
         private float _overRotationCount;
         private int _grabbingFrames;
-        private bool _wasGrabbingBone;
+        private bool _wasBoneGrabbing;
 
         private float _displacementDistance = 0f;
         private float _displacementRotation = 0f;
@@ -53,8 +53,8 @@ namespace Leap.Unity.ContactHands
             articulationBody.matchAnchors = false;
 
             articulationBody.mass = hardContactParent.boneMass * 3f;
-            articulationBody.solverIterations = hardContactParent.useProjectPhysicsIterations ? Physics.defaultSolverIterations : hardContactParent.handSolverIterations;
-            articulationBody.solverVelocityIterations = hardContactParent.useProjectPhysicsIterations ? Physics.defaultSolverVelocityIterations : hardContactParent.handSolverVelocityIterations;
+
+            UpdateIterations();
 
             articulationBody.angularDamping = 50f;
             articulationBody.linearDamping = 0f;
@@ -70,8 +70,8 @@ namespace Leap.Unity.ContactHands
             articulationBody.matchAnchors = false;
 
             articulationBody.mass = hardContactParent.boneMass;
-            articulationBody.solverIterations = hardContactParent.useProjectPhysicsIterations ? Physics.defaultSolverIterations : hardContactParent.handSolverIterations;
-            articulationBody.solverVelocityIterations = hardContactParent.useProjectPhysicsIterations ? Physics.defaultSolverVelocityIterations : hardContactParent.handSolverVelocityIterations;
+
+            UpdateIterations();
 
             articulationBody.maxAngularVelocity = 1.75f;
             articulationBody.maxDepenetrationVelocity = 3f;
@@ -205,11 +205,11 @@ namespace Leap.Unity.ContactHands
                 hardContactHand.currentPalmWeight = Mathf.Lerp(hardContactHand.currentPalmWeight, hardContactHand.currentPalmWeightInterp, Time.fixedDeltaTime * (1.0f / 0.075f));
             }
 
-            Vector3 delta = hand.PalmPosition - contactHand.transform.position;
+            Vector3 delta = hand.PalmPosition - transform.position;
 
             articulationBody.velocity = Vector3.ClampMagnitude(Vector3.MoveTowards(articulationBody.velocity, delta * Mathf.Lerp(1.0f, 0.05f, hardContactHand.currentPalmWeight) / Time.fixedDeltaTime, 15f), hardContactHand.currentPalmVelocity * Time.fixedDeltaTime);
 
-            Quaternion rotationDelta = Quaternion.Normalize(Quaternion.Slerp(Quaternion.identity, hand.Rotation * Quaternion.Inverse(contactHand.transform.rotation), Mathf.Lerp(1.0f, 0.1f, hardContactHand.currentPalmWeight)));
+            Quaternion rotationDelta = Quaternion.Normalize(Quaternion.Slerp(Quaternion.identity, hand.Rotation * Quaternion.Inverse(transform.rotation), Mathf.Lerp(1.0f, 0.1f, hardContactHand.currentPalmWeight)));
 
             rotationDelta.ToAngleAxis(out float angleInDeg, out Vector3 rotationAxis);
 
@@ -267,7 +267,7 @@ namespace Leap.Unity.ContactHands
             xDrive.damping = _xDampening;
             xDrive.forceLimit = _xForceLimit * Time.fixedDeltaTime;
             xDrive.upperLimit = hardContactHand.grabbingFingers[finger] >= joint ? _grabbingXDrive : _originalXDriveUpper;
-            xDrive.target = _wasGrabbingBone ? Mathf.Clamp(_xTargetAngle, articulationBody.xDrive.lowerLimit, _grabbingXDrive) : _xTargetAngle;
+            xDrive.target = _wasBoneGrabbing ? Mathf.Clamp(_xTargetAngle, articulationBody.xDrive.lowerLimit, _grabbingXDrive) : _xTargetAngle;
             articulationBody.xDrive = xDrive;
 
             if (joint == 0)
@@ -318,6 +318,149 @@ namespace Leap.Unity.ContactHands
 
             // We want the rotation displacement to be more powerful than the distance
             DisplacementAmount = ((Mathf.InverseLerp(0.01f, hardContactParent.teleportDistance, _displacementDistance) * 0.75f) + (Mathf.InverseLerp(5f, 35f, _displacementRotation) * 1.25f)) * (1 + (Joint * 0.5f));
+        }
+
+        internal bool CalculateGrabbingLimits(bool hasFingerGrabbed)
+        {
+            if (articulationBody.jointPosition.dofCount > 0)
+            {
+                _currentXDrive = articulationBody.jointPosition[0] * Mathf.Rad2Deg;
+            }
+
+            if (_grabbingFrames > 0)
+            {
+                _grabbingFrames--;
+                if (_grabbingFrames == 0)
+                {
+                    _grabbingXDrive = _currentXDrive;
+                }
+                else
+                {
+                    _grabbingXDrive = Mathf.Lerp(_grabbingXDrive, articulationBody.xDrive.target, 1f / 3f);
+                }
+            }
+
+            float distanceCheck;
+            if (_wasBoneGrabbing)
+            {
+                distanceCheck = finger == 0 ? hardContactParent.contactThumbExitDistance : hardContactParent.contactThumbExitDistance;
+            }
+            else
+            {
+                distanceCheck = finger == 0 ? hardContactParent.contactThumbEnterDistance : hardContactParent.contactEnterDistance;
+            }
+
+            // If we haven't grasped the other joints then we're not going to successfully with the 0th.
+            if (hardContactHand.grabbingFingers[finger] == -1 && joint == 0)
+            {
+                if (!hasFingerGrabbed)
+                {
+                    _wasBoneGrabbing = false;
+                }
+                return hasFingerGrabbed;
+            }
+
+            if (hardContactHand.grabbingFingers[finger] != -1)
+            {
+                if (!_wasBoneGrabbing)
+                {
+                    _grabbingXDrive = _originalXDriveUpper;
+                    _wasBoneGrabbing = true;
+                    _grabbingFrames = 3;
+                    hardContactHand.fingerStiffness[finger] = 0f;
+                    _xDampening = 10f;
+                }
+            }
+            else if (IsBoneHovering && ObjectDistance < distanceCheck)
+            {
+                if (IsBoneGrabbing)
+                {
+                    if (!_wasBoneGrabbing)
+                    {
+                        _grabbingXDrive = _originalXDriveUpper;
+                        _grabbingFrames = 3;
+                        hardContactHand.fingerStiffness[finger] = 0f;
+                        _xDampening = 10f;
+                    }
+                    hardContactHand.grabbingFingers[finger] = joint;
+                    _wasBoneGrabbing = true;
+                }
+                else if (_wasBoneGrabbing)
+                {
+                    hardContactHand.grabbingFingers[finger] = joint;
+                }
+            }
+            else
+            {
+                _wasBoneGrabbing = false;
+            }
+            if (_wasBoneGrabbing)
+            {
+                hasFingerGrabbed = true;
+                if (IsBoneHovering && (ObjectDistance < hardContactHand.grabbingFingerDistances[finger] || (hardContactHand.grabbingFingerDistances[finger] == 1 && joint == 0)))
+                {
+                    hardContactHand.grabbingFingerDistances[finger] = ObjectDistance;
+                }
+            }
+            return hasFingerGrabbed;
+        }
+        #endregion
+
+        #region Resetting
+        internal void ResetPalm()
+        {
+            transform.position = contactHand.dataHand.PalmPosition;
+            transform.rotation = contactHand.dataHand.Rotation;
+            articulationBody.TeleportRoot(transform.position, transform.rotation);
+            articulationBody.immovable = false;
+            ContactUtils.SetupPalmCollider(palmCollider, contactHand.dataHand);
+        }
+
+        internal void ResetBone(Bone prevBone, Bone bone)
+        {
+            _wasBoneGrabbing = false;
+            _xDampening = 1f;
+
+            if (transform.parent != null)
+            {
+                transform.localScale = new Vector3(
+                    1f / transform.parent.lossyScale.x,
+                    1f / transform.parent.lossyScale.y,
+                    1f / transform.parent.lossyScale.z);
+            }
+
+            ContactUtils.SetupBoneCollider(boneCollider, bone);
+
+            // Move the anchor positions to account for hand sizes
+            if (joint == 0)
+            {
+                transform.position = finger == 0 ? prevBone.PrevJoint : prevBone.NextJoint;
+                transform.rotation = prevBone.Rotation;
+
+                articulationBody.parentAnchorPosition = ContactUtils.InverseTransformPoint(contactHand.dataHand.PalmPosition, contactHand.dataHand.Rotation, prevBone.NextJoint);
+                if (finger == 0)
+                {
+                    articulationBody.parentAnchorRotation = Quaternion.Euler(0,
+                        contactHand.dataHand.IsLeft ? ContactUtils.HAND_ROTATION_OFFSET_Y : -ContactUtils.HAND_ROTATION_OFFSET_Y,
+                        contactHand.dataHand.IsLeft ? ContactUtils.HAND_ROTATION_OFFSET_Z : -ContactUtils.HAND_ROTATION_OFFSET_Z);
+                }
+            }
+            else
+            {
+                transform.localPosition = transform.InverseTransformPoint(prevBone.PrevJoint);
+                transform.localRotation = Quaternion.identity;
+
+                articulationBody.parentAnchorPosition = ContactUtils.InverseTransformPoint(prevBone.PrevJoint, prevBone.Rotation, bone.PrevJoint);
+                articulationBody.parentAnchorRotation = Quaternion.identity;
+            }
+
+            UpdateBoneAngle(prevBone, bone);
+        }
+
+        internal void UpdateIterations()
+        {
+            articulationBody.solverIterations = hardContactParent.useProjectPhysicsIterations ? Physics.defaultSolverIterations : hardContactParent.handSolverIterations;
+            articulationBody.solverVelocityIterations = hardContactParent.useProjectPhysicsIterations ? Physics.defaultSolverVelocityIterations : hardContactParent.handSolverVelocityIterations;
         }
         #endregion
 
