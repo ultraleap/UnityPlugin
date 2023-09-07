@@ -10,6 +10,8 @@ namespace Ultraleap.Tracking.OpenXR
     public partial class HandTrackingFeatureBuildHooks : OpenXRFeatureBuildHooks
     {
         private const string OpenXRPackageRuntimeService = "org.khronos.openxr.OpenXRRuntimeService";
+        private const string OpenXRHandTrackingFeature = "org.khronos.openxr.feature.ext.HAND_TRACKING";
+        private const string OpenXRHandTrackingPermission = "org.khronos.openxr.permission.ext.HAND_TRACKING";
 
         private const string MetaHandTrackingFeature = "oculus.software.handtracking";
         private const string MetaHandTrackingPermission = "com.oculus.permission.HAND_TRACKING";
@@ -32,6 +34,10 @@ namespace Ultraleap.Tracking.OpenXR
                 // Intent query is required for OpenXR to work correctly.
                 manifest.AddQueriesIntentAction(OpenXRPackageRuntimeService);
             }
+
+            // Adds the feature and permission for headsets that support the unified hand-tracking permission.
+            manifest.AddUsesFeature(OpenXRHandTrackingFeature, false);
+            manifest.AddUsesPermission(OpenXRHandTrackingPermission);
 
             if (feature.metaPermissions)
             {
