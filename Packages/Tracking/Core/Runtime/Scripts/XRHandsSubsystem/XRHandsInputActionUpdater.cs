@@ -6,17 +6,12 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using LeapInternal;
-using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using UnityEditor.VersionControl;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Layouts;
-using UnityEngine.SubsystemsImplementation.Extensions;
 using UnityEngine.XR.Hands;
-using UnityEngine.XR.Hands.ProviderImplementation;
 using UnityEngine.XR.Hands.Processing;
 
 namespace Leap.Unity.InputActions
@@ -111,49 +106,29 @@ namespace Leap.Unity.InputActions
 
         private static void UpdateHands(XRHandSubsystem subsystem, XRHandSubsystem.UpdateSuccessFlags updateSuccessFlags, XRHandSubsystem.UpdateType updateType)
         {
-            if (Application.isPlaying)
+            if (Application.isPlaying && updateType == XRHandSubsystem.UpdateType.Dynamic)
             {
-                // TODO This does not copy the data, need to get all of the individual joints and copy them. Alternatively, mem copy
-
-
                 XRHand rightHand = subsystem.rightHand;
                 XRHand leftHand = subsystem.leftHand;
 
-                if (subsystem.subsystemDescriptor.id == "UL XR Hands")
+                //if (Camera.main.transform.parent != null)
+                //{
+                //    // Convert the XRHands into world space
+                //    Pose newRootPoseRight = ToWorldPose(rightHand.rootPose, Camera.main.transform.parent);
+                //    Pose newRootPoseLeft = ToWorldPose(leftHand.rootPose, Camera.main.transform.parent);
+                //    rightHand.SetRootPose(newRootPoseRight);
+                //    leftHand.SetRootPose(newRootPoseLeft);
+                //}
 
-                {
-                    var camPos = Camera.main.transform.parent.position;
-                    var camRot = Camera.main.transform.parent.rotation;
-
-                    ConvertRootToWorldSpace(camPos, camRot, subsystem, subsystem.rightHand, out Pose rightRootPose);
-                    ConvertRootToWorldSpace(camPos, camRot, subsystem, subsystem.leftHand, out Pose leftRootPose);
-
-                    rightHand.SetRootPose(rightRootPose);
-                    leftHand.SetRootPose(leftRootPose);
-                }
-
-
-
-
-
-                rightHand.SetRootPose(rightHand.rootPose);
-                leftHand.SetRootPose(leftHand.rootPose);
-                
                 UpdateStateWithLeapHand(rightDevice, rightHand, ref rightState);
                 UpdateStateWithLeapHand(leftDevice, leftHand, ref leftState);
             }
         }
 
-
-        private static void ConvertRootToWorldSpace(Vector3 camPos, Quaternion camRot, XRHandSubsystem subsystem, XRHand subsystemXrHand, out Pose pose)
+        private static Pose ToWorldPose(Pose pose, Transform origin)
         {
-            pose = new Pose(camPos, camRot);
-
-            pose.position = subsystemXrHand.rootPose.position + camPos;
-            pose.rotation = camRot * subsystemXrHand.rootPose.rotation;
-
+            return pose.GetTransformedBy(origin);
         }
-
 
         /// <summary>
         /// Handles updating the inputDevice with chosen data from the hand using the cached handState structure as a base
@@ -163,28 +138,26 @@ namespace Leap.Unity.InputActions
             if (hand.isTracked)
             {
                 ConvertLeapHandToState(ref handState, hand);
-
-                if (ultraleapSettings.updateLeapInputSystem && inputDevice != null)
-                {
-                    InputSystem.QueueStateEvent(inputDevice, handState);
-                }
             }
             else // No hand, so handle relevant states
             {
-                ConvertLeapHandToState(ref handState, hand);
-
                 if (handState.tracked != 0)
                 {
                     handState.tracked = 0;
 
                     handState.activating = 0;
                     handState.selecting = 0;
-
-                    if (ultraleapSettings.updateLeapInputSystem && inputDevice != null)
-                    {
-                        InputSystem.QueueStateEvent(inputDevice, handState);
-                    }
                 }
+            }
+
+            if (ultraleapSettings.updateLeapInputSystem && inputDevice != null)
+            {
+                InputSystem.QueueStateEvent(inputDevice, handState);
+            }
+
+            if (ultraleapSettings.updateMetaInputSystem)
+            {
+                SendMetaAimStateUpdate(handState, hand);
             }
         }
 
@@ -212,11 +185,6 @@ namespace Leap.Unity.InputActions
 
             state.pokePosition = stateOverrides.pokePositionDelegate(hand);
             state.pokeDirection = stateOverrides.pokeDirectionDelegate(hand);
-
-            if (ultraleapSettings.updateMetaInputSystem)
-            {
-                SendMetaAimStateUpdate(state, hand);
-            }
         }
 
         private static void SendMetaAimStateUpdate(LeapHandState state, XRHand hand)
@@ -368,12 +336,13 @@ namespace Leap.Unity.InputActions
         static Quaternion GetSimpleShoulderPinchDirection(XRHand hand)
         {
             // First get the shoulder position
-            Vector3 direction = Camera.main.transform.position;
-            direction += Vector3.down * 0.1f;
-            direction += Camera.main.transform.right * (hand.handedness == Handedness.Left ? -0.1f : 0.1f);
+            // Note: UNKNOWN as to why we require localposition here as the StablePinchPosition should be in world space by now
+            Vector3 direction = Camera.main.transform.localPosition;
+            direction += (Vector3.down * 0.1f);
+            direction += (Vector3.right * (hand.handedness == Handedness.Left ? -0.1f : 0.1f));
 
             // Use the shoulder position to determine an aim direction
-            direction = (GetStablePinchWorldPosition(hand) - direction).normalized;
+            direction = GetStablePinchPosition(hand) - direction;
 
             return Quaternion.LookRotation(direction);
         }
@@ -614,16 +583,6 @@ namespace Leap.Unity.InputActions
 
             if (hand.GetJoint(XRHandJointID.IndexDistal).TryGetPose(out Pose indexTipPose)) indexTip = indexTipPose.position;
             if (hand.GetJoint(XRHandJointID.ThumbDistal).TryGetPose(out Pose thumbTipPose)) thumbTip = thumbTipPose.position;
-            return Vector3.Lerp(indexTip, thumbTip, 0.75f);
-        }
-
-        static Vector3 GetStablePinchWorldPosition(XRHand hand)
-        {
-            Vector3 indexTip = Vector3.zero;
-            Vector3 thumbTip = Vector3.zero;
-
-            if (hand.GetJoint(XRHandJointID.IndexDistal).TryGetPose(out Pose indexTipPose)) indexTip = indexTipPose.position + Camera.main.transform.parent.position;
-            if (hand.GetJoint(XRHandJointID.ThumbDistal).TryGetPose(out Pose thumbTipPose)) thumbTip = thumbTipPose.position + Camera.main.transform.parent.position;
             return Vector3.Lerp(indexTip, thumbTip, 0.75f);
         }
 

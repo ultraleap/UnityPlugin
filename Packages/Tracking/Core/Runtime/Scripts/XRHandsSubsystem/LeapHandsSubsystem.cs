@@ -105,13 +105,13 @@ namespace Leap.Unity
 
             XRHandSubsystem.UpdateSuccessFlags updateSuccessFlags = XRHandSubsystem.UpdateSuccessFlags.None;
 
-            if (PopulateXRHandFromLeap(currentFrame.GetHand(Chirality.Left), ref leftHandRootPose, ref leftHandJoints))
+            if (PopulateXRHandFromLeap(currentFrame.GetHand(Chirality.Left), ref leftHandRootPose, ref leftHandJoints, updateType))
             {
                 updateSuccessFlags |= XRHandSubsystem.UpdateSuccessFlags.LeftHandRootPose;
                 updateSuccessFlags |= XRHandSubsystem.UpdateSuccessFlags.LeftHandJoints;
             }
 
-            if (PopulateXRHandFromLeap(currentFrame.GetHand(Chirality.Right), ref rightHandRootPose, ref rightHandJoints))
+            if (PopulateXRHandFromLeap(currentFrame.GetHand(Chirality.Right), ref rightHandRootPose, ref rightHandJoints, updateType))
             {
                 updateSuccessFlags |= XRHandSubsystem.UpdateSuccessFlags.RightHandRootPose;
                 updateSuccessFlags |= XRHandSubsystem.UpdateSuccessFlags.RightHandJoints;
@@ -122,26 +122,27 @@ namespace Leap.Unity
             return updateSuccessFlags;
         }
 
-        bool PopulateXRHandFromLeap(Hand leapHand, ref Pose rootPose, ref NativeArray<XRHandJoint> handJoints)
+        bool PopulateXRHandFromLeap(Hand leapHand, ref Pose rootPose, ref NativeArray<XRHandJoint> handJoints, XRHandSubsystem.UpdateType updateType)
         {
             if (leapHand == null)
             {
                 return false;
             }
 
-            if (Camera.main.transform != null)
+            if (updateType == XRHandSubsystem.UpdateType.BeforeRender)
             {
-                var camPos = Camera.main.transform.parent.position;
-                var camRot = Camera.main.transform.parent.rotation;
-                leapHand.Transform(-camPos, Quaternion.Inverse(camRot));
+                if (Camera.main.transform != null && Camera.main.transform.parent != null)
+                {
+                    var camPos = Camera.main.transform.parent.position;
+                    var camRot = Camera.main.transform.parent.rotation;
 
+                    leapHand.Transform(-camPos, Quaternion.identity);
+                    leapHand.Transform(Vector3.zero, Quaternion.Inverse(camRot));
+                }
             }
-
 
             Pose palmPose = CalculatePalmPose(leapHand);
             Pose wristPose = CalculateWristPose(leapHand);
-
-
 
             rootPose = wristPose;
             Handedness handedness = (Handedness)((int)leapHand.GetChirality() + 1); // +1 as unity has "invalid" handedness while we do not
