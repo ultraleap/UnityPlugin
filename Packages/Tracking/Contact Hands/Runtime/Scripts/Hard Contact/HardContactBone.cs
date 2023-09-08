@@ -409,15 +409,17 @@ namespace Leap.Unity.ContactHands
         #region Resetting
         internal void ResetPalm()
         {
+            articulationBody.immovable = false;
             transform.position = contactHand.dataHand.PalmPosition;
             transform.rotation = contactHand.dataHand.Rotation;
             articulationBody.TeleportRoot(transform.position, transform.rotation);
-            articulationBody.immovable = false;
             ContactUtils.SetupPalmCollider(palmCollider, contactHand.dataHand);
         }
 
         internal void ResetBone(Bone prevBone, Bone bone)
         {
+            _overRotationCount = 0;
+
             _wasBoneGrabbing = false;
             _xDampening = 1f;
 
@@ -461,6 +463,38 @@ namespace Leap.Unity.ContactHands
         {
             articulationBody.solverIterations = hardContactParent.useProjectPhysicsIterations ? Physics.defaultSolverIterations : hardContactParent.handSolverIterations;
             articulationBody.solverVelocityIterations = hardContactParent.useProjectPhysicsIterations ? Physics.defaultSolverVelocityIterations : hardContactParent.handSolverVelocityIterations;
+        }
+
+        internal bool BoneOverRotationCheck(float eulerThreshold = 20f)
+        {
+            float angle = Mathf.Repeat(articulationBody.transform.localRotation.eulerAngles.x + 180, 360) - 180;
+            if (angle < articulationBody.xDrive.lowerLimit - eulerThreshold)
+            {
+                return true;
+            }
+
+            if (angle > articulationBody.xDrive.upperLimit + eulerThreshold)
+            {
+                return true;
+            }
+
+            // If the overlapBone's meant to be pretty flat
+            float delta = Mathf.DeltaAngle(angle, articulationBody.xDrive.target);
+            if (Mathf.Abs(articulationBody.xDrive.target) < eulerThreshold / 2f && delta > eulerThreshold)
+            {
+                // We are over rotated, add a frame to the frame count
+                _overRotationCount++;
+                if (_overRotationCount > 10)
+                {
+                    return true;
+                }
+            }
+            else
+            {
+                // We were over rotated, but no longer are, remove a frame from the frame count
+                _overRotationCount = Mathf.Clamp(_overRotationCount - 1, 0, 10);
+            }
+            return false;
         }
         #endregion
 

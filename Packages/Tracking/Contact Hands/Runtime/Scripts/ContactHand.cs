@@ -14,6 +14,7 @@ namespace Leap.Unity.ContactHands
         public Chirality handedness = Chirality.Left;
 
         internal Hand modifiedHand = new Hand(), dataHand = new Hand();
+        [SerializeField]
         internal bool tracked = false, resetting = false, ghosted = false;
         internal bool isHandPhysical = true;
         /// <summary>
@@ -44,8 +45,8 @@ namespace Leap.Unity.ContactHands
 
         public bool IsGrabbing => isGrabbing;
 
-        protected Vector3 _oldDataPosition;
-        protected Quaternion _oldDataRotation;
+        protected Vector3 _oldDataPosition, _oldContactPosition;
+        protected Quaternion _oldDataRotation, _oldContactRotation;
 
         /// <summary>
         /// These values will need to be manually calculated if there are no rigidbodies on the bones.
@@ -236,6 +237,8 @@ namespace Leap.Unity.ContactHands
             _angularVelocity = ContactUtils.ToAngularVelocity(_oldDataRotation, modifiedHand.Rotation, Time.fixedDeltaTime);
             _oldDataPosition = dataHand.PalmPosition;
             _oldDataRotation = dataHand.Rotation;
+            _oldContactPosition = palmBone.transform.position;
+            _oldContactRotation = palmBone.transform.rotation;
         }
 
         protected void ChangeHandLayer(SingleLayer layer)
