@@ -6,9 +6,9 @@ namespace Leap.Unity.ContactHands
 {
     public class NoContactHand : ContactHand
     {
-        protected override void ProcessOutputHand()
+        protected override void ProcessOutputHand(ref Hand modifiedHand)
         {
-            // Don't need to modify the hand
+            modifiedHand.CopyFrom(dataHand);
         }
 
         internal override void BeginHand(Hand hand)
@@ -41,7 +41,6 @@ namespace Leap.Unity.ContactHands
 
         protected override void UpdateHandLogic(Hand hand)
         {
-            modifiedHand.CopyFrom(hand);
             _velocity = ContactUtils.ToLinearVelocity(_oldDataPosition, hand.PalmPosition, Time.fixedDeltaTime);
             _angularVelocity = ContactUtils.ToAngularVelocity(_oldDataRotation, hand.Rotation, Time.fixedDeltaTime);
         }

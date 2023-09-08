@@ -13,7 +13,8 @@ namespace Leap.Unity.ContactHands
 
         public Chirality handedness = Chirality.Left;
 
-        internal Hand modifiedHand = new Hand(), dataHand = new Hand();
+        private Hand modifiedHand = new Hand();
+        internal Hand dataHand = new Hand();
         [SerializeField]
         internal bool tracked = false, resetting = false, ghosted = false;
         internal bool isHandPhysical = true;
@@ -123,10 +124,15 @@ namespace Leap.Unity.ContactHands
         /// </summary>
         internal abstract void FinishHand();
 
-        protected abstract void ProcessOutputHand();
+        protected void ResetModifiedHand()
+        {
+            modifiedHand.CopyFrom(dataHand);
+        }
+        protected abstract void ProcessOutputHand(ref Hand modifiedHand);
 
         internal Hand OutputHand()
         {
+            ProcessOutputHand(ref modifiedHand);
             if (tracked)
             {
                 return modifiedHand;

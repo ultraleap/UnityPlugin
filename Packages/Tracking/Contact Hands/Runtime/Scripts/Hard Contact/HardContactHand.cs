@@ -46,8 +46,60 @@ namespace Leap.Unity.ContactHands
         internal float[] grabbingFingerDistances, fingerStiffness;
         #endregion
 
-        protected override void ProcessOutputHand()
+        protected override void ProcessOutputHand(ref Hand modifiedHand)
         {
+            modifiedHand.SetTransform(palmBone.transform.position, palmBone.transform.rotation);
+            int boneInd = 0;
+            Vector3 posA, posB;
+
+            float r;
+            if (!_justGhosted)
+            {
+                for (int i = 0; i < modifiedHand.Fingers.Count; i++)
+                {
+                    Bone b = modifiedHand.Fingers[i].bones[0];
+                    PhysExts.ToWorldSpaceCapsule(bones[boneInd].boneCollider, out posA, out posB, out r);
+                    b.NextJoint = posB;
+
+                    for (int j = 1; j < modifiedHand.Fingers[i].bones.Length; j++)
+                    {
+                        b = modifiedHand.Fingers[i].bones[j];
+                        PhysExts.ToWorldSpaceCapsule(bones[boneInd].boneCollider, out posA, out posB, out r);
+                        b.PrevJoint = posB;
+                        b.NextJoint = posA;
+                        b.Width = r;
+                        b.Center = (b.PrevJoint + b.NextJoint) / 2f;
+                        b.Direction = (b.NextJoint - b.PrevJoint).normalized;
+                        b.Length = Vector3.Distance(posA, posB);
+                        b.Rotation = bones[boneInd].transform.rotation;
+                        boneInd++;
+                    }
+                    modifiedHand.Fingers[i].TipPosition = GetTipPosition(i);
+                }
+            }
+
+            modifiedHand.WristPosition = palmBone.transform.position - (palmBone.transform.rotation * Quaternion.Inverse(dataHand.Rotation) * (dataHand.PalmPosition - dataHand.WristPosition));
+
+            Vector3 direction = Vector3.Lerp(modifiedHand.Arm.Direction, dataHand.Arm.Direction, Mathf.Lerp(1.0f, 0.1f, currentPalmWeight));
+
+            modifiedHand.Arm.PrevJoint = modifiedHand.WristPosition + (-dataHand.Arm.Length * direction);
+            modifiedHand.Arm.NextJoint = modifiedHand.WristPosition;
+            modifiedHand.Arm.Center = (modifiedHand.Arm.PrevJoint + modifiedHand.Arm.NextJoint) / 2f;
+            modifiedHand.Arm.Length = Vector3.Distance(modifiedHand.Arm.PrevJoint, modifiedHand.Arm.NextJoint);
+            modifiedHand.Arm.Direction = (modifiedHand.WristPosition - modifiedHand.Arm.PrevJoint).normalized;
+            modifiedHand.Arm.Rotation = Quaternion.LookRotation(modifiedHand.Arm.Direction, -dataHand.PalmNormal);
+            modifiedHand.Arm.Width = dataHand.Arm.Width;
+
+            modifiedHand.PalmWidth = palmBone.palmCollider.size.y;
+            modifiedHand.Confidence = dataHand.Confidence;
+            modifiedHand.Direction = dataHand.Direction;
+            modifiedHand.FrameId = dataHand.FrameId;
+            modifiedHand.Id = dataHand.Id;
+            modifiedHand.GrabStrength = CalculateGrabStrength(modifiedHand);
+            modifiedHand.PinchStrength = CalculatePinchStrength(modifiedHand, palmBone.palmCollider.size.y);
+            modifiedHand.PinchDistance = CalculatePinchDistance(modifiedHand);
+            modifiedHand.PalmVelocity = (palmBone.transform.position - _oldContactPosition) / Time.fixedDeltaTime;
+            modifiedHand.TimeVisible = dataHand.TimeVisible;
         }
 
         internal override void BeginHand(Hand hand)
@@ -127,6 +179,9 @@ namespace Leap.Unity.ContactHands
             {
                 CacheHandData(dataHand);
 
+                _elbowPosition = dataHand.Arm.PrevJoint;
+                currentPalmVelocity = hardContactParent.maxPalmVelocity;
+
                 ((HardContactBone)palmBone).ResetPalm();
 
                 for (int fingerIndex = 0; fingerIndex < FINGERS; fingerIndex++)
@@ -149,6 +204,7 @@ namespace Leap.Unity.ContactHands
 
         private void CompleteReset()
         {
+            ResetModifiedHand();
             _timeOnReset = Time.time;
             UpdateIterations();
             resetting = false;
@@ -300,6 +356,98 @@ namespace Leap.Unity.ContactHands
                 }
             }
             return false;
+        }
+
+        public Vector3 GetTipPosition(int index)
+        {
+            if (index > 4)
+            {
+                return Vector3.zero;
+            }
+            PhysExts.ToWorldSpaceCapsule(bones[(FINGER_BONES * index) + FINGER_BONES - 1].boneCollider, out Vector3 outPos, out var outB, out var outRadius);
+            outPos += (outPos - outB).normalized * outRadius;
+            return outPos;
+        }
+
+        // Copied from OpenXRLeapProvider
+        private float CalculatePinchStrength(Hand hand, float handScale)
+        {
+            // Get the thumb position.
+            var thumbTipPosition = hand.GetThumb().TipPosition;
+
+            // Compute the distance midpoints between the thumb and the each finger and find the smallest.
+            var minDistanceSquared = float.MaxValue;
+
+            // Iterate through the fingers, skipping the thumb.
+            for (var i = 1; i < hand.Fingers.Count; ++i)
+            {
+                var distanceSquared = (hand.Fingers[i].TipPosition - thumbTipPosition).sqrMagnitude;
+                minDistanceSquared = Mathf.Min(distanceSquared, minDistanceSquared);
+            }
+
+            // Compute the pinch strength. Magic values taken from existing LeapC implementation (scaled to metres)
+            float distanceZero = 0.0600f * handScale;
+            float distanceOne = 0.0220f * handScale;
+            return Mathf.Clamp01((Mathf.Sqrt(minDistanceSquared) - distanceZero) / (distanceOne - distanceZero));
+        }
+
+        private float CalculateBoneDistanceSquared(Bone boneA, Bone boneB)
+        {
+            // Denormalize directions to bone length.
+            var boneAJoint = boneA.PrevJoint;
+            var boneBJoint = boneB.PrevJoint;
+            var boneADirection = boneA.Direction * boneA.Length;
+            var boneBDirection = boneB.Direction * boneB.Length;
+
+            // Compute the minimum (squared) distance between two bones.
+            var diff = boneBJoint - boneAJoint;
+            var d1 = Vector3.Dot(boneADirection, diff);
+            var d2 = Vector3.Dot(boneBDirection, diff);
+            var a = boneADirection.sqrMagnitude;
+            var b = Vector3.Dot(boneADirection, boneBDirection);
+            var c = boneBDirection.sqrMagnitude;
+            var det = b * b - a * c;
+            var t1 = Mathf.Clamp01((b * d2 - c * d1) / det);
+            var t2 = Mathf.Clamp01((a * d2 - b * d1) / det);
+            var pa = boneAJoint + t1 * boneADirection;
+            var pb = boneBJoint + t2 * boneBDirection;
+            return (pa - pb).sqrMagnitude;
+        }
+
+        private float CalculatePinchDistance(Hand hand)
+        {
+            // Get the farthest 2 segments of thumb and index finger, respectively, and compute distances.
+            var minDistanceSquared = float.MaxValue;
+            for (var thumbBoneIndex = 2; thumbBoneIndex < hand.GetThumb().bones.Length; ++thumbBoneIndex)
+            {
+                for (var indexBoneIndex = 2; indexBoneIndex < hand.GetIndex().bones.Length; ++indexBoneIndex)
+                {
+                    var distanceSquared = CalculateBoneDistanceSquared(
+                        hand.GetThumb().bones[thumbBoneIndex],
+                        hand.GetIndex().bones[indexBoneIndex]);
+                    minDistanceSquared = Mathf.Min(distanceSquared, minDistanceSquared);
+                }
+            }
+
+            // Return the pinch distance, converted to millimeters to match other providers.
+            return Mathf.Sqrt(minDistanceSquared) * 1000.0f;
+        }
+
+        float CalculateGrabStrength(Hand hand)
+        {
+            // magic numbers so it approximately lines up with the leap results
+            const float bendZero = 0.25f;
+            const float bendOne = 0.85f;
+
+            // Find the minimum bend angle for the non-thumb fingers.
+            float minBend = float.MaxValue;
+            for (int finger_idx = 1; finger_idx < 5; finger_idx++)
+            {
+                minBend = Mathf.Min(hand.GetFingerStrength(finger_idx), minBend);
+            }
+
+            // Return the grab strength.
+            return Mathf.Clamp01((minBend - bendZero) / (bendOne - bendZero));
         }
     }
 }
