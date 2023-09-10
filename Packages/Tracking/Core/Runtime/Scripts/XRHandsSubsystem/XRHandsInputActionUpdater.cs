@@ -106,28 +106,14 @@ namespace Leap.Unity.InputActions
 
         private static void UpdateHands(XRHandSubsystem subsystem, XRHandSubsystem.UpdateSuccessFlags updateSuccessFlags, XRHandSubsystem.UpdateType updateType)
         {
-            if (Application.isPlaying && updateType == XRHandSubsystem.UpdateType.Dynamic)
+            if (Application.isPlaying && updateType == XRHandSubsystem.UpdateType.BeforeRender)
             {
                 XRHand rightHand = subsystem.rightHand;
                 XRHand leftHand = subsystem.leftHand;
 
-                //if (Camera.main.transform.parent != null)
-                //{
-                //    // Convert the XRHands into world space
-                //    Pose newRootPoseRight = ToWorldPose(rightHand.rootPose, Camera.main.transform.parent);
-                //    Pose newRootPoseLeft = ToWorldPose(leftHand.rootPose, Camera.main.transform.parent);
-                //    rightHand.SetRootPose(newRootPoseRight);
-                //    leftHand.SetRootPose(newRootPoseLeft);
-                //}
-
                 UpdateStateWithLeapHand(rightDevice, rightHand, ref rightState);
                 UpdateStateWithLeapHand(leftDevice, leftHand, ref leftState);
             }
-        }
-
-        private static Pose ToWorldPose(Pose pose, Transform origin)
-        {
-            return pose.GetTransformedBy(origin);
         }
 
         /// <summary>

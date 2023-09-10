@@ -129,16 +129,13 @@ namespace Leap.Unity
                 return false;
             }
 
-            if (updateType == XRHandSubsystem.UpdateType.BeforeRender)
+            if (Camera.main.transform != null && Camera.main.transform.parent != null)
             {
-                if (Camera.main.transform != null && Camera.main.transform.parent != null)
-                {
-                    var camPos = Camera.main.transform.parent.position;
-                    var camRot = Camera.main.transform.parent.rotation;
+                var camPos = Camera.main.transform.parent.position;
+                var camRot = Camera.main.transform.parent.rotation;
 
-                    leapHand.Transform(-camPos, Quaternion.identity);
-                    leapHand.Transform(Vector3.zero, Quaternion.Inverse(camRot));
-                }
+                leapHand.Transform(-camPos, Quaternion.identity);
+                leapHand.Transform(Vector3.zero, Quaternion.Inverse(camRot));
             }
 
             Pose palmPose = CalculatePalmPose(leapHand);
