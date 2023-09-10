@@ -101,7 +101,7 @@ namespace Leap.Unity
                 return XRHandSubsystem.UpdateSuccessFlags.None;
             }
 
-            Frame currentFrame = TrackingProvider.CurrentFrame;
+            Frame currentFrame = GetLatestTrackingFrameCopy();
 
             XRHandSubsystem.UpdateSuccessFlags updateSuccessFlags = XRHandSubsystem.UpdateSuccessFlags.None;
 
@@ -122,20 +122,36 @@ namespace Leap.Unity
             return updateSuccessFlags;
         }
 
+        /// <summary>
+        /// Get the latest tracking frame from the TrackingProvider.
+        /// This will be in local space to the camera's parent if it is available
+        /// 
+        /// Also ensures the Frame is a copy if it is transformed to avoid transforming the original Frame
+        /// </summary>
+        Frame GetLatestTrackingFrameCopy()
+        {
+            Frame currentFrame = TrackingProvider.CurrentFrame;
+
+            if (currentFrame != null &&
+                    Camera.main != null &&
+                    Camera.main.transform.parent != null)
+            {
+                Vector3 camPos = Camera.main.transform.parent.position;
+                Quaternion camRot = Camera.main.transform.parent.rotation;
+
+                // Move first to ensure correct order of transformation
+                currentFrame = currentFrame.TransformedCopy(-camPos, Quaternion.identity);
+                currentFrame.Transform(Vector3.zero, Quaternion.Inverse(camRot));
+            }
+
+            return currentFrame;
+        }
+
         bool PopulateXRHandFromLeap(Hand leapHand, ref Pose rootPose, ref NativeArray<XRHandJoint> handJoints, XRHandSubsystem.UpdateType updateType)
         {
             if (leapHand == null)
             {
                 return false;
-            }
-
-            if (Camera.main.transform != null && Camera.main.transform.parent != null)
-            {
-                var camPos = Camera.main.transform.parent.position;
-                var camRot = Camera.main.transform.parent.rotation;
-
-                leapHand.Transform(-camPos, Quaternion.identity);
-                leapHand.Transform(Vector3.zero, Quaternion.Inverse(camRot));
             }
 
             Pose palmPose = CalculatePalmPose(leapHand);

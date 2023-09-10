@@ -106,13 +106,10 @@ namespace Leap.Unity.InputActions
 
         private static void UpdateHands(XRHandSubsystem subsystem, XRHandSubsystem.UpdateSuccessFlags updateSuccessFlags, XRHandSubsystem.UpdateType updateType)
         {
-            if (Application.isPlaying && updateType == XRHandSubsystem.UpdateType.BeforeRender)
+            if (Application.isPlaying)
             {
-                XRHand rightHand = subsystem.rightHand;
-                XRHand leftHand = subsystem.leftHand;
-
-                UpdateStateWithLeapHand(rightDevice, rightHand, ref rightState);
-                UpdateStateWithLeapHand(leftDevice, leftHand, ref leftState);
+                UpdateStateWithLeapHand(rightDevice, subsystem.rightHand, ref rightState);
+                UpdateStateWithLeapHand(leftDevice, subsystem.leftHand, ref leftState);
             }
         }
 
