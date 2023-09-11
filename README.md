@@ -43,7 +43,7 @@
 
 The Ultraleap Unity Plugin empowers developers to build Unity applications using Ultraleap's hand tracking technology. It includes various assets, examples, and utilities that make it easy to design and build applications using hand tracking in XR projects.
 
-| [![Downloading the Plugin](Markdown/images/UL-Icon.png)](#Installation)<br/><div align="center">[Downloading the Plugin](#Installation)</div>| [![Feature Guides](Markdown/images/UL-Icon2.png)](https://docs.ultraleap.com/unity-api/#)<br/><div align="center">[Feature Guides](https://docs.ultraleap.com/unity-api/#)</div>| [![Contributing](Markdown/images/UL-Icon3.png)](#Contributing)<br/><div align="center">[Contributing](#Contributing)</div>|
+| <div align="center">[![Downloading the Plugin](Markdown/images/UL-Icon.png)](#Installation)<br/>[Downloading the Plugin](#Installation)</div>| <div align="center">[![Feature Guides](Markdown/images/UL-Icon2.png)](https://docs.ultraleap.com/unity-api/#)<br/>[Feature Guides](https://docs.ultraleap.com/unity-api/#)</div>| <div align="center">[![Contributing](Markdown/images/UL-Icon3.png)](#Contributing)<br/>[Contributing](#Contributing)</div>|
 |:---|:---|:---|
 | Get set up with the Ultraleap Plugin for Unity.| Learn how to make the most of hand tracking and what features are available.| Contribute to this Open Source repository to make your mark and help others. |
 
