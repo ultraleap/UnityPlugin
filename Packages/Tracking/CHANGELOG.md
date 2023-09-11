@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [NEXT] - xx/xx/xx
 
 ### Added
--  
+-  (MRTK Support) Added an MRTK3 subsystem for using Leap tracking directly (non-OpenXR)
 
 ### Changed
 - (Service Provider) Expose service IP and port as user settable variables
