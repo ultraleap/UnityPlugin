@@ -90,7 +90,7 @@ namespace Leap.Unity
                 return;
             }
 
-            LeapXRServiceProvider leapProvider = GameObject.FindAnyObjectByType<LeapXRServiceProvider>();
+            LeapProvider leapProvider = GameObject.FindAnyObjectByType<LeapXRServiceProvider>();
 
             // If there is no leap provider in the scene
             if (leapProvider == null)
@@ -98,7 +98,9 @@ namespace Leap.Unity
                 Debug.Log("There are no LeapXRServiceProviders in the scene, automatically assigning one for use with Ultraleap Subsystem for XRHands");
 
                 GameObject leapProviderGO = new GameObject("LeapXRServiceProvider");
-                leapProvider = leapProviderGO.AddComponent<LeapXRServiceProvider>();
+                LeapXRServiceProvider leapXRServiceProvider = leapProviderGO.AddComponent<LeapXRServiceProvider>();
+                leapXRServiceProvider.PositionDeviceRelativeToMainCamera = true;
+                leapProvider = (LeapProvider)leapXRServiceProvider;
                 GameObject.DontDestroyOnLoad(leapProviderGO);
             }
             else
