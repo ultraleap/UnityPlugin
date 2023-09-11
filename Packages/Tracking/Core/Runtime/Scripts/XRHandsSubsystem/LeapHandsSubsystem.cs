@@ -7,7 +7,9 @@
  ******************************************************************************/
 
 using System.Collections.Generic;
+
 using Unity.Collections;
+
 using UnityEngine;
 using UnityEngine.XR.Hands;
 using UnityEngine.XR.Hands.ProviderImplementation;

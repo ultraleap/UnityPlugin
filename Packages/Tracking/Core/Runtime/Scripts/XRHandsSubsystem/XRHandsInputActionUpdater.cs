@@ -7,12 +7,11 @@
  ******************************************************************************/
 
 using System.Collections.Generic;
-using UnityEditor;
+
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Layouts;
 using UnityEngine.XR.Hands;
-using UnityEngine.XR.Hands.Processing;
 
 namespace Leap.Unity.InputActions
 {
