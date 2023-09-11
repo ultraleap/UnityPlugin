@@ -615,29 +615,28 @@ namespace Leap.Unity
                         if (_currentDevice.DevicePose != Pose.identity)
                         {
                             warpedPosition += warpedRotation * _currentDevice.DevicePose.position;
-                            warpedRotation *= _currentDevice.DevicePose.rotation;
+                            //warpedRotation *= _currentDevice.DevicePose.rotation; // This causes unexpected results, fall back to the below for leap -> openxr rotation
+                            warpedRotation *= Quaternion.Euler(-90f, 180f, 0f);
                         }
                         else // Fall back to the consts if we are given a Pose.identity as it is assumed to be false
                         {
                             warpedPosition += warpedRotation * Vector3.up * deviceOffsetYAxis
                                             + warpedRotation * Vector3.forward * deviceOffsetZAxis;
                             warpedRotation *= Quaternion.Euler(deviceTiltXAxis, 0f, 0f);
+                            warpedRotation *= Quaternion.Euler(-90f, 180f, 0f);
                         }
                     }
-                    warpedRotation *= Quaternion.Euler(-90f, 180f, 0f);
                     break;
                 case DeviceOffsetMode.ManualHeadOffset:
                     warpedPosition += warpedRotation * Vector3.up * deviceOffsetYAxis
                                     + warpedRotation * Vector3.forward * deviceOffsetZAxis;
                     warpedRotation *= Quaternion.Euler(deviceTiltXAxis, 0f, 0f);
-
                     warpedRotation *= Quaternion.Euler(-90f, 180f, 0f);
                     break;
                 case DeviceOffsetMode.Transform:
                     warpedRotation *= Quaternion.Euler(-90f, 90f, 90f);
                     break;
             }
-
 
             // Use the mainCamera parent to transfrom the warped positions so the player can move around
             if (mainCamera.transform.parent != null && _positionDeviceRelativeToMainCamera)

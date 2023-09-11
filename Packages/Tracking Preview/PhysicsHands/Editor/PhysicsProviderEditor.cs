@@ -84,7 +84,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             _teleportDistance = _handParameters.FindPropertyRelative("teleportDistance");
 
             _boneMass = _handParameters.FindPropertyRelative("boneMass");
-            _boneStiffness = _handParameters.FindPropertyRelative("boneStiffness"); 
+            _boneStiffness = _handParameters.FindPropertyRelative("boneStiffness");
             _boneForceLimit = _handParameters.FindPropertyRelative("boneForceLimit");
 
             _maxPalmVel = _handParameters.FindPropertyRelative("maximumPalmVelocity");
@@ -127,7 +127,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
         private void WarningsSection()
         {
             // Provider
-            if(_inputProvider.objectReferenceValue == null)
+            if (_inputProvider.objectReferenceValue == null)
             {
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.HelpBox($"You will need to assign an Input Leap Provider otherwise you will not have any hands.", MessageType.Warning);
