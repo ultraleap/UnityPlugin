@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [NEXT] - xx/xx/xx
 
 ### Added
--  
+-  (MRTK Support) Added an MRTK3 subsystem for using Leap tracking directly (non-OpenXR)
 
 ### Changed
 - (XRHands) XRHands subsystem will now use existing LeapXRServiceProviders found in the scene before considering generating new ones
