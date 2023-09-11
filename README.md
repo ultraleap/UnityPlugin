@@ -45,7 +45,7 @@ The Ultraleap Unity Plugin empowers developers to build Unity applications using
 
 | <div align="center">[![Downloading the Plugin](Markdown/images/UL-Icon.png)](#Installation)<br/>[Downloading the Plugin](#Installation)</div>                                   | <div align="center">[![Feature Guides](Markdown/images/UL-Icon2.png)](https://docs.ultraleap.com/unity-api/#)<br/>[Feature Guides](https://docs.ultraleap.com/unity-api/#)</div>| <div align="center">[![Contributing](Markdown/images/UL-Icon3.png)](#Contributing)<br/>[Contributing](#Contributing)</div>                                                      |
 |:---|:---|:---|
-| Get set up with the Ultraleap Plugin for Unity.                              | Learn how to make the most of hand tracking and what features are available. | Contribute to this Open Source repository to make your mark and help others. |
+| Get set up with the Ultraleap Plugin for Unity.                             | Discover the available features of the Ultraleap Plugin for Unity.          | Contribute to the Open Source repository to make your mark and help others. |
 
 ## Getting Started
 
@@ -56,12 +56,12 @@ To use this plugin you will need the following:
 3. Unity 2021.3 LTS or newer. UnityPlugin packages have been tested to work against 2021.3 LTS and 2022.3 LTS.
 5. Follow one of the Installation workflows listed below.
 
+More detailed Getting Started documentation is available on [our website][documentation]
+
 **Please note:**
 
 - Due to the ever changing landscape of package dependencies in Unity we cannot guarantee compatibility with every plugin or variant of Unity, but aim to provide support for any LTS versions that are under continuous support from Unity.
 - If you are sourcing the Unity Plugin directly from this repository, you may find that it does not function well with earlier versions of Unity.
-
-More detailed Getting Started documentation is available on [our website][documentation]
 
 ## Installation
 
