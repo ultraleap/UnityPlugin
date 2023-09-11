@@ -6,10 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
 
-## [NEXT] - xx/xx/xx
+## [6.12.0] - 12/09/23
 
 ### Added
--  (MRTK Support) Added an MRTK3 subsystem for using Leap tracking directly (non-OpenXR)
+- (MRTK Support) Added an MRTK3 subsystem for using Leap tracking directly (non-OpenXR)
 
 ### Changed
 - (XRHands) XRHands subsystem will now use existing LeapXRServiceProviders found in the scene before considering generating new ones
