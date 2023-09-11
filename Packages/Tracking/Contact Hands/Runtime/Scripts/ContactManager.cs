@@ -77,7 +77,7 @@ namespace Leap.Unity.ContactHands
 
         private void Awake()
         {
-            contactHands = GetComponentInChildren<ContactParent>(true);
+            contactHands = GetComponentInChildren<ContactParent>();
             GenerateLayers();
             SetupAutomaticCollisionLayers();
         }
@@ -266,7 +266,7 @@ namespace Leap.Unity.ContactHands
         {
             if (contactHands == null)
             {
-                contactHands = GetComponentInChildren<ContactParent>(true);
+                contactHands = GetComponentInChildren<ContactParent>();
             }
         }
 

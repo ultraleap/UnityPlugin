@@ -153,6 +153,7 @@ namespace Leap.Unity.ContactHands
         #region Updating
         internal override void PostFixedUpdateBone()
         {
+
         }
 
         internal override void UpdateBone(Bone prevBone, Bone bone)
@@ -160,6 +161,8 @@ namespace Leap.Unity.ContactHands
             UpdateBoneSizes(prevBone, bone);
 
             UpdateBoneAngle(prevBone, bone);
+
+            UpdateBoneWorldSpace();
         }
 
         internal override void UpdatePalmBone(Hand hand)
@@ -219,10 +222,17 @@ namespace Leap.Unity.ContactHands
             {
                 articulationBody.angularVelocity = angularVelocity;
             }
+
+            UpdateBoneWorldSpace();
         }
 
-        private void UpdateBoneSizes(Bone prevBone, Bone bone)
+        private void UpdateBoneSizes(Bone prevBone, Bone bone, bool forceUpdate = false)
         {
+            if (!forceUpdate && !Time.inFixedTimeStep)
+            {
+                return;
+            }
+
             if (IsBoneContacting)
             {
                 if (joint > 0)
@@ -239,8 +249,13 @@ namespace Leap.Unity.ContactHands
             }
         }
 
-        private void UpdateBoneAngle(Bone prevBone, Bone bone)
+        private void UpdateBoneAngle(Bone prevBone, Bone bone, bool forceUpdate = false)
         {
+            if(!forceUpdate && !Time.inFixedTimeStep)
+            {
+                return;
+            }
+
             _xTargetAngle = CalculateXJointAngle(prevBone.Rotation, bone.Direction);
 
             _xDampening = Mathf.Lerp(_xDampening, 2f, Time.fixedDeltaTime * (1.0f / 0.1f));
@@ -280,6 +295,26 @@ namespace Leap.Unity.ContactHands
                 yDrive.forceLimit = hardContactParent.maxPalmVelocity * Time.fixedDeltaTime;
                 yDrive.target = _yTargetAngle;
                 articulationBody.yDrive = yDrive;
+            }
+        }
+
+        private void UpdateBoneWorldSpace()
+        {
+            if (isPalm)
+            {
+                PhysExts.ToWorldSpaceBox(palmCollider, out Vector3 center, out Vector3 halfExtents, out Quaternion orientation);
+                this.center = center;
+                this.tipPosition = center + (orientation * (Vector3.forward * halfExtents.z));
+                this.palmThickness = halfExtents.y * 2f;
+                this.wristPosition = transform.position - (transform.rotation * Quaternion.Inverse(contactHand.dataHand.Rotation) * (contactHand.dataHand.PalmPosition - contactHand.dataHand.WristPosition));
+            }
+            else
+            {
+                PhysExts.ToWorldSpaceCapsule(boneCollider, out Vector3 tip, out Vector3 bottom, out float radius);
+                this.tipPosition = tip;
+                this.width = radius;
+                this.length = Vector3.Distance(bottom, tip);
+                this.center = Vector3.Lerp(bottom, tip, 0.5f);
             }
         }
 
@@ -456,7 +491,9 @@ namespace Leap.Unity.ContactHands
                 articulationBody.parentAnchorRotation = Quaternion.identity;
             }
 
-            UpdateBoneAngle(prevBone, bone);
+            UpdateBoneSizes(prevBone, bone, true);
+
+            UpdateBoneAngle(prevBone, bone, true);
         }
 
         internal void UpdateIterations()

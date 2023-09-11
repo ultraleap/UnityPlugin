@@ -103,7 +103,7 @@ namespace Leap.Unity.ContactHands
             UpdateHandLogic(hand);
             // Update the bones
             palmBone.UpdatePalmBone(hand);
-            for (int i = 0; i < bones.Length - 1; i++)
+            for (int i = 0; i < bones.Length; i++)
             {
                 bones[i].UpdateBone(hand.Fingers[bones[i].Finger].bones[bones[i].joint], hand.Fingers[bones[i].Finger].bones[bones[i].joint + 1]);
             }
