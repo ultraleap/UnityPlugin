@@ -1,13 +1,11 @@
-using System.Collections.Generic;
-
-using UnityEngine;
-using UnityEngine.Scripting;
-using UnityEngine.XR;
-using UnityEngine.InputSystem;
-
 using MixedReality.Toolkit;
 using MixedReality.Toolkit.Input;
 using MixedReality.Toolkit.Subsystems;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.Scripting;
+using UnityEngine.XR;
 
 namespace Leap.Unity.MRTK
 {
@@ -26,7 +24,7 @@ namespace Leap.Unity.MRTK
         {
             bool subsystemEnabled = MRTKProfile.Instance.LoadedSubsystems.Contains(typeof(LeapMRTKSubsystem));
 
-            if(!subsystemEnabled)
+            if (!subsystemEnabled)
             {
                 return;
             }
