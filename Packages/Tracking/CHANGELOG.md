@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (XRHands) XRHands subsystem will now use existing LeapXRServiceProviders found in the scene before considering generating new ones
 
 ### Fixed
-- 
+- (XRHands) XRHands double-translates tracking data causing XRI InputActions to be wrongly positioned when the XROrigin is moved
 
 ### Known issues 
 - Use of the LeapCSharp Config class is unavailable with v5.X tracking service

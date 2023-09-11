@@ -7,7 +7,9 @@
  ******************************************************************************/
 
 using System.Collections.Generic;
+
 using Unity.Collections;
+
 using UnityEngine;
 using UnityEngine.XR.Hands;
 using UnityEngine.XR.Hands.ProviderImplementation;
@@ -101,17 +103,17 @@ namespace Leap.Unity
                 return XRHandSubsystem.UpdateSuccessFlags.None;
             }
 
-            Frame currentFrame = TrackingProvider.CurrentFrame;
+            Frame currentFrame = GetLatestTrackingFrameCopy();
 
             XRHandSubsystem.UpdateSuccessFlags updateSuccessFlags = XRHandSubsystem.UpdateSuccessFlags.None;
 
-            if (PopulateXRHandFromLeap(currentFrame.GetHand(Chirality.Left), ref leftHandRootPose, ref leftHandJoints))
+            if (PopulateXRHandFromLeap(currentFrame.GetHand(Chirality.Left), ref leftHandRootPose, ref leftHandJoints, updateType))
             {
                 updateSuccessFlags |= XRHandSubsystem.UpdateSuccessFlags.LeftHandRootPose;
                 updateSuccessFlags |= XRHandSubsystem.UpdateSuccessFlags.LeftHandJoints;
             }
 
-            if (PopulateXRHandFromLeap(currentFrame.GetHand(Chirality.Right), ref rightHandRootPose, ref rightHandJoints))
+            if (PopulateXRHandFromLeap(currentFrame.GetHand(Chirality.Right), ref rightHandRootPose, ref rightHandJoints, updateType))
             {
                 updateSuccessFlags |= XRHandSubsystem.UpdateSuccessFlags.RightHandRootPose;
                 updateSuccessFlags |= XRHandSubsystem.UpdateSuccessFlags.RightHandJoints;
@@ -122,26 +124,40 @@ namespace Leap.Unity
             return updateSuccessFlags;
         }
 
-        bool PopulateXRHandFromLeap(Hand leapHand, ref Pose rootPose, ref NativeArray<XRHandJoint> handJoints)
+        /// <summary>
+        /// Get the latest tracking frame from the TrackingProvider.
+        /// This will be in local space to the camera's parent if it is available
+        /// 
+        /// Also ensures the Frame is a copy if it is transformed to avoid transforming the original Frame
+        /// </summary>
+        Frame GetLatestTrackingFrameCopy()
+        {
+            Frame currentFrame = TrackingProvider.CurrentFrame;
+
+            if (currentFrame != null &&
+                    Camera.main != null &&
+                    Camera.main.transform.parent != null)
+            {
+                Vector3 camPos = Camera.main.transform.parent.position;
+                Quaternion camRot = Camera.main.transform.parent.rotation;
+
+                // Move first to ensure correct order of transformation
+                currentFrame = currentFrame.TransformedCopy(-camPos, Quaternion.identity);
+                currentFrame.Transform(Vector3.zero, Quaternion.Inverse(camRot));
+            }
+
+            return currentFrame;
+        }
+
+        bool PopulateXRHandFromLeap(Hand leapHand, ref Pose rootPose, ref NativeArray<XRHandJoint> handJoints, XRHandSubsystem.UpdateType updateType)
         {
             if (leapHand == null)
             {
                 return false;
             }
 
-            if (Camera.main.transform != null)
-            {
-                var camPos = Camera.main.transform.parent.position;
-                var camRot = Camera.main.transform.parent.rotation;
-                leapHand.Transform(-camPos, Quaternion.Inverse(camRot));
-
-            }
-
-
             Pose palmPose = CalculatePalmPose(leapHand);
             Pose wristPose = CalculateWristPose(leapHand);
-
-
 
             rootPose = wristPose;
             Handedness handedness = (Handedness)((int)leapHand.GetChirality() + 1); // +1 as unity has "invalid" handedness while we do not
