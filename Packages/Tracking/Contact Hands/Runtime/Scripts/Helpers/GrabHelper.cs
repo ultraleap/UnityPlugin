@@ -24,8 +24,10 @@ namespace Leap.Unity.ContactHands
 
         #region Safety Overlap Data
         private bool _jobsCreated = false;
-        private const int SAFETY_CYCLES = 2;
+        private const int SAFETY_CYCLES = 3;
         private float[] _safetyCheckDistances;
+        private bool[] _safetyCheckMultiply;
+        private float _physicsSyncTime;
         #endregion
 
         #region Interaction Data
@@ -71,9 +73,11 @@ namespace Leap.Unity.ContactHands
 
         private void InitJobs()
         {
-            // Two sets of jobs because of two hands, two repetitions because of inside hand and close to hand
-            _safetyCheckDistances = new float[] { 0.005f, contactManager.ContactDistance };
-            
+            // The radii used for the different safety jobs
+            _safetyCheckDistances = new float[] { 0.005f, contactManager.ContactDistance, -0.5f };
+            // Decides whether the values above are raw or a multiplication of the current radius of the bone
+            _safetyCheckMultiply = new bool[] { false, false, true };
+             
             _jobsCreated = true;
         }
 
@@ -233,8 +237,14 @@ namespace Leap.Unity.ContactHands
         // Unity 2021
         private void UpdateSafetyOverlaps()
         {
-#if UNITY_2022_3_OR_NEWER
+            if(_physicsSyncTime != Time.time)
+            {
+                Physics.SyncTransforms();
+                _physicsSyncTime = Time.time;
+            }
 
+#if UNITY_2022_3_OR_NEWER
+            // Add burst jobs in here
 #else
             // Pre 2022 overlaps
             HandSafetyOverlaps(_leftContactHand);
@@ -262,7 +272,10 @@ namespace Leap.Unity.ContactHands
 
         private void PalmSafetyOverlaps(ContactBone palmBone)
         {
-            int count = PhysExts.OverlapBoxNonAllocOffset(palmBone.palmCollider, Vector3.zero, _colliderCache, contactManager.InteractionMask, QueryTriggerInteraction.Ignore, extraRadius: _safetyCheckDistances[0]);
+            float radiusAmount = PhysExts.MaxVec3(Vector3.Scale(palmBone.palmCollider.size, PhysExts.AbsVec3(palmBone.transform.lossyScale)));
+
+            int count = PhysExts.OverlapBoxNonAllocOffset(palmBone.palmCollider, Vector3.zero, _colliderCache, contactManager.InteractionMask, QueryTriggerInteraction.Ignore,
+                extraRadius: (_safetyCheckMultiply[0] ? radiusAmount * _safetyCheckDistances[0] : _safetyCheckDistances[0]));
             for (int i = 0; i < count; i++)
             {
                 if (_colliderCache[i] != null && WillColliderAffectHand(_colliderCache[i]))
@@ -273,7 +286,8 @@ namespace Leap.Unity.ContactHands
             }
 
             // Contact
-            count = PhysExts.OverlapBoxNonAllocOffset(palmBone.palmCollider, Vector3.zero, _colliderCache, contactManager.InteractionMask, QueryTriggerInteraction.Ignore, extraRadius: _safetyCheckDistances[1]);
+            count = PhysExts.OverlapBoxNonAllocOffset(palmBone.palmCollider, Vector3.zero, _colliderCache, contactManager.InteractionMask, QueryTriggerInteraction.Ignore,
+                extraRadius: (_safetyCheckMultiply[1] ? radiusAmount * _safetyCheckDistances[1] : _safetyCheckDistances[1]));
             for (int i = 0; i < count; i++)
             {
                 if (_colliderCache[i] != null && WillColliderAffectHand(_colliderCache[i]))
@@ -282,11 +296,18 @@ namespace Leap.Unity.ContactHands
                     break;
                 }
             }
+
+            // Intersection
+            count = PhysExts.OverlapBoxNonAllocOffset(palmBone.palmCollider, Vector3.zero, _colliderCache, contactManager.InteractionMask, QueryTriggerInteraction.Ignore,
+                extraRadius: (_safetyCheckMultiply[2] ? radiusAmount * _safetyCheckDistances[2] : _safetyCheckDistances[2]));
+
+            HandleSafetyInteractionOverlaps(count, palmBone.contactHand);
         }
 
         private void JointSafetyOverlaps(ContactBone bone)
         {
-            int count = PhysExts.OverlapCapsuleNonAllocOffset(bone.boneCollider, Vector3.zero, _colliderCache, contactManager.InteractionMask, QueryTriggerInteraction.Ignore, extraRadius: _safetyCheckDistances[0]);
+            int count = PhysExts.OverlapCapsuleNonAllocOffset(bone.boneCollider, Vector3.zero, _colliderCache, contactManager.InteractionMask, QueryTriggerInteraction.Ignore,
+                extraRadius: (_safetyCheckMultiply[0] ? bone.width * _safetyCheckDistances[0] : _safetyCheckDistances[0]));
             for (int i = 0; i < count; i++)
             {
                 if (_colliderCache[i] != null && WillColliderAffectHand(_colliderCache[i]))
@@ -297,7 +318,8 @@ namespace Leap.Unity.ContactHands
             }
 
             // Contact
-            count = PhysExts.OverlapCapsuleNonAllocOffset(bone.boneCollider, Vector3.zero, _colliderCache, contactManager.InteractionMask, QueryTriggerInteraction.Ignore, extraRadius: _safetyCheckDistances[1]);
+            count = PhysExts.OverlapCapsuleNonAllocOffset(bone.boneCollider, Vector3.zero, _colliderCache, contactManager.InteractionMask, QueryTriggerInteraction.Ignore,
+                extraRadius: (_safetyCheckMultiply[1] ? bone.width * _safetyCheckDistances[1] : _safetyCheckDistances[1]));
             for (int i = 0; i < count; i++)
             {
                 if (_colliderCache[i] != null && WillColliderAffectHand(_colliderCache[i]))
@@ -306,6 +328,57 @@ namespace Leap.Unity.ContactHands
                     break;
                 }
             }
+
+            // Intersection
+            count = PhysExts.OverlapCapsuleNonAllocOffset(bone.boneCollider, Vector3.zero, _colliderCache, contactManager.InteractionMask, QueryTriggerInteraction.Ignore,
+                extraRadius: (_safetyCheckMultiply[2] ? bone.width * _safetyCheckDistances[2] : _safetyCheckDistances[2]));
+
+            HandleSafetyInteractionOverlaps(count, bone.contactHand);
+        }
+
+        private void HandleSafetyInteractionOverlaps(int count, ContactHand hand)
+        {
+            HashSet<int> foundBodies = new HashSet<int>();
+
+            for (int i = 0; i < count; i++)
+            {
+                if (_colliderCache[i] != null && WillColliderAffectHand(_colliderCache[i]))
+                {
+                    int id = _colliderCache[i].attachedRigidbody.gameObject.GetInstanceID();
+
+                    if (foundBodies.Contains(id))
+                    {
+                        continue;
+                    }
+
+                    if (IsRigidbodyAlreadyColliding(_colliderCache[i].attachedRigidbody))
+                    {
+                        hand.IgnoreCollision(_colliderCache[i].attachedRigidbody, timeout: Time.fixedDeltaTime * 5f);
+                        foundBodies.Add(id);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Simple test to ensure that a rigidbody that is now inside of a hand was already known to the system
+        /// </summary>
+        private bool IsRigidbodyAlreadyColliding(Rigidbody body)
+        {
+            // Does a helper already exist (we would at least be idle or hovering at this point)
+            if (_grabHelpers.TryGetValue(body, out var helper))
+            {
+                // Is that helper only idle or hovering?
+                if (helper.GraspState == GrabHelperObject.State.Idle || helper.GraspState == GrabHelperObject.State.Hover)
+                {
+                    return true;
+                }
+            }
+            else
+            {
+                return true;
+            }
+            return false;
         }
 
 #if UNITY_2022_3_OR_NEWER
@@ -427,7 +500,7 @@ namespace Leap.Unity.ContactHands
         private void PalmOverlapJobs()
         {
 
-        }
+        }  
 
         private void JointOverlapJobs()
         {
