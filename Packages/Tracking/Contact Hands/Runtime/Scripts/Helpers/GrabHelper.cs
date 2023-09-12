@@ -94,6 +94,7 @@ namespace Leap.Unity.ContactHands
         {
             UpdateHandHeuristics();
             UpdateHelpers();
+            UpdateHandStates();
         }
 
         #region Hand Updating
@@ -517,6 +518,45 @@ namespace Leap.Unity.ContactHands
                 return true;
             }
             return false;
+        }
+        #endregion
+
+        #region Hand States
+        private void UpdateHandStates()
+        {
+            if (_leftGoodState)
+            {
+                FindHandState(_leftContactHand);
+            }
+            if (_rightGoodState)
+            {
+                FindHandState(_rightContactHand);
+            }
+        }
+
+        private void FindHandState(ContactHand hand)
+        {
+            if (hand == null)
+            {
+                return;
+            }
+
+            bool found = false;
+            float mass = 0;
+            foreach (var item in _grabHelpers)
+            {
+                if (item.Value.GraspingHands.Contains(hand))
+                {
+                    found = true;
+                    mass += item.Value.OriginalMass;
+                    break;
+                }
+            }
+            if (found != hand.IsGrabbing)
+            {
+                hand.isGrabbing = found;
+            }
+            hand.grabMass = mass;
         }
         #endregion
 

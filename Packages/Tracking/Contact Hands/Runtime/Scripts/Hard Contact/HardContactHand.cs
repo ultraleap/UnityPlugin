@@ -19,6 +19,10 @@ namespace Leap.Unity.ContactHands
         private float _timeOnReset;
 
         private float _overallFingerDisplacement = 0f, _averageFingerDisplacement = 0f, _contactFingerDisplacement = 0f;
+        public float FingerDisplacement => _overallFingerDisplacement;
+        public float FingerAverageDisplacement => _averageFingerDisplacement;
+        public float FingerContactDisplacement => _contactFingerDisplacement;
+
         // Interpolate back in displacement values after the hand has just released
         private float _displacementGrabCooldown = 0.25f, _displacementGrabCooldownCurrent = 0f;
 
@@ -37,9 +41,11 @@ namespace Leap.Unity.ContactHands
         internal float currentPalmVelocity, currentPalmAngularVelocity;
         internal float currentPalmVelocityInterp, currentPalmWeightInterp;
 
+        internal Vector3 computedPhysicsPosition;
+        internal Quaternion computedPhysicsRotation;
         internal float computedHandDistance;
 
-        internal float graspingWeight, currentPalmWeight, fingerDisplacement;
+        internal float graspingWeight, currentPalmWeight;
         internal float currentResetLerp;
 
         internal int[] grabbingFingers;
@@ -213,7 +219,15 @@ namespace Leap.Unity.ContactHands
 
         internal override void PostFixedUpdateHand()
         {
+            CacheComputedPositions();
             CalculateDisplacementsAndLimits();
+        }
+
+        private void CacheComputedPositions()
+        {
+            computedPhysicsPosition = palmBone.transform.position;
+            computedPhysicsRotation = palmBone.transform.rotation;
+            computedHandDistance = Vector3.Distance(_oldDataPosition, computedPhysicsPosition);
         }
 
         private void CalculateDisplacementsAndLimits()

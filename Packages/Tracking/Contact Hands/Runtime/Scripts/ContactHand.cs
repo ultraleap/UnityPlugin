@@ -49,6 +49,9 @@ namespace Leap.Unity.ContactHands
         protected Vector3 _oldDataPosition, _oldContactPosition;
         protected Quaternion _oldDataRotation, _oldContactRotation;
 
+        internal float grabMass = 0f;
+        public float GrabMass => grabMass;
+
         /// <summary>
         /// These values will need to be manually calculated if there are no rigidbodies on the bones.
         /// </summary>

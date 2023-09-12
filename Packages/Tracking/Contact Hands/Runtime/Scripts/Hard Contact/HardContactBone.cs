@@ -190,9 +190,9 @@ namespace Leap.Unity.ContactHands
                 // Reduce the overall delta amount when the weight is heigher
                 hardContactHand.currentPalmWeightInterp = Mathf.InverseLerp(Mathf.Min(hardContactParent.maxWeight * 0.1f, 1f), hardContactParent.maxWeight, hardContactHand.graspingWeight).EaseOut();
             }
-            else if (hardContactHand.fingerDisplacement > 0.8f)
+            else if (hardContactHand.FingerContactDisplacement > 0.8f)
             {
-                hardContactHand.currentPalmWeightInterp = Mathf.InverseLerp(0.8f, 8f, hardContactHand.fingerDisplacement).EaseOut();
+                hardContactHand.currentPalmWeightInterp = Mathf.InverseLerp(0.8f, 8f, hardContactHand.FingerContactDisplacement).EaseOut();
             }
             else
             {
