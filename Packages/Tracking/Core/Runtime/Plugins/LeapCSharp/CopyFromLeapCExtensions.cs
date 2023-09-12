@@ -80,8 +80,9 @@ namespace LeapInternal
             hand.Fingers[3].CopyFrom(leapHand.ring, Leap.Finger.FingerType.TYPE_RING, hand.Id, hand.TimeVisible);
             hand.Fingers[4].CopyFrom(leapHand.pinky, Leap.Finger.FingerType.TYPE_PINKY, hand.Id, hand.TimeVisible);
 
-            hand.TransformToUnityUnits();
+            Debug.Log($"{leapHand.palm.position.x}, {leapHand.palm.position.y}, {leapHand.palm.position.z}");
 
+            hand.TransformToUnityUnits();
             return hand;
         }
 

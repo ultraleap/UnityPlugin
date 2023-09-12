@@ -315,7 +315,6 @@ namespace Leap
             return status;
         }
 
-
         /// <summary>
         /// The software has detected a possible smudge on the translucent cover
         /// over the Leap Motion cameras.

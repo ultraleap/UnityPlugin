@@ -205,6 +205,7 @@ namespace Leap
         /// </summary>
         public UnityEngine.Vector3 RectilinearToPixel(CameraType camera, UnityEngine.Vector3 ray)
         {
+            // Humm, think this might fail with Connection.GetConnection()
             return Connection.GetConnection().RectilinearToPixelEx(
                 Connection.GetConnection().Devices.FindDeviceByID(deviceId).Handle,
                 camera,

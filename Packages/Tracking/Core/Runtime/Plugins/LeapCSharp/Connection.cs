@@ -13,6 +13,7 @@ namespace LeapInternal
     using System.Collections.Generic;
     using System.Runtime.InteropServices;
     using System.Threading;
+    using UnityEngine;
 
     public class Connection
     {
@@ -121,6 +122,9 @@ namespace LeapInternal
         public EventHandler<DeviceEventArgs> LeapDeviceLost;
         public EventHandler<DeviceFailureEventArgs> LeapDeviceFailure;
         public EventHandler<PolicyEventArgs> LeapPolicyChange;
+
+        public EventHandler<RawFrameEventArgs> LeapRawFrameData;
+
         public EventHandler<FrameEventArgs> LeapFrame;
         public EventHandler<InternalFrameEventArgs> LeapInternalFrame;
         public EventHandler<LogEventArgs> LeapLogEvent;
@@ -412,6 +416,11 @@ namespace LeapInternal
         private void handleTrackingMessage(ref LEAP_TRACKING_EVENT trackingMsg, UInt32 deviceID)
         {
             Frames.Put(ref trackingMsg);
+
+            if (LeapRawFrameData != null)
+            {
+                LeapRawFrameData.DispatchOnContext(this, EventContext, new RawFrameEventArgs(trackingMsg));
+            }
 
             if (LeapFrame != null)
             {
@@ -1372,6 +1381,45 @@ namespace LeapInternal
                 pm.ids[i] = unchecked((UInt32)ids[i]);
             }
             Marshal.FreeHGlobal(buffer);
+        }
+
+        public Matrix4x4 LeapExtrinsicCameraMatrix(Image.CameraType camera, Device? device)
+        {
+            float[] data = new float[16];
+
+            try
+            {
+                eLeapRS result = eLeapRS.eLeapRS_Success;
+
+                if (device != null)
+                {
+                    result = LeapC.LeapExtrinsicCameraMatrixEx(_leapConnection, device.Handle, camera == Image.CameraType.LEFT ?
+                       eLeapPerspectiveType.eLeapPerspectiveType_stereo_left :
+                       eLeapPerspectiveType.eLeapPerspectiveType_stereo_right, data);
+                }
+                else
+                {
+                    result = LeapC.LeapExtrinsicCameraMatrix(_leapConnection, camera == Image.CameraType.LEFT ?
+                       eLeapPerspectiveType.eLeapPerspectiveType_stereo_left :
+                       eLeapPerspectiveType.eLeapPerspectiveType_stereo_right, data);
+                }
+
+                if (result != eLeapRS.eLeapRS_Success)
+                {
+                    return new Matrix4x4(new Vector4(data[0], data[1], data[2], data[3]),
+                        new Vector4(data[4], data[5], data[6], data[7]),
+                        new Vector4(data[8], data[9], data[10], data[11]),
+                        new Vector4(data[12], data[13], data[14], data[15])
+                        );
+                }
+
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+            }
+
+            return Matrix4x4.identity;
         }
 
         private eLeapRS _lastResult; //Used to avoid repeating the same log message, ie. for events like time out

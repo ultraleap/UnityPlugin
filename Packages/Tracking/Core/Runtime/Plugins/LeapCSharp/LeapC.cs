@@ -1227,5 +1227,11 @@ namespace LeapInternal
 
         [DllImport("LeapC", EntryPoint = "LeapGetVersion")]
         public static extern eLeapRS GetVersion(IntPtr hConnection, eLeapVersionPart versionPart, ref LEAP_VERSION pVersion);
+
+        [DllImport("LeapC", EntryPoint = "LeapExtrinsicCameraMatrix")]
+        public static extern eLeapRS LeapExtrinsicCameraMatrix(IntPtr hConnection, eLeapPerspectiveType camera, [MarshalAs(UnmanagedType.LPArray, SizeConst = 16)] float[] extrinsicMatrix);
+
+        [DllImport("LeapC", EntryPoint = "LeapExtrinsicCameraMatrixEx")]
+        public static extern eLeapRS LeapExtrinsicCameraMatrixEx(IntPtr hConnection, IntPtr hDevice, eLeapPerspectiveType camera, [MarshalAs(UnmanagedType.LPArray, SizeConst = 16)] float[] extrinsicMatrix);
     }
 }

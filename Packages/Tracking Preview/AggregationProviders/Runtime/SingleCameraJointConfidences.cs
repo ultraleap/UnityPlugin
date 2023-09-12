@@ -18,13 +18,27 @@ public class SingleCameraJointConfidences : MonoBehaviour
     /// <summary>
     /// A list of providers that are used for aggregation
     /// </summary>
-    [Tooltip("Capsule hands used to visualize confind")]
+    [Tooltip("Capsule hands used to visualize confidence")]
     [EditTimeOnly]
     public CapsuleHand[] visualCapsuleHands;
+
+
+    private Camera jointOcclusionCamera;
+
+    /// <summary>
+    /// 
+    /// </summary>
+    [Tooltip("An optional visualizer for showing the joint confidence image")]
+    public ConfidenceFromPoseVisualizer confidenceFromPoseVisualizer;
 
     private void Update()
     {
         SetupJointOcclusion();
+
+        if (jointOcclusionCamera != null && confidenceFromPoseVisualizer!= null)
+        {
+            confidenceFromPoseVisualizer.UpdateTexture(jointOcclusionCamera.targetTexture);
+        }
     }
 
     private void FixedUpdate()
@@ -57,11 +71,12 @@ public class SingleCameraJointConfidences : MonoBehaviour
                         visualizer.occlusionProvider = jointOcclusion;
                         visualizer.serviceProvider = provider;
                         visualizer.hand = jointOcclusionHand;
-                    }
+                    } 
                 }
 
+                jointOcclusionCamera = jointOcclusion.GetComponent<Camera>();
+        
                 jointOcclusions.Add(jointOcclusion);
-
             }
 
             foreach (JointOcclusion jointOcclusion in jointOcclusions)
@@ -81,7 +96,6 @@ public class SingleCameraJointConfidences : MonoBehaviour
                 jointOcclusions[i].transform.SetPose(deviceOrigin.GetPose());
                 jointOcclusions[i].transform.Rotate(new Vector3(-90, 0, 180));
             }
-
         }
     }
 

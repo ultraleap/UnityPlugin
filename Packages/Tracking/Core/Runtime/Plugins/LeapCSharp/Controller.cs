@@ -134,6 +134,21 @@ namespace Leap
         }
 
         /// <summary>
+        ///  Dispatched when the raw frame data is ready
+        /// </summary>
+        public event EventHandler<RawFrameEventArgs> RawFrameReady
+        {
+            add
+            {
+                _connection.LeapRawFrameData += value;
+            }
+            remove
+            {
+                _connection.LeapRawFrameData -= value;
+            }
+        }
+
+        /// <summary>
         /// Dispatched when an internal tracking frame is ready.
         /// @since 3.0
         /// </summary>
@@ -975,6 +990,13 @@ namespace Leap
             POLICY_OPTIMIZE_SCREENTOP = (1 << 8),
         }
 
+        public Matrix4x4 LeapExtrinsicCameraMatrix(Image.CameraType camera, Device device)
+        {
+            float[] data = new float[16];
+
+            return _connection.LeapExtrinsicCameraMatrix(camera, device);
+        }
+
         protected virtual void OnInit(object sender, LeapEventArgs eventArgs)
         {
             _hasInitialized = true;
@@ -987,6 +1009,11 @@ namespace Leap
         protected virtual void OnDisconnect(object sender, ConnectionLostEventArgs eventArgs)
         {
             _hasInitialized = false;
+        }
+
+        public Vector3 RectilinearToPixel(Image.CameraType camera, Vector3 ray)
+        {
+            return _connection.RectilinearToPixel(camera, ray);
         }
     }
 }

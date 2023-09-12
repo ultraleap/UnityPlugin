@@ -98,6 +98,45 @@ namespace Leap
     }
 
     /// <summary>
+    /// Provides access to the raw leap frame data
+    /// </summary>
+    public class RawFrameEventArgs : LeapEventArgs
+    {
+        public RawFrameEventArgs(LEAP_TRACKING_EVENT trackingMsg) : base(LeapEvent.EVENT_FRAME)
+        {
+            HasLeftHand = false;
+            HasRightHand = false;
+
+            for (int i = (int)trackingMsg.nHands; i-- != 0;)
+            {
+                LEAP_HAND hand;
+
+                StructMarshal<LEAP_HAND>.ArrayElementToStruct(trackingMsg.pHands, i, out hand);
+
+                switch (hand.type)
+                {
+                    case eLeapHandType.eLeapHandType_Left:
+                        LeftHand = hand;
+                        HasLeftHand = true;
+                        break;
+
+                    case eLeapHandType.eLeapHandType_Right:
+                        RightHand = hand;
+                        HasRightHand = true;
+                        break;
+                }
+                
+            }
+        }
+            
+        public bool HasLeftHand { get; set; }
+        public LEAP_HAND LeftHand { get; set; }
+
+        public bool HasRightHand { get; set; }
+        public LEAP_HAND RightHand { get; set; }
+    }
+
+    /// <summary>
     /// Dispatched when a policy change is complete.
     ///
     /// Provides the current and previous policies as arguments.
