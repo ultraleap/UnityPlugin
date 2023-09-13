@@ -72,7 +72,6 @@ namespace Leap.Unity
             }
 
             settings.ApplyModifiedPropertiesWithoutUndo();
-
         }
     }
 #endif
@@ -148,16 +147,16 @@ namespace Leap.Unity
             newSO = ScriptableObject.CreateInstance<UltraleapSettings>();
 
             Directory.CreateDirectory(Application.dataPath + "/Resources/");
-
             AssetDatabase.CreateAsset(newSO, "Assets/Resources/Ultraleap Settings.asset");
-
 #endif
             return newSO;
         }
 
+#if UNITY_EDITOR
         internal static SerializedObject GetSerializedSettings()
         {
             return new SerializedObject(FindSettingsSO());
         }
+#endif
     }
 }
