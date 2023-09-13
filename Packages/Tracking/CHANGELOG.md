@@ -9,13 +9,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [NEXT] - xx/xx/xx
 
 ### Added
--  (MRTK Support) Added an MRTK3 subsystem for using Leap tracking directly (non-OpenXR)
+- 
 
 ### Changed
 - Ultraleap settings are now in the project settings window, under "Ultraleap"
 
 ### Fixed
 - 
+
+### Known issues 
+- 
+
+
+
+## [6.12.0] - 12/09/23
+
+### Added
+- (MRTK Support) Added an MRTK3 subsystem for using Leap tracking directly (non-OpenXR)
+
+### Changed
+- (XRHands) XRHands subsystem will now use existing LeapXRServiceProviders found in the scene before considering generating new ones
+
+### Fixed
+- (XRHands) XRHands double-translates tracking data causing XRI InputActions to be wrongly positioned when the XROrigin is moved
 
 ### Known issues 
 - Use of the LeapCSharp Config class is unavailable with v5.X tracking service
