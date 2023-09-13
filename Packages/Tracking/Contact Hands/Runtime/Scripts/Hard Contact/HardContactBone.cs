@@ -449,6 +449,7 @@ namespace Leap.Unity.ContactHands
             transform.rotation = contactHand.dataHand.Rotation;
             articulationBody.TeleportRoot(transform.position, transform.rotation);
             ContactUtils.SetupPalmCollider(palmCollider, contactHand.dataHand);
+            articulationBody.WakeUp();
         }
 
         internal void ResetBone(Bone prevBone, Bone bone)
@@ -494,6 +495,8 @@ namespace Leap.Unity.ContactHands
             UpdateBoneSizes(prevBone, bone, true);
 
             UpdateBoneAngle(prevBone, bone, true);
+
+            articulationBody.WakeUp();
         }
 
         internal void UpdateIterations()

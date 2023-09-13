@@ -342,7 +342,7 @@ namespace Leap.Unity.ContactHands
 
             for (int i = 0; i < count; i++)
             {
-                if (_colliderCache[i] != null && WillColliderAffectHand(_colliderCache[i]))
+                if (_colliderCache[i] != null && _colliderCache[i].attachedRigidbody != null && WillColliderAffectHand(_colliderCache[i]))
                 {
                     int id = _colliderCache[i].attachedRigidbody.gameObject.GetInstanceID();
 
@@ -369,7 +369,7 @@ namespace Leap.Unity.ContactHands
             if (_grabHelpers.TryGetValue(body, out var helper))
             {
                 // Is that helper only idle or hovering?
-                if (helper.GraspState == GrabHelperObject.State.Idle || helper.GraspState == GrabHelperObject.State.Hover)
+                if (helper.GrabState == GrabHelperObject.State.Idle || helper.GrabState == GrabHelperObject.State.Hover)
                 {
                     return true;
                 }
@@ -553,7 +553,7 @@ namespace Leap.Unity.ContactHands
             foreach (var helper in _grabHelpers)
             {
                 // Removed ignore check here and moved into the helper so we can still get state information
-                oldState = helper.Value.GraspState;
+                oldState = helper.Value.GrabState;
                 state = helper.Value.UpdateHelper();
                 if (state != oldState)
                 {
@@ -578,7 +578,7 @@ namespace Leap.Unity.ContactHands
             {
                 if (_grabHelpers.ContainsKey(rigid))
                 {
-                    if (_grabHelpers[rigid].GraspState == GrabHelperObject.State.Grasp)
+                    if (_grabHelpers[rigid].GrabState == GrabHelperObject.State.Grab)
                     {
                         // Ensure we release the object first
                         _grabHelpers[rigid].ReleaseObject();
@@ -618,7 +618,7 @@ namespace Leap.Unity.ContactHands
             float mass = 0;
             foreach (var item in _grabHelpers)
             {
-                if (item.Value.GraspingHands.Contains(hand))
+                if (item.Value.GrabbingHands.Contains(hand))
                 {
                     found = true;
                     mass += item.Value.OriginalMass;
