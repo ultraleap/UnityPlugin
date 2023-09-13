@@ -135,10 +135,20 @@ namespace Leap.Unity.ContactHands
             }
 
             contactHands?.UpdateFrame();
-
+        
             // Output the frame on each update
-            contactHands?.OutputFrame(ref _modifiedFrame);
-            DispatchUpdateFrameEvent(_modifiedFrame);
+            if (Time.inFixedTimeStep)
+            {
+                // Fixed frame on fixed update
+                contactHands?.OutputFrame(ref _modifiedFrame);
+                DispatchFixedFrameEvent(_modifiedFrame);
+            }
+            else
+            {
+                // Update frame otherwise
+                contactHands?.OutputFrame(ref _modifiedFrame);
+                DispatchUpdateFrameEvent(_modifiedFrame);
+            }
         }
 
         private IEnumerator PostFixedUpdate()
@@ -152,13 +162,9 @@ namespace Leap.Unity.ContactHands
             for (; ; )
             {
                 contactHands?.PostFixedUpdateFrame();
-                // Output the frame after physics update is complete
-                contactHands?.OutputFrame(ref _modifiedFrame);
-                DispatchFixedFrameEvent(_modifiedFrame);
                 yield return _postFixedUpdateWait;
             }
         }
-
 
         #region Layer Generation
         protected void GenerateLayers()

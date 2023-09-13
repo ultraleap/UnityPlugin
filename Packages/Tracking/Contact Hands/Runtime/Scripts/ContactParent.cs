@@ -47,6 +47,10 @@ namespace Leap.Unity.ContactHands
 
         private void UpdateHand(int index, ContactHand hand, Hand dataHand)
         {
+            if (hand.IsHandPhysical && !Time.inFixedTimeStep)
+            {
+                return;
+            }
             if (index != -1)
             {
                 hand.dataHand.CopyFrom(dataHand);

@@ -17,6 +17,7 @@ namespace Leap.Unity.ContactHands
 
         private bool _wasGrabbing, _justGhosted;
         private float _timeOnReset;
+        internal float currentResetLerp { get { return _timeOnReset == 0 ? 1 : Mathf.InverseLerp(0.1f, 0.25f, Time.time - _timeOnReset); } }
 
         private float _overallFingerDisplacement = 0f, _averageFingerDisplacement = 0f, _contactFingerDisplacement = 0f;
         public float FingerDisplacement => _overallFingerDisplacement;
@@ -44,7 +45,6 @@ namespace Leap.Unity.ContactHands
         internal float computedHandDistance;
 
         internal float graspingWeight, currentPalmWeight;
-        internal float currentResetLerp;
 
         internal int[] grabbingFingers;
         internal float[] grabbingFingerDistances, fingerStiffness;
@@ -261,6 +261,13 @@ namespace Leap.Unity.ContactHands
             _angularVelocity = ((HardContactBone)palmBone).articulationBody.angularVelocity;
             // Fix the hand if it gets into a bad situation by teleporting and holding in place until its bad velocities disappear
             HandleTeleportingHands();
+
+            if(!IsGrabbing && _wasGrabbing)
+            {
+                _timeOnReset = Time.time;
+            }
+
+            _wasGrabbing = IsGrabbing;
         }
 
         private void HandleTeleportingHands()

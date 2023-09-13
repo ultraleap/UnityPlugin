@@ -75,6 +75,8 @@ namespace Leap.Unity.ContactHands
                 this.colliders = colliders;
             }
         }
+
+        private Collider[] _colliderCache = new Collider[32];
         #endregion
 
         private void Awake()
@@ -252,8 +254,6 @@ namespace Leap.Unity.ContactHands
 
         protected void CacheHandData(Hand dataHand)
         {
-            _velocity = ContactUtils.ToLinearVelocity(_oldDataPosition, modifiedHand.PalmPosition, Time.fixedDeltaTime);
-            _angularVelocity = ContactUtils.ToAngularVelocity(_oldDataRotation, modifiedHand.Rotation, Time.fixedDeltaTime);
             _oldDataPosition = dataHand.PalmPosition;
             _oldDataRotation = dataHand.Rotation;
             _oldContactPosition = palmBone.transform.position;
@@ -270,6 +270,7 @@ namespace Leap.Unity.ContactHands
             }
         }
 
+        #region Ignored Objects
         private void HandleIgnoredObjects()
         {
             if (_ignoredData.Count > 0)
@@ -289,7 +290,7 @@ namespace Leap.Unity.ContactHands
                     }
 
                     // TODO: Batch call the ignored objects to see if they appear in the hand data
-                    if (_ignoredData[i].timeout <= 0 /* && !IsObjectInHandRadius(_ignoredData[i].rigid, _ignoredData[i].radius)*/)
+                    if (_ignoredData[i].timeout <= 0 && !IsObjectInHandRadius(_ignoredData[i].rigid, _ignoredData[i].radius))
                     {
                         TogglePhysicsIgnore(_ignoredData[i].rigid, false);
                         i--;
@@ -343,5 +344,53 @@ namespace Leap.Unity.ContactHands
                 }
             }
         }
+
+        /// <summary>
+        /// Checks to see whether the hand will be in contact with a specified object. Radius can be used to inflate the bones.
+        /// </summary>
+        public bool IsObjectInHandRadius(Rigidbody rigid, float extraRadius = 0f)
+        {
+            if (rigid == null)
+                return false;
+
+            if (IsObjectInBoneRadius(rigid, palmBone, extraRadius))
+            {
+                return true;
+            }
+
+            foreach (var bone in bones)
+            {
+                if (IsObjectInBoneRadius(rigid, bone, extraRadius))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Checks to see whether a specific physicsBone will be in contact with a specified object. Radius can be used to inflate the physicsBone.
+        /// </summary>
+        public bool IsObjectInBoneRadius(Rigidbody rigid, ContactBone bone, float extraRadius = 0f)
+        {
+            int overlappingColliders;
+            if (bone.IsPalm)
+            {
+                overlappingColliders = PhysExts.OverlapBoxNonAllocOffset(bone.palmCollider, Vector3.zero, _colliderCache, contactManager.InteractionMask, QueryTriggerInteraction.Ignore, extraRadius);
+            }
+            else
+            {
+                overlappingColliders = PhysExts.OverlapCapsuleNonAllocOffset(bone.boneCollider, Vector3.zero, _colliderCache, contactManager.InteractionMask, QueryTriggerInteraction.Ignore, extraRadius);
+            }
+            for (int i = 0; i < overlappingColliders; i++)
+            {
+                if (_colliderCache[i].attachedRigidbody == rigid)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        #endregion
     }
 }

@@ -167,6 +167,9 @@ namespace Leap.Unity.ContactHands
 
         internal override void UpdatePalmBone(Hand hand)
         {
+            // Update the palm collider with the distance between knuckles to wrist + palm width
+            palmCollider.size = Vector3.Lerp(palmCollider.size, ContactUtils.CalculatePalmSize(hand), hardContactHand.currentResetLerp);
+
             if (contactHand.isContacting || contactHand.isGrabbing)
             {
                 // Reduce the hand velocity if we're pushing through an object
