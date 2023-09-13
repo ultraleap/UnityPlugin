@@ -35,8 +35,9 @@ namespace Leap.Unity.ContactHands
             isHandPhysical = false;
         }
 
-        internal override void PostFixedUpdateHand()
+        internal override void PostFixedUpdateHandLogic()
         {
+            // Don't need to do anything here
         }
 
         protected override void UpdateHandLogic(Hand hand)

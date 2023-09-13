@@ -185,7 +185,6 @@ namespace Leap.Unity.ContactHands
             {
                 CacheHandData(dataHand);
 
-                _elbowPosition = dataHand.Arm.PrevJoint;
                 currentPalmVelocity = hardContactParent.maxPalmVelocity;
 
                 ((HardContactBone)palmBone).ResetPalm();
@@ -217,7 +216,7 @@ namespace Leap.Unity.ContactHands
             tracked = true;
         }
 
-        internal override void PostFixedUpdateHand()
+        internal override void PostFixedUpdateHandLogic()
         {
             CacheComputedPositions();
             CalculateDisplacementsAndLimits();

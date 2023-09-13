@@ -149,7 +149,17 @@ namespace Leap.Unity.ContactHands
         /// <summary>
         /// Any logic that needs to occur after the physics simulation has run, but before update.
         /// </summary>
-        internal abstract void PostFixedUpdateHand();
+        internal void PostFixedUpdateHand()
+        {
+            PostFixedUpdateHandLogic();
+            palmBone.PostFixedUpdateBone();
+            for (int i = 0; i < bones.Length; i++)
+            {
+                bones[i].PostFixedUpdateBone();
+            }
+        }
+
+        internal abstract void PostFixedUpdateHandLogic();
 
         /// <summary>
         /// Generates a basic hand structure with accompanying bone components.

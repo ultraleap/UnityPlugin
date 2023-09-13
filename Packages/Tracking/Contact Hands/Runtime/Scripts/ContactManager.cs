@@ -57,6 +57,10 @@ namespace Leap.Unity.ContactHands
                 "If you increase this value too much, you may cause physics errors.")]
         private float _contactDistance = 0.002f;
         public float ContactDistance => _contactDistance;
+
+        [SerializeField, Tooltip("Allows the hands to collide with one another.")]
+        private bool _interHandCollisions = false;
+        public bool InterHandCollisions => _interHandCollisions;
         #endregion
 
         private WaitForFixedUpdate _postFixedUpdateWait = null;
@@ -220,6 +224,11 @@ namespace Leap.Unity.ContactHands
                 _interactableLayers.Add(new SingleLayer() { layerIndex = 0 });
             }
 
+            if (_interHandCollisions)
+            {
+                _interactableLayers.Add(_handsLayer);
+            }
+
             _interactionMask = new LayerMask();
             for (int i = 0; i < _interactableLayers.Count; i++)
             {
@@ -256,6 +265,9 @@ namespace Leap.Unity.ContactHands
             {
                 Physics.IgnoreLayerCollision(_noContactLayers[i], _handsLayer, true);
             }
+
+            // Setup interhand collisions
+            Physics.IgnoreLayerCollision(_handsLayer, _handsLayer, !_interHandCollisions);
         }
 
         #endregion

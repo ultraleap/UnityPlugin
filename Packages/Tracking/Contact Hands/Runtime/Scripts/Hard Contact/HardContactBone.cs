@@ -153,7 +153,7 @@ namespace Leap.Unity.ContactHands
         #region Updating
         internal override void PostFixedUpdateBone()
         {
-
+            UpdateBoneWorldSpace();
         }
 
         internal override void UpdateBone(Bone prevBone, Bone bone)
@@ -330,7 +330,7 @@ namespace Leap.Unity.ContactHands
 
             Vector3 bonePos, position;
             // Palm
-            if (Finger == 5)
+            if (isPalm)
             {
                 bonePos = contactHand.dataHand.PalmPosition;
                 position = transform.position;
