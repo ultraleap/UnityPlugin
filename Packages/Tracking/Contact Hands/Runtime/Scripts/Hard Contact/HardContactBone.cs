@@ -233,7 +233,7 @@ namespace Leap.Unity.ContactHands
                 return;
             }
 
-            if (IsBoneContacting)
+            if (!IsBoneContacting)
             {
                 if (joint > 0)
                 {
