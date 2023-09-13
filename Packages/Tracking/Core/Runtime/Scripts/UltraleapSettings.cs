@@ -8,6 +8,23 @@ using System.IO;
 namespace Leap.Unity
 {
 #if UNITY_EDITOR
+    [CustomEditor(typeof(UltraleapSettings))]
+    public class UltraleapSettingsDrawer : Editor
+    {
+        public override void OnInspectorGUI()
+        {
+            base.OnInspectorGUI();
+
+            EditorGUILayout.Space(20);
+            if (GUILayout.Button("Open Ultraleap Settings"))
+            {
+                SettingsService.OpenProjectSettings("Project/Ultraleap");
+            }
+        }
+    }
+#endif
+
+#if UNITY_EDITOR
     static class UltraleapProjectSettings
     {
         [SettingsProvider]
