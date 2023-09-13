@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 
 
 ### Changed
-- 
+- Ultraleap settings are now in the project settings window, under "Ultraleap"
 
 ### Fixed
 - 
