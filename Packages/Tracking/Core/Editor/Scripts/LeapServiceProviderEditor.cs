@@ -63,7 +63,7 @@ namespace Leap.Unity
 
             specifyCustomDrawer("_specificSerialNumber", drawSerialNumberToggle);
 
-            deferProperty("_serverConnectionInput");
+            deferProperty("_serviceConnectionInput");
             deferProperty("_serverNameSpace");
             deferProperty("_servicePort");
             deferProperty("_serviceIP");
