@@ -67,6 +67,7 @@ namespace Leap
 
             specifyCustomDrawer("_specificSerialNumber", drawSerialNumberToggle);
 
+            deferProperty("_serverConnectionInput");
             deferProperty("_serverNameSpace");
             deferProperty("_servicePort");
             deferProperty("_serviceIP");
@@ -85,6 +86,21 @@ namespace Leap
             }
 
             addPropertyToFoldout("_useInterpolation", "Advanced Options");
+
+            addPropertyToFoldout("_serviceConnectionInput", "Advanced Options");
+
+            specifyConditionalDrawing("_serviceConnectionInput",
+                (int)LeapServiceProvider.ServiceConnectionInput.NAME,
+                "_serverNameSpace");
+
+            specifyConditionalDrawing("_serviceConnectionInput",
+                (int)LeapServiceProvider.ServiceConnectionInput.IP_PORT,
+                "_serviceIP");
+
+            specifyConditionalDrawing("_serviceConnectionInput",
+                (int)LeapServiceProvider.ServiceConnectionInput.IP_PORT,
+                "_servicePort");
+
             addPropertyToFoldout("_serverNameSpace", "Advanced Options");
             addPropertyToFoldout("_serviceIP", "Advanced Options");
             addPropertyToFoldout("_servicePort", "Advanced Options");
