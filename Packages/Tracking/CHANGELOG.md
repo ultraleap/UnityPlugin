@@ -72,6 +72,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (Locomotion) Expose teleport anchor list & last teleported anchor
 - (Locomotion) Moved Jump Gems further away from the arm, to account for sleeves
 - (Locomotion) Added functionality to update the initial position and rotations of the TP anchor after the first Awake
+- (Aggregation) Aggregation and its scripts and shaders are in an asmdef to avoid any missing references
 
 ### Fixed
 - (Physics Hands) Hand forces are reduced when pushing into objects with fingers
