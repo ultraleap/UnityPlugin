@@ -14,7 +14,8 @@ namespace Leap.Unity.ContactHands
         public Chirality handedness = Chirality.Left;
 
         internal Hand modifiedHand = new Hand(), dataHand = new Hand();
-        internal bool tracked = false, ghosted = false;
+        internal bool tracked = false, resetting = false, ghosted = false;
+        internal bool isHandPhysical = true;
         /// <summary>
         /// Is the hand tracked from a visual sense?
         /// </summary>
@@ -26,14 +27,25 @@ namespace Leap.Unity.ContactHands
         /// <summary>
         /// Is the hand both tracked and not resetting due to physics interactions?
         /// </summary>
-        public bool InGoodState { get { return tracked && !ghosted; } }
+        public bool InGoodState { get { return tracked && !resetting && !ghosted; } }
+
+        /// <summary>
+        /// Is the hand going to apply physics forces or should it pass through objects?
+        /// </summary>
+        public bool IsHandPhysical => isHandPhysical;
 
         internal ContactParent contactParent = null;
+        internal ContactManager contactManager => contactParent.contactManager;
 
         #region Interaction Data
-        public bool isContacting = false, isCloseToObject = false;
+        internal bool isContacting = false, isCloseToObject = false, isGrabbing = false;
         public bool IsContacting => isContacting;
         public bool IsCloseToObject => isCloseToObject;
+
+        public bool IsGrabbing => isGrabbing;
+
+        protected Vector3 _oldDataPosition;
+        protected Quaternion _oldDataRotation;
 
         /// <summary>
         /// These values will need to be manually calculated if there are no rigidbodies on the bones.
@@ -41,6 +53,23 @@ namespace Leap.Unity.ContactHands
         protected Vector3 _velocity, _angularVelocity;
         public Vector3 Velocity => _velocity;
         public Vector3 AngularVelocity => _angularVelocity;
+        #endregion
+
+        #region Physics Data
+        private List<IgnoreData> _ignoredData = new List<IgnoreData>();
+        private class IgnoreData
+        {
+            public Rigidbody rigid;
+            public Collider[] colliders;
+            public float timeout = 0;
+            public float radius = 0;
+
+            public IgnoreData(Rigidbody rigid, Collider[] colliders)
+            {
+                this.rigid = rigid;
+                this.colliders = colliders;
+            }
+        }
         #endregion
 
         private void Awake()
@@ -55,6 +84,7 @@ namespace Leap.Unity.ContactHands
         {
             contactParent = GetComponentInParent<ContactParent>();
             GenerateHandLogic();
+            gameObject.SetActive(false);
         }
         internal abstract void GenerateHandLogic();
 
@@ -64,11 +94,28 @@ namespace Leap.Unity.ContactHands
         /// <param name="hand">The original data hand coming from the input frame</param>
         internal abstract void BeginHand(Hand hand);
 
+
+        internal void UpdateHand(Hand hand)
+        {
+            dataHand.CopyFrom(hand);
+            UpdateHandLogic(hand);
+            // Update the bones
+            palmBone.UpdatePalmBone(hand);
+            for (int i = 0; i < bones.Length - 1; i++)
+            {
+                bones[i].UpdateBone(hand.Fingers[bones[i].Finger].bones[bones[i].joint], hand.Fingers[bones[i].Finger].bones[bones[i].joint + 1]);
+            }
+            CacheHandData(dataHand);
+            if (Time.inFixedTimeStep)
+            {
+                HandleIgnoredObjects();
+            }
+        }
         /// <summary>
-        /// Every other frame that the hand needs to update when the hand reports tracked as true.
+        /// Every other frame that the hand needs to update when the hand reports tracked as true. This happens before the bones are updated.
         /// </summary>
         /// <param name="hand">The original data hand coming from the input frame</param>
-        internal abstract void UpdateHand(Hand hand);
+        protected abstract void UpdateHandLogic(Hand hand);
 
         /// <summary>
         /// When the original data hand has lost tracking.
@@ -181,6 +228,98 @@ namespace Leap.Unity.ContactHands
         public ContactBone GetBone(int fingerIndex, int jointIndex)
         {
             return bones[fingerIndex * FINGER_BONES + jointIndex];
+        }
+
+        protected void CacheHandData(Hand dataHand)
+        {
+            _velocity = ContactUtils.ToLinearVelocity(_oldDataPosition, modifiedHand.PalmPosition, Time.fixedDeltaTime);
+            _angularVelocity = ContactUtils.ToAngularVelocity(_oldDataRotation, modifiedHand.Rotation, Time.fixedDeltaTime);
+            _oldDataPosition = dataHand.PalmPosition;
+            _oldDataRotation = dataHand.Rotation;
+        }
+
+        protected void ChangeHandLayer(SingleLayer layer)
+        {
+            gameObject.layer = layer;
+            palmBone.gameObject.layer = layer;
+            for (int i = 0; i < bones.Length; i++)
+            {
+                bones[i].gameObject.layer = layer;
+            }
+        }
+
+        private void HandleIgnoredObjects()
+        {
+            if (_ignoredData.Count > 0)
+            {
+                for (int i = 0; i < _ignoredData.Count; i++)
+                {
+                    // Handle destroyed objects
+                    if (_ignoredData[i].rigid == null)
+                    {
+                        _ignoredData.RemoveAt(i);
+                        continue;
+                    }
+
+                    if (_ignoredData[i].timeout >= 0)
+                    {
+                        _ignoredData[i].timeout -= Time.fixedDeltaTime;
+                    }
+
+                    // TODO: Batch call the ignored objects to see if they appear in the hand data
+                    if (_ignoredData[i].timeout <= 0 /* && !IsObjectInHandRadius(_ignoredData[i].rigid, _ignoredData[i].radius)*/)
+                    {
+                        TogglePhysicsIgnore(_ignoredData[i].rigid, false);
+                        i--;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Disables all collisions between a rigidbody and hand. Will automatically handle all colliders on the rigidbody. Timeout lets you specify a minimum time to ignore collisions for.
+        /// </summary>
+        public void IgnoreCollision(Rigidbody rigid, float timeout = 0, float radius = 0)
+        {
+            TogglePhysicsIgnore(rigid, true, timeout, radius);
+        }
+
+        private void TogglePhysicsIgnore(Rigidbody rigid, bool ignore, float timeout = 0, float radius = 0)
+        {
+            // If the rigid has been destroyed we can't do anything
+            if (rigid == null)
+            {
+                return;
+            }
+            Collider[] colliders = rigid.GetComponentsInChildren<Collider>(true);
+            foreach (var collider in colliders)
+            {
+                Physics.IgnoreCollision(collider, palmBone.palmCollider, ignore);
+                foreach (var bone in bones)
+                {
+                    Physics.IgnoreCollision(collider, bone.boneCollider, ignore);
+                }
+            }
+            int ind = _ignoredData.FindIndex(x => x.rigid == rigid);
+            if (ignore)
+            {
+                if (ind == -1)
+                {
+                    _ignoredData.Add(new IgnoreData(rigid, colliders) { timeout = timeout, radius = radius });
+                }
+                else
+                {
+                    _ignoredData[ind].timeout = timeout;
+                    _ignoredData[ind].radius = radius;
+                }
+            }
+            else
+            {
+                if (ind != -1)
+                {
+                    _ignoredData.RemoveAt(ind);
+                }
+            }
         }
     }
 }

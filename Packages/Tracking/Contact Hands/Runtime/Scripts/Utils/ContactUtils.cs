@@ -7,6 +7,10 @@ namespace Leap.Unity.ContactHands
     public static class ContactUtils
     {
 
+        // Magic 0th thumb bone dataRotation offsets from LeapC
+        // TODO: Remove this and make it non-necessary
+        public const float HAND_ROTATION_OFFSET_Y = 25.9f, HAND_ROTATION_OFFSET_Z = -63.45f;
+
         public static Vector3 CalculateAverageKnucklePosition(this Hand hand)
         {
             return (hand.Fingers[1].bones[0].NextJoint +
@@ -80,6 +84,33 @@ namespace Leap.Unity.ContactHands
         public static bool IsValid(this Vector3 v)
         {
             return !(float.IsNaN(v.x) || float.IsNaN(v.y) || float.IsNaN(v.z)) && !(float.IsInfinity(v.x) || float.IsInfinity(v.y) || float.IsInfinity(v.z));
+        }
+
+        public static Vector3 InverseTransformPoint(Vector3 transformPos, Quaternion transformRotation, Vector3 transformScale, Vector3 pos)
+        {
+            Matrix4x4 matrix = Matrix4x4.TRS(transformPos, transformRotation, transformScale);
+            Matrix4x4 inverse = matrix.inverse;
+            return inverse.MultiplyPoint3x4(pos);
+        }
+
+        public static Vector3 InverseTransformPoint(Vector3 transformPos, Quaternion transformRotation, Vector3 pos)
+        {
+            return InverseTransformPoint(transformPos, transformRotation, Vector3.one, pos);
+        }
+
+        public static float EaseOut(this float input)
+        {
+            return input.Flip().Square().Flip();
+        }
+
+        public static float Square(this float input)
+        {
+            return input * input;
+        }
+
+        public static float Flip(this float input)
+        {
+            return 1 - input;
         }
 
         /// <summary>

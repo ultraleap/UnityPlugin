@@ -18,6 +18,27 @@ namespace Leap.Unity.ContactHands
 
         internal abstract void GenerateHands();
 
+        internal void GenerateHandsObjects(System.Type handType, bool callGenerate = true)
+        {
+            GameObject handObject = new GameObject($"Left {handType.Name}", handType);
+            handObject.transform.parent = transform;
+            leftHand = handObject.GetComponent<ContactHand>();
+            leftHand.handedness = Chirality.Left;
+            if (callGenerate)
+            {
+                leftHand.GenerateHand();
+            }
+
+            handObject = new GameObject($"Right {handType.Name}", handType);
+            handObject.transform.parent = transform;
+            rightHand = handObject.GetComponent<ContactHand>();
+            rightHand.handedness = Chirality.Right;
+            if (callGenerate)
+            {
+                rightHand.GenerateHand();
+            }
+        }
+
         internal void UpdateFrame()
         {
             UpdateHand(contactManager._leftHandIndex, leftHand, contactManager._leftDataHand);
@@ -33,14 +54,15 @@ namespace Leap.Unity.ContactHands
                 {
                     hand.BeginHand(dataHand);
                 }
-                else
+                // Actually call the update once the hand is ready
+                if (hand.tracked)
                 {
                     hand.UpdateHand(dataHand);
                 }
             }
             else
             {
-                if(hand.tracked)
+                if (hand.tracked || hand.resetting)
                 {
                     hand.FinishHand();
                 }
@@ -56,7 +78,7 @@ namespace Leap.Unity.ContactHands
 
         private void OutputHand(int index, ContactHand hand, ref Frame inputFrame)
         {
-            if(index == -1)
+            if (index == -1)
             {
                 if (hand.tracked)
                 {
