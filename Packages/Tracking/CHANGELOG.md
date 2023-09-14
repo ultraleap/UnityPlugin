@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [NEXT] - xx/xx/xx
 
 ### Added
-- 
+- (Pose Detector) Add a new rule type to match rotation of a joint to a target
 
 ### Changed
 - (Preview Teleportation) Lightweight Pinch Detector's finger detection can be configured
@@ -57,6 +57,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Please see the updated scripts in the Physics Hands example scene for more information
 - (HandRays) Add methods to invoke handray Frame & State Change in inherited classes
 - (LeapXRServiceProvider) Use of device transforms from the service when using Default device offset mode. This does not include tilt/rotation
+
 
 ### Changed
 - (Physics Hands) Burst compute is now used to improve certain physics calculation performance
