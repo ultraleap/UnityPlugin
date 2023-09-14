@@ -395,15 +395,12 @@ namespace Leap.Unity
                         switch (direction.FindPropertyRelative("typeOfDirectionCheck").enumValueIndex)
                         {
                             case 0: //OBJECT
+                            case 3: //OBJECTROT
                                 {
                                     EditorGUILayout.PropertyField(direction.FindPropertyRelative("poseTarget"), new GUIContent("Object to face:"));
                                     break;
                                 }
                             case 1: //WORLD
-                                {
-                                    EditorGUILayout.PropertyField(direction.FindPropertyRelative("axisToFace"), new GUIContent("Axis to face:"));
-                                    break;
-                                }
                             case 2: //CAMERALOCAL
                                 {
                                     EditorGUILayout.PropertyField(direction.FindPropertyRelative("axisToFace"), new GUIContent("Axis to face:"));
@@ -493,12 +490,8 @@ namespace Leap.Unity
 
             switch (dir)
             {
-                case HandPoseDetector.TypeOfDirectionCheck.TowardsObject:
-                    break;
-                case HandPoseDetector.TypeOfDirectionCheck.WorldDirection:
-                    name += (HandPoseDetector.AxisToFace)direction.FindPropertyRelative("axisToFace").enumValueIndex;
-                    break;
                 case HandPoseDetector.TypeOfDirectionCheck.CameraDirection:
+                case HandPoseDetector.TypeOfDirectionCheck.WorldDirection:
                     name += (HandPoseDetector.AxisToFace)direction.FindPropertyRelative("axisToFace").enumValueIndex;
                     break;
             }

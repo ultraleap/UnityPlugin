@@ -109,7 +109,8 @@ namespace Leap.Unity
         {
             TowardsObject = 0,
             WorldDirection = 1,
-            CameraDirection = 2
+            CameraDirection = 2,
+            MatchObjectRotation = 3
         };
 
         /// <summary>
@@ -492,6 +493,26 @@ namespace Leap.Unity
                                     {
                                         directionMatchInRule = true;
                                     }
+                                    break;
+                                }
+                            case TypeOfDirectionCheck.MatchObjectRotation:
+                                {
+                                    Quaternion jointRotation = Quaternion.identity;
+
+                                    if ((int)rule.finger == 5) // This represents the palm
+                                    {
+                                        jointRotation = playerHand.Rotation;
+                                    }
+                                    else
+                                    {
+                                        jointRotation = playerHand.Fingers[(int)rule.finger].bones[rule.bone].Rotation;
+                                    }
+
+                                    if (Quaternion.Angle(jointRotation, direction.poseTarget.rotation) < direction.rotationThreshold)
+                                    {
+                                        directionMatchInRule = true;
+                                    }
+
                                     break;
                                 }
                         }

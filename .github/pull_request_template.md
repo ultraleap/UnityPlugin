@@ -8,21 +8,20 @@ _Add a Summary here._
 - [ ] Add a CHANGELOG entry for this change.
 - [ ] Ensure documentation requirements are met e.g., public API is commented.
 - [ ] Consider any licensing/other legal implications for this MR e.g. notices required by any new libraries.
-- [ ] Add any relevant labels such as `breaking` to this MR.
+
+## Test Cycle
+
+_Link to the test cycle here._
 
 ## Reviewer Tasks
 
-_Add any instructions or tasks for the reviewer such as specific test considerations before this can be merged._
-
-[Use emojis in review threads to communicate intent and help contributors.](https://github.com/ultraleap/UnityPlugin/blob/develop/CONTRIBUTING.md#review-threads)
-
-- [ ] Run all tests associated with the ticket.
 - [ ] Code reviewed.
 - [ ] Non-code assets e.g. Unity assets/scenes reviewed.
+- [ ] All tests must be ran and cover all scenarios (If not, add new tests to the cycle and run them).
 - [ ] Documentation has been reviewed.
 - [ ] Approve with a comment of any additional tests run or any observations.
 
-## Closes JIRA Issue
+## Related JIRA Issues
 
 _If this MR closes any JIRA issues list them below in the form `Closes PROJECT-#`_
 
