@@ -269,7 +269,20 @@ namespace Leap.Unity
         [SerializeField]
         protected bool _preventInitializingTrackingMode;
 
-        [Tooltip("[DEPRECATED] Which Leap Service API Endpoint to connect to.  This is configured on the service with the 'api_namespace' argument.")]
+        /// <summary>
+        /// The type of input to use for connection to the service
+        /// </summary>
+        public enum ServiceConnectionInput
+        {
+            NAME,
+            IP_PORT
+        }
+        [Tooltip("Which input to use for the service connection")]
+        [SerializeField]
+        [EditTimeOnly]
+        protected ServiceConnectionInput _serviceConnectionInput = ServiceConnectionInput.NAME;
+
+        [Tooltip("Which Leap Service API Endpoint to connect to.  This is configured on the service with the 'api_namespace' argument.")]
         [SerializeField]
         [EditTimeOnly]
         protected string _serverNameSpace = "Leap Service";
@@ -898,7 +911,7 @@ namespace Leap.Unity
 
             string serialNumber = _multipleDeviceMode != MultipleDeviceMode.Disabled ? SpecificSerialNumber : "";
 
-            if (_serverNameSpace == "Leap Service")
+            if(_serviceConnectionInput == ServiceConnectionInput.IP_PORT)
             {
                 _serverNameSpace = $"{{\"tracking_server_ip\": \"{_serviceIP}\", \"tracking_server_port\": {_servicePort}}}";
             }
@@ -1081,7 +1094,7 @@ namespace Leap.Unity
                 return _trackingSource;
             }
 #endif
-            if (_serverNameSpace == "Leap Service")
+            if (_serviceConnectionInput == ServiceConnectionInput.IP_PORT)
             {
                 _serverNameSpace = $"{{\"tracking_server_ip\": \"{_serviceIP}\", \"tracking_server_port\": {_servicePort}}}";
             }
