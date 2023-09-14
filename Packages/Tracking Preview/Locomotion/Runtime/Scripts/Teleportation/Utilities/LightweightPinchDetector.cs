@@ -55,7 +55,7 @@ namespace Leap.Unity.Preview.Locomotion
             _chiralityLastFrame = chirality;
             if (leapProvider == null)
             {
-                leapProvider = FindObjectOfType<LeapProvider>();
+                leapProvider = FindAnyObjectByType<LeapProvider>();
             }
         }
 
