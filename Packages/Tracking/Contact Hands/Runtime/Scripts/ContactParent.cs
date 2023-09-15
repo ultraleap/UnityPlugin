@@ -71,6 +71,7 @@ namespace Leap.Unity.ContactHands
 
         internal void OutputFrame(ref Frame inputFrame)
         {
+            contactManager._leftHandIndex = inputFrame.Hands.FindIndex(x => x.IsLeft);
             OutputHand(contactManager._leftHandIndex, leftHand, ref inputFrame);
             contactManager._rightHandIndex = inputFrame.Hands.FindIndex(x => x.IsRight);
             OutputHand(contactManager._rightHandIndex, rightHand, ref inputFrame);
