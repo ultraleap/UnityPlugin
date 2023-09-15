@@ -191,7 +191,7 @@ namespace Leap.Unity.Encoding
                     prevJoint = ToWorld(prevJoint, palmPos, palmRot);
                     boneRot = palmRot * boneRot;
 
-                    if(fingerIdx == 0 && boneIdx == 0)
+                    if (fingerIdx == 0 && boneIdx == 0)
                     {
                         boneRot *= ThumbMetacarpalRotationOffset[intoHand.IsLeft ? 0 : 1];
                     }

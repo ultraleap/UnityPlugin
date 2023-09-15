@@ -115,7 +115,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
         public static bool ContainsRange<T>(this T[] arr, T value, int maxIndex)
         {
-            return System.Array.IndexOf(arr, value,0, maxIndex) != -1;
+            return System.Array.IndexOf(arr, value, 0, maxIndex) != -1;
         }
     }
 

@@ -57,6 +57,10 @@ namespace Leap.Unity.ContactHands
                 "If you increase this value too much, you may cause physics errors.")]
         private float _contactDistance = 0.002f;
         public float ContactDistance => _contactDistance;
+
+        [SerializeField, Tooltip("Allows the hands to collide with one another.")]
+        private bool _interHandCollisions = false;
+        public bool InterHandCollisions => _interHandCollisions;
         #endregion
 
         private WaitForFixedUpdate _postFixedUpdateWait = null;
@@ -77,7 +81,7 @@ namespace Leap.Unity.ContactHands
 
         private void Awake()
         {
-            contactHands = GetComponentInChildren<ContactParent>(true);
+            contactHands = GetComponentInChildren<ContactParent>();
             GenerateLayers();
             SetupAutomaticCollisionLayers();
         }
@@ -131,10 +135,20 @@ namespace Leap.Unity.ContactHands
             }
 
             contactHands?.UpdateFrame();
-
+        
             // Output the frame on each update
-            contactHands?.OutputFrame(ref _modifiedFrame);
-            DispatchUpdateFrameEvent(_modifiedFrame);
+            if (Time.inFixedTimeStep)
+            {
+                // Fixed frame on fixed update
+                contactHands?.OutputFrame(ref _modifiedFrame);
+                DispatchFixedFrameEvent(_modifiedFrame);
+            }
+            else
+            {
+                // Update frame otherwise
+                contactHands?.OutputFrame(ref _modifiedFrame);
+                DispatchUpdateFrameEvent(_modifiedFrame);
+            }
         }
 
         private IEnumerator PostFixedUpdate()
@@ -148,13 +162,9 @@ namespace Leap.Unity.ContactHands
             for (; ; )
             {
                 contactHands?.PostFixedUpdateFrame();
-                // Output the frame after physics update is complete
-                contactHands?.OutputFrame(ref _modifiedFrame);
-                DispatchFixedFrameEvent(_modifiedFrame);
                 yield return _postFixedUpdateWait;
             }
         }
-
 
         #region Layer Generation
         protected void GenerateLayers()
@@ -220,6 +230,11 @@ namespace Leap.Unity.ContactHands
                 _interactableLayers.Add(new SingleLayer() { layerIndex = 0 });
             }
 
+            if (_interHandCollisions)
+            {
+                _interactableLayers.Add(_handsLayer);
+            }
+
             _interactionMask = new LayerMask();
             for (int i = 0; i < _interactableLayers.Count; i++)
             {
@@ -256,6 +271,9 @@ namespace Leap.Unity.ContactHands
             {
                 Physics.IgnoreLayerCollision(_noContactLayers[i], _handsLayer, true);
             }
+
+            // Setup interhand collisions
+            Physics.IgnoreLayerCollision(_handsLayer, _handsLayer, !_interHandCollisions);
         }
 
         #endregion
@@ -266,7 +284,7 @@ namespace Leap.Unity.ContactHands
         {
             if (contactHands == null)
             {
-                contactHands = GetComponentInChildren<ContactParent>(true);
+                contactHands = GetComponentInChildren<ContactParent>();
             }
         }
 

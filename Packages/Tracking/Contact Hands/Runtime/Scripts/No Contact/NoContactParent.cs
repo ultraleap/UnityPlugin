@@ -11,7 +11,7 @@ namespace Leap.Unity.ContactHands
             GenerateHandsObjects(typeof(NoContactHand));
         }
 
-        internal override void PostFixedUpdateFrame()
+        internal override void PostFixedUpdateFrameLogic()
         {
         }
     }
