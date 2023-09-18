@@ -80,8 +80,7 @@ public class ContactHandsSettings
         EditorGUILayout.HelpBox($"To ensure the best experience for your users, Ultraleap has provided recommended settings below.", MessageType.Info);
         GUILayout.EndHorizontal();
 
-
-        GUILayout.Space(LARGE_SPACE);
+        GUILayout.Space(SMALL_SPACE);
 
         GUILayout.BeginHorizontal(GUILayout.Width(815));
         EditorGUILayout.HelpBox($"The following recommended settings impact performance:" + performanceList, MessageType.Info);
