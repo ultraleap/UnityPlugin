@@ -10,12 +10,14 @@ using static System.Net.Mime.MediaTypeNames;
 /// </summary>
 public class ConfidenceFromIRVisualizer : MonoBehaviour
 {
+    [Header("Inputs")]
     [SerializeField]
     public LeapImageRetriever imageRetriever;
 
     [SerializeField]
     public PoseToIRImageConfidence poseToIRImageConfidence;
 
+    [Header("Output Targets")]
     [SerializeField]
     public RawImage outputImage;
 
@@ -31,7 +33,10 @@ public class ConfidenceFromIRVisualizer : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        outputImage.texture = imageRetriever.TextureData.TextureData.CombinedTexture;
-        outputImageWithProjectedPoints.texture = poseToIRImageConfidence.IRImageWithOverlaidPosePoints;
+        if (outputImage != null)
+            outputImage.texture = imageRetriever.TextureData.TextureData.CombinedTexture;
+
+        if (outputImageWithProjectedPoints!= null)
+            outputImageWithProjectedPoints.texture = poseToIRImageConfidence.IRImageWithOverlaidPosePoints;
     }
 }

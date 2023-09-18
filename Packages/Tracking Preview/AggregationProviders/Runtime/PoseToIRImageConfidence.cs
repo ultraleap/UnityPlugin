@@ -38,36 +38,50 @@ public enum FingerTipName
 /// </summary>
 public class PoseToIRImageConfidence : MonoBehaviour
 {
-    [SerializeField]
-    public bool generateImageVisuals;
 
+    [Header("Inputs")]
     [SerializeField]
     public LeapImageRetriever imageRetriever;
 
     [SerializeField]
     public LeapServiceProvider leapProvider;
 
+    [Header("Settings")]
     [SerializeField]
     [Range(0f, 255f)]
-    public int IRThreshold = 64;
+    [Tooltip("The average IR pixel value below which we shade the IR image in blue)")]
+    public int IRThreshold = 7;
 
     [SerializeField]
     [Range(0f, 255f)]
-    public int LowerConfidencePixelThreshold = 64;
+    [Tooltip("The average IR pixel value below which we colour the joint as low confidence (red)")]
+    public int LowerConfidencePixelThreshold = 7;
 
     [SerializeField]
     [Range(0f, 255f)]
-    public int UpperConfidencePixelThreshold = 90;
+    [Tooltip("The average IR pixel value above which we colour the joint as high confidence (green)")]
+    public int UpperConfidencePixelThreshold = 35;
 
     [SerializeField]
     [Range(0f, 255f)]
-    public int LastKnownGoodPositionConfidencePixelThreshold = 90;
+    [Tooltip("The average IR pixel value above which the joint position is considered to be high confidence")]
+    public int LastKnownGoodPositionConfidencePixelThreshold = 35;
 
     [SerializeField]
     [Range(0f, 10f)]
-    public float TipOffset_mm = 0.55f;
+    [Tooltip("The distance along a vector from the fingertip to the intermediate joint to use as the sampling origin")]
+    public float TipOffset_cm = 0.55f;
 
+    [Header("Visualization")]
+    [Tooltip("Generate an image with debug visuals for fingertip locations and confidences")]
+    [SerializeField]
+    public bool generateImageVisuals;
+
+
+    [HideInInspector]
+    [Tooltip("Image showing fingertip locations (coloured squares) and confidences (colour)")]
     public Texture2D IRImageWithOverlaidPosePoints;
+
     private List<(Vector3 position, FingerTipName fingerName, Chirality hand)> tips_LeapUnits = new List<(Vector3, FingerTipName, Chirality)>();
 
     private Dictionary<(FingerTipName fingerName, Chirality hand), Vector3> fingerPositionCacheDistal = new Dictionary<(FingerTipName fingerName, Chirality hand), Vector3>();
@@ -79,7 +93,6 @@ public class PoseToIRImageConfidence : MonoBehaviour
     private UnityEngine.Matrix4x4? extrinsics;
     private Controller leapController;
     private const Image.CameraType targetCamera = Image.CameraType.LEFT;
-
 
     private bool newImage = false;
     private Image image;
@@ -149,7 +162,7 @@ public class PoseToIRImageConfidence : MonoBehaviour
         
         if (leapProvider != null)
         {
-            if (TipOffset_mm == 0)
+            if (TipOffset_cm == 0)
             {
                 tips_LeapUnits.Add((AsVector3(hand.pinky.distal.next_joint), FingerTipName.PinkyFinger, chirality));
                 tips_LeapUnits.Add((AsVector3(hand.ring.distal.next_joint), FingerTipName.RingFinger, chirality));
@@ -195,8 +208,7 @@ public class PoseToIRImageConfidence : MonoBehaviour
                     return FingerTipName.PinkyFinger;
 
                 default:
-                    throw new Exception("Unknown finger type");
-                    break;  
+                    throw new Exception("Unknown finger type");  
             }
         }
 
@@ -208,7 +220,7 @@ public class PoseToIRImageConfidence : MonoBehaviour
         Vector3 ScaleBackFromDistal(LEAP_BONE endBone)
         { 
             Vector3 boneV = AsVector3(endBone.prev_joint) - AsVector3(endBone.next_joint);
-            boneV.Scale(new Vector3(TipOffset_mm, TipOffset_mm, TipOffset_mm));
+            boneV.Scale(new Vector3(TipOffset_cm, TipOffset_cm, TipOffset_cm));
             return AsVector3(endBone.next_joint) + boneV;
         }
 

@@ -1,0 +1,106 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &7909970116275332626
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7909970116275332627}
+  - component: {fileID: 7909970116275332638}
+  - component: {fileID: 7909970116275332639}
+  - component: {fileID: 7909970116275332632}
+  - component: {fileID: 5557567796580671678}
+  m_Layer: 0
+  m_Name: Confidence-From IR Image
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7909970116275332627
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7909970116275332626}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7909970116275332638
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7909970116275332626}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6562718064122f408f1ade2bbdbec47, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  imageRetriever: {fileID: 5557567796580671678}
+  leapProvider: {fileID: 0}
+  IRThreshold: 7
+  LowerConfidencePixelThreshold: 7
+  UpperConfidencePixelThreshold: 35
+  LastKnownGoodPositionConfidencePixelThreshold: 35
+  TipOffset_cm: 0.55
+  generateImageVisuals: 1
+  IRImageWithOverlaidPosePoints: {fileID: 0}
+--- !u!114 &7909970116275332639
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7909970116275332626}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 045e2033f239f974791fa9455df3f3ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  imageRetriever: {fileID: 5557567796580671678}
+  poseToIRImageConfidence: {fileID: 7909970116275332638}
+  outputImage: {fileID: 0}
+  outputImageWithProjectedPoints: {fileID: 0}
+--- !u!114 &7909970116275332632
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7909970116275332626}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ad7fc7b9a38745448c9f55027cf847c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  editTimePose: 1
+  _inputLeapProvider: {fileID: 0}
+  dataUpdateMode: 0
+  passthroughOnly: 0
+  imageBasedConfidence: {fileID: 7909970116275332638}
+--- !u!114 &5557567796580671678
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7909970116275332626}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd815635398474cbbba564563a209f82, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _gammaCorrection: 1
+  _provider: {fileID: 0}
+  <HideRigelDebug>k__BackingField: 1
