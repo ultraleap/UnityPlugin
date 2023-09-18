@@ -5,6 +5,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using static System.Net.Mime.MediaTypeNames;
 
+/// <summary>
+/// Takes image data from the PoseToIRImageConfidence script and updates an output image (RawImage)
+/// </summary>
 public class ConfidenceFromIRVisualizer : MonoBehaviour
 {
     [SerializeField]

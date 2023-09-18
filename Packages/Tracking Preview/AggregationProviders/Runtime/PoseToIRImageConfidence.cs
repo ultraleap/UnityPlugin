@@ -1,4 +1,3 @@
-using Codice.CM.SEIDInfo;
 using Leap;
 using Leap.Unity;
 using LeapInternal;
@@ -17,12 +16,12 @@ public class TipConfidences
 
 public class HandTipConfidences
 {
-    public (float confidence, Vector3 lastGoodPosition_LeapSpace, Vector3 lastGoodPosition_PixelSpace) ThumbTip;
-    public (float confidence, Vector3 lastGoodPosition_LeapSpace, Vector3 lastGoodPosition_PixelSpace) IndexTip;
-    public (float confidence, Vector3 lastGoodPosition_LeapSpace, Vector3 lastGoodPosition_PixelSpace) MiddleTip;
-    public (float confidence, Vector3 lastGoodPosition_LeapSpace, Vector3 lastGoodPosition_PixelSpace) RingTip;
-    public (float confidence, Vector3 lastGoodPosition_LeapSpace, Vector3 lastGoodPosition_PixelSpace) PinkyTip;
-}
+    public (float confidence, Vector3 lastGoodPosition_LeapSpace_proximal, Vector3 lastGoodPosition_LeapSpace_intermediate, Vector3 lastGoodPosition_LeapSpace_distal, Vector3 lastGoodPosition_PixelSpace) ThumbTip;
+    public (float confidence, Vector3 lastGoodPosition_LeapSpace_proximal, Vector3 lastGoodPosition_LeapSpace_intermediate, Vector3 lastGoodPosition_LeapSpace_distal, Vector3 lastGoodPosition_PixelSpace) IndexTip;
+    public (float confidence, Vector3 lastGoodPosition_LeapSpace_proximal, Vector3 lastGoodPosition_LeapSpace_intermediate, Vector3 lastGoodPosition_LeapSpace_distal, Vector3 lastGoodPosition_PixelSpace) MiddleTip;
+    public (float confidence, Vector3 lastGoodPosition_LeapSpace_proximal, Vector3 lastGoodPosition_LeapSpace_intermediate, Vector3 lastGoodPosition_LeapSpace_distal, Vector3 lastGoodPosition_PixelSpace) RingTip;
+    public (float confidence, Vector3 lastGoodPosition_LeapSpace_proximal, Vector3 lastGoodPosition_LeapSpace_intermediate, Vector3 lastGoodPosition_LeapSpace_distal, Vector3 lastGoodPosition_PixelSpace) PinkyTip;
+}                                                               
 
 public enum FingerTipName
 {
@@ -33,8 +32,15 @@ public enum FingerTipName
     PinkyFinger = 4
 }
 
+/// <summary>
+/// Use the coorelation between the hand pose and the IR image at the projects fingertup locations
+/// to determine a confidence in the position of the digits in the returned pose.
+/// </summary>
 public class PoseToIRImageConfidence : MonoBehaviour
 {
+    [SerializeField]
+    public bool generateImageVisuals;
+
     [SerializeField]
     public LeapImageRetriever imageRetriever;
 
@@ -62,9 +68,14 @@ public class PoseToIRImageConfidence : MonoBehaviour
     public float TipOffset_mm = 0.55f;
 
     public Texture2D IRImageWithOverlaidPosePoints;
+    private List<(Vector3 position, FingerTipName fingerName, Chirality hand)> tips_LeapUnits = new List<(Vector3, FingerTipName, Chirality)>();
 
-    private List<(Vector3 position, FingerTipName fingerName, Chirality hand)> tips = new List<(Vector3, FingerTipName, Chirality)>();
+    private Dictionary<(FingerTipName fingerName, Chirality hand), Vector3> fingerPositionCacheDistal = new Dictionary<(FingerTipName fingerName, Chirality hand), Vector3>();
+    private Dictionary<(FingerTipName fingerName, Chirality hand), Vector3> fingerPositionCacheIntermediate = new Dictionary<(FingerTipName fingerName, Chirality hand), Vector3>();
+    private Dictionary<(FingerTipName fingerName, Chirality hand), Vector3> fingerPositionCacheProximal = new Dictionary<(FingerTipName fingerName, Chirality hand), Vector3>();
+
     private List<(Vector2 position, FingerTipName fingerName, Chirality hand)> tipPixels = new List<(Vector2, FingerTipName, Chirality)>();
+
     private UnityEngine.Matrix4x4? extrinsics;
     private Controller leapController;
     private const Image.CameraType targetCamera = Image.CameraType.LEFT;
@@ -99,14 +110,23 @@ public class PoseToIRImageConfidence : MonoBehaviour
 
     private void LeapController_RawFrameReady(object sender, RawFrameEventArgs e)
     {
-        tips.Clear();
+        fingerPositionCacheIntermediate.Clear();
+        fingerPositionCacheDistal.Clear();    
+        fingerPositionCacheProximal.Clear();
+
+        tips_LeapUnits.Clear();
         tipPixels.Clear();
 
         if (e.HasLeftHand)
+        {
             UpdateFingerTipsRaw(e.LeftHand);
+        }
 
         if (e.HasRightHand)
+        {
             UpdateFingerTipsRaw(e.RightHand);
+ 
+        }
     }
 
     private void UpdateFingerTipsRaw(LEAP_HAND hand)
@@ -126,28 +146,59 @@ public class PoseToIRImageConfidence : MonoBehaviour
     private IEnumerable<(Vector3 position, FingerTipName finger, Chirality handChirality)> UpdateFingerTipsRawForHand(LEAP_HAND hand)
     {
         Chirality chirality = hand.type == eLeapHandType.eLeapHandType_Left ? Chirality.Left : Chirality.Right;
+        
         if (leapProvider != null)
         {
             if (TipOffset_mm == 0)
             {
-                tips.Add((AsVector3(hand.pinky.distal.next_joint), FingerTipName.PinkyFinger, chirality));
-                tips.Add((AsVector3(hand.ring.distal.next_joint), FingerTipName.RingFinger, chirality));
-                tips.Add((AsVector3(hand.middle.distal.next_joint), FingerTipName.MiddleFinger, chirality));
-                tips.Add((AsVector3(hand.index.distal.next_joint), FingerTipName.IndexFinger, chirality));
-                tips.Add((AsVector3(hand.thumb.distal.next_joint), FingerTipName.Thumb, chirality));
+                tips_LeapUnits.Add((AsVector3(hand.pinky.distal.next_joint), FingerTipName.PinkyFinger, chirality));
+                tips_LeapUnits.Add((AsVector3(hand.ring.distal.next_joint), FingerTipName.RingFinger, chirality));
+                tips_LeapUnits.Add((AsVector3(hand.middle.distal.next_joint), FingerTipName.MiddleFinger, chirality));
+                tips_LeapUnits.Add((AsVector3(hand.index.distal.next_joint), FingerTipName.IndexFinger, chirality));
+                tips_LeapUnits.Add((AsVector3(hand.thumb.distal.next_joint), FingerTipName.Thumb, chirality));
             }
             else
             {
-                tips.Add((ScaleBackFromDistal(hand.pinky.distal), FingerTipName.PinkyFinger, chirality));
-                tips.Add((ScaleBackFromDistal(hand.ring.distal), FingerTipName.RingFinger, chirality));
-                tips.Add((ScaleBackFromDistal(hand.middle.distal), FingerTipName.MiddleFinger, chirality));
-                tips.Add((ScaleBackFromDistal(hand.index.distal), FingerTipName.IndexFinger, chirality));
-                tips.Add((ScaleBackFromDistal(hand.thumb.distal), FingerTipName.Thumb, chirality));
+                tips_LeapUnits.Add((ScaleBackFromDistal(hand.pinky.distal), FingerTipName.PinkyFinger, chirality));
+                tips_LeapUnits.Add((ScaleBackFromDistal(hand.ring.distal), FingerTipName.RingFinger, chirality));
+                tips_LeapUnits.Add((ScaleBackFromDistal(hand.middle.distal), FingerTipName.MiddleFinger, chirality));
+                tips_LeapUnits.Add((ScaleBackFromDistal(hand.index.distal), FingerTipName.IndexFinger, chirality));
+                tips_LeapUnits.Add((ScaleBackFromDistal(hand.thumb.distal), FingerTipName.Thumb, chirality));
             }
-            
+
+            AddFingerToCache(Leap.Finger.FingerType.TYPE_THUMB, chirality);
+            AddFingerToCache(Leap.Finger.FingerType.TYPE_INDEX, chirality);
+            AddFingerToCache(Leap.Finger.FingerType.TYPE_MIDDLE, chirality);
+            AddFingerToCache(Leap.Finger.FingerType.TYPE_RING, chirality);
+            AddFingerToCache(Leap.Finger.FingerType.TYPE_PINKY, chirality);
         }
 
-        return tips;
+        return tips_LeapUnits;
+
+        FingerTipName FingerTypeToName(Finger.FingerType type)
+        {
+            switch (type)
+            {
+                case Finger.FingerType.TYPE_THUMB:
+                    return FingerTipName.Thumb;
+                    
+                case Finger.FingerType.TYPE_INDEX:
+                    return FingerTipName.IndexFinger;
+                 
+                case Finger.FingerType.TYPE_MIDDLE:
+                    return FingerTipName.MiddleFinger;
+
+                case Finger.FingerType.TYPE_RING:
+                    return FingerTipName.RingFinger;
+
+                case Finger.FingerType.TYPE_PINKY:
+                    return FingerTipName.PinkyFinger;
+
+                default:
+                    throw new Exception("Unknown finger type");
+                    break;  
+            }
+        }
 
         Vector3 AsVector3(LEAP_VECTOR v)
         {
@@ -159,6 +210,18 @@ public class PoseToIRImageConfidence : MonoBehaviour
             Vector3 boneV = AsVector3(endBone.prev_joint) - AsVector3(endBone.next_joint);
             boneV.Scale(new Vector3(TipOffset_mm, TipOffset_mm, TipOffset_mm));
             return AsVector3(endBone.next_joint) + boneV;
+        }
+
+        void AddFingerToCache(Finger.FingerType type, Chirality chirality)
+        {
+            Hand hand = leapProvider.GetHand(chirality);
+
+            if (hand != null)
+            {
+                fingerPositionCacheDistal.Add((FingerTypeToName(type), chirality), hand.Fingers[(int)type].Bone(Bone.BoneType.TYPE_DISTAL).NextJoint);
+                fingerPositionCacheIntermediate.Add((FingerTypeToName(type), chirality), hand.Fingers[(int)type].Bone(Bone.BoneType.TYPE_INTERMEDIATE).NextJoint);
+                fingerPositionCacheProximal.Add((FingerTypeToName(type), chirality), hand.Fingers[(int)type].Bone(Bone.BoneType.TYPE_PROXIMAL).NextJoint);
+            }
         }
     }
 
@@ -175,32 +238,35 @@ public class PoseToIRImageConfidence : MonoBehaviour
                 IRImageWithOverlaidPosePoints = new Texture2D(e.image.Width, e.image.Height, TextureFormat.ARGB32, false);
             }
 
-            if (imagePixels == null && image != null)
-            {
-                imagePixels = new Color32[image.Width * image.Height];
-            }
-
             byte[] data = image.Data(targetCamera);
 
-            for (int i = 0; i < image.Width * image.Height; i++)
+            if (generateImageVisuals)
             {
-                if (data[i] >= IRThreshold)
+                if (imagePixels == null && image != null)
                 {
-                    imagePixels[i].r = data[i];
-                    imagePixels[i].g = data[i];
-                    imagePixels[i].b = data[i];
-                    imagePixels[i].a = (byte)255;
+                    imagePixels = new Color32[image.Width * image.Height];
                 }
-                else
-                {
-                    imagePixels[i].r = 0;
-                    imagePixels[i].b = data[i];
-                    imagePixels[i].g = 0;
-                    imagePixels[i].a = (byte)255;
-                }
-            }
 
-            IRImageWithOverlaidPosePoints.SetPixels32(imagePixels);
+                for (int i = 0; i < image.Width * image.Height; i++)
+                {
+                    if (data[i] >= IRThreshold)
+                    {
+                        imagePixels[i].r = data[i];
+                        imagePixels[i].g = data[i];
+                        imagePixels[i].b = data[i];
+                        imagePixels[i].a = (byte)255;
+                    }
+                    else
+                    {
+                        imagePixels[i].r = 0;
+                        imagePixels[i].b = data[i];
+                        imagePixels[i].g = 0;
+                        imagePixels[i].a = (byte)255;
+                    }
+                }
+
+                IRImageWithOverlaidPosePoints.SetPixels32(imagePixels);
+            }
 
             foreach (var pixel in tipPixels)
             {
@@ -218,15 +284,22 @@ public class PoseToIRImageConfidence : MonoBehaviour
 
                 float lerpRange = UpperConfidencePixelThreshold - LowerConfidencePixelThreshold;
                 float averagePixelIntensity = IRBrightnessIntegral / count;
-
                 float confidence = Mathf.Lerp(0, 1, (averagePixelIntensity - LowerConfidencePixelThreshold) / lerpRange);
-                Color confidenceColor = Color.Lerp(Color.red, Color.green, confidence);
 
-                for (int x = Math.Max(0, (int)pixel.position.x - 1); x < Math.Min(image.Width, (int)pixel.position.x + 1); x++)
+                if (generateImageVisuals)
                 {
-                    for (int y = Math.Max(0, (int)pixel.position.y - 1); y < Math.Min(image.Height, (int)pixel.position.y + 1); y++)
+                    Color confidenceColor = Color.green;
+                    if (pixel.fingerName == FingerTipName.Thumb)
                     {
-                        IRImageWithOverlaidPosePoints.SetPixel(x, y, confidenceColor);
+                        confidenceColor = Color.Lerp(Color.red, Color.green, confidence);
+                    }
+
+                    for (int x = Math.Max(0, (int)pixel.position.x - 1); x < Math.Min(image.Width, (int)pixel.position.x + 1); x++)
+                    {
+                        for (int y = Math.Max(0, (int)pixel.position.y - 1); y < Math.Min(image.Height, (int)pixel.position.y + 1); y++)
+                        {
+                            IRImageWithOverlaidPosePoints.SetPixel(x, y, confidenceColor);
+                        }
                     }
                 }
 
@@ -242,57 +315,103 @@ public class PoseToIRImageConfidence : MonoBehaviour
                     case FingerTipName.Thumb:
                         handConfidences.ThumbTip.confidence = confidence;
                         if (highTipConfidence)
+                        {
                             handConfidences.ThumbTip.lastGoodPosition_PixelSpace = pixel.position;
+                            handConfidences.ThumbTip.lastGoodPosition_LeapSpace_distal = fingerPositionCacheDistal[(FingerTipName.Thumb, pixel.hand)];
+                            handConfidences.ThumbTip.lastGoodPosition_LeapSpace_intermediate = fingerPositionCacheIntermediate[(FingerTipName.Thumb, pixel.hand)];
+                            handConfidences.ThumbTip.lastGoodPosition_LeapSpace_proximal = fingerPositionCacheProximal[(FingerTipName.Thumb, pixel.hand)];
+                        }
                         else
+                        {
                             lastKnownGoodPos = handConfidences.ThumbTip.lastGoodPosition_PixelSpace;
+                        }
                         break;
+
                     case FingerTipName.IndexFinger:
                         handConfidences.IndexTip.confidence = confidence;
                         if (highTipConfidence)
+                        {
                             handConfidences.IndexTip.lastGoodPosition_PixelSpace = pixel.position;
+                            handConfidences.IndexTip.lastGoodPosition_LeapSpace_distal = fingerPositionCacheDistal[(FingerTipName.IndexFinger, pixel.hand)];
+                            handConfidences.IndexTip.lastGoodPosition_LeapSpace_intermediate = fingerPositionCacheIntermediate[(FingerTipName.IndexFinger, pixel.hand)];
+                            handConfidences.IndexTip.lastGoodPosition_LeapSpace_proximal = fingerPositionCacheProximal[(FingerTipName.IndexFinger, pixel.hand)];
+                        }
                         else
-                            lastKnownGoodPos = handConfidences.ThumbTip.lastGoodPosition_PixelSpace;
+                        {
+                            lastKnownGoodPos = handConfidences.IndexTip.lastGoodPosition_PixelSpace;
+ 
+                        }
                         break;
+
                     case FingerTipName.MiddleFinger:
                         handConfidences.MiddleTip.confidence = confidence;
                         if (highTipConfidence)
+                        {
                             handConfidences.MiddleTip.lastGoodPosition_PixelSpace = pixel.position;
+                            handConfidences.MiddleTip.lastGoodPosition_LeapSpace_distal = fingerPositionCacheDistal[(FingerTipName.MiddleFinger, pixel.hand)];
+                            handConfidences.MiddleTip.lastGoodPosition_LeapSpace_intermediate = fingerPositionCacheIntermediate[(FingerTipName.MiddleFinger, pixel.hand)];
+                            handConfidences.MiddleTip.lastGoodPosition_LeapSpace_proximal = fingerPositionCacheProximal[(FingerTipName.MiddleFinger, pixel.hand)];
+                        }
                         else
-                            lastKnownGoodPos = handConfidences.ThumbTip.lastGoodPosition_PixelSpace;
+                        {
+                            lastKnownGoodPos = handConfidences.MiddleTip.lastGoodPosition_PixelSpace;
+                        }
                         break;
+
                     case FingerTipName.RingFinger:
                         handConfidences.RingTip.confidence = confidence;
                         if (highTipConfidence)
+                        {
                             handConfidences.RingTip.lastGoodPosition_PixelSpace = pixel.position;
+                            handConfidences.RingTip.lastGoodPosition_LeapSpace_distal = fingerPositionCacheDistal[(FingerTipName.RingFinger, pixel.hand)];
+                            handConfidences.RingTip.lastGoodPosition_LeapSpace_intermediate = fingerPositionCacheIntermediate[(FingerTipName.RingFinger, pixel.hand)];
+                            handConfidences.RingTip.lastGoodPosition_LeapSpace_proximal = fingerPositionCacheProximal[(FingerTipName.RingFinger, pixel.hand)];
+                        }
                         else
-                            lastKnownGoodPos = handConfidences.ThumbTip.lastGoodPosition_PixelSpace;
+                        {
+                            lastKnownGoodPos = handConfidences.RingTip.lastGoodPosition_PixelSpace;
+                        }
                         break;
+
                     case FingerTipName.PinkyFinger:
                         handConfidences.PinkyTip.confidence = confidence;
                         if (highTipConfidence)
+                        {
                             handConfidences.PinkyTip.lastGoodPosition_PixelSpace = pixel.position;
+                            handConfidences.PinkyTip.lastGoodPosition_LeapSpace_distal = fingerPositionCacheDistal[(FingerTipName.PinkyFinger, pixel.hand)];
+                            handConfidences.PinkyTip.lastGoodPosition_LeapSpace_intermediate = fingerPositionCacheIntermediate[(FingerTipName.PinkyFinger, pixel.hand)];
+                            handConfidences.PinkyTip.lastGoodPosition_LeapSpace_proximal = fingerPositionCacheProximal[(FingerTipName.PinkyFinger, pixel.hand)];
+                        }
                         else
-                            lastKnownGoodPos = handConfidences.ThumbTip.lastGoodPosition_PixelSpace;
+                        {
+                            lastKnownGoodPos = handConfidences.PinkyTip.lastGoodPosition_PixelSpace;
+                        }
                         break;
 
                     default:
                         break;
                 }
 
-                if (!highTipConfidence && lastKnownGoodPos.HasValue)
+                if (generateImageVisuals)
                 {
-                    for (int x = Math.Max(0, (int)lastKnownGoodPos.Value.x - 1); x < Math.Min(image.Width, (int)lastKnownGoodPos.Value.x + 1); x++)
+                    if (!highTipConfidence && lastKnownGoodPos.HasValue && pixel.fingerName == FingerTipName.Thumb)
                     {
-                        for (int y = Math.Max(0, (int) lastKnownGoodPos.Value.y - 1); y < Math.Min(image.Height, (int)lastKnownGoodPos.Value.y + 1); y++)
+                        for (int x = Math.Max(0, (int)lastKnownGoodPos.Value.x - 1); x < Math.Min(image.Width, (int)lastKnownGoodPos.Value.x + 1); x++)
                         {
-                            IRImageWithOverlaidPosePoints.SetPixel(x, y, Color.yellow);
+                            for (int y = Math.Max(0, (int)lastKnownGoodPos.Value.y - 1); y < Math.Min(image.Height, (int)lastKnownGoodPos.Value.y + 1); y++)
+                            {
+                                IRImageWithOverlaidPosePoints.SetPixel(x, y, Color.yellow);
+                            }
                         }
                     }
                 }
 
             }
 
-            IRImageWithOverlaidPosePoints.Apply();
+            if (generateImageVisuals)
+            {
+                IRImageWithOverlaidPosePoints.Apply();
+            }
         }
     }
 
@@ -318,9 +437,9 @@ public class PoseToIRImageConfidence : MonoBehaviour
 
     private void UpdateTargetPixels(LEAP_HAND hand)
     {
-        if (tips.Any() && extrinsics != null)
+        if (tips_LeapUnits.Any() && extrinsics != null)
         {
-            foreach (var tip in tips)
+            foreach (var tip in tips_LeapUnits)
             {
                 var transformed = extrinsics.Value.MultiplyPoint(tip.position);
 
