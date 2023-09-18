@@ -143,7 +143,7 @@ namespace Leap.Unity
         {
             public string recommended, description;
             public SerializedProperty property;
-            public bool ignored;
+            public bool ignored, impactsPerformance;
         }
 
         [HideInInspector, SerializeField]
@@ -291,7 +291,8 @@ namespace Leap.Unity
                     {
                         property = physicsManager.FindProperty(ID_SOLVER_VEL_ITERATIONS),
                         recommended = "5",
-                        description = "Improves physics system velocity stability after a bounce."
+                        description = "Improves physics system velocity stability after a bounce.",
+                        impactsPerformance = true
                     }
                 },
                 {
@@ -300,7 +301,8 @@ namespace Leap.Unity
                     {
                         property = physicsManager.FindProperty(ID_ENHANCED_DETERMINISM),
                         recommended = "True",
-                        description = "Reduce instability and randomness of the physics sim."
+                        description = "Reduce instability and randomness of the physics sim.",
+                        impactsPerformance = true
                     }
                 },
                 {
@@ -309,7 +311,8 @@ namespace Leap.Unity
                     {
                         property = physicsManager.FindProperty(ID_SOLVER_TYPE),
                         recommended = "Temporal Gauss Seidel",
-                        description = "2021 only. Ensures that rotations for Hard Contact Hands are calculated correctly."
+                        description = "2021 only. Ensures that rotations for Hard Contact Hands are calculated correctly.",
+                        impactsPerformance = true
                     }
                 },
                 {
@@ -318,7 +321,8 @@ namespace Leap.Unity
                     {
                         property = timeManager.FindProperty(ID_FIXED_TIMESTEP),
                         recommended = "0.011111",
-                        description = "Makes your app physics run smoother."
+                        description = "Makes your app physics run smoother.",
+                        impactsPerformance = true
                     }
                 }
             };

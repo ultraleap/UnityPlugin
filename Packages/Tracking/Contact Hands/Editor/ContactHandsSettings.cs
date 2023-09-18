@@ -10,6 +10,17 @@ using UnityEngine.UIElements;
 
 public class ContactHandsSettings
 {
+    static MultiColumnHeaderState columnState;
+    static MultiColumnHeader header;
+    static ContactHandsTreeView treeView;
+
+    private const int SMALL_SPACE = 5;
+    private const int MEDIUM_SPACE = 10;
+    private const int LARGE_SPACE = 20;
+
+    private static string performanceList = "";
+
+
     [SettingsProvider]
     public static SettingsProvider CreateMyCustomSettingsProvider()
     {
@@ -35,28 +46,56 @@ public class ContactHandsSettings
         columnState = ContactHandsTreeView.CreateDefaultMultiColumnHeaderState();
         header = new MultiColumnHeader(columnState);
         treeView = new ContactHandsTreeView(new TreeViewState(), header);
+
+        foreach(UltraleapSettings.RecommendedSetting setting in UltraleapSettings.Instance.recommendedSettings.Values)
+        {
+            if (setting.impactsPerformance)
+            {
+                performanceList += "\n- " + setting.property.displayName;
+            }
+        }
     }
-
-
-    static MultiColumnHeaderState columnState;
-    static MultiColumnHeader header;
-    static ContactHandsTreeView treeView;
 
     private static void OnGUI(string searchContext)
     {
-        GUILayout.Space(20);
-        UltraleapSettings.Instance.showUltraleapSettingsOnStartup = GUILayout.Toggle(UltraleapSettings.Instance.showUltraleapSettingsOnStartup, new GUIContent("Show Contact Hands settings on project start if unapplied settings"));
+        EditorGUI.indentLevel++;
 
-        GUILayout.Space(20);
+        GUILayout.Space(SMALL_SPACE);
+        EditorGUILayout.LabelField("Settings Config", EditorStyles.boldLabel);
+        GUILayout.Space(SMALL_SPACE);
 
-        EditorGUILayout.LabelField("Apply all recommended settings", EditorStyles.boldLabel);
-        GUILayout.Space(pixels: 10);
+        GUILayout.BeginHorizontal();
 
-        GUILayout.BeginHorizontal(GUILayout.Width(810));
-        GUILayout.Space(10);
+        GUILayout.Space(LARGE_SPACE);
+        UltraleapSettings.Instance.showUltraleapSettingsOnStartup = GUILayout.Toggle(UltraleapSettings.Instance.showUltraleapSettingsOnStartup,
+            new GUIContent("Show Contact Hands settings on project start if unapplied settings"));
+        GUILayout.EndHorizontal();
+
+        GUILayout.Space(LARGE_SPACE);
+
+        EditorGUILayout.LabelField("Recommended Settings", EditorStyles.boldLabel);
+        GUILayout.Space(SMALL_SPACE);
+
+        GUILayout.BeginHorizontal(GUILayout.Width(815));
+        EditorGUILayout.HelpBox($"To ensure the best experience for your users, Ultraleap has provided recommended settings below.", MessageType.Info);
+        GUILayout.EndHorizontal();
+
+
+        GUILayout.Space(LARGE_SPACE);
+
+        GUILayout.BeginHorizontal(GUILayout.Width(815));
+        EditorGUILayout.HelpBox($"The following recommended settings impact performance:" + performanceList, MessageType.Info);
+        GUILayout.EndHorizontal();
+
+        GUILayout.Space(LARGE_SPACE);
+
+        GUILayout.BeginHorizontal(GUILayout.Width(820));
+        GUILayout.Space(LARGE_SPACE);
+
+
 
         GUILayout.BeginHorizontal(EditorStyles.toolbar);
-        GUILayout.Space(10);
+        GUILayout.Space(SMALL_SPACE);
         bool newValue = GUILayout.Toggle(UltraleapSettings.Instance.showAppliedSettings, new GUIContent("Show Applied Settings"));
 
         if (newValue != UltraleapSettings.Instance.showAppliedSettings) {
@@ -74,9 +113,6 @@ public class ContactHandsSettings
             treeView.Reload();
         }
 
-
-
-        GUILayout.Space(100);
         GUILayout.FlexibleSpace();
         if (GUILayout.Button("Apply All", GUILayout.Width(75)))
         {
@@ -89,10 +125,64 @@ public class ContactHandsSettings
         GUILayout.EndHorizontal();
 
         Rect rect = GUILayoutUtility.GetRect(800, 800, 0, 300, EditorStyles.selectionRect);
-        rect.x += 10;
+        rect.x += LARGE_SPACE;
         treeView.OnGUI(rect);
 
+
+        // Burst Compute
+        
+        if (!(!UltraleapSettings.Instance.showIgnoredSettings && UltraleapSettings.Instance.ignoreBurst))
+        {
+
+            BurstSetting();
+
+
+
+        }
+
+
+        EditorGUI.indentLevel--;
     }
 
+    private static void BurstSetting()
+    {
+        if (!UltraleapSettings.Instance.showAppliedSettings)
+        {
+
+#if BURST_AVAILABLE
+            return;
+#endif
+        }
+        else
+        {
+            GUI.enabled = !UltraleapSettings.Instance.showAppliedSettings;
+
+        }
+        EditorGUILayout.BeginHorizontal(GUILayout.Width(820));
+        GUILayout.Space(5);
+        EditorGUILayout.HelpBox($"Please install the Unity Burst package, otherwise overall performance will be impacted.", MessageType.Warning);
+
+        if (GUILayout.Button("Install Package", GUILayout.Width(100), GUILayout.Height(38)))
+        {
+            UnityEditor.PackageManager.Client.Add("com.unity.burst");
+        }
+
+        GUI.enabled = true;
+        if (UltraleapSettings.Instance.ignoreBurst)
+        {
+            if (GUILayout.Button("Watch", GUILayout.Width(100), GUILayout.Height(38)))
+            {
+                UltraleapSettings.Instance.ignoreBurst = false;
+            }
+        }
+        else
+        {
+            if (GUILayout.Button("Ignore", GUILayout.Width(100), GUILayout.Height(38)))
+            {
+                UltraleapSettings.Instance.ignoreBurst = true;
+            }
+        }
+        EditorGUILayout.EndHorizontal();
+    }
 
 }
