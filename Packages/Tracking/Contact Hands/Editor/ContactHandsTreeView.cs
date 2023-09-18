@@ -25,7 +25,7 @@ public class ContactHandsTreeView : TreeView
 
     public ContactHandsTreeView(TreeViewState state, MultiColumnHeader multiColumnHeader) : base(state, multiColumnHeader)
     {
-        UltraleapSettings.Instance.RefreshRecommendedSettingsValues();
+        ContactHandsSettings.Instance.RefreshRecommendedSettingsValues();
 
         rowHeight = ROW_HEIGHT;
         columnIndexForTreeFoldouts = 2;
@@ -54,19 +54,19 @@ public class ContactHandsTreeView : TreeView
 
         List<TreeViewItem> myList = new List<TreeViewItem>();
 
-        var recommendedSettings = UltraleapSettings.Instance.recommendedSettings;
+        var recommendedSettings = ContactHandsSettings.Instance.recommendedSettings;
 
-        string[] ids = recommendedSettings.Keys.OrderBy(id => UltraleapSettings.Instance.IsRecommendedSettingApplied(id)).ThenBy(id => recommendedSettings[id].ignored).ThenBy(id => recommendedSettings[id].property.displayName).ToArray();
+        string[] ids = recommendedSettings.Keys.OrderBy(id => ContactHandsSettings.Instance.IsRecommendedSettingApplied(id)).ThenBy(id => recommendedSettings[id].ignored).ThenBy(id => recommendedSettings[id].property.displayName).ToArray();
 
         for (int i = 0; i < ids.Length; i++)
         {
-            UltraleapSettings.RecommendedSetting recommendedSetting;
+            ContactHandsSettings.RecommendedSetting recommendedSetting;
             if (!recommendedSettings.TryGetValue(ids[i], out recommendedSetting)) continue;
 
-            bool settingApplied = UltraleapSettings.Instance.IsRecommendedSettingApplied(ids[i]);
+            bool settingApplied = ContactHandsSettings.Instance.IsRecommendedSettingApplied(ids[i]);
 
-            if (settingApplied && !UltraleapSettings.Instance.showAppliedSettings) continue;
-            if (recommendedSetting.ignored && !UltraleapSettings.Instance.showIgnoredSettings) continue;
+            if (settingApplied && !ContactHandsSettings.Instance.showAppliedSettings) continue;
+            if (recommendedSetting.ignored && !ContactHandsSettings.Instance.showIgnoredSettings) continue;
 
             myList.Add(new TreeViewItem(i, 0, ids[i]));
         }
@@ -178,9 +178,9 @@ public class ContactHandsTreeView : TreeView
     private void DrawCellGUI(Rect cellRect, TreeViewItem item, Columns column, ref RowGUIArgs args)
     {
         string recommendedSettingKey = item.displayName;
-        UltraleapSettings.RecommendedSetting recommendedSetting;
-        if (!UltraleapSettings.Instance.recommendedSettings.TryGetValue(recommendedSettingKey, out recommendedSetting)) return;
-        bool settingApplied = UltraleapSettings.Instance.IsRecommendedSettingApplied(recommendedSettingKey);
+        ContactHandsSettings.RecommendedSetting recommendedSetting;
+        if (!ContactHandsSettings.Instance.recommendedSettings.TryGetValue(recommendedSettingKey, out recommendedSetting)) return;
+        bool settingApplied = ContactHandsSettings.Instance.IsRecommendedSettingApplied(recommendedSettingKey);
 
         // Center cell rect vertically (makes it easier to place controls, icons etc in the cells)
         CenterRectUsingLineHeight(ref cellRect);
@@ -214,7 +214,7 @@ public class ContactHandsTreeView : TreeView
             case Columns.Apply:
                 if (GUI.Button(new Rect(cellRect.xMax - ((BUTTON_WIDTH / 2) * 2) - BUTTON_PADDING, cellRect.y + (BUTTON_HEIGHT / 4), BUTTON_WIDTH, BUTTON_HEIGHT), "Apply"))
                 {
-                    UltraleapSettings.Instance.ApplyRecommendedSetting(recommendedSettingKey);
+                    ContactHandsSettings.Instance.ApplyRecommendedSetting(recommendedSettingKey);
                     Reload();
                     return;
                 }
@@ -227,7 +227,7 @@ public class ContactHandsTreeView : TreeView
                     if (GUI.Button(new Rect(cellRect.xMax - ((BUTTON_WIDTH / 2) * 2) - BUTTON_PADDING, cellRect.y + (BUTTON_HEIGHT / 4), BUTTON_WIDTH, BUTTON_HEIGHT), "Watch"))
                     {
                         recommendedSetting.ignored = false;
-                        UltraleapSettings.Instance.recommendedSettings[recommendedSettingKey] = recommendedSetting;
+                        ContactHandsSettings.Instance.recommendedSettings[recommendedSettingKey] = recommendedSetting;
                         Reload();
                         return;
                     }
@@ -237,7 +237,7 @@ public class ContactHandsTreeView : TreeView
                     if (GUI.Button(new Rect(cellRect.xMax - ((BUTTON_WIDTH / 2) * 2) - BUTTON_PADDING, cellRect.y + (BUTTON_HEIGHT / 4), BUTTON_WIDTH, BUTTON_HEIGHT), "Ignore"))
                     {
                         recommendedSetting.ignored = true;
-                        UltraleapSettings.Instance.recommendedSettings[recommendedSettingKey] = recommendedSetting;
+                        ContactHandsSettings.Instance.recommendedSettings[recommendedSettingKey] = recommendedSetting;
                         Reload();
                         return;
                     }
