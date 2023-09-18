@@ -92,8 +92,6 @@ public class ContactHandsSettings
         GUILayout.BeginHorizontal(GUILayout.Width(820));
         GUILayout.Space(LARGE_SPACE);
 
-
-
         GUILayout.BeginHorizontal(EditorStyles.toolbar);
         GUILayout.Space(SMALL_SPACE);
         bool newValue = GUILayout.Toggle(UltraleapSettings.Instance.showAppliedSettings, new GUIContent("Show Applied Settings"));
@@ -133,13 +131,8 @@ public class ContactHandsSettings
         
         if (!(!UltraleapSettings.Instance.showIgnoredSettings && UltraleapSettings.Instance.ignoreBurst))
         {
-
             BurstSetting();
-
-
-
         }
-
 
         EditorGUI.indentLevel--;
     }

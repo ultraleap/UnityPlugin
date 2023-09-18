@@ -19,7 +19,8 @@ public class ContactHandsTreeView : TreeView
         Name,
         CurrentValue,
         RecommendedValue,
-        Apply
+        Apply,
+        Ignore
     }
 
     public ContactHandsTreeView(TreeViewState state, MultiColumnHeader multiColumnHeader) : base(state, multiColumnHeader)
@@ -135,9 +136,22 @@ public class ContactHandsTreeView : TreeView
                     headerTextAlignment = TextAlignment.Right,
                     sortedAscending = true,
                     sortingArrowAlignment = TextAlignment.Left,
-                    width = BUTTON_WIDTH *3,
-                    minWidth = BUTTON_WIDTH *3,
-                    maxWidth = BUTTON_WIDTH *3,
+                    width = BUTTON_WIDTH *1.5f,
+                    minWidth = BUTTON_WIDTH *1.5f,
+                    maxWidth = BUTTON_WIDTH *1.5f,
+                    autoResize = true,
+                    allowToggleVisibility = false,
+                    canSort = false,
+                },
+                new MultiColumnHeaderState.Column
+                {
+                    headerContent = new GUIContent("Ignore", "Ignore this property."),
+                    headerTextAlignment = TextAlignment.Right,
+                    sortedAscending = true,
+                    sortingArrowAlignment = TextAlignment.Left,
+                    width = BUTTON_WIDTH *1.5f,
+                    minWidth = BUTTON_WIDTH *1.5f,
+                    maxWidth = BUTTON_WIDTH *1.5f,
                     autoResize = true,
                     allowToggleVisibility = false,
                     canSort = false,
@@ -198,13 +212,15 @@ public class ContactHandsTreeView : TreeView
                 contents = recommendedSetting.recommended;
                 break;
             case Columns.Apply:
-
-                if (GUI.Button(new Rect(cellRect.xMax - ((BUTTON_WIDTH / 2) * 4) - (BUTTON_PADDING * 2), cellRect.y + (BUTTON_HEIGHT / 4), BUTTON_WIDTH, BUTTON_HEIGHT), "Apply"))
+                if (GUI.Button(new Rect(cellRect.xMax - ((BUTTON_WIDTH / 2) * 2) - BUTTON_PADDING, cellRect.y + (BUTTON_HEIGHT / 4), BUTTON_WIDTH, BUTTON_HEIGHT), "Apply"))
                 {
                     UltraleapSettings.Instance.ApplyRecommendedSetting(recommendedSettingKey);
                     Reload();
                     return;
                 }
+                break;
+
+            case Columns.Ignore:
                 GUI.enabled = true;
                 if (recommendedSetting.ignored)
                 {
