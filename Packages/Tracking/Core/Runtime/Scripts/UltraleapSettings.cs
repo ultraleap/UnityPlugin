@@ -8,6 +8,23 @@ using System.IO;
 namespace Leap.Unity
 {
 #if UNITY_EDITOR
+    [CustomEditor(typeof(UltraleapSettings))]
+    public class UltraleapSettingsDrawer : Editor
+    {
+        public override void OnInspectorGUI()
+        {
+            base.OnInspectorGUI();
+
+            EditorGUILayout.Space(20);
+            if (GUILayout.Button("Open Ultraleap Settings"))
+            {
+                SettingsService.OpenProjectSettings("Project/Ultraleap");
+            }
+        }
+    }
+#endif
+
+#if UNITY_EDITOR
     static class UltraleapProjectSettings
     {
         [SettingsProvider]
@@ -72,7 +89,6 @@ namespace Leap.Unity
             }
 
             settings.ApplyModifiedPropertiesWithoutUndo();
-
         }
     }
 #endif
@@ -148,16 +164,16 @@ namespace Leap.Unity
             newSO = ScriptableObject.CreateInstance<UltraleapSettings>();
 
             Directory.CreateDirectory(Application.dataPath + "/Resources/");
-
             AssetDatabase.CreateAsset(newSO, "Assets/Resources/Ultraleap Settings.asset");
-
 #endif
             return newSO;
         }
 
+#if UNITY_EDITOR
         internal static SerializedObject GetSerializedSettings()
         {
             return new SerializedObject(FindSettingsSO());
         }
+#endif
     }
 }
