@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Leap.Unity;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
@@ -12,23 +13,6 @@ public class ContactHandsTreeView : TreeView
     const float BUTTON_WIDTH = 60f;
     const float BUTTON_HEIGHT = 20f;
     const float BUTTON_PADDING = 2.5f;
-    const string PROJECT_SETTINGS_ASSET_PATH = "ProjectSettings/DynamicsManager.asset";
-
-    SerializedObject physicsManager;
-
-    const string ID_SLEEP_THRESHOLD = "m_SleepThreshold";
-    const string ID_DEFAULT_MAX_ANGULAR_SPEED = "m_DefaultMaxAngularSpeed";
-    const string ID_DEFAULT_CONTACT_OFFSET = "m_DefaultContactOffset";
-    const string ID_AUTO_SYNC_TRANSFORMS = "m_AutoSyncTransforms";
-    const string ID_CONTACTS_GENERATION = "m_ContactsGeneration";
-
-    private Dictionary<string, RecommendedSetting> recommendedSettings = new Dictionary<string, RecommendedSetting>();
-    private struct RecommendedSetting
-    {
-        public string after, description;
-        public SerializedProperty property;
-        public bool ignored;
-    }
 
     private enum Columns
     {
@@ -40,6 +24,8 @@ public class ContactHandsTreeView : TreeView
 
     public ContactHandsTreeView(TreeViewState state, MultiColumnHeader multiColumnHeader) : base(state, multiColumnHeader)
     {
+        UltraleapSettings.Instance.RefreshRecommendedSettingsValues();
+
         rowHeight = ROW_HEIGHT;
         columnIndexForTreeFoldouts = 2;
         showAlternatingRowBackgrounds = true;
@@ -49,64 +35,6 @@ public class ContactHandsTreeView : TreeView
         Reload();
     }
 
-    private void UpdateRecommendedSettingsStates()
-    {
-        physicsManager = new SerializedObject(AssetDatabase.LoadAllAssetsAtPath(PROJECT_SETTINGS_ASSET_PATH)[0]);
-        recommendedSettings.Clear();
-        recommendedSettings = new Dictionary<string, RecommendedSetting>
-        {
-            {
-                ID_SLEEP_THRESHOLD,
-                new RecommendedSetting()
-                {
-                    property = physicsManager.FindProperty(ID_SLEEP_THRESHOLD),
-                    after = "0.001",
-                    description = "Increases the realism of your physics objects e.g. allows objects to correctly rest",
-                    ignored = false
-                }
-            },
-            {
-                ID_DEFAULT_MAX_ANGULAR_SPEED,
-                new RecommendedSetting()
-                {
-                    property = physicsManager.FindProperty(ID_DEFAULT_MAX_ANGULAR_SPEED),
-                    after = "100",
-                    description = "Allows you to rotate objects more closely to the hand tracking data",
-                    ignored = false
-                }
-            },
-            {
-                ID_DEFAULT_CONTACT_OFFSET,
-                new RecommendedSetting()
-                {
-                    property = physicsManager.FindProperty(ID_DEFAULT_CONTACT_OFFSET),
-                    after = "0.001",
-                    description = "Distance used by physics sim to generate collision contacts. ",
-                    ignored = false
-                }
-            },
-            {
-                ID_AUTO_SYNC_TRANSFORMS,
-                new RecommendedSetting()
-                {
-                    property = physicsManager.FindProperty(ID_AUTO_SYNC_TRANSFORMS),
-                    after = "False",
-                    description = "Automatically update transform positions and rotations in the physics sim. If enabled, may cause jitter on rigidbodies when grabbed.",
-                    ignored = false
-                }
-            },
-            {
-                ID_CONTACTS_GENERATION,
-                new RecommendedSetting()
-                {
-                    property = physicsManager.FindProperty(ID_CONTACTS_GENERATION),
-                    after = "Persistent Contact Manifold",
-                    description = "Recommended default by unity for generating contacts every physics frame..",
-                    ignored = true
-                }
-            },
-        };
-    }
 
     protected override TreeViewItem BuildRoot()
     {
@@ -123,13 +51,22 @@ public class ContactHandsTreeView : TreeView
             displayName = "root"
         };
 
-        UpdateRecommendedSettingsStates();
-
         List<TreeViewItem> myList = new List<TreeViewItem>();
-        string[] ids = recommendedSettings.Keys.OrderBy(id => id).ToArray();
+
+        var recommendedSettings = UltraleapSettings.Instance.recommendedSettings;
+
+        string[] ids = recommendedSettings.Keys.OrderBy(id => UltraleapSettings.Instance.IsRecommendedSettingApplied(id)).ThenBy(id => recommendedSettings[id].ignored).ThenBy(id => recommendedSettings[id].property.displayName).ToArray();
 
         for (int i = 0; i < ids.Length; i++)
         {
+            UltraleapSettings.RecommendedSetting recommendedSetting;
+            if (!recommendedSettings.TryGetValue(ids[i], out recommendedSetting)) continue;
+
+            bool settingApplied = UltraleapSettings.Instance.IsRecommendedSettingApplied(ids[i]);
+
+            if (settingApplied && !UltraleapSettings.Instance.showAppliedSettings) continue;
+            if (recommendedSetting.ignored && !UltraleapSettings.Instance.showIgnoredSettings) continue;
+
             myList.Add(new TreeViewItem(i, 0, ids[i]));
         }
 
@@ -159,8 +96,9 @@ public class ContactHandsTreeView : TreeView
                     headerTextAlignment = TextAlignment.Right,
                     sortedAscending = true,
                     sortingArrowAlignment = TextAlignment.Center,
-                    width = 200,
-                    minWidth = (BUTTON_WIDTH *2) + BUTTON_PADDING * 4,
+                    width = 220,
+                    minWidth = 220,
+                    maxWidth = 220,
                     autoResize = false,
                     allowToggleVisibility = false,
                     canSort = false,
@@ -171,8 +109,9 @@ public class ContactHandsTreeView : TreeView
                     headerTextAlignment = TextAlignment.Right,
                     sortedAscending = true,
                     sortingArrowAlignment = TextAlignment.Left,
-                    width = 200,
-                    minWidth = (BUTTON_WIDTH *2) + BUTTON_PADDING * 4,
+                    width = 170,
+                    minWidth = 170,
+                    maxWidth = 170,
                     autoResize = true,
                     allowToggleVisibility = false,
                     canSort = false
@@ -183,8 +122,9 @@ public class ContactHandsTreeView : TreeView
                     headerTextAlignment = TextAlignment.Right,
                     sortedAscending = true,
                     sortingArrowAlignment = TextAlignment.Left,
-                    width = 200,
-                    minWidth = (BUTTON_WIDTH *2) + BUTTON_PADDING * 4,
+                    width = 170,
+                    minWidth = 170,
+                    maxWidth = 170,
                     autoResize = true,
                     allowToggleVisibility = false,
                     canSort = false
@@ -196,7 +136,8 @@ public class ContactHandsTreeView : TreeView
                     sortedAscending = true,
                     sortingArrowAlignment = TextAlignment.Left,
                     width = BUTTON_WIDTH *3,
-                    minWidth = (BUTTON_WIDTH *2) + BUTTON_PADDING * 4,
+                    minWidth = BUTTON_WIDTH *3,
+                    maxWidth = BUTTON_WIDTH *3,
                     autoResize = true,
                     allowToggleVisibility = false,
                     canSort = false,
@@ -222,11 +163,13 @@ public class ContactHandsTreeView : TreeView
 
     private void DrawCellGUI(Rect cellRect, TreeViewItem item, Columns column, ref RowGUIArgs args)
     {
+        string recommendedSettingKey = item.displayName;
+        UltraleapSettings.RecommendedSetting recommendedSetting;
+        if (!UltraleapSettings.Instance.recommendedSettings.TryGetValue(recommendedSettingKey, out recommendedSetting)) return;
+        bool settingApplied = UltraleapSettings.Instance.IsRecommendedSettingApplied(recommendedSettingKey);
+
         // Center cell rect vertically (makes it easier to place controls, icons etc in the cells)
         CenterRectUsingLineHeight(ref cellRect);
-
-        RecommendedSetting recommendedSetting;
-        if (!recommendedSettings.TryGetValue(item.displayName, out recommendedSetting)) return;
 
         GUIStyle label = new GUIStyle("TV Line");
         label.alignment = TextAnchor.MiddleRight;
@@ -234,9 +177,7 @@ public class ContactHandsTreeView : TreeView
         label.padding.right = 2;
         string contents = "";
 
-        GUI.enabled = !recommendedSetting.ignored && recommendedSetting.property.ValueToString().ToLower() != recommendedSetting.after.ToLower();
-
-
+        GUI.enabled = !settingApplied;
 
         switch (column)
         {
@@ -254,22 +195,25 @@ public class ContactHandsTreeView : TreeView
                 break;
 
             case Columns.RecommendedValue:
-                contents = recommendedSetting.after;
+                contents = recommendedSetting.recommended;
                 break;
             case Columns.Apply:
-                GUI.enabled = true;
-                if (GUI.Button(new Rect(cellRect.xMax - ((BUTTON_WIDTH / 2) * 4) - ( BUTTON_PADDING * 2), cellRect.y + (BUTTON_HEIGHT / 4), BUTTON_WIDTH, BUTTON_HEIGHT), "Apply"))
-                {
-                    ApplyRecommendedSetting(recommendedSetting);
-                    Reload();
-                }
 
+                if (GUI.Button(new Rect(cellRect.xMax - ((BUTTON_WIDTH / 2) * 4) - (BUTTON_PADDING * 2), cellRect.y + (BUTTON_HEIGHT / 4), BUTTON_WIDTH, BUTTON_HEIGHT), "Apply"))
+                {
+                    UltraleapSettings.Instance.ApplyRecommendedSetting(recommendedSettingKey);
+                    Reload();
+                    return;
+                }
+                GUI.enabled = true;
                 if (recommendedSetting.ignored)
                 {
                     if (GUI.Button(new Rect(cellRect.xMax - ((BUTTON_WIDTH / 2) * 2) - BUTTON_PADDING, cellRect.y + (BUTTON_HEIGHT / 4), BUTTON_WIDTH, BUTTON_HEIGHT), "Watch"))
                     {
                         recommendedSetting.ignored = false;
+                        UltraleapSettings.Instance.recommendedSettings[recommendedSettingKey] = recommendedSetting;
                         Reload();
+                        return;
                     }
                 }
                 else
@@ -277,51 +221,21 @@ public class ContactHandsTreeView : TreeView
                     if (GUI.Button(new Rect(cellRect.xMax - ((BUTTON_WIDTH / 2) * 2) - BUTTON_PADDING, cellRect.y + (BUTTON_HEIGHT / 4), BUTTON_WIDTH, BUTTON_HEIGHT), "Ignore"))
                     {
                         recommendedSetting.ignored = true;
+                        UltraleapSettings.Instance.recommendedSettings[recommendedSettingKey] = recommendedSetting;
                         Reload();
+                        return;
                     }
                 }
-
-                GUI.enabled = !recommendedSetting.ignored;
-
                 break;
         }
 
 
-        if(column != Columns.Apply)
+        if (column != Columns.Apply)
         {
             GUI.Label(cellRect, new GUIContent(contents, recommendedSetting.description), label);
         }
         GUI.enabled = true;
 
-    }
-
-    public void ApplyAllRecommendedSettings()
-    {
-        foreach(var setting in recommendedSettings)
-        {
-            ApplyRecommendedSetting(setting.Value);
-        }
-    }
-
-    private void ApplyRecommendedSetting(RecommendedSetting recommendedSetting)
-    {
-        SerializedProperty property = recommendedSetting.property;
-        switch (property.propertyType)
-        {
-            case SerializedPropertyType.Boolean:
-                property.boolValue = Convert.ToBoolean(recommendedSetting.after.ToLower());
-                break;
-            case SerializedPropertyType.Float:
-                property.floatValue = float.Parse(recommendedSetting.after);
-                break;
-            case SerializedPropertyType.Integer:
-                property.intValue = int.Parse(recommendedSetting.after);
-                break;
-            case SerializedPropertyType.Enum:
-                property.enumValueIndex = property.enumDisplayNames.ToList().IndexOf(recommendedSetting.after);
-                   break;
-        }
-        physicsManager.ApplyModifiedProperties();
     }
 
     protected void CenterRectUsingLineHeight(ref Rect rect)

@@ -1,7 +1,10 @@
 {
     "name": "Ultraleap.Tracking.ContactHands.Editor",
     "rootNamespace": "",
-    "references": [],
+    "references": [
+        "GUID:db4e617c04f44c144bc19216a63dd19b",
+        "GUID:cec9848704c49724192ff47f9b3e9156"
+    ],
     "includePlatforms": [
         "Editor"
     ],
@@ -13,6 +16,12 @@
     "defineConstraints": [
         "UNITY_2021_3_OR_NEWER"
     ],
-    "versionDefines": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.burst",
+            "expression": "",
+            "define": "BURST_AVAILABLE"
+        }
+    ],
     "noEngineReferences": false
 }
