@@ -288,40 +288,40 @@ dependencies-libtrack:
 # -----------------------------------------------------------------------------
 # This job is responsible for running all automated tests defined within the project using the Unity test runner framework (based on NUnit).
 #
-# .run-tests:
+.run-tests:
 
-#   extends: .unity-template
-#   stage: test
-#   allow_failure: true
-#   needs: []
-#   variables:
+  extends: .unity-template
+  stage: test
+  allow_failure: true
+  needs: []
+  variables:
 
-#     UNITY_TEST_RESULTS_NUNIT: "$CI_PROJECT_DIR/$ARTIFACTS_PATH_UNITY_PROJECT/unity_test_results_nunit.xml"
-#     UNITY_TEST_RESULTS_JUNIT: "$CI_PROJECT_DIR/$ARTIFACTS_PATH_UNITY_PROJECT/unity_test_results_junit.xml"
-#     CONVERTER_XSLT_PATH: "$CI_PROJECT_DIR/$CI_PATH/nunit-to-junit/nunit3-junit.xslt"
+    UNITY_TEST_RESULTS_NUNIT: "$CI_PROJECT_DIR/$ARTIFACTS_PATH_UNITY_PROJECT/unity_test_results_nunit.xml"
+    UNITY_TEST_RESULTS_JUNIT: "$CI_PROJECT_DIR/$ARTIFACTS_PATH_UNITY_PROJECT/unity_test_results_junit.xml"
+    CONVERTER_XSLT_PATH: "$CI_PROJECT_DIR/$CI_PATH/nunit-to-junit/nunit3-junit.xslt"
 
-#   script:
+  script:
 
-#     # Run tests
-#     - echo "Running tests - log file outputting to '$UNITY_LOG_FILE'"
-#     - echo "Running tests - test report outputting to '$UNITY_TEST_RESULTS_NUNIT'"
-#     - $process = Start-Process -Wait -PassThru -FilePath "$UNITY_PATH" -ArgumentList "-runTests -batchmode -logFile `"$UNITY_LOG_FILE`" -projectPath `"$UNITY_PROJECT_PATH`" -testResults `"$UNITY_TEST_RESULTS_NUNIT`" -testPlatform EditMode"
-#     - echo $process.ExitCode
-#     - if (-not ($process.ExitCode -eq 0)) { exit $process.ExitCode }
-#     - if ( -not (Test-Path "$UNITY_TEST_RESULTS_NUNIT")) { echo "Error generating test report"; exit 1; }
+    # Run tests
+    - echo "Running tests - log file outputting to '$UNITY_LOG_FILE'"
+    - echo "Running tests - test report outputting to '$UNITY_TEST_RESULTS_NUNIT'"
+    - $process = Start-Process -Wait -PassThru -FilePath "$UNITY_PATH" -ArgumentList "-runTests -batchmode -logFile `"$UNITY_LOG_FILE`" -projectPath `"$UNITY_PROJECT_PATH`" -testResults `"$UNITY_TEST_RESULTS_NUNIT`" -testPlatform EditMode"
+    - echo $process.ExitCode
+    - if (-not ($process.ExitCode -eq 0)) { exit $process.ExitCode }
+    - if ( -not (Test-Path "$UNITY_TEST_RESULTS_NUNIT")) { echo "Error generating test report"; exit 1; }
 
-#     - $xslt = New-Object System.Xml.Xsl.XslCompiledTransform;
-#     - $xslt.Load("$CONVERTER_XSLT_PATH");
-#     - $xslt.Transform("$UNITY_TEST_RESULTS_NUNIT", "$UNITY_TEST_RESULTS_JUNIT");
+    - $xslt = New-Object System.Xml.Xsl.XslCompiledTransform;
+    - $xslt.Load("$CONVERTER_XSLT_PATH");
+    - $xslt.Transform("$UNITY_TEST_RESULTS_NUNIT", "$UNITY_TEST_RESULTS_JUNIT");
 
-#   artifacts:
-#     name: "$ARTIFACTS_NAME-test-results"
-#     paths:
-#       - "$ARTIFACTS_PATH/"
-#     reports:
-#       junit: "$UNITY_TEST_RESULTS_JUNIT"
+  artifacts:
+    name: "$ARTIFACTS_NAME-test-results"
+    paths:
+      - "$ARTIFACTS_PATH/"
+    reports:
+      junit: "$UNITY_TEST_RESULTS_JUNIT"
 
-#     when: always
+    when: always
     
 # -----------------------------------------------------------------------------
 # License Headers Template
