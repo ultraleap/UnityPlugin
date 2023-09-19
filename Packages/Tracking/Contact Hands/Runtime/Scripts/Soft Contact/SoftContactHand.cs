@@ -27,7 +27,14 @@ namespace Leap.Unity.ContactHands
         // Interpolate back in displacement values after the hand has just released
         private float _displacementGrabCooldown = 0.25f, _displacementGrabCooldownCurrent = 0f;
 
-
+        public float DistanceFromDataHand
+        {
+            get
+            {
+                if (!tracked || dataHand == null || palmBone == null || palmBone.transform == null) return -1;
+                return Vector3.Distance(palmBone.transform.position, dataHand.PalmPosition);
+            }
+        }
 
         #region Settings
         internal float currentPalmVelocity, currentPalmAngularVelocity;
@@ -77,12 +84,14 @@ namespace Leap.Unity.ContactHands
             GenerateHandObjects(typeof(SoftContactBone));
 
             ((SoftContactBone)palmBone).SetupBone();
+            palmBone.gameObject.AddComponent<Rigidbody>().useGravity = false;
+
             // Set the colliders to ignore eachother
             foreach (var bone in bones)
             {
                 ((SoftContactBone)bone).SetupBone();
                 Physics.IgnoreCollision(palmBone.palmCollider, bone.boneCollider);
-
+                bone.gameObject.AddComponent<Rigidbody>().useGravity = false;
                 foreach (var bone2 in bones)
                 {
                     if (bone != bone2)
@@ -135,6 +144,29 @@ namespace Leap.Unity.ContactHands
         {
             _velocity = ContactUtils.ToLinearVelocity(_oldDataPosition, hand.PalmPosition, Time.fixedDeltaTime);
             _angularVelocity = ContactUtils.ToAngularVelocity(_oldDataRotation, hand.Rotation, Time.fixedDeltaTime);
+            HandleTeleportingHands();
+        }
+
+        private void HandleTeleportingHands()
+        {
+            _justGhosted = false;
+            // Fix the hand if it gets into a bad situation by teleporting and holding in place until its bad velocities disappear
+            if (DistanceFromDataHand > softContactParent.teleportDistance)
+            {
+                ResetSoftContactHand();
+                // Don't need to wait for the hand to reset as much here
+                _teleportFrameCount = TELEPORT_FRAME_COUNT;
+
+                ghosted = true;
+                _justGhosted = true;
+            }
+
+            if (Time.frameCount - _lastFrameTeleport >= _teleportFrameCount && ghosted && !IsCloseToObject)
+            {
+                ChangeHandLayer(contactManager.HandsLayer);
+
+                ghosted = false;
+            }
         }
     }
 }
