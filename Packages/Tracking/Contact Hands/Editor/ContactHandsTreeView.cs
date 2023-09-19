@@ -36,7 +36,6 @@ public class ContactHandsTreeView : TreeView
         Reload();
     }
 
-
     protected override TreeViewItem BuildRoot()
     {
         // BuildRoot is called every time Reload is called to ensure that TreeViewItems 
