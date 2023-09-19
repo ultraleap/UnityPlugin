@@ -223,6 +223,8 @@ dependencies-libtrack:
 # -----------------------------------------------------------------------------
 test:
   extends: .run-tests
+  variables:
+    UNITY_PROJECT_FOLDER: "2021.3"
 
 # -----------------------------------------------------------------------------
 # Unity Project Job Templates & Usages
