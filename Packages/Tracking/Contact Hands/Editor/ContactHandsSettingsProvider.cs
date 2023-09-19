@@ -127,6 +127,7 @@ public class ContactHandsSettingsProvider
         if (GUILayout.Button("Apply All", GUILayout.Width(75)))
         {
             ContactHandsSettings.Instance.ApplyAllRecommendedSettings();
+            InstallBurst();
             treeView.Reload();
         }
 
@@ -164,7 +165,7 @@ public class ContactHandsSettingsProvider
 
         if (GUILayout.Button("Install Package", GUILayout.Width(100), GUILayout.Height(38)))
         {
-            UnityEditor.PackageManager.Client.Add("com.unity.burst");
+            InstallBurst();
         }
 
         GUI.enabled = true;
@@ -185,4 +186,13 @@ public class ContactHandsSettingsProvider
         EditorGUILayout.EndHorizontal();
     }
 
+    private static void InstallBurst()
+    {
+#if BURST_AVAILABLE
+        return;
+#endif
+        if (ContactHandsSettings.Instance.ignoreBurst ) { return; }
+
+        UnityEditor.PackageManager.Client.Add("com.unity.burst");
+    }
 }
