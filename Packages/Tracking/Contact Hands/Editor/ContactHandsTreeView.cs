@@ -9,11 +9,6 @@ using UnityEngine.Assertions;
 
 public class ContactHandsTreeView : TreeView
 {
-    const float ROW_HEIGHT = 30f;
-    const float BUTTON_WIDTH = 60f;
-    const float BUTTON_HEIGHT = 20f;
-    const float BUTTON_PADDING = 2.5f;
-
     private enum Columns
     {
         Name,
@@ -22,6 +17,11 @@ public class ContactHandsTreeView : TreeView
         Apply,
         Ignore
     }
+
+    private const float ROW_HEIGHT = 30f;
+    private const float BUTTON_WIDTH = 60f;
+    private const float BUTTON_HEIGHT = 20f;
+    private const float BUTTON_PADDING = 2.5f;
 
     public ContactHandsTreeView(TreeViewState state, MultiColumnHeader multiColumnHeader) : base(state, multiColumnHeader)
     {

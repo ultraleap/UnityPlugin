@@ -6,7 +6,6 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-
 #if UNITY_EDITOR
 [CustomEditor(typeof(ContactHandsSettings))]
 public class ContactHandsSettingsDrawer : Editor
@@ -27,21 +26,26 @@ public class ContactHandsSettingsDrawer : Editor
 [Serializable]
 public class ContactHandsSettings : ScriptableObject
 {
-    static ContactHandsSettings instance;
+    public struct RecommendedSetting
+    {
+        public string recommended, description;
+        public SerializedProperty property;
+        public bool ignored, impactsPerformance;
+    }
+
+    private static ContactHandsSettings _instance;
     public static ContactHandsSettings Instance
     {
         get
         {
-            if (instance != null)
-                return instance;
+            if (_instance != null)
+                return _instance;
             else
-                return instance = FindSettingsSO();
+                return _instance = FindSettingsSO();
         }
-        set { instance = value; }
+        set { _instance = value; }
     }
 
-    private SerializedObject physicsManager;
-    private SerializedObject timeManager;
     private const string PHYSICS_SETTINGS_ASSET_PATH = "ProjectSettings/DynamicsManager.asset";
     private const string TIME_SETTINGS_ASSET_PATH = "ProjectSettings/TimeManager.asset";
     private const string ID_SLEEP_THRESHOLD = "m_SleepThreshold";
@@ -59,13 +63,8 @@ public class ContactHandsSettings : ScriptableObject
     private const string ID_ENHANCED_DETERMINISM = "m_EnableEnhancedDeterminism";
     private const string ID_SOLVER_TYPE = "m_SolverType";
     private const string ID_FIXED_TIMESTEP = "Fixed Timestep";
-
-    public struct RecommendedSetting
-    {
-        public string recommended, description;
-        public SerializedProperty property;
-        public bool ignored, impactsPerformance;
-    }
+    private SerializedObject _physicsManager;
+    private SerializedObject _timeManager;
 
     [HideInInspector, SerializeField]
     public Dictionary<string, RecommendedSetting> recommendedSettings = new Dictionary<string, RecommendedSetting>();
@@ -98,8 +97,8 @@ public class ContactHandsSettings : ScriptableObject
     }
     public void RefreshRecommendedSettingsValues()
     {
-        physicsManager = new SerializedObject(AssetDatabase.LoadAllAssetsAtPath(PHYSICS_SETTINGS_ASSET_PATH)[0]);
-        timeManager = new SerializedObject(AssetDatabase.LoadAllAssetsAtPath(TIME_SETTINGS_ASSET_PATH)[0]);
+        _physicsManager = new SerializedObject(AssetDatabase.LoadAllAssetsAtPath(PHYSICS_SETTINGS_ASSET_PATH)[0]);
+        _timeManager = new SerializedObject(AssetDatabase.LoadAllAssetsAtPath(TIME_SETTINGS_ASSET_PATH)[0]);
         recommendedSettings.Clear();
         recommendedSettings = new Dictionary<string, RecommendedSetting>
             {
@@ -107,7 +106,7 @@ public class ContactHandsSettings : ScriptableObject
                     ID_SLEEP_THRESHOLD,
                     new RecommendedSetting()
                     {
-                        property = physicsManager.FindProperty(ID_SLEEP_THRESHOLD),
+                        property = _physicsManager.FindProperty(ID_SLEEP_THRESHOLD),
                         recommended = "0.001",
                         description = "Increases the realism of your physics objects e.g. allows objects to correctly rest"
                     }
@@ -116,7 +115,7 @@ public class ContactHandsSettings : ScriptableObject
                     ID_DEFAULT_MAX_ANGULAR_SPEED,
                     new RecommendedSetting()
                     {
-                        property = physicsManager.FindProperty(ID_DEFAULT_MAX_ANGULAR_SPEED),
+                        property = _physicsManager.FindProperty(ID_DEFAULT_MAX_ANGULAR_SPEED),
                         recommended = "100",
                         description = "Allows you to rotate objects more closely to the hand tracking data"
                     }
@@ -125,7 +124,7 @@ public class ContactHandsSettings : ScriptableObject
                     ID_DEFAULT_CONTACT_OFFSET,
                     new RecommendedSetting()
                     {
-                        property = physicsManager.FindProperty(ID_DEFAULT_CONTACT_OFFSET),
+                        property = _physicsManager.FindProperty(ID_DEFAULT_CONTACT_OFFSET),
                         recommended = "0.001",
                         description = "Distance used by physics sim to generate collision contacts. "
                     }
@@ -134,7 +133,7 @@ public class ContactHandsSettings : ScriptableObject
                     ID_AUTO_SYNC_TRANSFORMS,
                     new RecommendedSetting()
                     {
-                        property = physicsManager.FindProperty(ID_AUTO_SYNC_TRANSFORMS),
+                        property = _physicsManager.FindProperty(ID_AUTO_SYNC_TRANSFORMS),
                         recommended = "False",
                         description = "Automatically update transform positions and rotations in the physics sim. If enabled, may cause jitter on rigidbodies when grabbed."
                     }
@@ -143,7 +142,7 @@ public class ContactHandsSettings : ScriptableObject
                     ID_CONTACTS_GENERATION,
                     new RecommendedSetting()
                     {
-                        property = physicsManager.FindProperty(ID_CONTACTS_GENERATION),
+                        property = _physicsManager.FindProperty(ID_CONTACTS_GENERATION),
                         recommended = "Persistent Contact Manifold",
                         description = "Recommended default by unity for generating contacts every physics frame."
                     }
@@ -152,7 +151,7 @@ public class ContactHandsSettings : ScriptableObject
                     ID_GRAVITY,
                     new RecommendedSetting()
                     {
-                        property = physicsManager.FindProperty(ID_GRAVITY),
+                        property = _physicsManager.FindProperty(ID_GRAVITY),
                         recommended = new Vector3(0, -4.905f, 0).ToString(),
                         description = "Makes things easier to manipulate with hands in VR"
                     }
@@ -161,7 +160,7 @@ public class ContactHandsSettings : ScriptableObject
                     ID_MAX_DEPEN_VEL,
                     new RecommendedSetting()
                     {
-                        property = physicsManager.FindProperty(ID_MAX_DEPEN_VEL),
+                        property = _physicsManager.FindProperty(ID_MAX_DEPEN_VEL),
                         //TODO confirm this is not actually 2!
                         recommended = "1",
                         description = "Reduces unwanted physics explosions"
@@ -171,7 +170,7 @@ public class ContactHandsSettings : ScriptableObject
                     ID_FRICTION_TYPE,
                     new RecommendedSetting()
                     {
-                        property = physicsManager.FindProperty(ID_FRICTION_TYPE),
+                        property = _physicsManager.FindProperty(ID_FRICTION_TYPE),
                         recommended = "Patch Friction Type",
                         description = "The most stable friction type unity provides"
                     }
@@ -180,7 +179,7 @@ public class ContactHandsSettings : ScriptableObject
                     ID_IMPROVED_PATCH_FRICTION,
                     new RecommendedSetting()
                     {
-                        property = physicsManager.FindProperty(ID_IMPROVED_PATCH_FRICTION),
+                        property = _physicsManager.FindProperty(ID_IMPROVED_PATCH_FRICTION),
                         recommended = "True",
                         description = "Guarantees static and dynamic friction do not exceed analytical results"
                     }
@@ -189,7 +188,7 @@ public class ContactHandsSettings : ScriptableObject
                     ID_BOUNCE_THRESHOLD,
                     new RecommendedSetting()
                     {
-                        property = physicsManager.FindProperty(ID_BOUNCE_THRESHOLD),
+                        property = _physicsManager.FindProperty(ID_BOUNCE_THRESHOLD),
                         recommended = "2",
                         description = "Reduces unwanted bounces."
                     }
@@ -198,7 +197,7 @@ public class ContactHandsSettings : ScriptableObject
                     ID_SOLVER_ITERATIONS,
                     new RecommendedSetting()
                     {
-                        property = physicsManager.FindProperty(ID_SOLVER_ITERATIONS),
+                        property = _physicsManager.FindProperty(ID_SOLVER_ITERATIONS),
                         recommended = "15",
                         description = "Improves physics system stability."
                     }
@@ -207,7 +206,7 @@ public class ContactHandsSettings : ScriptableObject
                     ID_SOLVER_VEL_ITERATIONS,
                     new RecommendedSetting()
                     {
-                        property = physicsManager.FindProperty(ID_SOLVER_VEL_ITERATIONS),
+                        property = _physicsManager.FindProperty(ID_SOLVER_VEL_ITERATIONS),
                         recommended = "5",
                         description = "Improves physics system velocity stability after a bounce.",
                         impactsPerformance = true
@@ -217,7 +216,7 @@ public class ContactHandsSettings : ScriptableObject
                     ID_ENHANCED_DETERMINISM,
                     new RecommendedSetting()
                     {
-                        property = physicsManager.FindProperty(ID_ENHANCED_DETERMINISM),
+                        property = _physicsManager.FindProperty(ID_ENHANCED_DETERMINISM),
                         recommended = "True",
                         description = "Reduce instability and randomness of the physics sim.",
                         impactsPerformance = true
@@ -227,7 +226,7 @@ public class ContactHandsSettings : ScriptableObject
                     ID_SOLVER_TYPE,
                     new RecommendedSetting()
                     {
-                        property = physicsManager.FindProperty(ID_SOLVER_TYPE),
+                        property = _physicsManager.FindProperty(ID_SOLVER_TYPE),
                         recommended = "Temporal Gauss Seidel",
                         description = "2021 only. Ensures that rotations for Hard Contact Hands are calculated correctly.",
                         impactsPerformance = true
@@ -237,7 +236,7 @@ public class ContactHandsSettings : ScriptableObject
                     ID_FIXED_TIMESTEP,
                     new RecommendedSetting()
                     {
-                        property = timeManager.FindProperty(ID_FIXED_TIMESTEP),
+                        property = _timeManager.FindProperty(ID_FIXED_TIMESTEP),
                         recommended = "0.011111",
                         description = "Makes your app physics run smoother.",
                         impactsPerformance = true
@@ -306,8 +305,8 @@ public class ContactHandsSettings : ScriptableObject
                 property.vector3Value = recommendedSetting.recommended.ToVector3();
                 break;
         }
-        physicsManager.ApplyModifiedProperties();
-        timeManager.ApplyModifiedProperties();
+        _physicsManager.ApplyModifiedProperties();
+        _timeManager.ApplyModifiedProperties();
     }
 
     #region Scriptable Object Setup
@@ -326,22 +325,22 @@ public class ContactHandsSettings : ScriptableObject
 
         if (ultraleapSettings != null)
         {
-            instance = ultraleapSettings;
-            return instance;
+            _instance = ultraleapSettings;
+            return _instance;
         }
 
         ContactHandsSettings[] settingsSO = Resources.FindObjectsOfTypeAll(typeof(ContactHandsSettings)) as ContactHandsSettings[];
 
         if (settingsSO != null && settingsSO.Length > 0)
         {
-            instance = settingsSO[0]; // Assume there is only one settings file
+            _instance = settingsSO[0]; // Assume there is only one settings file
         }
         else
         {
-            instance = CreateSettingsSO();
+            _instance = CreateSettingsSO();
         }
 
-        return instance;
+        return _instance;
     }
 
     static ContactHandsSettings CreateSettingsSO()
@@ -364,5 +363,3 @@ public class ContactHandsSettings : ScriptableObject
 #endif
     #endregion
 }
-
-
