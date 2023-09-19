@@ -33,13 +33,13 @@ namespace Leap.Unity
             // Fall through to the best available Leap Provider if none is assigned
             if (s_provider == null)
             {
-                s_provider = UnityEngine.Object.FindObjectOfType<PostProcessProvider>();
+                s_provider = UnityEngine.Object.FindAnyObjectByType<PostProcessProvider>();
                 if (s_provider == null)
                 {
-                    s_provider = UnityEngine.Object.FindObjectOfType<XRLeapProviderManager>();
+                    s_provider = UnityEngine.Object.FindAnyObjectByType<XRLeapProviderManager>();
                     if (s_provider == null)
                     {
-                        s_provider = UnityEngine.Object.FindObjectOfType<LeapProvider>();
+                        s_provider = UnityEngine.Object.FindAnyObjectByType<LeapProvider>();
                         if (s_provider == null)
                         {
                             Debug.Log("There are no Leap Providers in the scene, please assign one manually");

@@ -47,7 +47,7 @@ namespace Leap.Unity.Preview.HandRays
         {
             if (farFieldLayerManager == null)
             {
-                farFieldLayerManager = FindObjectOfType<FarFieldLayerManager>();
+                farFieldLayerManager = FindAnyObjectByType<FarFieldLayerManager>();
             }
 
             layerMask |= farFieldLayerManager.FarFieldObjectLayer.layerMask;
@@ -61,7 +61,7 @@ namespace Leap.Unity.Preview.HandRays
         {
             if (farFieldLayerManager == null)
             {
-                farFieldLayerManager = FindObjectOfType<FarFieldLayerManager>();
+                farFieldLayerManager = FindAnyObjectByType<FarFieldLayerManager>();
             }
         }
 
@@ -69,7 +69,7 @@ namespace Leap.Unity.Preview.HandRays
         {
             if (_handRay == null)
             {
-                _handRay = FindObjectOfType<WristShoulderHandRay>();
+                _handRay = FindAnyObjectByType<WristShoulderHandRay>();
                 if (_handRay == null)
                 {
                     Debug.LogWarning("HandRayInteractor needs a HandRay");

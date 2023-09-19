@@ -171,10 +171,10 @@ namespace Leap.Unity.Preview.Locomotion
 
             if (leapProvider == null)
             {
-                leapProvider = FindObjectOfType<LeapProvider>();
+                leapProvider = FindAnyObjectByType<LeapProvider>();
             }
 
-            _jumpGemTeleport = FindObjectOfType<JumpGemTeleport>(true);
+            _jumpGemTeleport = FindAnyObjectByType<JumpGemTeleport>(FindObjectsInactive.Include);
 
             if (_audioSource == null)
             {
