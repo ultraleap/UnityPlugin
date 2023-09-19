@@ -59,7 +59,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
             if (_provider == null)
             {
-                _provider = FindObjectOfType<PhysicsProvider>(true);
+                _provider = FindAnyObjectByType<PhysicsProvider>(FindObjectsInactive.Include);
             }
             if (_provider != null)
             {

@@ -129,7 +129,7 @@ namespace Leap.Unity.InputModule
             //Find and apply LSP/Camera if not already
             if (leapDataProvider == null)
             {
-                leapDataProvider = GameObject.FindObjectOfType<LeapProvider>();
+                leapDataProvider = GameObject.FindAnyObjectByType<LeapProvider>();
                 if (leapDataProvider == null || !leapDataProvider.isActiveAndEnabled)
                 {
                     Debug.LogError("Failed to find active LeapProvider", leapDataProvider);
