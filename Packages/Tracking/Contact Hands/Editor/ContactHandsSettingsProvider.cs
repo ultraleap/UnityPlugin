@@ -6,6 +6,7 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.UIElements;
 
+[InitializeOnLoad]
 public class ContactHandsSettingsProvider
 {
     static MultiColumnHeaderState columnState;
@@ -20,7 +21,7 @@ public class ContactHandsSettingsProvider
 
     private ContactHandsSettingsProvider()
     {
-
+        EditorApplication.delayCall += FirstLoad;
     }
 
     [SettingsProvider]
@@ -36,7 +37,6 @@ public class ContactHandsSettingsProvider
 
         provider.guiHandler += OnGUI;
         provider.activateHandler += OnActivate;
-        EditorApplication.delayCall += FirstLoad;
 
         return provider;
     }
@@ -45,7 +45,8 @@ public class ContactHandsSettingsProvider
     {
         // Unload so we don't keep trying do it over and over
         EditorApplication.delayCall -= FirstLoad;
-        if (!ContactHandsSettings.Instance.AllSettingsApplied())
+
+        if (ContactHandsSettings.Instance.showContactHandsSettingsOnStartup && !ContactHandsSettings.Instance.AllSettingsApplied())
         {
             SettingsService.OpenProjectSettings("Project/Ultraleap/Contact Hands");
         }

@@ -24,6 +24,7 @@ public class ContactHandsSettingsDrawer : Editor
 }
 #endif
 
+[Serializable]
 public class ContactHandsSettings : ScriptableObject
 {
     static ContactHandsSettings instance;
@@ -275,7 +276,10 @@ public class ContactHandsSettings : ScriptableObject
     {
         foreach (var key in recommendedSettings.Keys)
         {
-            ApplyRecommendedSetting(key);
+            if (!recommendedSettings[key].ignored)
+            {
+                ApplyRecommendedSetting(key);
+            }
         }
     }
 
