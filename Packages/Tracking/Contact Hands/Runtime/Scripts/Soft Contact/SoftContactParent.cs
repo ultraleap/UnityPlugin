@@ -10,12 +10,11 @@ namespace Leap.Unity.ContactHands
         [SerializeField, HideInInspector]
         private PhysicMaterial _physicsMaterial;
         public PhysicMaterial PhysicsMaterial => _physicsMaterial;
-        
+
         private SoftContactHand leftSoftContactHand => leftHand as SoftContactHand;
         private SoftContactHand rightSoftContactHand => rightHand as SoftContactHand;
 
 
-        #region Settings
         [SerializeField, Tooltip("The velocity that the hand will reduce down to, the further it gets away from the original data hand. " +
                 "Increasing this number will cause the hand to appear \"stronger\" when pushing into objects, if less stable.")]
         internal float minPalmVelocity = 50f;
@@ -39,7 +38,8 @@ namespace Leap.Unity.ContactHands
 
         internal float contactEnterDistance = 0.004f, contactExitDistance = 0.012f;
         internal float contactThumbEnterDistance = 0.005f, contactThumbExitDistance = 0.02f;
-        #endregion
+
+
 
 
         internal override void GenerateHands()
@@ -48,9 +48,10 @@ namespace Leap.Unity.ContactHands
             GenerateHandsObjects(typeof(SoftContactHand));
         }
 
-        internal override void PostFixedUpdateFrame()
+        internal override void PostFixedUpdateFrameLogic()
         {
         }
+
         private static PhysicMaterial CreateHandPhysicsMaterial()
         {
             PhysicMaterial material = new PhysicMaterial("HandPhysics");

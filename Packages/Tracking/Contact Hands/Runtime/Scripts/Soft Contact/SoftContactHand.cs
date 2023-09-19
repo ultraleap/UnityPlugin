@@ -11,78 +11,76 @@ namespace Leap.Unity.ContactHands
 
         private SoftContactParent softContactParent => contactParent as SoftContactParent;
 
-        private bool _hasReset = false;
         private int _resetCounter = 2, _teleportFrameCount = 10;
         private int _layerMask = 0;
+        private int _lastFrameTeleport;
+
+        private bool _wasGrabbing, _justGhosted;
+        private float _timeOnReset;
+        internal float currentResetLerp { get { return _timeOnReset == 0 ? 1 : Mathf.InverseLerp(0.1f, 0.25f, Time.time - _timeOnReset); } }
+
+        private float _overallFingerDisplacement = 0f, _averageFingerDisplacement = 0f, _contactFingerDisplacement = 0f;
+        public float FingerDisplacement => _overallFingerDisplacement;
+        public float FingerAverageDisplacement => _averageFingerDisplacement;
+        public float FingerContactDisplacement => _contactFingerDisplacement;
+
+        // Interpolate back in displacement values after the hand has just released
+        private float _displacementGrabCooldown = 0.25f, _displacementGrabCooldownCurrent = 0f;
+
+
 
         #region Settings
-
         internal float currentPalmVelocity, currentPalmAngularVelocity;
         internal float currentPalmVelocityInterp, currentPalmWeightInterp;
 
+        internal Vector3 computedPhysicsPosition;
+        internal Quaternion computedPhysicsRotation;
         internal float computedHandDistance;
 
-        internal float graspingWeight, currentPalmWeight, fingerDisplacement;
-        internal float currentResetLerp;
+        internal float graspingWeight, currentPalmWeight;
 
         internal int[] grabbingFingers;
-        internal float[] grabbingFingerDistances;
+        internal float[] grabbingFingerDistances, fingerStiffness;
         #endregion
 
-        protected override void ProcessOutputHand()
+
+        protected override void ProcessOutputHand(ref Hand modifiedHand)
         {
+            modifiedHand.CopyFrom(dataHand);
         }
 
         internal override void BeginHand(Hand hand)
         {
-            if (!resetting)
-            {
-                _resetCounter = RESET_FRAME_COUNT;
-                _hasReset = false;
-                resetting = true;
-                tracked = true;
-                _teleportFrameCount = RESET_FRAME_TELEPORT_COUNT;
-                ghosted = true;
-                for (int i = 0; i < 32; i++)
-                {
-                    if (!Physics.GetIgnoreLayerCollision(contactManager.HandsLayer, i))
-                    {
-                        _layerMask = _layerMask | 1 << i;
-                    }
-                }
-                gameObject.SetActive(true);
-            }
-            else
-            {
-
-            }
+            gameObject.SetActive(true);
+            _oldDataPosition = hand.PalmPosition;
+            _oldDataRotation = hand.Rotation;
+            _velocity = Vector3.zero;
+            _angularVelocity = Vector3.zero;
+            tracked = true;
         }
 
         internal override void FinishHand()
         {
             tracked = false;
-            resetting = false;
+            _velocity = Vector3.zero;
+            _angularVelocity = Vector3.zero;
+            ResetSoftContactHand();
             gameObject.SetActive(false);
-            ResetSoftContactHand(false);
-        }
-
-        private void ResetSoftContactHand(bool active)
-        {
-            ChangeHandLayer(contactManager.HandsResetLayer);
         }
 
         internal override void GenerateHandLogic()
         {
             grabbingFingerDistances = new float[FINGERS];
             grabbingFingers = new int[FINGERS];
+            fingerStiffness = new float[FINGERS];
 
             GenerateHandObjects(typeof(SoftContactBone));
 
-            ((SoftContactBone)palmBone).SetupBoneBody();
+            ((SoftContactBone)palmBone).SetupBone();
             // Set the colliders to ignore eachother
             foreach (var bone in bones)
             {
-                ((SoftContactBone)bone).SetupBoneBody();
+                ((SoftContactBone)bone).SetupBone();
                 Physics.IgnoreCollision(palmBone.palmCollider, bone.boneCollider);
 
                 foreach (var bone2 in bones)
@@ -95,69 +93,48 @@ namespace Leap.Unity.ContactHands
             }
         }
 
-        private void ResetHand()
+        private void ResetSoftContactHand()
         {
-            ContactUtils.SetupPalmCollider(palmBone.palmCollider, dataHand);
-
-            for (int fingerIndex = 0; fingerIndex < FINGERS; fingerIndex++)
+            _lastFrameTeleport = Time.frameCount;
+            ghosted = true;
+            ChangeHandLayer(contactManager.HandsResetLayer);
+            if (gameObject.activeInHierarchy)
             {
-                Bone knuckleBone = dataHand.Fingers[fingerIndex].Bone(0);
+                CacheHandData(dataHand);
 
-                for (int jointIndex = 0; jointIndex < FINGER_BONES; jointIndex++)
+                currentPalmVelocity = softContactParent.maxPalmVelocity;
+                currentPalmVelocity = softContactParent.maxPalmVelocity;
+
+                ((SoftContactBone)palmBone).ResetPalm();
+
+                for (int fingerIndex = 0; fingerIndex < FINGERS; fingerIndex++)
                 {
-                    Bone prevBone = dataHand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex));
-                    Bone bone = dataHand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex + 1)); // +1 to skip first bone.
-
-                    int boneArrayIndex = fingerIndex * FINGER_BONES + jointIndex;
-
-                    if (jointIndex == 0)
+                    fingerStiffness[fingerIndex] = softContactParent.boneStiffness;
+                    for (int jointIndex = 0; jointIndex < FINGER_BONES; jointIndex++)
                     {
-                        bones[boneArrayIndex].transform.position = fingerIndex == 0 ? knuckleBone.PrevJoint : knuckleBone.NextJoint;
-                    }
-                    else
-                    {
-                        bones[boneArrayIndex].transform.localPosition = transform.InverseTransformPoint(prevBone.PrevJoint);
-                    }
+                        Bone prevBone = dataHand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex));
+                        Bone bone = dataHand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex + 1)); // +1 to skip first bone.
 
-                    bones[boneArrayIndex].transform.rotation = knuckleBone.Rotation;
+                        int boneArrayIndex = fingerIndex * FINGER_BONES + jointIndex;
 
-                    if (bones[boneArrayIndex].transform.parent != null)
-                    {
-                        bones[boneArrayIndex].transform.localScale = new Vector3(
-                            1f / bones[boneArrayIndex].transform.parent.lossyScale.x,
-                            1f / bones[boneArrayIndex].transform.parent.lossyScale.y,
-                            1f / bones[boneArrayIndex].transform.parent.lossyScale.z);
-                    }
-
-                    ContactUtils.SetupBoneCollider(bones[boneArrayIndex].boneCollider, bone);
-
-                    // Move the anchor positions to account for hand sizes
-                    if (jointIndex > 0)
-                    {
-                        ((SoftContactBone)bones[boneArrayIndex]).articulationBody.parentAnchorPosition = ContactUtils.InverseTransformPoint(prevBone.PrevJoint, prevBone.Rotation, bone.PrevJoint);
-                        ((SoftContactBone)bones[boneArrayIndex]).articulationBody.parentAnchorRotation = Quaternion.identity;
-                    }
-                    else
-                    {
-                        ((SoftContactBone)bones[boneArrayIndex]).articulationBody.parentAnchorPosition = ContactUtils.InverseTransformPoint(dataHand.PalmPosition, dataHand.Rotation, knuckleBone.NextJoint);
-                        if (fingerIndex == 0)
-                        {
-                            ((SoftContactBone)bones[boneArrayIndex]).articulationBody.parentAnchorRotation = Quaternion.Euler(0,
-                                dataHand.IsLeft ? ContactUtils.HAND_ROTATION_OFFSET_Y : -ContactUtils.HAND_ROTATION_OFFSET_Y,
-                                dataHand.IsLeft ? ContactUtils.HAND_ROTATION_OFFSET_Z : -ContactUtils.HAND_ROTATION_OFFSET_Z);
-                        }
+                        ((SoftContactBone)bones[boneArrayIndex]).ResetBone(prevBone, bone);
                     }
                 }
+                palmBone.gameObject.SetActive(false);
+                palmBone.gameObject.SetActive(true);
             }
         }
 
-        internal override void PostFixedUpdateHand()
+
+        internal override void PostFixedUpdateHandLogic()
         {
+            // Don't need to do anything here
         }
 
         protected override void UpdateHandLogic(Hand hand)
         {
-
+            _velocity = ContactUtils.ToLinearVelocity(_oldDataPosition, hand.PalmPosition, Time.fixedDeltaTime);
+            _angularVelocity = ContactUtils.ToAngularVelocity(_oldDataRotation, hand.Rotation, Time.fixedDeltaTime);
         }
     }
 }
