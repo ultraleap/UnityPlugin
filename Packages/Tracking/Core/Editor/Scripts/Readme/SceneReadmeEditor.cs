@@ -37,7 +37,7 @@ namespace Leap.Unity.Readme
             ChangedScene(EditorSceneManager.GetActiveScene(), OpenSceneMode.Single);
         }
 
-        [MenuItem("Ultraleap/Show Readme For Scene")]
+        [MenuItem("Ultraleap/Show Readme For Scene", false, 51)]
         public static void SelectSceneReadmeDropdown()
         {
             SelectSceneReadme();
