@@ -33,7 +33,14 @@ namespace Leap.Unity.ContactHands
         {
             GenerateHandObjects(typeof(NoContactBone));
             isHandPhysical = false;
-        }
+
+            foreach(var bone in bones)
+            {
+                bone.boneCollider.isTrigger = true;
+            }
+
+            palmBone.palmCollider.isTrigger = true;
+    }
 
         internal override void PostFixedUpdateHandLogic()
         {

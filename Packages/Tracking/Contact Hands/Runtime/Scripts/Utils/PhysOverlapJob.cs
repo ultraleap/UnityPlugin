@@ -1,4 +1,4 @@
-#if UNITY_2022_3_OR_NEWER
+#if UNITY_2023_3_OR_NEWER
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Jobs;
@@ -163,7 +163,7 @@ namespace Leap.Unity.ContactHands
             Vector3 halfExtents = this.halfExtents[index];
 
 
-#if UNITY_2022_3_OR_NEWER
+#if UNITY_2023_3_OR_NEWER
                 this.sphereCommands[index] = new SpherecastCommand(
                     origin, radius, direction, new QueryParameters(layerMask: layerMask, hitTriggers: QueryTriggerInteraction.Ignore), distance: distance);
 #else

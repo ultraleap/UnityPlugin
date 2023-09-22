@@ -82,6 +82,7 @@ namespace Leap.Unity.ContactHands
             fingerStiffness = new float[FINGERS];
 
             GenerateHandObjects(typeof(SoftContactBone));
+            isHandPhysical = false;
 
             ((SoftContactBone)palmBone).SetupBone();
             palmBone.gameObject.AddComponent<Rigidbody>().useGravity = false;

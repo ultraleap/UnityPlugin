@@ -138,7 +138,7 @@ namespace Leap.Unity.ContactHands
 
         private void UpdateHandOverlaps(ContactHand hand)
         {
-#if UNITY_2022_3_OR_NEWER
+#if UNITY_2023_3_OR_NEWER
             // batch the jobs here
 #else
             HandOverlaps(hand);
@@ -243,7 +243,7 @@ namespace Leap.Unity.ContactHands
                 _physicsSyncTime = Time.time;
             }
 
-#if UNITY_2022_3_OR_NEWER
+#if UNITY_2023_3_OR_NEWER
             // Add burst jobs in here
 #else
             // Pre 2022 overlaps
@@ -381,7 +381,7 @@ namespace Leap.Unity.ContactHands
             return false;
         }
 
-#if UNITY_2022_3_OR_NEWER
+#if UNITY_2023_3_OR_NEWER
         private void UpdateSafetyOverlapJobs()
         {
             JobHandle combinedHandle = default;

@@ -35,20 +35,29 @@ namespace Leap.Unity.ContactHands
         #region Updating
         internal override void UpdatePalmBone(Hand hand)
         {
-            transform.position = hand.PalmPosition;
-            transform.rotation = hand.Rotation;
+            if(contactHand.IsGrabbing)
+                Collider.isTrigger = true;
+            else
+                Collider.isTrigger = false;
+
             width = hand.PalmWidth;
             palmThickness = hand.Fingers[2].Bone(0).Width;
             tipPosition = hand.CalculateAverageKnucklePosition();
             wristPosition = hand.WristPosition;
             length = Vector3.Distance(tipPosition, wristPosition);
+
+            UpdateWithInteractionEngineLogic(hand.PalmPosition, hand.Rotation);
+
             ContactUtils.SetupPalmCollider(palmCollider, hand);
         }
 
         internal override void UpdateBone(Bone prevBone, Bone bone)
         {
-            //transform.position = bone.PrevJoint;
-            //transform.rotation = bone.Rotation;
+            if (contactHand.IsGrabbing)
+                Collider.isTrigger = true;
+            else
+                Collider.isTrigger = false;
+
             tipPosition = bone.NextJoint;
             width = bone.Width;
             length = bone.Length;

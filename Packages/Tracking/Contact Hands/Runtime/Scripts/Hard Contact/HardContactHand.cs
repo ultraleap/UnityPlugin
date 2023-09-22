@@ -15,8 +15,8 @@ namespace Leap.Unity.ContactHands
         private int _layerMask = 0;
         private int _lastFrameTeleport;
 
-        private bool _wasGrabbing, _justGhosted;
-        private float _timeOnReset;
+        protected bool _wasGrabbing, _justGhosted;
+        protected float _timeOnReset;
         internal float currentResetLerp { get { return _timeOnReset == 0 ? 1 : Mathf.InverseLerp(0.1f, 0.25f, Time.time - _timeOnReset); } }
 
         private float _overallFingerDisplacement = 0f, _averageFingerDisplacement = 0f, _contactFingerDisplacement = 0f;
@@ -315,7 +315,7 @@ namespace Leap.Unity.ContactHands
                         break;
                     }
 
-                    if (((HardContactBone)bones[boneArrayIndex]).BoneOverRotationCheck())
+                    if (((HardContactBone)bones[boneArrayIndex]).BoneOverRotationCheck(eulerThreshold))
                     {
                         return true;
                     }
