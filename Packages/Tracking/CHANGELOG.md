@@ -6,18 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
 
-## [6.12.1] - xx/xx/xx
+## [6.12.1] - 28/09/23
 
 ### Tracking Client versions
 - Windows 	v5.16.0
 - MacOS 	v5.16.0
 - Android 	v5.16.0
-
-### Added
-- 
-
-### Changed
-- 
 
 ### Fixed
 - (leapXRServiceProvider) Hands offset incorrectly on Windows when using Leap 2
@@ -28,7 +22,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Currently the Ultraleap Hand Tracking feature for OpenXR requires the New and Legacy input systems to be enabled, to simultaneously use OpenXR and the Ultraleap Unity Plugin's features.
 - The OpenXR Leap Provider does not currently support the `Confidence` hand property (and will return fixed values)
 - After using Ultraleap OpenXR in Unity Editor, the tracking mode of device 0 will be set to HMD until the Unity Editor session ends. This can stop the testing of non-XR scenes until the Unity Editor is re-opened
-- The OpenXR Leap Provider palm can be in unexpected position when using pre-1.4.3 OpenXR Layer. A workaround is to ensure you use 1.4.3 or newer - installed by the 5.12.0 or newer Tracking Service Installer
 - Running both the Ultraleap XRHands Subsystem and another XRHands Subsystem at the same time causes unstable results. Only enable one at a time.
 
 
