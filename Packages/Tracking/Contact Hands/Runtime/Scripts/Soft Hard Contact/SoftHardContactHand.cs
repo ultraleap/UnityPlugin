@@ -16,7 +16,7 @@ namespace Leap.Unity.ContactHands
                 foreach (var col in colliders)
                     col.isTrigger = false;
 
-                // TODO: do teleporting here because the collider might be inside the object
+                ResetHand();
             }
 
             if (isGrabbing && !_wasGrabbing)
@@ -26,14 +26,22 @@ namespace Leap.Unity.ContactHands
                 foreach (var col in colliders)
                     col.isTrigger = true;
             }
-
             base.UpdateHandLogic(hand);
+        }
+
+        private void ResetHand()
+        {
+            ResetHardContactHand();
+            // Don't need to wait for the hand to reset as much here
+            _teleportFrameCount = 0;
+
+            ghosted = true;
+            _justGhosted = true;
         }
 
         protected override void ProcessOutputHand(ref Hand modifiedHand)
         {
             modifiedHand = modifiedHand.CopyFrom(dataHand);
-            return;
         }
     }
 }
