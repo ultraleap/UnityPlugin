@@ -130,9 +130,18 @@ namespace Leap.Unity.ContactHands
         internal void ProcessColliderQueue()
         {
             // Remove old hovers
-            foreach (var key in _hoverObjects.Keys)
+            for (int i = 0; i < _hoverObjects.Keys.Count; i++)
             {
-                _hoverObjects[key].RemoveWhere(RemoveHoverQueue);
+                //_hoverObjects[_hoverObjects.Keys.ElementAt(i)].RemoveWhere(RemoveHoverQueue);
+
+                Rigidbody hoverRigidbody = _hoverObjects.Keys.ElementAt(i);
+
+                if (_hoverObjects[hoverRigidbody].Count == 0)
+                {
+                    _hoverObjects.Remove(hoverRigidbody);
+                    _hoverDirections.Remove(hoverRigidbody);
+                    i--;
+                }
             }
 
             // Add new hovers
@@ -140,7 +149,7 @@ namespace Leap.Unity.ContactHands
             {
                 Rigidbody rb = _hoverQueue[i].attachedRigidbody;
 
-                if (_hoverObjects.TryGetValue(rb, out var temp))
+                if (_hoverObjects.ContainsKey(rb))
                 {
                     if (!_hoverObjects[rb].Contains(_hoverQueue[i]))
                     {
@@ -172,27 +181,20 @@ namespace Leap.Unity.ContactHands
 
             }
 
-            // Remove empty entries
-            var badKeys = _hoverObjects.Where(pair => pair.Value.Count == 0)
-                        .Select(pair => pair.Key)
-                        .ToList();
-            foreach (var oldRigid in badKeys)
-            {
-                _hoverObjects.Remove(oldRigid);
-                _hoverDirections.Remove(oldRigid);
-
-                //if (oldRigid != null && oldRigid.TryGetComponent<IPhysicsBoneHover>(out var physicsHandGrab))
-                //{
-                //    physicsHandGrab.OnBoneHoverExit(this);
-                //}
-            }
-
             _hoverQueueCount = 0;
 
             // Remove old contacts
-            foreach (var key in _contactObjects.Keys)
+            for (int i = 0; i < _contactObjects.Keys.Count; i++)
             {
-                _contactObjects[key].RemoveWhere(RemoveContactQueue);
+                //_contactObjects[_hoverObjects.Keys.ElementAt(i)].RemoveWhere(RemoveContactQueue);
+
+                Rigidbody contactRigidbody = _contactObjects.Keys.ElementAt(i);
+
+                if (_contactObjects[contactRigidbody].Count == 0)
+                {
+                    _contactObjects.Remove(contactRigidbody);
+                    i--;
+                }
             }
 
             // Add new contacts
@@ -216,19 +218,6 @@ namespace Leap.Unity.ContactHands
                     //    physicsHandGrab.OnBoneContact(this);
                     //}
                 }
-            }
-
-            // Remove empty entries
-            badKeys = _contactObjects.Where(pair => pair.Value.Count == 0)
-                        .Select(pair => pair.Key)
-                        .ToList();
-            foreach (var oldRigid in badKeys)
-            {
-                _contactObjects.Remove(oldRigid);
-                //if (oldRigid != null && oldRigid.TryGetComponent<IPhysicsBoneContact>(out var physicsHandGrab))
-                //{
-                //    physicsHandGrab.OnBoneContactExit(this);
-                //}
             }
 
             _contactQueueCount = 0;
