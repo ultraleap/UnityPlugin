@@ -132,7 +132,7 @@ namespace Leap.Unity.ContactHands
             // Remove old hovers
             for (int i = 0; i < _hoverObjects.Keys.Count; i++)
             {
-                //_hoverObjects[_hoverObjects.Keys.ElementAt(i)].RemoveWhere(RemoveHoverQueue);
+                _hoverObjects[_hoverObjects.Keys.ElementAt(i)].RemoveWhere(RemoveHoverQueue);
 
                 Rigidbody hoverRigidbody = _hoverObjects.Keys.ElementAt(i);
 
@@ -186,7 +186,7 @@ namespace Leap.Unity.ContactHands
             // Remove old contacts
             for (int i = 0; i < _contactObjects.Keys.Count; i++)
             {
-                //_contactObjects[_hoverObjects.Keys.ElementAt(i)].RemoveWhere(RemoveContactQueue);
+                _contactObjects[_hoverObjects.Keys.ElementAt(i)].RemoveWhere(RemoveContactQueue);
 
                 Rigidbody contactRigidbody = _contactObjects.Keys.ElementAt(i);
 
