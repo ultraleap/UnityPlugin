@@ -14,10 +14,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Android 	v5.16.0
 
 ### Added
-- 
+- (Pose Detector) Add a new rule type to match rotation of a joint to a target
 
 ### Changed
-- 
+- Changed from using obsolete FindObjectOfType to using newer implementations
+- (Preview Teleportation) Lightweight Pinch Detector's finger detection can be configured
+- Ultraleap settings are now in the project settings window, under "Ultraleap" 
 
 ### Fixed
 - 

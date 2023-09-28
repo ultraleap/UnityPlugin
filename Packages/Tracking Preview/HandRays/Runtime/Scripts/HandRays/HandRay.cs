@@ -61,10 +61,10 @@ namespace Leap.Unity.Preview.HandRays
 
             if (leapProvider == null)
             {
-                leapProvider = FindObjectOfType<LeapServiceProvider>();
+                leapProvider = FindAnyObjectByType<LeapServiceProvider>();
                 if (leapProvider == null)
                 {
-                    leapProvider = FindObjectOfType<LeapProvider>();
+                    leapProvider = FindAnyObjectByType<LeapProvider>();
                     if (leapProvider == null)
                     {
                         Debug.LogWarning("No leap provider in scene - HandRay is dependent on one.");
