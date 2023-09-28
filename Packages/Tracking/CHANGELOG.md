@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - (Pose Detector) Add a new rule type to match rotation of a joint to a target
+- Help Menu that links out to docs, a place to report bugs & places to get support
 
 ### Changed
 - Changed from using obsolete FindObjectOfType to using newer implementations
