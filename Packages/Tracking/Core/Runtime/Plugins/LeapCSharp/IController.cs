@@ -24,7 +24,7 @@ namespace Leap
         long Now();
 
         bool IsConnected { get; }
-        Config Config { get; }
+
         DeviceList Devices { get; }
 
         event EventHandler<ConnectionEventArgs> Connect;
