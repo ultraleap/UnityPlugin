@@ -1052,6 +1052,9 @@ namespace LeapInternal
         [DllImport("LeapC", EntryPoint = "LeapGetDeviceInfo", CharSet = CharSet.Ansi)]
         public static extern eLeapRS GetDeviceInfo(IntPtr hDevice, ref LEAP_DEVICE_INFO info);
 
+        [DllImport("LeapC", EntryPoint = "LeapDeviceTransformAvailable")]
+        public static extern bool GetDeviceTransformAvailable(IntPtr hDevice);
+
         [DllImport("LeapC", EntryPoint = "LeapGetDeviceTransform")]
         public static extern eLeapRS GetDeviceTransform(IntPtr hDevice, [MarshalAs(UnmanagedType.LPArray, SizeConst = 16)] float[] transform);
 

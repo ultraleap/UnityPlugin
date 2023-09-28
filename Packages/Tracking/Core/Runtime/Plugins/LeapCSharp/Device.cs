@@ -263,6 +263,15 @@ namespace Leap
                     return devicePose;
                 }
 
+                bool deviceTransformAvailable = LeapC.GetDeviceTransformAvailable(Handle);
+
+                if (!deviceTransformAvailable)
+                {
+                    devicePose = Pose.identity;
+                    poseSet = true;
+                    return Pose.identity;
+                }
+
                 float[] data = new float[16];
                 eLeapRS result = LeapC.GetDeviceTransform(Handle, data);
 
