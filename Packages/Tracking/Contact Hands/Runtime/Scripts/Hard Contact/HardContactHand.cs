@@ -7,7 +7,7 @@ namespace Leap.Unity.ContactHands
 {
     public class HardContactHand : ContactHand
     {
-        protected const int RESET_FRAME_COUNT = 2, TELEPORT_FRAME_COUNT = 5, RESET_FRAME_TELEPORT_COUNT = 10;
+        protected int RESET_FRAME_COUNT = 2, TELEPORT_FRAME_COUNT = 5, RESET_FRAME_TELEPORT_COUNT = 10;
 
         private HardContactParent hardContactParent => contactParent as HardContactParent;
 
