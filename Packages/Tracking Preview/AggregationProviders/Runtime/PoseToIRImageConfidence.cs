@@ -5,22 +5,52 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Hand = Leap.Hand;
 using Vector2 = UnityEngine.Vector2;
 using Vector3 = UnityEngine.Vector3;
 
+/// <summary>
+/// Stores information about the confidence in the pose of each finger inthe hand, based on the tip location
+/// </summary>
 public class TipConfidences
 {
-    public HandTipConfidences LeftConfidence = new HandTipConfidences();
-    public HandTipConfidences RightConfidence = new HandTipConfidences();
+    public HandFingerConfidences LeftConfidence = new HandFingerConfidences();
+    public HandFingerConfidences RightConfidence = new HandFingerConfidences();
 }
 
-public class HandTipConfidences
+/// <summary>
+/// Stores confidence info for a finger. 
+/// </summary>
+public class FingerConfidence
 {
-    public (float confidence, Vector3 lastGoodPosition_LeapSpace_proximal, Vector3 lastGoodPosition_LeapSpace_intermediate, Vector3 lastGoodPosition_LeapSpace_distal, Vector3 lastGoodPosition_PixelSpace) ThumbTip;
-    public (float confidence, Vector3 lastGoodPosition_LeapSpace_proximal, Vector3 lastGoodPosition_LeapSpace_intermediate, Vector3 lastGoodPosition_LeapSpace_distal, Vector3 lastGoodPosition_PixelSpace) IndexTip;
-    public (float confidence, Vector3 lastGoodPosition_LeapSpace_proximal, Vector3 lastGoodPosition_LeapSpace_intermediate, Vector3 lastGoodPosition_LeapSpace_distal, Vector3 lastGoodPosition_PixelSpace) MiddleTip;
-    public (float confidence, Vector3 lastGoodPosition_LeapSpace_proximal, Vector3 lastGoodPosition_LeapSpace_intermediate, Vector3 lastGoodPosition_LeapSpace_distal, Vector3 lastGoodPosition_PixelSpace) RingTip;
-    public (float confidence, Vector3 lastGoodPosition_LeapSpace_proximal, Vector3 lastGoodPosition_LeapSpace_intermediate, Vector3 lastGoodPosition_LeapSpace_distal, Vector3 lastGoodPosition_PixelSpace) PinkyTip;
+    /// <summary>
+    /// A value indicating how confident we currently are in the finger pose
+    /// </summary>
+    public float Confidence;
+
+    /// <summary>
+    /// timestamp of the last good data (high confidence data)
+    /// </summary>
+    public long Timestamp;
+
+    /// <summary>
+    /// Finger pose captured when we last had confidence in the pose
+    /// </summary>
+    public Finger LastConfidentPositionForFinger_LeapSpace = new Finger();
+
+    /// <summary>
+    /// Location in the IR image of the sampling point when we last had high confidence in the pose
+    /// </summary>
+    public Vector2 LastConfidentPosition_PixelSpace;
+}
+
+public class HandFingerConfidences
+{
+    public FingerConfidence Thumb = new FingerConfidence();
+    public FingerConfidence Index = new FingerConfidence();
+    public FingerConfidence Middle = new FingerConfidence();
+    public FingerConfidence Ring = new FingerConfidence();
+    public FingerConfidence Pinky = new FingerConfidence();
 }                                                               
 
 public enum FingerTipName
@@ -32,9 +62,41 @@ public enum FingerTipName
     PinkyFinger = 4
 }
 
+public enum JointName
+{
+    Palm = 0,
+    Wrist = 1,
+    ThumbMetacarpal = 2,
+    ThumbProximal = 3,
+    ThumbDistal = 4,
+    ThumbTip = 5,
+    IndexMetacarpal = 6,
+    IndexProximal = 7,
+    IndexIntermediate = 8,
+    IndexDistal = 9,
+    IndexTip = 10,
+    MiddleMetacarpal = 11,
+    MiddleProximal = 12,
+    MiddleIntermediate = 13,
+    MiddleDistal = 14,
+    MiddleTip = 15,
+    RingMetacarpal = 16,
+    RingProximal = 17,
+    RingIntermediate = 18,
+    RingDistal = 19,
+    RingTip = 20,
+    LittleMetacarpal = 21,
+    LittleProximal = 22,
+    LittleIntermediate = 23,
+    LittleDistal = 24,
+    LittleTip = 25,
+    Elbow = 26
+}
+
+
 /// <summary>
-/// Use the coorelation between the hand pose and the IR image at the projects fingertup locations
-/// to determine a confidence in the position of the digits in the returned pose.
+/// Uses the coorelation between the hand pose and the IR image at the projected fingertup locations
+/// to determine a confidence in the position of the fingers in the returned pose.
 /// </summary>
 public class PoseToIRImageConfidence : MonoBehaviour
 {
@@ -84,9 +146,10 @@ public class PoseToIRImageConfidence : MonoBehaviour
 
     private List<(Vector3 position, FingerTipName fingerName, Chirality hand)> tips_LeapUnits = new List<(Vector3, FingerTipName, Chirality)>();
 
-    private Dictionary<(FingerTipName fingerName, Chirality hand), Vector3> fingerPositionCacheDistal = new Dictionary<(FingerTipName fingerName, Chirality hand), Vector3>();
-    private Dictionary<(FingerTipName fingerName, Chirality hand), Vector3> fingerPositionCacheIntermediate = new Dictionary<(FingerTipName fingerName, Chirality hand), Vector3>();
-    private Dictionary<(FingerTipName fingerName, Chirality hand), Vector3> fingerPositionCacheProximal = new Dictionary<(FingerTipName fingerName, Chirality hand), Vector3>();
+    private Hand handWhenConfidenceEvaluated_Left = new Hand();
+    private long timestampWhenConfidenceEvaluated_Left;
+    private Hand handWhenConfidenceEvaluated_Right = new Hand();
+    private long timestampWhenConfidenceEvaluated_Right;
 
     private List<(Vector2 position, FingerTipName fingerName, Chirality hand)> tipPixels = new List<(Vector2, FingerTipName, Chirality)>();
 
@@ -123,22 +186,26 @@ public class PoseToIRImageConfidence : MonoBehaviour
 
     private void LeapController_RawFrameReady(object sender, RawFrameEventArgs e)
     {
-        fingerPositionCacheIntermediate.Clear();
-        fingerPositionCacheDistal.Clear();    
-        fingerPositionCacheProximal.Clear();
-
         tips_LeapUnits.Clear();
         tipPixels.Clear();
 
-        if (e.HasLeftHand)
+        if (leapProvider != null)
         {
-            UpdateFingerTipsRaw(e.LeftHand);
-        }
+            if (e.HasLeftHand)
+            {
+                Hand currentHand = leapProvider.GetHand(Chirality.Left);
+                handWhenConfidenceEvaluated_Left = CopyFromOtherExtensions.CopyFrom(handWhenConfidenceEvaluated_Left, currentHand); // LeapCExt.CopyFrom(handWhenConfidenceEvaluated_Left, ref h, (long)1);
+                timestampWhenConfidenceEvaluated_Left = leapProvider.CurrentFrame.Timestamp;
+                UpdateFingerTipsRaw(e.LeftHand);
+            }
 
-        if (e.HasRightHand)
-        {
-            UpdateFingerTipsRaw(e.RightHand);
- 
+            if (e.HasRightHand)
+            {
+                var currentHand = leapProvider.GetHand(Chirality.Right);
+                handWhenConfidenceEvaluated_Right = CopyFromOtherExtensions.CopyFrom(handWhenConfidenceEvaluated_Right, currentHand); // LeapCExt.CopyFrom(handWhenConfidenceEvaluated_Right, ref h,(long) 1);
+                timestampWhenConfidenceEvaluated_Right = leapProvider.CurrentFrame.Timestamp;
+                UpdateFingerTipsRaw(e.RightHand);
+            }
         }
     }
 
@@ -178,12 +245,6 @@ public class PoseToIRImageConfidence : MonoBehaviour
                 tips_LeapUnits.Add((ScaleBackFromDistal(hand.index.distal), FingerTipName.IndexFinger, chirality));
                 tips_LeapUnits.Add((ScaleBackFromDistal(hand.thumb.distal), FingerTipName.Thumb, chirality));
             }
-
-            AddFingerToCache(Leap.Finger.FingerType.TYPE_THUMB, chirality);
-            AddFingerToCache(Leap.Finger.FingerType.TYPE_INDEX, chirality);
-            AddFingerToCache(Leap.Finger.FingerType.TYPE_MIDDLE, chirality);
-            AddFingerToCache(Leap.Finger.FingerType.TYPE_RING, chirality);
-            AddFingerToCache(Leap.Finger.FingerType.TYPE_PINKY, chirality);
         }
 
         return tips_LeapUnits;
@@ -222,18 +283,6 @@ public class PoseToIRImageConfidence : MonoBehaviour
             Vector3 boneV = AsVector3(endBone.prev_joint) - AsVector3(endBone.next_joint);
             boneV.Scale(new Vector3(TipOffset_cm, TipOffset_cm, TipOffset_cm));
             return AsVector3(endBone.next_joint) + boneV;
-        }
-
-        void AddFingerToCache(Finger.FingerType type, Chirality chirality)
-        {
-            Hand hand = leapProvider.GetHand(chirality);
-
-            if (hand != null)
-            {
-                fingerPositionCacheDistal.Add((FingerTypeToName(type), chirality), hand.Fingers[(int)type].Bone(Bone.BoneType.TYPE_DISTAL).NextJoint);
-                fingerPositionCacheIntermediate.Add((FingerTypeToName(type), chirality), hand.Fingers[(int)type].Bone(Bone.BoneType.TYPE_INTERMEDIATE).NextJoint);
-                fingerPositionCacheProximal.Add((FingerTypeToName(type), chirality), hand.Fingers[(int)type].Bone(Bone.BoneType.TYPE_PROXIMAL).NextJoint);
-            }
         }
     }
 
@@ -300,11 +349,7 @@ public class PoseToIRImageConfidence : MonoBehaviour
 
                 if (generateImageVisuals)
                 {
-                    Color confidenceColor = Color.green;
-                    if (pixel.fingerName == FingerTipName.Thumb)
-                    {
-                        confidenceColor = Color.Lerp(Color.red, Color.green, confidence);
-                    }
+                    Color confidenceColor = Color.Lerp(Color.red, Color.green, confidence);
 
                     for (int x = Math.Max(0, (int)pixel.position.x - 1); x < Math.Min(image.Width, (int)pixel.position.x + 1); x++)
                     {
@@ -316,101 +361,106 @@ public class PoseToIRImageConfidence : MonoBehaviour
                 }
 
                 bool highTipConfidence = averagePixelIntensity > LastKnownGoodPositionConfidencePixelThreshold;
-                Vector2? lastKnownGoodPos = null;
+                Vector2? lastKnownGoodPos_PixelSpace = null;
 
-                HandTipConfidences handConfidences = TipConfidence.RightConfidence;
+                HandFingerConfidences handConfidences = TipConfidence.RightConfidence;
+                Hand handPoseWhenConfidenceEvaluated = handWhenConfidenceEvaluated_Right;
+                long timestampWhenPoseEvaluated = timestampWhenConfidenceEvaluated_Right;
+
                 if (pixel.hand == Chirality.Left)
-                    handConfidences = TipConfidence.LeftConfidence;
-
-                switch (pixel.fingerName)
                 {
-                    case FingerTipName.Thumb:
-                        handConfidences.ThumbTip.confidence = confidence;
-                        if (highTipConfidence)
-                        {
-                            handConfidences.ThumbTip.lastGoodPosition_PixelSpace = pixel.position;
-                            handConfidences.ThumbTip.lastGoodPosition_LeapSpace_distal = fingerPositionCacheDistal[(FingerTipName.Thumb, pixel.hand)];
-                            handConfidences.ThumbTip.lastGoodPosition_LeapSpace_intermediate = fingerPositionCacheIntermediate[(FingerTipName.Thumb, pixel.hand)];
-                            handConfidences.ThumbTip.lastGoodPosition_LeapSpace_proximal = fingerPositionCacheProximal[(FingerTipName.Thumb, pixel.hand)];
-                        }
-                        else
-                        {
-                            lastKnownGoodPos = handConfidences.ThumbTip.lastGoodPosition_PixelSpace;
-                        }
-                        break;
+                    handConfidences = TipConfidence.LeftConfidence;
+                    handPoseWhenConfidenceEvaluated = handWhenConfidenceEvaluated_Left;
+                    timestampWhenPoseEvaluated = timestampWhenConfidenceEvaluated_Left;
+                }
 
-                    case FingerTipName.IndexFinger:
-                        handConfidences.IndexTip.confidence = confidence;
-                        if (highTipConfidence)
-                        {
-                            handConfidences.IndexTip.lastGoodPosition_PixelSpace = pixel.position;
-                            handConfidences.IndexTip.lastGoodPosition_LeapSpace_distal = fingerPositionCacheDistal[(FingerTipName.IndexFinger, pixel.hand)];
-                            handConfidences.IndexTip.lastGoodPosition_LeapSpace_intermediate = fingerPositionCacheIntermediate[(FingerTipName.IndexFinger, pixel.hand)];
-                            handConfidences.IndexTip.lastGoodPosition_LeapSpace_proximal = fingerPositionCacheProximal[(FingerTipName.IndexFinger, pixel.hand)];
-                        }
-                        else
-                        {
-                            lastKnownGoodPos = handConfidences.IndexTip.lastGoodPosition_PixelSpace;
- 
-                        }
-                        break;
+                if (handConfidences != null && handPoseWhenConfidenceEvaluated != null)
+                {
+                    switch (pixel.fingerName)
+                    {
+                        case FingerTipName.Thumb:
+                            handConfidences.Thumb.Confidence = confidence;
+                            if (highTipConfidence)
+                            {
+                                handConfidences.Thumb.LastConfidentPosition_PixelSpace = pixel.position;
+                                handConfidences.Thumb.LastConfidentPositionForFinger_LeapSpace = CopyFromOtherExtensions.CopyFrom(handConfidences.Thumb.LastConfidentPositionForFinger_LeapSpace, handPoseWhenConfidenceEvaluated.GetThumb());
+                                handConfidences.Thumb.Timestamp = timestampWhenPoseEvaluated;
+                            }
+                            else
+                            {
+                                lastKnownGoodPos_PixelSpace = handConfidences.Thumb.LastConfidentPosition_PixelSpace;
+                            }
+                            break;
 
-                    case FingerTipName.MiddleFinger:
-                        handConfidences.MiddleTip.confidence = confidence;
-                        if (highTipConfidence)
-                        {
-                            handConfidences.MiddleTip.lastGoodPosition_PixelSpace = pixel.position;
-                            handConfidences.MiddleTip.lastGoodPosition_LeapSpace_distal = fingerPositionCacheDistal[(FingerTipName.MiddleFinger, pixel.hand)];
-                            handConfidences.MiddleTip.lastGoodPosition_LeapSpace_intermediate = fingerPositionCacheIntermediate[(FingerTipName.MiddleFinger, pixel.hand)];
-                            handConfidences.MiddleTip.lastGoodPosition_LeapSpace_proximal = fingerPositionCacheProximal[(FingerTipName.MiddleFinger, pixel.hand)];
-                        }
-                        else
-                        {
-                            lastKnownGoodPos = handConfidences.MiddleTip.lastGoodPosition_PixelSpace;
-                        }
-                        break;
+                        case FingerTipName.IndexFinger:
+                            handConfidences.Index.Confidence = confidence;
+                            if (highTipConfidence)
+                            {
+                                handConfidences.Index.LastConfidentPosition_PixelSpace = pixel.position;
+                                handConfidences.Index.LastConfidentPositionForFinger_LeapSpace = CopyFromOtherExtensions.CopyFrom(handConfidences.Index.LastConfidentPositionForFinger_LeapSpace, handPoseWhenConfidenceEvaluated.GetIndex());
+                                handConfidences.Index.Timestamp = timestampWhenPoseEvaluated;
+                            }
+                            else
+                            {
+                                lastKnownGoodPos_PixelSpace = handConfidences.Index.LastConfidentPosition_PixelSpace;
 
-                    case FingerTipName.RingFinger:
-                        handConfidences.RingTip.confidence = confidence;
-                        if (highTipConfidence)
-                        {
-                            handConfidences.RingTip.lastGoodPosition_PixelSpace = pixel.position;
-                            handConfidences.RingTip.lastGoodPosition_LeapSpace_distal = fingerPositionCacheDistal[(FingerTipName.RingFinger, pixel.hand)];
-                            handConfidences.RingTip.lastGoodPosition_LeapSpace_intermediate = fingerPositionCacheIntermediate[(FingerTipName.RingFinger, pixel.hand)];
-                            handConfidences.RingTip.lastGoodPosition_LeapSpace_proximal = fingerPositionCacheProximal[(FingerTipName.RingFinger, pixel.hand)];
-                        }
-                        else
-                        {
-                            lastKnownGoodPos = handConfidences.RingTip.lastGoodPosition_PixelSpace;
-                        }
-                        break;
+                            }
+                            break;
 
-                    case FingerTipName.PinkyFinger:
-                        handConfidences.PinkyTip.confidence = confidence;
-                        if (highTipConfidence)
-                        {
-                            handConfidences.PinkyTip.lastGoodPosition_PixelSpace = pixel.position;
-                            handConfidences.PinkyTip.lastGoodPosition_LeapSpace_distal = fingerPositionCacheDistal[(FingerTipName.PinkyFinger, pixel.hand)];
-                            handConfidences.PinkyTip.lastGoodPosition_LeapSpace_intermediate = fingerPositionCacheIntermediate[(FingerTipName.PinkyFinger, pixel.hand)];
-                            handConfidences.PinkyTip.lastGoodPosition_LeapSpace_proximal = fingerPositionCacheProximal[(FingerTipName.PinkyFinger, pixel.hand)];
-                        }
-                        else
-                        {
-                            lastKnownGoodPos = handConfidences.PinkyTip.lastGoodPosition_PixelSpace;
-                        }
-                        break;
+                        case FingerTipName.MiddleFinger:
+                            handConfidences.Middle.Confidence = confidence;
+                            if (highTipConfidence)
+                            {
+                                handConfidences.Middle.LastConfidentPosition_PixelSpace = pixel.position;
+                                handConfidences.Middle.LastConfidentPositionForFinger_LeapSpace = CopyFromOtherExtensions.CopyFrom(handConfidences.Middle.LastConfidentPositionForFinger_LeapSpace, handPoseWhenConfidenceEvaluated.GetMiddle());
+                                handConfidences.Middle.Timestamp = timestampWhenPoseEvaluated;
+                            }
+                            else
+                            {
+                                lastKnownGoodPos_PixelSpace = handConfidences.Middle.LastConfidentPosition_PixelSpace;
+                            }
+                            break;
 
-                    default:
-                        break;
+                        case FingerTipName.RingFinger:
+                            handConfidences.Ring.Confidence = confidence;
+                            if (highTipConfidence)
+                            {
+                                handConfidences.Ring.LastConfidentPosition_PixelSpace = pixel.position;
+                                handConfidences.Ring.LastConfidentPositionForFinger_LeapSpace = CopyFromOtherExtensions.CopyFrom(handConfidences.Ring.LastConfidentPositionForFinger_LeapSpace, handPoseWhenConfidenceEvaluated.GetRing());
+                                handConfidences.Ring.Timestamp= timestampWhenPoseEvaluated;
+                            }
+                            else
+                            {
+                                lastKnownGoodPos_PixelSpace = handConfidences.Ring.LastConfidentPosition_PixelSpace;
+                            }
+                            break;
+
+                        case FingerTipName.PinkyFinger:
+                            handConfidences.Pinky.Confidence = confidence;
+                            if (highTipConfidence)
+                            {
+                                handConfidences.Pinky.LastConfidentPosition_PixelSpace = pixel.position;
+                                handConfidences.Pinky.LastConfidentPositionForFinger_LeapSpace = CopyFromOtherExtensions.CopyFrom(handConfidences.Pinky.LastConfidentPositionForFinger_LeapSpace, handPoseWhenConfidenceEvaluated.GetPinky());
+                                handConfidences.Pinky.Timestamp = timestampWhenPoseEvaluated;
+                            }
+                            else
+                            {
+                                lastKnownGoodPos_PixelSpace = handConfidences.Pinky.LastConfidentPosition_PixelSpace;
+                            }
+                            break;
+
+                        default:
+                            break;
+                    }
                 }
 
                 if (generateImageVisuals)
                 {
-                    if (!highTipConfidence && lastKnownGoodPos.HasValue && pixel.fingerName == FingerTipName.Thumb)
+                    if (!highTipConfidence && lastKnownGoodPos_PixelSpace.HasValue) // && pixel.fingerName == FingerTipName.Thumb)
                     {
-                        for (int x = Math.Max(0, (int)lastKnownGoodPos.Value.x - 1); x < Math.Min(image.Width, (int)lastKnownGoodPos.Value.x + 1); x++)
+                        for (int x = Math.Max(0, (int)lastKnownGoodPos_PixelSpace.Value.x - 1); x < Math.Min(image.Width, (int)lastKnownGoodPos_PixelSpace.Value.x + 1); x++)
                         {
-                            for (int y = Math.Max(0, (int)lastKnownGoodPos.Value.y - 1); y < Math.Min(image.Height, (int)lastKnownGoodPos.Value.y + 1); y++)
+                            for (int y = Math.Max(0, (int)lastKnownGoodPos_PixelSpace.Value.y - 1); y < Math.Min(image.Height, (int)lastKnownGoodPos_PixelSpace.Value.y + 1); y++)
                             {
                                 IRImageWithOverlaidPosePoints.SetPixel(x, y, Color.yellow);
                             }
