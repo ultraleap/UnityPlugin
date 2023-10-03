@@ -1,14 +1,13 @@
 {
   "name": "com.ultraleap.tracking.preview",
-  "version": "6.11.0",
+  "version": "6.12.1",
   "description": "Ultraleap Tracking Preview",
   "displayName": "Ultraleap Tracking Preview",
   "unity": "2021.3",
   "license": "Apache-2.0",
   "dependencies": {
-    "com.ultraleap.tracking": "6.11.0",
-    "com.unity.inputsystem": "1.5.0",
-    "com.unity.xr.interaction.toolkit": "2.3.1"
+    "com.ultraleap.tracking": "6.12.1",
+    "com.unity.inputsystem": "1.5.0"
   },
   "keywords": [
     "ultraleap",
@@ -24,8 +23,8 @@
   },
   "samples": [
     {
-      "displayName": "Examples",
-      "description": "A collection of examples for the Preview package",
+      "displayName": "Preview Examples",
+      "description": "A collection of examples for the Ultraleap Tracking Preview package",
       "path": "Examples~"
     }
   ]

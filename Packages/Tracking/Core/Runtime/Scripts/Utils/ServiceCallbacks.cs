@@ -18,7 +18,7 @@ public class ServiceCallbacks : AndroidJavaProxy
         Debug.Log("ServiceCallbacks.onUnbound");
         // Ensure we disconnect if the service becomes unbound to prevent
         // a TIME_WAIT state on the Service TCP socket/address
-        foreach (var provider in GameObject.FindObjectsOfType<Leap.Unity.LeapServiceProvider>())
+        foreach (var provider in GameObject.FindObjectsByType<Leap.Unity.LeapServiceProvider>(FindObjectsSortMode.None))
         {
             provider.destroyController();
         }

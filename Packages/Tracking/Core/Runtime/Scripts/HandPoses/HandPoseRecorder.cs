@@ -13,7 +13,7 @@ namespace Leap.Unity
         /// The name that the pose should have when it is serialised. E.g. "Thumbs Up Left"
         /// </summary>
         [SerializeField]
-        private string handPoseName = "New hand pose";
+        public string handPoseName = "New hand pose";
 
         /// <summary>
         /// Which hand should be captured?
