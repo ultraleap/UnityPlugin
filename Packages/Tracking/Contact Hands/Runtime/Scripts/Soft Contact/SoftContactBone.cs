@@ -34,14 +34,9 @@ namespace Leap.Unity.ContactHands
             ContactUtils.SetupBoneCollider(boneCollider, bone);
         }
 
-        int _lastObjectTouchedAdjustedMass = 1;
+        int lastObjectTouchedAdjustedMass = 1;
         Vector3 lastTargetPosition;
-        private float _softContactDislocationDistance = 0.03F;
-        protected float softContactDislocationDistance
-        {
-            get { return _softContactDislocationDistance; }
-            set { _softContactDislocationDistance = value; }
-        }
+        float softContactDislocationDistance = 0.03F;
 
         protected const float DEAD_ZONE_FRACTION = 0.04F;
         public float scale { get { return this.transform.lossyScale.x; } }
@@ -67,17 +62,17 @@ namespace Leap.Unity.ContactHands
             float speed = contactHand.dataHand.PalmVelocity.magnitude;
             float massScale = Mathf.Clamp(1.0F - (errorFraction * 2.0F), 0.1F, 1.0F)
                           * Mathf.Clamp(speed * 10F, 1F, 10F);
-            if (massScale * _lastObjectTouchedAdjustedMass > 0)
+            if (massScale * lastObjectTouchedAdjustedMass > 0)
             {
-                Collider.attachedRigidbody.mass = massScale * _lastObjectTouchedAdjustedMass;
+                Collider.attachedRigidbody.mass = massScale * lastObjectTouchedAdjustedMass;
             }
 
             // Potentially enable Soft Contact if our error is too large.
-            if (contactHand.IsGrabbing || (errorDistance >= softContactDislocationDistance && speed < 1.5F))
+            if (contactHand.IsGrabbing || (errorDistance >= softContactDislocationDistance))
             {
                 Collider.isTrigger = true;
             }
-            else
+            else if (!contactHand.isContacting)
             {
                 Collider.isTrigger = false;
             }

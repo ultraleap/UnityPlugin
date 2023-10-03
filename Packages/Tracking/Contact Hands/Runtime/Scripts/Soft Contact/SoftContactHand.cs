@@ -37,7 +37,6 @@ namespace Leap.Unity.ContactHands
 
             ((SoftContactBone)palmBone).SetupBone();
             var rbody = palmBone.gameObject.AddComponent<Rigidbody>();
-            rbody.freezeRotation = true;
             rbody.useGravity = false;
             rbody.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
             rbody.includeLayers = ~0;
@@ -49,7 +48,6 @@ namespace Leap.Unity.ContactHands
                 Physics.IgnoreCollision(palmBone.palmCollider, bone.boneCollider);
 
                 rbody = bone.gameObject.AddComponent<Rigidbody>();
-                rbody.freezeRotation = true;
                 rbody.useGravity = false;
                 rbody.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
                 rbody.includeLayers = ~0;
