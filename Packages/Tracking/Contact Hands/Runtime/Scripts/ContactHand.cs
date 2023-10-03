@@ -258,6 +258,17 @@ namespace Leap.Unity.ContactHands
             _oldDataRotation = dataHand.Rotation;
             _oldContactPosition = palmBone.transform.position;
             _oldContactRotation = palmBone.transform.rotation;
+
+            if (palmBone.rigid != null)
+            {
+                _velocity = palmBone.rigid.velocity;
+                _angularVelocity = palmBone.rigid.angularVelocity;
+            }
+            else if (palmBone.articulation != null)
+            {
+                _velocity = palmBone.articulation.velocity;
+                _angularVelocity = palmBone.articulation.angularVelocity;
+            }
         }
 
         protected void ChangeHandLayer(SingleLayer layer)

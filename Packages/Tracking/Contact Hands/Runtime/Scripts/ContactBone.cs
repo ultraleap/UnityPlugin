@@ -19,6 +19,9 @@ namespace Leap.Unity.ContactHands
         internal Vector3 wristPosition = Vector3.zero;
         internal Vector3 center = Vector3.zero;
 
+        internal Rigidbody rigid;
+        internal ArticulationBody articulation;
+
         internal CapsuleCollider boneCollider;
         internal BoxCollider palmCollider;
         protected Collider Collider { get { return IsPalm ? palmCollider : boneCollider; } }
