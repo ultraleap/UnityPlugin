@@ -166,6 +166,8 @@ public class PoseToIRImageConfidence : MonoBehaviour
 
     public TipConfidences TipConfidence = new TipConfidences();
 
+    private int highestDeviceIndex = 0;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -194,28 +196,48 @@ public class PoseToIRImageConfidence : MonoBehaviour
             if (e.HasLeftHand)
             {
                 Hand currentHand = leapProvider.GetHand(Chirality.Left);
-                handWhenConfidenceEvaluated_Left = CopyFromOtherExtensions.CopyFrom(handWhenConfidenceEvaluated_Left, currentHand); // LeapCExt.CopyFrom(handWhenConfidenceEvaluated_Left, ref h, (long)1);
-                timestampWhenConfidenceEvaluated_Left = leapProvider.CurrentFrame.Timestamp;
-                UpdateFingerTipsRaw(e.LeftHand);
+                if (currentHand != null)
+                {
+                    handWhenConfidenceEvaluated_Left = CopyFromOtherExtensions.CopyFrom(handWhenConfidenceEvaluated_Left, currentHand); // LeapCExt.CopyFrom(handWhenConfidenceEvaluated_Left, ref h, (long)1);
+                    timestampWhenConfidenceEvaluated_Left = leapProvider.CurrentFrame.Timestamp;
+                    UpdateFingerTipsRaw(e.LeftHand);
+                }
             }
 
             if (e.HasRightHand)
             {
                 var currentHand = leapProvider.GetHand(Chirality.Right);
-                handWhenConfidenceEvaluated_Right = CopyFromOtherExtensions.CopyFrom(handWhenConfidenceEvaluated_Right, currentHand); // LeapCExt.CopyFrom(handWhenConfidenceEvaluated_Right, ref h,(long) 1);
-                timestampWhenConfidenceEvaluated_Right = leapProvider.CurrentFrame.Timestamp;
-                UpdateFingerTipsRaw(e.RightHand);
+
+                if (currentHand != null)
+                {
+                    handWhenConfidenceEvaluated_Right = CopyFromOtherExtensions.CopyFrom(handWhenConfidenceEvaluated_Right, currentHand); // LeapCExt.CopyFrom(handWhenConfidenceEvaluated_Right, ref h,(long) 1);
+                    timestampWhenConfidenceEvaluated_Right = leapProvider.CurrentFrame.Timestamp;
+                    UpdateFingerTipsRaw(e.RightHand);
+                }
             }
         }
     }
 
     private void UpdateFingerTipsRaw(LEAP_HAND hand)
     {
-        if (leapController != null && leapController.Devices.Count == 1 && image != null && newImage)
+        if (leapController != null && leapController.Devices.Count >= 1 && image != null && newImage)
         {
+            if (leapController.Devices.Count > highestDeviceIndex) 
+            {
+                extrinsics = null;
+                highestDeviceIndex = leapController.Devices.Count;
+            }
+
             if (extrinsics == null)
             {
-                extrinsics = leapController.LeapExtrinsicCameraMatrix(targetCamera, leapController.Devices[0]);
+                try
+                {
+                    extrinsics = leapController.LeapExtrinsicCameraMatrix(targetCamera, leapController.Devices[leapController.Devices.Count - 1]);
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogException(ex);
+                }
             }
 
             UpdateFingerTipsRawForHand(hand);
