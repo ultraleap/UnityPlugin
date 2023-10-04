@@ -13,7 +13,9 @@ namespace Leap.Unity.ContactHands
 
         public Chirality handedness = Chirality.Left;
 
-        internal Hand modifiedHand = new Hand(), dataHand = new Hand();
+        private Hand modifiedHand = new Hand();
+        internal Hand dataHand = new Hand();
+        [SerializeField]
         internal bool tracked = false, resetting = false, ghosted = false;
         internal bool isHandPhysical = true;
         /// <summary>
@@ -44,8 +46,11 @@ namespace Leap.Unity.ContactHands
 
         public bool IsGrabbing => isGrabbing;
 
-        protected Vector3 _oldDataPosition;
-        protected Quaternion _oldDataRotation;
+        protected Vector3 _oldDataPosition, _oldContactPosition;
+        protected Quaternion _oldDataRotation, _oldContactRotation;
+
+        internal float grabMass = 0f;
+        public float GrabMass => grabMass;
 
         /// <summary>
         /// These values will need to be manually calculated if there are no rigidbodies on the bones.
@@ -70,6 +75,8 @@ namespace Leap.Unity.ContactHands
                 this.colliders = colliders;
             }
         }
+
+        private Collider[] _colliderCache = new Collider[32];
         #endregion
 
         private void Awake()
@@ -101,7 +108,7 @@ namespace Leap.Unity.ContactHands
             UpdateHandLogic(hand);
             // Update the bones
             palmBone.UpdatePalmBone(hand);
-            for (int i = 0; i < bones.Length - 1; i++)
+            for (int i = 0; i < bones.Length; i++)
             {
                 bones[i].UpdateBone(hand.Fingers[bones[i].Finger].bones[bones[i].joint], hand.Fingers[bones[i].Finger].bones[bones[i].joint + 1]);
             }
@@ -122,10 +129,15 @@ namespace Leap.Unity.ContactHands
         /// </summary>
         internal abstract void FinishHand();
 
-        protected abstract void ProcessOutputHand();
+        protected void ResetModifiedHand()
+        {
+            modifiedHand.CopyFrom(dataHand);
+        }
+        protected abstract void ProcessOutputHand(ref Hand modifiedHand);
 
         internal Hand OutputHand()
         {
+            ProcessOutputHand(ref modifiedHand);
             if (tracked)
             {
                 return modifiedHand;
@@ -139,7 +151,17 @@ namespace Leap.Unity.ContactHands
         /// <summary>
         /// Any logic that needs to occur after the physics simulation has run, but before update.
         /// </summary>
-        internal abstract void PostFixedUpdateHand();
+        internal void PostFixedUpdateHand()
+        {
+            PostFixedUpdateHandLogic();
+            palmBone.PostFixedUpdateBone();
+            for (int i = 0; i < bones.Length; i++)
+            {
+                bones[i].PostFixedUpdateBone();
+            }
+        }
+
+        internal abstract void PostFixedUpdateHandLogic();
 
         /// <summary>
         /// Generates a basic hand structure with accompanying bone components.
@@ -232,10 +254,21 @@ namespace Leap.Unity.ContactHands
 
         protected void CacheHandData(Hand dataHand)
         {
-            _velocity = ContactUtils.ToLinearVelocity(_oldDataPosition, modifiedHand.PalmPosition, Time.fixedDeltaTime);
-            _angularVelocity = ContactUtils.ToAngularVelocity(_oldDataRotation, modifiedHand.Rotation, Time.fixedDeltaTime);
             _oldDataPosition = dataHand.PalmPosition;
             _oldDataRotation = dataHand.Rotation;
+            _oldContactPosition = palmBone.transform.position;
+            _oldContactRotation = palmBone.transform.rotation;
+
+            if (palmBone.rigid != null)
+            {
+                _velocity = palmBone.rigid.velocity;
+                _angularVelocity = palmBone.rigid.angularVelocity;
+            }
+            else if (palmBone.articulation != null)
+            {
+                _velocity = palmBone.articulation.velocity;
+                _angularVelocity = palmBone.articulation.angularVelocity;
+            }
         }
 
         protected void ChangeHandLayer(SingleLayer layer)
@@ -248,6 +281,7 @@ namespace Leap.Unity.ContactHands
             }
         }
 
+        #region Ignored Objects
         private void HandleIgnoredObjects()
         {
             if (_ignoredData.Count > 0)
@@ -267,7 +301,7 @@ namespace Leap.Unity.ContactHands
                     }
 
                     // TODO: Batch call the ignored objects to see if they appear in the hand data
-                    if (_ignoredData[i].timeout <= 0 /* && !IsObjectInHandRadius(_ignoredData[i].rigid, _ignoredData[i].radius)*/)
+                    if (_ignoredData[i].timeout <= 0 && !IsObjectInHandRadius(_ignoredData[i].rigid, _ignoredData[i].radius))
                     {
                         TogglePhysicsIgnore(_ignoredData[i].rigid, false);
                         i--;
@@ -321,5 +355,53 @@ namespace Leap.Unity.ContactHands
                 }
             }
         }
+
+        /// <summary>
+        /// Checks to see whether the hand will be in contact with a specified object. Radius can be used to inflate the bones.
+        /// </summary>
+        public bool IsObjectInHandRadius(Rigidbody rigid, float extraRadius = 0f)
+        {
+            if (rigid == null)
+                return false;
+
+            if (IsObjectInBoneRadius(rigid, palmBone, extraRadius))
+            {
+                return true;
+            }
+
+            foreach (var bone in bones)
+            {
+                if (IsObjectInBoneRadius(rigid, bone, extraRadius))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Checks to see whether a specific physicsBone will be in contact with a specified object. Radius can be used to inflate the physicsBone.
+        /// </summary>
+        public bool IsObjectInBoneRadius(Rigidbody rigid, ContactBone bone, float extraRadius = 0f)
+        {
+            int overlappingColliders;
+            if (bone.IsPalm)
+            {
+                overlappingColliders = PhysExts.OverlapBoxNonAllocOffset(bone.palmCollider, Vector3.zero, _colliderCache, contactManager.InteractionMask, QueryTriggerInteraction.Ignore, extraRadius);
+            }
+            else
+            {
+                overlappingColliders = PhysExts.OverlapCapsuleNonAllocOffset(bone.boneCollider, Vector3.zero, _colliderCache, contactManager.InteractionMask, QueryTriggerInteraction.Ignore, extraRadius);
+            }
+            for (int i = 0; i < overlappingColliders; i++)
+            {
+                if (_colliderCache[i].attachedRigidbody == rigid)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        #endregion
     }
 }

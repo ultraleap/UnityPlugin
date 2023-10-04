@@ -47,6 +47,10 @@ namespace Leap.Unity.ContactHands
 
         private void UpdateHand(int index, ContactHand hand, Hand dataHand)
         {
+            if (hand.IsHandPhysical && !Time.inFixedTimeStep)
+            {
+                return;
+            }
             if (index != -1)
             {
                 hand.dataHand.CopyFrom(dataHand);
@@ -71,6 +75,7 @@ namespace Leap.Unity.ContactHands
 
         internal void OutputFrame(ref Frame inputFrame)
         {
+            contactManager._leftHandIndex = inputFrame.Hands.FindIndex(x => x.IsLeft);
             OutputHand(contactManager._leftHandIndex, leftHand, ref inputFrame);
             contactManager._rightHandIndex = inputFrame.Hands.FindIndex(x => x.IsRight);
             OutputHand(contactManager._rightHandIndex, rightHand, ref inputFrame);
@@ -91,14 +96,24 @@ namespace Leap.Unity.ContactHands
                 {
                     inputFrame.Hands[index].CopyFrom(hand.OutputHand());
                 }
-                else
+                else if(inputFrame.Hands.Count > 0)
                 {
                     inputFrame.Hands.RemoveAt(index);
                 }
             }
         }
 
-        internal abstract void PostFixedUpdateFrame();
+        internal void PostFixedUpdateFrame()
+        {
+            PostFixedUpdateFrameLogic();
+            leftHand.PostFixedUpdateHand();
+            rightHand.PostFixedUpdateHand();
+        }
+
+        /// <summary>
+        /// Happens before the hands update is called.
+        /// </summary>
+        internal abstract void PostFixedUpdateFrameLogic();
 
         internal void ProcessHandIntersection()
         {

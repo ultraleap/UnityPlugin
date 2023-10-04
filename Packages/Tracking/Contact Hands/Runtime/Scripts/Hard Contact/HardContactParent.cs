@@ -24,7 +24,7 @@ namespace Leap.Unity.ContactHands
         internal float minPalmAngularVelocity = 6000f, maxPalmAngularVelocity = 8000f;
         [SerializeField]
         internal float minFingerVelocity = 50f, maxFingerVelocity = 200f;
-        [Range(0.01f, 0.5f), Tooltip("The maximum distance at which the hand will then jump back to the data hand.")]
+        [SerializeField, Range(0.01f, 0.5f), Tooltip("The maximum distance at which the hand will then jump back to the data hand.")]
         internal float teleportDistance = 0.1f;
         [SerializeField]
         internal float maxWeight = 15f;
@@ -46,9 +46,9 @@ namespace Leap.Unity.ContactHands
             GenerateHandsObjects(typeof(HardContactHand));
         }
 
-        internal override void PostFixedUpdateFrame()
+        internal override void PostFixedUpdateFrameLogic()
         {
-
+            
         }
 
         private static PhysicMaterial CreateHandPhysicsMaterial()

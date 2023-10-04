@@ -17,6 +17,10 @@ namespace Leap.Unity.ContactHands
         internal float width = 0f, length = 0f, palmThickness = 0f;
         internal Vector3 tipPosition = Vector3.zero;
         internal Vector3 wristPosition = Vector3.zero;
+        internal Vector3 center = Vector3.zero;
+
+        internal Rigidbody rigid;
+        internal ArticulationBody articulation;
 
         internal CapsuleCollider boneCollider;
         internal BoxCollider palmCollider;
