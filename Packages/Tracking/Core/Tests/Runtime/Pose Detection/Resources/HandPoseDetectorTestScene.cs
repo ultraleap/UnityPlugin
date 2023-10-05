@@ -72,7 +72,7 @@ namespace Leap.Testing
             {
                 if (_handPoseDetector == null)
                 {
-                    _handPoseDetector = Object.FindObjectOfType<HandPoseDetector>();
+                    _handPoseDetector = Object.FindAnyObjectByType<HandPoseDetector>();
                 }
 
                 return _handPoseDetector;
@@ -88,7 +88,7 @@ namespace Leap.Testing
             {
                 if (_testLeapProvider == null)
                 {
-                    _testLeapProvider = Object.FindObjectOfType<TestLeapProvider>();
+                    _testLeapProvider = Object.FindAnyObjectByType<TestLeapProvider>();
                 }
 
                 return _testLeapProvider;
@@ -104,7 +104,7 @@ namespace Leap.Testing
             {
                 if (_poseEventListener == null)
                 {
-                    _poseEventListener = Object.FindObjectOfType<PoseEventListener>();
+                    _poseEventListener = Object.FindAnyObjectByType<PoseEventListener>();
                 }
 
                 return _poseEventListener;

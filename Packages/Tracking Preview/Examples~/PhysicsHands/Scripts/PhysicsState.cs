@@ -16,6 +16,7 @@ namespace Leap.Unity.Interaction.PhysicsHands.Example
     /// <summary>
     /// Example script that listens to object state changes, fired by the Physics Provider.
     /// This event allows you to easily bind your own custom logic.
+    /// It is designed for use when using either a specific or numerous rigidbodies.
     /// </summary>
     public class PhysicsState : MonoBehaviour
     {
@@ -30,32 +31,41 @@ namespace Leap.Unity.Interaction.PhysicsHands.Example
         private void Start()
         {
             _text = GetComponentInChildren<TextMeshPro>(true);
-            _rigid = GetComponent<Rigidbody>();
         }
 
         private void OnEnable()
         {
             if (_physicsProvider == null)
             {
-                _physicsProvider = FindObjectOfType<PhysicsProvider>(true);
+                _physicsProvider = FindAnyObjectByType<PhysicsProvider>(FindObjectsInactive.Include);
+            }
+            if (_rigid == null)
+            {
+                _rigid = GetComponent<Rigidbody>();
+            }
+            if (_physicsProvider != null && _rigid != null)
+            {
+                _physicsProvider.SubscribeToStateChanges(_rigid, StateChange);
             }
         }
 
-        private void FixedUpdate()
+        private void OnDisable()
         {
             if (_physicsProvider != null)
             {
-                if (_physicsProvider.IsObjectHovered(_rigid))
-                {
-                    if (_physicsProvider.GetObjectState(_rigid, out var state))
-                    {
-                        _text.text = _prefix + state.ToString();
-                    }
-                }
-                else
-                {
-                    _text.text = _prefix + "Idle";
-                }
+                _physicsProvider.UnsubscribeFromStateChanges(_rigid, StateChange);
+            }
+        }
+
+        private void StateChange(PhysicsGraspHelper graspHelper)
+        {
+            if (graspHelper == null)
+            {
+                _text.text = _prefix + "Idle";
+            }
+            else
+            {
+                _text.text = _prefix + graspHelper.GraspState.ToString();
             }
         }
     }

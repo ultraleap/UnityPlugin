@@ -105,7 +105,7 @@ public class JointOcclusion : MonoBehaviour
     /// </summary>
     public void Setup()
     {
-        List<JointOcclusion> allJointOcclusions = FindObjectsOfType<JointOcclusion>().ToList();
+        List<JointOcclusion> allJointOcclusions = FindObjectsByType<JointOcclusion>(FindObjectsSortMode.None).ToList();
         layerName = "JointOcclusion" + allJointOcclusions.IndexOf(this).ToString();
 
         cam = GetComponent<Camera>();

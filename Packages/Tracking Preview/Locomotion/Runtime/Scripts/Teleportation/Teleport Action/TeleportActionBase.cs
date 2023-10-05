@@ -47,6 +47,7 @@ namespace Leap.Unity.Preview.Locomotion
 
         protected TeleportAnchor _currentAnchor { get { return _currentAnchorVal; } private set { _currentAnchorVal = value; } }
         protected List<TeleportAnchor> _teleportAnchors = new List<TeleportAnchor>();
+        public List<TeleportAnchor> TeleportAnchors => _teleportAnchors;
 
         protected Vector3 _currentPosition { get; private set; }
         protected Quaternion _currentRotation { get; private set; }
@@ -63,6 +64,7 @@ namespace Leap.Unity.Preview.Locomotion
         protected bool _currentTeleportAnchorLocked = false;
 
         private TeleportAnchor _lastHighlightedAnchor;
+        public TeleportAnchor LastTeleportedAnchor => _lastTeleportedAnchor;
         private TeleportAnchor _lastTeleportedAnchor;
         private TeleportAnchor _currentAnchorVal;
 
@@ -99,7 +101,7 @@ namespace Leap.Unity.Preview.Locomotion
             if (Player == null) Player = Head.parent.gameObject == null ? Head.gameObject : Head.parent.gameObject;
             if (farFieldLayerManager == null)
             {
-                farFieldLayerManager = FindObjectOfType<FarFieldLayerManager>();
+                farFieldLayerManager = FindAnyObjectByType<FarFieldLayerManager>();
             }
 
             if (handRayInteractor != null)
@@ -109,12 +111,12 @@ namespace Leap.Unity.Preview.Locomotion
 
             if (findTeleportAnchorsOnStart)
             {
-                _teleportAnchors = new List<TeleportAnchor>(FindObjectsOfType<TeleportAnchor>(true));
+                _teleportAnchors = new List<TeleportAnchor>(FindObjectsByType<TeleportAnchor>(FindObjectsInactive.Include, FindObjectsSortMode.None));
             }
 
-            if (freeTeleportAnchor.GetComponent<MeshCollider>() != null)
+            if (freeTeleportAnchor.TryGetComponent(out MeshCollider anchorCollider))
             {
-                Destroy(freeTeleportAnchor.GetComponent<MeshCollider>());
+                Destroy(anchorCollider);
             }
 
             _movementTypeLastFrame = movementType;
@@ -143,7 +145,7 @@ namespace Leap.Unity.Preview.Locomotion
 
             if (farFieldLayerManager == null)
             {
-                farFieldLayerManager = FindObjectOfType<FarFieldLayerManager>();
+                farFieldLayerManager = FindAnyObjectByType<FarFieldLayerManager>();
             }
         }
 
@@ -241,6 +243,7 @@ namespace Leap.Unity.Preview.Locomotion
                 {
                     _lastHighlightedAnchor.SetHighlighted(false);
                 }
+                handRayRenderer.SetValid(IsValid);
                 return;
             }
 

@@ -1,22 +1,27 @@
-## Release Tasks
+## Pre-Release Tasks
 
 [Pre-release](https://ultrahaptics.atlassian.net/wiki/spaces/SV/pages/3665625233/Unity+Plugin+Development+Release+Process#Pre-release-Steps)
-- [ ] Update JIRA release version number
-- [ ] Update client library versions in changelog
+- [ ] Update JIRA release version number. _See the [releases page](https://ultrahaptics.atlassian.net/projects/UNITY?selectedItem=com.atlassian.jira.jira-projects-plugin:release-page)._
 - [ ] Update package.json versions and dependencies
-- [ ] Update changelog date & release version
+- [ ] Update client libraries (.dll, .so, .dylib)
+- [ ] Update changelog date, release version & client library versions
 - [ ] Update Readme if required
 - [ ] Apply CI formatting patch
-- [ ] Update client libraries (.dll, .so, .dylib)
 - [ ] Ensure documentation requirements are met e.g., public API is commented.
 - [ ] If this is a major release, action any `Obsolete` items and other breaking considerations.
 
 - [ ] Run the required tests for the release
 - [ ] Complete the request to release on Cognidox
 
-## JIRA Release
-
-_See the [releases page](https://ultrahaptics.atlassian.net/projects/UNITY?selectedItem=com.atlassian.jira.jira-projects-plugin:release-page)._
+[After Approval](https://ultrahaptics.atlassian.net/wiki/spaces/SV/pages/3665625233/Unity+Plugin+Development+Release+Process#Release-Steps)
+- [ ] Tag the branch (e.g. com.ultraleap.tracking/5.9.0 and com.ultraleap.tracking.preview/5.9.0)
+- [ ] Merge to main
+- [ ] Crate Github Release with CI artefact for .unitypackage
+- [ ] Resolve any public GitHub issues
+- [ ] Release version on JIRA and make a new Unity Plugin NEXT version
+- [ ] Merge main to develop (also add [NEXT] - unreleased to changelog)
+- [ ] Announce release on various platforms
+- [ ] Publish any accompanying docs
 
 ## Pull Request Templates
 

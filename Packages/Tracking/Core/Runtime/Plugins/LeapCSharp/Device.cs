@@ -263,33 +263,61 @@ namespace Leap
                     return devicePose;
                 }
 
-                //float[] data = new float[16];
-                //eLeapRS result = LeapC.GetDeviceTransform(Handle, data);
+                bool deviceTransformAvailable = LeapC.GetDeviceTransformAvailable(Handle);
 
-                //if (result != eLeapRS.eLeapRS_Success || data == null)
-                //{
-                //    devicePose = Pose.identity;
-                //    return devicePose;
-                //}
+                if (!deviceTransformAvailable)
+                {
+                    devicePose = Pose.identity;
+                    poseSet = true;
+                    return Pose.identity;
+                }
 
-                //// Get transform matrix and convert to unity space by inverting Z.
-                //Matrix4x4 transformMatrix = new Matrix4x4(
-                //    new Vector4(data[0], data[1], data[2], data[3]),
-                //    new Vector4(data[4], data[5], data[6], data[7]),
-                //    new Vector4(data[8], data[9], data[10], data[11]),
-                //    new Vector4(data[12], data[13], data[14], data[15]));
-                //Matrix4x4 toUnity = Matrix4x4.Scale(new Vector3(1, 1, -1));
-                //transformMatrix = toUnity * transformMatrix;
+                float[] data = new float[16];
+                eLeapRS result = LeapC.GetDeviceTransform(Handle, data);
 
-                //// Identity matrix here means we have no device transform, also check validity.
-                //if (transformMatrix.isIdentity || !transformMatrix.ValidTRS())
-                //{
-                //    devicePose = Pose.identity;
-                //    return devicePose;
-                //}
+                if (result != eLeapRS.eLeapRS_Success || data == null)
+                {
+                    devicePose = Pose.identity;
+                    poseSet = true;
+                    return Pose.identity;
+                }
 
-                //// Return the valid pose
-                //devicePose = new Pose(transformMatrix.GetColumn(3), transformMatrix.rotation);
+                // Using the LEAP->OPENXR device transform matrix
+                // Unitys matrices are generated as 4 columns:
+                Matrix4x4 deviceTransform = new Matrix4x4(
+                                                    new Vector4(data[0], data[1], data[2], data[3]),
+                                                    new Vector4(data[4], data[5], data[6], data[7]),
+                                                    new Vector4(data[8], data[9], data[10], data[11]),
+                                                    new Vector4(data[12], data[13], data[14], data[15]));
+
+
+                // An example of the expected matrix if it were 8cm forward from the head origin
+                // Unitys matrices are generated as 4 columns:
+                //Matrix4x4 deviceTransform = new Matrix4x4(
+                //                                    new Vector4(-0.001f, 0, 0, 0),
+                //                                    new Vector4(0, 0, -0.001f, 0),
+                //                                    new Vector4(0, -0.001f, 0, 0),
+                //                                    new Vector4(0, 0, -0.08f, 1));
+
+                if (deviceTransform == Matrix4x4.identity)
+                {
+                    devicePose = Pose.identity;
+                    poseSet = true;
+                    return Pose.identity;
+                }
+
+                Matrix4x4 openXRToUnity = new Matrix4x4(
+                                                    new Vector4(1f, 0, 0, 0),
+                                                    new Vector4(0, 1f, 0, 0),
+                                                    new Vector4(0, 0, -1f, 0),
+                                                    new Vector4(0, 0, 0, 1));
+
+                deviceTransform = openXRToUnity * deviceTransform;
+
+                Vector3 outputPos = deviceTransform.GetPosition();
+                //Quaternion outputRot = deviceTransform.rotation; // Note: the matrices we receive are not rotatrion matrices. This produces unexpected results
+
+                devicePose = new Pose(outputPos, Quaternion.identity);
 
                 poseSet = true;
                 return devicePose;

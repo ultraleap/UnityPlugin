@@ -50,9 +50,7 @@ namespace Leap.Unity.Preview.Locomotion
 
         private void Awake()
         {
-            initialPosition = transform.position;
-            initialRotation = transform.rotation;
-            initialRotationIndicatorsRotation = _rotationIndicators.rotation;
+            UpdateInitialPositions();
 
             Material material = _markerMesh.sharedMaterial;
             if (material != null)
@@ -71,6 +69,27 @@ namespace Leap.Unity.Preview.Locomotion
         public virtual void OnDisable()
         {
             ResetPoint();
+        }
+
+        /// <summary>
+        /// Updates the saved initial position and rotation values using the position and rotations provided as arguments.
+        /// </summary>
+        /// <param name="pos">Provide a position that the saved initial position should be</param>
+        /// <param name="rot">Provide a rotation that the saved initial rotation should be</param>
+        /// <param name="rotationIndicatorRot">Provide a rotation that the saved initial indicator rotation should be</param>
+        public void UpdateInitialPositions(Vector3 pos, Quaternion rot, Quaternion rotationIndicatorRot)
+        {
+            initialPosition = pos;
+            initialRotation = rot;
+            initialRotationIndicatorsRotation = rotationIndicatorRot;
+        }
+
+        /// <summary>
+        /// Updates the saved initial position and rotation values using the current transform of the tp anchor
+        /// </summary>
+        public void UpdateInitialPositions()
+        {
+            UpdateInitialPositions(transform.position, transform.rotation, _rotationIndicators.rotation);
         }
 
         /// <summary>

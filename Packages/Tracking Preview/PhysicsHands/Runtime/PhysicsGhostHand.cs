@@ -1,6 +1,3 @@
-using Leap.Unity;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -11,9 +8,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
     {
         [SerializeField]
         private PhysicsHand _physicsHand;
+        public PhysicsHand PhysicsHand => _physicsHand;
 
         [SerializeField]
         private HandModelBase _handModel;
+        public HandModelBase HandModel => _handModel;
 
         [SerializeField]
         private float _alpha = 0.02f;
@@ -32,6 +31,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
             _renderer.material.SetColor("_MainColor", Color.clear);
         }
 
+        public void SetPhysicsHand(PhysicsHand hand)
+        {
+            _physicsHand = hand;
+        }
+
         void Update()
         {
             if (_physicsHand != null)
@@ -44,6 +48,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 if (val < _physicsHand.DistanceFromDataHand)
                 {
                     val = _physicsHand.DistanceFromDataHand;
+                }
+                float contactDisplacement = Mathf.InverseLerp(0.8f, 20f, _physicsHand.FingerContactDisplacement);
+                if (val < contactDisplacement)
+                {
+                    val = contactDisplacement;
                 }
                 if (val < _minimumDistance)
                 {
@@ -64,7 +73,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
             }
             if (_handModel != null && _physicsHand == null)
             {
-                _physicsHand = FindObjectsOfType<PhysicsHand>().Where(x => x.Handedness == _handModel.Handedness).DefaultIfEmpty(null).First();
+                _physicsHand = FindObjectsByType<PhysicsHand>(FindObjectsSortMode.None).Where(x => x.Handedness == _handModel.Handedness).DefaultIfEmpty(null).First();
             }
         }
     }

@@ -48,7 +48,7 @@ namespace Leap.Unity.Preview.Locomotion
 
         private void Awake()
         {
-            _jumpGems = FindObjectsOfType<JumpGem>(true).ToList();
+            _jumpGems = FindObjectsByType<JumpGem>(FindObjectsInactive.Include, FindObjectsSortMode.None).ToList();
             for (int i = 0; i < _jumpGems.Count; i++)
             {
                 int j = i;
@@ -117,6 +117,13 @@ namespace Leap.Unity.Preview.Locomotion
                 {
                     SelectTeleport(false);
                     _pinchedGem = null;
+                }
+            }
+            else
+            {
+                if (IsSelected)
+                {
+                    SelectTeleport(false);
                 }
             }
         }

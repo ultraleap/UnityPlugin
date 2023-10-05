@@ -15,19 +15,54 @@ namespace Leap.Unity.Interaction.PhysicsHands
 
     public class PhysicsIgnoreHelpers : MonoBehaviour
     {
-        [Tooltip("This prevents the object from being collided with Physics Hands.")]
-        public bool DisableHandCollisions = false;
+        [Tooltip("This prevents the object from being collided with all Physics Hands."), UnityEngine.Serialization.FormerlySerializedAsAttribute("DisableHandCollisions")]
+        public bool DisableAllHandCollisions = false;
+        [Tooltip("This prevents the object from being collided with a specific Physics Hands.")]
+        public bool DisableSpecificHandCollisions = false;
+        [Tooltip("Which hand should be ignored.")]
+        public Chirality DisabledHandedness = Chirality.Left;
+
+        public bool IsThisBoneIgnored(PhysicsBone bone)
+        {
+            if (bone == null)
+                return false;
+            if (DisableAllHandCollisions)
+                return true;
+            if (DisableSpecificHandCollisions && DisabledHandedness == bone.Hand.Handedness)
+                return true;
+            return false;
+        }
+
+        public bool IsThisHandIgnored(PhysicsHand hand)
+        {
+            if (hand == null)
+                return false;
+            if (DisableAllHandCollisions)
+                return true;
+            if (DisableSpecificHandCollisions && DisabledHandedness == hand.Handedness)
+                return true;
+            return false;
+        }
 
         private void OnCollisionEnter(Collision collision)
         {
-            if (DisableHandCollisions)
+            if (DisableAllHandCollisions || DisableSpecificHandCollisions)
             {
-                if (collision.gameObject != null && collision.gameObject.TryGetComponent<PhysicsBone>(out var temp))
+                DisableBoneCollisions(collision);
+            }
+        }
+
+        private void DisableBoneCollisions(Collision collision)
+        {
+            if (collision.gameObject != null && collision.gameObject.TryGetComponent<PhysicsBone>(out var temp))
+            {
+                if (!IsThisBoneIgnored(temp))
                 {
-                    foreach (var contact in collision.contacts)
-                    {
-                        Physics.IgnoreCollision(temp.Collider, contact.thisCollider);
-                    }
+                    return;
+                }
+                foreach (var contact in collision.contacts)
+                {
+                    Physics.IgnoreCollision(temp.Collider, contact.thisCollider);
                 }
             }
         }
