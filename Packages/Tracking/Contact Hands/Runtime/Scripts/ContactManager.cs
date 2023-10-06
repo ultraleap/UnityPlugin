@@ -1,6 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using UnityEditor;
+using UnityEditor.VersionControl;
 using UnityEngine;
 
 namespace Leap.Unity.ContactHands
@@ -11,7 +15,12 @@ namespace Leap.Unity.ContactHands
         [SerializeField] private LeapProvider _inputProvider;
         public LeapProvider InputProvider => _inputProvider;
 
+        [HideInInspector]
         public ContactParent contactHands;
+        [HideInInspector]
+        public string contactParentName;
+        [HideInInspector]
+        public int contactParentChoiceIndex = 0;
 
         #region Layers
         // Layers
@@ -289,6 +298,111 @@ namespace Leap.Unity.ContactHands
         }
 
         #endregion
+    }
+
+    [CustomEditor(typeof(ContactManager))]
+    public class ContactManagerEditor : Editor
+    {
+        string contactParentPath;
+        GameObject previousContactParentGO;
+        string[] contactParentPaths;
+
+        
+
+        public override void OnInspectorGUI()
+        {
+            ContactManager thisAsContactManager = (ContactManager)target;
+
+            #region contact parent dropdown
+
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField(new GUIContent("Type Of Contact Hands"), EditorStyles.boldLabel);
+            GUILayout.FlexibleSpace();
+            if (thisAsContactManager.contactHands != null)
+            {
+                previousContactParentGO = thisAsContactManager.contactHands.gameObject;
+            }
+            contactParentPath = thisAsContactManager.contactParentName;
+
+            List<string> contactParentNames = new List<string>();
+
+            contactParentPaths = FindContactParentAssetPaths().ToArray();
+            if (contactParentPaths.Length > 0)
+            {
+                for (int i = 0; i < contactParentPaths.Length; i++)
+                {
+                    contactParentNames.Add(Path.GetFileNameWithoutExtension(contactParentPaths[i]));
+                }
+                contactParentNames.Add("Custom");
+
+                thisAsContactManager.contactParentChoiceIndex = EditorGUILayout.Popup(thisAsContactManager.contactParentChoiceIndex, contactParentNames.ToArray());
+
+                if (contactParentNames[thisAsContactManager.contactParentChoiceIndex] != "Custom")
+                {
+                    if (contactParentPath != contactParentPaths[thisAsContactManager.contactParentChoiceIndex])
+                    {
+                        contactParentPath = contactParentPaths[thisAsContactManager.contactParentChoiceIndex];
+
+                        if (previousContactParentGO != null)
+                        {
+                            DestroyImmediate(previousContactParentGO);
+                        }
+                        previousContactParentGO = Instantiate(AssetDatabase.LoadAssetAtPath<GameObject>(contactParentPath));
+                        previousContactParentGO.transform.parent = thisAsContactManager.transform;
+
+                        ContactParent newContactParent = previousContactParentGO.GetComponent<ContactParent>();
+                        newContactParent.contactManager = thisAsContactManager;
+
+                        // Update the selected choice in ContactManager
+                        thisAsContactManager.contactHands = newContactParent;
+                        thisAsContactManager.contactParentName = contactParentPath;
+                    }
+                }
+                else
+                {
+                    if (previousContactParentGO != null)
+                    {
+                        DestroyImmediate(previousContactParentGO);
+                    }
+                }
+                EditorUtility.SetDirty(target);
+            }
+            EditorGUILayout.EndHorizontal();
+
+
+            if(contactParentNames[thisAsContactManager.contactParentChoiceIndex] == "Custom")
+            {
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("contactHands"));
+            }
+
+            GUILayout.Space(10);
+            #endregion
+
+            DrawDefaultInspector();
+        }
+
+
+        private static List<string> FindContactParentAssetPaths()
+        {
+            List<ContactParent> assets = new List<ContactParent>();
+            List<string> assetPaths = new List<string>();
+
+            string[] guids = AssetDatabase.FindAssets(string.Format("t:prefab", typeof(ContactParent)));
+
+            for (int i = 0; i < guids.Length; i++)
+            {
+                string assetPath = AssetDatabase.GUIDToAssetPath(guids[i]);
+                ContactParent asset = AssetDatabase.LoadAssetAtPath<ContactParent>(assetPath);
+
+                if (asset != null)
+                {
+                    assets.Add(asset);
+                    assetPaths.Add(assetPath);
+                }
+            }
+            return assetPaths;
+        }
+
     }
 
 }
