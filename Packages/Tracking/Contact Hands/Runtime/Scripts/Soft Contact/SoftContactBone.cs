@@ -1,0 +1,153 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace Leap.Unity.ContactHands
+{
+    public class SoftContactBone : ContactBone
+    {
+        internal void SetupBone()
+        {
+            Collider.material = ((SoftContactParent)contactHand.contactParent).PhysicsMaterial;
+        }
+
+        #region Updating
+        internal override void UpdatePalmBone(Hand hand)
+        {
+            width = hand.PalmWidth;
+            palmThickness = hand.Fingers[2].Bone(0).Width;
+            tipPosition = hand.CalculateAverageKnucklePosition();
+            wristPosition = hand.WristPosition;
+            length = Vector3.Distance(tipPosition, wristPosition);
+
+            UpdateWithInteractionEngineLogic(hand.PalmPosition, hand.Rotation);
+
+            ContactUtils.SetupPalmCollider(palmCollider, hand);
+        }
+
+        internal override void UpdateBone(Bone prevBone, Bone bone)
+        {
+            tipPosition = bone.NextJoint;
+            width = bone.Width;
+            length = bone.Length;
+            UpdateWithInteractionEngineLogic(bone.PrevJoint, bone.Rotation);
+            ContactUtils.SetupBoneCollider(boneCollider, bone);
+        }
+
+        int lastObjectTouchedAdjustedMass = 1;
+        Vector3 lastTargetPosition;
+        float softContactDislocationDistance = 0.03F;
+
+        protected const float DEAD_ZONE_FRACTION = 0.04F;
+        public float scale { get { return this.transform.lossyScale.x; } }
+
+        internal void UpdateWithInteractionEngineLogic(Vector3 targetPosition, Quaternion targetRotation)
+        {
+            // Infer ahead if the Interaction Manager has a moving frame of reference.
+            //manager.TransformAheadByFixedUpdate(targetPosition, targetRotation, out targetPosition, out targetRotation);
+
+            // Set a fixed rotation for bones; otherwise most friction is lost
+            // as any capsule or spherical bones will roll on contact.
+            Collider.attachedRigidbody.MoveRotation(targetRotation);
+
+            Vector3 lastTargetPositionTransformedAhead = lastTargetPosition;
+
+            // Calculate how far off its target the contact bone is.
+            float errorDistance = Vector3.Distance(lastTargetPositionTransformedAhead, Collider.attachedRigidbody.position);
+            float errorFraction = errorDistance / width;
+
+            // Adjust the mass of the contact bone based on the mass of
+            // the object it is currently touching.
+            float speed = contactHand.dataHand.PalmVelocity.magnitude;
+            float massScale = Mathf.Clamp(1.0F - (errorFraction * 2.0F), 0.1F, 1.0F)
+                          * Mathf.Clamp(speed * 10F, 1F, 10F);
+            if (massScale * lastObjectTouchedAdjustedMass > 0)
+            {
+                Collider.attachedRigidbody.mass = massScale * lastObjectTouchedAdjustedMass;
+            }
+
+            // Potentially enable Soft Contact if our error is too large.
+            if (contactHand.IsGrabbing || (errorDistance >= softContactDislocationDistance))
+            {
+                Collider.isTrigger = true;
+            }
+            else if (!contactHand.isContacting)
+            {
+                Collider.isTrigger = false;
+            }
+
+            // Attempt to move the contact bone to its target position and rotation
+            // by setting its target velocity and angular velocity. Include a "deadzone"
+            // for position to avoid tiny vibrations.
+            float deadzone = Mathf.Min(DEAD_ZONE_FRACTION * width, 0.01F * scale);
+            Vector3 delta = (targetPosition - Collider.attachedRigidbody.position);
+            float deltaMag = delta.magnitude;
+
+            if (deltaMag <= deadzone)
+            {
+                Collider.attachedRigidbody.velocity = Vector3.zero;
+                lastTargetPosition = Collider.attachedRigidbody.position;
+            }
+            else
+            {
+                delta *= (deltaMag - deadzone) / deltaMag;
+                lastTargetPosition = Collider.attachedRigidbody.position + delta;
+
+                Vector3 targetVelocity = delta / Time.fixedDeltaTime;
+                float targetVelocityMag = targetVelocity.magnitude;
+                Collider.attachedRigidbody.velocity = (targetVelocity / targetVelocityMag)
+                              * Mathf.Clamp(targetVelocityMag, 0F, 100F);
+            }
+
+            Quaternion deltaRot = targetRotation * Quaternion.Inverse(Collider.attachedRigidbody.rotation);
+            Collider.attachedRigidbody.angularVelocity = ToAngularVelocity(deltaRot, Time.fixedDeltaTime);
+        }
+
+        public static Vector3 ToAngularVelocity(Quaternion deltaRotation, float deltaTime)
+        {
+            Vector3 deltaAxis;
+            float deltaAngle;
+            deltaRotation.ToAngleAxis(out deltaAngle, out deltaAxis);
+
+            if (float.IsInfinity(deltaAxis.x))
+            {
+                deltaAxis = Vector3.zero;
+                deltaAngle = 0;
+            }
+
+            if (deltaAngle > 180)
+            {
+                deltaAngle -= 360.0f;
+            }
+
+            return deltaAxis * deltaAngle * Mathf.Deg2Rad / deltaTime;
+        }
+
+        internal override void PostFixedUpdateBone()
+        {
+            UpdateBoneWorldSpace();
+        }
+
+        private void UpdateBoneWorldSpace()
+        {
+            if (isPalm)
+            {
+                PhysExts.ToWorldSpaceBox(palmCollider, out Vector3 center, out Vector3 halfExtents, out Quaternion orientation);
+                this.center = center;
+                this.tipPosition = center + (orientation * (Vector3.forward * halfExtents.z));
+                this.palmThickness = halfExtents.y * 2f;
+                this.wristPosition = transform.position - (transform.rotation * Quaternion.Inverse(contactHand.dataHand.Rotation) * (contactHand.dataHand.PalmPosition - contactHand.dataHand.WristPosition));
+            }
+            else
+            {
+                PhysExts.ToWorldSpaceCapsule(boneCollider, out Vector3 tip, out Vector3 bottom, out float radius);
+                this.tipPosition = tip;
+                this.width = radius;
+                this.length = Vector3.Distance(bottom, tip);
+                this.center = Vector3.Lerp(bottom, tip, 0.5f);
+            }
+        }
+
+        #endregion
+    }
+}

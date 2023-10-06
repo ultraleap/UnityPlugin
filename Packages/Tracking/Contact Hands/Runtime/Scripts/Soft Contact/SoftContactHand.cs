@@ -1,10 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
 
 namespace Leap.Unity.ContactHands
 {
-    public class NoContactHand : ContactHand
+    public class SoftContactHand : ContactHand
     {
         protected override void ProcessOutputHand(ref Hand modifiedHand)
         {
@@ -31,16 +32,37 @@ namespace Leap.Unity.ContactHands
 
         internal override void GenerateHandLogic()
         {
-            GenerateHandObjects(typeof(NoContactBone));
+            GenerateHandObjects(typeof(SoftContactBone));
             isHandPhysical = false;
 
-            foreach(var bone in bones)
+            ((SoftContactBone)palmBone).SetupBone();
+            var rbody = palmBone.gameObject.AddComponent<Rigidbody>();
+            rbody.useGravity = false;
+            rbody.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+#if UNITY_2022_3_OR_NEWER
+            rbody.includeLayers = ~0;
+#endif
+            // Set the colliders to ignore eachother
+            foreach (var bone in bones)
             {
-                bone.boneCollider.isTrigger = true;
-            }
+                ((SoftContactBone)bone).SetupBone();
+                Physics.IgnoreCollision(palmBone.palmCollider, bone.boneCollider);
 
-            palmBone.palmCollider.isTrigger = true;
-    }
+                rbody = bone.gameObject.AddComponent<Rigidbody>();
+                rbody.useGravity = false;
+                rbody.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+#if UNITY_2022_3_OR_NEWER
+                rbody.includeLayers = ~0;
+#endif
+                foreach (var bone2 in bones)
+                {
+                    if (bone != bone2)
+                    {
+                        Physics.IgnoreCollision(bone.boneCollider, bone2.boneCollider);
+                    }
+                }
+            }
+        }
 
         internal override void PostFixedUpdateHandLogic()
         {

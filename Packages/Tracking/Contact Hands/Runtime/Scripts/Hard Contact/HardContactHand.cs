@@ -283,7 +283,7 @@ namespace Leap.Unity.ContactHands
                 _justGhosted = true;
             }
 
-            if (Time.frameCount - _lastFrameTeleport >= _teleportFrameCount && ghosted && !IsCloseToObject)
+            if (Time.frameCount - _lastFrameTeleport >= _teleportFrameCount && ghosted && !isCloseToObject)
             {
                 ChangeHandLayer(contactManager.HandsLayer);
 
@@ -313,7 +313,7 @@ namespace Leap.Unity.ContactHands
                         break;
                     }
 
-                    if (((HardContactBone)bones[boneArrayIndex]).BoneOverRotationCheck())
+                    if (((HardContactBone)bones[boneArrayIndex]).BoneOverRotationCheck(eulerThreshold))
                     {
                         return true;
                     }

@@ -3,13 +3,28 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 namespace Leap.Unity.ContactHands
 {
     public class ContactManager : LeapProvider
     {
+        public enum ContactMode
+        {
+            HardContact,
+            SoftContact,
+            NoContact,
+            Custom
+        }
 
         [SerializeField] private LeapProvider _inputProvider;
         public LeapProvider InputProvider => _inputProvider;
+
+        ContactMode _contactMode = ContactMode.NoContact;
+        [Space, SerializeField]
+        ContactMode contactMode;
 
         public ContactParent contactHands;
 
@@ -17,7 +32,7 @@ namespace Leap.Unity.ContactHands
         // Layers
         // Object Layers
         public SingleLayer DefaultLayer => _defaultLayer;
-        [SerializeField, Tooltip("This layer will be used as the base when automatically generating layers.")]
+        [Space, SerializeField, Tooltip("This layer will be used as the base when automatically generating layers.")]
         private SingleLayer _defaultLayer = 0;
 
         public List<SingleLayer> InteractableLayers => _interactableLayers;
@@ -166,6 +181,53 @@ namespace Leap.Unity.ContactHands
             }
         }
 
+        public void SetContactMode(ContactMode mode)
+        {
+            if (contactHands != null) // delete old contact hands
+            {
+                if (Application.isPlaying)
+                {
+                    Destroy(contactHands.gameObject);
+                }
+                else
+                {
+                    DestroyImmediate(contactHands.gameObject);
+                }
+
+                contactHands = null;
+            }
+
+            _contactMode = mode;
+            contactMode = mode;
+
+            if (contactMode == ContactMode.Custom) // don't make new ones if we are now custom
+            {
+                return;
+            }
+
+            // Make new hands hand add their component
+
+            GameObject newContactHands = new GameObject(_contactMode.ToString());
+
+            switch (_contactMode)
+            {
+                case ContactMode.HardContact:
+                    contactHands = newContactHands.AddComponent(typeof(HardContactParent)) as ContactParent;
+                    break;
+                case ContactMode.SoftContact:
+                    contactHands = newContactHands.AddComponent(typeof(SoftContactParent)) as ContactParent;
+                    break;
+                case ContactMode.NoContact:
+                    contactHands = newContactHands.AddComponent(typeof(NoContactParent)) as ContactParent;
+                    break;
+            }
+
+            if (transform != null) // catches some edit-time issues
+            {
+                newContactHands.transform.parent = transform;
+            }
+        }
+
         #region Layer Generation
         protected void GenerateLayers()
         {
@@ -280,15 +342,39 @@ namespace Leap.Unity.ContactHands
 
         #region Unity Editor
 
+#if UNITY_EDITOR
+
+
+        bool setContactMode = false;
+
         private void OnValidate()
         {
             if (contactHands == null)
             {
                 contactHands = GetComponentInChildren<ContactParent>();
             }
+
+            if (contactMode != _contactMode || contactHands == null)
+            {
+                // Use EditorApplication.update and a bool to avoid multiple edit-time errors
+                setContactMode = true;
+                EditorApplication.update -= HandleEditorUpdateNewContactMode;
+                EditorApplication.update += HandleEditorUpdateNewContactMode;
+            }
         }
+
+        void HandleEditorUpdateNewContactMode()
+        {
+            if(setContactMode)
+            {
+                EditorApplication.update -= HandleEditorUpdateNewContactMode;
+                SetContactMode(contactMode);
+                setContactMode = false;
+            }
+        }
+
+#endif
 
         #endregion
     }
-
 }
