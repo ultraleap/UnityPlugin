@@ -160,8 +160,8 @@ namespace Leap.Unity.ContactHands
 
         internal override void PostFixedUpdateHandLogic()
         {
-            _velocity = ((HardContactBone)palmBone).articulationBody.velocity;
-            _angularVelocity = ((HardContactBone)palmBone).articulationBody.angularVelocity;
+            _velocity = ((HardContactBone)palmBone).articulation.velocity;
+            _angularVelocity = ((HardContactBone)palmBone).articulation.angularVelocity;
             CacheComputedPositions();
             CalculateDisplacementsAndLimits();
         }
@@ -257,8 +257,6 @@ namespace Leap.Unity.ContactHands
 
         protected override void UpdateHandLogic(Hand hand)
         {
-            _velocity = ((HardContactBone)palmBone).articulationBody.velocity;
-            _angularVelocity = ((HardContactBone)palmBone).articulationBody.angularVelocity;
             // Fix the hand if it gets into a bad situation by teleporting and holding in place until its bad velocities disappear
             HandleTeleportingHands();
 

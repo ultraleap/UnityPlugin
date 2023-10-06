@@ -888,8 +888,8 @@ namespace Leap.Unity.ContactHands
 
                 if (hand.dataHand != null)
                 {
-                    _newPosition = hand.palmBone.transform.position + (hand.palmBone.transform.rotation * Quaternion.Inverse(_grabbingValues[hand].originalHandRotation) * _grabbingValues[hand].offset);
-                    _newRotation = hand.palmBone.transform.rotation * _grabbingValues[hand].rotationOffset;
+                    _newPosition = hand.palmBone.transform.position + (hand.Velocity * Time.fixedDeltaTime) + (hand.palmBone.transform.rotation * Quaternion.Inverse(_grabbingValues[hand].originalHandRotation) * _grabbingValues[hand].offset);
+                    _newRotation = hand.palmBone.transform.rotation * Quaternion.Euler(hand.AngularVelocity * Time.fixedDeltaTime) * _grabbingValues[hand].rotationOffset;
                 }
             }
         }

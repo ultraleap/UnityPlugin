@@ -6,8 +6,6 @@ namespace Leap.Unity.ContactHands
 {
     public class HardContactBone : ContactBone
     {
-        internal ArticulationBody articulationBody;
-
         private HardContactParent hardContactParent => contactParent as HardContactParent;
         private HardContactHand hardContactHand => contactHand as HardContactHand;
 
@@ -28,7 +26,7 @@ namespace Leap.Unity.ContactHands
         internal void SetupBoneBody()
         {
             Collider.material = ((HardContactParent)contactHand.contactParent).PhysicsMaterial;
-            articulationBody = gameObject.AddComponent<ArticulationBody>();
+            articulation = gameObject.AddComponent<ArticulationBody>();
             if (isPalm)
             {
                 SetupPalmArticulation();
@@ -49,44 +47,44 @@ namespace Leap.Unity.ContactHands
 
         private void SetupPalmArticulation()
         {
-            articulationBody.immovable = false;
-            articulationBody.matchAnchors = false;
+            articulation.immovable = false;
+            articulation.matchAnchors = false;
 
-            articulationBody.mass = hardContactParent.boneMass * 3f;
+            articulation.mass = hardContactParent.boneMass * 3f;
 
             UpdateIterations();
 
-            articulationBody.angularDamping = 50f;
-            articulationBody.linearDamping = 0f;
-            articulationBody.useGravity = false;
-            articulationBody.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
-            articulationBody.maxDepenetrationVelocity = 0.001f;
+            articulation.angularDamping = 50f;
+            articulation.linearDamping = 0f;
+            articulation.useGravity = false;
+            articulation.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
+            articulation.maxDepenetrationVelocity = 0.001f;
         }
 
         private void SetupBoneArticulation()
         {
-            articulationBody.anchorPosition = Vector3.zero;
-            articulationBody.anchorRotation = Quaternion.identity;
-            articulationBody.matchAnchors = false;
+            articulation.anchorPosition = Vector3.zero;
+            articulation.anchorRotation = Quaternion.identity;
+            articulation.matchAnchors = false;
 
-            articulationBody.mass = hardContactParent.boneMass;
+            articulation.mass = hardContactParent.boneMass;
 
             UpdateIterations();
 
-            articulationBody.maxAngularVelocity = 1.75f;
-            articulationBody.maxDepenetrationVelocity = 3f;
-            articulationBody.useGravity = false;
-            articulationBody.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
-            articulationBody.maxDepenetrationVelocity = 0.001f;
-            articulationBody.linearDamping = 0f;
+            articulation.maxAngularVelocity = 1.75f;
+            articulation.maxDepenetrationVelocity = 3f;
+            articulation.useGravity = false;
+            articulation.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
+            articulation.maxDepenetrationVelocity = 0.001f;
+            articulation.linearDamping = 0f;
         }
 
         private void SetupKnuckleDrives(float stiffness, float forceLimit)
         {
-            articulationBody.jointType = ArticulationJointType.SphericalJoint;
-            articulationBody.twistLock = ArticulationDofLock.LimitedMotion;
-            articulationBody.swingYLock = ArticulationDofLock.LimitedMotion;
-            articulationBody.swingZLock = ArticulationDofLock.LimitedMotion;
+            articulation.jointType = ArticulationJointType.SphericalJoint;
+            articulation.twistLock = ArticulationDofLock.LimitedMotion;
+            articulation.swingYLock = ArticulationDofLock.LimitedMotion;
+            articulation.swingZLock = ArticulationDofLock.LimitedMotion;
 
             ArticulationDrive xDrive = new ArticulationDrive()
             {
@@ -103,7 +101,7 @@ namespace Leap.Unity.ContactHands
                 xDrive.upperLimit = 45f;
             }
 
-            articulationBody.xDrive = xDrive;
+            articulation.xDrive = xDrive;
             _originalXDriveLower = xDrive.lowerLimit;
             _originalXDriveUpper = xDrive.upperLimit;
 
@@ -122,18 +120,18 @@ namespace Leap.Unity.ContactHands
                 yDrive.upperLimit = contactHand.handedness == Chirality.Left ? 50f : 10f;
             }
 
-            articulationBody.yDrive = yDrive;
+            articulation.yDrive = yDrive;
 
             // Set Z limits to 0, locking them causes insane jittering
             yDrive.lowerLimit = 0f;
             yDrive.upperLimit = 0f;
-            articulationBody.zDrive = yDrive;
+            articulation.zDrive = yDrive;
         }
 
         private void SetupBoneDrives(float stiffness, float forceLimit)
         {
-            articulationBody.jointType = ArticulationJointType.RevoluteJoint;
-            articulationBody.twistLock = ArticulationDofLock.LimitedMotion;
+            articulation.jointType = ArticulationJointType.RevoluteJoint;
+            articulation.twistLock = ArticulationDofLock.LimitedMotion;
 
             ArticulationDrive xDrive = new ArticulationDrive()
             {
@@ -144,7 +142,7 @@ namespace Leap.Unity.ContactHands
                 upperLimit = 89f
             };
 
-            articulationBody.xDrive = xDrive;
+            articulation.xDrive = xDrive;
             _originalXDriveLower = xDrive.lowerLimit;
             _originalXDriveUpper = xDrive.upperLimit;
         }
@@ -213,7 +211,7 @@ namespace Leap.Unity.ContactHands
 
             Vector3 delta = hand.PalmPosition - transform.position;
 
-            articulationBody.velocity = Vector3.ClampMagnitude(Vector3.MoveTowards(articulationBody.velocity, delta * Mathf.Lerp(1.0f, 0.05f, hardContactHand.currentPalmWeight) / Time.fixedDeltaTime, 15f), hardContactHand.currentPalmVelocity * Time.fixedDeltaTime);
+            articulation.velocity = Vector3.ClampMagnitude(Vector3.MoveTowards(articulation.velocity, delta * Mathf.Lerp(1.0f, 0.05f, hardContactHand.currentPalmWeight) / Time.fixedDeltaTime, 15f), hardContactHand.currentPalmVelocity * Time.fixedDeltaTime);
 
             Quaternion rotationDelta = Quaternion.Normalize(Quaternion.Slerp(Quaternion.identity, hand.Rotation * Quaternion.Inverse(transform.rotation), Mathf.Lerp(1.0f, 0.1f, hardContactHand.currentPalmWeight)));
 
@@ -223,7 +221,7 @@ namespace Leap.Unity.ContactHands
 
             if (angularVelocity.IsValid())
             {
-                articulationBody.angularVelocity = angularVelocity;
+                articulation.angularVelocity = angularVelocity;
             }
 
             UpdateBoneWorldSpace();
@@ -280,24 +278,24 @@ namespace Leap.Unity.ContactHands
                 _xForceLimit = Mathf.Lerp(_xForceLimit, hardContactParent.maxFingerVelocity, Time.fixedDeltaTime * (1.0f / 0.5f));
             }
 
-            ArticulationDrive xDrive = articulationBody.xDrive;
+            ArticulationDrive xDrive = articulation.xDrive;
             xDrive.stiffness = hardContactParent.boneStiffness;
             xDrive.damping = _xDampening;
             xDrive.forceLimit = _xForceLimit * Time.fixedDeltaTime;
             xDrive.upperLimit = hardContactHand.grabbingFingers[finger] >= joint ? _grabbingXDrive : _originalXDriveUpper;
-            xDrive.target = _wasBoneGrabbing ? Mathf.Clamp(_xTargetAngle, articulationBody.xDrive.lowerLimit, _grabbingXDrive) : _xTargetAngle;
-            articulationBody.xDrive = xDrive;
+            xDrive.target = _wasBoneGrabbing ? Mathf.Clamp(_xTargetAngle, articulation.xDrive.lowerLimit, _grabbingXDrive) : _xTargetAngle;
+            articulation.xDrive = xDrive;
 
             if (joint == 0)
             {
                 _yTargetAngle = CalculateYJointAngle(prevBone.Rotation, bone.Rotation);
 
-                ArticulationDrive yDrive = articulationBody.yDrive;
+                ArticulationDrive yDrive = articulation.yDrive;
                 yDrive.damping = _xDampening * .75f;
                 yDrive.stiffness = hardContactParent.boneStiffness;
                 yDrive.forceLimit = hardContactParent.maxPalmVelocity * Time.fixedDeltaTime;
                 yDrive.target = _yTargetAngle;
-                articulationBody.yDrive = yDrive;
+                articulation.yDrive = yDrive;
             }
         }
 
@@ -346,9 +344,9 @@ namespace Leap.Unity.ContactHands
                 boneCollider.ToWorldSpaceCapsule(out Vector3 tip, out Vector3 temp, out float rad);
                 position = tip;
 
-                if (articulationBody.dofCount > 0)
+                if (articulation.dofCount > 0)
                 {
-                    _displacementRotation = Mathf.Abs(articulationBody.xDrive.target - articulationBody.jointPosition[0] * Mathf.Rad2Deg);
+                    _displacementRotation = Mathf.Abs(articulation.xDrive.target - articulation.jointPosition[0] * Mathf.Rad2Deg);
                 }
             }
 
@@ -360,9 +358,9 @@ namespace Leap.Unity.ContactHands
 
         internal bool CalculateGrabbingLimits(bool hasFingerGrabbed)
         {
-            if (articulationBody.jointPosition.dofCount > 0)
+            if (articulation.jointPosition.dofCount > 0)
             {
-                _currentXDrive = articulationBody.jointPosition[0] * Mathf.Rad2Deg;
+                _currentXDrive = articulation.jointPosition[0] * Mathf.Rad2Deg;
             }
 
             if (_grabbingFrames > 0)
@@ -374,7 +372,7 @@ namespace Leap.Unity.ContactHands
                 }
                 else
                 {
-                    _grabbingXDrive = Mathf.Lerp(_grabbingXDrive, articulationBody.xDrive.target, 1f / 3f);
+                    _grabbingXDrive = Mathf.Lerp(_grabbingXDrive, articulation.xDrive.target, 1f / 3f);
                 }
             }
 
@@ -447,12 +445,12 @@ namespace Leap.Unity.ContactHands
         #region Resetting
         internal void ResetPalm()
         {
-            articulationBody.immovable = false;
+            articulation.immovable = false;
             transform.position = contactHand.dataHand.PalmPosition;
             transform.rotation = contactHand.dataHand.Rotation;
-            articulationBody.TeleportRoot(transform.position, transform.rotation);
+            articulation.TeleportRoot(transform.position, transform.rotation);
             ContactUtils.SetupPalmCollider(palmCollider, contactHand.dataHand);
-            articulationBody.WakeUp();
+            articulation.WakeUp();
         }
 
         internal void ResetBone(Bone prevBone, Bone bone)
@@ -478,10 +476,10 @@ namespace Leap.Unity.ContactHands
                 transform.position = finger == 0 ? prevBone.PrevJoint : prevBone.NextJoint;
                 transform.rotation = prevBone.Rotation;
 
-                articulationBody.parentAnchorPosition = ContactUtils.InverseTransformPoint(contactHand.dataHand.PalmPosition, contactHand.dataHand.Rotation, prevBone.NextJoint);
+                articulation.parentAnchorPosition = ContactUtils.InverseTransformPoint(contactHand.dataHand.PalmPosition, contactHand.dataHand.Rotation, prevBone.NextJoint);
                 if (finger == 0)
                 {
-                    articulationBody.parentAnchorRotation = Quaternion.Euler(0,
+                    articulation.parentAnchorRotation = Quaternion.Euler(0,
                         contactHand.dataHand.IsLeft ? ContactUtils.HAND_ROTATION_OFFSET_Y : -ContactUtils.HAND_ROTATION_OFFSET_Y,
                         contactHand.dataHand.IsLeft ? ContactUtils.HAND_ROTATION_OFFSET_Z : -ContactUtils.HAND_ROTATION_OFFSET_Z);
                 }
@@ -491,39 +489,39 @@ namespace Leap.Unity.ContactHands
                 transform.localPosition = transform.InverseTransformPoint(prevBone.PrevJoint);
                 transform.localRotation = Quaternion.identity;
 
-                articulationBody.parentAnchorPosition = ContactUtils.InverseTransformPoint(prevBone.PrevJoint, prevBone.Rotation, bone.PrevJoint);
-                articulationBody.parentAnchorRotation = Quaternion.identity;
+                articulation.parentAnchorPosition = ContactUtils.InverseTransformPoint(prevBone.PrevJoint, prevBone.Rotation, bone.PrevJoint);
+                articulation.parentAnchorRotation = Quaternion.identity;
             }
 
             UpdateBoneSizes(prevBone, bone, true);
 
             UpdateBoneAngle(prevBone, bone, true);
 
-            articulationBody.WakeUp();
+            articulation.WakeUp();
         }
 
         internal void UpdateIterations()
         {
-            articulationBody.solverIterations = hardContactParent.useProjectPhysicsIterations ? Physics.defaultSolverIterations : hardContactParent.handSolverIterations;
-            articulationBody.solverVelocityIterations = hardContactParent.useProjectPhysicsIterations ? Physics.defaultSolverVelocityIterations : hardContactParent.handSolverVelocityIterations;
+            articulation.solverIterations = hardContactParent.useProjectPhysicsIterations ? Physics.defaultSolverIterations : hardContactParent.handSolverIterations;
+            articulation.solverVelocityIterations = hardContactParent.useProjectPhysicsIterations ? Physics.defaultSolverVelocityIterations : hardContactParent.handSolverVelocityIterations;
         }
 
         internal bool BoneOverRotationCheck(float eulerThreshold = 20f)
         {
-            float angle = Mathf.Repeat(articulationBody.transform.localRotation.eulerAngles.x + 180, 360) - 180;
-            if (angle < articulationBody.xDrive.lowerLimit - eulerThreshold)
+            float angle = Mathf.Repeat(articulation.transform.localRotation.eulerAngles.x + 180, 360) - 180;
+            if (angle < articulation.xDrive.lowerLimit - eulerThreshold)
             {
                 return true;
             }
 
-            if (angle > articulationBody.xDrive.upperLimit + eulerThreshold)
+            if (angle > articulation.xDrive.upperLimit + eulerThreshold)
             {
                 return true;
             }
 
             // If the overlapBone's meant to be pretty flat
-            float delta = Mathf.DeltaAngle(angle, articulationBody.xDrive.target);
-            if (Mathf.Abs(articulationBody.xDrive.target) < eulerThreshold / 2f && delta > eulerThreshold)
+            float delta = Mathf.DeltaAngle(angle, articulation.xDrive.target);
+            if (Mathf.Abs(articulation.xDrive.target) < eulerThreshold / 2f && delta > eulerThreshold)
             {
                 // We are over rotated, add a frame to the frame count
                 _overRotationCount++;
@@ -585,7 +583,7 @@ namespace Leap.Unity.ContactHands
                 // Has the benefit of stopping small objects falling through bones
                 return;
             }
-            articulationBody.parentAnchorPosition = Vector3.Lerp(articulationBody.parentAnchorPosition,
+            articulation.parentAnchorPosition = Vector3.Lerp(articulation.parentAnchorPosition,
                 ContactUtils.InverseTransformPoint(leapHand.PalmPosition, leapHand.Rotation, finger == 0 ? knuckleBone.PrevJoint : knuckleBone.NextJoint),
                 deltaTime);
         }
@@ -599,7 +597,7 @@ namespace Leap.Unity.ContactHands
                 return;
             }
 
-            articulationBody.parentAnchorPosition = Vector3.Lerp(articulationBody.parentAnchorPosition,
+            articulation.parentAnchorPosition = Vector3.Lerp(articulation.parentAnchorPosition,
                 ContactUtils.InverseTransformPoint(parentPosition, parentRotation, childPosition),
                 deltaTime);
 
