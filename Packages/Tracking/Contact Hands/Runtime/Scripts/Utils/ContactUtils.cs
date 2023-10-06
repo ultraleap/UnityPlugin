@@ -146,6 +146,15 @@ namespace Leap.Unity.ContactHands
             return false;
         }
 
+        public static Vector3 GetClosestPointOnFiniteLine(Vector3 point, Vector3 lineStart, Vector3 lineEnd)
+        {
+            Vector3 lineDir = lineEnd - lineStart;
+            float lineLength = lineDir.magnitude;
+            lineDir.Normalize();
+            float projectLength = Mathf.Clamp(Vector3.Dot(point - lineStart, lineDir), 0f, lineLength);
+            return lineStart + lineDir * projectLength;
+        }
+
         #region Names
         public static string IndexToFinger(int fingerIndex)
         {

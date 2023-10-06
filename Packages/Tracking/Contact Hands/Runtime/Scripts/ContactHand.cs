@@ -40,9 +40,11 @@ namespace Leap.Unity.ContactHands
         internal ContactManager contactManager => contactParent.contactManager;
 
         #region Interaction Data
-        internal bool isContacting = false, isCloseToObject = false, isGrabbing = false;
+        internal bool isContacting = false, isHovering = false, isCloseToObject = false, isGrabbing = false, isIntersecting = false;
+        public bool IsHovering => isHovering;
         public bool IsContacting => isContacting;
         public bool IsCloseToObject => isCloseToObject;
+        public bool IsIntersecting => isIntersecting;
 
         public bool IsGrabbing => isGrabbing;
 
