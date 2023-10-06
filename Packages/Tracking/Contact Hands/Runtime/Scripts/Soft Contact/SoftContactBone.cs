@@ -50,12 +50,11 @@ namespace Leap.Unity.ContactHands
             // as any capsule or spherical bones will roll on contact.
             Collider.attachedRigidbody.MoveRotation(targetRotation);
 
-            float boneWidth = width;
             Vector3 lastTargetPositionTransformedAhead = lastTargetPosition;
 
             // Calculate how far off its target the contact bone is.
             float errorDistance = Vector3.Distance(lastTargetPositionTransformedAhead, Collider.attachedRigidbody.position);
-            float errorFraction = errorDistance / boneWidth;
+            float errorFraction = errorDistance / width;
 
             // Adjust the mass of the contact bone based on the mass of
             // the object it is currently touching.
@@ -80,7 +79,7 @@ namespace Leap.Unity.ContactHands
             // Attempt to move the contact bone to its target position and rotation
             // by setting its target velocity and angular velocity. Include a "deadzone"
             // for position to avoid tiny vibrations.
-            float deadzone = Mathf.Min(DEAD_ZONE_FRACTION * boneWidth, 0.01F * scale);
+            float deadzone = Mathf.Min(DEAD_ZONE_FRACTION * width, 0.01F * scale);
             Vector3 delta = (targetPosition - Collider.attachedRigidbody.position);
             float deltaMag = delta.magnitude;
 

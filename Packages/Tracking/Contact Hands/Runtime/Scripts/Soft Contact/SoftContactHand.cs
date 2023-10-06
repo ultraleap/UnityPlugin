@@ -39,8 +39,9 @@ namespace Leap.Unity.ContactHands
             var rbody = palmBone.gameObject.AddComponent<Rigidbody>();
             rbody.useGravity = false;
             rbody.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+#if UNITY_2022_3_OR_NEWER
             rbody.includeLayers = ~0;
-
+#endif
             // Set the colliders to ignore eachother
             foreach (var bone in bones)
             {
@@ -50,8 +51,9 @@ namespace Leap.Unity.ContactHands
                 rbody = bone.gameObject.AddComponent<Rigidbody>();
                 rbody.useGravity = false;
                 rbody.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+#if UNITY_2022_3_OR_NEWER
                 rbody.includeLayers = ~0;
-
+#endif
                 foreach (var bone2 in bones)
                 {
                     if (bone != bone2)

@@ -1,32 +1,38 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using UnityEditor;
-using UnityEditor.VersionControl;
 using UnityEngine;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace Leap.Unity.ContactHands
 {
     public class ContactManager : LeapProvider
     {
+        public enum ContactMode
+        {
+            HardContact,
+            SoftContact,
+            NoContact,
+            Custom
+        }
 
         [SerializeField] private LeapProvider _inputProvider;
         public LeapProvider InputProvider => _inputProvider;
 
-        [HideInInspector]
+        ContactMode _contactMode = ContactMode.NoContact;
+        [Space, SerializeField]
+        ContactMode contactMode;
+
         public ContactParent contactHands;
-        [HideInInspector]
-        public string contactParentName;
-        [HideInInspector]
-        public int contactParentChoiceIndex = 0;
 
         #region Layers
         // Layers
         // Object Layers
         public SingleLayer DefaultLayer => _defaultLayer;
-        [SerializeField, Tooltip("This layer will be used as the base when automatically generating layers.")]
+        [Space, SerializeField, Tooltip("This layer will be used as the base when automatically generating layers.")]
         private SingleLayer _defaultLayer = 0;
 
         public List<SingleLayer> InteractableLayers => _interactableLayers;
@@ -175,6 +181,53 @@ namespace Leap.Unity.ContactHands
             }
         }
 
+        public void SetContactMode(ContactMode mode)
+        {
+            if (contactHands != null) // delete old contact hands
+            {
+                if (Application.isPlaying)
+                {
+                    Destroy(contactHands.gameObject);
+                }
+                else
+                {
+                    DestroyImmediate(contactHands.gameObject);
+                }
+
+                contactHands = null;
+            }
+
+            _contactMode = mode;
+            contactMode = mode;
+
+            if (contactMode == ContactMode.Custom) // don't make new ones if we are now custom
+            {
+                return;
+            }
+
+            // Make new hands hand add their component
+
+            GameObject newContactHands = new GameObject(_contactMode.ToString());
+
+            switch (_contactMode)
+            {
+                case ContactMode.HardContact:
+                    contactHands = newContactHands.AddComponent(typeof(HardContactParent)) as ContactParent;
+                    break;
+                case ContactMode.SoftContact:
+                    contactHands = newContactHands.AddComponent(typeof(SoftContactParent)) as ContactParent;
+                    break;
+                case ContactMode.NoContact:
+                    contactHands = newContactHands.AddComponent(typeof(NoContactParent)) as ContactParent;
+                    break;
+            }
+
+            if (transform != null) // catches some edit-time issues
+            {
+                newContactHands.transform.parent = transform;
+            }
+        }
+
         #region Layer Generation
         protected void GenerateLayers()
         {
@@ -289,120 +342,39 @@ namespace Leap.Unity.ContactHands
 
         #region Unity Editor
 
+#if UNITY_EDITOR
+
+
+        bool setContactMode = false;
+
         private void OnValidate()
         {
             if (contactHands == null)
             {
                 contactHands = GetComponentInChildren<ContactParent>();
             }
+
+            if (contactMode != _contactMode || contactHands == null)
+            {
+                // Use EditorApplication.update and a bool to avoid multiple edit-time errors
+                setContactMode = true;
+                EditorApplication.update -= HandleEditorUpdateNewContactMode;
+                EditorApplication.update += HandleEditorUpdateNewContactMode;
+            }
         }
+
+        void HandleEditorUpdateNewContactMode()
+        {
+            if(setContactMode)
+            {
+                EditorApplication.update -= HandleEditorUpdateNewContactMode;
+                SetContactMode(contactMode);
+                setContactMode = false;
+            }
+        }
+
+#endif
 
         #endregion
     }
-
-    [CustomEditor(typeof(ContactManager))]
-    public class ContactManagerEditor : Editor
-    {
-        string contactParentPath;
-        GameObject previousContactParentGO;
-        string[] contactParentPaths;
-
-        
-
-        public override void OnInspectorGUI()
-        {
-            ContactManager thisAsContactManager = (ContactManager)target;
-
-            #region contact parent dropdown
-
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField(new GUIContent("Type Of Contact Hands"), EditorStyles.boldLabel);
-            GUILayout.FlexibleSpace();
-            if (thisAsContactManager.contactHands != null)
-            {
-                previousContactParentGO = thisAsContactManager.contactHands.gameObject;
-            }
-            contactParentPath = thisAsContactManager.contactParentName;
-
-            List<string> contactParentNames = new List<string>();
-
-            contactParentPaths = FindContactParentAssetPaths().ToArray();
-            if (contactParentPaths.Length > 0)
-            {
-                for (int i = 0; i < contactParentPaths.Length; i++)
-                {
-                    contactParentNames.Add(Path.GetFileNameWithoutExtension(contactParentPaths[i]));
-                }
-                contactParentNames.Add("Custom");
-
-                thisAsContactManager.contactParentChoiceIndex = EditorGUILayout.Popup(thisAsContactManager.contactParentChoiceIndex, contactParentNames.ToArray());
-
-                if (contactParentNames[thisAsContactManager.contactParentChoiceIndex] != "Custom")
-                {
-                    if (contactParentPath != contactParentPaths[thisAsContactManager.contactParentChoiceIndex])
-                    {
-                        contactParentPath = contactParentPaths[thisAsContactManager.contactParentChoiceIndex];
-
-                        if (previousContactParentGO != null)
-                        {
-                            DestroyImmediate(previousContactParentGO);
-                        }
-                        previousContactParentGO = Instantiate(AssetDatabase.LoadAssetAtPath<GameObject>(contactParentPath));
-                        previousContactParentGO.transform.parent = thisAsContactManager.transform;
-
-                        ContactParent newContactParent = previousContactParentGO.GetComponent<ContactParent>();
-                        newContactParent.contactManager = thisAsContactManager;
-
-                        // Update the selected choice in ContactManager
-                        thisAsContactManager.contactHands = newContactParent;
-                        thisAsContactManager.contactParentName = contactParentPath;
-                    }
-                }
-                else
-                {
-                    if (previousContactParentGO != null)
-                    {
-                        DestroyImmediate(previousContactParentGO);
-                    }
-                }
-                EditorUtility.SetDirty(target);
-            }
-            EditorGUILayout.EndHorizontal();
-
-
-            if(contactParentNames[thisAsContactManager.contactParentChoiceIndex] == "Custom")
-            {
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("contactHands"));
-            }
-
-            GUILayout.Space(10);
-            #endregion
-
-            DrawDefaultInspector();
-        }
-
-
-        private static List<string> FindContactParentAssetPaths()
-        {
-            List<ContactParent> assets = new List<ContactParent>();
-            List<string> assetPaths = new List<string>();
-
-            string[] guids = AssetDatabase.FindAssets(string.Format("t:prefab", typeof(ContactParent)));
-
-            for (int i = 0; i < guids.Length; i++)
-            {
-                string assetPath = AssetDatabase.GUIDToAssetPath(guids[i]);
-                ContactParent asset = AssetDatabase.LoadAssetAtPath<ContactParent>(assetPath);
-
-                if (asset != null)
-                {
-                    assets.Add(asset);
-                    assetPaths.Add(assetPath);
-                }
-            }
-            return assetPaths;
-        }
-
-    }
-
 }
