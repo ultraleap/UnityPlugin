@@ -8,7 +8,7 @@ namespace Leap.Unity.ContactHands
     {
 
         [SerializeField, HideInInspector]
-        protected PhysicMaterial _physicsMaterial;
+        private PhysicMaterial _physicsMaterial;
         public PhysicMaterial PhysicsMaterial => _physicsMaterial;
 
         private HardContactHand leftHardContactHand => leftHand as HardContactHand;
@@ -51,7 +51,7 @@ namespace Leap.Unity.ContactHands
             
         }
 
-        protected static PhysicMaterial CreateHandPhysicsMaterial()
+        private static PhysicMaterial CreateHandPhysicsMaterial()
         {
             PhysicMaterial material = new PhysicMaterial("HandPhysics");
 

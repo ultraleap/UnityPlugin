@@ -132,12 +132,12 @@ namespace Leap.Unity.ContactHands
 
         internal void ProcessColliderQueue()
         {
-            foreach(var key in _hoverObjects.Keys)
+            // Remove old hovers
+            foreach (var key in _hoverObjects.Keys)
             {
                 _hoverObjects[key].RemoveWhere(RemoveHoverQueue);
             }
 
-            // Remove old hovers
             for (int i = 0; i < _hoverObjects.Keys.Count; i++)
             {
                 Rigidbody hoverRigidbody = _hoverObjects.Keys.ElementAt(i);
@@ -189,12 +189,12 @@ namespace Leap.Unity.ContactHands
 
             _hoverQueueCount = 0;
 
+            // Remove old contacts
             foreach (var key in _contactObjects.Keys)
             {
                 _contactObjects[key].RemoveWhere(RemoveContactQueue);
             }
 
-            // Remove old contacts
             for (int i = 0; i < _contactObjects.Keys.Count; i++)
             {
                 Rigidbody contactRigidbody = _contactObjects.Keys.ElementAt(i);

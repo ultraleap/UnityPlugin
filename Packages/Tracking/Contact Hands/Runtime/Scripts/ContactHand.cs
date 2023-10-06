@@ -79,7 +79,7 @@ namespace Leap.Unity.ContactHands
         private Collider[] _colliderCache = new Collider[32];
         #endregion
 
-        protected virtual void Awake()
+        private void Awake()
         {
             bones = new ContactBone[(FINGERS * FINGER_BONES)];
         }

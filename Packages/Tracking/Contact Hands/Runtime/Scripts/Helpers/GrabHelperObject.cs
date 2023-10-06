@@ -514,55 +514,55 @@ namespace Leap.Unity.ContactHands
 
         private void CheckForBonesFacingEachOther()
         {
-            int i = 0;
+            int bone1Index = 0;
 
-            foreach (ContactBone b1 in BoneHash)
+            foreach (ContactBone bone1 in BoneHash)
             {
-                if (b1.GrabbableDirections.TryGetValue(_rigid, out var grabbableDirectionsB1))
+                if (bone1.GrabbableDirections.TryGetValue(_rigid, out var grabbableDirectionsB1))
                 {
-                    int j = 0;
+                    int bone2Index = 0;
 
-                    foreach (ContactBone b2 in BoneHash)
+                    foreach (ContactBone bone2 in BoneHash)
                     {
-                        if(j < i)
+                        if(bone2Index < bone1Index) // Avoid double-checking the same index combinations
                         {
-                            j++;
+                            bone2Index++;
                             continue;
                         }
 
                         // Don't compare against the same bone
-                        if (b1 == b2) continue;
+                        if (bone1 == bone2) continue;
 
-                        if (b2.GrabbableDirections.TryGetValue(_rigid, out var grabbableDirectionsB2))
+                        if (bone2.GrabbableDirections.TryGetValue(_rigid, out var grabbableDirectionsB2))
                         {
                             foreach (var directionPairB1 in grabbableDirectionsB1)
                             {
                                 //If the grabbable direction is facing away from the bone forward direction, disregard it
-                                if (Vector3.Dot(directionPairB1.Value.direction, -b1.transform.up) < FORWARD_DIRECTION_DOT) continue;
+                                if (Vector3.Dot(directionPairB1.Value.direction, -bone1.transform.up) < FORWARD_DIRECTION_DOT) continue;
 
                                 foreach (var directionPairB2 in grabbableDirectionsB2)
                                 {
                                     //If the grabbable direction is facing away from the bone forward direction, disregard it
-                                    if (Vector3.Dot(directionPairB2.Value.direction, -b2.transform.up) < FORWARD_DIRECTION_DOT) continue;
+                                    if (Vector3.Dot(directionPairB2.Value.direction, -bone2.transform.up) < FORWARD_DIRECTION_DOT) continue;
 
                                     float dot = Vector3.Dot(directionPairB1.Value.direction, directionPairB2.Value.direction);
 
                                     //If the two bones are facing opposite directions (i.e. pushing towards each other), they're grabbing
                                     if (dot < GRABBABLE_DIRECTIONS_DOT)
                                     {
-                                        if (b1.contactHand == b2.contactHand)
+                                        if (bone1.contactHand == bone2.contactHand)
                                         {
-                                            _grabbingValues[b1.contactHand].handGrabbing = true;
-                                            _grabbingValues[b2.contactHand].handGrabbing = true;
+                                            _grabbingValues[bone1.contactHand].handGrabbing = true;
+                                            _grabbingValues[bone2.contactHand].handGrabbing = true;
                                         }
                                         else
                                         {
-                                            _grabbingValues[b1.contactHand].facingOppositeHand = true;
-                                            _grabbingValues[b2.contactHand].facingOppositeHand = true;
+                                            _grabbingValues[bone1.contactHand].facingOppositeHand = true;
+                                            _grabbingValues[bone2.contactHand].facingOppositeHand = true;
                                         }
 
-                                        RegisterGrabbingHand(b1.contactHand);
-                                        RegisterGrabbingHand(b2.contactHand);
+                                        RegisterGrabbingHand(bone1.contactHand);
+                                        RegisterGrabbingHand(bone2.contactHand);
 
                                         return;
                                     }
@@ -572,73 +572,8 @@ namespace Leap.Unity.ContactHands
                     }
                 }
 
-                i++;
+                bone1Index++;
             }
-
-
-
-            //HashSet<Tuple<int, int>> checkedPairs = new HashSet<Tuple<int, int>>();
-
-            //foreach (ContactBone b1 in BoneHash)
-            //{
-            //    if (b1.GrabbableDirections.TryGetValue(_rigid, out var grabbableDirectionsB1))
-            //    {
-            //        int idB1 = b1.GetInstanceID();
-            //        foreach (ContactBone b2 in BoneHash)
-            //        {
-            //            // Don't compare against the same bone
-            //            if (b1 == b2) continue;
-
-            //            int idB2 = b2.GetInstanceID();
-
-            //            Tuple<int, int> idPair1 = new Tuple<int, int>(idB1, idB2);
-            //            Tuple<int, int> idPair2 = new Tuple<int, int>(idB2, idB1);
-
-            //            // Don't compare against a pair that has already been compared against
-            //            if (checkedPairs.Contains(idPair1) || checkedPairs.Contains(idPair2)) continue;
-
-            //            // Register this pair of bones as checked, so that we don't check against it again
-            //            checkedPairs.Add(idPair1);
-
-            //            if (b2.GrabbableDirections.TryGetValue(_rigid, out var grabbableDirectionsB2))
-            //            {
-            //                foreach (var directionPairB1 in grabbableDirectionsB1)
-            //                {
-            //                    //If the grabbable direction is facing away from the bone forward direction, disregard it
-            //                    if (Vector3.Dot(directionPairB1.Value.direction, -b1.transform.up) < FORWARD_DIRECTION_DOT) continue;
-
-            //                    foreach (var directionPairB2 in grabbableDirectionsB2)
-            //                    {
-            //                        //If the grabbable direction is facing away from the bone forward direction, disregard it
-            //                        if (Vector3.Dot(directionPairB2.Value.direction, -b2.transform.up) < FORWARD_DIRECTION_DOT) continue;
-
-            //                        float dot = Vector3.Dot(directionPairB1.Value.direction, directionPairB2.Value.direction);
-
-            //                        //If the two bones are facing opposite directions (i.e. pushing towards each other), they're grabbing
-            //                        if (dot < GRABBABLE_DIRECTIONS_DOT)
-            //                        {
-            //                            if (b1.contactHand == b2.contactHand)
-            //                            {
-            //                                _grabbingValues[b1.contactHand].handGrabbing = true;
-            //                                _grabbingValues[b2.contactHand].handGrabbing = true;
-            //                            }
-            //                            else
-            //                            {
-            //                                _grabbingValues[b1.contactHand].facingOppositeHand = true;
-            //                                _grabbingValues[b2.contactHand].facingOppositeHand = true;
-            //                            }
-
-            //                            RegisterGrabbingHand(b1.contactHand);
-            //                            RegisterGrabbingHand(b2.contactHand);
-
-            //                            return;
-            //                        }
-            //                    }
-            //                }
-            //            }
-            //        }
-            //    }
-            //}
         }
 
         private void RegisterGrabbingHand(ContactHand hand)

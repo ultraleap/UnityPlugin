@@ -7,16 +7,16 @@ namespace Leap.Unity.ContactHands
 {
     public class HardContactHand : ContactHand
     {
-        protected int RESET_FRAME_COUNT = 2, TELEPORT_FRAME_COUNT = 5, RESET_FRAME_TELEPORT_COUNT = 10;
+        private const int RESET_FRAME_COUNT = 2, TELEPORT_FRAME_COUNT = 5, RESET_FRAME_TELEPORT_COUNT = 10;
 
         private HardContactParent hardContactParent => contactParent as HardContactParent;
 
-        protected int _resetCounter = 2, _teleportFrameCount = 10;
+        private int _resetCounter = 2, _teleportFrameCount = 10;
         private int _layerMask = 0;
         private int _lastFrameTeleport;
 
-        protected bool _wasGrabbing, _justGhosted;
-        protected float _timeOnReset;
+        private bool _wasGrabbing, _justGhosted;
+        private float _timeOnReset;
         internal float currentResetLerp { get { return _timeOnReset == 0 ? 1 : Mathf.InverseLerp(0.1f, 0.25f, Time.time - _timeOnReset); } }
 
         private float _overallFingerDisplacement = 0f, _averageFingerDisplacement = 0f, _contactFingerDisplacement = 0f;
@@ -118,7 +118,7 @@ namespace Leap.Unity.ContactHands
             }
         }
 
-        protected void ResetHardContactHand()
+        private void ResetHardContactHand()
         {
             _lastFrameTeleport = Time.frameCount;
             ghosted = true;
@@ -283,7 +283,7 @@ namespace Leap.Unity.ContactHands
                 _justGhosted = true;
             }
 
-            if (Time.frameCount - _lastFrameTeleport >= _teleportFrameCount && ghosted && !IsContacting)
+            if (Time.frameCount - _lastFrameTeleport >= _teleportFrameCount && ghosted && !isCloseToObject)
             {
                 ChangeHandLayer(contactManager.HandsLayer);
 
