@@ -33,15 +33,14 @@ namespace Leap.Unity.ContactHands
         internal override void GenerateHandLogic()
         {
             GenerateHandObjects(typeof(SoftContactBone));
-            isHandPhysical = false;
 
             ((SoftContactBone)palmBone).SetupBone();
             var rbody = palmBone.gameObject.AddComponent<Rigidbody>();
             rbody.useGravity = false;
-            rbody.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
-#if UNITY_2022_3_OR_NEWER
-            rbody.includeLayers = ~0;
-#endif
+            rbody.collisionDetectionMode = CollisionDetectionMode.Continuous;
+
+            palmBone.rigid = rbody;
+
             // Set the colliders to ignore eachother
             foreach (var bone in bones)
             {
@@ -50,10 +49,8 @@ namespace Leap.Unity.ContactHands
 
                 rbody = bone.gameObject.AddComponent<Rigidbody>();
                 rbody.useGravity = false;
-                rbody.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
-#if UNITY_2022_3_OR_NEWER
-                rbody.includeLayers = ~0;
-#endif
+                rbody.collisionDetectionMode = CollisionDetectionMode.Continuous;
+
                 foreach (var bone2 in bones)
                 {
                     if (bone != bone2)
@@ -62,6 +59,8 @@ namespace Leap.Unity.ContactHands
                     }
                 }
             }
+
+            ChangeHandLayer(contactManager.HandsLayer);
         }
 
         internal override void PostFixedUpdateHandLogic()
