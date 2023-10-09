@@ -22,9 +22,10 @@ namespace Leap.Unity.ContactHands
         [SerializeField] private LeapProvider _inputProvider;
         public LeapProvider InputProvider => _inputProvider;
 
-        ContactMode _contactMode = ContactMode.NoContact;
+
+        private ContactMode _currentContactMode;
         [Space, SerializeField]
-        ContactMode contactMode;
+        protected ContactMode contactMode;
 
         public ContactParent contactHands;
 
@@ -183,6 +184,11 @@ namespace Leap.Unity.ContactHands
 
         public void SetContactMode(ContactMode mode)
         {
+            if(_currentContactMode == mode && contactMode == mode)
+            {
+                return;
+            }
+
             if (contactHands != null) // delete old contact hands
             {
                 if (Application.isPlaying)
@@ -197,19 +203,18 @@ namespace Leap.Unity.ContactHands
                 contactHands = null;
             }
 
-            _contactMode = mode;
             contactMode = mode;
+            _currentContactMode = mode;
 
-            if (contactMode == ContactMode.Custom) // don't make new ones if we are now custom
+            if (_currentContactMode == ContactMode.Custom) // don't make new ones if we are now custom
             {
                 return;
             }
 
             // Make new hands hand add their component
+            GameObject newContactHands = new GameObject(_currentContactMode.ToString());
 
-            GameObject newContactHands = new GameObject(_contactMode.ToString());
-
-            switch (_contactMode)
+            switch (_currentContactMode)
             {
                 case ContactMode.HardContact:
                     contactHands = newContactHands.AddComponent(typeof(HardContactParent)) as ContactParent;
@@ -344,32 +349,11 @@ namespace Leap.Unity.ContactHands
 
 #if UNITY_EDITOR
 
-
-        bool setContactMode = false;
-
         private void OnValidate()
         {
             if (contactHands == null)
             {
                 contactHands = GetComponentInChildren<ContactParent>();
-            }
-
-            if (contactMode != _contactMode || contactHands == null)
-            {
-                // Use EditorApplication.update and a bool to avoid multiple edit-time errors
-                setContactMode = true;
-                EditorApplication.update -= HandleEditorUpdateNewContactMode;
-                EditorApplication.update += HandleEditorUpdateNewContactMode;
-            }
-        }
-
-        void HandleEditorUpdateNewContactMode()
-        {
-            if(setContactMode)
-            {
-                EditorApplication.update -= HandleEditorUpdateNewContactMode;
-                SetContactMode(contactMode);
-                setContactMode = false;
             }
         }
 
