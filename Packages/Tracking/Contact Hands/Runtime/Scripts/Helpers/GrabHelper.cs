@@ -14,11 +14,11 @@ namespace Leap.Unity.ContactHands
         public LeapProvider dataProvider;
         public ContactManager contactManager;
 
-        private bool _leftGoodState { get { return contactManager.contactHands.leftHand.InGoodState; } }
-        private bool _rightGoodState { get { return contactManager.contactHands.rightHand.InGoodState; } }
+        private bool _leftGoodState { get { return contactManager.contactHands.LeftHand.InGoodState; } }
+        private bool _rightGoodState { get { return contactManager.contactHands.RightHand.InGoodState; } }
 
-        private ContactHand _leftContactHand { get { return contactManager.contactHands.leftHand; } }
-        private ContactHand _rightContactHand { get { return contactManager.contactHands.rightHand; } }
+        private ContactHand _leftContactHand { get { return contactManager.contactHands.LeftHand; } }
+        private ContactHand _rightContactHand { get { return contactManager.contactHands.RightHand; } }
 
         private Collider[] _colliderCache = new Collider[32];
 

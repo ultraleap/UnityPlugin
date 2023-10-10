@@ -22,7 +22,6 @@ namespace Leap.Unity.ContactHands
         [SerializeField] private LeapProvider _inputProvider;
         public LeapProvider InputProvider => _inputProvider;
 
-
         private ContactMode _currentContactMode;
         [Space, SerializeField]
         protected ContactMode contactMode;
@@ -31,42 +30,21 @@ namespace Leap.Unity.ContactHands
 
         #region Layers
         // Layers
-        // Object Layers
-        public SingleLayer DefaultLayer => _defaultLayer;
-        [Space, SerializeField, Tooltip("This layer will be used as the base when automatically generating layers.")]
-        private SingleLayer _defaultLayer = 0;
-
-        public List<SingleLayer> InteractableLayers => _interactableLayers;
-        [SerializeField, Tooltip("The layers that you want hands and helpers to make contact and interact with. If no layers are added then the default layer will be included.")]
-        private List<SingleLayer> _interactableLayers = new List<SingleLayer>() { 0 };
-
-        public List<SingleLayer> NoContactLayers => _noContactLayers;
-        [SerializeField, Tooltip("Layers that should be ignored by the hands. " +
-            "These layers should be used throughout your scene on objects that you want hands to freely pass through. We recommend creating these layers manually. " +
-            "If no layers are added then a layer will be created.")]
-        private List<SingleLayer> _noContactLayers = new List<SingleLayer>();
-
         // Hand Layers
         public SingleLayer HandsLayer => _handsLayer;
-        [SerializeField, Tooltip("The default layer for the hands.")]
-        private SingleLayer _handsLayer = new SingleLayer();
-
-        [SerializeField, Tooltip("The default layer for the hands. It is recommended to leave this as an automatically generated layer.")]
-        private bool _automaticHandsLayer = true;
+        private SingleLayer _handsLayer = -1;
 
         public SingleLayer HandsResetLayer => _handsResetLayer;
-        [SerializeField, Tooltip("The layer that the hands will be set to during non-active or reset states.")]
-        private SingleLayer _handsResetLayer = new SingleLayer();
-        [SerializeField, Tooltip("The layer that the hands will be set to during non-active or reset states. It is recommended to leave this as an automatically generated layer.")]
-        private bool _automaticHandsResetLayer = true;
+        private SingleLayer _handsResetLayer = -1;
 
         private bool _layersGenerated = false;
+
         private LayerMask _interactionMask;
         public LayerMask InteractionMask => _interactionMask;
         #endregion
 
         #region Hand Settings
-        [SerializeField, Tooltip("The distance that bones will have their radius inflated by when calculating if an object is hovered.")]
+        [Space, SerializeField, Tooltip("The distance that bones will have their radius inflated by when calculating if an object is hovered.")]
         private float _hoverDistance = 0.04f;
         public float HoverDistance => _hoverDistance;
         [SerializeField, Tooltip("The distance that bones will have their radius inflated by when calculating if an object is grabbed. " +
@@ -74,7 +52,7 @@ namespace Leap.Unity.ContactHands
         private float _contactDistance = 0.002f;
         public float ContactDistance => _contactDistance;
 
-        [SerializeField, Tooltip("Allows the hands to collide with one another.")]
+        [Space, SerializeField, Tooltip("Allows the hands to collide with one another.")]
         private bool _interHandCollisions = false;
         public bool InterHandCollisions => _interHandCollisions;
         #endregion
@@ -241,33 +219,15 @@ namespace Leap.Unity.ContactHands
                 return;
             }
 
-            if (_automaticHandsLayer || HandsLayer == DefaultLayer)
-            {
-                _handsLayer = -1;
-            }
-            if (_automaticHandsResetLayer || HandsResetLayer == DefaultLayer)
-            {
-                _handsResetLayer = -1;
-            }
-            for (int i = 0; i < _noContactLayers.Count; i++)
-            {
-                if (_noContactLayers[i] == DefaultLayer)
-                {
-                    _noContactLayers.Remove(i);
-                    i--;
-                }
-            }
+            _handsLayer = LayerMask.NameToLayer("ContactHands");
+            _handsResetLayer = LayerMask.NameToLayer("ContactHandsReset");
 
             for (int i = 8; i < 32; i++)
             {
                 string layerName = LayerMask.LayerToName(i);
+
                 if (string.IsNullOrEmpty(layerName))
                 {
-                    if (_noContactLayers.Count == 0)
-                    {
-                        _noContactLayers.Add(new SingleLayer() { layerIndex = i });
-                        continue;
-                    }
                     if (_handsLayer == -1)
                     {
                         _handsLayer = i;
@@ -292,10 +252,7 @@ namespace Leap.Unity.ContactHands
                 return;
             }
 
-            if (_interactableLayers.Count == 0)
-            {
-                _interactableLayers.Add(new SingleLayer() { layerIndex = 0 });
-            }
+            List<SingleLayer> _interactableLayers = new List<SingleLayer>() { 0 };
 
             if (_interHandCollisions)
             {
@@ -315,28 +272,8 @@ namespace Leap.Unity.ContactHands
         {
             for (int i = 0; i < 32; i++)
             {
-                // Copy ignore settings from template layer
-                bool shouldIgnore = Physics.GetIgnoreLayerCollision(DefaultLayer, i);
-                Physics.IgnoreLayerCollision(_handsLayer, i, shouldIgnore);
-
-                for (int j = 0; j < _noContactLayers.Count; j++)
-                {
-                    Physics.IgnoreLayerCollision(_noContactLayers[j], i, shouldIgnore);
-                }
-
                 // Hands ignore all contact
                 Physics.IgnoreLayerCollision(_handsResetLayer, i, true);
-            }
-
-            for (int i = 0; i < _interactableLayers.Count; i++)
-            {
-                Physics.IgnoreLayerCollision(_interactableLayers[i], _handsLayer, false);
-            }
-
-            // Disable interaction between hands and nocontact objects
-            for (int i = 0; i < _noContactLayers.Count; i++)
-            {
-                Physics.IgnoreLayerCollision(_noContactLayers[i], _handsLayer, true);
             }
 
             // Setup interhand collisions

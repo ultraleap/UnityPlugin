@@ -11,8 +11,8 @@ namespace Leap.Unity.ContactHands
         private PhysicMaterial _physicsMaterial;
         public PhysicMaterial PhysicsMaterial => _physicsMaterial;
 
-        private HardContactHand leftHardContactHand => leftHand as HardContactHand;
-        private HardContactHand rightHardContactHand => rightHand as HardContactHand;
+        private HardContactHand leftHardContactHand => LeftHand as HardContactHand;
+        private HardContactHand rightHardContactHand => RightHand as HardContactHand;
 
         #region Settings
         [SerializeField, Tooltip("The velocity that the hand will reduce down to, the further it gets away from the original data hand. " +

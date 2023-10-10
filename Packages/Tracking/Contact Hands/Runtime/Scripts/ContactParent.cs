@@ -6,7 +6,11 @@ namespace Leap.Unity.ContactHands
 {
     public abstract class ContactParent : MonoBehaviour
     {
-        public ContactHand leftHand, rightHand;
+        private ContactHand _leftHand;
+        public ContactHand LeftHand => _leftHand;
+
+        private ContactHand _rightHand;
+        public ContactHand RightHand => _rightHand;
 
         public ContactManager contactManager;
 
@@ -22,27 +26,27 @@ namespace Leap.Unity.ContactHands
         {
             GameObject handObject = new GameObject($"Left {handType.Name}", handType);
             handObject.transform.parent = transform;
-            leftHand = handObject.GetComponent<ContactHand>();
-            leftHand.handedness = Chirality.Left;
+            _leftHand = handObject.GetComponent<ContactHand>();
+            _leftHand.handedness = Chirality.Left;
             if (callGenerate)
             {
-                leftHand.GenerateHand();
+                _leftHand.GenerateHand();
             }
 
             handObject = new GameObject($"Right {handType.Name}", handType);
             handObject.transform.parent = transform;
-            rightHand = handObject.GetComponent<ContactHand>();
-            rightHand.handedness = Chirality.Right;
+            _rightHand = handObject.GetComponent<ContactHand>();
+            _rightHand.handedness = Chirality.Right;
             if (callGenerate)
             {
-                rightHand.GenerateHand();
+                _rightHand.GenerateHand();
             }
         }
 
         internal void UpdateFrame()
         {
-            UpdateHand(contactManager._leftHandIndex, leftHand, contactManager._leftDataHand);
-            UpdateHand(contactManager._rightHandIndex, rightHand, contactManager._rightDataHand);
+            UpdateHand(contactManager._leftHandIndex, _leftHand, contactManager._leftDataHand);
+            UpdateHand(contactManager._rightHandIndex, _rightHand, contactManager._rightDataHand);
         }
 
         private void UpdateHand(int index, ContactHand hand, Hand dataHand)
@@ -76,9 +80,9 @@ namespace Leap.Unity.ContactHands
         internal void OutputFrame(ref Frame inputFrame)
         {
             contactManager._leftHandIndex = inputFrame.Hands.FindIndex(x => x.IsLeft);
-            OutputHand(contactManager._leftHandIndex, leftHand, ref inputFrame);
+            OutputHand(contactManager._leftHandIndex, _leftHand, ref inputFrame);
             contactManager._rightHandIndex = inputFrame.Hands.FindIndex(x => x.IsRight);
-            OutputHand(contactManager._rightHandIndex, rightHand, ref inputFrame);
+            OutputHand(contactManager._rightHandIndex, _rightHand, ref inputFrame);
         }
 
         private void OutputHand(int index, ContactHand hand, ref Frame inputFrame)
@@ -106,8 +110,8 @@ namespace Leap.Unity.ContactHands
         internal void PostFixedUpdateFrame()
         {
             PostFixedUpdateFrameLogic();
-            leftHand.PostFixedUpdateHand();
-            rightHand.PostFixedUpdateHand();
+            _leftHand.PostFixedUpdateHand();
+            _rightHand.PostFixedUpdateHand();
         }
 
         /// <summary>
