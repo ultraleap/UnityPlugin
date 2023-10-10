@@ -84,8 +84,8 @@ namespace Leap.Unity.ContactHands
 
         private void UpdateOverlaps()
         {
-            HandOverlaps2(_leftContactHand);
-            HandOverlaps2(_rightContactHand);
+            HandOverlaps(_leftContactHand);
+            HandOverlaps(_rightContactHand);
         }
 
         private void UntrackedHand(ContactHand hand)
@@ -96,7 +96,7 @@ namespace Leap.Unity.ContactHands
             }
         }
 
-        private void HandOverlaps2(ContactHand hand)
+        private void HandOverlaps(ContactHand hand)
         {
             hand.isHovering = false;
             hand.isContacting = false;
