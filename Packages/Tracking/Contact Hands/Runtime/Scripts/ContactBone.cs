@@ -316,7 +316,7 @@ namespace Leap.Unity.ContactHands
                 UpdateHoverCollider(collider.attachedRigidbody, collider, hover);
 
                 // Contact
-                UpdateContactCollider(collider.attachedRigidbody, collider, boneDistance <= contactParent.contactManager.ContactDistance);
+                UpdateContactCollider(collider.attachedRigidbody, collider, boneDistance <= (IsPalm ? contactParent.contactManager.ContactDistance * 2f : contactParent.contactManager.ContactDistance));
 
                 // Safety
                 UpdateSafetyCollider(collider, boneDistance == 0, boneDistance <= SAFETY_CLOSE_DISTANCE);
