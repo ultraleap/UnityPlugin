@@ -52,7 +52,7 @@ namespace Leap.Unity.ContactHands
             {
                 Collider.isTrigger = true;
             }
-            else if (!contactHand.isContacting)
+            else if (!IsBoneContacting)
             {
                 Collider.isTrigger = false;
             }
