@@ -15,7 +15,7 @@ namespace Leap.Unity.ContactHands
             tipPosition = hand.CalculateAverageKnucklePosition();
             wristPosition = hand.WristPosition;
             length = Vector3.Distance(tipPosition, wristPosition);
-            ContactUtils.SetupPalmCollider(palmCollider, hand);
+            ContactUtils.SetupPalmCollider(palmCollider, palmEdgeColliders, hand);
         }
 
         internal override void UpdateBone(Bone prevBone, Bone bone)

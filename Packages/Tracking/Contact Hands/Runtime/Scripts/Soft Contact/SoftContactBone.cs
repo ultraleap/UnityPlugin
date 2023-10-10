@@ -22,7 +22,8 @@ namespace Leap.Unity.ContactHands
 
             UpdateWithInteractionEngineLogic(hand.PalmPosition, hand.Rotation);
 
-            ContactUtils.SetupPalmCollider(palmCollider, hand);
+            // May need to interpolate this if objects are jittery.
+            ContactUtils.SetupPalmCollider(palmCollider, palmEdgeColliders, hand);
         }
 
         internal override void UpdateBone(Bone prevBone, Bone bone)
@@ -31,6 +32,7 @@ namespace Leap.Unity.ContactHands
             width = bone.Width;
             length = bone.Length;
             UpdateWithInteractionEngineLogic(bone.PrevJoint, bone.Rotation);
+            // May need to interpolate this if objects are jittery.
             ContactUtils.SetupBoneCollider(boneCollider, bone);
         }
 
