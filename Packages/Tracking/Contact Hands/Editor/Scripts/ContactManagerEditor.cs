@@ -37,13 +37,10 @@ namespace Leap.Unity.ContactHands
             if (!layersExist)
             {
                 EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.HelpBox($"All allowed layers have been filled. Contact Hands requires 2 available layers to function. \n Delete 2 layers and retry.", MessageType.Warning);
-                if (GUILayout.Button("Retry", GUILayout.Width(80)))
+                EditorGUILayout.HelpBox($"All allowed layers have been filled. Contact Hands requires 2 available layers to function. \n Delete 2 layers to use Contact Hands.", MessageType.Warning);
+                if (GUILayout.Button("Edit Layers", GUILayout.Width(80)))
                 {
-                    if (CreateContactHandLayers())
-                    {
-                        layersExist = true;
-                    }
+                    SettingsService.OpenProjectSettings("Project/Tags and Layers");
                 }
                 EditorGUILayout.EndHorizontal();
             }
