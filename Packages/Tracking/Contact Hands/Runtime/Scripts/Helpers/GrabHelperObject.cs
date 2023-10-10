@@ -98,8 +98,8 @@ namespace Leap.Unity.ContactHands
         private List<ContactBone> _boneCooldownItems = new List<ContactBone>();
         private List<float> _boneCooldownTime = new List<float>();
 
-        public bool Ignored { get { return false; } }
-        //private PhysicsIgnoreHelpers _ignored = null;
+        public bool Ignored;
+        private IgnoreContactHelper _ignoreContactHelper;
 
         /// <summary>
         /// Returns true if the provided hand is grabbing an object.
@@ -160,7 +160,16 @@ namespace Leap.Unity.ContactHands
                 _rigid.maxAngularVelocity = 100f;
             }
             _colliders = rigid.GetComponentsInChildren<Collider>(true).ToList();
-            //_ignored = rigid.GetComponentInChildren<PhysicsIgnoreHelpers>();
+
+            _ignoreContactHelper = rigid.GetComponentInChildren<IgnoreContactHelper>();
+            if (_ignoreContactHelper != null)
+            {
+                Ignored = _ignoreContactHelper.DisableAllGrabbing;
+                _ignoreContactHelper.grabHelperObject = this;
+                _ignoreContactHelper.SetAllHandCollisions();
+
+            }
+
             Manager = manager;
         }
 
@@ -580,7 +589,7 @@ namespace Leap.Unity.ContactHands
         {
             if (_grabbingHands.Contains(hand)) return;
 
-            if (!Ignored && _grabbingHands.Count == 0)
+            if (!Ignored)
             {
                 // Store the original rigidbody variables
                 _oldKinematic = _rigid.isKinematic;
@@ -1020,7 +1029,7 @@ namespace Leap.Unity.ContactHands
             {
                 foreach (var hand in _grabbingCandidates)
                 {
-                    //hand.IgnoreCollision(_rigid, 0f, 0.005f);
+                    hand.IgnoreCollision(_rigid, 0f, 0.005f);
                 }
                 // We only want to apply the forces if we actually want to cause movement to the object
                 // We're still disabling collisions though to allow for the physics system to fully control if necessary

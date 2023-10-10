@@ -50,11 +50,14 @@ namespace Leap.Unity.ContactHands
             // Potentially enable Soft Contact if our error is too large.
             if (contactHand.IsGrabbing || (errorDistance >= softContactDislocationDistance))
             {
-                Collider.isTrigger = true;
+                //Collider.isTrigger = true;
+                gameObject.layer = contactParent.contactManager.HandsResetLayer;
             }
             else if (!contactHand.isContacting)
             {
-                Collider.isTrigger = false;
+                //Collider.isTrigger = false;
+                gameObject.layer = contactParent.contactManager.HandsLayer;
+
             }
 
             // Attempt to move the contact bone to its target position and rotation

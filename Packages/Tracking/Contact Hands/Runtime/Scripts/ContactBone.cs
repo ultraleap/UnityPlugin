@@ -25,7 +25,8 @@ namespace Leap.Unity.ContactHands
         internal CapsuleCollider boneCollider;
         internal BoxCollider palmCollider;
         internal CapsuleCollider[] palmEdgeColliders;
-        protected Collider Collider { get { return IsPalm ? palmCollider : boneCollider; } }
+        public Collider Collider { get { return IsPalm ? palmCollider : boneCollider; } }
+
 
         internal ContactHand contactHand;
         internal ContactParent contactParent => contactHand.contactParent;
