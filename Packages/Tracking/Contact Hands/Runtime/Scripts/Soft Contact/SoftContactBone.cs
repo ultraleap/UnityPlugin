@@ -73,9 +73,7 @@ namespace Leap.Unity.ContactHands
                 lastTargetPosition = Collider.attachedRigidbody.position + delta;
 
                 Vector3 targetVelocity = delta / Time.fixedDeltaTime;
-                float targetVelocityMag = targetVelocity.magnitude;
-                Collider.attachedRigidbody.velocity = (targetVelocity / targetVelocityMag)
-                              * Mathf.Clamp(targetVelocityMag, 0F, 5F);
+                Collider.attachedRigidbody.velocity = targetVelocity;
             }
 
             Quaternion deltaRot = targetRotation * Quaternion.Inverse(Collider.attachedRigidbody.rotation);
