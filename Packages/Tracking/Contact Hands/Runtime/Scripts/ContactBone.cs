@@ -24,6 +24,7 @@ namespace Leap.Unity.ContactHands
 
         internal CapsuleCollider boneCollider;
         internal BoxCollider palmCollider;
+        internal CapsuleCollider[] palmEdgeColliders;
         protected Collider Collider { get { return IsPalm ? palmCollider : boneCollider; } }
 
         internal ContactHand contactHand;
@@ -48,10 +49,15 @@ namespace Leap.Unity.ContactHands
             /// </summary>
             public Vector3 direction = Vector3.zero;
             /// <summary>
-            /// Distance from the raw "position" of the bone
+            /// Distance from the edge of the bone
             /// </summary>
             public float distance = 0f;
         }
+
+        private Vector3 _palmColCenter, _palmColHalfExtents, _palmExtentsReduced, _palmExtentsReducedFlipped;
+        private Quaternion _palmColRotation;
+        private Plane _palmPlane = new Plane();
+        private Vector3[] _palmPoints = new Vector3[4];
 
         private Dictionary<Rigidbody, HashSet<Collider>> _colliderObjects = new Dictionary<Rigidbody, HashSet<Collider>>();
         private Dictionary<Rigidbody, float> _objectDistances = new Dictionary<Rigidbody, float>();
@@ -135,7 +141,22 @@ namespace Leap.Unity.ContactHands
             }
 
             // Update the joint collider positions for cached checks, palm uses the collider directly
-            if (!IsPalm)
+            if (IsPalm)
+            {
+                palmCollider.ToWorldSpaceBox(out _palmColCenter, out _palmColHalfExtents, out _palmColRotation);
+                _palmColCenter -= _palmColRotation * new Vector3(0, palmCollider.center.y, 0);
+                _palmPlane.SetNormalAndPosition(_palmColRotation * Vector3.up, transform.position);
+
+                _palmExtentsReduced = new Vector3(_palmColHalfExtents.x, 0, _palmColHalfExtents.z);
+                _palmExtentsReducedFlipped = new Vector3(_palmExtentsReduced.x, 0, _palmExtentsReduced.z * -1);
+                _palmPoints[0] = _palmColCenter + (_palmColRotation * _palmExtentsReduced);
+                _palmPoints[1] = _palmColCenter + (_palmColRotation * _palmExtentsReducedFlipped);
+                _palmPoints[2] = _palmColCenter - (_palmColRotation * _palmExtentsReduced);
+                _palmPoints[3] = _palmColCenter - (_palmColRotation * _palmExtentsReducedFlipped);
+
+                width = palmEdgeColliders[0].radius;
+            }
+            else
             {
                 boneCollider.ToWorldSpaceCapsule(out tipPosition, out var temp, out width);
             }
@@ -210,7 +231,6 @@ namespace Leap.Unity.ContactHands
             return true;
         }
 
-        // TODO: Palm logic needs to be done separately
         private void UpdateObjectDistances(Collider[] colliderCache, int count)
         {
             _objectDistance = float.MaxValue;
@@ -224,19 +244,23 @@ namespace Leap.Unity.ContactHands
             {
                 collider = colliderCache[i];
 
-                colliderPos = collider.ClosestPoint(Collider.transform.position);
+                // Make sure we don't add invalid objects
+                if (collider.attachedRigidbody == null)
+                    continue;
 
                 if (IsPalm)
                 {
                     // Do palm logic
-                    bonePos = Collider.ClosestPoint(collider.transform.position);
-                    midPoint = colliderPos + (bonePos - colliderPos) / 2f;
+                    colliderPos = ContactUtils.ClosestPointEstimationFromRectangle(_palmColCenter, _palmColRotation, _palmExtentsReduced.xz(), collider);
+                    bonePos = ContactUtils.ClosestPointToRectangleFace(_palmPoints, _palmPlane.ClosestPointOnPlane(collider.transform.position));
+                    midPoint = colliderPos + (bonePos + ((bonePos - colliderPos).normalized * width) - colliderPos) / 2f;
 
                     colliderPos = collider.ClosestPoint(midPoint);
-                    bonePos = Collider.ClosestPoint(midPoint);
+                    bonePos = ContactUtils.ClosestPointToRectangleFace(_palmPoints, _palmPlane.ClosestPointOnPlane(midPoint));
                 }
                 else
                 {
+                    colliderPos = collider.ClosestPoint(Vector3.Lerp(transform.position, tipPosition, 0.5f));
                     // Do joint logic
                     bonePos = ContactUtils.GetClosestPointOnFiniteLine(collider.transform.position, transform.position, tipPosition);
                     // We need to extrude the line to get the bone's edge
@@ -249,14 +273,7 @@ namespace Leap.Unity.ContactHands
                 distance = Vector3.Distance(colliderPos, bonePos);
                 direction = (colliderPos - bonePos).normalized;
 
-                if (IsPalm)
-                {
-                    boneDistance = distance;
-                }
-                else
-                {
-                    boneDistance = Mathf.Clamp(distance - width, 0, float.MaxValue);
-                }
+                boneDistance = Mathf.Clamp(distance - width, 0, float.MaxValue);
 
                 hover = boneDistance <= contactParent.contactManager.HoverDistance;
 
@@ -271,8 +288,8 @@ namespace Leap.Unity.ContactHands
                     if (_objectDirections[collider.attachedRigidbody].ContainsKey(collider))
                     {
                         _objectDirections[collider.attachedRigidbody][collider].direction = direction;
-                        _objectDirections[collider.attachedRigidbody][collider].bonePos = bonePos + (IsPalm ? Vector3.zero : (direction * width));
-                        _objectDirections[collider.attachedRigidbody][collider].distance = distance;
+                        _objectDirections[collider.attachedRigidbody][collider].bonePos = bonePos + (direction * width);
+                        _objectDirections[collider.attachedRigidbody][collider].distance = boneDistance;
                     }
                     else
                     {
@@ -280,9 +297,9 @@ namespace Leap.Unity.ContactHands
                             collider,
                             new ClosestObjectDirection()
                             {
-                                bonePos = bonePos + (IsPalm ? Vector3.zero : (direction * width)),
+                                bonePos = bonePos + (direction * width),
                                 direction = direction,
-                                distance = distance
+                                distance = boneDistance
                             }
                         );
                     }
@@ -316,16 +333,11 @@ namespace Leap.Unity.ContactHands
                         if (singleObjectDistance < _objectDistance)
                         {
                             _objectDistance = singleObjectDistance;
-                            if (IsPalm)
-                            {
-                                _debugA = col.Value.bonePos;
-                                _debugB = col.Value.bonePos + (col.Value.direction * (col.Value.distance - width));
-                            }
+                            _debugA = col.Value.bonePos;
+                            _debugB = col.Value.bonePos + (col.Value.direction * (col.Value.distance));
                         }
                     }
                 }
-
-                singleObjectDistance -= IsPalm ? 0 : width;
 
                 // Store the distance for the object
                 if (_objectDistances.ContainsKey(colliderPairs.Key))
@@ -337,7 +349,6 @@ namespace Leap.Unity.ContactHands
                     _objectDistances.Add(colliderPairs.Key, singleObjectDistance);
                 }
             }
-            _objectDistance -= IsPalm ? 0 : width;
         }
 
         // TODO: add events
@@ -547,6 +558,13 @@ namespace Leap.Unity.ContactHands
             Gizmos.DrawSphere(_debugA, 0.001f);
             Gizmos.DrawSphere(_debugB, 0.001f);
             Gizmos.DrawLine(_debugA, _debugB);
+
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawSphere(_palmColCenter, 0.001f);
+            for (int i = 0; i < _palmPoints.Length; i++)
+            {
+                Gizmos.DrawSphere(_palmPoints[i], 0.001f);
+            }
         }
 
         #endregion

@@ -24,13 +24,73 @@ namespace Leap.Unity.ContactHands
             return new Vector3(hand.PalmWidth, hand.Fingers[2].Bone(0).Width, Vector3.Distance(CalculateAverageKnucklePosition(hand), hand.WristPosition));
         }
 
-        public static void SetupPalmCollider(BoxCollider collider, Hand hand, PhysicMaterial material = null)
+        public static void SetupPalmCollider(BoxCollider collider, CapsuleCollider[] palmEdges, Hand hand, PhysicMaterial material = null)
         {
-            collider.center = new Vector3(0f, 0f, -0.015f);
-            collider.size = CalculatePalmSize(hand);
+            Vector3 palmSize = CalculatePalmSize(hand);
+            if (palmEdges != null)
+            {
+                collider.center = new Vector3(0f, palmSize.y * 0.1f, -0.015f);
+                collider.size = new Vector3(palmSize.x - palmSize.y, palmSize.y - (palmSize.y * 0.2f), palmSize.z - (palmSize.y / 2f));
+
+                palmEdges[0].direction = 0;
+                palmEdges[0].radius = palmSize.y / 2f;
+                palmEdges[0].height = palmSize.x;
+                palmEdges[0].center = new Vector3(0, 0, collider.center.z - (collider.size.z / 2f));
+
+                palmEdges[1].direction = 2;
+                palmEdges[1].radius = palmSize.y / 2f;
+                palmEdges[1].height = collider.size.z + (palmSize.y / 2f);
+                palmEdges[1].center = new Vector3(collider.size.x / 2f, 0, collider.center.z - (palmSize.y / 4f));
+
+                palmEdges[2].direction = 2;
+                palmEdges[2].radius = palmSize.y / 2f;
+                palmEdges[2].height = collider.size.z + (palmSize.y / 2f);
+                palmEdges[2].center = new Vector3(-collider.size.x / 2f, 0, collider.center.z - (palmSize.y / 4f));
+
+                if (material != null)
+                {
+                    for (int i = 0; i < palmEdges.Length; i++)
+                    {
+                        palmEdges[i].material = material;
+                    }
+                }
+            }
+            else
+            {
+                collider.center = new Vector3(0, 0, -0.015f);
+                collider.size = palmSize;
+            }
+
             if (material != null)
             {
                 collider.material = material;
+            }
+        }
+
+        public static void InterpolatePalmBones(BoxCollider collider, CapsuleCollider[] palmEdges, Hand hand, float interp)
+        {
+            Vector3 palmSize = CalculatePalmSize(hand);
+            if (palmEdges != null)
+            {
+                collider.center = Vector3.Lerp(collider.center, new Vector3(0f, palmSize.y * 0.1f, -0.015f), interp);
+                collider.size = Vector3.Lerp(collider.size, new Vector3(palmSize.x - palmSize.y, palmSize.y - (palmSize.y * 0.2f), palmSize.z - (palmSize.y / 2f)), interp);
+
+                palmEdges[0].radius = Mathf.Lerp(palmEdges[0].radius, palmSize.y / 2f, interp);
+                palmEdges[0].height = Mathf.Lerp(palmEdges[0].height, palmSize.x, interp);
+                palmEdges[0].center = Vector3.Lerp(palmEdges[0].center, new Vector3(0, 0, collider.center.z - (collider.size.z / 2f)), interp);
+
+                palmEdges[1].radius = Mathf.Lerp(palmEdges[1].radius, palmSize.y / 2f, interp);
+                palmEdges[1].height = Mathf.Lerp(palmEdges[1].height, collider.size.z + (palmSize.y / 2f), interp);
+                palmEdges[1].center = Vector3.Lerp(palmEdges[1].center, new Vector3(collider.size.x / 2f, 0, collider.center.z - (palmSize.y / 4f)), interp);
+
+                palmEdges[2].radius = Mathf.Lerp(palmEdges[2].radius, palmSize.y / 2f, interp);
+                palmEdges[2].height = Mathf.Lerp(palmEdges[2].height, collider.size.z + (palmSize.y / 2f), interp);
+                palmEdges[2].center = Vector3.Lerp(palmEdges[2].center, new Vector3(-collider.size.x / 2f, 0, collider.center.z - (palmSize.y / 4f)), interp);
+            }
+            else
+            {
+                collider.center = new Vector3(0f, 0, -0.015f);
+                collider.size = Vector3.Lerp(collider.size, palmSize, interp);
             }
         }
 
@@ -153,6 +213,139 @@ namespace Leap.Unity.ContactHands
             lineDir.Normalize();
             float projectLength = Mathf.Clamp(Vector3.Dot(point - lineStart, lineDir), 0f, lineLength);
             return lineStart + lineDir * projectLength;
+        }
+
+        public static Vector3 GetClosestPointOnLine(Vector3 point, Vector3 lineStart, Vector3 lineEnd)
+        {
+            Vector3 lineDir = lineEnd - lineStart;
+            lineDir.Normalize();
+            float dot = Vector3.Dot(point - lineStart, lineDir);
+            return lineStart + lineDir * dot;
+        }
+
+        /// <summary>
+        /// Takes the center of the box and the 4 points of the halfExtents, scaled down, and then performs ClosestPoint checks relative to them. 
+        /// Reduce one of your halfExtents axes to perform this as a 2D rectangle.
+        /// </summary>
+        /// <param name="center"></param>
+        /// <param name="orientation"></param>
+        /// <param name="halfExtents"></param>
+        /// <param name="collider">The collider you want to test against</param>
+        /// <param name="axis">Specifies which axis the rectangle sits across. Defaults to Y.</param>
+        /// <returns></returns>
+        public static Vector3 ClosestPointEstimationFromRectangle(Vector3 center, Quaternion orientation, Vector2 halfExtents, Collider collider, int axis = 1)
+        {
+            float distance = float.MaxValue, tempDist;
+            Vector3 returnPoint = Vector3.zero, tempPoint, extents;
+
+            tempPoint = collider.ClosestPoint(center);
+            tempDist = Vector3.Distance(tempPoint, center);
+            if (tempDist < distance)
+            {
+                returnPoint = tempPoint;
+            }
+
+            halfExtents *= 0.66f;
+            for (int i = 0; i < 4; i++)
+            {
+                switch (axis)
+                {
+                    // X
+                    case 0:
+                        extents = new Vector3(0, i / 2 < 1 ? halfExtents.x : -halfExtents.x, i % 2 == 0 ? halfExtents.y : -halfExtents.y);
+                        break;
+                    // Y
+                    default:
+                    case 1:
+                        extents = new Vector3(i / 2 < 1 ? halfExtents.x : -halfExtents.x, 0, i % 2 == 0 ? halfExtents.y : -halfExtents.y);
+                        break;
+                    // Z
+                    case 2:
+                        extents = new Vector3(i / 2 < 1 ? halfExtents.x : -halfExtents.x, i % 2 == 0 ? halfExtents.y : -halfExtents.y, 0);
+                        break;
+                }
+                tempPoint = collider.ClosestPoint(center + (orientation * extents));
+                tempDist = Vector3.Distance(tempPoint, center);
+                if(tempDist < distance)
+                {
+                    returnPoint = tempPoint;
+                }
+            }
+            return returnPoint;
+        }
+
+        /// <summary>
+        /// Check if a point is inside the points of the face and then modify it if it's not. You must enter the points in the correct order of the face.
+        /// </summary>
+        public static Vector3 ClosestPointToRectangleFace(Vector3[] face, Vector3 point)
+        {
+            // 1_ get sqrDist to closest face point
+            var closestDistance = float.MaxValue;
+            var chosenIndex = -1;
+            for (var i = 0; i < face.Length; i++)
+            {
+                var f = face[i];
+                var sqrDist = Vector3.SqrMagnitude(f - point);
+                if (sqrDist < closestDistance)
+                {
+                    chosenIndex = i;
+                    closestDistance = sqrDist;
+                }
+            }
+
+            // 2_ get the distance to the 2 neighbour points of the face's closest point.
+            // if we have a smaller distance to the 2 neighbour points than the distance between the chosen point and the neighbour point: we are inside the face.
+            var chosenPoint = face[chosenIndex];
+
+            var nextNeighbour = face[(chosenIndex + 1) % face.Length];
+            var prevNeighbour = face[(-1 + chosenIndex + face.Length) % (face.Length)];
+
+            // We are inside of the face.
+            if (GetClosestPointOnLine(point, nextNeighbour, chosenPoint).IsBetween(chosenPoint, nextNeighbour) &&
+                GetClosestPointOnLine(point, prevNeighbour, chosenPoint).IsBetween(chosenPoint, prevNeighbour))
+            {
+                return point;
+            }
+            else // we are outside the face! That means the closest point is necessarily on the lines defined by the 4 corners points of the face.
+            {
+                var closestSqrDistance = float.MaxValue;
+                var closestPoint = Vector3.zero;
+                for (var i = 0; i < face.Length; i++)
+                {
+                    var prevNearestPoint = GetClosestPointOnFiniteLine(point, face[i], face[(-1 + chosenIndex + face.Length) % (face.Length)]);
+                    var nextNearestPoint = GetClosestPointOnFiniteLine(point, face[i], face[(chosenIndex + 1) % face.Length]);
+
+                    var distanceToNextNearestPoint = Vector3.SqrMagnitude(nextNearestPoint - point);
+                    if (distanceToNextNearestPoint < closestSqrDistance)
+                    {
+                        closestPoint = nextNearestPoint;
+                        closestSqrDistance = distanceToNextNearestPoint;
+                    }
+                    var distanceToPrevNearestPoint = Vector3.SqrMagnitude(prevNearestPoint - point);
+                    if (distanceToPrevNearestPoint < closestSqrDistance)
+                    {
+                        closestPoint = prevNearestPoint;
+                        closestSqrDistance = distanceToPrevNearestPoint;
+                    }
+                }
+
+                return closestPoint;
+            }
+        }
+
+        public static float SqrDist(Vector3 a, Vector3 b)
+        {
+            return Vector3.SqrMagnitude(a - b);
+        }
+
+        public static bool IsBetween(this Vector3 a, Vector3 b, Vector3 c)
+        {
+            var totalDist = SqrDist(b, c);
+            if (SqrDist(a, b) <= totalDist && SqrDist(a, c) <= totalDist)
+            {
+                return true;
+            }
+            else return false;
         }
 
         #region Names

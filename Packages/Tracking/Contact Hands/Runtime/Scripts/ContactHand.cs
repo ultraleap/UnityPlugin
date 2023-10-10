@@ -178,7 +178,7 @@ namespace Leap.Unity.ContactHands
             }
 
             Leap.Hand leapHand = TestHandFactory.MakeTestHand(isLeft: handedness == Chirality.Left ? true : false, pose: TestHandFactory.TestHandPose.HeadMountedB);
-            palmBone = new GameObject($"{(handedness == Chirality.Left ? "Left" : "Right")} Palm", boneType, typeof(BoxCollider)).GetComponent<ContactBone>();
+            palmBone = new GameObject($"{(handedness == Chirality.Left ? "Left" : "Right")} Palm", boneType, typeof(BoxCollider), typeof(CapsuleCollider), typeof(CapsuleCollider), typeof(CapsuleCollider)).GetComponent<ContactBone>();
 
             palmBone.gameObject.layer = contactParent.contactManager.HandsResetLayer;
             palmBone.transform.SetParent(transform);
@@ -188,7 +188,8 @@ namespace Leap.Unity.ContactHands
             palmBone.finger = 5;
 
             palmBone.palmCollider = palmBone.GetComponent<BoxCollider>();
-            ContactUtils.SetupPalmCollider(palmBone.palmCollider, leapHand);
+            palmBone.palmEdgeColliders = palmBone.GetComponents<CapsuleCollider>();
+            ContactUtils.SetupPalmCollider(palmBone.palmCollider, palmBone.palmEdgeColliders, leapHand);
             palmBone.contactHand = this;
 
             Transform lastTransform;

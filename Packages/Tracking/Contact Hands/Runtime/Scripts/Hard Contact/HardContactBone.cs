@@ -166,7 +166,10 @@ namespace Leap.Unity.ContactHands
         internal override void UpdatePalmBone(Hand hand)
         {
             // Update the palm collider with the distance between knuckles to wrist + palm width
-            palmCollider.size = Vector3.Lerp(palmCollider.size, ContactUtils.CalculatePalmSize(hand), hardContactHand.currentResetLerp);
+            if (!IsBoneContacting)
+            {
+                ContactUtils.InterpolatePalmBones(palmCollider, palmEdgeColliders, hand, hardContactHand.currentResetLerp);
+            }
 
             if (contactHand.isContacting || contactHand.isGrabbing)
             {
@@ -449,7 +452,7 @@ namespace Leap.Unity.ContactHands
             transform.position = contactHand.dataHand.PalmPosition;
             transform.rotation = contactHand.dataHand.Rotation;
             articulation.TeleportRoot(transform.position, transform.rotation);
-            ContactUtils.SetupPalmCollider(palmCollider, contactHand.dataHand);
+            ContactUtils.SetupPalmCollider(palmCollider, palmEdgeColliders, contactHand.dataHand);
             articulation.WakeUp();
         }
 

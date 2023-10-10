@@ -367,7 +367,8 @@ namespace Leap.Unity.ContactHands
             modifiedHand.Arm.Rotation = Quaternion.LookRotation(modifiedHand.Arm.Direction, -dataHand.PalmNormal);
             modifiedHand.Arm.Width = dataHand.Arm.Width;
 
-            modifiedHand.PalmWidth = palmBone.palmCollider.size.y;
+            // Add the radius of one of the palm edges to the box collider to get the correct width
+            modifiedHand.PalmWidth = palmBone.palmCollider.size.y + palmBone.palmEdgeColliders[1].radius;
             modifiedHand.Confidence = dataHand.Confidence;
             modifiedHand.Direction = dataHand.Direction;
             modifiedHand.FrameId = dataHand.FrameId;
