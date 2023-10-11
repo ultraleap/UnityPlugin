@@ -53,7 +53,7 @@ namespace Leap.Unity.ContactHands
                 //Collider.isTrigger = true;
                 gameObject.layer = contactParent.contactManager.HandsResetLayer;
             }
-            else if (!contactHand.isContacting)
+            else if (!IsBoneContacting)
             {
                 //Collider.isTrigger = false;
                 gameObject.layer = contactParent.contactManager.HandsLayer;
