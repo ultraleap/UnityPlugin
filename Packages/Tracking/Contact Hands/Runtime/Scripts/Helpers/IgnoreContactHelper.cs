@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Xml.Linq;
 using UnityEngine;
 using Leap.Unity.Attributes;
+using UnityEngine.UIElements;
 
 namespace Leap.Unity.ContactHands
 {
@@ -17,48 +18,68 @@ namespace Leap.Unity.ContactHands
         private bool _disableAllGrabbing = false;
         public bool DisableAllGrabbing 
         { 
-            get { return _disableAllGrabbing; } 
-            private set 
-            { 
-                _disableAllGrabbing = value; 
-                grabHelperObject.Ignored = _disableAllGrabbing;
+            get { return _disableAllGrabbing; }
+            set
+            {
+                _disableAllGrabbing = value;
 
-            } 
+                if (GrabHelperObject != null)
+                {
+                    GrabHelperObject.Ignored = _disableAllGrabbing;
+                }
+            }
         }
 
         [Tooltip("This prevents the object from being collided with all Contact Hands."), UnityEngine.Serialization.FormerlySerializedAsAttribute("DisableHandCollisions")]
         [SerializeProperty("DisableAllHandCollisions"), SerializeField]
-        public bool _disableAllHandCollisions = false;
+        private bool _disableAllHandCollisions = false;
         public bool DisableAllHandCollisions
         {
             get { return _disableAllHandCollisions; }
-            private set 
+            set 
             { 
                 _disableAllHandCollisions = value;
                 SetAllHandCollisions();
             }
         }
 
-        [Tooltip("This prevents the object from being collided with a specific Contact Hands.")]
-        public bool DisableSpecificHandCollisions = false;
-        [Tooltip("Which hand should be ignored.")]
-        public Chirality DisabledHandedness = Chirality.Left;
+        [HideInInspector]
+        private GrabHelperObject _grabHelperObject = null;
+        public GrabHelperObject GrabHelperObject 
+        { 
+            get { return _grabHelperObject; }
+            set 
+            { 
+                _grabHelperObject = value;
+                _grabHelperObject.Ignored = _disableAllGrabbing;
+            } 
+        }
 
-        public GrabHelperObject grabHelperObject = null;
-        public ContactManager contactManager = null;
+        List<ContactHand> contactHands = new List<ContactHand>();
 
-        private void Start()
+        public void AddToHands(ContactHand contactHand)
         {
-            contactManager = FindFirstObjectByType<ContactManager>();
-            Invoke("SetAllHandCollisions", 0.1f);
+            if (!contactHands.Contains(contactHand))
+            {
+                contactHands.Add(contactHand);
+                SetCollisionHand(_disableAllHandCollisions, contactHand);
+            }
         }
 
         public void SetAllHandCollisions() 
         {
-            if (contactManager != null)
+            for (int i = 0; i < contactHands.Count; i++)
             {
-                SetCollisionHand(DisableAllHandCollisions, contactManager.contactHands.LeftHand);
-                SetCollisionHand(DisableAllHandCollisions, contactManager.contactHands.RightHand);
+                if (contactHands[i] != null)
+                {
+                    SetCollisionHand(_disableAllHandCollisions, contactHands[i]);
+                }
+                else
+                {
+                    contactHands.RemoveAt(i);
+                    i--;
+                }
+
             }
         }
 
@@ -69,7 +90,6 @@ namespace Leap.Unity.ContactHands
                 foreach (var bone in contactHand.bones)
                 {
                     Physics.IgnoreCollision(bone.Collider, objectCollider, collisionDisabled);
-
                 }
                 foreach (var palmCollider in contactHand.palmBone.palmEdgeColliders)
                 {

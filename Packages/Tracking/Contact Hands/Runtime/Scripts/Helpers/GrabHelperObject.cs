@@ -160,17 +160,23 @@ namespace Leap.Unity.ContactHands
                 _rigid.maxAngularVelocity = 100f;
             }
             _colliders = rigid.GetComponentsInChildren<Collider>(true).ToList();
+            HandleIgnoreContactHelper();
+            Manager = manager;
+        }
 
-            _ignoreContactHelper = rigid.GetComponentInChildren<IgnoreContactHelper>();
+
+        /// <summary>
+        /// Find if the object we are attached to has an IgnoreContactHelper script on it.
+        /// If it does, save a reference to it and give it a reference to us so that it can update our ignore values.
+        /// </summary>
+        private void HandleIgnoreContactHelper()
+        {
+            _ignoreContactHelper = _rigid.GetComponentInChildren<IgnoreContactHelper>();
+
             if (_ignoreContactHelper != null)
             {
-                Ignored = _ignoreContactHelper.DisableAllGrabbing;
-                _ignoreContactHelper.grabHelperObject = this;
-                _ignoreContactHelper.SetAllHandCollisions();
-
+                _ignoreContactHelper.GrabHelperObject = this;
             }
-
-            Manager = manager;
         }
 
         public void ReleaseHelper()
@@ -229,6 +235,11 @@ namespace Leap.Unity.ContactHands
                 //{
                 //    ContactHandHover.OnHandHover(hand);
                 //}
+
+                if (_ignoreContactHelper)
+                {
+                    _ignoreContactHelper.AddToHands(hand);
+                }
             }
         }
 
@@ -1029,7 +1040,7 @@ namespace Leap.Unity.ContactHands
             {
                 foreach (var hand in _grabbingCandidates)
                 {
-                    hand.IgnoreCollision(_rigid, 0f, 0.005f);
+                    //hand.IgnoreCollision(_rigid, 0f, 0.005f);
                 }
                 // We only want to apply the forces if we actually want to cause movement to the object
                 // We're still disabling collisions though to allow for the physics system to fully control if necessary
