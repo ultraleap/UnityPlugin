@@ -58,6 +58,8 @@ namespace Leap.Unity.ContactHands
         private Quaternion _palmColRotation;
         private Plane _palmPlane = new Plane();
         private Vector3[] _palmPoints = new Vector3[4];
+        private Rigidbody[] _oldRigids = new Rigidbody[32];
+        private int _oldRigidCount = 0;
 
         private Dictionary<Rigidbody, HashSet<Collider>> _colliderObjects = new Dictionary<Rigidbody, HashSet<Collider>>();
         private Dictionary<Rigidbody, float> _objectDistances = new Dictionary<Rigidbody, float>();
@@ -436,29 +438,44 @@ namespace Leap.Unity.ContactHands
 
         private void ClearOldObjects()
         {
-            // Remove empty entries
-            var badKeys = _hoverObjects.Where(pair => pair.Value.Count == 0)
-                        .Select(pair => pair.Key)
-                        .ToList();
-            foreach (var oldRigid in badKeys)
+            _oldRigidCount = 0;
+            foreach (var pair in _hoverObjects)
             {
-                _hoverObjects.Remove(oldRigid);
-                _objectDirections.Remove(oldRigid);
-                _objectDistances.Remove(oldRigid);
+                if(pair.Value.Count == 0)
+                {
+                    _oldRigids[_oldRigidCount] = pair.Key;
+                    _oldRigidCount++;
+                    if (_oldRigidCount >= _oldRigids.Length)
+                        break;
+                }
+            }
 
+            for (int i = 0; i < _oldRigidCount; i++)
+            {
+                _hoverObjects.Remove(_oldRigids[i]);
+                _objectDirections.Remove(_oldRigids[i]);
+                _objectDistances.Remove(_oldRigids[i]);
                 //if (oldRigid != null && oldRigid.TryGetComponent<IPhysicsBoneHover>(out var physicsHandGrab))
                 //{
                 //    physicsHandGrab.OnBoneHoverExit(this);
                 //}
             }
 
-            // Remove empty entries
-            badKeys = _contactObjects.Where(pair => pair.Value.Count == 0)
-                        .Select(pair => pair.Key)
-                        .ToList();
-            foreach (var oldRigid in badKeys)
+            _oldRigidCount = 0;
+            foreach (var pair in _contactObjects)
             {
-                _contactObjects.Remove(oldRigid);
+                if (pair.Value.Count == 0)
+                {
+                    _oldRigids[_oldRigidCount] = pair.Key;
+                    _oldRigidCount++;
+                    if (_oldRigidCount >= _oldRigids.Length)
+                        break;
+                }
+            }
+
+            for (int i = 0; i < _oldRigidCount; i++)
+            {
+                _contactObjects.Remove(_oldRigids[i]);
                 //if (oldRigid != null && oldRigid.TryGetComponent<IPhysicsBoneContact>(out var physicsHandGrab))
                 //{
                 //    physicsHandGrab.OnBoneContactExit(this);
