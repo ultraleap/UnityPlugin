@@ -38,6 +38,7 @@ namespace Leap.Unity.ContactHands
 
         Vector3 lastTargetPosition;
         float softContactDislocationDistance = 0.03F;
+        float teleportDistance = 0.05F;
 
         protected const float DEAD_ZONE_FRACTION = 0.04F;
         public float scale { get { return this.transform.lossyScale.x; } }
@@ -46,6 +47,18 @@ namespace Leap.Unity.ContactHands
         {
             // Calculate how far off its target the contact bone is.
             float errorDistance = Vector3.Distance(lastTargetPosition, Collider.attachedRigidbody.position);
+
+            if(errorDistance > teleportDistance)
+            {
+                Collider.attachedRigidbody.position = targetPosition;
+                Collider.attachedRigidbody.rotation = targetRotation;
+                Collider.isTrigger = true;
+
+                Collider.attachedRigidbody.velocity = Vector3.zero;
+                Collider.attachedRigidbody.angularVelocity = Vector3.zero;
+                lastTargetPosition = Collider.attachedRigidbody.position;
+                return;
+            }
 
             // Potentially enable Soft Contact if our error is too large.
             if (contactHand.IsGrabbing || (errorDistance >= softContactDislocationDistance))
