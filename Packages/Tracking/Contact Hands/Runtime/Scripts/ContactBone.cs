@@ -59,7 +59,8 @@ namespace Leap.Unity.ContactHands
         private Plane _palmPlane = new Plane();
         private Vector3[] _palmPoints = new Vector3[4];
         private Rigidbody[] _oldRigids = new Rigidbody[32];
-        private int _oldRigidCount = 0;
+        private Collider[] _oldColliders = new Collider[32];
+        private int _oldRigidCount = 0, _oldColliderCount = 0;
 
         private Dictionary<Rigidbody, HashSet<Collider>> _colliderObjects = new Dictionary<Rigidbody, HashSet<Collider>>();
         private Dictionary<Rigidbody, float> _objectDistances = new Dictionary<Rigidbody, float>();
@@ -136,13 +137,69 @@ namespace Leap.Unity.ContactHands
         #region Interaction Functions
         internal void ProcessColliderQueue(Collider[] colliderCache, int count)
         {
-            foreach (var key in _colliderObjects.Keys)
-            {
-                // Remove items that aren't hovered by the hand
-                _colliderObjects[key].RemoveWhere(c => RemoveColliderQueue(c, colliderCache, count));
-            }
+            RemoveOldColliders(colliderCache, count);
 
-            // Update the joint collider positions for cached checks, palm uses the collider directly
+            UpdatedColliderInfo();
+
+            UpdateObjectDistances(colliderCache, count);
+
+            ClearOldObjects();
+
+            RemoveOldGrabbedObjects();
+
+            ProcessGrabbedObjects();
+
+            IsBoneHovering = _hoverObjects.Count > 0;
+            IsBoneContacting = _contactObjects.Count > 0;
+            IsBoneReadyToGrab = _grabObjects.Count > 0;
+        }
+
+        private void RemoveOldColliders(Collider[] colliderCache, int count)
+        {
+            foreach (var rigid in _colliderObjects.Keys)
+            {
+                _oldColliderCount = 0;
+                foreach (var collider in _colliderObjects[rigid])
+                {
+                    if (!colliderCache.ContainsRange(collider, count))
+                    {
+                        _oldColliders[_oldRigidCount] = collider;
+                        _oldColliderCount++;
+                        if(_oldColliderCount > _oldColliders.Length)
+                        {
+                            break;
+                        }
+                    }
+                }
+
+                for (int i = 0; i < _oldColliderCount; i++)
+                {
+                    _colliderObjects[rigid].Remove(_oldColliders[i]);
+
+                    if (_oldColliders[i].attachedRigidbody != null)
+                    {
+                        if (_objectDirections.ContainsKey(_oldColliders[i].attachedRigidbody))
+                        {
+                            _objectDirections[_oldColliders[i].attachedRigidbody].Remove(_oldColliders[i]);
+                        }
+                        if (_hoverObjects.ContainsKey(_oldColliders[i].attachedRigidbody))
+                        {
+                            _hoverObjects[_oldColliders[i].attachedRigidbody].Remove(_oldColliders[i]);
+                        }
+                        if (_contactObjects.ContainsKey(_oldColliders[i].attachedRigidbody))
+                        {
+                            _contactObjects[_oldColliders[i].attachedRigidbody].Remove(_oldColliders[i]);
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Update the joint collider positions for overlap checks.
+        /// </summary>
+        private void UpdatedColliderInfo()
+        {
             if (IsPalm)
             {
                 palmCollider.ToWorldSpaceBox(out _palmColCenter, out _palmColHalfExtents, out _palmColRotation);
@@ -162,14 +219,31 @@ namespace Leap.Unity.ContactHands
             {
                 boneCollider.ToWorldSpaceCapsule(out tipPosition, out var temp, out width);
             }
+        }
 
-            UpdateObjectDistances(colliderCache, count);
-
-            ClearOldObjects();
-
+        private void RemoveOldGrabbedObjects()
+        {
             // Remove the grabbed objects where they're no longer contacting
-            _grabObjects.RemoveWhere(RemoveGrabQueue);
+            _oldRigidCount = 0;
+            foreach (var rigid in _grabObjects)
+            {
+                if (!_contactObjects.ContainsKey(rigid))
+                {
+                    _oldRigids[_oldRigidCount] = rigid;
+                    _oldRigidCount++;
+                    if (_oldRigidCount >= _oldRigids.Length)
+                        break;
+                }
+            }
 
+            for (int i = 0; i < _oldRigidCount; i++)
+            {
+                _grabbedObjects.Remove(_oldRigids[i]);
+            }
+        }
+
+        private void ProcessGrabbedObjects()
+        {
             foreach (var key in _contactObjects.Keys)
             {
                 if (IsObjectGrabbable(key))
@@ -192,45 +266,6 @@ namespace Leap.Unity.ContactHands
                     _grabbableDirections.Remove(key);
                 }
             }
-
-            IsBoneHovering = _hoverObjects.Count > 0;
-            IsBoneContacting = _contactObjects.Count > 0;
-            IsBoneReadyToGrab = _grabObjects.Count > 0;
-        }
-
-        private bool RemoveColliderQueue(Collider collider, Collider[] colliderCache, int count)
-        {
-            if (colliderCache.ContainsRange(collider, count))
-            {
-                return false;
-            }
-
-            if (collider.attachedRigidbody != null)
-            {
-                if (_objectDirections.ContainsKey(collider.attachedRigidbody))
-                {
-                    _objectDirections[collider.attachedRigidbody].Remove(collider);
-                }
-                if (_hoverObjects.ContainsKey(collider.attachedRigidbody))
-                {
-                    _hoverObjects[collider.attachedRigidbody].Remove(collider);
-                }
-                if (_contactObjects.ContainsKey(collider.attachedRigidbody))
-                {
-                    _contactObjects[collider.attachedRigidbody].Remove(collider);
-                }
-            }
-
-            return true;
-        }
-
-        private bool RemoveGrabQueue(Rigidbody rigid)
-        {
-            if (_contactObjects.TryGetValue(rigid, out var temp))
-            {
-                return false;
-            }
-            return true;
         }
 
         private void UpdateObjectDistances(Collider[] colliderCache, int count)
