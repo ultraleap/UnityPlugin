@@ -2,16 +2,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
+using Leap.Unity.Attributes;
 
 namespace Leap.Unity.ContactHands
 {
     public class ContactManager : LeapProvider
     {
-        public enum ContactMode
+        public enum ContactModes
         {
             HardContact,
             SoftContact,
@@ -19,12 +16,19 @@ namespace Leap.Unity.ContactHands
             Custom
         }
 
-        [SerializeField] private LeapProvider _inputProvider;
+        private LeapProvider _inputProvider;
         public LeapProvider InputProvider => _inputProvider;
 
-        private ContactMode _currentContactMode;
-        [Space, SerializeField]
-        protected ContactMode contactMode;
+        [Space, SerializeProperty("ContactMode"), SerializeField]
+        private ContactModes _contactMode;
+        public ContactModes ContactMode
+        {
+            get { return _contactMode; }
+            set
+            {
+                SetContactMode(value);
+            }
+        }
 
         public ContactParent contactHands;
 
@@ -160,13 +164,8 @@ namespace Leap.Unity.ContactHands
             }
         }
 
-        public void SetContactMode(ContactMode mode)
+        public void SetContactMode(ContactModes mode)
         {
-            if(_currentContactMode == mode && contactMode == mode)
-            {
-                return;
-            }
-
             if (contactHands != null) // delete old contact hands
             {
                 if (Application.isPlaying)
@@ -181,26 +180,25 @@ namespace Leap.Unity.ContactHands
                 contactHands = null;
             }
 
-            contactMode = mode;
-            _currentContactMode = mode;
+            _contactMode = mode;
 
-            if (_currentContactMode == ContactMode.Custom) // don't make new ones if we are now custom
+            if (_contactMode == ContactModes.Custom) // don't make new ones if we are now custom
             {
                 return;
             }
 
             // Make new hands hand add their component
-            GameObject newContactHands = new GameObject(_currentContactMode.ToString());
+            GameObject newContactHands = new GameObject(_contactMode.ToString());
 
-            switch (_currentContactMode)
+            switch (_contactMode)
             {
-                case ContactMode.HardContact:
+                case ContactModes.HardContact:
                     contactHands = newContactHands.AddComponent(typeof(HardContactParent)) as ContactParent;
                     break;
-                case ContactMode.SoftContact:
+                case ContactModes.SoftContact:
                     contactHands = newContactHands.AddComponent(typeof(SoftContactParent)) as ContactParent;
                     break;
-                case ContactMode.NoContact:
+                case ContactModes.NoContact:
                     contactHands = newContactHands.AddComponent(typeof(NoContactParent)) as ContactParent;
                     break;
             }
@@ -285,7 +283,6 @@ namespace Leap.Unity.ContactHands
         #region Unity Editor
 
 #if UNITY_EDITOR
-
         private void OnValidate()
         {
             if (contactHands == null)
@@ -293,7 +290,6 @@ namespace Leap.Unity.ContactHands
                 contactHands = GetComponentInChildren<ContactParent>();
             }
         }
-
 #endif
 
         #endregion

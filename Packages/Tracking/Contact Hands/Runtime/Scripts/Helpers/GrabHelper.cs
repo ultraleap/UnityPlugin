@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 namespace Leap.Unity.ContactHands
 {
@@ -110,11 +109,19 @@ namespace Leap.Unity.ContactHands
         /// </summary>
         private void HelperOverlaps(ContactHand hand)
         {
-            float lerp = 0;
+            float lerp = float.MaxValue;
             if (_fingerStrengths.ContainsKey(hand))
             {
                 // Get the least curled finger excluding the thumb
-                lerp = _fingerStrengths[hand].Skip(1).Min();
+                var curls = _fingerStrengths[hand];
+
+                for(int i = 1; i < curls.Length; i++)
+                {
+                    if (curls[i] < lerp)
+                    {
+                        lerp = curls[i];
+                    }
+                }
             }
 
             float radiusAmount = PhysExts.MaxVec3(Vector3.Scale(hand.palmBone.palmCollider.size, PhysExts.AbsVec3(hand.palmBone.transform.lossyScale)));

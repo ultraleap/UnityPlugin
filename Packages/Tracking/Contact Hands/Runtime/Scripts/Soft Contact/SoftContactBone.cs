@@ -52,7 +52,7 @@ namespace Leap.Unity.ContactHands
             {
                 Collider.attachedRigidbody.position = targetPosition;
                 Collider.attachedRigidbody.rotation = targetRotation;
-                Collider.isTrigger = true;
+                gameObject.layer = contactParent.contactManager.HandsResetLayer;
 
                 Collider.attachedRigidbody.velocity = Vector3.zero;
                 Collider.attachedRigidbody.angularVelocity = Vector3.zero;
@@ -63,14 +63,11 @@ namespace Leap.Unity.ContactHands
             // Potentially enable Soft Contact if our error is too large.
             if (contactHand.IsGrabbing || (errorDistance >= softContactDislocationDistance))
             {
-                //Collider.isTrigger = true;
                 gameObject.layer = contactParent.contactManager.HandsResetLayer;
             }
             else if (!IsBoneContacting)
             {
-                //Collider.isTrigger = false;
                 gameObject.layer = contactParent.contactManager.HandsLayer;
-
             }
 
             // Attempt to move the contact bone to its target position and rotation
