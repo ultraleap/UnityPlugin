@@ -16,6 +16,7 @@ namespace Leap.Unity.ContactHands
             Custom
         }
 
+        [SerializeField]
         private LeapProvider _inputProvider;
         public LeapProvider InputProvider => _inputProvider;
 
