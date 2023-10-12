@@ -534,6 +534,15 @@ namespace Leap.Unity.ContactHands
 
         private void CheckForBonesFacingEachOther()
         {
+            // When hands are not Physical, we should skip this step to avoid unwanted grabs
+            foreach (var hand in _grabbingCandidates)
+            {
+                if (!hand.isHandPhysical)
+                {
+                    return;
+                }
+            }
+
             int bone1Index = 0;
 
             foreach (ContactBone bone1 in BoneHash)
