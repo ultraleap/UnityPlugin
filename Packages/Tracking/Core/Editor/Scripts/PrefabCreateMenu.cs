@@ -6,6 +6,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
+using Leap.Unity.PhysicsHands;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -168,15 +169,25 @@ namespace Leap
             CreatePrefab("Anchor");
         }
 
-        [MenuItem("GameObject/Ultraleap/Interaction/Contact Manager", false, 28),
-            MenuItem("Ultraleap/Interaction/Contact Manager", false, 28)]
-        public static void CreateContactManagerMenu()
+        [MenuItem("GameObject/Ultraleap/Interaction/Physics Hands Manager", false, 40),
+            MenuItem("Ultraleap/Interaction/Physics Hands Manager", false, 40)]
+        public static void CreatePhysicsHandsManagerMenu()
         {
-            CreatePrefab("Contact Manager");
+            GameObject physicsHandsManager = CreatePrefab("Physics Hands Manager");
+            if(physicsHandsManager != null)
+            {
+                var physHandsManager = physicsHandsManager.GetComponent<Leap.Unity.PhysicsHands.PhysicsHandsManager>();
+                // Ensure that there is a contact parent at runtime
+                if (physHandsManager != null)
+                {
+                    physHandsManager.ContactMode = physHandsManager.ContactMode;
+                }
+            }
+
         }
         #endregion
 
-        public static void CreatePrefab(string prefabName)
+        public static GameObject CreatePrefab(string prefabName)
         {
             var guids = AssetDatabase.FindAssets(prefabName);
 
@@ -198,8 +209,7 @@ namespace Leap
 
                     if (newObject != null)
                     {
-                        HandleObjectCreation(newObject);
-                        return;
+                        return HandleObjectCreation(newObject);
                     }
                 }
             }
@@ -212,13 +222,14 @@ namespace Leap
 
                 if (newObject != null)
                 {
-                    HandleObjectCreation(newObject);
-                    break;
+                    return HandleObjectCreation(newObject);
                 }
             }
+
+            return null;
         }
 
-        static void HandleObjectCreation(GameObject gameObject)
+        static GameObject HandleObjectCreation(GameObject gameObject)
         {
             gameObject = PrefabUtility.InstantiatePrefab(gameObject) as GameObject;
 
@@ -242,6 +253,8 @@ namespace Leap
 
             // For prefabs, let's mark the scene as dirty for saving
             EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
+
+            return gameObject;
         }
     }
 }
