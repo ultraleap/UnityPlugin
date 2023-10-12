@@ -5,8 +5,6 @@ namespace Leap.Unity.ContactHands
     [RequireComponent(typeof(ContactManager))]
     public class GrabHelper : MonoBehaviour
     {
-        [Tooltip("If this is null then the Contact Manager's input provider will be used.")]
-        public LeapProvider dataProvider;
         public ContactManager contactManager;
 
         private bool _leftGoodState { get { return contactManager.contactHands.LeftHand.InGoodState; } }

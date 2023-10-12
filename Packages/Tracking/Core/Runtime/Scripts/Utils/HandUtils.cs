@@ -5,7 +5,6 @@
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
-
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -42,7 +41,8 @@ namespace Leap.Unity
                         s_provider = UnityEngine.Object.FindAnyObjectByType<LeapProvider>();
                         if (s_provider == null)
                         {
-                            Debug.Log("There are no Leap Providers in the scene, please assign one manually");
+                            Debug.Log("There are no Leap Providers in the scene, please assign one manually." +
+                                "Alternatively, use Hands.CreateXRLeapProvider() to automatically create an XRLeapProvider");
                             return;
                         }
                     }
@@ -50,6 +50,21 @@ namespace Leap.Unity
             }
 
             Debug.Log("LeapProvider was not assigned. Auto assigning: " + s_provider);
+        }
+
+        /// <summary>
+        /// Assign a static reference to the most suitable provider in the scene.
+        /// 
+        /// Order:
+        /// - First PostProcessProvider found
+        /// - First XRLeapProviderManager found
+        /// - First LeapProvider found
+        /// </summary>
+        public static LeapXRServiceProvider CreateXRLeapProviderManager()
+        {
+            GameObject leapProviderGO = new GameObject("Leap XR Service Provider");
+            LeapXRServiceProvider leapXRServiceProvider = leapProviderGO.AddComponent<LeapXRServiceProvider>();
+            return leapXRServiceProvider;
         }
 
         /// <summary>

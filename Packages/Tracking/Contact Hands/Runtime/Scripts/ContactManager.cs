@@ -16,9 +16,23 @@ namespace Leap.Unity.ContactHands
             Custom
         }
 
-        [SerializeField]
-        private LeapProvider _inputProvider;
-        public LeapProvider InputProvider => _inputProvider;
+        [SerializeField] private LeapProvider _inputProvider;
+        public LeapProvider InputProvider
+        {
+            get
+            {
+                if (_inputProvider == null)
+                {
+                    GetOrCreateBestInputProvider(out _inputProvider);
+                }
+
+                return _inputProvider;
+            }
+            set
+            {
+                _inputProvider = value;
+            }
+        }
 
         [Space, SerializeProperty("ContactMode"), SerializeField]
         private ContactModes _contactMode;
@@ -87,12 +101,12 @@ namespace Leap.Unity.ContactHands
 
         private void OnEnable()
         {
-            if (_inputProvider != null)
+            if (InputProvider != null)
             {
-                _inputProvider.OnUpdateFrame -= ProcessFrame;
-                _inputProvider.OnUpdateFrame += ProcessFrame;
-                _inputProvider.OnFixedFrame -= ProcessFrame;
-                _inputProvider.OnFixedFrame += ProcessFrame;
+                InputProvider.OnUpdateFrame -= ProcessFrame;
+                InputProvider.OnUpdateFrame += ProcessFrame;
+                InputProvider.OnFixedFrame -= ProcessFrame;
+                InputProvider.OnFixedFrame += ProcessFrame;
 
                 StartCoroutine(PostFixedUpdate());
             }
@@ -104,6 +118,16 @@ namespace Leap.Unity.ContactHands
             {
                 _inputProvider.OnUpdateFrame -= ProcessFrame;
                 _inputProvider.OnFixedFrame -= ProcessFrame;
+            }
+        }
+
+        private void GetOrCreateBestInputProvider(out LeapProvider inputProvider)
+        {
+            inputProvider = Hands.Provider;
+            if (inputProvider == null || inputProvider == this)
+            {
+                inputProvider = Hands.CreateXRLeapProviderManager();
+                Debug.Log("Physics Hands Manager: No Input Provider set. A LeapXRServiceProvider has been generated for you.");
             }
         }
 
