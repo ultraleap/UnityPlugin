@@ -168,6 +168,12 @@ namespace Leap
             CreatePrefab("Anchor");
         }
 
+        [MenuItem("GameObject/Ultraleap/Interaction/Contact Manager", false, 28),
+            MenuItem("Ultraleap/Interaction/Contact Manager", false, 28)]
+        public static void CreateContactManagerMenu()
+        {
+            CreatePrefab("Contact Manager");
+        }
         #endregion
 
         public static void CreatePrefab(string prefabName)
