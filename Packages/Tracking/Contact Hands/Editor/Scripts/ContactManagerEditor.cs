@@ -6,17 +6,13 @@ namespace Leap.Unity.ContactHands
     [CustomEditor(typeof(ContactManager))]
     public class ContactManagerEditor : CustomEditorBase<ContactManager>
     {
-        private readonly string[] _testHandPoses = { "Hard Contact", "Soft Contact", "No Contact", "Custom" };
-
         bool layersExist = false;
 
         protected override void OnEnable()
         {
             base.OnEnable();
             specifyConditionalDrawing(() => false, "editTimePose");
-            specifyCustomDrawer("contactMode", DrawCustomEnum);
-            SerializedProperty contactModeProperty = serializedObject.FindProperty("contactMode");
-            specifyConditionalDrawing(() => contactModeProperty.enumValueIndex == ((int)ContactManager.ContactMode.Custom), "contactHands");
+            specifyConditionalDrawing(() => target.ContactMode == ContactManager.ContactModes.Custom, "contactHands");
 
             if(CreateContactHandLayers())
             { 
@@ -43,16 +39,6 @@ namespace Leap.Unity.ContactHands
                     SettingsService.OpenProjectSettings("Project/Tags and Layers");
                 }
                 EditorGUILayout.EndHorizontal();
-            }
-        }
-
-        private void DrawCustomEnum(SerializedProperty property)
-        {
-            property.enumValueIndex = EditorGUILayout.Popup("Contact Mode", property.enumValueIndex, _testHandPoses);
-
-            if(serializedObject.ApplyModifiedProperties())
-            {
-                target.SetContactMode((ContactManager.ContactMode)property.enumValueIndex);
             }
         }
 
