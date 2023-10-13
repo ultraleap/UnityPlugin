@@ -20,7 +20,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Changed from using obsolete FindObjectOfType to using newer implementations
 - (Preview Teleportation) Lightweight Pinch Detector's finger detection can be configured
-- Ultraleap settings are now in the project settings window, under "Ultraleap" 
+- Ultraleap settings are now in the project settings window, under "Ultraleap"
+- XRLeapProviderManager defaults to Direct when using Automatic. Will use OpenXR if Direct is not available (Select OpenXR if you require OpenXR hand tracking)
 
 ### Fixed
 - 

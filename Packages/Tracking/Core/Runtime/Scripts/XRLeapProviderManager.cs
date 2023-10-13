@@ -102,11 +102,7 @@ namespace Leap.Unity
                     yield return new WaitForEndOfFrame();
                 }
                 
-                if (openXRLeapProvider != null && openXRLeapProvider.TrackingDataSource == TrackingSource.OPENXR_LEAP)
-                {
-                    SelectTrackingSource(TrackingSourceType.OPEN_XR);
-                }
-                else if (leapXRServiceProvider != null && leapXRServiceProvider.TrackingDataSource == TrackingSource.LEAPC)
+                if (leapXRServiceProvider != null && leapXRServiceProvider.TrackingDataSource == TrackingSource.LEAPC)
                 {
                     SelectTrackingSource(TrackingSourceType.LEAP_DIRECT);
                 }
