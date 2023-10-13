@@ -106,7 +106,7 @@ namespace Leap.Unity
                 {
                     SelectTrackingSource(TrackingSourceType.LEAP_DIRECT);
                 }
-                else if (openXRLeapProvider != null && openXRLeapProvider.TrackingDataSource == TrackingSource.OPENXR)
+                else if (openXRLeapProvider != null && (openXRLeapProvider.TrackingDataSource == TrackingSource.OPENXR || openXRLeapProvider.TrackingDataSource == TrackingSource.OPENXR_LEAP))
                 {
                     SelectTrackingSource(TrackingSourceType.OPEN_XR);
                 }
