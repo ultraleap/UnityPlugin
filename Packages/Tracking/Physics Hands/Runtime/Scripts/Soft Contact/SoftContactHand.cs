@@ -13,7 +13,7 @@ namespace Leap.Unity.PhysicsHands
 
             // return here to not send the colider positions
 
-            
+            return;
 
             modifiedHand.SetTransform(palmBone.transform.position, palmBone.transform.rotation);
             int boneInd = 0;

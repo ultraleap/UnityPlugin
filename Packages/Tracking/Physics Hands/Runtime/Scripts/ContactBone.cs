@@ -59,6 +59,7 @@ namespace Leap.Unity.PhysicsHands
         private Plane _palmPlane = new Plane();
         private Vector3[] _palmPoints = new Vector3[4];
         private Rigidbody[] _oldRigids = new Rigidbody[32];
+        private Collider[] _oldColliders = new Collider[32];
 
         private Dictionary<Rigidbody, HashSet<Collider>> _colliderObjects = new Dictionary<Rigidbody, HashSet<Collider>>();
         private Dictionary<Rigidbody, float> _objectDistances = new Dictionary<Rigidbody, float>();
@@ -135,11 +136,7 @@ namespace Leap.Unity.PhysicsHands
         #region Interaction Functions
         internal void ProcessColliderQueue(Collider[] colliderCache, int count)
         {
-            foreach (var key in _colliderObjects.Keys)
-            {
-                // Remove items that aren't hovered by the hand
-                _colliderObjects[key].RemoveWhere(c => RemoveColliderQueue(c, colliderCache, count));
-            }
+            RemoveOldColliders(colliderCache, count);
 
             // Update the joint collider positions for cached checks, palm uses the collider directly
             if (IsPalm)
@@ -164,72 +161,43 @@ namespace Leap.Unity.PhysicsHands
 
             UpdateObjectDistances(colliderCache, count);
 
-            ClearOldObjects();
-
-            // Remove the grabbed objects where they're no longer contacting
-            _grabObjects.RemoveWhere(RemoveGrabQueue);
-
-            foreach (var key in _contactObjects.Keys)
-            {
-                if (IsObjectGrabbable(key))
-                {
-                    // add to grabbable rb dicts
-                    _grabObjects.Add(key);
-
-                    if (_grabbableDirections.ContainsKey(key))
-                    {
-                        _grabbableDirections[key] = _objectDirections[key];
-                    }
-                    else
-                    {
-                        _grabbableDirections.Add(key, _objectDirections[key]);
-                    }
-                }
-                else
-                {
-                    _grabObjects.Remove(key);
-                    _grabbableDirections.Remove(key);
-                }
-            }
+            UpdateContactHoverGrabs();
 
             IsBoneHovering = _hoverObjects.Count > 0;
             IsBoneContacting = _contactObjects.Count > 0;
             IsBoneReadyToGrab = _grabObjects.Count > 0;
         }
 
-        private bool RemoveColliderQueue(Collider collider, Collider[] colliderCache, int count)
+        private void RemoveOldColliders(Collider[] colliderCache, int count)
         {
-            if (colliderCache.ContainsRange(collider, count))
+            foreach (var rigid in _colliderObjects.Keys)
             {
-                return false;
-            }
-
-            if (collider.attachedRigidbody != null)
-            {
-                if (_objectDirections.ContainsKey(collider.attachedRigidbody))
+                int oldColliderCount = 0;
+                foreach (var collider in _colliderObjects[rigid])
                 {
-                    _objectDirections[collider.attachedRigidbody].Remove(collider);
+                    if (!colliderCache.ContainsRange(collider, count))
+                    {
+                        _oldColliders[oldColliderCount] = collider;
+                        oldColliderCount++;
+                        if (oldColliderCount > _oldColliders.Length)
+                        {
+                            break;
+                        }
+                    }
                 }
-                if (_hoverObjects.ContainsKey(collider.attachedRigidbody))
+
+                for (int i = 0; i < oldColliderCount; i++)
                 {
-                    _hoverObjects[collider.attachedRigidbody].Remove(collider);
-                }
-                if (_contactObjects.ContainsKey(collider.attachedRigidbody))
-                {
-                    _contactObjects[collider.attachedRigidbody].Remove(collider);
+                    _colliderObjects[rigid].Remove(_oldColliders[i]);
+
+                    if (_oldColliders[i].attachedRigidbody != null)
+                    {
+                        _objectDirections[_oldColliders[i].attachedRigidbody].Remove(_oldColliders[i]);
+                        _hoverObjects[_oldColliders[i].attachedRigidbody].Remove(_oldColliders[i]);
+                        _contactObjects[_oldColliders[i].attachedRigidbody].Remove(_oldColliders[i]);
+                    }
                 }
             }
-
-            return true;
-        }
-
-        private bool RemoveGrabQueue(Rigidbody rigid)
-        {
-            if (_contactObjects.TryGetValue(rigid, out var temp))
-            {
-                return false;
-            }
-            return true;
         }
 
         private void UpdateObjectDistances(Collider[] colliderCache, int count)
@@ -280,20 +248,31 @@ namespace Leap.Unity.PhysicsHands
 
                 if (hover)
                 {
-                    if (!_objectDirections.ContainsKey(collider.attachedRigidbody))
+                    if (_objectDirections.ContainsKey(collider.attachedRigidbody))
                     {
-                        _objectDirections.Add(collider.attachedRigidbody, new Dictionary<Collider, ClosestObjectDirection>());
-                        _objectDirections[collider.attachedRigidbody].Add(collider, new ClosestObjectDirection());
-                    }
-
-                    if (_objectDirections[collider.attachedRigidbody].ContainsKey(collider))
-                    {
-                        _objectDirections[collider.attachedRigidbody][collider].direction = direction;
-                        _objectDirections[collider.attachedRigidbody][collider].bonePos = bonePos + (direction * width);
-                        _objectDirections[collider.attachedRigidbody][collider].distance = boneDistance;
+                        if (_objectDirections[collider.attachedRigidbody].ContainsKey(collider))
+                        {
+                            _objectDirections[collider.attachedRigidbody][collider].direction = direction;
+                            _objectDirections[collider.attachedRigidbody][collider].bonePos = bonePos + (direction * width);
+                            _objectDirections[collider.attachedRigidbody][collider].distance = boneDistance;
+                        }
+                        else
+                        {
+                            _objectDirections[collider.attachedRigidbody].Add(
+                                collider,
+                                new ClosestObjectDirection()
+                                {
+                                    bonePos = bonePos + (direction * width),
+                                    direction = direction,
+                                    distance = boneDistance
+                                }
+                            );
+                        }
                     }
                     else
                     {
+                        _objectDirections.Add(collider.attachedRigidbody, new Dictionary<Collider, ClosestObjectDirection>());
+
                         _objectDirections[collider.attachedRigidbody].Add(
                             collider,
                             new ClosestObjectDirection()
@@ -301,8 +280,7 @@ namespace Leap.Unity.PhysicsHands
                                 bonePos = bonePos + (direction * width),
                                 direction = direction,
                                 distance = boneDistance
-                            }
-                        );
+                            });
                     }
                 }
                 else
@@ -417,7 +395,7 @@ namespace Leap.Unity.PhysicsHands
             }
         }
 
-        private void ClearOldObjects()
+        private void UpdateContactHoverGrabs()
         {
             int oldRigidCount = 0;
 
@@ -432,6 +410,7 @@ namespace Leap.Unity.PhysicsHands
 
             for(int i = 0; i < oldRigidCount; i++)
             {
+                // Remove no longer hovering objects
                 _hoverObjects.Remove(_oldRigids[i]);
                 _objectDirections.Remove(_oldRigids[i]);
                 _objectDistances.Remove(_oldRigids[i]);
@@ -446,11 +425,37 @@ namespace Leap.Unity.PhysicsHands
                     _oldRigids[oldRigidCount] = rigid;
                     oldRigidCount++;
                 }
+                else
+                {
+                    // Add the Grab objects
+                    if (IsObjectGrabbable(rigid))
+                    {
+                        // add to grabbable rb dicts
+                        _grabObjects.Add(rigid);
+
+                        if (_grabbableDirections.ContainsKey(rigid))
+                        {
+                            _grabbableDirections[rigid] = _objectDirections[rigid];
+                        }
+                        else
+                        {
+                            _grabbableDirections.Add(rigid, _objectDirections[rigid]);
+                        }
+                    }
+                    else
+                    {
+                        // Remove ungrabbed objects
+                        _grabObjects.Remove(rigid);
+                        _grabbableDirections.Remove(rigid);
+                    }
+                }
             }
 
             for (int i = 0; i < oldRigidCount; i++)
             {
+                // Remove no longer contacting objects
                 _contactObjects.Remove(_oldRigids[i]);
+                _grabObjects.Remove(_oldRigids[i]);
             }
         }
 
@@ -518,7 +523,7 @@ namespace Leap.Unity.PhysicsHands
 
         private bool WillColliderAffectBone(Collider collider)
         {
-            if (collider.gameObject.TryGetComponent<ContactBone>(out var bone)/* && collider.attachedRigidbody.TryGetComponent<PhysicsIgnoreHelpers>(out var temp) && temp.IsThisHandIgnored(this)*/)
+            if (contactHand.physicsHandsManager.InterHandCollisions && collider.gameObject.TryGetComponent<ContactBone>(out var bone)/* && collider.attachedRigidbody.TryGetComponent<PhysicsIgnoreHelpers>(out var temp) && temp.IsThisHandIgnored(this)*/)
             {
                 return false;
             }

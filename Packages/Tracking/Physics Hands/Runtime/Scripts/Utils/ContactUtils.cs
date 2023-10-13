@@ -210,9 +210,8 @@ namespace Leap.Unity.PhysicsHands
         {
             Vector3 lineDir = lineEnd - lineStart;
             float lineLength = lineDir.magnitude;
-            lineDir.Normalize();
             float projectLength = Mathf.Clamp(Vector3.Dot(point - lineStart, lineDir), 0f, lineLength);
-            return lineStart + lineDir * projectLength;
+            return lineStart + lineDir * (projectLength / lineLength);
         }
 
         public static Vector3 GetClosestPointOnLine(Vector3 point, Vector3 lineStart, Vector3 lineEnd)
