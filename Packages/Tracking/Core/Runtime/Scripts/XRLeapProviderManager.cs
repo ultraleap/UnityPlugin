@@ -80,7 +80,7 @@ namespace Leap.Unity
         /// <summary>
         /// The chosen source of hand tracking data
         /// </summary>
-        [Tooltip("AUTOMATIC - Windows will use LeapService, other platforms will use OpenXR if available and LeapService if OpenXR is not" +
+        [Tooltip("AUTOMATIC - Will use LeapService, if available and OpenXR if not" +
                     "OPEN_XR - Use OpenXR as the source of tracking" +
                     "LEAP_DIRECT - Directly use LeapC as the source of tracking")]
         public TrackingSourceType trackingSource;
