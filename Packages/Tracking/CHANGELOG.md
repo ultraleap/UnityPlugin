@@ -23,7 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ultraleap settings are now in the project settings window, under "Ultraleap" 
 
 ### Fixed
-- 
+- LeapXRServiceProvider ensures default device offset mode is set to new defaults when enabled
 
 ### Known issues 
 - Use of the LeapCSharp Config class is unavailable with v5.X tracking service
