@@ -939,12 +939,12 @@ namespace Leap.Unity.PhysicsHands
         // Taken from SlidingWindowThrow.cs
 
         // Length of time to average, and delay between the average and current time.
-        private float _windowLength = 0.045f, _windowDelay = 0.015f;
+        private float _windowLength = 0.05f, _windowDelay = 0.02f;
 
         // Throwing curve
         private AnimationCurve _throwVelocityMultiplierCurve = new AnimationCurve(
-                                                            new Keyframe(0.0F, 0.7F, 0, 0),
-                                                            new Keyframe(3.0F, 1.0F, 0, 0));
+                                                            new Keyframe(0.0F, 1.0F, 0, 0),
+                                                            new Keyframe(2.5F, 1.5F, 0, 0));
 
         private Queue<VelocitySample> _velocityQueue = new Queue<VelocitySample>(64);
 
@@ -958,7 +958,7 @@ namespace Leap.Unity.PhysicsHands
             {
                 this.position = position;
                 this.rotation = rotation;
-                this.time = Time.fixedTime;
+                this.time = time;
             }
 
             public static VelocitySample Interpolate(VelocitySample a, VelocitySample b, float time)
@@ -1014,7 +1014,7 @@ namespace Leap.Unity.PhysicsHands
             VelocitySample end0, end1;
             VelocitySample s0, s1;
 
-            s0 = s1 = start0 = start1 = end0 = end1 = _velocityQueue.Dequeue();
+            s1 = start0 = start1 = end0 = end1 = _velocityQueue.Dequeue();
 
             while (_velocityQueue.Count != 0)
             {
@@ -1047,10 +1047,6 @@ namespace Leap.Unity.PhysicsHands
 
             if (interpolatedVelocity.magnitude > 1.0f)
             {
-                foreach (var hand in _grabbingCandidates)
-                {
-                    //hand.IgnoreCollision(_rigid, 0f, 0.005f);
-                }
                 // We only want to apply the forces if we actually want to cause movement to the object
                 // We're still disabling collisions though to allow for the physics system to fully control if necessary
                 if (!Ignored)
