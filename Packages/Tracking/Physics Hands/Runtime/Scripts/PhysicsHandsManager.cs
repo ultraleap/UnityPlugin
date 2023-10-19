@@ -120,6 +120,11 @@ namespace Leap.Unity.PhysicsHands
             }
         }
 
+        private void Reset()
+        {
+            ContactMode = _contactMode;
+        }
+
         private void GetOrCreateBestInputProvider(out LeapProvider inputProvider)
         {
             inputProvider = Hands.Provider;
@@ -142,8 +147,6 @@ namespace Leap.Unity.PhysicsHands
                 OnPrePhysicsUpdate?.Invoke();
             }
 
-            _modifiedFrame.CopyFrom(inputFrame);
-
             _leftHandIndex = inputFrame.Hands.FindIndex(x => x.IsLeft);
             if (_leftHandIndex != -1)
             {
@@ -157,18 +160,19 @@ namespace Leap.Unity.PhysicsHands
             }
 
             contactParent?.UpdateFrame();
-        
+
+            _modifiedFrame.CopyFrom(inputFrame);
+            contactParent?.OutputFrame(ref _modifiedFrame);
+
             // Output the frame on each update
             if (Time.inFixedTimeStep)
             {
                 // Fixed frame on fixed update
-                contactParent?.OutputFrame(ref _modifiedFrame);
                 DispatchFixedFrameEvent(_modifiedFrame);
             }
             else
             {
                 // Update frame otherwise
-                contactParent?.OutputFrame(ref _modifiedFrame);
                 DispatchUpdateFrameEvent(_modifiedFrame);
             }
         }
