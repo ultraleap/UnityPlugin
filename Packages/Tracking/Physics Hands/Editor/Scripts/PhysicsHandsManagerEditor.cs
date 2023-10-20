@@ -12,7 +12,7 @@ namespace Leap.Unity.PhysicsHands
         {
             base.OnEnable();
             specifyConditionalDrawing(() => false, "editTimePose");
-            specifyConditionalDrawing(() => target.ContactMode == PhysicsHandsManager.ContactModes.Custom, "contactParent");
+            //specifyConditionalDrawing(() => target.ContactMode == PhysicsHandsManager.ContactModes.Custom, "contactParent");
 
             if (CreateContactHandLayers())
             { 

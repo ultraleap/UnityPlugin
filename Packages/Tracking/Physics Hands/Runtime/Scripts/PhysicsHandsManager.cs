@@ -12,8 +12,7 @@ namespace Leap.Unity.PhysicsHands
         {
             HardContact,
             SoftContact,
-            NoContact,
-            Custom
+            NoContact
         }
 
         [SerializeField] private LeapProvider _inputProvider;
@@ -45,6 +44,7 @@ namespace Leap.Unity.PhysicsHands
             }
         }
 
+        [HideInInspector]
         public ContactParent contactParent;
 
         #region Layers
@@ -210,11 +210,6 @@ namespace Leap.Unity.PhysicsHands
 
             _contactMode = mode;
 
-            if (_contactMode == ContactModes.Custom) // don't make new ones if we are now custom
-            {
-                return;
-            }
-
             // Make new hands hand add their component
             GameObject newContactParent = new GameObject(_contactMode.ToString());
 
@@ -245,8 +240,8 @@ namespace Leap.Unity.PhysicsHands
                 return;
             }
 
-            _handsLayer = LayerMask.NameToLayer("ContactHands");
-            _handsResetLayer = LayerMask.NameToLayer("ContactHandsReset");
+            _handsLayer = LayerMask.NameToLayer("PhysicalHands");
+            _handsResetLayer = LayerMask.NameToLayer("PhysicalHandsReset");
 
             for (int i = 8; i < 32; i++)
             {
