@@ -6,7 +6,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity.PhysicsHands;
+using Leap.Unity.PhysicalHands;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -169,14 +169,14 @@ namespace Leap
             CreatePrefab("Anchor");
         }
 
-        [MenuItem("GameObject/Ultraleap/Interaction/Physics Hands Manager", false, 40),
-            MenuItem("Ultraleap/Interaction/Physics Hands Manager", false, 40)]
-        public static void CreatePhysicsHandsManagerMenu()
+        [MenuItem("GameObject/Ultraleap/Interaction/Physical Hands Manager", false, 40),
+            MenuItem("Ultraleap/Interaction/Physical Hands Manager", false, 40)]
+        public static void CreatePhysicalHandsManagerMenu()
         {
-            GameObject physicsHandsManager = CreatePrefab("Physics Hands Manager");
-            if(physicsHandsManager != null)
+            GameObject physicalHandsManager = CreatePrefab("Physical Hands Manager");
+            if(physicalHandsManager != null)
             {
-                var physHandsManager = physicsHandsManager.GetComponent<Leap.Unity.PhysicsHands.PhysicsHandsManager>();
+                var physHandsManager = physicalHandsManager.GetComponent<Leap.Unity.PhysicalHands.PhysicalHandsManager>();
                 // Ensure that there is a contact parent at runtime
                 if (physHandsManager != null)
                 {
