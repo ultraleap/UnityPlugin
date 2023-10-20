@@ -36,11 +36,11 @@ namespace Leap.Unity.PhysicalHands
                 SetupBoneArticulation();
                 if (joint == 0)
                 {
-                    SetupKnuckleDrives(0, 0);
+                    SetupKnuckleDrives();
                 }
                 else
                 {
-                    SetupBoneDrives(0, 0);
+                    SetupBoneDrives();
                 }
             }
         }
@@ -79,7 +79,7 @@ namespace Leap.Unity.PhysicalHands
             articulation.linearDamping = 0f;
         }
 
-        private void SetupKnuckleDrives(float stiffness, float forceLimit)
+        private void SetupKnuckleDrives()
         {
             articulation.jointType = ArticulationJointType.SphericalJoint;
             articulation.twistLock = ArticulationDofLock.LimitedMotion;
@@ -88,8 +88,8 @@ namespace Leap.Unity.PhysicalHands
 
             ArticulationDrive xDrive = new ArticulationDrive()
             {
-                stiffness = stiffness,
-                forceLimit = forceLimit * Time.fixedDeltaTime,
+                stiffness = 0f,
+                forceLimit = 0f,
                 damping = 1f,
                 lowerLimit = -30f,
                 upperLimit = 80f
@@ -107,8 +107,8 @@ namespace Leap.Unity.PhysicalHands
 
             ArticulationDrive yDrive = new ArticulationDrive()
             {
-                stiffness = stiffness,
-                forceLimit = forceLimit * Time.fixedDeltaTime,
+                stiffness = 0f,
+                forceLimit = 0f,
                 damping = 2f,
                 lowerLimit = -15f,
                 upperLimit = 15f
@@ -128,15 +128,15 @@ namespace Leap.Unity.PhysicalHands
             articulation.zDrive = yDrive;
         }
 
-        private void SetupBoneDrives(float stiffness, float forceLimit)
+        private void SetupBoneDrives()
         {
             articulation.jointType = ArticulationJointType.RevoluteJoint;
             articulation.twistLock = ArticulationDofLock.LimitedMotion;
 
             ArticulationDrive xDrive = new ArticulationDrive()
             {
-                stiffness = stiffness,
-                forceLimit = forceLimit * Time.fixedDeltaTime,
+                stiffness = 0f,
+                forceLimit = 0f,
                 damping = 1f,
                 lowerLimit = -10f,
                 upperLimit = 89f
@@ -282,7 +282,7 @@ namespace Leap.Unity.PhysicalHands
             }
 
             ArticulationDrive xDrive = articulation.xDrive;
-            xDrive.stiffness = hardContactParent.boneStiffness;
+            xDrive.stiffness = hardContactHand.fingerStiffness[finger];
             xDrive.damping = _xDampening;
             xDrive.forceLimit = _xForceLimit * Time.fixedDeltaTime;
             xDrive.upperLimit = hardContactHand.grabbingFingers[finger] >= joint ? _grabbingXDrive : _originalXDriveUpper;
@@ -295,7 +295,7 @@ namespace Leap.Unity.PhysicalHands
 
                 ArticulationDrive yDrive = articulation.yDrive;
                 yDrive.damping = _xDampening * .75f;
-                yDrive.stiffness = hardContactParent.boneStiffness;
+                yDrive.stiffness = hardContactHand.fingerStiffness[finger];
                 yDrive.forceLimit = hardContactParent.maxPalmVelocity * Time.fixedDeltaTime;
                 yDrive.target = _yTargetAngle;
                 articulation.yDrive = yDrive;
@@ -406,7 +406,7 @@ namespace Leap.Unity.PhysicalHands
                     _grabbingXDrive = _originalXDriveUpper;
                     _wasBoneGrabbing = true;
                     _grabbingFrames = 3;
-                    hardContactHand.fingerStiffness[finger] = 0f;
+                    hardContactHand.fingerStiffness[finger] = 10f;
                     _xDampening = 10f;
                 }
             }
@@ -417,12 +417,13 @@ namespace Leap.Unity.PhysicalHands
                     if (!_wasBoneGrabbing)
                     {
                         _grabbingXDrive = _originalXDriveUpper;
+                        _wasBoneGrabbing = true;
                         _grabbingFrames = 3;
-                        hardContactHand.fingerStiffness[finger] = 0f;
+                        hardContactHand.fingerStiffness[finger] = 10f;
                         _xDampening = 10f;
                     }
                     hardContactHand.grabbingFingers[finger] = joint;
-                    _wasBoneGrabbing = true;
+                    
                 }
                 else if (_wasBoneGrabbing)
                 {

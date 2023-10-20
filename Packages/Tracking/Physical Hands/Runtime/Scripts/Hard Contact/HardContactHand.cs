@@ -219,6 +219,13 @@ namespace Leap.Unity.PhysicalHands
                 {
                     contactingFingers++;
                 }
+
+                if(!hasFingerGrasped)
+                {
+                    fingerStiffness[fingerIndex] = hardContactParent.boneStiffness;
+
+                    //Debug.Log("Finger Stiffness set to " + hardContactParent.boneStiffness + " Finger: " + finger);
+                }
             }
 
             if (IsGrabbing)
