@@ -161,6 +161,7 @@ namespace Leap.Unity.PhysicalHands
             }
             _colliders = rigid.GetComponentsInChildren<Collider>(true).ToList();
             HandleIgnoreContactHelper();
+            CalculateWindowLengthAndDelay(out _windowLength, out _windowDelay); //to calculate throw window and delay
             Manager = manager;
         }
 
@@ -939,7 +940,18 @@ namespace Leap.Unity.PhysicalHands
         // Taken from SlidingWindowThrow.cs
 
         // Length of time to average, and delay between the average and current time.
+        // This is for default unity Timestep. These are set for current timestep in the constructor
         private float _windowLength = 0.05f, _windowDelay = 0.02f;
+
+
+        private void CalculateWindowLengthAndDelay(out float windowLength, out float windowDelay)
+        {
+            // These magic numbers calculate each thing from a line. They use the equation y = mx+b to predict values at every timestep.
+            // The full calculation has been ommitted to save calculations at runtime
+            windowLength = (0.5625f * Time.fixedDeltaTime) + 0.03875f;
+
+            windowDelay = (0.5625f * Time.fixedDeltaTime) + 0.00875f;
+        }
 
         // Throwing curve
         private AnimationCurve _throwVelocityMultiplierCurve = new AnimationCurve(
