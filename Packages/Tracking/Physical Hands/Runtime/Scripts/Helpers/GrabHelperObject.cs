@@ -1063,6 +1063,12 @@ namespace Leap.Unity.PhysicalHands
                 // We're still disabling collisions though to allow for the physics system to fully control if necessary
                 if (!Ignored)
                 {
+                    // Ignore collision after throwing so we don't knock the object
+                    //foreach (var hand in _grabbingCandidates)
+                    //{
+                        //hand.IgnoreCollision(_rigid, 0f, 0.005f);
+                    //}
+
                     _rigid.velocity = interpolatedVelocity;
                     _rigid.angularVelocity = ContactUtils.ToAngularVelocity(start.rotation,
                                                                                         end.rotation,

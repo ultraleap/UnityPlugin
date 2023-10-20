@@ -328,7 +328,19 @@ namespace Leap.Unity.PhysicalHands
             {
                 return;
             }
+
             Collider[] colliders = rigid.GetComponentsInChildren<Collider>(true);
+
+            // If objects are already ignoring, we shouldn't add it to a timer that will re-enable collision
+            // Rarely loops through more than 1 collider
+            foreach (var collider in colliders)
+            {
+                if (Physics.GetIgnoreCollision(collider, palmBone.palmCollider))
+                {
+                    return;
+                }
+            }
+
             foreach (var collider in colliders)
             {
                 Physics.IgnoreCollision(collider, palmBone.palmCollider, ignore);
