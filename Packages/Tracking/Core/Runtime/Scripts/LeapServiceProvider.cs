@@ -903,6 +903,11 @@ namespace Leap.Unity
                 if (e.Device == _currentDevice)
                 {
                     _currentDevice = null;
+
+                    _untransformedUpdateFrame.Hands.Clear();
+                    _transformedUpdateFrame.Hands.Clear();
+                    _untransformedFixedFrame.Hands.Clear();
+                    _transformedFixedFrame.Hands.Clear();
                 }
             };
 
