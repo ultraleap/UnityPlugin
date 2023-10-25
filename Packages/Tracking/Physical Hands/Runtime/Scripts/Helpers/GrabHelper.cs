@@ -61,7 +61,7 @@ namespace Leap.Unity.PhysicalHands
         #region Hand Updating
         private void UpdateHandHeuristics()
         {
-            if (_leftGoodState)
+            if (_leftContactHand.tracked)
             {
                 UpdateHandStatistics(_leftContactHand);
             }
@@ -69,7 +69,7 @@ namespace Leap.Unity.PhysicalHands
             {
                 UntrackedHand(_leftContactHand);
             }
-            if (_rightGoodState)
+            if (_leftContactHand.tracked)
             {
                 UpdateHandStatistics(_rightContactHand);
             }
