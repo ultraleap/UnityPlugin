@@ -8,8 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [NEXT] - xx/xx/xx
 
+### Tracking Client versions
+- Windows 	v5.16.0
+- MacOS 	v5.16.0
+- Android 	v5.16.0
+
 ### Added
 - (Pose Detector) Add a new rule type to match rotation of a joint to a target
+- Help Menu that links out to docs, a place to report bugs & places to get support
 - (Service Provider) Expose service IP and port as user settable variables
 
 ### Changed
@@ -18,7 +24,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ultraleap settings are now in the project settings window, under "Ultraleap" 
 
 ### Fixed
-- 
+- LeapXRServiceProvider ensures default device offset mode is set to new defaults when enabled
+
+### Known issues 
+- Use of the LeapCSharp Config class is unavailable with v5.X tracking service
+- Repeatedly opening scenes can cause memory use increase
+- Currently the Ultraleap Hand Tracking feature for OpenXR requires the New and Legacy input systems to be enabled, to simultaneously use OpenXR and the Ultraleap Unity Plugin's features.
+- The OpenXR Leap Provider does not currently support the `Confidence` hand property (and will return fixed values)
+- After using Ultraleap OpenXR in Unity Editor, the tracking mode of device 0 will be set to HMD until the Unity Editor session ends. This can stop the testing of non-XR scenes until the Unity Editor is re-opened
+- The OpenXR Leap Provider palm can be in unexpected position when using pre-1.4.3 OpenXR Layer. A workaround is to ensure you use 1.4.3 or newer - installed by the 5.12.0 or newer Tracking Service Installer
+- Running both the Ultraleap XRHands Subsystem and another XRHands Subsystem at the same time causes unstable results. Only enable one at a time.
+
+## [6.12.1] - 28/09/23
+
+### Tracking Client versions
+- Windows 	v5.16.0
+- MacOS 	v5.16.0
+- Android 	v5.16.0
+
+### Fixed
+- (leapXRServiceProvider) Hands offset incorrectly on Windows when using Leap 2
+
+### Known issues 
+- Use of the LeapCSharp Config class is unavailable with v5.X tracking service
+- Repeatedly opening scenes can cause memory use increase
+- Currently the Ultraleap Hand Tracking feature for OpenXR requires the New and Legacy input systems to be enabled, to simultaneously use OpenXR and the Ultraleap Unity Plugin's features.
+- The OpenXR Leap Provider does not currently support the `Confidence` hand property (and will return fixed values)
+- After using Ultraleap OpenXR in Unity Editor, the tracking mode of device 0 will be set to HMD until the Unity Editor session ends. This can stop the testing of non-XR scenes until the Unity Editor is re-opened
+- Running both the Ultraleap XRHands Subsystem and another XRHands Subsystem at the same time causes unstable results. Only enable one at a time.
+
+
+## [6.12.0] - 12/09/23
+
+### Added
+- (MRTK Support) Added an MRTK3 subsystem for using Leap tracking directly (non-OpenXR)
+
+### Changed
+- (XRHands) XRHands subsystem will now use existing LeapXRServiceProviders found in the scene before considering generating new ones
+
+### Fixed
+- (XRHands) XRHands double-translates tracking data causing XRI InputActions to be wrongly positioned when the XROrigin is moved
 
 ### Known issues 
 - Use of the LeapCSharp Config class is unavailable with v5.X tracking service
@@ -60,7 +105,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (HandRays) Add methods to invoke handray Frame & State Change in inherited classes
 - (LeapXRServiceProvider) Use of device transforms from the service when using Default device offset mode. This does not include tilt/rotation
 
-
 ### Changed
 - (Physics Hands) Burst compute is now used to improve certain physics calculation performance
     - In Unity 2020+ this is used for "hand is colliding" functions only
@@ -75,7 +119,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (Locomotion) Expose teleport anchor list & last teleported anchor
 - (Locomotion) Moved Jump Gems further away from the arm, to account for sleeves
 - (Locomotion) Added functionality to update the initial position and rotations of the TP anchor after the first Awake
-- (Aggregation) Aggregation and its scripts and shaders are in an asmdef to avoid any missing references
 
 ### Fixed
 - (Physics Hands) Hand forces are reduced when pushing into objects with fingers

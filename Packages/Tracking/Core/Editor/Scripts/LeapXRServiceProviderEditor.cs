@@ -76,12 +76,6 @@ namespace Leap.Unity
             addPropertyToFoldout("_preventInitializingTrackingMode", "Advanced Options");
             addPropertyToFoldout("_autoCreateTrackedPoseDriver", "Advanced Options");
             hideField("_trackingOptimization");
-
-            // Ensure the default values are up to date by re-firing the property setter
-            if ((target as LeapXRServiceProvider).deviceOffsetMode == LeapXRServiceProvider.DeviceOffsetMode.Default)
-            {
-                (target as LeapXRServiceProvider).deviceOffsetMode = LeapXRServiceProvider.DeviceOffsetMode.Default;
-            }
         }
 
         private void DrawCustomEnum(SerializedProperty property)
