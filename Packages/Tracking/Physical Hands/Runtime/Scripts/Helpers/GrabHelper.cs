@@ -69,7 +69,7 @@ namespace Leap.Unity.PhysicalHands
             {
                 UntrackedHand(_leftContactHand);
             }
-            if (_leftContactHand.tracked)
+            if (_rightContactHand.tracked)
             {
                 UpdateHandStatistics(_rightContactHand);
             }

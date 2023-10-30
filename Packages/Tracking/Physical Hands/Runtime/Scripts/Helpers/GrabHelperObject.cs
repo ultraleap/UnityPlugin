@@ -161,7 +161,7 @@ namespace Leap.Unity.PhysicalHands
             }
             _colliders = rigid.GetComponentsInChildren<Collider>(true).ToList();
             HandleIgnoreContactHelper();
-            CalculateWindowLengthAndDelay(out _windowLength, out _windowDelay); //to calculate throw window and delay
+            //CalculateWindowLengthAndDelay(out _windowLength, out _windowDelay); //to calculate throw window and delay
             Manager = manager;
         }
 
@@ -267,7 +267,7 @@ namespace Leap.Unity.PhysicalHands
                 {
                     // Only ever unset the rigidbody values here otherwise outside logic will get confused
                     _rigid.isKinematic = _oldKinematic;
-                    ThrowingOnRelease();
+                    ThrowingOnRelease(true);
                 }
             }
         }
@@ -554,7 +554,7 @@ namespace Leap.Unity.PhysicalHands
 
                     foreach (ContactBone bone2 in BoneHash)
                     {
-                        if(bone2Index < bone1Index) // Avoid double-checking the same index combinations
+                        if (bone2Index < bone1Index) // Avoid double-checking the same index combinations
                         {
                             bone2Index++;
                             continue;
@@ -993,17 +993,76 @@ namespace Leap.Unity.PhysicalHands
             {
                 VelocitySample oldestVelocity = _velocityQueue.Peek();
 
-                // Dequeue conservatively if the oldest velocity is more than 4 frames later
-                // than the start of the window.
-                if (oldestVelocity.time + (Time.fixedDeltaTime * 4) < Time.fixedTime
-                                                                      - _windowLength
-                                                                      - _windowDelay)
+                // Dequeue conservatively
+                if (oldestVelocity.time < (Time.fixedTime - _windowLength - _windowDelay))
                 {
                     _velocityQueue.Dequeue();
                 }
                 else
                 {
                     break;
+                }
+            }
+        }
+
+        private void ThrowingOnRelease(bool test = true)
+        {
+            // Ensure that they are at least 4 frames to average
+            if (_velocityQueue.Count < 4)
+            {
+                _rigid.velocity = Vector3.zero;
+                _rigid.angularVelocity = Vector3.zero;
+                return;
+            }
+
+            float windowEnd = Time.fixedTime - _windowDelay;
+
+            Vector3 averageVelocity = Vector3.zero;
+            Quaternion averageAngularVelocity = Quaternion.identity;
+
+            VelocitySample initialVelocity = _velocityQueue.Peek();
+
+            while (_velocityQueue.Count > 0)
+            {
+                VelocitySample oldestVelocity = _velocityQueue.Dequeue();
+
+                if (oldestVelocity.time < windowEnd)
+                {
+                    averageVelocity = Vector3.Lerp(averageVelocity, oldestVelocity.position, 0.5f);
+                    averageAngularVelocity = Quaternion.Lerp(averageAngularVelocity, oldestVelocity.rotation, 0.5f);
+                }
+                else 
+                { 
+                    _velocityQueue.Clear();
+                    break; 
+                }
+            }
+
+            averageVelocity -= initialVelocity.position;
+            averageAngularVelocity = averageAngularVelocity * Quaternion.Inverse(initialVelocity.rotation);
+
+            averageVelocity *= Time.fixedDeltaTime;
+            Vector3 averageAngularVelocityVec3 = averageAngularVelocity.eulerAngles;
+            averageAngularVelocityVec3 *= Time.fixedDeltaTime;
+
+
+
+            if (averageVelocity.magnitude > 1.0f)
+            {
+                // We only want to apply the forces if we actually want to cause movement to the object
+                // We're still disabling collisions though to allow for the physics system to fully control if necessary
+                if (!Ignored)
+                {
+                    // Ignore collision after throwing so we don't knock the object
+                    //foreach (var hand in _grabbingCandidates)
+                    //{
+                    //hand.IgnoreCollision(_rigid, 0f, 0.005f);
+                    //}
+
+                    _rigid.velocity = averageVelocity;
+                    _rigid.angularVelocity = averageAngularVelocityVec3;
+
+                    _rigid.velocity *= _throwVelocityMultiplierCurve.Evaluate(_rigid.velocity.magnitude);
                 }
             }
         }
