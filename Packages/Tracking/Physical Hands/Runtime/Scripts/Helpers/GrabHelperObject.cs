@@ -161,7 +161,6 @@ namespace Leap.Unity.PhysicalHands
             }
             _colliders = rigid.GetComponentsInChildren<Collider>(true).ToList();
             HandleIgnoreContactHelper();
-            //CalculateWindowLengthAndDelay(out _windowLength, out _windowDelay); //to calculate throw window and delay
             Manager = manager;
         }
 
@@ -267,7 +266,7 @@ namespace Leap.Unity.PhysicalHands
                 {
                     // Only ever unset the rigidbody values here otherwise outside logic will get confused
                     _rigid.isKinematic = _oldKinematic;
-                    ThrowingOnRelease(true);
+                    ThrowingOnRelease();
                 }
             }
         }
@@ -897,8 +896,6 @@ namespace Leap.Unity.PhysicalHands
 
         // Ripped from IE
         protected float _maxVelocity = 15F;
-        protected AnimationCurve _strengthByDistance = new AnimationCurve(new Keyframe(0.0f, 1.0f, 0.0f, 0.0f),
-                                                                             new Keyframe(0.08f, 0.3f, 0.0f, 0.0f));
 
         private void PhysicsMovement(Vector3 solvedPosition, Quaternion solvedRotation,
                                Rigidbody intObj)
@@ -937,56 +934,30 @@ namespace Leap.Unity.PhysicalHands
 
         #region Throwing
 
-        // Taken from SlidingWindowThrow.cs
+        // the time before release to ignore velocities when throwing
+        private const float WINDOW_DELAY = 0.02f;
+        // the time before WINDOW_DELAY to capture velocities to be applied to objects when throwing
+        private const float WINDOW_LENGTH = 0.05f;
 
-        // Length of time to average, and delay between the average and current time.
-        // This is for default unity Timestep. These are set for current timestep in the constructor
-        private float _windowLength = 0.05f, _windowDelay = 0.02f;
+        private const float MAX_THROW_VELOCITY = 3f;
 
-
-        private void CalculateWindowLengthAndDelay(out float windowLength, out float windowDelay)
-        {
-            // These magic numbers calculate each thing from a line. They use the equation y = mx+b to predict values at every timestep.
-            // The full calculation has been ommitted to save calculations at runtime
-            windowLength = (0.5625f * Time.fixedDeltaTime) + 0.03875f;
-
-            windowDelay = (0.5625f * Time.fixedDeltaTime) + 0.00875f;
-        }
-
-        // Throwing curve
-        private AnimationCurve _throwVelocityMultiplierCurve = new AnimationCurve(
-                                                            new Keyframe(0.0F, 1.0F, 0, 0),
-                                                            new Keyframe(2.5F, 1.5F, 0, 0));
-
-        private Queue<VelocitySample> _velocityQueue = new Queue<VelocitySample>(64);
+        private Queue<VelocitySample> _velocityQueue = new Queue<VelocitySample>(16);
 
         private struct VelocitySample
         {
             public float time;
             public Vector3 position;
-            public Quaternion rotation;
 
-            public VelocitySample(Vector3 position, Quaternion rotation, float time)
+            public VelocitySample(Vector3 position, float time)
             {
                 this.position = position;
-                this.rotation = rotation;
                 this.time = time;
-            }
-
-            public static VelocitySample Interpolate(VelocitySample a, VelocitySample b, float time)
-            {
-                float alpha = Mathf.Clamp01(Mathf.InverseLerp(a.time, b.time, time));
-
-                return new VelocitySample(Vector3.Lerp(a.position, b.position, alpha),
-                                          Quaternion.Slerp(a.rotation, b.rotation, alpha),
-                                          time);
             }
         }
 
         private void ThrowingOnHold()
         {
             _velocityQueue.Enqueue(new VelocitySample(_rigid.position,
-                                                      _rigid.rotation,
                                                       Time.fixedTime));
 
             while (true)
@@ -994,7 +965,7 @@ namespace Leap.Unity.PhysicalHands
                 VelocitySample oldestVelocity = _velocityQueue.Peek();
 
                 // Dequeue conservatively
-                if (oldestVelocity.time < (Time.fixedTime - _windowLength - _windowDelay))
+                if (oldestVelocity.time < (Time.fixedTime - WINDOW_LENGTH - WINDOW_DELAY))
                 {
                     _velocityQueue.Dequeue();
                 }
@@ -1005,7 +976,7 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
-        private void ThrowingOnRelease(bool test = true)
+        private void ThrowingOnRelease()
         {
             // Ensure that they are at least 4 frames to average
             if (_velocityQueue.Count < 4)
@@ -1015,12 +986,13 @@ namespace Leap.Unity.PhysicalHands
                 return;
             }
 
-            float windowEnd = Time.fixedTime - _windowDelay;
+            // The last frame time to use to avoid using deceleration frames
+            float windowEnd = Time.fixedTime - WINDOW_DELAY;
 
             Vector3 averageVelocity = Vector3.zero;
-            Quaternion averageAngularVelocity = Quaternion.identity;
-
             VelocitySample initialVelocity = _velocityQueue.Peek();
+
+            int velocityCount = 0;
 
             while (_velocityQueue.Count > 0)
             {
@@ -1028,24 +1000,27 @@ namespace Leap.Unity.PhysicalHands
 
                 if (oldestVelocity.time < windowEnd)
                 {
-                    averageVelocity = Vector3.Lerp(averageVelocity, oldestVelocity.position, 0.5f);
-                    averageAngularVelocity = Quaternion.Lerp(averageAngularVelocity, oldestVelocity.rotation, 0.5f);
+                    averageVelocity += oldestVelocity.position;
+                    velocityCount++;
                 }
                 else 
-                { 
+                {
+                    // We are in the WINDOW_DELAY time, ignore the remaining frames
                     _velocityQueue.Clear();
                     break; 
                 }
             }
 
+            // average the frames to get the average positional change
+            averageVelocity /= velocityCount;
+
+            // remove the initial position to get the delta
             averageVelocity -= initialVelocity.position;
-            averageAngularVelocity = averageAngularVelocity * Quaternion.Inverse(initialVelocity.rotation);
 
-            averageVelocity *= Time.fixedDeltaTime;
-            Vector3 averageAngularVelocityVec3 = averageAngularVelocity.eulerAngles;
-            averageAngularVelocityVec3 *= Time.fixedDeltaTime;
+            // convert the positional change to a velocity
+            averageVelocity /= Time.fixedDeltaTime;
 
-
+            averageVelocity = Vector3.ClampMagnitude(averageVelocity, MAX_THROW_VELOCITY);
 
             if (averageVelocity.magnitude > 1.0f)
             {
@@ -1056,84 +1031,11 @@ namespace Leap.Unity.PhysicalHands
                     // Ignore collision after throwing so we don't knock the object
                     //foreach (var hand in _grabbingCandidates)
                     //{
-                    //hand.IgnoreCollision(_rigid, 0f, 0.005f);
+                    //    hand.IgnoreCollision(_rigid, 0f, 0.005f);
                     //}
 
                     _rigid.velocity = averageVelocity;
-                    _rigid.angularVelocity = averageAngularVelocityVec3;
-
-                    _rigid.velocity *= _throwVelocityMultiplierCurve.Evaluate(_rigid.velocity.magnitude);
-                }
-            }
-        }
-
-        private void ThrowingOnRelease()
-        {
-            if (_velocityQueue.Count < 2)
-            {
-                _rigid.velocity = Vector3.zero;
-                _rigid.angularVelocity = Vector3.zero;
-                return;
-            }
-
-            float windowEnd = Time.fixedTime - _windowDelay;
-            float windowStart = windowEnd - _windowLength;
-
-            // 0 occurs before 1,
-            // start occurs before end.
-            VelocitySample start0, start1;
-            VelocitySample end0, end1;
-            VelocitySample s0, s1;
-
-            s1 = start0 = start1 = end0 = end1 = _velocityQueue.Dequeue();
-
-            while (_velocityQueue.Count != 0)
-            {
-                s0 = s1;
-                s1 = _velocityQueue.Dequeue();
-
-                if (s0.time < windowStart && s1.time >= windowStart)
-                {
-                    start0 = s0;
-                    start1 = s1;
-                }
-
-                if (s0.time < windowEnd && s1.time >= windowEnd)
-                {
-                    end0 = s0;
-                    end1 = s1;
-
-                    // We have assigned both start and end and can break out of the loop.
-                    _velocityQueue.Clear();
-                    break;
-                }
-            }
-
-            VelocitySample start = VelocitySample.Interpolate(start0, start1, windowStart);
-            VelocitySample end = VelocitySample.Interpolate(end0, end1, windowEnd);
-
-            Vector3 interpolatedVelocity = ContactUtils.ToLinearVelocity(start.position,
-                                                                           end.position,
-                                                                           _windowLength);
-
-            if (interpolatedVelocity.magnitude > 1.0f)
-            {
-                // We only want to apply the forces if we actually want to cause movement to the object
-                // We're still disabling collisions though to allow for the physics system to fully control if necessary
-                if (!Ignored)
-                {
-                    // Ignore collision after throwing so we don't knock the object
-                    //foreach (var hand in _grabbingCandidates)
-                    //{
-                        //hand.IgnoreCollision(_rigid, 0f, 0.005f);
-                    //}
-
-                    _rigid.velocity = interpolatedVelocity;
-                    _rigid.angularVelocity = ContactUtils.ToAngularVelocity(start.rotation,
-                                                                                        end.rotation,
-                                                                                        _windowLength);
-
-                    _rigid.velocity *= _throwVelocityMultiplierCurve.Evaluate(_rigid.velocity.magnitude);
+                    // Allow physics to solve for rotational change
                 }
             }
         }
