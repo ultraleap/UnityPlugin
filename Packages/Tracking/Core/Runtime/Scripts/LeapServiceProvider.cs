@@ -871,7 +871,7 @@ namespace Leap.Unity
         /// <summary>
         /// Set the _serviceConnectionInput mode to IP_PORT, set the target IP and port of the service to the parameters and connect to the new service address
         /// </summary>
-        public void SetServiceIPPort(string IP, string port)
+        public void SetTargetServiceIPPortToConnectTo(string IP, string port)
         {
             _serviceConnectionInput = ServiceConnectionInput.IP_PORT;
 
