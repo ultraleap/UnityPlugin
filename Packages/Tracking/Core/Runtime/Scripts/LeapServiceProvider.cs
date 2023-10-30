@@ -868,6 +868,20 @@ namespace Leap.Unity
             throw new Exception("Unknown tracking optimization mode");
         }
 
+        /// <summary>
+        /// Set the _serviceConnectionInput mode to IP_PORT, set the target IP and port of the service to the parameters and connect to the new service address
+        /// </summary>
+        public void SetServiceIPPort(string IP, string port)
+        {
+            _serviceConnectionInput = ServiceConnectionInput.IP_PORT;
+
+            _serviceIP = IP;
+            _servicePort = port;
+
+            destroyController();
+            createController();
+        }
+
         #endregion
 
         #region Internal Methods
