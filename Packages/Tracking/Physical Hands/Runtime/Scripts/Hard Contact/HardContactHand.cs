@@ -83,6 +83,12 @@ namespace Leap.Unity.PhysicalHands
                         break;
                 }
             }
+
+            prevPalmPos = palmBone.transform.position;
+            prevPalmRot = palmBone.transform.rotation;
+
+            nextPos = palmBone.transform.position;
+            nextRot = palmBone.transform.rotation;
         }
 
         internal override void FinishHand()
@@ -333,10 +339,44 @@ namespace Leap.Unity.PhysicalHands
             return false;
         }
 
+        Vector3 prevPalmPos;
+        Quaternion prevPalmRot;
+
+        Vector3 nextPos;
+        Quaternion nextRot;
+
+        float prevFixedTime;
+
         #region Output Hand
         protected override void ProcessOutputHand(ref Hand modifiedHand)
         {
             modifiedHand.SetTransform(palmBone.transform.position, palmBone.transform.rotation);
+
+            if (hardContactParent.smoothOutputHands)
+            {
+                if (Time.inFixedTimeStep)
+                {
+                    prevPalmPos = nextPos;
+                    prevPalmRot = nextRot;
+
+                    nextPos = palmBone.transform.position;
+                    nextRot = palmBone.transform.rotation;
+
+                    modifiedHand.SetTransform(palmBone.transform.position, palmBone.transform.rotation);
+                    prevFixedTime = Time.time;
+                }
+                else
+                {
+                    float delta = Time.time - prevFixedTime;
+                    // use interpolated palm pos
+                    Vector3 lerpedPos = Vector3.Lerp(prevPalmPos, nextPos, delta / Time.fixedDeltaTime);
+                    Quaternion lerpedRot = Quaternion.Lerp(prevPalmRot, nextRot, delta / Time.fixedDeltaTime);
+
+                    modifiedHand.SetTransform(lerpedPos, lerpedRot);
+                    return;
+                }
+            }
+
             int boneInd = 0;
             Vector3 posA, posB;
 
@@ -353,6 +393,7 @@ namespace Leap.Unity.PhysicalHands
                     {
                         b = modifiedHand.Fingers[i].bones[j];
                         PhysExts.ToWorldSpaceCapsule(bones[boneInd].boneCollider, out posA, out posB, out r);
+
                         b.PrevJoint = posB;
                         b.NextJoint = posA;
                         b.Width = r;
@@ -362,6 +403,7 @@ namespace Leap.Unity.PhysicalHands
                         b.Rotation = bones[boneInd].transform.rotation;
                         boneInd++;
                     }
+
                     modifiedHand.Fingers[i].TipPosition = GetTipPosition(i);
                 }
             }

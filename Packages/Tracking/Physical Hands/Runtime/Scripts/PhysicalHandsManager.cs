@@ -138,7 +138,6 @@ namespace Leap.Unity.PhysicalHands
                     contactParent = null;
                 }
             }
-            ContactMode = _contactMode;
         }
 
         private void GetOrCreateBestInputProvider(out LeapProvider inputProvider)

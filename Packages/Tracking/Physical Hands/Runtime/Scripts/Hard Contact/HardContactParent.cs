@@ -38,6 +38,9 @@ namespace Leap.Unity.PhysicalHands
 
         internal float contactEnterDistance = 0.004f, contactExitDistance = 0.012f;
         internal float contactThumbEnterDistance = 0.005f, contactThumbExitDistance = 0.02f;
+
+        [SerializeField]
+        internal bool smoothOutputHands = true;
         #endregion
 
         internal override void GenerateHands()
