@@ -26,10 +26,6 @@ namespace Leap.Unity.PhysicalHands
         /// Is the hand able to interact with the physic simulation, or is it in a reset state?
         /// </summary>
         public bool Ghosted => ghosted;
-        /// <summary>
-        /// Is the hand both tracked and not resetting due to physics interactions?
-        /// </summary>
-        public bool InGoodState { get { return tracked && !resetting && !ghosted; } }
 
         /// <summary>
         /// Is the hand going to apply physics forces or should it pass through objects?

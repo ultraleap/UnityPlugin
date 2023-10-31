@@ -236,19 +236,23 @@ namespace Leap.Unity.PhysicalHands
             _averageFingerDisplacement = _overallFingerDisplacement / (FINGERS * FINGER_BONES);
             if (contactingFingers > 0)
             {
-                _contactFingerDisplacement = _overallFingerDisplacement * Mathf.Max(6 - contactingFingers, 1);
                 if (IsGrabbing)
                 {
                     _contactFingerDisplacement = 0f;
                 }
-                else if (_displacementGrabCooldown > 0)
+                else
                 {
-                    _displacementGrabCooldownCurrent -= Time.fixedDeltaTime;
-                    if (_displacementGrabCooldownCurrent <= 0)
+                    _contactFingerDisplacement = _overallFingerDisplacement * Mathf.Max(6 - contactingFingers, 1);
+
+                    if (_displacementGrabCooldown > 0)
                     {
-                        _displacementGrabCooldownCurrent = 0f;
+                        _displacementGrabCooldownCurrent -= Time.fixedDeltaTime;
+                        if (_displacementGrabCooldownCurrent <= 0)
+                        {
+                            _displacementGrabCooldownCurrent = 0f;
+                        }
+                        _contactFingerDisplacement = Mathf.Lerp(_contactFingerDisplacement, 0, Mathf.InverseLerp(0.5f, 1.0f, (_displacementGrabCooldownCurrent / _displacementGrabCooldown).EaseOut()));
                     }
-                    _contactFingerDisplacement = Mathf.Lerp(_contactFingerDisplacement, 0, Mathf.InverseLerp(0.5f, 1.0f, (_displacementGrabCooldownCurrent / _displacementGrabCooldown).EaseOut()));
                 }
             }
         }

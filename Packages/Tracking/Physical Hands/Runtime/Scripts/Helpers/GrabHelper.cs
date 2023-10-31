@@ -7,9 +7,6 @@ namespace Leap.Unity.PhysicalHands
     {
         public PhysicalHandsManager physicalHandsManager;
 
-        private bool _leftGoodState { get { return physicalHandsManager.contactParent.LeftHand.InGoodState; } }
-        private bool _rightGoodState { get { return physicalHandsManager.contactParent.RightHand.InGoodState; } }
-
         private ContactHand _leftContactHand { get { return physicalHandsManager.contactParent.LeftHand; } }
         private ContactHand _rightContactHand { get { return physicalHandsManager.contactParent.RightHand; } }
 
@@ -225,22 +222,8 @@ namespace Leap.Unity.PhysicalHands
         #region Hand States
         private void UpdateHandStates()
         {
-            if (_leftGoodState)
-            {
-                FindHandState(_leftContactHand);
-            }
-            else
-            {
-                _leftContactHand.isGrabbing = false;
-            }
-            if (_rightGoodState)
-            {
-                FindHandState(_rightContactHand);
-            }
-            else
-            {
-                _rightContactHand.isGrabbing = false;
-            }
+            FindHandState(_leftContactHand);
+            FindHandState(_rightContactHand);
         }
 
         private void FindHandState(ContactHand hand)
