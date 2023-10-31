@@ -99,7 +99,7 @@ namespace Leap.Unity.PhysicalHands
         private List<float> _boneCooldownTime = new List<float>();
 
         public bool Ignored;
-        private IgnorePhysicalHands _ignorePhysicsHands;
+        private IgnorePhysicalHands _ignorePhysicalHands;
 
         /// <summary>
         /// Returns true if the provided hand is grabbing an object.
@@ -171,11 +171,11 @@ namespace Leap.Unity.PhysicalHands
         /// </summary>
         private void HandleIgnoreContactHelper()
         {
-            _ignorePhysicsHands = _rigid.GetComponentInChildren<IgnorePhysicalHands>();
+            _ignorePhysicalHands = _rigid.GetComponentInChildren<IgnorePhysicalHands>();
 
-            if (_ignorePhysicsHands != null)
+            if (_ignorePhysicalHands != null)
             {
-                _ignorePhysicsHands.GrabHelperObject = this;
+                _ignorePhysicalHands.GrabHelperObject = this;
             }
         }
 
@@ -236,9 +236,9 @@ namespace Leap.Unity.PhysicalHands
                 //    ContactHandHover.OnHandHover(hand);
                 //}
 
-                if (_ignorePhysicsHands)
+                if (_ignorePhysicalHands)
                 {
-                    _ignorePhysicsHands.AddToHands(hand);
+                    _ignorePhysicalHands.AddToHands(hand);
                 }
             }
         }
@@ -1028,14 +1028,18 @@ namespace Leap.Unity.PhysicalHands
                 // We're still disabling collisions though to allow for the physics system to fully control if necessary
                 if (!Ignored)
                 {
-                    // Ignore collision after throwing so we don't knock the object
-                    //foreach (var hand in _grabbingCandidates)
-                    //{
-                    //    hand.IgnoreCollision(_rigid, 0f, 0.005f);
-                    //}
+                    // Check if we are safe to temporaily ignore collisions
+                    if (_ignorePhysicalHands == null || !_ignorePhysicalHands.DisableAllHandCollisions)
+                    {
+                        // Ignore collision after throwing so we don't knock the object
+                        foreach (var hand in _grabbingCandidates)
+                        {
+                            hand.IgnoreCollision(_rigid, 0f, 0.005f);
+                        }
+                    }
 
+                    // Set the new velocty. Allow physics to solve for rotational change
                     _rigid.velocity = averageVelocity;
-                    // Allow physics to solve for rotational change
                 }
             }
         }
