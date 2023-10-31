@@ -333,9 +333,16 @@ namespace Leap.Unity.PhysicalHands
             return false;
         }
 
+        [SerializeField]
+        private float lerpOutputHandSpeed = 17;
+
         #region Output Hand
         protected override void ProcessOutputHand(ref Hand modifiedHand)
         {
+
+
+            Vector3 lerpedPosition = Vector3.Lerp(modifiedHand.PalmPosition, palmBone.transform.position, Time.fixedDeltaTime * lerpOutputHandSpeed);
+
             modifiedHand.SetTransform(palmBone.transform.position, palmBone.transform.rotation);
             int boneInd = 0;
             Vector3 posA, posB;
@@ -353,8 +360,12 @@ namespace Leap.Unity.PhysicalHands
                     {
                         b = modifiedHand.Fingers[i].bones[j];
                         PhysExts.ToWorldSpaceCapsule(bones[boneInd].boneCollider, out posA, out posB, out r);
-                        b.PrevJoint = posB;
-                        b.NextJoint = posA;
+
+                        Vector3 lerpedPosB = Vector3.Lerp(b.PrevJoint, posB, Time.fixedDeltaTime * lerpOutputHandSpeed);
+                        Vector3 lerpedPosA = Vector3.Lerp(b.NextJoint, posA, Time.fixedDeltaTime * lerpOutputHandSpeed);
+
+                        b.PrevJoint = lerpedPosB;
+                        b.NextJoint = lerpedPosA;
                         b.Width = r;
                         b.Center = (b.PrevJoint + b.NextJoint) / 2f;
                         b.Direction = (b.NextJoint - b.PrevJoint).normalized;
@@ -362,7 +373,11 @@ namespace Leap.Unity.PhysicalHands
                         b.Rotation = bones[boneInd].transform.rotation;
                         boneInd++;
                     }
-                    modifiedHand.Fingers[i].TipPosition = GetTipPosition(i);
+
+                    Vector3 lerpedTipPos = Vector3.Lerp(modifiedHand.Fingers[i].TipPosition, GetTipPosition(i), Time.fixedDeltaTime * lerpOutputHandSpeed);
+
+
+                    modifiedHand.Fingers[i].TipPosition = lerpedTipPos;
                 }
             }
 
