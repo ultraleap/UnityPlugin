@@ -8,19 +8,103 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [NEXT] - xx/xx/xx
 
-This release was tested against Unity 2021.3 LTS and 2022.3 LTS
+### Tracking Client versions
+- Windows 	v5.16.0
+- MacOS 	v5.16.0
+- Android 	v5.16.0
+
+### Added
+- (Pose Detector) Add a new rule type to match rotation of a joint to a target
+- Help Menu that links out to docs, a place to report bugs & places to get support
+
+### Changed
+- Changed from using obsolete FindObjectOfType to using newer implementations
+- (Preview Teleportation) Lightweight Pinch Detector's finger detection can be configured
+- Ultraleap settings are now in the project settings window, under "Ultraleap" 
+
+### Fixed
+- LeapXRServiceProvider ensures default device offset mode is set to new defaults when enabled
+
+### Known issues 
+- Use of the LeapCSharp Config class is unavailable with v5.X tracking service
+- Repeatedly opening scenes can cause memory use increase
+- Currently the Ultraleap Hand Tracking feature for OpenXR requires the New and Legacy input systems to be enabled, to simultaneously use OpenXR and the Ultraleap Unity Plugin's features.
+- The OpenXR Leap Provider does not currently support the `Confidence` hand property (and will return fixed values)
+- After using Ultraleap OpenXR in Unity Editor, the tracking mode of device 0 will be set to HMD until the Unity Editor session ends. This can stop the testing of non-XR scenes until the Unity Editor is re-opened
+- The OpenXR Leap Provider palm can be in unexpected position when using pre-1.4.3 OpenXR Layer. A workaround is to ensure you use 1.4.3 or newer - installed by the 5.12.0 or newer Tracking Service Installer
+- Running both the Ultraleap XRHands Subsystem and another XRHands Subsystem at the same time causes unstable results. Only enable one at a time.
+
+## [6.12.1] - 28/09/23
+
+### Tracking Client versions
+- Windows 	v5.16.0
+- MacOS 	v5.16.0
+- Android 	v5.16.0
+
+### Fixed
+- (leapXRServiceProvider) Hands offset incorrectly on Windows when using Leap 2
+
+### Known issues 
+- Use of the LeapCSharp Config class is unavailable with v5.X tracking service
+- Repeatedly opening scenes can cause memory use increase
+- Currently the Ultraleap Hand Tracking feature for OpenXR requires the New and Legacy input systems to be enabled, to simultaneously use OpenXR and the Ultraleap Unity Plugin's features.
+- The OpenXR Leap Provider does not currently support the `Confidence` hand property (and will return fixed values)
+- After using Ultraleap OpenXR in Unity Editor, the tracking mode of device 0 will be set to HMD until the Unity Editor session ends. This can stop the testing of non-XR scenes until the Unity Editor is re-opened
+- Running both the Ultraleap XRHands Subsystem and another XRHands Subsystem at the same time causes unstable results. Only enable one at a time.
+
+
+## [6.12.0] - 12/09/23
+
+### Added
+- (MRTK Support) Added an MRTK3 subsystem for using Leap tracking directly (non-OpenXR)
+
+### Changed
+- (XRHands) XRHands subsystem will now use existing LeapXRServiceProviders found in the scene before considering generating new ones
+
+### Fixed
+- (XRHands) XRHands double-translates tracking data causing XRI InputActions to be wrongly positioned when the XROrigin is moved
+
+### Known issues 
+- Use of the LeapCSharp Config class is unavailable with v5.X tracking service
+- Repeatedly opening scenes can cause memory use increase
+- Currently the Ultraleap Hand Tracking feature for OpenXR requires the New and Legacy input systems to be enabled, to simultaneously use OpenXR and the Ultraleap Unity Plugin's features.
+- The OpenXR Leap Provider does not currently support the `Confidence` hand property (and will return fixed values)
+- After using Ultraleap OpenXR in Unity Editor, the tracking mode of device 0 will be set to HMD until the Unity Editor session ends. This can stop the testing of non-XR scenes until the Unity Editor is re-opened
+- The OpenXR Leap Provider palm can be in unexpected position when using pre-1.4.3 OpenXR Layer. A workaround is to ensure you use 1.4.3 or newer - installed by the 5.12.0 or newer Tracking Service Installer
+- Running both the Ultraleap XRHands Subsystem and another XRHands Subsystem at the same time causes unstable results. Only enable one at a time.
+
+
+## [6.12.0] - 12/09/23
+
+### Added
+- (MRTK Support) Added an MRTK3 subsystem for using Leap tracking directly (non-OpenXR)
+
+### Changed
+- (XRHands) XRHands subsystem will now use existing LeapXRServiceProviders found in the scene before considering generating new ones
+
+### Fixed
+- (XRHands) XRHands double-translates tracking data causing XRI InputActions to be wrongly positioned when the XROrigin is moved
+
+### Known issues 
+- Use of the LeapCSharp Config class is unavailable with v5.X tracking service
+- Repeatedly opening scenes can cause memory use increase
+- Currently the Ultraleap Hand Tracking feature for OpenXR requires the New and Legacy input systems to be enabled, to simultaneously use OpenXR and the Ultraleap Unity Plugin's features.
+- The OpenXR Leap Provider does not currently support the `Confidence` hand property (and will return fixed values)
+- After using Ultraleap OpenXR in Unity Editor, the tracking mode of device 0 will be set to HMD until the Unity Editor session ends. This can stop the testing of non-XR scenes until the Unity Editor is re-opened
+- The OpenXR Leap Provider palm can be in unexpected position when using pre-1.4.3 OpenXR Layer. A workaround is to ensure you use 1.4.3 or newer - installed by the 5.12.0 or newer Tracking Service Installer
+- Running both the Ultraleap XRHands Subsystem and another XRHands Subsystem at the same time causes unstable results. Only enable one at a time.
+
+
+## [6.11.0] - 14/08/23
 
 ### Added
 - (Physics Hands) Finger displacement values to each finger
 - (Physics Hands) Interface based events for easier development
     - Please see the updated scripts in the Physics Hands example scene for more information
-- (XRHands) Direct Leap XRHands Subsystem
-- (UlrealeapSettings) Ultraleap Settings ScriptableObject to toggle features
-- (InputSystem) A XRHands to Leap InputActions and Meta Aim InputActions converter
-
+- (HandRays) Add methods to invoke handray Frame & State Change in inherited classes
+- (LeapXRServiceProvider) Use of device transforms from the service when using Default device offset mode. This does not include tilt/rotation
 
 ### Changed
-- (Hand Pose) Removed unnecessary Hand Pose scriptable context menu option
 - (Physics Hands) Burst compute is now used to improve certain physics calculation performance
     - In Unity 2020+ this is used for "hand is colliding" functions only
 	- In Unity 2022+ all collision functions are handled by Burst
@@ -29,14 +113,48 @@ This release was tested against Unity 2021.3 LTS and 2022.3 LTS
     - This is tailored to handle specific Rigidbodies and will only fire when your subscribed Rigidbody is affected
 - (Physics Hands) Hand and bone states have been improved and are more consistent with expectations
 - (Physics Hands) Updated example scene with new events and better visuals
-- (Multi device aggregation) Added wrist and arm to ConfidenceInterpolation aggregator
+- (Physics Hands) Updated PhysicsBone IsObjectGrabbable calculations to use the closest point on the bone to the hovered object
+- (Physics Hands) Improved Physics Hands grasp helpers to take into account grabs where bones are facing each other
+- (Locomotion) Expose teleport anchor list & last teleported anchor
+- (Locomotion) Moved Jump Gems further away from the arm, to account for sleeves
+- (Locomotion) Added functionality to update the initial position and rotations of the TP anchor after the first Awake
 
+### Fixed
+- (Physics Hands) Hand forces are reduced when pushing into objects with fingers
+- (Physics Hands) Stopped physics buttons from rotating incorrectly
+- (Locomotion) Jump Gems look for audio sources in their children, even if the audio source was set
+- (Locomotion) If pinched gem was null, jump gem teleport could still be in a selected state
+- (Locomotion) Teleport ray did not change to an invalid colour when no colliders were hit
+- (Core) Fixed hands juddering in XR when interpolation is turned off on the LeapXRServiceProvider. Turning off interpolation now turns off head pose interpolation
+- (PoseViewer) Pose viewer rotation does not match the targets rotation
+
+### Known issues 
+- Use of the LeapCSharp Config class is unavailable with v5.X tracking service
+- Repeatedly opening scenes can cause memory use increase
+- Currently the Ultraleap Hand Tracking feature for OpenXR requires the New and Legacy input systems to be enabled, to simultaneously use OpenXR and the Ultraleap Unity Plugin's features.
+- The OpenXR Leap Provider does not currently support the `Confidence` hand property (and will return fixed values)
+- After using Ultraleap OpenXR in Unity Editor, the tracking mode of device 0 will be set to HMD until the Unity Editor session ends. This can stop the testing of non-XR scenes until the Unity Editor is re-opened
+- The OpenXR Leap Provider palm can be in unexpected position when using pre-1.4.3 OpenXR Layer. A workaround is to ensure you use 1.4.3 or newer - installed by the 5.12.0 or newer Tracking Service Installer
+- Running both the Ultraleap XRHands Subsystem and another XRHands Subsystem at the same time causes unstable results. Only enable one at a time.
+
+## [6.10.0] - 05/07/23
+
+This release was tested against Unity 2021.3 LTS and 2022.3 LTS
+
+### Added
+- (XRHands) Direct Leap XRHands Subsystem
+- (UltraleapSettings) Ultraleap Settings ScriptableObject to toggle features
+- (InputSystem) A XRHands to Leap InputActions and Meta Aim InputActions converter
+
+### Changed
+- (Hand Pose) Removed unnecessary Hand Pose scriptable context menu option
+- (Multi device aggregation) Added wrist and arm to ConfidenceInterpolation aggregator
+- (Preview XRI) Removed XRI content from Preview Package in favour of XRHands+XRI content in Tracking Package. Follow the Ultraleap [XR Docs](https://docs.ultraleap.com/unity-api/The-Examples/XR/index.html) for XRI and XRHands to get started
 
 ### Fixed
 - (Preview) CPU performance issues on PICO when re-connecting tracking device
 - (Locomotion) Jump gems could occasionally break and not show their ray
-- (Physics Hands) Hand forces are reduced when pushing into objects with fingers
-
+- VectorHand bone directions and thumb rotations
 
 ### Known issues 
 - Use of the LeapCSharp Config class is unavailable with v5.X tracking service
@@ -55,7 +173,7 @@ This release was tested against Unity 2021.3 LTS and 2022.3 LTS
 - (Physics Hands) In-editor readme for example scene
 - (Attachment Hands) Predicted pinch position
 - (LeapServiceProvider) Ability to change the number of Service connection attempts and interval
-- (HandRays) Add methods to invoke handray Frame & State Change in inherited classes
+
 
 ### Changed
 - (HandUtils) Only cache static Provider and CameraRig references when they are requested
@@ -63,8 +181,6 @@ This release was tested against Unity 2021.3 LTS and 2022.3 LTS
 - (UIInput) Cursors are disabled by default and enabled when required
 - (LeapXRServiceProvider) When using Default offset, updated values will be used automatically
 - (Utils) All references to Utils in the Plugin specify Leap.Unity.Utils to avoid clashes with other Utils classes
-- (Locomotion) Expose teleport anchor list & last teleported anchor
-- (Locomotion) Moved Jump Gems further away from the arm, to account for sleeves
 
 ### Fixed
 - (OpenXRProvider) Hand `Rotation`, `Direction`, `PalmPosition`, `PalmNormal` and `StabilisedPalmPosition` do not match LeapC when using OpenXR layer 1.4.4
@@ -72,9 +188,7 @@ This release was tested against Unity 2021.3 LTS and 2022.3 LTS
 - (OpenXRProvider) Finger `Direction` is incorrectly set to the tip bone direction rather than the intermediate
 - (OpenXRProvider) Hand `GrabStrength` is computed before all required information is available
 - (UIInput) When hand lost or leaves canvas near hovered button, button stays hovered
-- (Locomotion) Jump Gems look for audio sources in their children, even if the audio source was set
-- (Locomotion) If pinched gem was null, jump gem teleport could still be in a selected state
-- (Locomotion) Teleport ray did not change to an invalid colour when no colliders were hit
+
 
 ### Known issues 
 - Use of the LeapCSharp Config class is unavailable with v5.X tracking service

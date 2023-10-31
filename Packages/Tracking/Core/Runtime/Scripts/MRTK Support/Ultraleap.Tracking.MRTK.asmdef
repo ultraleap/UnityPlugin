@@ -1,0 +1,36 @@
+{
+    "name": "Ultraleap.Tracking.MRTK",
+    "rootNamespace": "",
+    "references": [
+        "GUID:2ee0542102ac1084e8d9a910885c1e81",
+        "GUID:ba171b3dd2a51234ab864770f99741a5",
+        "GUID:e40ba710768534012815d3193fa296cb",
+        "GUID:cec9848704c49724192ff47f9b3e9156",
+        "GUID:75469ad4d38634e559750d17036d5f7c",
+        "GUID:d59347cf3d47ac148925927618efb1b5",
+        "GUID:56255bd5d851a6243b63cb370cfc40b1"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "INPUT_SYSTEM",
+        "MRTK_INPUT"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.unity.inputsystem",
+            "expression": "1.5.0",
+            "define": "INPUT_SYSTEM"
+        },
+        {
+            "name": "org.mixedrealitytoolkit.input",
+            "expression": "3.0.0-Development",
+            "define": "MRTK_INPUT"
+        }
+    ],
+    "noEngineReferences": false
+}

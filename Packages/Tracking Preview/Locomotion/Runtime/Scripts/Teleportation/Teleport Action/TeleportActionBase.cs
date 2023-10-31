@@ -101,7 +101,7 @@ namespace Leap.Unity.Preview.Locomotion
             if (Player == null) Player = Head.parent.gameObject == null ? Head.gameObject : Head.parent.gameObject;
             if (farFieldLayerManager == null)
             {
-                farFieldLayerManager = FindObjectOfType<FarFieldLayerManager>();
+                farFieldLayerManager = FindAnyObjectByType<FarFieldLayerManager>();
             }
 
             if (handRayInteractor != null)
@@ -111,12 +111,12 @@ namespace Leap.Unity.Preview.Locomotion
 
             if (findTeleportAnchorsOnStart)
             {
-                _teleportAnchors = new List<TeleportAnchor>(FindObjectsOfType<TeleportAnchor>(true));
+                _teleportAnchors = new List<TeleportAnchor>(FindObjectsByType<TeleportAnchor>(FindObjectsInactive.Include, FindObjectsSortMode.None));
             }
 
-            if (freeTeleportAnchor.GetComponent<MeshCollider>() != null)
+            if (freeTeleportAnchor.TryGetComponent(out MeshCollider anchorCollider))
             {
-                Destroy(freeTeleportAnchor.GetComponent<MeshCollider>());
+                Destroy(anchorCollider);
             }
 
             _movementTypeLastFrame = movementType;
@@ -145,7 +145,7 @@ namespace Leap.Unity.Preview.Locomotion
 
             if (farFieldLayerManager == null)
             {
-                farFieldLayerManager = FindObjectOfType<FarFieldLayerManager>();
+                farFieldLayerManager = FindAnyObjectByType<FarFieldLayerManager>();
             }
         }
 

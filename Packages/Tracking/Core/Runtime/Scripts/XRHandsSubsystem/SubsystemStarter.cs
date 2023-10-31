@@ -8,9 +8,9 @@
 
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SubsystemsImplementation.Extensions;
 using UnityEngine.XR.Hands;
 using UnityEngine.XR.Hands.ProviderImplementation;
-using UnityEngine.SubsystemsImplementation.Extensions;
 
 namespace Leap.Unity
 {
@@ -64,7 +64,7 @@ namespace Leap.Unity
 
             if (m_Subsystem != null)
             {
-                if(!m_Subsystem.running)
+                if (!m_Subsystem.running)
                 {
                     m_Subsystem.Start();
 
@@ -90,23 +90,23 @@ namespace Leap.Unity
                 return;
             }
 
-            LeapProvider leapProvider = Hands.Provider;
+            LeapProvider leapProvider = GameObject.FindAnyObjectByType<LeapXRServiceProvider>();
 
             // If there is no leap provider in the scene
             if (leapProvider == null)
             {
-                Debug.Log("There are no Leap Providers in the scene, automatically assigning one for use with Leap XRHands");
+                Debug.Log("There are no LeapXRServiceProviders in the scene, automatically assigning one for use with Ultraleap Subsystem for XRHands");
+
+                GameObject leapProviderGO = new GameObject("LeapXRServiceProvider");
+                LeapXRServiceProvider leapXRServiceProvider = leapProviderGO.AddComponent<LeapXRServiceProvider>();
+                leapXRServiceProvider.PositionDeviceRelativeToMainCamera = true;
+                leapProvider = (LeapProvider)leapXRServiceProvider;
+                GameObject.DontDestroyOnLoad(leapProviderGO);
             }
             else
             {
-                Debug.LogWarning("We recommend that you do not add a Leap Provider to scenes using the Leap Subsystem for XR Hands. This can cause unwanted behaviour. \n A new leap provider has been created which the subsystem will use.");
+                Debug.Log("Ultraleap Subsystem for XRHands is using the existing LeapXRServiceProvider found in the current scene");
             }
-
-            leapProviderGO = new GameObject("LeapXRServiceProvider");
-            LeapXRServiceProvider leapXRServiceProvider = leapProviderGO.AddComponent<LeapXRServiceProvider>();
-            leapXRServiceProvider.PositionDeviceRelativeToMainCamera = true;
-            leapProvider = (LeapProvider)leapXRServiceProvider;
-            GameObject.DontDestroyOnLoad(leapProviderGO);
 
             if (subsystemProvider != null)
             {

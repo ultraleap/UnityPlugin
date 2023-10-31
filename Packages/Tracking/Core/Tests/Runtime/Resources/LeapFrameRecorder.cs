@@ -77,7 +77,7 @@ namespace Leap.Testing
                         // This should be changed if someone uses this outside unit testing
                         // https://learn.microsoft.com/en-us/dotnet/standard/serialization/binaryformatter-security-guide
                         var bf = new BinaryFormatter();
-                        frameS = (SerializableFrame) bf.Deserialize(file);
+                        frameS = (SerializableFrame)bf.Deserialize(file);
                     }
 
                     return frameS;

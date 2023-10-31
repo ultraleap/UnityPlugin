@@ -1,7 +1,7 @@
-using System.Collections;
-using System.IO;
 using Leap.Unity;
 using NUnit.Framework;
+using System.Collections;
+using System.IO;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -63,7 +63,7 @@ namespace Leap.Testing
             (OK_ASSET_FILE_NAME, OPEN_PALM_FRAME_FILE_NAME),
             (OPEN_PALM_ASSET_FILE_NAME, THUMBS_UP_FRAME_FILE_NAME),
             (POINT_ASSET_FILE_NAME, OPEN_PALM_FRAME_FILE_NAME)
-        };  
+        };
 
         /// <summary>
         /// A collection of (string) references to test poses, a tracking frame that will trigger the pose and a tracking frame that does not match the pose. Used to check pose detection changes state
@@ -170,7 +170,7 @@ namespace Leap.Testing
         {
             LogTestData(testData);
             SetupScene();
-            yield return new WaitForFixedUpdate(); 
+            yield return new WaitForFixedUpdate();
 
             HandPoseDetectorTestScene.FrameDataSource = FRAME_FILE_REPOSITORY;
             HandPoseDetectorTestScene.PoseToDetect = LoadPoseTarget(testData.TargetPoseAsset);
@@ -190,7 +190,7 @@ namespace Leap.Testing
         /// </summary>
         public void SetupScene()
         {
-            foreach(var buildSettingsScene in EditorBuildSettings.scenes)
+            foreach (var buildSettingsScene in EditorBuildSettings.scenes)
             {
                 if (buildSettingsScene != null && buildSettingsScene.path.Contains(SCENE_NAME))
                 {
@@ -205,7 +205,7 @@ namespace Leap.Testing
 
             if (availableScenes != null)
             {
-                foreach(var scenePath in availableScenes)
+                foreach (var scenePath in availableScenes)
                 {
                     if (scenePath.Contains(SCENE_NAME))
                     {
