@@ -138,7 +138,6 @@ namespace Leap.Unity.PhysicalHands
                     contactParent = null;
                 }
             }
-            ContactMode = _contactMode;
         }
 
         private void GetOrCreateBestInputProvider(out LeapProvider inputProvider)
@@ -178,12 +177,11 @@ namespace Leap.Unity.PhysicalHands
             contactParent?.UpdateFrame();
 
             _modifiedFrame.CopyFrom(inputFrame);
-            
+            contactParent?.OutputFrame(ref _modifiedFrame);
 
             // Output the frame on each update
             if (Time.inFixedTimeStep)
             {
-                contactParent?.OutputFrame(ref _modifiedFrame);
                 // Fixed frame on fixed update
                 DispatchFixedFrameEvent(_modifiedFrame);
             }
