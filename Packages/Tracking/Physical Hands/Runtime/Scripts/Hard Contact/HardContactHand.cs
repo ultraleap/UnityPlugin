@@ -352,26 +352,29 @@ namespace Leap.Unity.PhysicalHands
         {
             modifiedHand.SetTransform(palmBone.transform.position, palmBone.transform.rotation);
 
-            if (Time.inFixedTimeStep)
+            if (hardContactParent.smoothOutputHands)
             {
-                prevPalmPos = nextPos;
-                prevPalmRot = nextRot;
+                if (Time.inFixedTimeStep)
+                {
+                    prevPalmPos = nextPos;
+                    prevPalmRot = nextRot;
 
-                nextPos = palmBone.transform.position;
-                nextRot = palmBone.transform.rotation;
+                    nextPos = palmBone.transform.position;
+                    nextRot = palmBone.transform.rotation;
 
-                modifiedHand.SetTransform(palmBone.transform.position, palmBone.transform.rotation);
-                prevFixedTime = Time.time;
-            }
-            else
-            {
-                float delta = Time.time - prevFixedTime;
-                // use interpolated palm pos
-                Vector3 lerpedPos = Vector3.Lerp(prevPalmPos, nextPos, delta / Time.fixedDeltaTime);
-                Quaternion lerpedRot = Quaternion.Lerp(prevPalmRot, nextRot, delta / Time.fixedDeltaTime);
+                    modifiedHand.SetTransform(palmBone.transform.position, palmBone.transform.rotation);
+                    prevFixedTime = Time.time;
+                }
+                else
+                {
+                    float delta = Time.time - prevFixedTime;
+                    // use interpolated palm pos
+                    Vector3 lerpedPos = Vector3.Lerp(prevPalmPos, nextPos, delta / Time.fixedDeltaTime);
+                    Quaternion lerpedRot = Quaternion.Lerp(prevPalmRot, nextRot, delta / Time.fixedDeltaTime);
 
-                modifiedHand.SetTransform(lerpedPos, lerpedRot);
-                return;
+                    modifiedHand.SetTransform(lerpedPos, lerpedRot);
+                    return;
+                }
             }
 
             int boneInd = 0;
