@@ -2,13 +2,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Leap.Unity.Attributes;
+using UnityEngine.Events;
 
 namespace Leap.Unity.PhysicalHands
 {
     public class PhysicalHandsManager : LeapProvider
     {
-        public enum ContactModes
+        public enum ContactMode
         {
             HardContact,
             SoftContact,
@@ -33,9 +33,10 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
-        [Space, SerializeProperty("ContactMode"), SerializeField]
-        private ContactModes _contactMode;
-        public ContactModes ContactMode
+        [SerializeField]
+        private ContactMode _contactMode;
+
+        public ContactMode contactMode
         {
             get { return _contactMode; }
             set
@@ -207,7 +208,7 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
-        public void SetContactMode(ContactModes mode)
+        public void SetContactMode(ContactMode mode)
         {
             if (contactParent != null) // delete old contact hands
             {
@@ -230,13 +231,13 @@ namespace Leap.Unity.PhysicalHands
 
             switch (_contactMode)
             {
-                case ContactModes.HardContact:
+                case ContactMode.HardContact:
                     contactParent = newContactParent.AddComponent(typeof(HardContactParent)) as ContactParent;
                     break;
-                case ContactModes.SoftContact:
+                case ContactMode.SoftContact:
                     contactParent = newContactParent.AddComponent(typeof(SoftContactParent)) as ContactParent;
                     break;
-                case ContactModes.NoContact:
+                case ContactMode.NoContact:
                     contactParent = newContactParent.AddComponent(typeof(NoContactParent)) as ContactParent;
                     break;
             }
@@ -329,6 +330,52 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 #endif
+
+        #endregion
+
+        #region Events
+
+        [Space, Header("Hover Events"), Space]
+        public UnityEvent<Rigidbody> onHover;
+        public UnityEvent<Rigidbody> onHoverExit;
+
+        [Space, Header("Contact Events"), Space]
+        public UnityEvent<Rigidbody> onContact;
+        public UnityEvent<Rigidbody> onContactExit;
+
+        [Space, Header("Grab Events"), Space]
+        public UnityEvent<Rigidbody> onGrab;
+        public UnityEvent<Rigidbody> onGrabExit;
+
+        internal void OnHandHover(Rigidbody rbody)
+        {
+            onHover?.Invoke(rbody);
+        }
+
+        internal void OnHandHoverExit(Rigidbody rbody)
+        {
+            onHoverExit?.Invoke(rbody);
+        }
+
+        internal void OnHandContact(Rigidbody rbody)
+        {
+            onContact?.Invoke(rbody);
+        }
+
+        internal void OnHandContactExit(Rigidbody rbody)
+        {
+            onContactExit?.Invoke(rbody);
+        }
+
+        internal void OnHandGrab(Rigidbody rbody)
+        {
+            onGrab?.Invoke(rbody);
+        }
+
+        internal void OnHandGrabExit(Rigidbody rbody)
+        {
+            onGrabExit?.Invoke(rbody);
+        }
 
         #endregion
     }

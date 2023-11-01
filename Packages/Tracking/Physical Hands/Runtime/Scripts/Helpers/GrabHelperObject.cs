@@ -189,25 +189,30 @@ namespace Leap.Unity.PhysicalHands
             _grabbingValues.Clear();
 
             //// Remove any lingering contact events
-            //if (_rigid != null && _rigid.TryGetComponent<IContactHandContact>(out var ContactHandContact))
-            //{
-            //    for (int i = 0; i < _graspingCandidatesContact.Count; i++)
-            //    {
-            //        if (_graspingCandidatesContact[i])
-            //        {
-            //            ContactHandContact.OnHandContactExit(_graspingCandidates[i]);
-            //        }
-            //    }
-            //}
-
             //// Remove any lingering hover events
-            //if (_rigid != null && _rigid.TryGetComponent<IContactHandHover>(out var ContactHandHover))
-            //{
-            //    foreach (var hand in _graspingCandidates)
-            //    {
-            //        ContactHandHover.OnHandHoverExit(hand);
-            //    }
-            //}
+            if (_rigid != null)
+            {
+                for (int i = 0; i < _grabbingCandidatesContact.Count; i++)
+                {
+                    if (_grabbingCandidatesContact[i])
+                    {
+                        if (_rigid.TryGetComponent<IPhysicalHandContact>(out var physicalHandContact))
+                        {
+                            physicalHandContact.OnHandContactExit(_grabbingCandidates[i]);
+                        }
+
+                        _grabbingCandidates[i].physicalHandsManager.OnHandContactExit(_rigid);
+                    }
+
+                    if (_rigid.TryGetComponent<IPhysicalHandHover>(out var physicalHandHover))
+                    {
+                        physicalHandHover.OnHandHoverExit(_grabbingCandidates[i]);
+                    }
+
+                    _grabbingCandidates[i].physicalHandsManager.OnHandHoverExit(_rigid);
+                }
+            }
+
             _grabbingCandidates.Clear();
             _grabbingCandidatesContact.Clear();
             _boneHash.Clear();
@@ -365,24 +370,45 @@ namespace Leap.Unity.PhysicalHands
 
             UpdateRemovedBones();
 
-            // Update the hand contact events
+            // Update the hand contact and hover events
             for (int i = 0; i < _grabbingCandidates.Count; i++)
             {
+                IPhysicalHandContact handContactEvent = null;
+
                 if (_grabbingCandidatesContact[i] != _grabbingCandidates[i].IsContacting)
                 {
-                    //if (_rigid.TryGetComponent<IContactHandContact>(out var ContactHandContact))
-                    //{
-                    //    if (_graspingCandidates[i].IsContacting)
-                    //    {
-                    //        ContactHandContact.OnHandContact(_graspingCandidates[i]);
-                    //    }
-                    //    else
-                    //    {
-                    //        ContactHandContact.OnHandContactExit(_graspingCandidates[i]);
-                    //    }
-                    //}
                     _grabbingCandidatesContact[i] = _grabbingCandidates[i].IsContacting;
+
+                    // We stopped contacting, so fire the contact exit event
+                    if (!_grabbingCandidates[i].IsContacting)
+                    {
+                        if (_rigid.TryGetComponent<IPhysicalHandContact>(out handContactEvent))
+                        {
+                            handContactEvent.OnHandContactExit(_grabbingCandidates[i]);
+                        }
+
+                        _grabbingCandidates[i].physicalHandsManager.OnHandContactExit(_rigid);
+                    }
                 }
+
+                // Fire the contacting event whether it changed or not
+                if (_grabbingCandidates[i].IsContacting)
+                {
+                    if (handContactEvent != null || _rigid.TryGetComponent<IPhysicalHandContact>(out handContactEvent))
+                    {
+                        handContactEvent.OnHandContact(_grabbingCandidates[i]);
+                    }
+
+                    _grabbingCandidates[i].physicalHandsManager.OnHandContact(_rigid);
+                }
+
+                // Fire the hovering event
+                if (_rigid.TryGetComponent<IPhysicalHandHover>(out var physicalHandHover))
+                {
+                    physicalHandHover.OnHandHover(_grabbingCandidates[i]);
+                }
+
+                _grabbingCandidates[i].physicalHandsManager.OnHandHover(_rigid);
             }
         }
 
@@ -625,10 +651,13 @@ namespace Leap.Unity.PhysicalHands
             _grabbingValues[hand].offset = _rigid.position - hand.palmBone.transform.position;
             _grabbingValues[hand].rotationOffset = Quaternion.Inverse(hand.palmBone.transform.rotation) * _rigid.rotation;
             _grabbingValues[hand].originalHandRotation = hand.palmBone.transform.rotation;
-            //if (_rigid.TryGetComponent<IContactHandGrab>(out var ContactHandGrab))
-            //{
-            //    ContactHandGrab.OnHandGrab(hand);
-            //}
+
+            if (_rigid.TryGetComponent<IPhysicalHandGrab>(out var physicalHandGrab))
+            {
+                physicalHandGrab.OnHandGrab(hand);
+            }
+
+            hand.physicalHandsManager.OnHandGrab(_rigid);
         }
 
         private void UpdateRemovedBones()
@@ -662,10 +691,14 @@ namespace Leap.Unity.PhysicalHands
                 {
                     SetBoneGrabbing(grabbedHand, false);
                     _grabbingHands.Remove(grabbedHand.Key);
-                    //if (_rigid.TryGetComponent<IContactHandGrab>(out var ContactHandGrab))
-                    //{
-                    //    ContactHandGrab.OnHandGrabExit(grabbedHand.Key);
-                    //}
+
+                    if (_rigid.TryGetComponent<IPhysicalHandGrab>(out var physicalHandGrab))
+                    {
+                        physicalHandGrab.OnHandGrabExit(grabbedHand.Key);
+                    }
+
+                    grabbedHand.Key.physicalHandsManager.OnHandGrabExit(_rigid);
+
                     continue;
                 }
 
@@ -711,10 +744,13 @@ namespace Leap.Unity.PhysicalHands
                     SetBoneGrabbing(grabbedHand, false);
                     _grabbingValues[grabbedHand.Key].waitingForInitialUnpinch = true;
                     _grabbingHands.Remove(grabbedHand.Key);
-                    //if (_rigid.TryGetComponent<IContactHandGrab>(out var ContactHandGrab))
-                    //{
-                    //    ContactHandGrab.OnHandGrabExit(graspedHand.Key);
-                    //}
+
+                    if (_rigid.TryGetComponent<IPhysicalHandGrab>(out var physicalHandGrab))
+                    {
+                        physicalHandGrab.OnHandGrabExit(grabbedHand.Key);
+                    }
+
+                    grabbedHand.Key.physicalHandsManager.OnHandGrabExit(_rigid);
                 }
                 else
                 {
@@ -745,6 +781,13 @@ namespace Leap.Unity.PhysicalHands
                         }
                     }
                 }
+
+                if (_rigid.TryGetComponent<IPhysicalHandGrab>(out var physicalHandGrab))
+                {
+                    physicalHandGrab.OnHandGrab(pair.Key);
+                }
+
+                pair.Key.physicalHandsManager.OnHandGrab(_rigid);
             }
             else
             {

@@ -6,12 +6,18 @@ namespace Leap.Unity.PhysicalHands
     [CustomEditor(typeof(PhysicalHandsManager))]
     public class PhysicalHandsManagerEditor : CustomEditorBase<PhysicalHandsManager>
     {
+        private readonly string[] contactModeNames = { "Hard Contact", "Soft Contact", "No Contact"};
+
         bool layersExist = false;
 
         protected override void OnEnable()
         {
             base.OnEnable();
             specifyConditionalDrawing(() => false, "editTimePose");
+
+            specifyCustomDrawer("_contactMode", DrawCustomEnum);
+
+            HandleEventsFoldout();
 
             if (CreateContactHandLayers())
             { 
@@ -25,6 +31,26 @@ namespace Leap.Unity.PhysicalHands
             serializedObject.ApplyModifiedProperties();
 
             base.OnInspectorGUI();
+        }
+
+        private void DrawCustomEnum(SerializedProperty property)
+        {
+            property.enumValueIndex = EditorGUILayout.Popup("Contact Mode", property.enumValueIndex, contactModeNames);
+
+            if (serializedObject.ApplyModifiedProperties())
+            {
+                target.SetContactMode((PhysicalHandsManager.ContactMode)property.enumValueIndex);
+            }
+        }
+
+        private void HandleEventsFoldout()
+        {
+            addPropertyToFoldout("onHover", "Events");
+            addPropertyToFoldout("onHoverExit", "Events");
+            addPropertyToFoldout("onContact", "Events");
+            addPropertyToFoldout("onContactExit", "Events");
+            addPropertyToFoldout("onGrab", "Events");
+            addPropertyToFoldout("onGrabExit", "Events");
         }
 
         void WarningsSection()

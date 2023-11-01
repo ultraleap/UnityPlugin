@@ -180,7 +180,7 @@ namespace Leap
                 // Ensure that there is a contact parent at runtime
                 if (physHandsManager != null)
                 {
-                    physHandsManager.ContactMode = physHandsManager.ContactMode;
+                    physHandsManager.SetContactMode(physHandsManager.contactMode);
                 }
             }
 

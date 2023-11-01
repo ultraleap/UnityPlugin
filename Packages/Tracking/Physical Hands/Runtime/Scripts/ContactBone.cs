@@ -330,7 +330,6 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
-        // TODO: add events
         private void UpdateHoverCollider(Rigidbody rigid, Collider collider, bool hover)
         {
             if (hover)
@@ -345,17 +344,26 @@ namespace Leap.Unity.PhysicalHands
                 {
                     _hoverObjects.Add(rigid, new HashSet<Collider>() { collider });
                 }
+
+                if (rigid.TryGetComponent<IPhysicalBoneHover>(out var physicalBoneHover))
+                {
+                    physicalBoneHover.OnBoneHover(this);
+                }
             }
             else
             {
                 if (_hoverObjects.ContainsKey(rigid))
                 {
                     _hoverObjects[rigid].Remove(collider);
+
+                    if (rigid.TryGetComponent<IPhysicalBoneHover>(out var physicalBoneHover))
+                    {
+                        physicalBoneHover.OnBoneHoverExit(this);
+                    }
                 }
             }
         }
 
-        // TODO: add events
         private void UpdateContactCollider(Rigidbody rigid, Collider collider, bool contact)
         {
             if (contact)
@@ -370,12 +378,22 @@ namespace Leap.Unity.PhysicalHands
                 {
                     _contactObjects.Add(rigid, new HashSet<Collider>() { collider });
                 }
+
+                if (rigid.TryGetComponent<IPhysicalBoneContact>(out var physicalBoneContact))
+                {
+                    physicalBoneContact.OnBoneContact(this);
+                }
             }
             else
             {
                 if (_contactObjects.ContainsKey(rigid))
                 {
                     _contactObjects[rigid].Remove(collider);
+
+                    if (rigid.TryGetComponent<IPhysicalBoneContact>(out var physicalBoneContact))
+                    {
+                        physicalBoneContact.OnBoneContactExit(this);
+                    }
                 }
             }
         }

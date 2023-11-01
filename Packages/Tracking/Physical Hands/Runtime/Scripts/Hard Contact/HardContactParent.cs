@@ -39,8 +39,8 @@ namespace Leap.Unity.PhysicalHands
         internal float contactEnterDistance = 0.004f, contactExitDistance = 0.012f;
         internal float contactThumbEnterDistance = 0.005f, contactThumbExitDistance = 0.02f;
 
-        [SerializeField]
-        internal bool smoothOutputHands = true;
+        [SerializeField, Tooltip("This interpolated from the last fixed frame to the latest, causing some latency to visual hands")]
+        internal bool smoothOutputHands = false;
         #endregion
 
         internal override void GenerateHands()
