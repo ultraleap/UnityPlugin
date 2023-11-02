@@ -724,5 +724,42 @@ namespace Leap.Unity
 
         #endregion
 
+        #region Misc Utils
+
+        public static string FingerIndexToName(int fingerIndex)
+        {
+            switch (fingerIndex)
+            {
+                case 0:
+                    return "Thumb";
+                case 1:
+                    return "Index";
+                case 2:
+                    return "Middle";
+                case 3:
+                    return "Ring";
+                case 4:
+                    return "Pinky";
+            }
+            return "";
+        }
+
+        public static string JointIndexToName(int jointIndex)
+        {
+            switch (jointIndex)
+            {
+                case 0:
+                    return "Metacarpal";
+                case 1:
+                    return "Proximal";
+                case 2:
+                    return "Intermediate";
+                case 3:
+                    return "Distal";
+            }
+            return "";
+        }
+
+        #endregion
     }
 }

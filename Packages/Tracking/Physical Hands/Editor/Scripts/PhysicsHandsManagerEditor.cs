@@ -31,6 +31,20 @@ namespace Leap.Unity.PhysicalHands
             serializedObject.ApplyModifiedProperties();
 
             base.OnInspectorGUI();
+
+            if (!PhysicalHandsSettings.AllSettingsApplied())
+            {
+                EditorGUILayout.Space(10);
+
+                GUILayout.BeginHorizontal();
+                GUILayout.FlexibleSpace();
+                if (GUILayout.Button("View Recommended Settings"))
+                {
+                    SettingsService.OpenProjectSettings("Project/Ultraleap/Physical Hands");
+                }
+                GUILayout.FlexibleSpace();
+                GUILayout.EndHorizontal();
+            }
         }
 
         private void DrawCustomEnum(SerializedProperty property)

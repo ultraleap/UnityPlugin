@@ -618,6 +618,38 @@ namespace Leap.Unity
             return count;
         }
 
+        /// <summary>
+        /// Converts a string of three floats (e.g. "(1.0, 2.0, 3.0)") to a Vector3
+        /// Credit: https://discussions.unity.com/t/string-to-vector3/158166/2
+        /// Returns Vector3.zero if incorrect string passed in
+        /// </summary>
+        public static Vector3 ToVector3(this string str)
+        {
+            // Remove the parentheses
+            if (str.StartsWith("(") && str.EndsWith(")"))
+            {
+                str = str.Substring(1, str.Length - 2);
+            }
+
+            // split the items
+            string[] sArray = str.Split(',');
+
+            Vector3 result = Vector3.zero;
+            try
+            {
+                result = new Vector3(
+                                float.Parse(sArray[0]),
+                                float.Parse(sArray[1]),
+                                float.Parse(sArray[2]));
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning(e.Message);
+            }
+
+            return result;
+        }
+
         #endregion
 
         #region Print Utils
