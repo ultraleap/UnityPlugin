@@ -1,89 +1,66 @@
-using Leap.Unity;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
+
 using UnityEditor;
+
 using UnityEngine;
 
-[Serializable]
-public class PhysicalHandsSettings : ScriptableObject
+namespace Leap.Unity.PhysicalHands
 {
-    public struct RecommendedSetting
+    [Serializable]
+    internal class PhysicalHandsSettings
     {
-        public string recommended, description;
-        public SerializedProperty property;
-        public bool ignored, impactsPerformance;
-    }
-
-    private static PhysicalHandsSettings _instance;
-    public static PhysicalHandsSettings Instance
-    {
-        get
+        internal struct RecommendedSetting
         {
-            if (_instance != null)
-                return _instance;
-            else
-                return _instance = FindSettingsSO();
+            public string recommended, description;
+            public SerializedProperty property;
+            public bool impactsPerformance;
         }
-        set { _instance = value; }
-    }
 
-    private const string PHYSICS_SETTINGS_ASSET_PATH = "ProjectSettings/DynamicsManager.asset";
-    private const string TIME_SETTINGS_ASSET_PATH = "ProjectSettings/TimeManager.asset";
-    private const string ID_SLEEP_THRESHOLD = "m_SleepThreshold";
-    private const string ID_DEFAULT_MAX_ANGULAR_SPEED = "m_DefaultMaxAngularSpeed";
-    private const string ID_DEFAULT_CONTACT_OFFSET = "m_DefaultContactOffset";
-    private const string ID_AUTO_SYNC_TRANSFORMS = "m_AutoSyncTransforms";
-    private const string ID_CONTACTS_GENERATION = "m_ContactsGeneration";
-    private const string ID_GRAVITY = "m_Gravity";
-    private const string ID_MAX_DEPEN_VEL = "m_DefaultMaxDepenetrationVelocity";
-    private const string ID_FRICTION_TYPE = "m_FrictionType";
-    private const string ID_IMPROVED_PATCH_FRICTION = "m_ImprovedPatchFriction";
-    private const string ID_BOUNCE_THRESHOLD = "m_BounceThreshold";
-    private const string ID_SOLVER_ITERATIONS = "m_DefaultSolverIterations";
-    private const string ID_SOLVER_VEL_ITERATIONS = "m_DefaultSolverVelocityIterations";
-    private const string ID_ENHANCED_DETERMINISM = "m_EnableEnhancedDeterminism";
-    private const string ID_SOLVER_TYPE = "m_SolverType";
-    private const string ID_FIXED_TIMESTEP = "Fixed Timestep";
-    private SerializedObject _physicsManager;
-    private SerializedObject _timeManager;
+        private const string PHYSICS_SETTINGS_ASSET_PATH = "ProjectSettings/DynamicsManager.asset";
+        private const string TIME_SETTINGS_ASSET_PATH = "ProjectSettings/TimeManager.asset";
+        private const string ID_SLEEP_THRESHOLD = "m_SleepThreshold";
+        private const string ID_DEFAULT_MAX_ANGULAR_SPEED = "m_DefaultMaxAngularSpeed";
+        private const string ID_DEFAULT_CONTACT_OFFSET = "m_DefaultContactOffset";
+        private const string ID_AUTO_SYNC_TRANSFORMS = "m_AutoSyncTransforms";
+        private const string ID_CONTACTS_GENERATION = "m_ContactsGeneration";
+        private const string ID_GRAVITY = "m_Gravity";
+        private const string ID_MAX_DEPEN_VEL = "m_DefaultMaxDepenetrationVelocity";
+        private const string ID_FRICTION_TYPE = "m_FrictionType";
+        private const string ID_IMPROVED_PATCH_FRICTION = "m_ImprovedPatchFriction";
+        private const string ID_BOUNCE_THRESHOLD = "m_BounceThreshold";
+        private const string ID_SOLVER_ITERATIONS = "m_DefaultSolverIterations";
+        private const string ID_SOLVER_VEL_ITERATIONS = "m_DefaultSolverVelocityIterations";
+        private const string ID_ENHANCED_DETERMINISM = "m_EnableEnhancedDeterminism";
+        private const string ID_SOLVER_TYPE = "m_SolverType";
+        private const string ID_FIXED_TIMESTEP = "Fixed Timestep";
+        private static SerializedObject _physicsManager;
+        private static SerializedObject _timeManager;
 
-    [HideInInspector, SerializeField]
-    public Dictionary<string, RecommendedSetting> recommendedSettings = new Dictionary<string, RecommendedSetting>();
+        [SerializeField]
+        internal static Dictionary<string, RecommendedSetting> recommendedSettings = new Dictionary<string, RecommendedSetting>();
 
-    [HideInInspector, SerializeField]
-    public bool ignoreBurst = false;
-
-    [HideInInspector, SerializeField]
-    public bool showAppliedSettings = false;
-    [HideInInspector, SerializeField]
-    public bool showIgnoredSettings = false;
-
-    [HideInInspector, SerializeField]
-    public bool showPhysicalHandsSettingsOnStartup = true;
-
-    public void ResetToDefaults()
-    {
-        RefreshRecommendedSettingsValues();
-        ResetRecommendedSettingsStates();
-    }
-
-    public void ResetRecommendedSettingsStates()
-    {
-        foreach (var recommendedSetting in recommendedSettings)
+        internal static void ResetToDefaults()
         {
-            RecommendedSetting modifiedSetting = recommendedSetting.Value;
-            modifiedSetting.ignored = false;
-            recommendedSettings[recommendedSetting.Key] = modifiedSetting;
+            RefreshRecommendedSettingsValues();
+            ResetRecommendedSettingsStates();
         }
-    }
-    public void RefreshRecommendedSettingsValues()
-    {
-        _physicsManager = new SerializedObject(AssetDatabase.LoadAllAssetsAtPath(PHYSICS_SETTINGS_ASSET_PATH)[0]);
-        _timeManager = new SerializedObject(AssetDatabase.LoadAllAssetsAtPath(TIME_SETTINGS_ASSET_PATH)[0]);
-        recommendedSettings.Clear();
-        recommendedSettings = new Dictionary<string, RecommendedSetting>
+
+        internal static void ResetRecommendedSettingsStates()
+        {
+            foreach (var recommendedSetting in recommendedSettings)
+            {
+                RecommendedSetting modifiedSetting = recommendedSetting.Value;
+                recommendedSettings[recommendedSetting.Key] = modifiedSetting;
+            }
+        }
+        internal static void RefreshRecommendedSettingsValues()
+        {
+            _physicsManager = new SerializedObject(AssetDatabase.LoadAllAssetsAtPath(PHYSICS_SETTINGS_ASSET_PATH)[0]);
+            _timeManager = new SerializedObject(AssetDatabase.LoadAllAssetsAtPath(TIME_SETTINGS_ASSET_PATH)[0]);
+            recommendedSettings.Clear();
+            recommendedSettings = new Dictionary<string, RecommendedSetting>
             {
                 {
                     ID_SLEEP_THRESHOLD,
@@ -144,7 +121,6 @@ public class PhysicalHandsSettings : ScriptableObject
                     new RecommendedSetting()
                     {
                         property = _physicsManager.FindProperty(ID_MAX_DEPEN_VEL),
-                        //TODO confirm this is not actually 2!
                         recommended = "1",
                         description = "Reduces unwanted physics explosions"
                     }
@@ -226,123 +202,64 @@ public class PhysicalHandsSettings : ScriptableObject
                     }
                 }
             };
-    }
-
-    public bool AllSettingsApplied()
-    {
-#if !BURST_AVAILABLE
-        if (!ignoreBurst) return false;
-#endif
-        foreach (RecommendedSetting setting in recommendedSettings.Values)
-        {
-            if (!setting.ignored && !IsRecommendedSettingApplied(setting))
-            {
-                return false;
-            }
         }
-        return true;
-    }
 
-    public bool IsRecommendedSettingApplied(string key)
-    {
-        RecommendedSetting recommendedSetting = recommendedSettings[key];
-        return IsRecommendedSettingApplied(recommendedSetting);
-    }
-
-    public bool IsRecommendedSettingApplied(RecommendedSetting recommendedSetting)
-    {
-        return recommendedSetting.property.ValueToString().ToLower() == recommendedSetting.recommended.ToLower();
-    }
-
-    public void ApplyAllRecommendedSettings()
-    {
-        foreach (var key in recommendedSettings.Keys)
+        internal static bool AllSettingsApplied()
         {
-            if (!recommendedSettings[key].ignored)
+            foreach (RecommendedSetting setting in recommendedSettings.Values)
+            {
+                if (!IsRecommendedSettingApplied(setting))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        internal static bool IsRecommendedSettingApplied(string key)
+        {
+            RecommendedSetting recommendedSetting = recommendedSettings[key];
+            return IsRecommendedSettingApplied(recommendedSetting);
+        }
+
+        internal static bool IsRecommendedSettingApplied(RecommendedSetting recommendedSetting)
+        {
+            return recommendedSetting.property.ValueToString().ToLower() == recommendedSetting.recommended.ToLower();
+        }
+
+        internal static void ApplyAllRecommendedSettings()
+        {
+            foreach (var key in recommendedSettings.Keys)
             {
                 ApplyRecommendedSetting(key);
             }
         }
-    }
 
-    public void ApplyRecommendedSetting(string key)
-    {
-        RecommendedSetting recommendedSetting = recommendedSettings[key];
-
-        SerializedProperty property = recommendedSetting.property;
-        switch (property.propertyType)
+        internal static void ApplyRecommendedSetting(string key)
         {
-            case SerializedPropertyType.Boolean:
-                property.boolValue = Convert.ToBoolean(recommendedSetting.recommended.ToLower());
-                break;
-            case SerializedPropertyType.Float:
-                property.floatValue = float.Parse(recommendedSetting.recommended);
-                break;
-            case SerializedPropertyType.Integer:
-                property.intValue = int.Parse(recommendedSetting.recommended);
-                break;
-            case SerializedPropertyType.Enum:
-                property.enumValueIndex = property.enumDisplayNames.ToList().IndexOf(recommendedSetting.recommended);
-                break;
-            case SerializedPropertyType.Vector3:
-                property.vector3Value = recommendedSetting.recommended.ToVector3();
-                break;
+            RecommendedSetting recommendedSetting = recommendedSettings[key];
+
+            SerializedProperty property = recommendedSetting.property;
+            switch (property.propertyType)
+            {
+                case SerializedPropertyType.Boolean:
+                    property.boolValue = Convert.ToBoolean(recommendedSetting.recommended.ToLower());
+                    break;
+                case SerializedPropertyType.Float:
+                    property.floatValue = float.Parse(recommendedSetting.recommended);
+                    break;
+                case SerializedPropertyType.Integer:
+                    property.intValue = int.Parse(recommendedSetting.recommended);
+                    break;
+                case SerializedPropertyType.Enum:
+                    property.enumValueIndex = property.enumDisplayNames.ToList().IndexOf(recommendedSetting.recommended);
+                    break;
+                case SerializedPropertyType.Vector3:
+                    property.vector3Value = recommendedSetting.recommended.ToVector3();
+                    break;
+            }
+            _physicsManager.ApplyModifiedProperties();
+            _timeManager.ApplyModifiedProperties();
         }
-        _physicsManager.ApplyModifiedProperties();
-        _timeManager.ApplyModifiedProperties();
     }
-
-    #region Scriptable Object Setup
-#if UNITY_EDITOR
-    [MenuItem("Ultraleap/Open Physical Hands Settings")]
-    private static void SelectULSettingsDropdown()
-    {
-        SettingsService.OpenProjectSettings("Project/Ultraleap/Physical Hands");
-    }
-#endif
-
-    private static PhysicalHandsSettings FindSettingsSO()
-    {
-        // Try to directly load the asset
-        PhysicalHandsSettings ultraleapSettings = Resources.Load<PhysicalHandsSettings>("Physical Hands Settings");
-
-        if (ultraleapSettings != null)
-        {
-            _instance = ultraleapSettings;
-            return _instance;
-        }
-
-        PhysicalHandsSettings[] settingsSO = Resources.FindObjectsOfTypeAll(typeof(PhysicalHandsSettings)) as PhysicalHandsSettings[];
-
-        if (settingsSO != null && settingsSO.Length > 0)
-        {
-            _instance = settingsSO[0]; // Assume there is only one settings file
-        }
-        else
-        {
-            _instance = CreateSettingsSO();
-        }
-
-        return _instance;
-    }
-
-    static PhysicalHandsSettings CreateSettingsSO()
-    {
-        PhysicalHandsSettings newSO = null;
-#if UNITY_EDITOR
-        newSO = ScriptableObject.CreateInstance<PhysicalHandsSettings>();
-
-        Directory.CreateDirectory(Application.dataPath + "/Resources/");
-        AssetDatabase.CreateAsset(newSO, "Assets/Resources/Physical Hands Settings.asset");
-#endif
-        return newSO;
-    }
-
-#if UNITY_EDITOR
-    public static SerializedObject GetSerializedSettings()
-    {
-        return new SerializedObject(FindSettingsSO());
-    }
-#endif
-    #endregion
 }

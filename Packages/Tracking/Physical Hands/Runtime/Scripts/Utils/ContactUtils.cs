@@ -347,39 +347,5 @@ namespace Leap.Unity.PhysicalHands
             }
             else return false;
         }
-
-        #region Names
-        public static string IndexToFinger(int fingerIndex)
-        {
-            switch (fingerIndex)
-            {
-                case 0:
-                    return "Thumb";
-                case 1:
-                    return "Index";
-                case 2:
-                    return "Middle";
-                case 3:
-                    return "Ring";
-                case 4:
-                    return "Pinky";
-            }
-            return "";
-        }
-
-        public static string IndexToJoint(int jointIndex)
-        {
-            switch (jointIndex)
-            {
-                case 0:
-                    return "Proximal";
-                case 1:
-                    return "Intermediate";
-                case 2:
-                    return "Distal";
-            }
-            return "";
-        }
-        #endregion
     }
 }

@@ -32,10 +32,18 @@ namespace Leap.Unity.PhysicalHands
 
             base.OnInspectorGUI();
 
-            EditorGUILayout.Space(10);
-            if (GUILayout.Button("Open Physical Hands Settings"))
+            if (!PhysicalHandsSettings.AllSettingsApplied())
             {
-                SettingsService.OpenProjectSettings("Project/Ultraleap/Physical Hands");
+                EditorGUILayout.Space(10);
+
+                GUILayout.BeginHorizontal();
+                GUILayout.FlexibleSpace();
+                if (GUILayout.Button("View Recommended Settings"))
+                {
+                    SettingsService.OpenProjectSettings("Project/Ultraleap/Physical Hands");
+                }
+                GUILayout.FlexibleSpace();
+                GUILayout.EndHorizontal();
             }
         }
 
