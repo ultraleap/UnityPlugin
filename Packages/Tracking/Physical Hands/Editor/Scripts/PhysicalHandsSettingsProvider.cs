@@ -50,8 +50,6 @@ namespace Leap.Unity.PhysicalHands
             EditorGUI.indentLevel++;
 
             GUILayout.Space(LARGE_SPACE);
-            EditorGUILayout.LabelField("Recommended Settings", EditorStyles.boldLabel);
-            GUILayout.Space(SMALL_SPACE);
 
             if (PhysicalHandsSettings.AllSettingsApplied())
             {
@@ -99,19 +97,26 @@ namespace Leap.Unity.PhysicalHands
                     GUILayout.Space(SMALL_SPACE);
 
                     GUILayout.BeginHorizontal();
-                    GUILayout.Space(SMALL_SPACE);
 
                     GUIStyle myStyle = GUI.skin.GetStyle("HelpBox");
                     myStyle.richText = true;
                     myStyle.fontSize = 12;
 
-                    EditorGUILayout.TextArea("Current: " + recommended.Value.property.ValueToString() + "\n" + "Recommended: " + recommended.Value.recommended, myStyle);
+                    GUILayout.Space(LARGE_SPACE);
 
-                    if (GUILayout.Button("Apply", GUILayout.Width(75), GUILayout.Height(30)))
+                    GUILayout.Box("<b>Current:</b> " + recommended.Value.property.ValueToString() + "\n" + "<b>Recommended:</b> " + recommended.Value.recommended, myStyle);
+
+                    GUIStyle buttonStyle = new GUIStyle(GUI.skin.button);
+                    buttonStyle.margin = new RectOffset(0, 0, 10, 0);
+
+                    if (GUILayout.Button("Apply", buttonStyle, GUILayout.Width(75), GUILayout.Height(20)))
                     {
                         PhysicalHandsSettings.ApplyRecommendedSetting(recommended.Key);
                     }
+
                     GUILayout.EndHorizontal();
+
+                    GUILayout.Space(LARGE_SPACE);
                 }
             }
         }
