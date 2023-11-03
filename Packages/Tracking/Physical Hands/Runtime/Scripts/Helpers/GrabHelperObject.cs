@@ -978,9 +978,9 @@ namespace Leap.Unity.PhysicalHands
         #region Throwing
 
         // the time before release to ignore velocities when throwing
-        private const float WINDOW_DELAY = 0.02f;
+        private const float WINDOW_DELAY = 0.015f;
         // the time before WINDOW_DELAY to capture velocities to be applied to objects when throwing
-        private const float WINDOW_LENGTH = 0.05f;
+        private const float WINDOW_LENGTH = 0.045f;
 
         private const float MAX_THROW_VELOCITY = 3f;
 

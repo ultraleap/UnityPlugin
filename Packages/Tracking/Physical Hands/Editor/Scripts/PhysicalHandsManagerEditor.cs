@@ -37,12 +37,11 @@ namespace Leap.Unity.PhysicalHands
                 EditorGUILayout.Space(10);
 
                 GUILayout.BeginHorizontal();
-                GUILayout.FlexibleSpace();
-                if (GUILayout.Button("View Recommended Settings"))
+                EditorGUILayout.HelpBox("One or more of your project settings are not recommended when using Physical Hands.", MessageType.Warning);
+                if (GUILayout.Button("View Recommended Settings", GUILayout.Height(37)))
                 {
                     SettingsService.OpenProjectSettings("Project/Ultraleap/Physical Hands");
                 }
-                GUILayout.FlexibleSpace();
                 GUILayout.EndHorizontal();
             }
         }
@@ -83,7 +82,7 @@ namespace Leap.Unity.PhysicalHands
 
         bool CreateContactHandLayers()
         {
-            if (CreateLayer("ContactHands") && CreateLayer("ContactHandsReset"))
+            if (CreateLayer("PhysicalHands") && CreateLayer("PhysicalHandsReset"))
             {
                 return true;
             }
@@ -104,7 +103,7 @@ namespace Leap.Unity.PhysicalHands
                     if (sp.stringValue == "")
                     {
                         sp.stringValue = layerName;
-                        UnityEngine.Debug.Log("Layer: " + layerName + " has been added for Contact Hands");
+                        UnityEngine.Debug.Log("Layer: " + layerName + " has been added for Physical Hands");
                         tagManager.ApplyModifiedProperties();
                         return true;
                     }
@@ -115,7 +114,7 @@ namespace Leap.Unity.PhysicalHands
                 return true;
             }
 
-            UnityEngine.Debug.LogWarning("All allowed layers have been filled. Contact Hands requires 2 available layers to function.", target.gameObject);
+            UnityEngine.Debug.LogWarning("All allowed layers have been filled. Physical Hands requires 2 available layers to function.", target.gameObject);
 
             return false;
         }

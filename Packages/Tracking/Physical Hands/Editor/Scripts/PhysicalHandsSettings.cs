@@ -206,6 +206,11 @@ namespace Leap.Unity.PhysicalHands
 
         internal static bool AllSettingsApplied()
         {
+            if(recommendedSettings.Count == 0)
+            {
+                PhysicalHandsSettings.RefreshRecommendedSettingsValues();
+            }
+
             foreach (RecommendedSetting setting in recommendedSettings.Values)
             {
                 if (!IsRecommendedSettingApplied(setting))
