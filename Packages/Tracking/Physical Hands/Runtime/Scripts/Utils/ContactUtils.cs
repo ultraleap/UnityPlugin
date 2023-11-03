@@ -6,7 +6,6 @@ namespace Leap.Unity.PhysicalHands
 {
     public static class ContactUtils
     {
-
         // Magic 0th thumb bone dataRotation offsets from LeapC
         // TODO: Remove this and make it non-necessary
         public const float HAND_ROTATION_OFFSET_Y = 25.9f, HAND_ROTATION_OFFSET_Z = -63.45f;

@@ -1,11 +1,13 @@
 using System.Collections.Generic;
 using UnityEngine;
+
 namespace Leap.Unity.PhysicalHands
 {
     [RequireComponent(typeof(PhysicalHandsManager))]
     public class GrabHelper : MonoBehaviour
     {
-        public PhysicalHandsManager physicalHandsManager;
+        [SerializeField]
+        private PhysicalHandsManager physicalHandsManager;
 
         private ContactHand _leftContactHand { get { return physicalHandsManager.contactParent.LeftHand; } }
         private ContactHand _rightContactHand { get { return physicalHandsManager.contactParent.RightHand; } }
@@ -14,7 +16,7 @@ namespace Leap.Unity.PhysicalHands
 
         #region Interaction Data
         private Dictionary<ContactHand, float[]> _fingerStrengths = new Dictionary<ContactHand, float[]>();
-        public Dictionary<ContactHand, float[]> FingerStrengths => _fingerStrengths;
+        internal Dictionary<ContactHand, float[]> FingerStrengths => _fingerStrengths;
 
         // Helpers
         private Dictionary<Rigidbody, GrabHelperObject> _grabHelpers = new Dictionary<Rigidbody, GrabHelperObject>();

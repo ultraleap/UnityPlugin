@@ -11,9 +11,10 @@ namespace Leap.Unity.PhysicalHands
         {
             modifiedHand.CopyFrom(dataHand);
 
-            // return here to not send the colider positions
-
+            // return here to not send the collider positions
             return;
+
+            #region Set modifiedHand to collider positions
 
             modifiedHand.SetTransform(palmBone.transform.position, palmBone.transform.rotation);
             int boneInd = 0;
@@ -65,6 +66,8 @@ namespace Leap.Unity.PhysicalHands
             modifiedHand.PinchDistance = 0f;
             modifiedHand.PalmVelocity = (palmBone.transform.position - _oldContactPosition) / Time.fixedDeltaTime;
             modifiedHand.TimeVisible = dataHand.TimeVisible;
+
+            #endregion
         }
 
         internal override void BeginHand(Hand hand)

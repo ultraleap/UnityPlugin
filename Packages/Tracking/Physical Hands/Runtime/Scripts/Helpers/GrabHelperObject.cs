@@ -16,7 +16,7 @@ namespace Leap.Unity.PhysicalHands
         /// <summary>
         /// The current state of the grasp helper.
         /// </summary>
-        public enum State
+        internal enum State
         {
             /// <summary>
             /// Idle will only ever be set when the helper is deleted, and is skipped during creation. This is because a helper is created when a hand is hovered.
@@ -35,29 +35,23 @@ namespace Leap.Unity.PhysicalHands
             /// </summary>
             Grab
         }
-        public State GrabState { get; private set; } = State.Idle;
+        internal State GrabState { get; private set; } = State.Idle;
 
-        public HashSet<ContactBone> BoneHash => _boneHash;
+        private HashSet<ContactBone> BoneHash => _boneHash;
         private HashSet<ContactBone> _boneHash = new HashSet<ContactBone>();
-        public int TotalBones { get { return _boneHash.Count; } }
 
-        /// <summary>
-        /// Bones is a hand indexed dictionary, of eligible to grab physics bone hashsets of the hand's fingers 
-        /// </summary>
-        public Dictionary<ContactHand, HashSet<ContactBone>[]> Bones => _bones;
         private Dictionary<ContactHand, HashSet<ContactBone>[]> _bones = new Dictionary<ContactHand, HashSet<ContactBone>[]>();
 
-        public List<ContactHand> GrabbingCandidates => _grabbingCandidates;
         private List<ContactHand> _grabbingCandidates = new List<ContactHand>();
         private List<bool> _grabbingCandidatesContact = new List<bool>();
 
-        public List<ContactHand> GrabbingHands => _grabbingHands;
+        internal List<ContactHand> GrabbingHands => _grabbingHands;
         private List<ContactHand> _grabbingHands = new List<ContactHand>();
 
         private Dictionary<ContactHand, GrabValues> _grabbingValues = new Dictionary<ContactHand, GrabValues>();
 
         [System.Serializable]
-        public class GrabValues
+        private class GrabValues
         {
             public float[] fingerStrength = new float[5];
             public float[] originalFingerStrength = new float[5];
@@ -81,10 +75,9 @@ namespace Leap.Unity.PhysicalHands
             public bool facingOppositeHand = false;
         }
 
-        public GrabHelper Manager { get; private set; }
+        private GrabHelper _manager;
 
         private Rigidbody _rigid;
-        public Rigidbody Rigidbody => _rigid;
         private List<Collider> _colliders = new List<Collider>();
 
         private Vector3 _newPosition;
@@ -92,13 +85,13 @@ namespace Leap.Unity.PhysicalHands
 
         private bool _oldKinematic;
         private float _originalMass = 1f;
-        public float OriginalMass => _originalMass;
+        internal float OriginalMass => _originalMass;
 
         // This means we can have bones stay "attached" for a small amount of time
         private List<ContactBone> _boneCooldownItems = new List<ContactBone>();
         private List<float> _boneCooldownTime = new List<float>();
 
-        public bool Ignored;
+        internal bool Ignored;
         private IgnorePhysicalHands _ignorePhysicalHands;
 
         /// <summary>
@@ -127,7 +120,7 @@ namespace Leap.Unity.PhysicalHands
         /// <param name="hand">The hand to check</param>
         /// <param name="finger">The finger to check</param>
         /// <returns>If the finger on the provided hand is grabbed</returns>
-        public bool Grabbed(ContactHand hand, int finger)
+        internal bool Grabbed(ContactHand hand, int finger)
         {
             if (_bones.TryGetValue(hand, out var bones))
             {
@@ -150,7 +143,7 @@ namespace Leap.Unity.PhysicalHands
             return false;
         }
 
-        public GrabHelperObject(Rigidbody rigid, GrabHelper manager)
+        internal GrabHelperObject(Rigidbody rigid, GrabHelper manager)
         {
             _rigid = rigid;
             _originalMass = _rigid.mass;
@@ -161,7 +154,7 @@ namespace Leap.Unity.PhysicalHands
             }
             _colliders = rigid.GetComponentsInChildren<Collider>(true).ToList();
             HandleIgnoreContactHelper();
-            Manager = manager;
+            _manager = manager;
         }
 
 
@@ -179,7 +172,7 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
-        public void ReleaseHelper()
+        internal void ReleaseHelper()
         {
             foreach (var item in _grabbingValues)
             {
@@ -226,7 +219,7 @@ namespace Leap.Unity.PhysicalHands
             _bones.Clear();
         }
 
-        public void AddHand(ContactHand hand)
+        internal void AddHand(ContactHand hand)
         {
             if (!_grabbingCandidates.Contains(hand))
             {
@@ -236,10 +229,6 @@ namespace Leap.Unity.PhysicalHands
                 }
                 _grabbingCandidates.Add(hand);
                 _grabbingCandidatesContact.Add(false);
-                //if (_rigid.TryGetComponent<IContactHandHover>(out var ContactHandHover))
-                //{
-                //    ContactHandHover.OnHandHover(hand);
-                //}
 
                 if (_ignorePhysicalHands)
                 {
@@ -248,20 +237,16 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
-        public void RemoveHand(ContactHand hand)
+        internal void RemoveHand(ContactHand hand)
         {
             if (_grabbingCandidates.Contains(hand))
             {
                 _grabbingCandidatesContact.RemoveAt(_grabbingCandidates.IndexOf(hand));
                 _grabbingCandidates.Remove(hand);
-                //if (_rigid != null && _rigid.TryGetComponent<IContactHandHover>(out var ContactHandHover))
-                //{
-                //    ContactHandHover.OnHandHoverExit(hand);
-                //}
             }
         }
 
-        public void ReleaseObject()
+        internal void ReleaseObject()
         {
             GrabState = State.Hover;
             // Make sure the object hasn't been destroyed
@@ -276,7 +261,7 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
-        public State UpdateHelper()
+        internal State UpdateHelper()
         {
             UpdateHands();
 
@@ -469,12 +454,12 @@ namespace Leap.Unity.PhysicalHands
 
                 for (int i = 0; i < 5; i++)
                 {
-                    if (Grabbed(hand, i) && Manager.FingerStrengths[hand][i] > (i == 0 ? MINIMUM_THUMB_STRENGTH : MINIMUM_STRENGTH))
+                    if (Grabbed(hand, i) && _manager.FingerStrengths[hand][i] > (i == 0 ? MINIMUM_THUMB_STRENGTH : MINIMUM_STRENGTH))
                     {
-                        _grabbingValues[hand].fingerStrength[i] = Manager.FingerStrengths[hand][i];
+                        _grabbingValues[hand].fingerStrength[i] = _manager.FingerStrengths[hand][i];
                         if (_grabbingValues[hand].originalFingerStrength[i] == -1)
                         {
-                            _grabbingValues[hand].originalFingerStrength[i] = Manager.FingerStrengths[hand][i];
+                            _grabbingValues[hand].originalFingerStrength[i] = _manager.FingerStrengths[hand][i];
                         }
                     }
                     else
@@ -708,16 +693,16 @@ namespace Leap.Unity.PhysicalHands
                     // Was the finger not contacting before?
                     if (grabbedHand.Value.fingerStrength[i] == -1)
                     {
-                        if (Manager.FingerStrengths[grabbedHand.Key][i] > (i == 0 ? MINIMUM_THUMB_STRENGTH : MINIMUM_STRENGTH) && Grabbed(grabbedHand.Key, i))
+                        if (_manager.FingerStrengths[grabbedHand.Key][i] > (i == 0 ? MINIMUM_THUMB_STRENGTH : MINIMUM_STRENGTH) && Grabbed(grabbedHand.Key, i))
                         {
                             // Store the strength value on contact
-                            grabbedHand.Value.fingerStrength[i] = Manager.FingerStrengths[grabbedHand.Key][i];
+                            grabbedHand.Value.fingerStrength[i] = _manager.FingerStrengths[grabbedHand.Key][i];
                         }
                     }
                     else
                     {
                         // If the finger was contacting but has uncurled by the exit percentage then it is no longer "grabbed"
-                        if (Manager.FingerStrengths[grabbedHand.Key][i] < (i == 0 ? MINIMUM_THUMB_STRENGTH : MINIMUM_STRENGTH) || grabbedHand.Value.fingerStrength[i] * (1 - (i == 0 ? REQUIRED_THUMB_EXIT_STRENGTH : REQUIRED_EXIT_STRENGTH)) >= Manager.FingerStrengths[grabbedHand.Key][i])
+                        if (_manager.FingerStrengths[grabbedHand.Key][i] < (i == 0 ? MINIMUM_THUMB_STRENGTH : MINIMUM_STRENGTH) || grabbedHand.Value.fingerStrength[i] * (1 - (i == 0 ? REQUIRED_THUMB_EXIT_STRENGTH : REQUIRED_EXIT_STRENGTH)) >= _manager.FingerStrengths[grabbedHand.Key][i])
                         {
                             grabbedHand.Value.fingerStrength[i] = -1;
                         }
@@ -901,31 +886,6 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
-        public void Gizmo()
-        {
-            Gizmos.color = Color.red;
-            Gizmos.DrawSphere(_newPosition, 0.01f);
-            Gizmos.color = Color.white;
-
-            foreach (ContactHand hand in _grabbingHands)
-            {
-                if (hand.dataHand == null || !_bones.ContainsKey(hand))
-                    continue;
-
-                foreach (var bone in _boneHash)
-                {
-                    try
-                    {
-                        Gizmos.DrawSphere(hand.dataHand.Fingers[bone.Finger].bones[bone.Joint].NextJoint, 0.005f);
-                    }
-                    catch
-                    {
-
-                    }
-                }
-            }
-        }
-
         private void MoveObject()
         {
             // Fixes issues with kinematic objects
@@ -968,12 +928,12 @@ namespace Leap.Unity.PhysicalHands
 
         // It's more stable to use physics movement currently
         // Using this will result in large amounts of spaghetti
-        private void KinematicMovement(Vector3 solvedPosition, Quaternion solvedRotation,
-                               Rigidbody intObj)
-        {
-            intObj.MovePosition(solvedPosition);
-            intObj.MoveRotation(solvedRotation);
-        }
+        //private void KinematicMovement(Vector3 solvedPosition, Quaternion solvedRotation,
+        //                       Rigidbody intObj)
+        //{
+        //    intObj.MovePosition(solvedPosition);
+        //    intObj.MoveRotation(solvedRotation);
+        //}
 
         #region Throwing
 

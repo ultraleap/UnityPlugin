@@ -18,9 +18,9 @@ namespace Leap.Unity.PhysicalHands
 
         private float _displacementDistance = 0f;
         private float _displacementRotation = 0f;
-        public float DisplacementAmount { get; private set; } = 0;
-        public float DisplacementDistance => _displacementDistance;
-        public float DisplacementRotation => _displacementRotation;
+        internal float DisplacementAmount { get; private set; } = 0;
+        internal float DisplacementDistance => _displacementDistance;
+        internal float DisplacementRotation => _displacementRotation;
 
         #region Setup
         internal void SetupBoneBody()
@@ -544,7 +544,7 @@ namespace Leap.Unity.PhysicalHands
         #endregion
 
         #region Utils
-        public static float CalculateXJointAngle(Quaternion previous, Vector3 direction)
+        private static float CalculateXJointAngle(Quaternion previous, Vector3 direction)
         {
             return AngleOffAroundAxis(
                         previous * Vector3.forward,
@@ -552,7 +552,7 @@ namespace Leap.Unity.PhysicalHands
                         previous * Vector3.right);
         }
 
-        public static float CalculateYJointAngle(Quaternion previous, Quaternion current)
+        private static float CalculateYJointAngle(Quaternion previous, Quaternion current)
         {
             return AngleOffAroundAxis(
                             previous * Vector3.right,
@@ -563,7 +563,7 @@ namespace Leap.Unity.PhysicalHands
         /// <summary>
         /// Find some projected angle measure off some forward around some axis.
         /// </summary>
-        public static float AngleOffAroundAxis(Vector3 forward, Vector3 v, Vector3 axis, bool clockwise = false)
+        private static float AngleOffAroundAxis(Vector3 forward, Vector3 v, Vector3 axis, bool clockwise = false)
         {
             Vector3 right;
             if (clockwise)

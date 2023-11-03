@@ -20,14 +20,14 @@ namespace Leap.Unity.PhysicalHands
         internal float currentResetLerp { get { return _timeOnReset == 0 ? 1 : Mathf.InverseLerp(0.1f, 0.25f, Time.time - _timeOnReset); } }
 
         private float _overallFingerDisplacement = 0f, _averageFingerDisplacement = 0f, _contactFingerDisplacement = 0f;
-        public float FingerDisplacement => _overallFingerDisplacement;
-        public float FingerAverageDisplacement => _averageFingerDisplacement;
-        public float FingerContactDisplacement => _contactFingerDisplacement;
+        internal float FingerDisplacement => _overallFingerDisplacement;
+        internal float FingerAverageDisplacement => _averageFingerDisplacement;
+        internal float FingerContactDisplacement => _contactFingerDisplacement;
 
         // Interpolate back in displacement values after the hand has just released
         private float _displacementGrabCooldown = 0.25f, _displacementGrabCooldownCurrent = 0f;
 
-        public float DistanceFromDataHand
+        internal float DistanceFromDataHand
         {
             get
             {
@@ -433,7 +433,7 @@ namespace Leap.Unity.PhysicalHands
             modifiedHand.TimeVisible = dataHand.TimeVisible;
         }
 
-        public Vector3 GetTipPosition(int index)
+        private Vector3 GetTipPosition(int index)
         {
             if (index > 4)
             {
