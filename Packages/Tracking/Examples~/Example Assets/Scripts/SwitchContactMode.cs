@@ -1,4 +1,4 @@
-using Leap.Unity.PhysicsHands;
+using Leap.Unity.PhysicalHands;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,12 +6,12 @@ using UnityEngine;
 public class SwitchContactMode : MonoBehaviour
 {
     [SerializeField]
-    PhysicsHandsManager physicsHandsManager = null;
+    PhysicalHandsManager physicsHandsManager = null;
     [SerializeField]
     GameObject selectionItem;
 
 
-    public PhysicsHandsManager.ContactModes contactMode = PhysicsHandsManager.ContactModes.HardContact;
+    public PhysicalHandsManager.ContactMode contactMode = PhysicalHandsManager.ContactMode.HardContact;
 
 
 
@@ -20,7 +20,7 @@ public class SwitchContactMode : MonoBehaviour
     {
         if (physicsHandsManager == null)
         {
-            physicsHandsManager = FindFirstObjectByType(typeof(PhysicsHandsManager)) as PhysicsHandsManager;
+            physicsHandsManager = FindFirstObjectByType(typeof(PhysicalHandsManager)) as PhysicalHandsManager;
         }
     }
 
@@ -28,7 +28,7 @@ public class SwitchContactMode : MonoBehaviour
     {
         if(other.gameObject == selectionItem)
         {
-            physicsHandsManager.ContactMode = contactMode;
+            physicsHandsManager.SetContactMode(contactMode);
 
         }
     }

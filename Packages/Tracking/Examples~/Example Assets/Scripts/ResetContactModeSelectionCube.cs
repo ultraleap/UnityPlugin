@@ -1,4 +1,4 @@
-using Leap.Unity.PhysicsHands;
+using Leap.Unity.PhysicalHands;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,7 +12,7 @@ public class ResetContactModeSelectionCube : MonoBehaviour
     [SerializeField]
     GameObject HardContactTrigger;
     [SerializeField]
-    PhysicsHandsManager physicsHandsManager;
+    PhysicalHandsManager physicalHandsManager;
 
     Vector3 offset = new Vector3(0, 0.12f, 0);
 
@@ -30,19 +30,19 @@ public class ResetContactModeSelectionCube : MonoBehaviour
         {
             this.transform.rotation = Quaternion.identity;
             this.GetComponent<Rigidbody>().velocity = Vector3.zero;
-            switch (physicsHandsManager.ContactMode)
+            switch (physicalHandsManager.contactMode)
             {
-                case PhysicsHandsManager.ContactModes.NoContact:
+                case PhysicalHandsManager.ContactMode.NoContact:
                     {
                         this.transform.position = NoContactTrigger.transform.position;
                         break;
                     }
-                    case PhysicsHandsManager.ContactModes.SoftContact:
+                    case PhysicalHandsManager.ContactMode.SoftContact:
                     {
                         this.transform.position = SoftContactTrigger.transform.position;
                         break;
                     }
-                    case PhysicsHandsManager.ContactModes.HardContact:
+                    case PhysicalHandsManager.ContactMode.HardContact:
                     {
                         this.transform.position = HardContactTrigger.transform.position;
                         break;

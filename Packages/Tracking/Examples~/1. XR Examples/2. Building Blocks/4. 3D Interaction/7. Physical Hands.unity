@@ -6480,7 +6480,7 @@ MeshRenderer:
   m_RenderingLayerMask: 257
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: c3474c208278e814cb8d1c29aa806e81, type: 2}
+  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -13655,6 +13655,7 @@ MonoBehaviour:
   useProjectPhysicsIterations: 0
   handSolverIterations: 30
   handSolverVelocityIterations: 20
+  smoothOutputHands: 0
 --- !u!4 &1876153995
 Transform:
   m_ObjectHideFlags: 0
@@ -14777,25 +14778,7 @@ PrefabInstance:
     - {fileID: 9036444215738533379, guid: 500aa0dad3cf55d4ea4496cec239dcfa, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 9036444217417129080, guid: 500aa0dad3cf55d4ea4496cec239dcfa, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 0}
-    - targetCorrespondingSourceObject: {fileID: 9036444216771443442, guid: 500aa0dad3cf55d4ea4496cec239dcfa, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 0}
-    - targetCorrespondingSourceObject: {fileID: 9036444217170658916, guid: 500aa0dad3cf55d4ea4496cec239dcfa, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 0}
-    - targetCorrespondingSourceObject: {fileID: 9036444216050092620, guid: 500aa0dad3cf55d4ea4496cec239dcfa, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 0}
-    - targetCorrespondingSourceObject: {fileID: 9036444216902010036, guid: 500aa0dad3cf55d4ea4496cec239dcfa, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 0}
-    - targetCorrespondingSourceObject: {fileID: 9036444215819190072, guid: 500aa0dad3cf55d4ea4496cec239dcfa, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 0}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 500aa0dad3cf55d4ea4496cec239dcfa, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
