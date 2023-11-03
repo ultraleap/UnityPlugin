@@ -186,7 +186,7 @@ namespace Leap.Unity
                             // Rotate the first joint of the thumb to better suit the OpenXR spec
                             Quaternion rot = bone.Rotation * Quaternion.Euler(0,
                                 leapHand.IsLeft ? 25.9f : -25.9f,
-                                leapHand.IsLeft ? -50f : 50f);
+                                leapHand.IsLeft ? -63.45f : 63.45f);
 
                             handJoints[jointIndex] = XRHandProviderUtility.CreateJoint(handedness,
                                                         XRHandJointTrackingState.Pose,
