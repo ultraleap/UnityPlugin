@@ -157,7 +157,7 @@ namespace Leap.Unity
             }
 
             Pose palmPose = CalculatePalmPose(leapHand);
-            Pose wristPose = CalculateWristPose(leapHand);
+            Pose wristPose = CalculateWristPose(leapHand, palmPose.position);
 
             rootPose = wristPose;
             Handedness handedness = (Handedness)((int)leapHand.GetChirality() + 1); // +1 as unity has "invalid" handedness while we do not
@@ -181,14 +181,32 @@ namespace Leap.Unity
                     {
                         var bone = finger.bones[i];
 
-                        handJoints[jointIndex] = XRHandProviderUtility.CreateJoint(handedness,
-                            XRHandJointTrackingState.Pose,
-                            XRHandJointIDUtility.FromIndex(jointIndex),
-                            new Pose(bone.PrevJoint, bone.Rotation));
+                        if (i == 1)
+                        {
+                            // Rotate the first joint of the thumb to better suit the OpenXR spec
+                            Quaternion rot = bone.Rotation * Quaternion.Euler(0,
+                                leapHand.IsLeft ? 25.9f : -25.9f,
+                                leapHand.IsLeft ? -50f : 50f);
+
+                            handJoints[jointIndex] = XRHandProviderUtility.CreateJoint(handedness,
+                                                        XRHandJointTrackingState.Pose,
+                                                        XRHandJointIDUtility.FromIndex(jointIndex),
+                                                        new Pose(bone.PrevJoint, rot));
+                        }
+                        else
+                        {
+                            handJoints[jointIndex] = XRHandProviderUtility.CreateJoint(handedness,
+                                                        XRHandJointTrackingState.Pose,
+                                                        XRHandJointIDUtility.FromIndex(jointIndex),
+                                                        new Pose(bone.PrevJoint, bone.Rotation));
+                        }
+
+
                         jointIndex++;
                     }
 
                     var distal = finger.Bone(Bone.BoneType.TYPE_DISTAL);
+
                     handJoints[jointIndex] = XRHandProviderUtility.CreateJoint(handedness,
                         XRHandJointTrackingState.Pose,
                         XRHandJointIDUtility.FromIndex(jointIndex),
@@ -229,14 +247,13 @@ namespace Leap.Unity
             return palmPose;
         }
 
-        Pose CalculateWristPose(Hand leapHand)
+        Pose CalculateWristPose(Hand leapHand, Vector3 newPalmPos)
         {
-            Vector3 wristUp = leapHand.GetMiddle().Bone(Bone.BoneType.TYPE_METACARPAL).Rotation * Vector3.up;
-            Vector3 wristForward = leapHand.GetMiddle().Bone(Bone.BoneType.TYPE_METACARPAL).PrevJoint - leapHand.WristPosition;
+            Vector3 palmToWrist = leapHand.WristPosition - leapHand.PalmPosition;
 
             Pose wristPose = new Pose();
-            wristPose.position = leapHand.WristPosition;
-            wristPose.rotation = Quaternion.LookRotation(wristForward, wristUp);
+            wristPose.position = newPalmPos + palmToWrist;
+            wristPose.rotation = leapHand.Rotation;
 
             return wristPose;
         }
