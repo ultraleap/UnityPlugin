@@ -253,9 +253,6 @@ namespace Ultraleap.Tracking.OpenXR
                         prevJoint.Pose.rotation);
                     fingerWidth = Mathf.Max(fingerWidth, bone.Width);
 
-                    if (fingerIndex == 1 && boneIndex == 1)
-                        Debug.Log(prevJoint.Radius);
-
                     if (bone.Type == Bone.BoneType.TYPE_INTERMEDIATE)
                     {
                         xrIntermediateIndex = xrPrevIndex;
