@@ -6,12 +6,13 @@ namespace Leap.Unity.PhysicalHands
 {
     public abstract class ContactHand : MonoBehaviour
     {
-        public const int FINGERS = 5, FINGER_BONES = 3;
+        internal const int FINGERS = 5, FINGER_BONES = 3;
 
-        public ContactBone[] bones;
-        public ContactBone palmBone;
+        internal ContactBone[] bones;
+        internal ContactBone palmBone;
 
-        public Chirality handedness = Chirality.Left;
+        internal Chirality _handedness = Chirality.Left;
+        public Chirality Handedness => _handedness;
 
         private Hand modifiedHand = new Hand();
         internal Hand dataHand = new Hand();
@@ -33,7 +34,7 @@ namespace Leap.Unity.PhysicalHands
         public bool IsHandPhysical => isHandPhysical;
 
         internal ContactParent contactParent = null;
-        internal PhysicalHandsManager physicalHandsManager => contactParent.physicalHandsManager;
+        internal PhysicalHandsManager physicalHandsManager => contactParent.PhysicalHandsManager;
 
         #region Interaction Data
         internal bool isContacting = false, isHovering = false, isCloseToObject = false, isGrabbing = false, isIntersecting = false;
@@ -173,10 +174,10 @@ namespace Leap.Unity.PhysicalHands
                 return;
             }
 
-            Leap.Hand leapHand = TestHandFactory.MakeTestHand(isLeft: handedness == Chirality.Left ? true : false, pose: TestHandFactory.TestHandPose.HeadMountedB);
-            palmBone = new GameObject($"{(handedness == Chirality.Left ? "Left" : "Right")} Palm", boneType, typeof(BoxCollider), typeof(CapsuleCollider), typeof(CapsuleCollider), typeof(CapsuleCollider)).GetComponent<ContactBone>();
+            Leap.Hand leapHand = TestHandFactory.MakeTestHand(isLeft: Handedness == Chirality.Left ? true : false, pose: TestHandFactory.TestHandPose.HeadMountedB);
+            palmBone = new GameObject($"{(Handedness == Chirality.Left ? "Left" : "Right")} Palm", boneType, typeof(BoxCollider), typeof(CapsuleCollider), typeof(CapsuleCollider), typeof(CapsuleCollider)).GetComponent<ContactBone>();
 
-            palmBone.gameObject.layer = contactParent.physicalHandsManager.HandsResetLayer;
+            palmBone.gameObject.layer = contactParent.PhysicalHandsManager.HandsResetLayer;
             palmBone.transform.SetParent(transform);
             palmBone.transform.position = leapHand.PalmPosition;
             palmBone.transform.rotation = leapHand.Rotation;
@@ -206,7 +207,7 @@ namespace Leap.Unity.PhysicalHands
 
                     bones[boneArrayIndex] = new GameObject($"{HandUtils.FingerIndexToName(fingerIndex)} {HandUtils.JointIndexToName(jointIndex + 1)}", boneType, typeof(CapsuleCollider)).GetComponent<ContactBone>();
                     bone = bones[boneArrayIndex];
-                    bone.gameObject.layer = contactParent.physicalHandsManager.HandsResetLayer;
+                    bone.gameObject.layer = contactParent.PhysicalHandsManager.HandsResetLayer;
                     bone.transform.SetParent(lastTransform);
 
                     bone.finger = fingerIndex;
@@ -360,7 +361,7 @@ namespace Leap.Unity.PhysicalHands
         /// <summary>
         /// Checks to see whether the hand will be in contact with a specified object. Radius can be used to inflate the bones.
         /// </summary>
-        public bool IsObjectInHandRadius(Rigidbody rigid, float extraRadius = 0f)
+        private bool IsObjectInHandRadius(Rigidbody rigid, float extraRadius = 0f)
         {
             if (rigid == null)
                 return false;
@@ -383,7 +384,7 @@ namespace Leap.Unity.PhysicalHands
         /// <summary>
         /// Checks to see whether a specific physicsBone will be in contact with a specified object. Radius can be used to inflate the physicsBone.
         /// </summary>
-        public bool IsObjectInBoneRadius(Rigidbody rigid, ContactBone bone, float extraRadius = 0f)
+        private bool IsObjectInBoneRadius(Rigidbody rigid, ContactBone bone, float extraRadius = 0f)
         {
             int overlappingColliders;
             if (bone.IsPalm)

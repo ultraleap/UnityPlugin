@@ -40,8 +40,8 @@ namespace Leap.Unity.PhysicalHands
         float softContactDislocationDistance = 0.03F;
         float teleportDistance = 0.05F;
 
-        protected const float DEAD_ZONE_FRACTION = 0.04F;
-        public float scale { get { return this.transform.lossyScale.x; } }
+        private const float DEAD_ZONE_FRACTION = 0.04F;
+        private float scale { get { return this.transform.lossyScale.x; } }
 
         internal void UpdateWithInteractionEngineLogic(Vector3 targetPosition, Quaternion targetRotation)
         {
@@ -52,7 +52,7 @@ namespace Leap.Unity.PhysicalHands
             {
                 Collider.attachedRigidbody.position = targetPosition;
                 Collider.attachedRigidbody.rotation = targetRotation;
-                gameObject.layer = contactParent.physicalHandsManager.HandsResetLayer;
+                gameObject.layer = contactParent.PhysicalHandsManager.HandsResetLayer;
 
                 Collider.attachedRigidbody.velocity = Vector3.zero;
                 Collider.attachedRigidbody.angularVelocity = Vector3.zero;
@@ -63,11 +63,11 @@ namespace Leap.Unity.PhysicalHands
             // Potentially enable Soft Contact if our error is too large.
             if (contactHand.IsGrabbing || (errorDistance >= softContactDislocationDistance))
             {
-                gameObject.layer = contactParent.physicalHandsManager.HandsResetLayer;
+                gameObject.layer = contactParent.PhysicalHandsManager.HandsResetLayer;
             }
             else if (!IsBoneContacting)
             {
-                gameObject.layer = contactParent.physicalHandsManager.HandsLayer;
+                gameObject.layer = contactParent.PhysicalHandsManager.HandsLayer;
             }
 
             // Attempt to move the contact bone to its target position and rotation
@@ -95,7 +95,7 @@ namespace Leap.Unity.PhysicalHands
             Collider.attachedRigidbody.angularVelocity = ToAngularVelocity(deltaRot, Time.fixedDeltaTime);
         }
 
-        public static Vector3 ToAngularVelocity(Quaternion deltaRotation, float deltaTime)
+        private static Vector3 ToAngularVelocity(Quaternion deltaRotation, float deltaTime)
         {
             Vector3 deltaAxis;
             float deltaAngle;

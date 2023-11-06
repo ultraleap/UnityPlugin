@@ -11,60 +11,63 @@ namespace Leap.Unity.PhysicalHands
         {
             modifiedHand.CopyFrom(dataHand);
 
-            // return here to not send the colider positions
-
+            // return here to not send the collider positions
             return;
 
-            modifiedHand.SetTransform(palmBone.transform.position, palmBone.transform.rotation);
-            int boneInd = 0;
-            Vector3 posA, posB;
+            #region Set modifiedHand to collider positions
 
-            float r;
-            for (int i = 0; i < modifiedHand.Fingers.Count; i++)
-            {
-                Bone b = modifiedHand.Fingers[i].bones[0];
-                PhysExts.ToWorldSpaceCapsule(bones[boneInd].boneCollider, out posA, out posB, out r);
-                b.NextJoint = posB;
+            //modifiedHand.SetTransform(palmBone.transform.position, palmBone.transform.rotation);
+            //int boneInd = 0;
+            //Vector3 posA, posB;
 
-                for (int j = 1; j < modifiedHand.Fingers[i].bones.Length; j++)
-                {
-                    b = modifiedHand.Fingers[i].bones[j];
-                    PhysExts.ToWorldSpaceCapsule(bones[boneInd].boneCollider, out posA, out posB, out r);
-                    b.PrevJoint = posB;
-                    b.NextJoint = posA;
-                    b.Width = r;
-                    b.Center = (b.PrevJoint + b.NextJoint) / 2f;
-                    b.Direction = (b.NextJoint - b.PrevJoint).normalized;
-                    b.Length = Vector3.Distance(posA, posB);
-                    b.Rotation = bones[boneInd].transform.rotation;
-                    boneInd++;
-                }
+            //float r;
+            //for (int i = 0; i < modifiedHand.Fingers.Count; i++)
+            //{
+            //    Bone b = modifiedHand.Fingers[i].bones[0];
+            //    PhysExts.ToWorldSpaceCapsule(bones[boneInd].boneCollider, out posA, out posB, out r);
+            //    b.NextJoint = posB;
 
-                modifiedHand.Fingers[i].TipPosition = posA;
-            }
+            //    for (int j = 1; j < modifiedHand.Fingers[i].bones.Length; j++)
+            //    {
+            //        b = modifiedHand.Fingers[i].bones[j];
+            //        PhysExts.ToWorldSpaceCapsule(bones[boneInd].boneCollider, out posA, out posB, out r);
+            //        b.PrevJoint = posB;
+            //        b.NextJoint = posA;
+            //        b.Width = r;
+            //        b.Center = (b.PrevJoint + b.NextJoint) / 2f;
+            //        b.Direction = (b.NextJoint - b.PrevJoint).normalized;
+            //        b.Length = Vector3.Distance(posA, posB);
+            //        b.Rotation = bones[boneInd].transform.rotation;
+            //        boneInd++;
+            //    }
 
-            modifiedHand.WristPosition = palmBone.transform.position - (palmBone.transform.rotation * Quaternion.Inverse(dataHand.Rotation) * (dataHand.PalmPosition - dataHand.WristPosition));
+            //    modifiedHand.Fingers[i].TipPosition = posA;
+            //}
 
-            Vector3 direction = Vector3.Lerp(modifiedHand.Arm.Direction, dataHand.Arm.Direction, Mathf.Lerp(1.0f, 0.1f, 0.05f));
+            //modifiedHand.WristPosition = palmBone.transform.position - (palmBone.transform.rotation * Quaternion.Inverse(dataHand.Rotation) * (dataHand.PalmPosition - dataHand.WristPosition));
 
-            modifiedHand.Arm.PrevJoint = modifiedHand.WristPosition + (-dataHand.Arm.Length * direction);
-            modifiedHand.Arm.NextJoint = modifiedHand.WristPosition;
-            modifiedHand.Arm.Center = (modifiedHand.Arm.PrevJoint + modifiedHand.Arm.NextJoint) / 2f;
-            modifiedHand.Arm.Length = Vector3.Distance(modifiedHand.Arm.PrevJoint, modifiedHand.Arm.NextJoint);
-            modifiedHand.Arm.Direction = (modifiedHand.WristPosition - modifiedHand.Arm.PrevJoint).normalized;
-            modifiedHand.Arm.Rotation = Quaternion.LookRotation(modifiedHand.Arm.Direction, -dataHand.PalmNormal);
-            modifiedHand.Arm.Width = dataHand.Arm.Width;
+            //Vector3 direction = Vector3.Lerp(modifiedHand.Arm.Direction, dataHand.Arm.Direction, Mathf.Lerp(1.0f, 0.1f, 0.05f));
 
-            modifiedHand.PalmWidth = palmBone.palmCollider.size.y;
-            modifiedHand.Confidence = dataHand.Confidence;
-            modifiedHand.Direction = dataHand.Direction;
-            modifiedHand.FrameId = dataHand.FrameId;
-            modifiedHand.Id = dataHand.Id;
-            modifiedHand.GrabStrength = 0f;
-            modifiedHand.PinchStrength = 0f;
-            modifiedHand.PinchDistance = 0f;
-            modifiedHand.PalmVelocity = (palmBone.transform.position - _oldContactPosition) / Time.fixedDeltaTime;
-            modifiedHand.TimeVisible = dataHand.TimeVisible;
+            //modifiedHand.Arm.PrevJoint = modifiedHand.WristPosition + (-dataHand.Arm.Length * direction);
+            //modifiedHand.Arm.NextJoint = modifiedHand.WristPosition;
+            //modifiedHand.Arm.Center = (modifiedHand.Arm.PrevJoint + modifiedHand.Arm.NextJoint) / 2f;
+            //modifiedHand.Arm.Length = Vector3.Distance(modifiedHand.Arm.PrevJoint, modifiedHand.Arm.NextJoint);
+            //modifiedHand.Arm.Direction = (modifiedHand.WristPosition - modifiedHand.Arm.PrevJoint).normalized;
+            //modifiedHand.Arm.Rotation = Quaternion.LookRotation(modifiedHand.Arm.Direction, -dataHand.PalmNormal);
+            //modifiedHand.Arm.Width = dataHand.Arm.Width;
+
+            //modifiedHand.PalmWidth = palmBone.palmCollider.size.y;
+            //modifiedHand.Confidence = dataHand.Confidence;
+            //modifiedHand.Direction = dataHand.Direction;
+            //modifiedHand.FrameId = dataHand.FrameId;
+            //modifiedHand.Id = dataHand.Id;
+            //modifiedHand.GrabStrength = 0f;
+            //modifiedHand.PinchStrength = 0f;
+            //modifiedHand.PinchDistance = 0f;
+            //modifiedHand.PalmVelocity = (palmBone.transform.position - _oldContactPosition) / Time.fixedDeltaTime;
+            //modifiedHand.TimeVisible = dataHand.TimeVisible;
+
+            #endregion
         }
 
         internal override void BeginHand(Hand hand)

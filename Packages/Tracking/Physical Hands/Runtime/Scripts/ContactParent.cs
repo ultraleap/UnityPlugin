@@ -12,11 +12,13 @@ namespace Leap.Unity.PhysicalHands
         private ContactHand _rightHand;
         public ContactHand RightHand => _rightHand;
 
-        public PhysicalHandsManager physicalHandsManager;
+        public PhysicalHandsManager _physicalHandsManager;
+
+        public PhysicalHandsManager PhysicalHandsManager => _physicalHandsManager;
 
         private void Start()
         {
-            physicalHandsManager = GetComponentInParent<PhysicalHandsManager>();
+            _physicalHandsManager = GetComponentInParent<PhysicalHandsManager>();
             GenerateHands();
         }
 
@@ -27,7 +29,7 @@ namespace Leap.Unity.PhysicalHands
             GameObject handObject = new GameObject($"Left {handType.Name}", handType);
             handObject.transform.parent = transform;
             _leftHand = handObject.GetComponent<ContactHand>();
-            _leftHand.handedness = Chirality.Left;
+            _leftHand._handedness = Chirality.Left;
             if (callGenerate)
             {
                 _leftHand.GenerateHand();
@@ -36,7 +38,7 @@ namespace Leap.Unity.PhysicalHands
             handObject = new GameObject($"Right {handType.Name}", handType);
             handObject.transform.parent = transform;
             _rightHand = handObject.GetComponent<ContactHand>();
-            _rightHand.handedness = Chirality.Right;
+            _rightHand._handedness = Chirality.Right;
             if (callGenerate)
             {
                 _rightHand.GenerateHand();
@@ -45,8 +47,8 @@ namespace Leap.Unity.PhysicalHands
 
         internal void UpdateFrame()
         {
-            UpdateHand(physicalHandsManager._leftHandIndex, _leftHand, physicalHandsManager._leftDataHand);
-            UpdateHand(physicalHandsManager._rightHandIndex, _rightHand, physicalHandsManager._rightDataHand);
+            UpdateHand(PhysicalHandsManager._leftHandIndex, _leftHand, PhysicalHandsManager._leftDataHand);
+            UpdateHand(PhysicalHandsManager._rightHandIndex, _rightHand, PhysicalHandsManager._rightDataHand);
         }
 
         private void UpdateHand(int index, ContactHand hand, Hand dataHand)
@@ -79,10 +81,10 @@ namespace Leap.Unity.PhysicalHands
 
         internal void OutputFrame(ref Frame inputFrame)
         {
-            physicalHandsManager._leftHandIndex = inputFrame.Hands.FindIndex(x => x.IsLeft);
-            OutputHand(physicalHandsManager._leftHandIndex, _leftHand, ref inputFrame);
-            physicalHandsManager._rightHandIndex = inputFrame.Hands.FindIndex(x => x.IsRight);
-            OutputHand(physicalHandsManager._rightHandIndex, _rightHand, ref inputFrame);
+            PhysicalHandsManager._leftHandIndex = inputFrame.Hands.FindIndex(x => x.IsLeft);
+            OutputHand(PhysicalHandsManager._leftHandIndex, _leftHand, ref inputFrame);
+            PhysicalHandsManager._rightHandIndex = inputFrame.Hands.FindIndex(x => x.IsRight);
+            OutputHand(PhysicalHandsManager._rightHandIndex, _rightHand, ref inputFrame);
         }
 
         private void OutputHand(int index, ContactHand hand, ref Frame inputFrame)
@@ -131,9 +133,9 @@ namespace Leap.Unity.PhysicalHands
 
         protected virtual void OnValidate()
         {
-            if (physicalHandsManager == null)
+            if (PhysicalHandsManager == null)
             {
-                physicalHandsManager = GetComponentInParent<PhysicalHandsManager>();
+                _physicalHandsManager = GetComponentInParent<PhysicalHandsManager>();
             }
         }
     }

@@ -1,17 +1,15 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace Leap.Unity.PhysicalHands
 {
     public static class ContactUtils
     {
-
         // Magic 0th thumb bone dataRotation offsets from LeapC
         // TODO: Remove this and make it non-necessary
-        public const float HAND_ROTATION_OFFSET_Y = 25.9f, HAND_ROTATION_OFFSET_Z = -63.45f;
+        internal const float HAND_ROTATION_OFFSET_Y = 25.9f, HAND_ROTATION_OFFSET_Z = -63.45f;
 
-        public static Vector3 CalculateAverageKnucklePosition(this Hand hand)
+        internal static Vector3 CalculateAverageKnucklePosition(this Hand hand)
         {
             return (hand.Fingers[1].bones[0].NextJoint +
                 hand.Fingers[2].bones[0].NextJoint +
@@ -19,12 +17,12 @@ namespace Leap.Unity.PhysicalHands
                 hand.Fingers[4].bones[0].NextJoint) / 4;
         }
 
-        public static Vector3 CalculatePalmSize(Hand hand)
+        internal static Vector3 CalculatePalmSize(Hand hand)
         {
             return new Vector3(hand.PalmWidth, hand.Fingers[2].Bone(0).Width, Vector3.Distance(CalculateAverageKnucklePosition(hand), hand.WristPosition));
         }
 
-        public static void SetupPalmCollider(BoxCollider collider, CapsuleCollider[] palmEdges, Hand hand, PhysicMaterial material = null)
+        internal static void SetupPalmCollider(BoxCollider collider, CapsuleCollider[] palmEdges, Hand hand, PhysicMaterial material = null)
         {
             Vector3 palmSize = CalculatePalmSize(hand);
             if (palmEdges != null)
@@ -67,7 +65,7 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
-        public static void InterpolatePalmBones(BoxCollider collider, CapsuleCollider[] palmEdges, Hand hand, float interp)
+        internal static void InterpolatePalmBones(BoxCollider collider, CapsuleCollider[] palmEdges, Hand hand, float interp)
         {
             Vector3 palmSize = CalculatePalmSize(hand);
             if (palmEdges != null)
@@ -94,7 +92,7 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
-        public static void SetupBoneCollider(CapsuleCollider collider, Bone bone, PhysicMaterial material = null)
+        internal static void SetupBoneCollider(CapsuleCollider collider, Bone bone, PhysicMaterial material = null)
         {
             collider.direction = 2;
             collider.radius = bone.Width * 0.5f;
@@ -106,17 +104,17 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
-        public static Vector3 ToLinearVelocity(Vector3 deltaPosition, float deltaTime)
+        internal static Vector3 ToLinearVelocity(Vector3 deltaPosition, float deltaTime)
         {
             return deltaPosition / deltaTime;
         }
 
-        public static Vector3 ToLinearVelocity(Vector3 startPosition, Vector3 destinationPosition, float deltaTime)
+        internal static Vector3 ToLinearVelocity(Vector3 startPosition, Vector3 destinationPosition, float deltaTime)
         {
             return ToLinearVelocity(destinationPosition - startPosition, deltaTime);
         }
 
-        public static Vector3 ToAngularVelocity(Quaternion deltaRotation, float deltaTime)
+        internal static Vector3 ToAngularVelocity(Quaternion deltaRotation, float deltaTime)
         {
             Vector3 deltaAxis;
             float deltaAngle;
@@ -136,39 +134,39 @@ namespace Leap.Unity.PhysicalHands
             return deltaAxis * deltaAngle * Mathf.Deg2Rad / deltaTime;
         }
 
-        public static Vector3 ToAngularVelocity(Quaternion startRotation, Quaternion destinationRotation, float deltaTime)
+        internal static Vector3 ToAngularVelocity(Quaternion startRotation, Quaternion destinationRotation, float deltaTime)
         {
             return ToAngularVelocity(destinationRotation * Quaternion.Inverse(startRotation), deltaTime);
         }
 
-        public static bool IsValid(this Vector3 v)
+        internal static bool IsValid(this Vector3 v)
         {
             return !(float.IsNaN(v.x) || float.IsNaN(v.y) || float.IsNaN(v.z)) && !(float.IsInfinity(v.x) || float.IsInfinity(v.y) || float.IsInfinity(v.z));
         }
 
-        public static Vector3 InverseTransformPoint(Vector3 transformPos, Quaternion transformRotation, Vector3 transformScale, Vector3 pos)
+        internal static Vector3 InverseTransformPoint(Vector3 transformPos, Quaternion transformRotation, Vector3 transformScale, Vector3 pos)
         {
             Matrix4x4 matrix = Matrix4x4.TRS(transformPos, transformRotation, transformScale);
             Matrix4x4 inverse = matrix.inverse;
             return inverse.MultiplyPoint3x4(pos);
         }
 
-        public static Vector3 InverseTransformPoint(Vector3 transformPos, Quaternion transformRotation, Vector3 pos)
+        internal static Vector3 InverseTransformPoint(Vector3 transformPos, Quaternion transformRotation, Vector3 pos)
         {
             return InverseTransformPoint(transformPos, transformRotation, Vector3.one, pos);
         }
 
-        public static float EaseOut(this float input)
+        internal static float EaseOut(this float input)
         {
             return input.Flip().Square().Flip();
         }
 
-        public static float Square(this float input)
+        internal static float Square(this float input)
         {
             return input * input;
         }
 
-        public static float Flip(this float input)
+        internal static float Flip(this float input)
         {
             return 1 - input;
         }
@@ -186,7 +184,7 @@ namespace Leap.Unity.PhysicalHands
         /// <param name="colliders">A list of colliders representing the object to check</param>
         /// <param name="boneWidth">Optional width of the bone - if not passed, will default to 0</param>
         /// <returns></returns>
-        public static bool IsBoneWithinObject(this Leap.Bone bone, List<Collider> colliders, float boneWidth = 0)
+        internal static bool IsBoneWithinObject(this Leap.Bone bone, List<Collider> colliders, float boneWidth = 0)
         {
             for (int i = 0; i < colliders.Count; i++)
             {
@@ -206,7 +204,7 @@ namespace Leap.Unity.PhysicalHands
             return false;
         }
 
-        public static Vector3 GetClosestPointOnFiniteLine(Vector3 point, Vector3 lineStart, Vector3 lineEnd)
+        internal static Vector3 GetClosestPointOnFiniteLine(Vector3 point, Vector3 lineStart, Vector3 lineEnd)
         {
             Vector3 lineDir = lineEnd - lineStart;
             float lineLength = lineDir.magnitude;
@@ -215,7 +213,7 @@ namespace Leap.Unity.PhysicalHands
             return lineStart + lineDir * projectLength;
         }
 
-        public static Vector3 GetClosestPointOnLine(Vector3 point, Vector3 lineStart, Vector3 lineEnd)
+        internal static Vector3 GetClosestPointOnLine(Vector3 point, Vector3 lineStart, Vector3 lineEnd)
         {
             Vector3 lineDir = lineEnd - lineStart;
             lineDir.Normalize();
@@ -233,7 +231,7 @@ namespace Leap.Unity.PhysicalHands
         /// <param name="collider">The collider you want to test against</param>
         /// <param name="axis">Specifies which axis the rectangle sits across. Defaults to Y.</param>
         /// <returns></returns>
-        public static Vector3 ClosestPointEstimationFromRectangle(Vector3 center, Quaternion orientation, Vector2 halfExtents, Collider collider, int axis = 1)
+        internal static Vector3 ClosestPointEstimationFromRectangle(Vector3 center, Quaternion orientation, Vector2 halfExtents, Collider collider, int axis = 1)
         {
             float distance = float.MaxValue, tempDist;
             Vector3 returnPoint = Vector3.zero, tempPoint, extents;
@@ -277,7 +275,7 @@ namespace Leap.Unity.PhysicalHands
         /// <summary>
         /// Check if a point is inside the points of the face and then modify it if it's not. You must enter the points in the correct order of the face.
         /// </summary>
-        public static Vector3 ClosestPointToRectangleFace(Vector3[] face, Vector3 point)
+        internal static Vector3 ClosestPointToRectangleFace(Vector3[] face, Vector3 point)
         {
             // 1_ get sqrDist to closest face point
             var closestDistance = float.MaxValue;
@@ -333,12 +331,12 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
-        public static float SqrDist(Vector3 a, Vector3 b)
+        internal static float SqrDist(Vector3 a, Vector3 b)
         {
             return Vector3.SqrMagnitude(a - b);
         }
 
-        public static bool IsBetween(this Vector3 a, Vector3 b, Vector3 c)
+        internal static bool IsBetween(this Vector3 a, Vector3 b, Vector3 c)
         {
             var totalDist = SqrDist(b, c);
             if (SqrDist(a, b) <= totalDist && SqrDist(a, c) <= totalDist)

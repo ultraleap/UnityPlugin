@@ -35,7 +35,6 @@ namespace Leap.Unity.PhysicalHands
 
         private void OnDrawGizmos()
         {
-            
             Debug.DrawLine(transform.position,tipPosition,Color.cyan);
         }
     }

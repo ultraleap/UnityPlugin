@@ -1,20 +1,22 @@
 using System.Collections.Generic;
 using UnityEngine;
+
 namespace Leap.Unity.PhysicalHands
 {
     [RequireComponent(typeof(PhysicalHandsManager))]
     public class GrabHelper : MonoBehaviour
     {
-        public PhysicalHandsManager physicalHandsManager;
+        [SerializeField]
+        private PhysicalHandsManager physicalHandsManager;
 
-        private ContactHand _leftContactHand { get { return physicalHandsManager.contactParent.LeftHand; } }
-        private ContactHand _rightContactHand { get { return physicalHandsManager.contactParent.RightHand; } }
+        private ContactHand _leftContactHand { get { return physicalHandsManager.ContactParent.LeftHand; } }
+        private ContactHand _rightContactHand { get { return physicalHandsManager.ContactParent.RightHand; } }
 
         private Collider[] _colliderCache = new Collider[128];
 
         #region Interaction Data
         private Dictionary<ContactHand, float[]> _fingerStrengths = new Dictionary<ContactHand, float[]>();
-        public Dictionary<ContactHand, float[]> FingerStrengths => _fingerStrengths;
+        internal Dictionary<ContactHand, float[]> FingerStrengths => _fingerStrengths;
 
         // Helpers
         private Dictionary<Rigidbody, GrabHelperObject> _grabHelpers = new Dictionary<Rigidbody, GrabHelperObject>();
@@ -121,7 +123,7 @@ namespace Leap.Unity.PhysicalHands
 
             float radiusAmount = PhysExts.MaxVec3(Vector3.Scale(hand.palmBone.palmCollider.size, PhysExts.AbsVec3(hand.palmBone.transform.lossyScale)));
 
-            int results = Physics.OverlapCapsuleNonAlloc(hand.palmBone.transform.position + (-hand.palmBone.transform.up * 0.025f) + ((hand.handedness == Chirality.Left ? hand.palmBone.transform.right : -hand.palmBone.transform.right) * 0.015f),
+            int results = Physics.OverlapCapsuleNonAlloc(hand.palmBone.transform.position + (-hand.palmBone.transform.up * 0.025f) + ((hand.Handedness == Chirality.Left ? hand.palmBone.transform.right : -hand.palmBone.transform.right) * 0.015f),
                 // Interpolate the tip position so we keep it relative to the straightest finger
                 hand.palmBone.transform.position + (-hand.palmBone.transform.up * Mathf.Lerp(0.025f, 0.07f, lerp)) + (hand.palmBone.transform.forward * Mathf.Lerp(0.06f, 0.02f, lerp)),
                 radiusAmount + (physicalHandsManager.HoverDistance * 2f), _colliderCache, physicalHandsManager.InteractionMask);
