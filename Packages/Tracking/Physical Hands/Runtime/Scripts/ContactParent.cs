@@ -20,6 +20,8 @@ namespace Leap.Unity.PhysicalHands
         {
             _physicalHandsManager = GetComponentInParent<PhysicalHandsManager>();
             GenerateHands();
+
+            PhysicalHandsManager.HandsInitiated();
         }
 
         internal abstract void GenerateHands();

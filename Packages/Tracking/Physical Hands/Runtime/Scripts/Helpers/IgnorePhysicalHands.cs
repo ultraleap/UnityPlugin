@@ -50,6 +50,8 @@ namespace Leap.Unity.PhysicalHands
             } 
         }
 
+        private PhysicalHandsManager _physicalHandsManager = null;
+
         List<ContactHand> contactHands = new List<ContactHand>();
 
         internal void AddToHands(ContactHand contactHand)
@@ -90,6 +92,31 @@ namespace Leap.Unity.PhysicalHands
                     Physics.IgnoreCollision(palmCollider, objectCollider, collisionDisabled);
                 }
                 Physics.IgnoreCollision(contactHand.palmBone.Collider, objectCollider, collisionDisabled);
+            }
+        }
+
+        private void HandsInitiated()
+        {
+            AddToHands(_physicalHandsManager.ContactParent.LeftHand);
+            AddToHands(_physicalHandsManager.ContactParent.RightHand);
+
+            SetAllHandCollisions();
+        }
+
+        private void Start()
+        {
+            _physicalHandsManager = (PhysicalHandsManager)FindAnyObjectByType(typeof(PhysicalHandsManager));
+            if( _physicalHandsManager != null )
+            {
+                if (_physicalHandsManager.onHandsInitiated == null)
+                {
+                    _physicalHandsManager.onHandsInitiated = new UnityEngine.Events.UnityEvent();
+                }
+                _physicalHandsManager.onHandsInitiated.AddListener(HandsInitiated);
+            }
+            else
+            {
+                Debug.Log("did not find physical hands manager");
             }
         }
     }

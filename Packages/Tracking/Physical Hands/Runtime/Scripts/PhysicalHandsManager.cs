@@ -152,6 +152,11 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
+        internal void HandsInitiated()
+        {
+            onHandsInitiated.Invoke();
+        }
+
         private void ProcessFrame(Frame inputFrame)
         {
             if (!Application.isPlaying)
@@ -347,6 +352,8 @@ namespace Leap.Unity.PhysicalHands
         [Space, Header("Grab Events"), Space]
         public UnityEvent<Rigidbody> onGrab;
         public UnityEvent<Rigidbody> onGrabExit;
+
+        internal UnityEvent onHandsInitiated;
 
         internal void OnHandHover(Rigidbody rbody)
         {
