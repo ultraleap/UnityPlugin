@@ -116,8 +116,8 @@ namespace Leap.Unity.PhysicalHands
 
             if (finger == 0)
             {
-                yDrive.lowerLimit = contactHand.handedness == Chirality.Left ? -10f : -50f;
-                yDrive.upperLimit = contactHand.handedness == Chirality.Left ? 50f : 10f;
+                yDrive.lowerLimit = contactHand.Handedness == Chirality.Left ? -10f : -50f;
+                yDrive.upperLimit = contactHand.Handedness == Chirality.Left ? 50f : 10f;
             }
 
             articulation.yDrive = yDrive;
@@ -410,7 +410,7 @@ namespace Leap.Unity.PhysicalHands
                     _xDampening = 10f;
                 }
             }
-            else if (IsBoneHovering && ObjectDistance < distanceCheck)
+            else if (IsBoneHovering && NearestObjectDistance < distanceCheck)
             {
                 if (IsBoneGrabbing)
                 {
@@ -437,9 +437,9 @@ namespace Leap.Unity.PhysicalHands
             if (_wasBoneGrabbing)
             {
                 hasFingerGrabbed = true;
-                if (IsBoneHovering && (ObjectDistance < hardContactHand.grabbingFingerDistances[finger] || (hardContactHand.grabbingFingerDistances[finger] == 1 && joint == 0)))
+                if (IsBoneHovering && (NearestObjectDistance < hardContactHand.grabbingFingerDistances[finger] || (hardContactHand.grabbingFingerDistances[finger] == 1 && joint == 0)))
                 {
-                    hardContactHand.grabbingFingerDistances[finger] = ObjectDistance;
+                    hardContactHand.grabbingFingerDistances[finger] = NearestObjectDistance;
                 }
             }
             return hasFingerGrabbed;

@@ -45,8 +45,9 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
-        [HideInInspector]
-        public ContactParent contactParent;
+
+        private ContactParent _contactParent;
+        public ContactParent ContactParent => _contactParent;
 
         #region Layers
         // Layers
@@ -136,7 +137,7 @@ namespace Leap.Unity.PhysicalHands
                         DestroyImmediate(parent.gameObject);
                     }
 
-                    contactParent = null;
+                    _contactParent = null;
                 }
             }
         }
@@ -175,10 +176,10 @@ namespace Leap.Unity.PhysicalHands
                 _rightDataHand.CopyFrom(inputFrame.Hands[_rightHandIndex]);
             }
 
-            contactParent?.UpdateFrame();
+            ContactParent?.UpdateFrame();
 
             _modifiedFrame.CopyFrom(inputFrame);
-            contactParent?.OutputFrame(ref _modifiedFrame);
+            ContactParent?.OutputFrame(ref _modifiedFrame);
 
             // Output the frame on each update
             if (Time.inFixedTimeStep)
@@ -203,25 +204,25 @@ namespace Leap.Unity.PhysicalHands
             yield return null;
             for (; ; )
             {
-                contactParent?.PostFixedUpdateFrame();
+                ContactParent?.PostFixedUpdateFrame();
                 yield return _postFixedUpdateWait;
             }
         }
 
         public void SetContactMode(ContactMode mode)
         {
-            if (contactParent != null) // delete old contact hands
+            if (ContactParent != null) // delete old contact hands
             {
                 if (Application.isPlaying)
                 {
-                    Destroy(contactParent.gameObject);
+                    Destroy(ContactParent.gameObject);
                 }
                 else
                 {
-                    DestroyImmediate(contactParent.gameObject);
+                    DestroyImmediate(ContactParent.gameObject);
                 }
 
-                contactParent = null;
+                _contactParent = null;
             }
 
             _contactMode = mode;
@@ -232,13 +233,13 @@ namespace Leap.Unity.PhysicalHands
             switch (_contactMode)
             {
                 case ContactMode.HardContact:
-                    contactParent = newContactParent.AddComponent(typeof(HardContactParent)) as ContactParent;
+                    _contactParent = newContactParent.AddComponent(typeof(HardContactParent)) as ContactParent;
                     break;
                 case ContactMode.SoftContact:
-                    contactParent = newContactParent.AddComponent(typeof(SoftContactParent)) as ContactParent;
+                    _contactParent = newContactParent.AddComponent(typeof(SoftContactParent)) as ContactParent;
                     break;
                 case ContactMode.NoContact:
-                    contactParent = newContactParent.AddComponent(typeof(NoContactParent)) as ContactParent;
+                    _contactParent = newContactParent.AddComponent(typeof(NoContactParent)) as ContactParent;
                     break;
             }
 
@@ -324,9 +325,9 @@ namespace Leap.Unity.PhysicalHands
 #if UNITY_EDITOR
         private void OnValidate()
         {
-            if (contactParent == null)
+            if (ContactParent == null)
             {
-                contactParent = GetComponentInChildren<ContactParent>();
+                _contactParent = GetComponentInChildren<ContactParent>();
             }
         }
 #endif

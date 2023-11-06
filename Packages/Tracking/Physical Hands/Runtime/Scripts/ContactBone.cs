@@ -38,7 +38,7 @@ namespace Leap.Unity.PhysicalHands
         #region Interaction Data
         private static float SAFETY_CLOSE_DISTANCE = 0.005f;
 
-        public class ClosestObjectDirection
+        internal class ClosestObjectDirection
         {
             /// <summary>
             /// The closest position on the hovering bone
@@ -89,13 +89,13 @@ namespace Leap.Unity.PhysicalHands
         ///<summary>
         /// Dictionary of dictionaries of the directions from this bone to a hovered object's colliders
         ///</summary>
-        public Dictionary<Rigidbody, Dictionary<Collider, ClosestObjectDirection>> HoverDirections => _objectDirections;
+        internal Dictionary<Rigidbody, Dictionary<Collider, ClosestObjectDirection>> HoverDirections => _objectDirections;
         private Dictionary<Rigidbody, Dictionary<Collider, ClosestObjectDirection>> _objectDirections = new Dictionary<Rigidbody, Dictionary<Collider, ClosestObjectDirection>>();
 
         ///<summary>
         /// Dictionary of dictionaries of the directions from this bone to a grabbable object's colliders
         ///</summary>
-        public Dictionary<Rigidbody, Dictionary<Collider, ClosestObjectDirection>> GrabbableDirections => _grabbableDirections;
+        internal Dictionary<Rigidbody, Dictionary<Collider, ClosestObjectDirection>> GrabbableDirections => _grabbableDirections;
         private Dictionary<Rigidbody, Dictionary<Collider, ClosestObjectDirection>> _grabbableDirections = new Dictionary<Rigidbody, Dictionary<Collider, ClosestObjectDirection>>();
 
         /// <summary>
@@ -120,9 +120,9 @@ namespace Leap.Unity.PhysicalHands
         /// <summary>
         /// Will report float.MaxValue if IsHovering is false
         /// </summary>
-        public float ObjectDistance => _objectDistance;
+        public float NearestObjectDistance => _nearestObjectDistance;
         [SerializeField, Tooltip("The distance between the edge of the bone collider and the nearest object. Will report float.MaxValue if IsHovering is false.")]
-        private float _objectDistance = float.MaxValue;
+        private float _nearestObjectDistance = float.MaxValue;
         #endregion
 
         private Vector3 _debugA, _debugB;
@@ -202,7 +202,7 @@ namespace Leap.Unity.PhysicalHands
 
         private void UpdateObjectDistances(Collider[] colliderCache, int count)
         {
-            _objectDistance = float.MaxValue;
+            _nearestObjectDistance = float.MaxValue;
 
             float distance, singleObjectDistance, boneDistance;
             Vector3 colliderPos, bonePos, midPoint, direction;
@@ -244,7 +244,7 @@ namespace Leap.Unity.PhysicalHands
 
                 boneDistance = Mathf.Clamp(distance - width, 0, float.MaxValue);
 
-                hover = boneDistance <= contactParent.physicalHandsManager.HoverDistance;
+                hover = boneDistance <= contactParent.PhysicalHandsManager.HoverDistance;
 
                 if (hover)
                 {
@@ -295,7 +295,7 @@ namespace Leap.Unity.PhysicalHands
                 UpdateHoverCollider(collider.attachedRigidbody, collider, hover);
 
                 // Contact
-                UpdateContactCollider(collider.attachedRigidbody, collider, boneDistance <= (IsPalm ? contactParent.physicalHandsManager.ContactDistance * 2f : contactParent.physicalHandsManager.ContactDistance));
+                UpdateContactCollider(collider.attachedRigidbody, collider, boneDistance <= (IsPalm ? contactParent.PhysicalHandsManager.ContactDistance * 2f : contactParent.PhysicalHandsManager.ContactDistance));
 
                 // Safety
                 UpdateSafetyCollider(collider, boneDistance == 0, boneDistance <= SAFETY_CLOSE_DISTANCE);
@@ -309,9 +309,9 @@ namespace Leap.Unity.PhysicalHands
                     if (col.Value.distance < singleObjectDistance)
                     {
                         singleObjectDistance = col.Value.distance;
-                        if (singleObjectDistance < _objectDistance)
+                        if (singleObjectDistance < _nearestObjectDistance)
                         {
-                            _objectDistance = singleObjectDistance;
+                            _nearestObjectDistance = singleObjectDistance;
                             _debugA = col.Value.bonePos;
                             _debugB = col.Value.bonePos + (col.Value.direction * (col.Value.distance));
                         }
@@ -509,11 +509,11 @@ namespace Leap.Unity.PhysicalHands
                     {
                         case 0:
                             // Point the thumb closer to the index
-                            jointDirection = Quaternion.AngleAxis(contactHand.handedness == Chirality.Left ? -45f : 45f, transform.forward) * jointDirection;
+                            jointDirection = Quaternion.AngleAxis(contactHand.Handedness == Chirality.Left ? -45f : 45f, transform.forward) * jointDirection;
                             break;
                         case 1:
                             // Point the index closer to the thumb
-                            jointDirection = Quaternion.AngleAxis(contactHand.handedness == Chirality.Left ? 25f : -25f, transform.forward) * jointDirection;
+                            jointDirection = Quaternion.AngleAxis(contactHand.Handedness == Chirality.Left ? 25f : -25f, transform.forward) * jointDirection;
                             break;
                     }
 

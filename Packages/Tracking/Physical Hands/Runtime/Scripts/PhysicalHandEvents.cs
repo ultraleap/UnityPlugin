@@ -95,7 +95,7 @@ namespace Leap.Unity.PhysicalHands
 
             onHover?.Invoke(hand);
 
-            if (hand.handedness == Chirality.Left)
+            if (hand.Handedness == Chirality.Left)
             {
                 if (!leftHandHovering)
                     onLeftHandHoverEnter?.Invoke(hand);
@@ -117,7 +117,7 @@ namespace Leap.Unity.PhysicalHands
         {
             onHoverExit?.Invoke(hand);
 
-            if (hand.handedness == Chirality.Left)
+            if (hand.Handedness == Chirality.Left)
             {
                 leftHandHovering = false;
                 onLeftHandHoverExit?.Invoke(hand);
@@ -136,7 +136,7 @@ namespace Leap.Unity.PhysicalHands
 
             onContact?.Invoke(hand);
 
-            if (hand.handedness == Chirality.Left)
+            if (hand.Handedness == Chirality.Left)
             {
                 if (!leftHandContacting)
                     onLeftHandContactEnter?.Invoke(hand);
@@ -156,7 +156,7 @@ namespace Leap.Unity.PhysicalHands
         {
             onContactExit?.Invoke(hand);
 
-            if (hand.handedness == Chirality.Left)
+            if (hand.Handedness == Chirality.Left)
             {
                 leftHandContacting = false;
                 onLeftHandContactExit?.Invoke(hand);
@@ -175,7 +175,7 @@ namespace Leap.Unity.PhysicalHands
 
             onGrab?.Invoke(hand);
 
-            if (hand.handedness == Chirality.Left)
+            if (hand.Handedness == Chirality.Left)
             {
                 if (!leftHandGrabbing)
                     onLeftHandGrabEnter?.Invoke(hand);
@@ -195,7 +195,7 @@ namespace Leap.Unity.PhysicalHands
         {
             onGrabExit?.Invoke(hand);
 
-            if (hand.handedness == Chirality.Left)
+            if (hand.Handedness == Chirality.Left)
             {
                 leftHandGrabbing = false;
                 onLeftHandGrabExit?.Invoke(hand);
@@ -213,7 +213,7 @@ namespace Leap.Unity.PhysicalHands
         {
             onBoneHover?.Invoke(bone);
 
-            if (bone.contactHand.handedness == Chirality.Left)
+            if (bone.contactHand.Handedness == Chirality.Left)
                 onLeftHandBoneHover?.Invoke(bone);
             else
                 onRightHandBoneHover?.Invoke(bone);
@@ -223,7 +223,7 @@ namespace Leap.Unity.PhysicalHands
         {
             onBoneHoverExit?.Invoke(bone);
 
-            if (bone.contactHand.handedness == Chirality.Left)
+            if (bone.contactHand.Handedness == Chirality.Left)
                 onLeftHandBoneHoverExit?.Invoke(bone);
             else
                 onRightHandBoneHoverExit?.Invoke(bone);
@@ -233,7 +233,7 @@ namespace Leap.Unity.PhysicalHands
         {
             onBoneContact?.Invoke(bone);
 
-            if (bone.contactHand.handedness == Chirality.Left)
+            if (bone.contactHand.Handedness == Chirality.Left)
                 onLeftHandBoneContact?.Invoke(bone);
             else
                 onRightHandBoneContact?.Invoke(bone);
@@ -243,7 +243,7 @@ namespace Leap.Unity.PhysicalHands
         {
             onBoneContactExit?.Invoke(bone);
 
-            if (bone.contactHand.handedness == Chirality.Left)
+            if (bone.contactHand.Handedness == Chirality.Left)
                 onLeftHandBoneContactExit?.Invoke(bone);
             else
                 onRightHandBoneContactExit?.Invoke(bone);
