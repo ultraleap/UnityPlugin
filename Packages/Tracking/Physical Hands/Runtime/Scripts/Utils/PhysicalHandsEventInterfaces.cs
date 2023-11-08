@@ -9,17 +9,7 @@ namespace Leap.Unity.PhysicalHands
         void OnHandHover(ContactHand hand);
         void OnHandHoverExit(ContactHand hand);
     }
-
-    /// <summary>
-    /// Reports the hover event called when an individual bone hovers your rigidbody.
-    /// This will be called dependant on the hover distance set by the hand.
-    /// </summary>
-    public interface IPhysicalBoneHover
-    {
-        void OnBoneHover(ContactBone bone);
-        void OnBoneHoverExit(ContactBone bone);
-    }
-
+    
     /// <summary>
     /// Reports the contact event when any part of the hand is in contact with an interactable rigidbody.
     /// This will be called dependant on the contact distance set by the hand.
@@ -28,16 +18,6 @@ namespace Leap.Unity.PhysicalHands
     {
         void OnHandContact(ContactHand hand);
         void OnHandContactExit(ContactHand hand);
-    }
-
-    /// <summary>
-    /// Reports the contact event when an an individual bone hovers your rigidbody.
-    /// This will be called dependant on the contact distance set by the hand.
-    /// </summary>
-    public interface IPhysicalBoneContact
-    {
-        void OnBoneContact(ContactBone bone);
-        void OnBoneContactExit(ContactBone bone);
     }
 
     /// <summary>

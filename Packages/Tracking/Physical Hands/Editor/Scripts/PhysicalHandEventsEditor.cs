@@ -18,10 +18,6 @@ namespace Leap.Unity.PhysicalHands
             addPropertyToFoldout("onGrabEnter", "Any Hand Events", true);
             addPropertyToFoldout("onGrab", "Any Hand Events", true);
             addPropertyToFoldout("onGrabExit", "Any Hand Events", true);
-            addPropertyToFoldout("onBoneHover", "Any Hand Events", true);
-            addPropertyToFoldout("onBoneHoverExit", "Any Hand Events", true);
-            addPropertyToFoldout("onBoneContact", "Any Hand Events", true);
-            addPropertyToFoldout("onBoneContactExit", "Any Hand Events", true);
 
             addPropertyToFoldout("onLeftHandHoverEnter", "Left Hand Events");
             addPropertyToFoldout("onLeftHandHover", "Left Hand Events");
@@ -32,10 +28,6 @@ namespace Leap.Unity.PhysicalHands
             addPropertyToFoldout("onLeftHandGrabEnter", "Left Hand Events");
             addPropertyToFoldout("onLeftHandGrab", "Left Hand Events");
             addPropertyToFoldout("onLeftHandGrabExit", "Left Hand Events");
-            addPropertyToFoldout("onLeftHandBoneHover", "Left Hand Events");
-            addPropertyToFoldout("onLeftHandBoneHoverExit", "Left Hand Events");
-            addPropertyToFoldout("onLeftHandBoneContact", "Left Hand Events");
-            addPropertyToFoldout("onLeftHandBoneContactExit", "Left Hand Events");
 
             addPropertyToFoldout("onRightHandHoverEnter", "Right Hand Events");
             addPropertyToFoldout("onRightHandHover", "Right Hand Events");
@@ -46,10 +38,6 @@ namespace Leap.Unity.PhysicalHands
             addPropertyToFoldout("onRightHandGrabEnter", "Right Hand Events");
             addPropertyToFoldout("onRightHandGrab", "Right Hand Events");
             addPropertyToFoldout("onRightHandGrabExit", "Right Hand Events");
-            addPropertyToFoldout("onRightHandBoneHover", "Right Hand Events");
-            addPropertyToFoldout("onRightHandBoneHoverExit", "Right Hand Events");
-            addPropertyToFoldout("onRightHandBoneContact", "Right Hand Events");
-            addPropertyToFoldout("onRightHandBoneContactExit", "Right Hand Events");
         }
     }
 }

@@ -5,7 +5,7 @@ using UnityEngine.Events;
 
 namespace Leap.Unity.PhysicalHands
 {
-    public class PhysicalHandEvents : MonoBehaviour, IPhysicalHandHover, IPhysicalBoneHover, IPhysicalHandContact, IPhysicalBoneContact, IPhysicalHandGrab
+    public class PhysicalHandEvents : MonoBehaviour, IPhysicalHandHover, IPhysicalHandContact, IPhysicalHandGrab
     {
         [Space, Header("Hover Events"), Space]
         public UnityEvent<ContactHand> onHoverEnter;
@@ -21,14 +21,6 @@ namespace Leap.Unity.PhysicalHands
         public UnityEvent<ContactHand> onGrabEnter;
         public UnityEvent<ContactHand> onGrab;
         public UnityEvent<ContactHand> onGrabExit;
-
-        [Space, Header("Bone Hover Events"), Space]
-        public UnityEvent<ContactBone> onBoneHover;
-        public UnityEvent<ContactBone> onBoneHoverExit;
-
-        [Space, Header("Bone Contact Events"), Space]
-        public UnityEvent<ContactBone> onBoneContact;
-        public UnityEvent<ContactBone> onBoneContactExit;
 
         //
 
@@ -47,14 +39,6 @@ namespace Leap.Unity.PhysicalHands
         public UnityEvent<ContactHand> onLeftHandGrab;
         public UnityEvent<ContactHand> onLeftHandGrabExit;
 
-        [Space, Header("Left Bone Hover Events"), Space]
-        public UnityEvent<ContactBone> onLeftHandBoneHover;
-        public UnityEvent<ContactBone> onLeftHandBoneHoverExit;
-
-        [Space, Header("Left Bone Contact Events"), Space]
-        public UnityEvent<ContactBone> onLeftHandBoneContact;
-        public UnityEvent<ContactBone> onLeftHandBoneContactExit;
-
         //
 
         [Space, Header("Right Hover Events"), Space]
@@ -71,14 +55,6 @@ namespace Leap.Unity.PhysicalHands
         public UnityEvent<ContactHand> onRightHandGrabEnter;
         public UnityEvent<ContactHand> onRightHandGrab;
         public UnityEvent<ContactHand> onRightHandGrabExit;
-
-        [Space, Header("Right Bone Hover Events"), Space]
-        public UnityEvent<ContactBone> onRightHandBoneHover;
-        public UnityEvent<ContactBone> onRightHandBoneHoverExit;
-
-        [Space, Header("Right Bone Contact Events"), Space]
-        public UnityEvent<ContactBone> onRightHandBoneContact;
-        public UnityEvent<ContactBone> onRightHandBoneContactExit;
 
         public bool leftHandHovering { get; private set; }
         public bool leftHandContacting { get; private set; }
@@ -205,48 +181,6 @@ namespace Leap.Unity.PhysicalHands
                 rightHandGrabbing = false;
                 onRightHandGrabExit?.Invoke(hand);
             }
-        }
-
-        //
-
-        public void OnBoneHover(ContactBone bone)
-        {
-            onBoneHover?.Invoke(bone);
-
-            if (bone.contactHand.Handedness == Chirality.Left)
-                onLeftHandBoneHover?.Invoke(bone);
-            else
-                onRightHandBoneHover?.Invoke(bone);
-        }
-
-        public void OnBoneHoverExit(ContactBone bone)
-        {
-            onBoneHoverExit?.Invoke(bone);
-
-            if (bone.contactHand.Handedness == Chirality.Left)
-                onLeftHandBoneHoverExit?.Invoke(bone);
-            else
-                onRightHandBoneHoverExit?.Invoke(bone);
-        }
-
-        public void OnBoneContact(ContactBone bone)
-        {
-            onBoneContact?.Invoke(bone);
-
-            if (bone.contactHand.Handedness == Chirality.Left)
-                onLeftHandBoneContact?.Invoke(bone);
-            else
-                onRightHandBoneContact?.Invoke(bone);
-        }
-
-        public void OnBoneContactExit(ContactBone bone)
-        {
-            onBoneContactExit?.Invoke(bone);
-
-            if (bone.contactHand.Handedness == Chirality.Left)
-                onLeftHandBoneContactExit?.Invoke(bone);
-            else
-                onRightHandBoneContactExit?.Invoke(bone);
         }
     }
 }

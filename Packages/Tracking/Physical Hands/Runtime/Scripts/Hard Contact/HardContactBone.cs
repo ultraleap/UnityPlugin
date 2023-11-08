@@ -156,7 +156,6 @@ namespace Leap.Unity.PhysicalHands
 
         internal override void UpdateBone(Bone prevBone, Bone bone)
         {
-            UpdateBoneSizes(prevBone, bone);
 
             UpdateBoneAngle(prevBone, bone);
 
