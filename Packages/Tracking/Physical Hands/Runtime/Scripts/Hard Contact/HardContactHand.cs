@@ -89,6 +89,7 @@ namespace Leap.Unity.PhysicalHands
         {
             tracked = false;
             resetting = false;
+            ghosted = false;
             ResetHardContactHand();
             gameObject.SetActive(false);
         }
