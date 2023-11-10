@@ -59,10 +59,6 @@ namespace Leap.Unity.PhysicalHands
         private Plane _palmPlane = new Plane();
         private Vector3[] _palmPoints = new Vector3[4];
         private Rigidbody[] _oldRigids = new Rigidbody[32];
-        private Collider[] _oldColliders = new Collider[32];
-
-        private Dictionary<Rigidbody, HashSet<Collider>> _colliderObjects = new Dictionary<Rigidbody, HashSet<Collider>>();
-        private Dictionary<Rigidbody, float> _objectDistances = new Dictionary<Rigidbody, float>();
 
         private Dictionary<Rigidbody, HashSet<Collider>> _hoverObjects = new Dictionary<Rigidbody, HashSet<Collider>>();
         public Dictionary<Rigidbody, HashSet<Collider>> HoverObjects => _hoverObjects;
@@ -136,8 +132,6 @@ namespace Leap.Unity.PhysicalHands
         #region Interaction Functions
         internal void ProcessColliderQueue(Collider[] colliderCache, int count)
         {
-            RemoveOldColliders(colliderCache, count);
-
             // Update the joint collider positions for cached checks, palm uses the collider directly
             if (IsPalm)
             {
@@ -166,38 +160,6 @@ namespace Leap.Unity.PhysicalHands
             IsBoneHovering = _hoverObjects.Count > 0;
             IsBoneContacting = _contactObjects.Count > 0;
             IsBoneReadyToGrab = _grabObjects.Count > 0;
-        }
-
-        private void RemoveOldColliders(Collider[] colliderCache, int count)
-        {
-            foreach (var rigid in _colliderObjects.Keys)
-            {
-                int oldColliderCount = 0;
-                foreach (var collider in _colliderObjects[rigid])
-                {
-                    if (!colliderCache.ContainsRange(collider, count))
-                    {
-                        _oldColliders[oldColliderCount] = collider;
-                        oldColliderCount++;
-                        if (oldColliderCount > _oldColliders.Length)
-                        {
-                            break;
-                        }
-                    }
-                }
-
-                for (int i = 0; i < oldColliderCount; i++)
-                {
-                    _colliderObjects[rigid].Remove(_oldColliders[i]);
-
-                    if (_oldColliders[i].attachedRigidbody != null)
-                    {
-                        _objectDirections[_oldColliders[i].attachedRigidbody].Remove(_oldColliders[i]);
-                        _hoverObjects[_oldColliders[i].attachedRigidbody].Remove(_oldColliders[i]);
-                        _contactObjects[_oldColliders[i].attachedRigidbody].Remove(_oldColliders[i]);
-                    }
-                }
-            }
         }
 
         private void UpdateObjectDistances(Collider[] colliderCache, int count)
@@ -317,16 +279,6 @@ namespace Leap.Unity.PhysicalHands
                         }
                     }
                 }
-
-                // Store the distance for the object
-                if (_objectDistances.ContainsKey(colliderPairs.Key))
-                {
-                    _objectDistances[colliderPairs.Key] = singleObjectDistance;
-                }
-                else
-                {
-                    _objectDistances.Add(colliderPairs.Key, singleObjectDistance);
-                }
             }
         }
 
@@ -411,7 +363,6 @@ namespace Leap.Unity.PhysicalHands
                 // Remove no longer hovering objects
                 _hoverObjects.Remove(_oldRigids[i]);
                 _objectDirections.Remove(_oldRigids[i]);
-                _objectDistances.Remove(_oldRigids[i]);
             }
 
             oldRigidCount = 0;

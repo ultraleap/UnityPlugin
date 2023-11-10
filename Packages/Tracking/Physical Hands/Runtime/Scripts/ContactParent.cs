@@ -47,29 +47,31 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
-        internal void UpdateFrame()
+        internal void UpdateFrame(Frame inputFrame)
         {
-            UpdateHand(PhysicalHandsManager._leftHandIndex, _leftHand, PhysicalHandsManager._leftDataHand);
-            UpdateHand(PhysicalHandsManager._rightHandIndex, _rightHand, PhysicalHandsManager._rightDataHand);
+            UpdateHand(PhysicalHandsManager._leftHandIndex, _leftHand, inputFrame);
+            UpdateHand(PhysicalHandsManager._rightHandIndex, _rightHand, inputFrame);
         }
 
-        private void UpdateHand(int index, ContactHand hand, Hand dataHand)
+        private void UpdateHand(int index, ContactHand hand, Frame inputFrame)
         {
             if (hand.IsHandPhysical && !Time.inFixedTimeStep)
             {
                 return;
             }
+
             if (index != -1)
             {
-                hand.dataHand.CopyFrom(dataHand);
+                hand.dataHand.CopyFrom(inputFrame.Hands[index]);
+
                 if (!hand.tracked)
                 {
-                    hand.BeginHand(dataHand);
+                    hand.BeginHand(hand.dataHand);
                 }
                 // Actually call the update once the hand is ready
                 if (hand.tracked)
                 {
-                    hand.UpdateHand(dataHand);
+                    hand.UpdateHand(hand.dataHand);
                 }
             }
             else
@@ -106,7 +108,7 @@ namespace Leap.Unity.PhysicalHands
                 }
                 else if(inputFrame.Hands.Count > 0)
                 {
-                    inputFrame.Hands.RemoveAt(index);
+                    inputFrame.Hands.Remove(inputFrame.Hands[index]);
                 }
             }
         }
@@ -122,16 +124,6 @@ namespace Leap.Unity.PhysicalHands
         /// Happens before the hands update is called.
         /// </summary>
         internal abstract void PostFixedUpdateFrameLogic();
-
-        internal void ProcessHandIntersection()
-        {
-
-        }
-
-        internal void ProcessHandOverlaps()
-        {
-
-        }
 
         protected virtual void OnValidate()
         {

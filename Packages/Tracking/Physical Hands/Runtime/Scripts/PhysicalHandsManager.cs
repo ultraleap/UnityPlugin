@@ -80,7 +80,6 @@ namespace Leap.Unity.PhysicalHands
 
         private WaitForFixedUpdate _postFixedUpdateWait = null;
 
-        internal Leap.Hand _leftDataHand = new Hand(), _rightDataHand = new Hand();
         internal int _leftHandIndex = -1, _rightHandIndex = -1;
 
         private Frame _modifiedFrame = new Frame();
@@ -154,7 +153,7 @@ namespace Leap.Unity.PhysicalHands
 
         internal void HandsInitiated()
         {
-            onHandsInitiated.Invoke();
+            onHandsInitiated?.Invoke();
         }
 
         private void ProcessFrame(Frame inputFrame)
@@ -170,18 +169,9 @@ namespace Leap.Unity.PhysicalHands
             }
 
             _leftHandIndex = inputFrame.Hands.FindIndex(x => x.IsLeft);
-            if (_leftHandIndex != -1)
-            {
-                _leftDataHand.CopyFrom(inputFrame.Hands[_leftHandIndex]);
-            }
-
             _rightHandIndex = inputFrame.Hands.FindIndex(x => x.IsRight);
-            if (_rightHandIndex != -1)
-            {
-                _rightDataHand.CopyFrom(inputFrame.Hands[_rightHandIndex]);
-            }
 
-            ContactParent?.UpdateFrame();
+            ContactParent?.UpdateFrame(inputFrame);
 
             _modifiedFrame.CopyFrom(inputFrame);
             ContactParent?.OutputFrame(ref _modifiedFrame);
