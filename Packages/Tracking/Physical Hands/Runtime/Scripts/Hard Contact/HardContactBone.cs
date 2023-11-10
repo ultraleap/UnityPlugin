@@ -580,7 +580,7 @@ namespace Leap.Unity.PhysicalHands
 
         private void InterpolateKnucklePosition(Bone knuckleBone, Leap.Hand leapHand, float deltaTime)
         {
-            if (ContactObjects.Count > 0)
+            if (IsBoneContacting)
             {
                 // Stop bones sizing if they're touching things
                 // Has the benefit of stopping small objects falling through bones
@@ -593,7 +593,7 @@ namespace Leap.Unity.PhysicalHands
 
         private void InterpolateBoneSize(Vector3 parentPosition, Quaternion parentRotation, Vector3 childPosition, float width, float length, float deltaTime)
         {
-            if (ContactObjects.Count > 0)
+            if (IsBoneContacting)
             {
                 // Stop bones sizing if they're touching things
                 // Has the benefit of stopping small objects falling through bones

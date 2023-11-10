@@ -570,8 +570,8 @@ namespace Leap.Unity.PhysicalHands
                             continue;
                         }
 
-                        // Don't compare against the same bone
-                        if (bone1 == bone2) continue;
+                        // Don't compare against the same finger
+                        if (bone1.finger == bone2.finger && bone1.contactHand == bone2.contactHand) continue;
 
                         if (bone2.GrabbableDirections.TryGetValue(_rigid, out var grabbableDirectionsB2))
                         {
