@@ -8,7 +8,7 @@ namespace Leap.Unity.PhysicalHands
     [System.Serializable]
     public class GrabHelperObject
     {
-        private const float GRAB_COOLDOWNTIME = 0.02f;
+        private const float THOWN_GRAB_COOLDOWNTIME = 0.5f;
         private const float MINIMUM_STRENGTH = 0.25f, MINIMUM_THUMB_STRENGTH = 0.2f;
         private const float REQUIRED_ENTRY_STRENGTH = 0.15f, REQUIRED_EXIT_STRENGTH = 0.05f, REQUIRED_THUMB_EXIT_STRENGTH = 0.1f, REQUIRED_PINCH_DISTANCE = 0.012f;
         private const float GRABBABLE_DIRECTIONS_DOT = -0.7f, FORWARD_DIRECTION_DOT = 0.25f;
@@ -39,7 +39,7 @@ namespace Leap.Unity.PhysicalHands
 
         private HashSet<ContactBone> _boneHash = new HashSet<ContactBone>();
 
-        private Dictionary<ContactHand, HashSet<ContactBone>[]> _bones = new Dictionary<ContactHand, HashSet<ContactBone>[]>();
+        private Dictionary<ContactHand, List<ContactBone>[]> _bones = new Dictionary<ContactHand, List<ContactBone>[]>();
 
         private List<ContactHand> _grabbingCandidates = new List<ContactHand>();
         private List<bool> _grabbingCandidatesContact = new List<bool>();
@@ -77,7 +77,7 @@ namespace Leap.Unity.PhysicalHands
         private GrabHelper _manager;
 
         private Rigidbody _rigid;
-        private List<Collider> _colliders = new List<Collider>();
+        private Collider[] _colliders;
 
         private Vector3 _newPosition;
         private Quaternion _newRotation;
@@ -86,12 +86,10 @@ namespace Leap.Unity.PhysicalHands
         private float _originalMass = 1f;
         internal float OriginalMass => _originalMass;
 
-        // This means we can have bones stay "attached" for a small amount of time
-        private List<ContactBone> _boneCooldownItems = new List<ContactBone>();
-        private List<float> _boneCooldownTime = new List<float>();
-
         internal bool Ignored;
         private IgnorePhysicalHands _ignorePhysicalHands;
+
+        float ignoreGrabTime = 0f;
 
         /// <summary>
         /// Returns true if the provided hand is grabbing an object.
@@ -151,7 +149,7 @@ namespace Leap.Unity.PhysicalHands
             {
                 _rigid.maxAngularVelocity = 100f;
             }
-            _colliders = rigid.GetComponentsInChildren<Collider>(true).ToList();
+            _colliders = rigid.GetComponentsInChildren<Collider>(true);
             HandleIgnoreContactHelper();
             _manager = manager;
         }
@@ -285,7 +283,7 @@ namespace Leap.Unity.PhysicalHands
                     if (_grabbingHands.Count > 0)
                     {
                         UpdateHandPositions();
-                        if (!Ignored)
+                        if (!Ignored && ignoreGrabTime < Time.time)
                         {
                             MoveObject();
                             ThrowingOnHold();
@@ -312,11 +310,12 @@ namespace Leap.Unity.PhysicalHands
             {
                 for (int i = 0; i < _bones[pair.Key].Length; i++)
                 {
-                    foreach (var bone in _bones[pair.Key][i])
+                    for(int j = 0; j < _bones[pair.Key][i].Count; j++)
                     {
-                        if (!bone.GrabbableObjects.Contains(_rigid))
+                        if (!_bones[pair.Key][i][j].GrabbableObjects.Contains(_rigid))
                         {
-                            AddBoneToCooldowns(bone);
+                            _bones[pair.Key][i].RemoveAt(j);
+                            j--;
                         }
                     }
                 }
@@ -329,30 +328,25 @@ namespace Leap.Unity.PhysicalHands
                     if (bone.GrabbableObjects.Contains(_rigid))
                     {
                         _boneHash.Add(bone);
-                        if (_bones.TryGetValue(bone.contactHand, out HashSet<ContactBone>[] storedBones))
+                        if (_bones.TryGetValue(bone.contactHand, out List<ContactBone>[] storedBones))
                         {
                             storedBones[bone.Finger].Add(bone);
-                            // Make sure we remove the bone from the cooldown if it's good again
-                            RemoveBoneFromCooldowns(bone);
                         }
                         else
                         {
-                            _bones.Add(bone.contactHand, new HashSet<ContactBone>[ContactHand.FINGERS + 1]);
+                            _bones.Add(bone.contactHand, new List<ContactBone>[ContactHand.FINGERS + 1]);
                             for (int i = 0; i < _bones[bone.contactHand].Length; i++)
                             {
-                                _bones[bone.contactHand][i] = new HashSet<ContactBone>();
+                                _bones[bone.contactHand][i] = new List<ContactBone>();
                                 if (bone.Finger == i)
                                 {
                                     _bones[bone.contactHand][i].Add(bone);
-                                    RemoveBoneFromCooldowns(bone);
                                 }
                             }
                         }
                     }
                 }
             }
-
-            UpdateRemovedBones();
 
             // Update the hand contact and hover events
             for (int i = 0; i < _grabbingCandidates.Count; i++)
@@ -393,27 +387,6 @@ namespace Leap.Unity.PhysicalHands
                 }
 
                 _grabbingCandidates[i].physicalHandsManager.OnHandHover(_rigid);
-            }
-        }
-
-        private void AddBoneToCooldowns(ContactBone bone)
-        {
-            int ind = _boneCooldownItems.IndexOf(bone);
-            // If we've found it then it's already cooling down.
-            if (ind == -1)
-            {
-                _boneCooldownItems.Add(bone);
-                _boneCooldownTime.Add(GRAB_COOLDOWNTIME);
-            }
-        }
-
-        private void RemoveBoneFromCooldowns(ContactBone bone)
-        {
-            int ind = _boneCooldownItems.IndexOf(bone);
-            if (ind != -1)
-            {
-                _boneCooldownItems.RemoveAt(ind);
-                _boneCooldownTime.RemoveAt(ind);
             }
         }
 
@@ -617,7 +590,11 @@ namespace Leap.Unity.PhysicalHands
 
         private void RegisterGrabbingHand(ContactHand hand)
         {
-            if (_grabbingHands.Contains(hand)) return;
+            if (ignoreGrabTime > Time.time)
+                return;
+
+            if (_grabbingHands.Contains(hand))
+                return;
 
             if (!Ignored)
             {
@@ -642,24 +619,6 @@ namespace Leap.Unity.PhysicalHands
             }
 
             hand.physicalHandsManager.OnHandGrab(_rigid);
-        }
-
-        private void UpdateRemovedBones()
-        {
-            for (int i = 0; i < _boneCooldownItems.Count; i++)
-            {
-                _boneCooldownTime[i] -= Time.fixedDeltaTime;
-                if (_boneCooldownTime[i] <= 0)
-                {
-                    if (_bones.ContainsKey(_boneCooldownItems[i].contactHand))
-                    {
-                        _bones[_boneCooldownItems[i].contactHand][_boneCooldownItems[i].Finger].Remove(_boneCooldownItems[i]);
-                    }
-                    _boneCooldownItems.RemoveAt(i);
-                    _boneCooldownTime.RemoveAt(i);
-                    i--;
-                }
-            }
         }
 
         private void UpdateGrabbingValues()
@@ -983,6 +942,8 @@ namespace Leap.Unity.PhysicalHands
             // Ensure that they are at least 4 frames to average
             if (_velocityQueue.Count < 4)
             {
+                _velocityQueue.Clear();
+
                 _rigid.velocity = Vector3.zero;
                 _rigid.angularVelocity = Vector3.zero;
                 return;
@@ -1024,25 +985,23 @@ namespace Leap.Unity.PhysicalHands
 
             averageVelocity = Vector3.ClampMagnitude(averageVelocity, MAX_THROW_VELOCITY);
 
-            if (averageVelocity.magnitude > 1.0f)
+            if (averageVelocity.magnitude > 0.5f)
             {
-                // We only want to apply the forces if we actually want to cause movement to the object
-                // We're still disabling collisions though to allow for the physics system to fully control if necessary
-                if (!Ignored)
+                // Check if we are safe to temporaily ignore collisions
+                if (_ignorePhysicalHands == null || !_ignorePhysicalHands.DisableAllHandCollisions)
                 {
-                    // Check if we are safe to temporaily ignore collisions
-                    if (_ignorePhysicalHands == null || !_ignorePhysicalHands.DisableAllHandCollisions)
+                    // Ignore collision after throwing so we don't knock the object
+                    foreach (var hand in _grabbingCandidates)
                     {
-                        // Ignore collision after throwing so we don't knock the object
-                        foreach (var hand in _grabbingCandidates)
-                        {
-                            hand.IgnoreCollision(_rigid, 0f, 0.005f);
-                        }
+                        hand.IgnoreCollision(_rigid, _colliders, 0, 0.01f);
                     }
 
-                    // Set the new velocty. Allow physics to solve for rotational change
-                    _rigid.velocity = averageVelocity;
+                    // Ignore Grabbing after throwing
+                    ignoreGrabTime = Time.time + THOWN_GRAB_COOLDOWNTIME;
                 }
+
+                // Set the new velocty. Allow physics to solve for rotational change
+                _rigid.velocity = averageVelocity;
             }
         }
 

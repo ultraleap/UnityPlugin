@@ -181,12 +181,12 @@ namespace Leap.Unity.PhysicalHands
         /// To take into account width, pass in the bone width
         /// </summary>
         /// <param name="bone">The bone to check if it is in</param>
-        /// <param name="colliders">A list of colliders representing the object to check</param>
+        /// <param name="colliders">An array of colliders representing the object to check</param>
         /// <param name="boneWidth">Optional width of the bone - if not passed, will default to 0</param>
         /// <returns></returns>
-        internal static bool IsBoneWithinObject(this Leap.Bone bone, List<Collider> colliders, float boneWidth = 0)
+        internal static bool IsBoneWithinObject(this Leap.Bone bone, Collider[] colliders, float boneWidth = 0)
         {
-            for (int i = 0; i < colliders.Count; i++)
+            for (int i = 0; i < colliders.Length; i++)
             {
                 if (colliders[i] == null)
                 {

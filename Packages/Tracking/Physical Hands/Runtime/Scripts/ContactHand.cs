@@ -303,7 +303,7 @@ namespace Leap.Unity.PhysicalHands
                     // TODO: Batch call the ignored objects to see if they appear in the hand data
                     if (_ignoredData[i].timeout <= 0 && !IsObjectInHandRadius(_ignoredData[i].rigid, _ignoredData[i].radius))
                     {
-                        TogglePhysicsIgnore(_ignoredData[i].rigid, false);
+                        TogglePhysicsIgnore(_ignoredData[i].rigid, _ignoredData[i].colliders, false);
                         i--;
                     }
                 }
@@ -311,14 +311,14 @@ namespace Leap.Unity.PhysicalHands
         }
 
         /// <summary>
-        /// Disables all collisions between a rigidbody and hand. Will automatically handle all colliders on the rigidbody. Timeout lets you specify a minimum time to ignore collisions for.
+        /// Disables all collisions between a rigidbody, its colliders and the contact hand. Will automatically handle all colliders on the rigidbody. Timeout lets you specify a minimum time to ignore collisions for.
         /// </summary>
-        public void IgnoreCollision(Rigidbody rigid, float timeout = 0, float radius = 0)
+        public void IgnoreCollision(Rigidbody rigid, Collider[] colliders, float timeout = 0, float radius = 0)
         {
-            TogglePhysicsIgnore(rigid, true, timeout, radius);
+            TogglePhysicsIgnore(rigid, colliders, true, timeout, radius);
         }
 
-        private void TogglePhysicsIgnore(Rigidbody rigid, bool ignore, float timeout = 0, float radius = 0)
+        private void TogglePhysicsIgnore(Rigidbody rigid, Collider[] colliders, bool ignore, float timeout = 0, float radius = 0)
         {
             // If the rigid has been destroyed we can't do anything
             if (rigid == null)
@@ -326,11 +326,15 @@ namespace Leap.Unity.PhysicalHands
                 return;
             }
 
-            Collider[] colliders = rigid.GetComponentsInChildren<Collider>(true);
-
             foreach (var collider in colliders)
             {
                 Physics.IgnoreCollision(collider, palmBone.palmCollider, ignore);
+
+                foreach (var palmEdgeCollider in palmBone.palmEdgeColliders)
+                {
+                    Physics.IgnoreCollision(collider, palmEdgeCollider, ignore);
+                }
+
                 foreach (var bone in bones)
                 {
                     Physics.IgnoreCollision(collider, bone.boneCollider, ignore);
