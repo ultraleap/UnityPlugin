@@ -37,7 +37,6 @@ namespace Leap.Unity.PhysicalHands
         }
         internal State GrabState { get; private set; } = State.Idle;
 
-        private HashSet<ContactBone> BoneHash => _boneHash;
         private HashSet<ContactBone> _boneHash = new HashSet<ContactBone>();
 
         private Dictionary<ContactHand, HashSet<ContactBone>[]> _bones = new Dictionary<ContactHand, HashSet<ContactBone>[]>();
@@ -556,13 +555,13 @@ namespace Leap.Unity.PhysicalHands
 
             int bone1Index = 0;
 
-            foreach (ContactBone bone1 in BoneHash)
+            foreach (ContactBone bone1 in _boneHash)
             {
                 if (bone1.GrabbableDirections.TryGetValue(_rigid, out var grabbableDirectionsB1))
                 {
                     int bone2Index = 0;
 
-                    foreach (ContactBone bone2 in BoneHash)
+                    foreach (ContactBone bone2 in _boneHash)
                     {
                         if (bone2Index < bone1Index) // Avoid double-checking the same index combinations
                         {
