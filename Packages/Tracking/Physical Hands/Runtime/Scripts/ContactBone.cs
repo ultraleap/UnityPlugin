@@ -33,6 +33,8 @@ namespace Leap.Unity.PhysicalHands
 
         #region Physics Data
 
+        private const int DISTANCE_CHECK_REDUCTION = 5; // How many fixed frames should we skip between distance checks
+
         #endregion
 
         #region Interaction Data
@@ -169,8 +171,17 @@ namespace Leap.Unity.PhysicalHands
             IsBoneReadyToGrab = _grabObjects.Count > 0;
         }
 
+        int frameReductionCounter = 0;
+
         private void UpdateObjectDistances(Collider[] colliderCache, int count)
         {
+            frameReductionCounter++;
+
+            if (frameReductionCounter % DISTANCE_CHECK_REDUCTION != 0)
+                return;
+
+            frameReductionCounter = 0;
+
             _nearestObjectDistance = float.MaxValue;
 
             float distance, singleObjectDistance, boneDistance;
