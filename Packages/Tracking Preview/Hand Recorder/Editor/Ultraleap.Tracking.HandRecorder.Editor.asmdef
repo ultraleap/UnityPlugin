@@ -1,0 +1,20 @@
+{
+    "name": "Ultraleap.Tracking.HandRecorder.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:db4e617c04f44c144bc19216a63dd19b",
+        "GUID:cec9848704c49724192ff47f9b3e9156",
+        "GUID:64ce740f48b320b4e8242e5923f8d0da"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
