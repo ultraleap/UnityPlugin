@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - LeapXRServiceProvider ensures default device offset mode is set to new defaults when enabled
+- (Pinch to Paint Example) Painting sound does not play if pinch began out of tracking range
 
 ### Known issues 
 - Use of the LeapCSharp Config class is unavailable with v5.X tracking service
