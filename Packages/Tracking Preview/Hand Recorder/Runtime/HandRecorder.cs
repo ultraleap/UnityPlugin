@@ -48,7 +48,7 @@ namespace Leap.Unity.Recording
         protected bool _lossyCompression = true;
 
         [Range(0, 3)]
-        public int frameSmoothing = 4;
+        public int frameSmoothing = 2;
 
         [Space, Header("Recording")]
         public KeyCode toggleRecordingKey = KeyCode.None;
