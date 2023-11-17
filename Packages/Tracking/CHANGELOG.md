@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - LeapXRServiceProvider ensures default device offset mode is set to new defaults when enabled
+- (Hand Binder) Hands begin at large/small scale and slowly scale to normal size
 
 ### Known issues
 - Repeatedly opening scenes can cause memory use increase
