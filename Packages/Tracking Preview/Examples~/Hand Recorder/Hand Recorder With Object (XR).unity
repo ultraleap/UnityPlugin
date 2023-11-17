@@ -448,6 +448,11 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 1625224805646936194, guid: 2bd8c93c1e2204c449902372b4643c08, type: 3}
   m_PrefabInstance: {fileID: 1886599092433864816}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &841760715 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2015374703930105234, guid: f7c36360fb485c441bedcca5b32bb16e, type: 3}
+  m_PrefabInstance: {fileID: 1367158965298880243}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &841760717 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6868690168729073294, guid: f7c36360fb485c441bedcca5b32bb16e, type: 3}
@@ -1469,28 +1474,88 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1142524349056613623, guid: 2bd8c93c1e2204c449902372b4643c08, type: 3}
+      propertyPath: OnRecordingStart.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1142524349056613623, guid: 2bd8c93c1e2204c449902372b4643c08, type: 3}
+      propertyPath: OnRecordingComplete.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1142524349056613623, guid: 2bd8c93c1e2204c449902372b4643c08, type: 3}
       propertyPath: onRecordingComplete.m_PersistentCalls.m_Calls.Array.size
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1142524349056613623, guid: 2bd8c93c1e2204c449902372b4643c08, type: 3}
+      propertyPath: OnRecordingStart.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 1142524349056613623, guid: 2bd8c93c1e2204c449902372b4643c08, type: 3}
+      propertyPath: OnRecordingStart.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 841760715}
+    - target: {fileID: 1142524349056613623, guid: 2bd8c93c1e2204c449902372b4643c08, type: 3}
+      propertyPath: OnRecordingComplete.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 1142524349056613623, guid: 2bd8c93c1e2204c449902372b4643c08, type: 3}
       propertyPath: onRecordingComplete.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1142524349056613623, guid: 2bd8c93c1e2204c449902372b4643c08, type: 3}
+      propertyPath: OnRecordingComplete.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 841760715}
+    - target: {fileID: 1142524349056613623, guid: 2bd8c93c1e2204c449902372b4643c08, type: 3}
+      propertyPath: OnRecordingStart.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1142524349056613623, guid: 2bd8c93c1e2204c449902372b4643c08, type: 3}
       propertyPath: onRecordingComplete.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 1142524349056613623, guid: 2bd8c93c1e2204c449902372b4643c08, type: 3}
+      propertyPath: OnRecordingStart.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: SetActive
+      objectReference: {fileID: 0}
+    - target: {fileID: 1142524349056613623, guid: 2bd8c93c1e2204c449902372b4643c08, type: 3}
+      propertyPath: OnRecordingComplete.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 1142524349056613623, guid: 2bd8c93c1e2204c449902372b4643c08, type: 3}
       propertyPath: onRecordingComplete.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 1142524349056613623, guid: 2bd8c93c1e2204c449902372b4643c08, type: 3}
+      propertyPath: OnRecordingComplete.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: SetActive
+      objectReference: {fileID: 0}
+    - target: {fileID: 1142524349056613623, guid: 2bd8c93c1e2204c449902372b4643c08, type: 3}
       propertyPath: onRecordingComplete.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: NewAnimationClip
       objectReference: {fileID: 0}
     - target: {fileID: 1142524349056613623, guid: 2bd8c93c1e2204c449902372b4643c08, type: 3}
+      propertyPath: OnRecordingStart.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: UnityEngine.GameObject, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 1142524349056613623, guid: 2bd8c93c1e2204c449902372b4643c08, type: 3}
+      propertyPath: OnRecordingComplete.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: UnityEngine.GameObject, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 1142524349056613623, guid: 2bd8c93c1e2204c449902372b4643c08, type: 3}
       propertyPath: onRecordingComplete.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
       value: Leap.Unity.Recording.HandRecordingPlaybackExample, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 1142524349056613623, guid: 2bd8c93c1e2204c449902372b4643c08, type: 3}
+      propertyPath: OnRecordingComplete.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_BoolArgument
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1142524349056613623, guid: 2bd8c93c1e2204c449902372b4643c08, type: 3}
+      propertyPath: OnRecordingStart.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 1142524349056613623, guid: 2bd8c93c1e2204c449902372b4643c08, type: 3}
+      propertyPath: OnRecordingComplete.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 1142524349056613623, guid: 2bd8c93c1e2204c449902372b4643c08, type: 3}
       propertyPath: onRecordingComplete.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName

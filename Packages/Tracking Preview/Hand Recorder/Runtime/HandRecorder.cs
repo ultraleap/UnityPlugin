@@ -13,6 +13,7 @@ using System.IO;
 using UnityEditor;
 using UnityEditor.Animations;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace Leap.Unity.Recording
 {
@@ -60,6 +61,9 @@ namespace Leap.Unity.Recording
 
         [Space, Header("Recording")]
         public KeyCode toggleRecordingKey = KeyCode.None;
+
+        public UnityEvent OnRecordingStart;
+        public UnityEvent<AnimationClip> OnRecordingComplete;
 
         public virtual bool shouldHaveCommonParent
         {
@@ -150,6 +154,8 @@ namespace Leap.Unity.Recording
             {
                 m_Recorder.BindComponentsOfType<Transform>(otherObj, true);
             }
+
+            OnRecordingStart?.Invoke();
 
             recording = true;
         }
@@ -253,6 +259,8 @@ namespace Leap.Unity.Recording
             }
 
             Debug.Log(completionMessage);
+
+            OnRecordingComplete?.Invoke(_targetClip);
 
             recording = false;
         }
