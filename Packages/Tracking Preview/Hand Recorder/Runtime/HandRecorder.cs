@@ -312,15 +312,7 @@ namespace Leap.Unity.Recording
             }
             else
             {
-                root = binder.BoundHand?.elbow?.boundTransform?.gameObject;
-
-                if (root == null)
-                    root = binder.BoundHand?.wrist?.boundTransform?.gameObject;
-
-                if (root == null)
-                {
-                    Debug.LogWarning("Hand Recorder: Unable to set " + chirality + " hand to record. The HandBinder has no suitable root");
-                }
+                root = binder.gameObject;
             }
 
             switch (chirality)
