@@ -53,6 +53,8 @@ namespace Leap.Unity.Recording
         private AnimationClip _targetClip;
         public AnimationClip targetClip;
 
+        private string fullClipPath;
+
         [SerializeField]
         protected bool _lossyCompression = true;
 
@@ -178,6 +180,8 @@ namespace Leap.Unity.Recording
                 fileIterator++;
             }
 
+            fullClipPath = fullPath;
+
             AssetDatabase.CreateAsset(newItem, fullPath);
             AssetDatabase.Refresh();
 
@@ -259,6 +263,11 @@ namespace Leap.Unity.Recording
             }
 
             Debug.Log(completionMessage);
+
+            if (automaticallyGenerateAnimationClip)
+            {
+                Debug.Log("Animation Clip saved to " + fullClipPath);
+            }
 
             OnRecordingComplete?.Invoke(_targetClip);
 
