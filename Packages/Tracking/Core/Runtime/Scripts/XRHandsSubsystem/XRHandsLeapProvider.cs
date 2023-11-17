@@ -185,12 +185,17 @@ namespace Leap.Unity
                     // Ignore thumb Metacarpal
                     if (fingerIndex == 0 && boneIndex == 0)
                     {
-                        var metacarpalPosition = joints[(int)XRHandJointID.ThumbMetacarpal].TryGetPose(out Pose thumbMetacarpalPose) ? thumbMetacarpalPose.position : Vector3.zero;
+                        var metacarpalPosition = joints[(int)XRHandJointID.ThumbProximal].TryGetPose(out Pose thumbProximalPose) ? thumbProximalPose.position : Vector3.zero;
+
+                        // Use the average of the thumb proximal to the wrist to account for XRHands not having suitable metacarpal positions
+                        metacarpalPosition += wristPose.position;
+                        metacarpalPosition /= 2;
+
                         hand.GetBone(boneIndex).Fill(
                             metacarpalPosition,
                             metacarpalPosition,
                             metacarpalPosition,
-                            thumbMetacarpalPose.forward,
+                            thumbProximalPose.forward,
                             0f,
                             joints[(int)XRHandJointID.ThumbMetacarpal].TryGetRadius(out float thumbMeracarpalRadius) ? thumbMeracarpalRadius * 2f : 0f,
                             (Bone.BoneType)boneIndex,
