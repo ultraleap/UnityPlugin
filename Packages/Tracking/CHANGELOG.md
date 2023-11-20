@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (Pose Detector) Add a new rule type to match rotation of a joint to a target
 - Help Menu that links out to docs, a place to report bugs & places to get support
 - (XR Hands) Added XRHandsLeapProvider to convert the current XRHandsSubsystem data to a LeapProvider for use with the Ultraleap Unity Plugin features
+- Added the ability to suppress the Android build warnings
 
 ### Changed
 - Changed from using obsolete FindObjectOfType to using newer implementations
