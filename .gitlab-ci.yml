@@ -3,24 +3,13 @@
 workflow:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-      when: always
-      allow_failure: false
-
     - if: '$CI_PIPELINE_SOURCE == "external_pull_request_event"'
-      when: always
-      allow_failure: false
-
     - if: $CI_COMMIT_BRANCH == "main"
-      when: always
-      allow_failure: false
-      
     - if: $CI_COMMIT_BRANCH == "develop"
       when: always
       allow_failure: false
 
-    - if: $CI_COMMIT_BRANCH
-      when: never
-      allow_failure: false
+    - when: never
 
 variables:
   UNITY_HUB: "C:/Program Files/Unity Hub/Unity Hub.exe"
