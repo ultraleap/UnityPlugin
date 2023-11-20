@@ -424,6 +424,121 @@ namespace Leap.Unity
             return hand.IsLeft ? Chirality.Left : Chirality.Right;
         }
 
+        // Magic numbers for palm width and PinchStrength calculation
+        private static readonly float[] DefaultMetacarpalLengths = { 0, 0.06812f, 0.06460f, 0.05800f, 0.05369f };
+
+        /// <summary>
+        /// Returns a relative scale to a default scale. Can be used to calculate palm width and pinch strength
+        /// </summary>
+        public static float CalculateHandScale(ref Hand hand)
+        {
+            // Iterate through the fingers, skipping the thumb and accumulate the scale.
+            float scale = 0.0f;
+            for (var i = 1; i < hand.Fingers.Count; ++i)
+            {
+                scale += (hand.Fingers[i].Bone(Bone.BoneType.TYPE_METACARPAL).Length / DefaultMetacarpalLengths[i]) / 4.0f;
+            }
+
+            return scale;
+        }
+       
+        /// <summary>
+        /// Returns a pinch strength for the hand based on the provided joint data. Value ranges from 0 to 1 where 1 is fully pinched.
+        /// 
+        /// Only use this where the pinch strength has not already been provided. Alternatively, use the provided Hand.PinchStrength.
+        /// </summary>
+        public static float CalculatePinchStrength(ref Hand hand)
+        {
+            // Get the thumb position.
+            Vector3 thumbTipPosition = hand.GetThumb().TipPosition;
+
+            // Compute the distance midpoints between the thumb and the each finger and find the smallest.
+            float minDistanceSquared = float.MaxValue;
+
+            // Iterate through the fingers, skipping the thumb.
+            for (var i = 1; i < hand.Fingers.Count; ++i)
+            {
+                float distanceSquared = (hand.Fingers[i].TipPosition - thumbTipPosition).sqrMagnitude;
+                minDistanceSquared = Mathf.Min(distanceSquared, minDistanceSquared);
+            }
+
+            float scale = CalculateHandScale(ref hand);
+
+            // Compute the pinch strength. Magic values taken from existing LeapC implementation (scaled to metres)
+            float distanceZero = 0.0600f * scale;
+            float distanceOne = 0.0220f * scale;
+            return Mathf.Clamp01((Mathf.Sqrt(minDistanceSquared) - distanceZero) / (distanceOne - distanceZero));
+        }
+
+        /// <summary>
+        /// Returns a pinch distance (in mm) for the hand based on the provided joint data.
+        /// 
+        /// Only use this where the pinch distance has not already been provided. Alternatively, use the provided Hand.PinchDistance.
+        /// </summary>
+        public static float CalculatePinchDistance(ref Hand hand)
+        {
+            // Get the farthest 2 segments of thumb and index finger, respectively, and compute distances.
+            float minDistanceSquared = float.MaxValue;
+            for (var thumbBoneIndex = 2; thumbBoneIndex < hand.GetThumb().bones.Length; ++thumbBoneIndex)
+            {
+                for (var indexBoneIndex = 2; indexBoneIndex < hand.GetIndex().bones.Length; ++indexBoneIndex)
+                {
+                    var distanceSquared = CalculateBoneDistanceSquared(
+                        hand.GetThumb().bones[thumbBoneIndex],
+                        hand.GetIndex().bones[indexBoneIndex]);
+                    minDistanceSquared = Mathf.Min(distanceSquared, minDistanceSquared);
+                }
+            }
+
+            // Return the pinch distance, converted to millimeters to match other providers.
+            return Mathf.Sqrt(minDistanceSquared) * 1000.0f;
+        }
+
+        static float CalculateBoneDistanceSquared(Bone boneA, Bone boneB)
+        {
+            // Denormalize directions to bone length.
+            Vector3 boneAJoint = boneA.PrevJoint;
+            Vector3 boneBJoint = boneB.PrevJoint;
+            Vector3 boneADirection = boneA.Direction * boneA.Length;
+            Vector3 boneBDirection = boneB.Direction * boneB.Length;
+
+            // Compute the minimum (squared) distance between two bones.
+            Vector3 diff = boneBJoint - boneAJoint;
+            float d1 = Vector3.Dot(boneADirection, diff);
+            float d2 = Vector3.Dot(boneBDirection, diff);
+            float a = boneADirection.sqrMagnitude;
+            float b = Vector3.Dot(boneADirection, boneBDirection);
+            float c = boneBDirection.sqrMagnitude;
+            float det = b * b - a * c;
+            float t1 = Mathf.Clamp01((b * d2 - c * d1) / det);
+            float t2 = Mathf.Clamp01((a * d2 - b * d1) / det);
+            Vector3 pa = boneAJoint + t1 * boneADirection;
+            Vector3 pb = boneBJoint + t2 * boneBDirection;
+            return (pa - pb).sqrMagnitude;
+        }
+
+        /// <summary>
+        /// Returns a grab strength for the hand based on the provided joint data. Value ranges from 0 to 1 where 1 is fully grabbed.
+        /// 
+        /// Only use this where the grab strength has not already been provided. Alternatively, use the provided Hand.GrabStrength.
+        /// </summary>
+        public static float CalculateGrabStrength(ref Hand hand)
+        {
+            // magic numbers so it approximately lines up with the leap results
+            const float bendZero = 0.25f;
+            const float bendOne = 0.85f;
+
+            // Find the minimum bend angle for the non-thumb fingers.
+            float minBend = float.MaxValue;
+            for (int finger_idx = 1; finger_idx < 5; finger_idx++)
+            {
+                minBend = Mathf.Min(hand.GetFingerStrength(finger_idx), minBend);
+            }
+
+            // Return the grab strength.
+            return Mathf.Clamp01((minBend - bendZero) / (bendOne - bendZero));
+        }
+
         /// <summary>
         /// Returns an unsmoothed ray representing the general reaching/interaction intent direction.
         /// </summary>
