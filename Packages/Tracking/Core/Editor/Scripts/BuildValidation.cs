@@ -1,6 +1,5 @@
 using Leap.Unity;
 using System;
-using System.Diagnostics;
 using UnityEditor;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
@@ -25,14 +24,19 @@ public class BuildValidation : IPreprocessBuildWithReport
 
     private void AndroidBuild()
     {
-        if (!UltraleapSettings.Instance.showAndroidBuildArchitectureWarning)
-            return;
-
         if (PlayerSettings.Android.targetArchitectures != AndroidArchitecture.ARM64) // Must be only arm64 so direct equality check, not checking for IL2CPP explicitly because it's required to select ARM64 anyway...
         {
-            DoValidationPopup($"Target architecture for an Android build including Ultraleap hand tracking must be ARM64.{Environment.NewLine}" +
-                              $"To fix this, go to 'Edit -> Project Settings -> Player -> Other Settings -> Configuration'.{Environment.NewLine}" +
-                              "Set 'Scripting Backend' to 'IL2CPP' and 'Target Architectures' to only 'ARM64'.", ValidationPopupType.ANDROID_ARCHITECTURE);
+            if (!UltraleapSettings.Instance.showAndroidBuildArchitectureWarning)
+            {
+                UnityEngine.Debug.Log("Some Ultraleap Android architecture build warnings are being muted. To unmute, re-enable in the Ultraleap Settings tab in the Project panel");
+                return;
+            }
+            else
+            {
+                DoValidationPopup($"Target architecture for an Android build including Ultraleap hand tracking must be ARM64.{Environment.NewLine}" +
+                                  $"To fix this, go to 'Edit -> Project Settings -> Player -> Other Settings -> Configuration'.{Environment.NewLine}" +
+                                  "Set 'Scripting Backend' to 'IL2CPP' and 'Target Architectures' to only 'ARM64'.", ValidationPopupType.ANDROID_ARCHITECTURE);
+            }
         }
     }
 
