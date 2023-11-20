@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - LeapXRServiceProvider ensures default device offset mode is set to new defaults when enabled
 - Attachment Hand Menu is incorrectly rotated
 - (Hand Binder) Hands begin at large/small scale and slowly scale to normal size
+- (Pinch to Paint Example) Painting sound does not play if pinch began out of tracking range
 
 ### Known issues
 - Repeatedly opening scenes can cause memory use increase
