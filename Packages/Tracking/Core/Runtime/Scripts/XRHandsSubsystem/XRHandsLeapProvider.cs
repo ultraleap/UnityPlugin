@@ -18,6 +18,9 @@ using UnityEngine.XR.Hands.Processing;
 
 namespace Leap.Unity
 {
+    /// <summary>
+    /// A LeapProvider that converts XRHands Subsystem data to a Leap.Frame for use in features that use Leap.Frame and LeapProviders as a data source.
+    /// </summary>
     public class XRHandsLeapProvider : LeapProvider
     {
         XRHandSubsystem currentSubsystem;
