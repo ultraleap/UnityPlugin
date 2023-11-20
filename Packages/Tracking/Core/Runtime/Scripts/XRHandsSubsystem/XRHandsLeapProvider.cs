@@ -35,9 +35,6 @@ namespace Leap.Unity
         private long _leftHandFirstSeen_ticks;
         private long _rightHandFirstSeen_ticks;
 
-        // Magic numbers for palm width and PinchStrength calculation
-        private static readonly float[] DefaultMetacarpalLengths = { 0, 0.06812f, 0.06460f, 0.05800f, 0.05369f };
-
         // Correction for the 0th thumb bone rotation offsets to match LeapC
         private static readonly Quaternion[] ThumbMetacarpalRotationOffset =
         {
@@ -250,7 +247,7 @@ namespace Leap.Unity
 
             // Populate the whole hand information.
             // NOTE: Ordering is important as some of the `Calculate*` functions requires some of this data to be set.
-            float handScale = CalculateHandScale(ref hand); // Requires fingers to be set.
+            float handScale = Hands.CalculateHandScale(ref hand); // Requires fingers to be set.
             hand.FrameId = _frameId;
             hand.Id = chirality == Chirality.Left ? _leftHandId : _rightHandId;
             hand.Confidence = 1.0f;
@@ -269,9 +266,9 @@ namespace Leap.Unity
 
             // Calculate now we have the hand data available.
             // Requires `Hand.Rotation` and fingers to be set.
-            hand.GrabStrength = CalculateGrabStrength(ref hand);
-            hand.PinchStrength = CalculatePinchStrength(ref hand, handScale);
-            hand.PinchDistance = CalculatePinchDistance(ref hand);
+            hand.GrabStrength = Hands.CalculateGrabStrength(ref hand);
+            hand.PinchStrength = Hands.CalculatePinchStrength(ref hand);
+            hand.PinchDistance = Hands.CalculatePinchDistance(ref hand);
 
             // Other hand-properties are derived.
             hand.PalmNormal = hand.Rotation * Vector3.down;
@@ -323,98 +320,6 @@ namespace Leap.Unity
             }
 
             return timeVisible;
-        }
-
-        private float CalculateHandScale(ref Hand hand)
-        {
-            // Iterate through the fingers, skipping the thumb and accumulate the scale.
-            float scale = 0.0f;
-            for (var i = 1; i < hand.Fingers.Count; ++i)
-            {
-                scale += (hand.Fingers[i].Bone(Bone.BoneType.TYPE_METACARPAL).Length / DefaultMetacarpalLengths[i]) / 4.0f;
-            }
-
-            return scale;
-        }
-
-        private float CalculatePinchStrength(ref Hand hand, float handScale)
-        {
-            // Get the thumb position.
-            var thumbTipPosition = hand.GetThumb().TipPosition;
-
-            // Compute the distance midpoints between the thumb and the each finger and find the smallest.
-            var minDistanceSquared = float.MaxValue;
-
-            // Iterate through the fingers, skipping the thumb.
-            for (var i = 1; i < hand.Fingers.Count; ++i)
-            {
-                var distanceSquared = (hand.Fingers[i].TipPosition - thumbTipPosition).sqrMagnitude;
-                minDistanceSquared = Mathf.Min(distanceSquared, minDistanceSquared);
-            }
-
-            // Compute the pinch strength. Magic values taken from existing LeapC implementation (scaled to metres)
-            float distanceZero = 0.0600f * handScale;
-            float distanceOne = 0.0220f * handScale;
-            return Mathf.Clamp01((Mathf.Sqrt(minDistanceSquared) - distanceZero) / (distanceOne - distanceZero));
-        }
-
-        private float CalculateBoneDistanceSquared(Bone boneA, Bone boneB)
-        {
-            // Denormalize directions to bone length.
-            var boneAJoint = boneA.PrevJoint;
-            var boneBJoint = boneB.PrevJoint;
-            var boneADirection = boneA.Direction * boneA.Length;
-            var boneBDirection = boneB.Direction * boneB.Length;
-
-            // Compute the minimum (squared) distance between two bones.
-            var diff = boneBJoint - boneAJoint;
-            var d1 = Vector3.Dot(boneADirection, diff);
-            var d2 = Vector3.Dot(boneBDirection, diff);
-            var a = boneADirection.sqrMagnitude;
-            var b = Vector3.Dot(boneADirection, boneBDirection);
-            var c = boneBDirection.sqrMagnitude;
-            var det = b * b - a * c;
-            var t1 = Mathf.Clamp01((b * d2 - c * d1) / det);
-            var t2 = Mathf.Clamp01((a * d2 - b * d1) / det);
-            var pa = boneAJoint + t1 * boneADirection;
-            var pb = boneBJoint + t2 * boneBDirection;
-            return (pa - pb).sqrMagnitude;
-        }
-
-        private float CalculatePinchDistance(ref Hand hand)
-        {
-            // Get the farthest 2 segments of thumb and index finger, respectively, and compute distances.
-            var minDistanceSquared = float.MaxValue;
-            for (var thumbBoneIndex = 2; thumbBoneIndex < hand.GetThumb().bones.Length; ++thumbBoneIndex)
-            {
-                for (var indexBoneIndex = 2; indexBoneIndex < hand.GetIndex().bones.Length; ++indexBoneIndex)
-                {
-                    var distanceSquared = CalculateBoneDistanceSquared(
-                        hand.GetThumb().bones[thumbBoneIndex],
-                        hand.GetIndex().bones[indexBoneIndex]);
-                    minDistanceSquared = Mathf.Min(distanceSquared, minDistanceSquared);
-                }
-            }
-
-            // Return the pinch distance, converted to millimeters to match other providers.
-            return Mathf.Sqrt(minDistanceSquared) * 1000.0f;
-        }
-
-        float CalculateGrabStrength(ref Hand hand)
-        {
-            // magic numbers so it approximately lines up with the leap results
-            const float bendZero = 0.25f;
-            const float bendOne = 0.85f;
-
-            // Find the minimum bend angle for the non-thumb fingers.
-            float minBend = float.MaxValue;
-            for (int finger_idx = 1; finger_idx < 5; finger_idx++)
-            {
-                minBend = Mathf.Min(hand.GetFingerStrength(finger_idx), minBend);
-            }
-
-            // Return the grab strength.
-            return Mathf.Clamp01((minBend - bendZero) / (bendOne - bendZero));
         }
 
         #region LeapProvider Implementation
