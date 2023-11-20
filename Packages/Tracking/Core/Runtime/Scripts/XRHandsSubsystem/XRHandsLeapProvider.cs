@@ -156,8 +156,15 @@ namespace Leap.Unity
 
             Chirality chirality = xrhand.handedness == UnityEngine.XR.Hands.Handedness.Left ? Chirality.Left : Chirality.Right;
 
-            joints[0].TryGetPose(out Pose wristPose);
-            joints[1].TryGetPose(out Pose palmPose);
+            if(!joints[0].TryGetPose(out Pose wristPose))
+            {
+                return;
+            }
+
+            if(!joints[1].TryGetPose(out Pose palmPose))
+            {
+                return;
+            }
 
             joints[1].TryGetLinearVelocity(out Vector3 palmLinearVelocity);
 
