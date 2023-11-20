@@ -58,14 +58,16 @@ namespace Leap.Unity.Recording
         [SerializeField]
         protected bool _lossyCompression = true;
 
-        [Range(0, 3)]
-        public int frameSmoothing = 2;
+        [Range(5, 60)]
+        public int captureFramerate = 15;
 
         [Space, Header("Recording")]
         public KeyCode toggleRecordingKey = KeyCode.None;
 
         public UnityEvent OnRecordingStart;
         public UnityEvent<AnimationClip> OnRecordingComplete;
+
+        float nextCaptureTime = 0;
 
         public virtual bool shouldHaveCommonParent
         {
@@ -160,6 +162,7 @@ namespace Leap.Unity.Recording
             OnRecordingStart?.Invoke();
 
             recording = true;
+            nextCaptureTime = Time.time + (1 / captureFramerate);
         }
 
         void MakeAnimaitonClipAsset()
@@ -183,6 +186,7 @@ namespace Leap.Unity.Recording
             fullClipPath = fullPath;
 
             AssetDatabase.CreateAsset(newItem, fullPath);
+            AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
 
             _targetClip = newItem;
@@ -195,10 +199,11 @@ namespace Leap.Unity.Recording
                 return;
             }
 
-            if (recording)
+            if (recording && Time.time >= nextCaptureTime)
             {
                 // Take a snapshot and record all the bindings values for this frame.
                 m_Recorder.TakeSnapshot(Time.deltaTime);
+                nextCaptureTime = Time.time + (1 / captureFramerate);
             }
         }
 
@@ -206,33 +211,22 @@ namespace Leap.Unity.Recording
         {
             var filterOptions = new CurveFilterOptions
             {
-                keyframeReduction = true
+                keyframeReduction = true,
+                positionError = 1f,
+                rotationError = 0.5f,
+                scaleError = 1f,
+                floatError = 1f,
             };
 
             if (_lossyCompression)
             {
-                filterOptions.positionError = .5f;
-                filterOptions.rotationError = .5f;
-                filterOptions.scaleError = .5f;
-                filterOptions.floatError = .5f;
+                m_Recorder.SaveToClip(_targetClip, captureFramerate, filterOptions);
             }
-
-            int fps = 60;
-
-            switch (frameSmoothing)
+            else
             {
-                case 1:
-                    fps = 30;
-                    break;
-                case 2:
-                    fps = 15;
-                    break;
-                case 3:
-                    fps = 6;
-                    break;
+                m_Recorder.SaveToClip(_targetClip, captureFramerate);
             }
 
-            m_Recorder.SaveToClip(_targetClip, fps, filterOptions);
             FilterClip(_targetClip);
 
             m_Recorder.ResetRecording();
