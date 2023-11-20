@@ -37,6 +37,13 @@ namespace Leap
             CreatePrefab("Service Provider (OpenXR)");
         }
 
+        [MenuItem("GameObject/Ultraleap/Tracking/XRHands Leap Provider", false, 33),
+            MenuItem("Ultraleap/Tracking/XRHands Leap Provider", false, 33)]
+        public static void CreateXRHandsLeapProvider()
+        {
+            CreatePrefab("XRHands Leap Provider");
+        }
+
         [MenuItem("GameObject/Ultraleap/Tracking/Service Provider (Desktop)", false, 45),
             MenuItem("Ultraleap/Tracking/Service Provider (Desktop)", false, 45)]
         public static void CreateServiceProviderDesktop()

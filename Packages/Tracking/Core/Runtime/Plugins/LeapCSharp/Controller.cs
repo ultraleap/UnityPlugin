@@ -43,7 +43,6 @@ namespace Leap
         bool _disposed = false;
         bool _supportsMultipleDevices = true;
         string _serverNamespace = "Leap Service";
-        Config _config;
 
         /// <summary>
         /// The SynchronizationContext used for dispatching events.
@@ -871,13 +870,12 @@ namespace Leap
         /// 
         /// @since 1.0
         /// </summary>
+        [Obsolete("Config.cs is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
         public Config Config
         {
             get
             {
-                if (_config == null)
-                    _config = new Config(this._connection.ConnectionKey);
-                return _config;
+                return null;
             }
         }
 
