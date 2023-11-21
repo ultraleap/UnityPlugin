@@ -342,6 +342,13 @@ namespace Leap.Unity
                 Camera.onPreCull += onPreCull;
             }
 
+
+            // Ensure the default values are up to date by re-firing the property setter
+            if (deviceOffsetMode == DeviceOffsetMode.Default)
+            {
+                deviceOffsetMode = DeviceOffsetMode.Default;
+            }
+
 #if UNITY_ANDROID
             base.OnEnable();
 #endif

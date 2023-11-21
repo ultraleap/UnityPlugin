@@ -22,7 +22,7 @@
     "versionDefines": [
         {
             "name": "com.unity.xr.hands",
-            "expression": "1.1.0",
+            "expression": "1.2.1",
             "define": "XR_XRHAND_ENABLED"
         },
         {

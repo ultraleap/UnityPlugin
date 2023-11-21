@@ -179,6 +179,7 @@ namespace Leap
     /// Provides the configuration key, whether the change was successful, and the id of the original change request.
     /// @since 3.0
     /// </summary>
+    [Obsolete("Config.cs is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
     public class SetConfigResponseEventArgs : LeapEventArgs
     {
         public SetConfigResponseEventArgs(string config_key, Config.ValueType dataType, object value, uint requestId) : base(LeapEvent.EVENT_CONFIG_RESPONSE)

@@ -80,6 +80,16 @@ namespace Leap.Unity
             }
             EditorGUILayout.Space(30);
 
+            EditorGUILayout.LabelField("Notifications", EditorStyles.boldLabel);
+            using (new EditorGUI.IndentLevelScope())
+            {
+                SerializedProperty showAndroidBuildArchitectureWarning = settings.FindProperty("showAndroidBuildArchitectureWarning");
+                showAndroidBuildArchitectureWarning.boolValue = EditorGUILayout.ToggleLeft("Show Android Architecture build warning", showAndroidBuildArchitectureWarning.boolValue);
+            }
+
+
+            EditorGUILayout.Space(30);
+
             if (GUILayout.Button("Reset To Defaults"))
             {
                 if (EditorUtility.DisplayDialog("Reset all settings", "This will reset all settings in this Ultraleap settings file", "Yes", "No"))
@@ -108,6 +118,7 @@ namespace Leap.Unity
             set { instance = value; }
         }
 
+        // XRHands and Input System
         [HideInInspector, SerializeField]
         public bool leapSubsystemEnabled;
 
@@ -116,6 +127,9 @@ namespace Leap.Unity
 
         [HideInInspector, SerializeField]
         public bool updateMetaInputSystem;
+
+        [HideInInspector, SerializeField]
+        public bool showAndroidBuildArchitectureWarning = true;
 
         public void ResetToDefaults()
         {
