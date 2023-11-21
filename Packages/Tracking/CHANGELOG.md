@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Help Menu that links out to docs, a place to report bugs & places to get support
 - (XR Hands) Added XRHandsLeapProvider to convert the current XRHandsSubsystem data to a LeapProvider for use with the Ultraleap Unity Plugin features
 - Added the ability to suppress the Android build warnings
+- (Hands Recorder Preview) A new Hand Recorder to record animation clips of hands and additional objects to produce re-playable actions (e.g for tutorials)
 
 ### Changed
 - Changed from using obsolete FindObjectOfType to using newer implementations
