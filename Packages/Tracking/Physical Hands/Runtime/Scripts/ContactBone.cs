@@ -378,11 +378,11 @@ namespace Leap.Unity.PhysicalHands
             for (int i = 0; i < oldRigidCount; i++)
             {
                 // Remove no longer contacting objects
-                _nearbyObjects.TryGetValue(_oldRigids[i], out Dictionary<Collider, ClosestColliderDirection> disposePoolObj);
-
-                disposePoolObj.Clear();
-                Pool<Dictionary<Collider, ClosestColliderDirection>>.Recycle(disposePoolObj);
-
+                if(_nearbyObjects.TryGetValue(_oldRigids[i], out Dictionary<Collider, ClosestColliderDirection> disposePoolObj));
+                {
+                    disposePoolObj.Clear();
+                    Pool<Dictionary<Collider, ClosestColliderDirection>>.Recycle(disposePoolObj);
+                }
                 _nearbyObjects.Remove(_oldRigids[i]);
                 _grabObjects.Remove(_oldRigids[i]);
 
