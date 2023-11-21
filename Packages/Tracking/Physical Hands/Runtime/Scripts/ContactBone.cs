@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -67,13 +66,13 @@ namespace Leap.Unity.PhysicalHands
         ///<summary>
         /// Dictionary of dictionaries of the directions from this bone to a grabbable object's colliders
         ///</summary>
-        private Dictionary<Rigidbody, Dictionary<Collider, ClosestColliderDirection>> _nearbyObjects = new Dictionary<Rigidbody, Dictionary<Collider, ClosestColliderDirection>>();
+        private Dictionary<Rigidbody, Dictionary<Collider, ClosestColliderDirection>> _nearbyObjects = new Dictionary<Rigidbody, Dictionary<Collider, ClosestColliderDirection>>(30);
         internal Dictionary<Rigidbody, Dictionary<Collider, ClosestColliderDirection>> NearbyObjects => _nearbyObjects;
 
         ///<summary>
         /// Dictionary of dictionaries of the directions from this bone to a grabbable object's colliders
         ///</summary>
-        private Dictionary<Rigidbody, Dictionary<Collider, ClosestColliderDirection>> _grabbableDirections = new Dictionary<Rigidbody, Dictionary<Collider, ClosestColliderDirection>>();
+        private Dictionary<Rigidbody, Dictionary<Collider, ClosestColliderDirection>> _grabbableDirections = new Dictionary<Rigidbody, Dictionary<Collider, ClosestColliderDirection>>(10);
         internal Dictionary<Rigidbody, Dictionary<Collider, ClosestColliderDirection>> GrabbableDirections => _grabbableDirections;
 
 
@@ -254,30 +253,29 @@ namespace Leap.Unity.PhysicalHands
                         }
                         else
                         {
+                            ClosestColliderDirection closestColliderDirectionPoolObj = Pool<ClosestColliderDirection>.Spawn();
+                            closestColliderDirectionPoolObj.isContactingCollider = contacting;
+                            closestColliderDirectionPoolObj.direction = direction;
+                            closestColliderDirectionPoolObj.bonePos = bonePos + (direction * width);
+                            closestColliderDirectionPoolObj.distance = boneDistance;
+
                             _nearbyObjects[collider.attachedRigidbody].Add(
-                                collider,
-                                new ClosestColliderDirection()
-                                {
-                                    isContactingCollider = contacting,
-                                    bonePos = bonePos + (direction * width),
-                                    direction = direction,
-                                    distance = boneDistance
-                                });
+                                collider, closestColliderDirectionPoolObj);
                         }
                     }
                     else
                     {
-                        _nearbyObjects.Add(collider.attachedRigidbody, new Dictionary<Collider, ClosestColliderDirection>());
+                        Dictionary<Collider, ClosestColliderDirection> colliderDictPoolObj = Pool<Dictionary<Collider, ClosestColliderDirection>>.Spawn();
+                        _nearbyObjects.Add(collider.attachedRigidbody, colliderDictPoolObj);
+
+                        ClosestColliderDirection closestColliderDirectionPoolObj = Pool<ClosestColliderDirection>.Spawn();
+                        closestColliderDirectionPoolObj.isContactingCollider = contacting;
+                        closestColliderDirectionPoolObj.direction = direction;
+                        closestColliderDirectionPoolObj.bonePos = bonePos + (direction * width);
+                        closestColliderDirectionPoolObj.distance = boneDistance;
 
                         _nearbyObjects[collider.attachedRigidbody].Add(
-                            collider,
-                            new ClosestColliderDirection()
-                            {
-                                isContactingCollider = contacting,
-                                bonePos = bonePos + (direction * width),
-                                direction = direction,
-                                distance = boneDistance
-                            });
+                            collider, closestColliderDirectionPoolObj);
                     }
                 }
                 else
@@ -380,8 +378,15 @@ namespace Leap.Unity.PhysicalHands
             for (int i = 0; i < oldRigidCount; i++)
             {
                 // Remove no longer contacting objects
+                _nearbyObjects.TryGetValue(_oldRigids[i], out Dictionary<Collider, ClosestColliderDirection> disposePoolObj);
+
+                disposePoolObj.Clear();
+                Pool<Dictionary<Collider, ClosestColliderDirection>>.Recycle(disposePoolObj);
+
                 _nearbyObjects.Remove(_oldRigids[i]);
                 _grabObjects.Remove(_oldRigids[i]);
+
+
             }
         }
 
