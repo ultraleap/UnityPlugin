@@ -8,7 +8,6 @@
 
 #if UNITY_EDITOR
 
-using Leap.Unity.HandsModule;
 using System.IO;
 using UnityEditor;
 using UnityEditor.Animations;
@@ -53,10 +52,8 @@ namespace Leap.Unity.Recording
         private AnimationClip _targetClip;
         public AnimationClip targetClip;
 
-        private string fullClipPath;
-
         [SerializeField]
-        protected bool _lossyCompression = true;
+        public bool _lossyCompression = true;
 
         [Range(5, 60)]
         public int captureFramerate = 15;
@@ -67,38 +64,14 @@ namespace Leap.Unity.Recording
         public UnityEvent OnRecordingStart;
         public UnityEvent<AnimationClip> OnRecordingComplete;
 
-        float nextCaptureTime = 0;
+        private float nextCaptureTime = 0;
+        private string fullClipPath;
 
-        public virtual bool shouldHaveCommonParent
+        private void OnDisable()
         {
-            get
+            if (recording)
             {
-                if (rightHandBoneRoot != null) return true;
-
-                if (additionalObjects.Length == 0) return false;
-
-                var secondaryIsEmpty = true;
-
-                foreach (GameObject secondary in additionalObjects)
-                {
-                    if (secondary != null)
-                    {
-                        secondaryIsEmpty = false;
-                    }
-                }
-
-                return !secondaryIsEmpty;
-            }
-        }
-
-        public void OnDisable()
-        {
-            if (_targetClip == null)
-                return;
-
-            if (m_Recorder && m_Recorder.isRecording)
-            {
-                m_Recorder.SaveToClip(_targetClip);
+                EndRecording();
             }
         }
 
@@ -120,16 +93,11 @@ namespace Leap.Unity.Recording
                 AutoSelectHandRoots();
             }
 
-            if (shouldHaveCommonParent && !AreObjectsChildren())
+            if(automaticallyGenerateAnimationClip)
             {
-                Debug.LogError("Could not start a Hand Recording - had multiple elements to record " +
-                                    "with no common parent!");
-                return;
+                MakeAnimaitonClipAsset();
             }
-
-            _targetClip = null;
-
-            if (!automaticallyGenerateAnimationClip)
+            else
             {
                 _targetClip = targetClip;
             }
@@ -165,7 +133,7 @@ namespace Leap.Unity.Recording
             nextCaptureTime = Time.time + (1 / captureFramerate);
         }
 
-        void MakeAnimaitonClipAsset()
+        private void MakeAnimaitonClipAsset()
         {
             AnimationClip newItem = new AnimationClip(); ;
 
@@ -192,7 +160,7 @@ namespace Leap.Unity.Recording
             _targetClip = newItem;
         }
 
-        public void LateUpdate()
+        private void LateUpdate()
         {
             if (_targetClip == null)
             {
@@ -268,7 +236,7 @@ namespace Leap.Unity.Recording
             recording = false;
         }
 
-        void FilterClip(AnimationClip clip)
+        private void FilterClip(AnimationClip clip)
         {
             foreach (var bind in AnimationUtility.GetCurveBindings(clip))
             {
@@ -283,47 +251,47 @@ namespace Leap.Unity.Recording
             }
         }
 
-        public void AutoSelectHandRoots()
+        private void AutoSelectHandRoots()
         {
-            HandBinder leftBinder = null;
-            HandBinder rightBinder = null;
+            HandModelBase leftHand = null;
+            HandModelBase rightHand = null;
 
-            HandBinder[] childBinders = GetComponentsInChildren<HandBinder>(true);
+            HandModelBase[] childHands = GetComponentsInChildren<HandModelBase>(true);
 
-            foreach (var binder in childBinders)
+            foreach (var hand in childHands)
             {
-                if (binder.Chirality == Chirality.Left)
-                    leftBinder = binder;
+                if (hand.Handedness == Chirality.Left)
+                    leftHand = hand;
                 else
-                    rightBinder = binder;
+                    rightHand = hand;
             }
 
             switch (handsToRecord)
             {
                 case ChiralityOptions.BOTH:
-                    SetBinderToRoot(leftBinder, Chirality.Left);
-                    SetBinderToRoot(rightBinder, Chirality.Right);
+                    SetHandModelBaseToRoot(leftHand, Chirality.Left);
+                    SetHandModelBaseToRoot(rightHand, Chirality.Right);
                     break;
                 case ChiralityOptions.LEFT:
-                    SetBinderToRoot(leftBinder, Chirality.Left);
+                    SetHandModelBaseToRoot(leftHand, Chirality.Left);
                     break;
                 case ChiralityOptions.RIGHT:
-                    SetBinderToRoot(rightBinder, Chirality.Right);
+                    SetHandModelBaseToRoot(rightHand, Chirality.Right);
                     break;
             }
         }
 
-        void SetBinderToRoot(HandBinder binder, Chirality chirality)
+        private void SetHandModelBaseToRoot(HandModelBase hand, Chirality chirality)
         {
             GameObject root = null;
 
-            if (binder == null)
+            if (hand == null)
             {
-                Debug.LogWarning("Hand Recorder: Unable to set " + chirality + " hand to record. There is no suitable HandBinder under the HandRecorder");
+                Debug.LogWarning("Hand Recorder: Unable to set " + chirality + " hand to record. There is no suitable HandModelBase under the HandRecorder");
             }
             else
             {
-                root = binder.gameObject;
+                root = hand.gameObject;
             }
 
             switch (chirality)
@@ -335,30 +303,6 @@ namespace Leap.Unity.Recording
                     rightHandBoneRoot = root;
                     break;
             }
-        }
-
-        // Find the common parent between *all* recorded objects
-        public virtual bool AreObjectsChildren()
-        {
-            if (rightHandBoneRoot != null &&
-                !rightHandBoneRoot.transform.IsChildOf(transform))
-            {
-                return false;
-            }
-
-            if (additionalObjects != null)
-            {
-                foreach (GameObject secondary in additionalObjects)
-                {
-                    if (secondary != null &&
-                        !secondary.transform.IsChildOf(transform))
-                    {
-                        return false;
-                    }
-                }
-            }
-
-            return true;
         }
     }
 }
