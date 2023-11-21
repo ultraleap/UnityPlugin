@@ -195,7 +195,7 @@ namespace Leap.Unity.PhysicalHands
             }
             else if (hardContactHand.FingerContactDisplacement > 0.8f)
             {
-                hardContactHand.currentPalmWeightInterp = Mathf.InverseLerp(2f, 0.8f, hardContactHand.FingerContactDisplacement).EaseOut();
+                hardContactHand.currentPalmWeightInterp = Mathf.InverseLerp(0.8f, 8f, hardContactHand.FingerContactDisplacement).EaseOut();
             }
             else
             {

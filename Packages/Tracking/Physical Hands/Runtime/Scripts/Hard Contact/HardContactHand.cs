@@ -19,9 +19,8 @@ namespace Leap.Unity.PhysicalHands
         private float _timeOnReset;
         internal float currentResetLerp { get { return _timeOnReset == 0 ? 1 : Mathf.InverseLerp(0.1f, 0.25f, Time.time - _timeOnReset); } }
 
-        private float _overallFingerDisplacement = 0f, _averageFingerDisplacement = 0f, _contactFingerDisplacement = 0f;
+        private float _overallFingerDisplacement = 0f, _contactFingerDisplacement = 0f;
         internal float FingerDisplacement => _overallFingerDisplacement;
-        internal float FingerAverageDisplacement => _averageFingerDisplacement;
         internal float FingerContactDisplacement => _contactFingerDisplacement;
 
         // Interpolate back in displacement values after the hand has just released
@@ -177,7 +176,6 @@ namespace Leap.Unity.PhysicalHands
         private void CalculateDisplacementsAndLimits()
         {
             _overallFingerDisplacement = 0f;
-            _averageFingerDisplacement = 0f;
             _contactFingerDisplacement = 0f;
 
             int contactingFingers = 0;
@@ -234,7 +232,6 @@ namespace Leap.Unity.PhysicalHands
                 _displacementGrabCooldownCurrent = _displacementGrabCooldown;
             }
 
-            _averageFingerDisplacement = _overallFingerDisplacement / (FINGERS * FINGER_BONES);
             if (contactingFingers > 0)
             {
                 if (IsGrabbing)
