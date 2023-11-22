@@ -37,8 +37,7 @@ namespace Leap.Unity.PhysicalHands
         }
         internal State GrabState { get; private set; } = State.Idle;
 
-        private HashSet<ContactBone> _boneHash = new HashSet<ContactBone>();
-
+        // A dictionary of each hand, with an array[5] of lists that represents each bone in each finger
         private Dictionary<ContactHand, List<ContactBone>[]> _bones = new Dictionary<ContactHand, List<ContactBone>[]>();
 
         private List<ContactHand> _grabbingCandidates = new List<ContactHand>();
@@ -90,6 +89,8 @@ namespace Leap.Unity.PhysicalHands
         private IgnorePhysicalHands _ignorePhysicalHands;
 
         float ignoreGrabTime = 0f;
+
+        private bool anyBoneGrabbable = false;
 
         /// <summary>
         /// Returns true if the provided hand is grabbing an object.
@@ -205,7 +206,6 @@ namespace Leap.Unity.PhysicalHands
 
             _grabbingCandidates.Clear();
             _grabbingCandidatesContact.Clear();
-            _boneHash.Clear();
             foreach (var pair in _bones)
             {
                 for (int j = 0; j < pair.Value.Length; j++)
@@ -262,7 +262,7 @@ namespace Leap.Unity.PhysicalHands
         {
             UpdateHands();
 
-            if (_boneHash.Count == 0 && GrabState != State.Grab)
+            if (!anyBoneGrabbable && GrabState != State.Grab)
             {
                 // If we don't then and we're not grabbing then just return
                 return GrabState = State.Hover;
@@ -273,7 +273,7 @@ namespace Leap.Unity.PhysicalHands
             switch (GrabState)
             {
                 case State.Hover:
-                    if (_boneHash.Count > 0)
+                    if (anyBoneGrabbable)
                     {
                         GrabState = State.Contact;
                     }
@@ -301,16 +301,13 @@ namespace Leap.Unity.PhysicalHands
 
         private void UpdateHands()
         {
-            // Remove bones from the hashset if we're not able to grab with them
-            _boneHash.RemoveWhere(RemoveOldBones);
-
             // Loop through each hand in our bone array, then the finger, then the bones in that finger
             // If we're no longer in a grabbing state with that bone we want to add it to the cooldowns
             foreach (var pair in _bones)
             {
                 for (int i = 0; i < _bones[pair.Key].Length; i++)
                 {
-                    for(int j = 0; j < _bones[pair.Key][i].Count; j++)
+                    for (int j = 0; j < _bones[pair.Key][i].Count; j++)
                     {
                         if (!_bones[pair.Key][i][j].GrabbableObjects.Contains(_rigid))
                         {
@@ -321,13 +318,15 @@ namespace Leap.Unity.PhysicalHands
                 }
             }
 
+            anyBoneGrabbable = false;
+
             foreach (var hand in _grabbingCandidates)
             {
                 foreach (var bone in hand.bones)
                 {
                     if (bone.GrabbableObjects.Contains(_rigid))
                     {
-                        _boneHash.Add(bone);
+                        anyBoneGrabbable = true;
                         if (_bones.TryGetValue(bone.contactHand, out List<ContactBone>[] storedBones))
                         {
                             storedBones[bone.Finger].Add(bone);
@@ -387,18 +386,6 @@ namespace Leap.Unity.PhysicalHands
                 }
 
                 _grabbingCandidates[i].physicalHandsManager.OnHandHover(_rigid);
-            }
-        }
-
-        private bool RemoveOldBones(ContactBone bone)
-        {
-            if (bone.GrabbableObjects.Contains(_rigid))
-            {
-                return false;
-            }
-            else
-            {
-                return true;
             }
         }
 
@@ -528,63 +515,69 @@ namespace Leap.Unity.PhysicalHands
 
             int bone1Index = 0;
 
-            foreach (ContactBone bone1 in _boneHash)
+            foreach (ContactHand hand in _grabbingCandidates)
             {
-                if (bone1.GrabbableDirections.TryGetValue(_rigid, out var grabbableDirectionsB1))
+                foreach (ContactHand hand2 in _grabbingCandidates)
                 {
-                    int bone2Index = 0;
-
-                    foreach (ContactBone bone2 in _boneHash)
+                    foreach (ContactBone bone1 in hand.bones)
                     {
-                        if (bone2Index < bone1Index) // Avoid double-checking the same index combinations
+                        if (bone1.GrabbableDirections.TryGetValue(_rigid, out var grabbableDirectionsB1))
                         {
-                            bone2Index++;
-                            continue;
-                        }
+                            int bone2Index = 0;
 
-                        // Don't compare against the same finger
-                        if (bone1.finger == bone2.finger && bone1.contactHand == bone2.contactHand) continue;
-
-                        if (bone2.GrabbableDirections.TryGetValue(_rigid, out var grabbableDirectionsB2))
-                        {
-                            foreach (var directionPairB1 in grabbableDirectionsB1)
+                            foreach (ContactBone bone2 in hand2.bones)
                             {
-                                //If the grabbable direction is facing away from the bone forward direction, disregard it
-                                if (Vector3.Dot(directionPairB1.Value.direction, -bone1.transform.up) < FORWARD_DIRECTION_DOT) continue;
-
-                                foreach (var directionPairB2 in grabbableDirectionsB2)
+                                if (bone2Index < bone1Index) // Avoid double-checking the same index combinations
                                 {
-                                    //If the grabbable direction is facing away from the bone forward direction, disregard it
-                                    if (Vector3.Dot(directionPairB2.Value.direction, -bone2.transform.up) < FORWARD_DIRECTION_DOT) continue;
+                                    bone2Index++;
+                                    continue;
+                                }
 
-                                    float dot = Vector3.Dot(directionPairB1.Value.direction, directionPairB2.Value.direction);
+                                // Don't compare against the same finger
+                                if (bone1.finger == bone2.finger && bone1.contactHand == bone2.contactHand) continue;
 
-                                    //If the two bones are facing opposite directions (i.e. pushing towards each other), they're grabbing
-                                    if (dot < GRABBABLE_DIRECTIONS_DOT)
+                                if (bone2.GrabbableDirections.TryGetValue(_rigid, out var grabbableDirectionsB2))
+                                {
+                                    foreach (var directionPairB1 in grabbableDirectionsB1)
                                     {
-                                        if (bone1.contactHand == bone2.contactHand)
-                                        {
-                                            _grabbingValues[bone1.contactHand].handGrabbing = true;
-                                            _grabbingValues[bone2.contactHand].handGrabbing = true;
-                                        }
-                                        else
-                                        {
-                                            _grabbingValues[bone1.contactHand].facingOppositeHand = true;
-                                            _grabbingValues[bone2.contactHand].facingOppositeHand = true;
-                                        }
+                                        //If the grabbable direction is facing away from the bone forward direction, disregard it
+                                        if (Vector3.Dot(directionPairB1.Value.direction, -bone1.transform.up) < FORWARD_DIRECTION_DOT) continue;
 
-                                        RegisterGrabbingHand(bone1.contactHand);
-                                        RegisterGrabbingHand(bone2.contactHand);
+                                        foreach (var directionPairB2 in grabbableDirectionsB2)
+                                        {
+                                            //If the grabbable direction is facing away from the bone forward direction, disregard it
+                                            if (Vector3.Dot(directionPairB2.Value.direction, -bone2.transform.up) < FORWARD_DIRECTION_DOT) continue;
 
-                                        return;
+                                            float dot = Vector3.Dot(directionPairB1.Value.direction, directionPairB2.Value.direction);
+
+                                            //If the two bones are facing opposite directions (i.e. pushing towards each other), they're grabbing
+                                            if (dot < GRABBABLE_DIRECTIONS_DOT)
+                                            {
+                                                if (bone1.contactHand == bone2.contactHand)
+                                                {
+                                                    _grabbingValues[bone1.contactHand].handGrabbing = true;
+                                                    _grabbingValues[bone2.contactHand].handGrabbing = true;
+                                                }
+                                                else
+                                                {
+                                                    _grabbingValues[bone1.contactHand].facingOppositeHand = true;
+                                                    _grabbingValues[bone2.contactHand].facingOppositeHand = true;
+                                                }
+
+                                                RegisterGrabbingHand(bone1.contactHand);
+                                                RegisterGrabbingHand(bone2.contactHand);
+
+                                                return;
+                                            }
+                                        }
                                     }
                                 }
                             }
                         }
+
+                        bone1Index++;
                     }
                 }
-
-                bone1Index++;
             }
         }
 
@@ -966,11 +959,11 @@ namespace Leap.Unity.PhysicalHands
                     averageVelocity += oldestVelocity.position;
                     velocityCount++;
                 }
-                else 
+                else
                 {
                     // We are in the WINDOW_DELAY time, ignore the remaining frames
                     _velocityQueue.Clear();
-                    break; 
+                    break;
                 }
             }
 
