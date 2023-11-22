@@ -58,6 +58,11 @@ namespace Leap.Unity
 
         private TrackedPoseDriver _trackedPoseDriver;
 
+        private float lastCheckForSubsystemTime = 0;
+
+        [Tooltip("Automatically adds a TrackedPoseDriver to the MainCamera if there is not one already")]
+        public bool _autoCreateTrackedPoseDriver = true;
+
         private void Start()
         {
             // Find the first available subsystem
@@ -82,7 +87,14 @@ namespace Leap.Unity
 
             currentSubsystem.updatedHands -= UpdateHands;
             currentSubsystem.updatedHands += UpdateHands;
+
             _trackedPoseDriver = Camera.main.GetComponent<TrackedPoseDriver>();
+
+            if(_trackedPoseDriver == null && _autoCreateTrackedPoseDriver)
+            {
+                Debug.Log("Automatically assigning a TrackedPoseDriver to the Main Camera");
+                _trackedPoseDriver = Camera.main.gameObject.AddComponent<TrackedPoseDriver>();
+            }
         }
 
         private void OnDestroy()
@@ -93,7 +105,7 @@ namespace Leap.Unity
 
         private void Update()
         {
-            if(currentSubsystem == null)
+            if(currentSubsystem == null && Time.time > lastCheckForSubsystemTime + 1)
             {
                 CheckForSubsystem();
             }
@@ -117,6 +129,8 @@ namespace Leap.Unity
             if (currentSubsystem == null)
             {
                 Debug.LogWarning("No XRHands Subsystem available.");
+
+                lastCheckForSubsystemTime = Time.time;
                 return;
             }
 
