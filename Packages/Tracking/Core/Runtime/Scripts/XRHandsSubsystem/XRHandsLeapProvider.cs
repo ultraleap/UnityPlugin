@@ -75,7 +75,7 @@ namespace Leap.Unity
 
             if (currentSubsystem == null)
             {
-                Debug.LogWarning("Unable to update InputActions, no Subsystem available.");
+                Debug.LogWarning("No XRHands Subsystem available.");
                 return;
             }
 
@@ -89,6 +89,40 @@ namespace Leap.Unity
         {
             if (currentSubsystem != null)
                 currentSubsystem.updatedHands -= UpdateHands;
+        }
+
+        private void Update()
+        {
+            if(currentSubsystem == null)
+            {
+                CheckForSubsystem();
+            }
+        }
+
+        void CheckForSubsystem()
+        {
+            // Find the first available subsystem
+            List<XRHandSubsystem> availableSubsystems = new List<XRHandSubsystem>();
+            SubsystemManager.GetSubsystems(availableSubsystems);
+
+            foreach (var subsystem in availableSubsystems)
+            {
+                if (subsystem != null)
+                {
+                    currentSubsystem = subsystem;
+                    break;
+                }
+            }
+
+            if (currentSubsystem == null)
+            {
+                Debug.LogWarning("No XRHands Subsystem available.");
+                return;
+            }
+
+            currentSubsystem.updatedHands -= UpdateHands;
+            currentSubsystem.updatedHands += UpdateHands;
+            _trackedPoseDriver = Camera.main.GetComponent<TrackedPoseDriver>();
         }
 
         private void UpdateHands(XRHandSubsystem subsystem, XRHandSubsystem.UpdateSuccessFlags updateSuccessFlags, XRHandSubsystem.UpdateType updateType)
@@ -132,7 +166,7 @@ namespace Leap.Unity
             leapFrame.Timestamp = (long)(Time.realtimeSinceStartup * 1000000f);
             leapFrame.CurrentFramesPerSecond = 1.0f / Time.smoothDeltaTime;
 
-            if (subsystem.leftHand == null)
+            if (subsystem.leftHand == null || !subsystem.leftHand.isTracked)
             {
                 _leftHandFirstSeen_ticks = -1;
             }
@@ -142,7 +176,7 @@ namespace Leap.Unity
                 leapFrame.Hands.Add(_leftHand);
             }
 
-            if (subsystem.rightHand == null)
+            if (subsystem.rightHand == null || !subsystem.rightHand.isTracked)
             {
                 _rightHandFirstSeen_ticks = -1;
             }
@@ -159,15 +193,8 @@ namespace Leap.Unity
 
             Chirality chirality = xrhand.handedness == UnityEngine.XR.Hands.Handedness.Left ? Chirality.Left : Chirality.Right;
 
-            if(!joints[0].TryGetPose(out Pose wristPose))
-            {
-                return;
-            }
-
-            if(!joints[1].TryGetPose(out Pose palmPose))
-            {
-                return;
-            }
+            joints[0].TryGetPose(out Pose wristPose);
+            joints[1].TryGetPose(out Pose palmPose);
 
             joints[1].TryGetLinearVelocity(out Vector3 palmLinearVelocity);
 
