@@ -95,6 +95,11 @@ namespace Leap.Unity.PhysicalHands
 
         private void Awake()
         {
+            if (ContactParent == null)
+            {
+                _contactParent = GetComponentInChildren<ContactParent>();
+            }
+
             GenerateLayers();
             SetupAutomaticCollisionLayers();
         }
@@ -315,9 +320,6 @@ namespace Leap.Unity.PhysicalHands
 
         #endregion
 
-        #region Unity Editor
-
-#if UNITY_EDITOR
         private void OnValidate()
         {
             if (ContactParent == null)
@@ -325,9 +327,6 @@ namespace Leap.Unity.PhysicalHands
                 _contactParent = GetComponentInChildren<ContactParent>();
             }
         }
-#endif
-
-        #endregion
 
         #region Events
 

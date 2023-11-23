@@ -22,6 +22,9 @@ namespace Leap.Unity.PhysicalHands
         internal float DisplacementDistance => _displacementDistance;
         internal float DisplacementRotation => _displacementRotation;
 
+        private const float SIZE_UPDATE_INTERVAL = 1;
+        private float nextSizeUpdate = 0;
+
         #region Setup
         internal void SetupBoneBody()
         {
@@ -156,6 +159,7 @@ namespace Leap.Unity.PhysicalHands
 
         internal override void UpdateBone(Bone prevBone, Bone bone)
         {
+            UpdateBoneSizes(prevBone, bone);
 
             UpdateBoneAngle(prevBone, bone);
 
@@ -231,10 +235,15 @@ namespace Leap.Unity.PhysicalHands
 
         private void UpdateBoneSizes(Bone prevBone, Bone bone, bool forceUpdate = false)
         {
-            if (!forceUpdate && !Time.inFixedTimeStep)
+            if (!forceUpdate &&
+                (!Time.inFixedTimeStep ||
+                Time.time < nextSizeUpdate))
             {
                 return;
             }
+
+            // set the time that the next size update is allowed when not resetting
+            nextSizeUpdate = Time.time + SIZE_UPDATE_INTERVAL;
 
             if (!IsBoneContacting)
             {
