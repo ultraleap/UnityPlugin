@@ -441,7 +441,7 @@ namespace Leap.Unity
 
             return scale;
         }
-       
+
         /// <summary>
         /// Returns a pinch strength for the hand based on the provided joint data. Value ranges from 0 to 1 where 1 is fully pinched.
         /// 
