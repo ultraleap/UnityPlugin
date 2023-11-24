@@ -45,6 +45,22 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
+        /// <summary>
+        /// Set the enum for contact mode.
+        /// 0 = Hard Contact
+        /// 1 = Soft Contact
+        /// 2 = No Contact
+        /// </summary>
+        /// <param name="contactMode">
+        /// 0 = Hard Contact
+        /// 1 = Soft Contact
+        /// 2 = No Contact 
+        /// </param>
+        public void SetContactModeEnum(int contactModeInt)
+        {
+            contactMode = (ContactMode)contactModeInt;
+        }
+
 
         private ContactParent _contactParent;
         public ContactParent ContactParent => _contactParent;
