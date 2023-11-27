@@ -16,7 +16,9 @@ namespace Leap.Unity.Interaction
 
         public int maximumAttachedMagnets = 4;
 
-        (ConfigurableJoint, Magnet)[] attachedMagnets; 
+        (ConfigurableJoint, Magnet)[] attachedMagnets;
+
+        bool clearingMagnetism = false;
 
         private void Awake()
         {
@@ -28,6 +30,9 @@ namespace Leap.Unity.Interaction
         /// </summary>
         public bool CanAttach(Magnet _toAttachTo)
         {
+            if (clearingMagnetism)
+                return false;
+
             int joinCount = 0;
 
             foreach (var join in attachedMagnets)
@@ -73,6 +78,12 @@ namespace Leap.Unity.Interaction
         /// </summary>
         private void FixedUpdate()
         {
+            if (clearingMagnetism)
+            {
+                clearingMagnetism = false;
+                return;
+            }
+
             for (int i = 0; i < attachedMagnets.Length; i++)
             {
                 if (attachedMagnets[i].Item1 != null)
@@ -83,6 +94,19 @@ namespace Leap.Unity.Interaction
                     }
                 }
             }
+        }
+
+        public void ClearMagnetism()
+        {
+            for (int i = 0; i < attachedMagnets.Length; i++)
+            {
+                if (attachedMagnets[i].Item1 != null)
+                {
+                    Destroy(attachedMagnets[i].Item1);
+                }
+            }
+
+            clearingMagnetism = true;
         }
     }
 }
