@@ -37,11 +37,11 @@ namespace Leap.Unity.PhysicalHands
         internal State GrabState { get; private set; } = State.Idle;
 
         // A dictionary of each hand, with an array[5] of lists that represents each bone in each finger
-        private Dictionary<ContactHand, List<ContactBone>[]> _bones = new Dictionary<ContactHand, List<ContactBone>[]>();
+        private Dictionary<ContactHand, List<ContactBone>[]> _grabbableBones = new Dictionary<ContactHand, List<ContactBone>[]>();
 
-        private List<ContactHand> _grabbingCandidates = new List<ContactHand>();
-        private List<bool> _grabbingCandidatesContact = new List<bool>();
-        private List<GrabValues> _grabValues = new List<GrabValues>();
+        private List<ContactHand> _grabbableHands = new List<ContactHand>();
+        private List<bool> _grabbableHandsContacting = new List<bool>();
+        private List<GrabValues> _grabbableHandsValues = new List<GrabValues>();
 
         internal List<ContactHand> GrabbingHands => _grabbingHands;
         private List<ContactHand> _grabbingHands = new List<ContactHand>();
@@ -51,8 +51,6 @@ namespace Leap.Unity.PhysicalHands
         {
             public float[] fingerStrength = new float[5];
             public float[] originalFingerStrength = new float[5];
-            public Vector3[] tipPositions = new Vector3[5];
-            public Matrix4x4 mat;
             public Vector3 offset;
             public Quaternion originalHandRotation, rotationOffset;
 
@@ -86,7 +84,7 @@ namespace Leap.Unity.PhysicalHands
         internal bool Ignored;
         private IgnorePhysicalHands _ignorePhysicalHands;
 
-        float ignoreGrabTime = 0f;
+        private float ignoreGrabTime = 0f;
 
         private bool anyBoneGrabbable = false;
 
@@ -98,7 +96,7 @@ namespace Leap.Unity.PhysicalHands
         /// <returns>If the provided hand is grabbing</returns>
         private bool Grabbed(ContactHand hand)
         {
-            if (_bones.TryGetValue(hand, out var bones))
+            if (_grabbableBones.TryGetValue(hand, out var bones))
             {
                 // These values are limited by the EligibleBones
                 return (bones[0].Count > 0 || bones[5].Count > 0) && // A thumb or palm bone
@@ -118,7 +116,7 @@ namespace Leap.Unity.PhysicalHands
         /// <returns>If the finger on the provided hand is grabbed</returns>
         internal bool Grabbed(ContactHand hand, int finger)
         {
-            if (_bones.TryGetValue(hand, out var bones))
+            if (_grabbableBones.TryGetValue(hand, out var bones))
             {
                 switch (finger)
                 {
@@ -170,7 +168,7 @@ namespace Leap.Unity.PhysicalHands
 
         internal void ReleaseHelper()
         {
-            foreach (var item in _grabbingCandidates)
+            foreach (var item in _grabbableHands)
             {
                 SetBoneGrabbing(item, false);
             }
@@ -180,51 +178,51 @@ namespace Leap.Unity.PhysicalHands
             //// Remove any lingering hover events
             if (_rigid != null)
             {
-                for (int i = 0; i < _grabbingCandidatesContact.Count; i++)
+                for (int i = 0; i < _grabbableHandsContacting.Count; i++)
                 {
-                    if (_grabbingCandidatesContact[i])
+                    if (_grabbableHandsContacting[i])
                     {
                         if (_rigid.TryGetComponent<IPhysicalHandContact>(out var physicalHandContact))
                         {
-                            physicalHandContact.OnHandContactExit(_grabbingCandidates[i]);
+                            physicalHandContact.OnHandContactExit(_grabbableHands[i]);
                         }
 
-                        _grabbingCandidates[i].physicalHandsManager.OnHandContactExit(_rigid);
+                        _grabbableHands[i].physicalHandsManager.OnHandContactExit(_rigid);
                     }
 
                     if (_rigid.TryGetComponent<IPhysicalHandHover>(out var physicalHandHover))
                     {
-                        physicalHandHover.OnHandHoverExit(_grabbingCandidates[i]);
+                        physicalHandHover.OnHandHoverExit(_grabbableHands[i]);
                     }
 
-                    _grabbingCandidates[i].physicalHandsManager.OnHandHoverExit(_rigid);
+                    _grabbableHands[i].physicalHandsManager.OnHandHoverExit(_rigid);
                 }
             }
 
-            _grabValues.Clear();
-            _grabbingCandidates.Clear();
-            _grabbingCandidatesContact.Clear();
-            foreach (var pair in _bones)
+            _grabbableHandsValues.Clear();
+            _grabbableHands.Clear();
+            _grabbableHandsContacting.Clear();
+            foreach (var pair in _grabbableBones)
             {
                 for (int j = 0; j < pair.Value.Length; j++)
                 {
                     pair.Value[j].Clear();
                 }
             }
-            _bones.Clear();
+            _grabbableBones.Clear();
         }
 
         internal void AddHand(ContactHand hand)
         {
-            if (!_grabbingCandidates.Contains(hand))
+            if (!_grabbableHands.Contains(hand))
             {
                 if (GrabState == State.Idle)
                 {
                     GrabState = State.Hover;
                 }
-                _grabbingCandidates.Add(hand);
-                _grabbingCandidatesContact.Add(false);
-                _grabValues.Add(new GrabValues());
+                _grabbableHands.Add(hand);
+                _grabbableHandsContacting.Add(false);
+                _grabbableHandsValues.Add(new GrabValues());
 
                 if (_ignorePhysicalHands)
                 {
@@ -235,10 +233,10 @@ namespace Leap.Unity.PhysicalHands
 
         internal void RemoveHand(ContactHand hand)
         {
-            if (_grabbingCandidates.Contains(hand))
+            if (_grabbableHands.Contains(hand))
             {
-                _grabbingCandidatesContact.RemoveAt(_grabbingCandidates.IndexOf(hand));
-                _grabbingCandidates.Remove(hand);
+                _grabbableHandsContacting.RemoveAt(_grabbableHands.IndexOf(hand));
+                _grabbableHands.Remove(hand);
             }
         }
 
@@ -302,105 +300,114 @@ namespace Leap.Unity.PhysicalHands
         {
             // Loop through each hand in our bone array, then the finger, then the bones in that finger
             // If we're no longer in a grabbing state with that bone we want to add it to the cooldowns
-            foreach (var pair in _bones)
+            foreach (var pair in _grabbableBones)
             {
-                for (int i = 0; i < _bones[pair.Key].Length; i++)
+                for (int i = 0; i < _grabbableBones[pair.Key].Length; i++)
                 {
-                    for (int j = 0; j < _bones[pair.Key][i].Count; j++)
+                    for (int j = 0; j < _grabbableBones[pair.Key][i].Count; j++)
                     {
-                        if (!_bones[pair.Key][i][j].GrabbableObjects.Contains(_rigid))
+                        if (!_grabbableBones[pair.Key][i][j].GrabbableObjects.Contains(_rigid))
                         {
-                            _bones[pair.Key][i].RemoveAt(j);
+                            _grabbableBones[pair.Key][i].RemoveAt(j);
                             j--;
                         }
                     }
                 }
             }
 
+            // Reset this value before use in UpdateGrabbables
             anyBoneGrabbable = false;
 
-            foreach (var hand in _grabbingCandidates)
+            for (int i = 0; i < _grabbableHands.Count; i++)
             {
-                foreach (var bone in hand.bones)
+                // Update references to _grabbableBones
+                UpdateGrabbableBones(_grabbableHands[i]);
+
+                // Update the hand contact and hover events
+                UpdateContactHoverEvents(i);
+            }
+        }
+
+        private void UpdateGrabbableBones(ContactHand hand)
+        {
+            foreach (var bone in hand.bones)
+            {
+                if (bone.GrabbableObjects.Contains(_rigid))
                 {
-                    if (bone.GrabbableObjects.Contains(_rigid))
+                    anyBoneGrabbable = true;
+                    if (_grabbableBones.TryGetValue(bone.contactHand, out List<ContactBone>[] storedBones))
                     {
-                        anyBoneGrabbable = true;
-                        if (_bones.TryGetValue(bone.contactHand, out List<ContactBone>[] storedBones))
+                        storedBones[bone.Finger].Add(bone);
+                    }
+                    else
+                    {
+                        _grabbableBones.Add(bone.contactHand, new List<ContactBone>[ContactHand.FINGERS + 1]);
+                        for (int j = 0; j < _grabbableBones[bone.contactHand].Length; j++)
                         {
-                            storedBones[bone.Finger].Add(bone);
-                        }
-                        else
-                        {
-                            _bones.Add(bone.contactHand, new List<ContactBone>[ContactHand.FINGERS + 1]);
-                            for (int i = 0; i < _bones[bone.contactHand].Length; i++)
+                            _grabbableBones[bone.contactHand][j] = new List<ContactBone>();
+                            if (bone.Finger == j)
                             {
-                                _bones[bone.contactHand][i] = new List<ContactBone>();
-                                if (bone.Finger == i)
-                                {
-                                    _bones[bone.contactHand][i].Add(bone);
-                                }
+                                _grabbableBones[bone.contactHand][j].Add(bone);
                             }
                         }
                     }
                 }
             }
+        }
 
-            // Update the hand contact and hover events
-            for (int i = 0; i < _grabbingCandidates.Count; i++)
+        void UpdateContactHoverEvents(int handIndex)
+        {
+            IPhysicalHandContact handContactEvent = null;
+
+            if (_grabbableHandsContacting[handIndex] != _grabbableHands[handIndex].IsContacting)
             {
-                IPhysicalHandContact handContactEvent = null;
+                _grabbableHandsContacting[handIndex] = _grabbableHands[handIndex].IsContacting;
 
-                if (_grabbingCandidatesContact[i] != _grabbingCandidates[i].IsContacting)
+                // We stopped contacting, so fire the contact exit event
+                if (!_grabbableHands[handIndex].IsContacting)
                 {
-                    _grabbingCandidatesContact[i] = _grabbingCandidates[i].IsContacting;
-
-                    // We stopped contacting, so fire the contact exit event
-                    if (!_grabbingCandidates[i].IsContacting)
+                    if (_rigid.TryGetComponent<IPhysicalHandContact>(out handContactEvent))
                     {
-                        if (_rigid.TryGetComponent<IPhysicalHandContact>(out handContactEvent))
-                        {
-                            handContactEvent.OnHandContactExit(_grabbingCandidates[i]);
-                        }
-
-                        _grabbingCandidates[i].physicalHandsManager.OnHandContactExit(_rigid);
-                    }
-                }
-
-                // Fire the contacting event whether it changed or not
-                if (_grabbingCandidates[i].IsContacting)
-                {
-                    if (handContactEvent != null || _rigid.TryGetComponent<IPhysicalHandContact>(out handContactEvent))
-                    {
-                        handContactEvent.OnHandContact(_grabbingCandidates[i]);
+                        handContactEvent.OnHandContactExit(_grabbableHands[handIndex]);
                     }
 
-                    _grabbingCandidates[i].physicalHandsManager.OnHandContact(_rigid);
+                    _grabbableHands[handIndex].physicalHandsManager.OnHandContactExit(_rigid);
                 }
-
-                // Fire the hovering event
-                if (_rigid.TryGetComponent<IPhysicalHandHover>(out var physicalHandHover))
-                {
-                    physicalHandHover.OnHandHover(_grabbingCandidates[i]);
-                }
-
-                _grabbingCandidates[i].physicalHandsManager.OnHandHover(_rigid);
             }
+
+            // Fire the contacting event whether it changed or not
+            if (_grabbableHands[handIndex].IsContacting)
+            {
+                if (handContactEvent != null || _rigid.TryGetComponent<IPhysicalHandContact>(out handContactEvent))
+                {
+                    handContactEvent.OnHandContact(_grabbableHands[handIndex]);
+                }
+
+                _grabbableHands[handIndex].physicalHandsManager.OnHandContact(_rigid);
+            }
+
+            // Fire the hovering event
+            if (_rigid.TryGetComponent<IPhysicalHandHover>(out var physicalHandHover))
+            {
+                physicalHandHover.OnHandHover(_grabbableHands[handIndex]);
+            }
+
+            _grabbableHands[handIndex].physicalHandsManager.OnHandHover(_rigid);
         }
 
         private void GrabbingContactCheck()
         {
             //Reset grab bools
-            foreach (var grabValue in _grabValues)
+            foreach (var grabValue in _grabbableHandsValues)
             {
                 grabValue.handGrabbing = false;
                 grabValue.facingOppositeHand = false;
             }
 
-            for (int handIndex = 0; handIndex < _grabbingCandidates.Count; handIndex++)
+            for (int handIndex = 0; handIndex < _grabbableHands.Count; handIndex++)
             {
-                ContactHand hand = _grabbingCandidates[handIndex];
-                GrabValues grabValues = _grabValues[handIndex];
+                ContactHand hand = _grabbableHands[handIndex];
+                GrabValues grabValues = _grabbableHandsValues[handIndex];
 
                 if (_grabbingHands.Contains(hand))
                 {
@@ -501,7 +508,7 @@ namespace Leap.Unity.PhysicalHands
         private void CheckForBonesFacingEachOther()
         {
             // When hands are not Physical, we should skip this step to avoid unwanted grabs
-            foreach (var hand in _grabbingCandidates)
+            foreach (var hand in _grabbableHands)
             {
                 if (!hand.isHandPhysical)
                 {
@@ -511,13 +518,13 @@ namespace Leap.Unity.PhysicalHands
 
             int bone1Index = 0;
 
-            foreach (ContactHand hand in _grabbingCandidates)
+            foreach (ContactHand hand in _grabbableHands)
             {
-                foreach (ContactHand hand2 in _grabbingCandidates)
+                foreach (ContactHand hand2 in _grabbableHands)
                 {
                     foreach (ContactBone bone1 in hand.bones)
                     {
-                        int grabHandIndex1 = _grabbingCandidates.IndexOf(bone1.contactHand);
+                        int grabHandIndex1 = _grabbableHands.IndexOf(bone1.contactHand);
 
                         if (bone1.GrabbableDirections.TryGetValue(_rigid, out var grabbableDirectionsB1))
                         {
@@ -536,7 +543,7 @@ namespace Leap.Unity.PhysicalHands
 
                                 if (bone2.GrabbableDirections.TryGetValue(_rigid, out var grabbableDirectionsB2))
                                 {
-                                    int grabHandIndex2 = _grabbingCandidates.IndexOf(bone2.contactHand);
+                                    int grabHandIndex2 = _grabbableHands.IndexOf(bone2.contactHand);
 
                                     foreach (var directionPairB1 in grabbableDirectionsB1)
                                     {
@@ -555,13 +562,13 @@ namespace Leap.Unity.PhysicalHands
                                             {
                                                 if (bone1.contactHand == bone2.contactHand)
                                                 {
-                                                    _grabValues[grabHandIndex1].handGrabbing = true;
-                                                    _grabValues[grabHandIndex2].handGrabbing = true;
+                                                    _grabbableHandsValues[grabHandIndex1].handGrabbing = true;
+                                                    _grabbableHandsValues[grabHandIndex2].handGrabbing = true;
                                                 }
                                                 else
                                                 {
-                                                    _grabValues[grabHandIndex1].facingOppositeHand = true;
-                                                    _grabValues[grabHandIndex2].facingOppositeHand = true;
+                                                    _grabbableHandsValues[grabHandIndex1].facingOppositeHand = true;
+                                                    _grabbableHandsValues[grabHandIndex2].facingOppositeHand = true;
                                                 }
 
                                                 RegisterGrabbingHand(bone1.contactHand);
@@ -603,11 +610,11 @@ namespace Leap.Unity.PhysicalHands
                 GrabState = State.Grab;
             }
 
-            int grabHandIndex = _grabbingCandidates.IndexOf(hand);
+            int grabHandIndex = _grabbableHands.IndexOf(hand);
 
-            _grabValues[grabHandIndex].offset = _rigid.position - hand.palmBone.transform.position;
-            _grabValues[grabHandIndex].rotationOffset = Quaternion.Inverse(hand.palmBone.transform.rotation) * _rigid.rotation;
-            _grabValues[grabHandIndex].originalHandRotation = hand.palmBone.transform.rotation;
+            _grabbableHandsValues[grabHandIndex].offset = _rigid.position - hand.palmBone.transform.position;
+            _grabbableHandsValues[grabHandIndex].rotationOffset = Quaternion.Inverse(hand.palmBone.transform.rotation) * _rigid.rotation;
+            _grabbableHandsValues[grabHandIndex].originalHandRotation = hand.palmBone.transform.rotation;
 
             if (_rigid.TryGetComponent<IPhysicalHandGrab>(out var physicalHandGrab))
             {
@@ -619,24 +626,24 @@ namespace Leap.Unity.PhysicalHands
 
         private void UpdateGrabbingValues()
         {
-            for(int grabHandIndex = 0; grabHandIndex < _grabbingCandidates.Count; grabHandIndex++)
+            for(int grabHandIndex = 0; grabHandIndex < _grabbableHands.Count; grabHandIndex++)
             {
                 // Check if this hand was grabbing and is now not grabbing
                 if (_grabbingHands.Count > 1
-                    && !_grabValues[grabHandIndex].handGrabbing
-                    && !_grabValues[grabHandIndex].facingOppositeHand
+                    && !_grabbableHandsValues[grabHandIndex].handGrabbing
+                    && !_grabbableHandsValues[grabHandIndex].facingOppositeHand
                     // Hand has moved significantly far away from the object
-                    && (_rigid.position - _grabbingCandidates[grabHandIndex].palmBone.transform.position).sqrMagnitude > _grabValues[grabHandIndex].offset.sqrMagnitude * 1.5f)
+                    && (_rigid.position - _grabbableHands[grabHandIndex].palmBone.transform.position).sqrMagnitude > _grabbableHandsValues[grabHandIndex].offset.sqrMagnitude * 1.5f)
                 {
-                    SetBoneGrabbing(_grabbingCandidates[grabHandIndex], false);
-                    _grabbingHands.Remove(_grabbingCandidates[grabHandIndex]);
+                    SetBoneGrabbing(_grabbableHands[grabHandIndex], false);
+                    _grabbingHands.Remove(_grabbableHands[grabHandIndex]);
 
                     if (_rigid.TryGetComponent<IPhysicalHandGrab>(out var physicalHandGrab))
                     {
-                        physicalHandGrab.OnHandGrabExit(_grabbingCandidates[grabHandIndex]);
+                        physicalHandGrab.OnHandGrabExit(_grabbableHands[grabHandIndex]);
                     }
 
-                    _grabbingCandidates[grabHandIndex].physicalHandsManager.OnHandGrabExit(_rigid);
+                    _grabbableHands[grabHandIndex].physicalHandsManager.OnHandGrabExit(_rigid);
 
                     continue;
                 }
@@ -645,55 +652,55 @@ namespace Leap.Unity.PhysicalHands
                 for (int i = 0; i < 5; i++)
                 {
                     // Was the finger not contacting before?
-                    if (_grabValues[grabHandIndex].fingerStrength[i] == -1)
+                    if (_grabbableHandsValues[grabHandIndex].fingerStrength[i] == -1)
                     {
-                        if (_manager.FingerStrengths[_grabbingCandidates[grabHandIndex]][i] > (i == 0 ? MINIMUM_THUMB_STRENGTH : MINIMUM_STRENGTH) && Grabbed(_grabbingCandidates[grabHandIndex], i))
+                        if (_manager.FingerStrengths[_grabbableHands[grabHandIndex]][i] > (i == 0 ? MINIMUM_THUMB_STRENGTH : MINIMUM_STRENGTH) && Grabbed(_grabbableHands[grabHandIndex], i))
                         {
                             // Store the strength value on contact
-                            _grabValues[grabHandIndex].fingerStrength[i] = _manager.FingerStrengths[_grabbingCandidates[grabHandIndex]][i];
+                            _grabbableHandsValues[grabHandIndex].fingerStrength[i] = _manager.FingerStrengths[_grabbableHands[grabHandIndex]][i];
                         }
                     }
                     else
                     {
                         // If the finger was contacting but has uncurled by the exit percentage then it is no longer "grabbed"
-                        if (_manager.FingerStrengths[_grabbingCandidates[grabHandIndex]][i] < (i == 0 ? MINIMUM_THUMB_STRENGTH : MINIMUM_STRENGTH) || _grabValues[grabHandIndex].fingerStrength[i] * (1 - (i == 0 ? REQUIRED_THUMB_EXIT_STRENGTH : REQUIRED_EXIT_STRENGTH)) >= _manager.FingerStrengths[_grabbingCandidates[grabHandIndex]][i])
+                        if (_manager.FingerStrengths[_grabbableHands[grabHandIndex]][i] < (i == 0 ? MINIMUM_THUMB_STRENGTH : MINIMUM_STRENGTH) || _grabbableHandsValues[grabHandIndex].fingerStrength[i] * (1 - (i == 0 ? REQUIRED_THUMB_EXIT_STRENGTH : REQUIRED_EXIT_STRENGTH)) >= _manager.FingerStrengths[_grabbableHands[grabHandIndex]][i])
                         {
-                            _grabValues[grabHandIndex].fingerStrength[i] = -1;
+                            _grabbableHandsValues[grabHandIndex].fingerStrength[i] = -1;
                         }
                     }
 
-                    if (_grabValues[grabHandIndex].fingerStrength[i] != -1)
+                    if (_grabbableHandsValues[grabHandIndex].fingerStrength[i] != -1)
                     {
                         c++;
                     }
                 }
 
                 // If we've got two fingers curled, the hand was grabbing in the grab contact checks, or the hand is facing the other, then we grab
-                if (c >= 2 || _grabValues[grabHandIndex].handGrabbing || _grabValues[grabHandIndex].facingOppositeHand)
+                if (c >= 2 || _grabbableHandsValues[grabHandIndex].handGrabbing || _grabbableHandsValues[grabHandIndex].facingOppositeHand)
                 {
-                    SetBoneGrabbing(_grabbingCandidates[grabHandIndex], true);
+                    SetBoneGrabbing(_grabbableHands[grabHandIndex], true);
                     continue;
                 }
 
                 // One final check to see if the original data hand has bones inside of the object to retain grabbing during physics updates
-                bool data = DataHandIntersection(_grabbingCandidates[grabHandIndex]);
+                bool data = DataHandIntersection(_grabbableHands[grabHandIndex]);
 
                 if (!data)
                 {
-                    SetBoneGrabbing(_grabbingCandidates[grabHandIndex], false);
-                    _grabValues[grabHandIndex].waitingForInitialUnpinch = true;
-                    _grabbingHands.Remove(_grabbingCandidates[grabHandIndex]);
+                    SetBoneGrabbing(_grabbableHands[grabHandIndex], false);
+                    _grabbableHandsValues[grabHandIndex].waitingForInitialUnpinch = true;
+                    _grabbingHands.Remove(_grabbableHands[grabHandIndex]);
 
                     if (_rigid.TryGetComponent<IPhysicalHandGrab>(out var physicalHandGrab))
                     {
-                        physicalHandGrab.OnHandGrabExit(_grabbingCandidates[grabHandIndex]);
+                        physicalHandGrab.OnHandGrabExit(_grabbableHands[grabHandIndex]);
                     }
 
-                    _grabbingCandidates[grabHandIndex].physicalHandsManager.OnHandGrabExit(_rigid);
+                    _grabbableHands[grabHandIndex].physicalHandsManager.OnHandGrabExit(_rigid);
                 }
                 else
                 {
-                    SetBoneGrabbing(_grabbingCandidates[grabHandIndex], true);
+                    SetBoneGrabbing(_grabbableHands[grabHandIndex], true);
                 }
             }
         }
@@ -702,14 +709,14 @@ namespace Leap.Unity.PhysicalHands
         {
             if (add)
             {
-                for (int j = 0; j < _bones[hand].Length; j++)
+                for (int j = 0; j < _grabbableBones[hand].Length; j++)
                 {
-                    if (_bones[hand][j].Count > 0)
+                    if (_grabbableBones[hand][j].Count > 0)
                     {
                         foreach (var bone in hand.bones)
                         {
                             // Using only the first element of a foreach is cheaper than using _bones[pair.Key][j].First for GC.Alloc
-                            foreach (var b in _bones[hand][j])
+                            foreach (var b in _grabbableBones[hand][j])
                             {
                                 if (bone.Finger == b.finger)
                                 {
@@ -753,14 +760,14 @@ namespace Leap.Unity.PhysicalHands
                 return false;
             }
 
-            if (!_bones.ContainsKey(hand))
+            if (!_grabbableBones.ContainsKey(hand))
             {
                 return false;
             }
 
-            for (int i = 0; i < _bones[hand].Length; i++)
+            for (int i = 0; i < _grabbableBones[hand].Length; i++)
             {
-                foreach (var bone in _bones[hand][i])
+                foreach (var bone in _grabbableBones[hand][i])
                 {
                     earlyQuit = false;
                     switch (bone.Finger)
@@ -820,9 +827,9 @@ namespace Leap.Unity.PhysicalHands
 
                 for (int i = _grabbingHands.Count - 1; i > 0; i--)
                 {
-                    int grabHandndex = _grabbingCandidates.IndexOf(_grabbingHands[i]);
+                    int grabHandndex = _grabbableHands.IndexOf(_grabbingHands[i]);
 
-                    if (!_grabValues[grabHandndex].handGrabbing)
+                    if (_grabbableHandsValues[grabHandndex].handGrabbing)
                     {
                         hand = _grabbingHands[i];
                         break;
@@ -836,10 +843,13 @@ namespace Leap.Unity.PhysicalHands
 
                 if (hand.dataHand != null)
                 {
-                    int grabHandndex = _grabbingCandidates.IndexOf(hand);
+                    int grabHandndex = _grabbableHands.IndexOf(hand);
 
-                    _newPosition = hand.palmBone.transform.position + (hand.Velocity * Time.fixedDeltaTime) + (hand.palmBone.transform.rotation * Quaternion.Inverse(_grabValues[grabHandndex].originalHandRotation) * _grabValues[grabHandndex].offset);
-                    _newRotation = hand.palmBone.transform.rotation * Quaternion.Euler(hand.AngularVelocity * Time.fixedDeltaTime) * _grabValues[grabHandndex].rotationOffset;
+                    if (grabHandndex != -1)
+                    {
+                        _newPosition = hand.palmBone.transform.position + (hand.Velocity * Time.fixedDeltaTime) + (hand.palmBone.transform.rotation * Quaternion.Inverse(_grabbableHandsValues[grabHandndex].originalHandRotation) * _grabbableHandsValues[grabHandndex].offset);
+                        _newRotation = hand.palmBone.transform.rotation * Quaternion.Euler(hand.AngularVelocity * Time.fixedDeltaTime) * _grabbableHandsValues[grabHandndex].rotationOffset;
+                    }
                 }
             }
         }
@@ -991,7 +1001,7 @@ namespace Leap.Unity.PhysicalHands
                 if (_ignorePhysicalHands == null || !_ignorePhysicalHands.DisableAllHandCollisions)
                 {
                     // Ignore collision after throwing so we don't knock the object
-                    foreach (var hand in _grabbingCandidates)
+                    foreach (var hand in _grabbableHands)
                     {
                         hand.IgnoreCollision(_rigid, _colliders, 0, 0.01f);
                     }
