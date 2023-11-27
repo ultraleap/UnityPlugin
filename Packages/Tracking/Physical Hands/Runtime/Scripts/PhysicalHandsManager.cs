@@ -177,8 +177,7 @@ namespace Leap.Unity.PhysicalHands
             _rightHandIndex = inputFrame.Hands.FindIndex(x => x.IsRight);
 
             ContactParent?.UpdateFrame(inputFrame);
-
-            _modifiedFrame.CopyFrom(inputFrame);
+            _modifiedFrame = _modifiedFrame.CopyFrom(inputFrame);
             ContactParent?.OutputFrame(ref _modifiedFrame);
 
             // Output the frame on each update
