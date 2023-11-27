@@ -62,13 +62,14 @@ namespace Leap.Unity.PhysicalHands
 
             if (index != -1)
             {
-                hand.dataHand.CopyFrom(inputFrame.Hands[index]);
+                hand.dataHand = hand.dataHand.CopyFrom(inputFrame.Hands[index]);
 
                 if (!hand.tracked)
                 {
                     hand.BeginHand(hand.dataHand);
                 }
-                // Actually call the update once the hand is ready
+
+                // Actually call the update once the hand is ready (sometimes BeginHand sets tracked to true)
                 if (hand.tracked)
                 {
                     hand.UpdateHand(hand.dataHand);
@@ -85,30 +86,17 @@ namespace Leap.Unity.PhysicalHands
 
         internal void OutputFrame(ref Frame inputFrame)
         {
-            PhysicalHandsManager._leftHandIndex = inputFrame.Hands.FindIndex(x => x.IsLeft);
             OutputHand(PhysicalHandsManager._leftHandIndex, _leftHand, ref inputFrame);
-            PhysicalHandsManager._rightHandIndex = inputFrame.Hands.FindIndex(x => x.IsRight);
             OutputHand(PhysicalHandsManager._rightHandIndex, _rightHand, ref inputFrame);
         }
 
         private void OutputHand(int index, ContactHand hand, ref Frame inputFrame)
         {
-            if (index == -1)
-            {
-                if (hand.tracked)
-                {
-                    inputFrame.Hands.Add(hand.OutputHand());
-                }
-            }
-            else
+            if (index != -1)
             {
                 if (hand.tracked)
                 {
                     inputFrame.Hands[index].CopyFrom(hand.OutputHand());
-                }
-                else if(inputFrame.Hands.Count > 0)
-                {
-                    inputFrame.Hands.Remove(inputFrame.Hands[index]);
                 }
             }
         }
