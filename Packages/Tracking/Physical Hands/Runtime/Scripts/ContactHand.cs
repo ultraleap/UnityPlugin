@@ -136,9 +136,9 @@ namespace Leap.Unity.PhysicalHands
 
         internal Hand OutputHand()
         {
-            ProcessOutputHand(ref modifiedHand);
-            if (tracked)
+            if (dataHand != null)
             {
+                ProcessOutputHand(ref modifiedHand);
                 return modifiedHand;
             }
             else

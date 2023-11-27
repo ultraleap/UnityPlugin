@@ -144,7 +144,6 @@ namespace Leap.Unity.PhysicalHands
                         GrabHelperObject helper = new GrabHelperObject(_colliderCache[i].attachedRigidbody, this);
                         helper.AddHand(hand);
                         _grabHelpers.Add(_colliderCache[i].attachedRigidbody, helper);
-                        //SendStates(_colliderCache[i].attachedRigidbody, helper);
                     }
                 }
             }
@@ -175,27 +174,21 @@ namespace Leap.Unity.PhysicalHands
         {
             ApplyHovers();
 
-            GrabHelperObject.State oldState, state;
-
             foreach (var helper in _grabHelpers)
             {
-                // Removed ignore check here and moved into the helper so we can still get state information
-                oldState = helper.Value.GrabState;
-                state = helper.Value.UpdateHelper();
-                if (state != oldState)
-                {
-                    //SendStates(helper.Value.Rigidbody, helper.Value);
-                }
+                helper.Value.UpdateHelper();
             }
         }
 
         private void ApplyHovers()
         {
+            _grabRigids.RemoveWhere(ValidateUnhoverRigids);
+
             foreach (var rigid in _hoveredItems)
             {
                 _grabRigids.Add(rigid);
             }
-            _grabRigids.RemoveWhere(ValidateUnhoverRigids);
+
             _hoveredItems.Clear();
         }
 
@@ -211,8 +204,6 @@ namespace Leap.Unity.PhysicalHands
                         _grabHelpers[rigid].ReleaseObject();
                     }
                     _grabHelpers[rigid].ReleaseHelper();
-                    //                    SendStates(rigid, _grabHelpers[rigid]);
-
                     _grabHelpers.Remove(rigid);
                 }
                 return true;
