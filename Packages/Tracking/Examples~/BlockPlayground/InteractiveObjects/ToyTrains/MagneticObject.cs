@@ -27,6 +27,8 @@ namespace Leap.Unity.Interaction
 
         List<MagneticObject> nearbyMagneticObjects = new List<MagneticObject>();
 
+        bool clearingMagnetism = false;
+
         private void Awake()
         {
             if (rbody == null)
@@ -39,6 +41,12 @@ namespace Leap.Unity.Interaction
 
         private void FixedUpdate()
         {
+            if (clearingMagnetism)
+            {
+                clearingMagnetism = false;
+                return;
+            }
+
             FindNearbyMagneticObjects();
             ApplyMagnets();
         }
@@ -126,6 +134,16 @@ namespace Leap.Unity.Interaction
                     }
                 }
             }
+        }
+
+        public void ClearMagnetism()
+        {
+            foreach (var magneticPoint in magneticPoints)
+            {
+                magneticPoint.ClearMagnetism();
+            }
+
+            clearingMagnetism = true;
         }
     }
 }
