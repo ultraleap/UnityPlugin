@@ -14,4 +14,9 @@ public class SceneReset : MonoBehaviour
         SceneManager.LoadScene(scene.name);
     }
 
+    public void ExitApplication()
+    {
+        Application.Quit();
+    }
+
 }

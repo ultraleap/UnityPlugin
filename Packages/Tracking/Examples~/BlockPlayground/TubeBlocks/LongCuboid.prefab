@@ -12,6 +12,8 @@ GameObject:
   - component: {fileID: 5021161003868712018}
   - component: {fileID: 5021161003868712019}
   - component: {fileID: 5021161003868712108}
+  - component: {fileID: 5021161003868712109}
+  - component: {fileID: 5021161003868712110}
   - component: {fileID: 5021161003868712111}
   m_Layer: 0
   m_Name: LongCuboid
@@ -42,7 +44,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5021161003868712105}
-  m_Mesh: {fileID: 5151382180428610131, guid: ed2c706c936646a4e956039e522ae59e, type: 3}
+  m_Mesh: {fileID: 5151382180428610131, guid: d7b6ed2b2ff739e4384a989a7dfca693, type: 3}
 --- !u!23 &5021161003868712019
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -101,6 +103,32 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 1
+--- !u!114 &5021161003868712109
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5021161003868712105}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1548f80b55edb7447a13a74a4146c57b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  distanceToReset: 2
+--- !u!114 &5021161003868712110
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5021161003868712105}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1548f80b55edb7447a13a74a4146c57b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  distanceToReset: 2
 --- !u!65 &5021161003868712111
 BoxCollider:
   m_ObjectHideFlags: 0
