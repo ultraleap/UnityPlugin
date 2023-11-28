@@ -90,7 +90,7 @@ namespace Leap.Unity
 
             _trackedPoseDriver = Camera.main.GetComponent<TrackedPoseDriver>();
 
-            if(_trackedPoseDriver == null && _autoCreateTrackedPoseDriver)
+            if (_trackedPoseDriver == null && _autoCreateTrackedPoseDriver)
             {
                 Debug.Log("Automatically assigning a TrackedPoseDriver to the Main Camera");
                 _trackedPoseDriver = Camera.main.gameObject.AddComponent<TrackedPoseDriver>();
@@ -105,7 +105,7 @@ namespace Leap.Unity
 
         private void Update()
         {
-            if(currentSubsystem == null && Time.time > lastCheckForSubsystemTime + 1)
+            if (currentSubsystem == null && Time.time > lastCheckForSubsystemTime + 1)
             {
                 CheckForSubsystem();
             }

@@ -46,7 +46,7 @@ public class BuildValidation : IPreprocessBuildWithReport
             $"Validation issue encountered: {error} Do you want to continue with the build anyway?", "Continue Building",
             "Stop Build"))
         {
-            switch(validationType)
+            switch (validationType)
             {
                 case ValidationPopupType.ANDROID_ARCHITECTURE:
                     UltraleapSettings.Instance.showAndroidBuildArchitectureWarning = false;
