@@ -6,6 +6,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
 
+## [6.13.0] - 24/11/23
+
+### Tracking Client versions
+- Windows 	v5.17.1
+- MacOS 	v5.17.1
+- Android 	v5.17.1
+
+### Added
+- (Hands Recorder Preview) A new Hand Recorder to record animation clips of hands and additional objects to produce re-playable actions (e.g for tutorials)
+- (Pose Detector) Add a new rule type to match rotation of a joint to a target
+- (XR Hands) Added XRHandsLeapProvider to convert the current XRHandsSubsystem data to a LeapProvider for use with the Ultraleap Unity Plugin features
+- Added the ability to suppress the Android build warnings
+- Help Menu that links out to docs, a place to report bugs & places to get support
+
+### Changed
+- (Preview Teleportation) Lightweight Pinch Detector's finger detection can be configured
+- (Obsolete) Some old unused LeapC APIs have been marked as Obsolete (config, IsSmudged, IsLightingBad)
+- Changed from using obsolete FindObjectOfType to using newer implementations
+- Ultraleap settings are now in the project settings window, under "Ultraleap"
+
+### Fixed
+- (Hand Binder) Hands begin at large/small scale and slowly scale to normal size
+- (Pinch to Paint Example) Painting sound does not play if pinch began out of tracking range
+- LeapXRServiceProvider ensures default device offset mode is set to new defaults when enabled
+- Attachment Hand Menu is incorrectly rotated
+
+### Known issues
+- Repeatedly opening scenes can cause memory use increase
+- The OpenXR Leap Provider does not currently support the `Confidence` hand property (and will return fixed values)
+- After using Ultraleap OpenXR in Unity Editor, the tracking mode of device 0 will be set to HMD until the Unity Editor session ends. This can stop the testing of non-XR scenes until the Unity Editor is re-opened
+
 ## [6.12.1] - 28/09/23
 
 ### Tracking Client versions

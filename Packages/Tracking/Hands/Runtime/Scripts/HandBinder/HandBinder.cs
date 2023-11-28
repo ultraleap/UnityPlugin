@@ -82,6 +82,8 @@ namespace Leap.Unity.HandsModule
         public SerializedTransform[] DefaultHandPose;
 
 
+        private float lastHandFoundTime = 0;
+        private float instantScaleAfterHandFoundTime = 1f; // seconds
         #endregion
 
         #region Hand Model Base
@@ -156,6 +158,8 @@ namespace Leap.Unity.HandsModule
             {
                 SetModelScale = false;
             }
+
+            lastHandFoundTime = Time.time;
         }
 
         /// <summary>
@@ -213,7 +217,17 @@ namespace Leap.Unity.HandsModule
             else // Lerp the scale during playmode
             {
                 var targetScale = BoundHand.startScale * scaleRatio;
-                transform.localScale = Vector3.Lerp(transform.localScale, targetScale, Time.deltaTime * ScalingSpeedMultiplier);
+
+                if (Time.time - lastHandFoundTime < instantScaleAfterHandFoundTime)
+                {
+                    // Instantly scale if it's not been long since the hand started tracking
+                    transform.localScale = targetScale;
+                }
+                else
+                {
+                    // Smoothly scale
+                    transform.localScale = Vector3.Lerp(transform.localScale, targetScale, Time.deltaTime * ScalingSpeedMultiplier);
+                }
             }
         }
 

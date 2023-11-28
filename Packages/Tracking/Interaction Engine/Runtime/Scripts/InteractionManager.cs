@@ -264,7 +264,7 @@ namespace Leap.Unity.Interaction
         {
             get
             {
-                if (s_instance == null) { s_instance = FindObjectOfType<InteractionManager>(); }
+                if (s_instance == null) { s_instance = FindAnyObjectByType<InteractionManager>(); }
                 return s_instance;
             }
             set { s_instance = value; }
@@ -304,7 +304,7 @@ namespace Leap.Unity.Interaction
 #if UNITY_EDITOR
             if (_drawControllerRuntimeGizmos == true)
             {
-                if (FindObjectOfType<RuntimeGizmoManager>() == null)
+                if (FindAnyObjectByType<RuntimeGizmoManager>() == null)
                 {
                     Debug.LogWarning("'_drawControllerRuntimeGizmos' is enabled, but there is no "
                                    + "RuntimeGizmoManager in your scene. Please add one if you'd "

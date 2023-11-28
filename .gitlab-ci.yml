@@ -2,10 +2,12 @@
 # This allows us to run all pipelines (web, branch, MR) without duplicating branch and MR pipelines
 workflow:
   rules:
-    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
-      when: never
-    - when: always
-
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "external_pull_request_event"'
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "develop"
+      when: always
+    - when: never
 
 variables:
   UNITY_HUB: "C:/Program Files/Unity Hub/Unity Hub.exe"
