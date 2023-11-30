@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -18,7 +19,18 @@ public class PhysicalHandsButton : MonoBehaviour
     public UnityEvent OnButtonPressed;
     public UnityEvent OnButtonUnPressed;
 
+    private List<Collider> _colliders;
 
+    [SerializeField]
+    private bool _buttonShouldDelayRebound = false;
+    [SerializeField]
+    private float buttonStaydownTimer = 2;
+
+
+    private void Start()
+    {
+        _colliders = this.transform.GetComponentsInChildren<Collider>().ToList();
+    }
 
 
     void FixedUpdate()
@@ -42,11 +54,37 @@ public class PhysicalHandsButton : MonoBehaviour
     void ButtonPressed()
     {
         OnButtonPressed.Invoke();
+        if (_buttonShouldDelayRebound)
+        {
+            StartCoroutine(ButtonCollisionReset());
+        }
     }
 
     void ButtonUnpressed()
     {
         OnButtonUnPressed.Invoke();
+    }
+
+    IEnumerator ButtonCollisionReset()
+    {
+        yield return new WaitForFixedUpdate();
+
+        buttonObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
+
+        foreach (var collider in _colliders)
+        {
+            collider.enabled = false;
+        }
+
+        yield return new WaitForSecondsRealtime(buttonStaydownTimer);
+
+        buttonObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
+
+        foreach (var collider in _colliders)
+        {
+            collider.enabled = true;
+        }
+
     }
 
 }

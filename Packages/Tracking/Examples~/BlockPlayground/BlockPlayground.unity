@@ -4473,6 +4473,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1572688315}
     - target: {fileID: 767538377468813851, guid: 7c877a94518df394bb200ddc9ccc50c9, type: 3}
+      propertyPath: _buttonShouldDelayRebound
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 767538377468813851, guid: 7c877a94518df394bb200ddc9ccc50c9, type: 3}
       propertyPath: OnButtonPressed.m_PersistentCalls.m_Calls.Array.size
       value: 1
       objectReference: {fileID: 0}
@@ -6039,6 +6043,10 @@ PrefabInstance:
       propertyPath: m_Material
       value: 
       objectReference: {fileID: 1572688315}
+    - target: {fileID: 767538377468813851, guid: 7c877a94518df394bb200ddc9ccc50c9, type: 3}
+      propertyPath: _buttonShouldDelayRebound
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 767538377468813851, guid: 7c877a94518df394bb200ddc9ccc50c9, type: 3}
       propertyPath: OnButtonPressed.m_PersistentCalls.m_Calls.Array.size
       value: 1
@@ -17861,6 +17869,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4677399194488223129, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.022
+      objectReference: {fileID: 0}
+    - target: {fileID: 4677399194488223129, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.022
+      objectReference: {fileID: 0}
     - target: {fileID: 4677399195784895745, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.95
@@ -17870,6 +17886,10 @@ PrefabInstance:
       value: 0.95
       objectReference: {fileID: 0}
     - target: {fileID: 5536264655608466747, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+      propertyPath: _buttonShouldDelayRebound
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5536264655608466747, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
       propertyPath: OnButtonPressed.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 1079808636}
@@ -17877,6 +17897,22 @@ PrefabInstance:
       propertyPath: OnButtonPressed.m_PersistentCalls.m_Calls.Array.data[1].m_Target
       value: 
       objectReference: {fileID: 1605294539}
+    - target: {fileID: 6010923430879593940, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+      propertyPath: m_TargetPosition.y
+      value: -0.022
+      objectReference: {fileID: 0}
+    - target: {fileID: 6010923430879593940, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+      propertyPath: m_ConnectedAnchor.y
+      value: 0.011
+      objectReference: {fileID: 0}
+    - target: {fileID: 7348451228333257400, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+      propertyPath: m_TargetPosition.y
+      value: -0.022
+      objectReference: {fileID: 0}
+    - target: {fileID: 7348451228333257400, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+      propertyPath: m_ConnectedAnchor.y
+      value: 0.011
+      objectReference: {fileID: 0}
     - target: {fileID: 8134623800898365424, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
       propertyPath: m_RootOrder
       value: 11
@@ -17925,6 +17961,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Tablet-ContactModes
       objectReference: {fileID: 0}
+    - target: {fileID: 8536735542557770485, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.022
+      objectReference: {fileID: 0}
+    - target: {fileID: 8536735542557770485, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.022
+      objectReference: {fileID: 0}
     - target: {fileID: 8536735543952960109, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.95
@@ -17937,6 +17981,10 @@ PrefabInstance:
       propertyPath: OnButtonPressed.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 1079808636}
+    - target: {fileID: 8810489104910744151, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+      propertyPath: _buttonShouldDelayRebound
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8810489104910744151, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
       propertyPath: OnButtonPressed.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
