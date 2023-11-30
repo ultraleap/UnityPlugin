@@ -105,6 +105,46 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 3123740035100676828}
     m_Modifications:
+    - target: {fileID: 112747678436361176, guid: 70615bf3458555642800cb5761a8b6ae, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.029
+      objectReference: {fileID: 0}
+    - target: {fileID: 3373810798329254196, guid: 70615bf3458555642800cb5761a8b6ae, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.016
+      objectReference: {fileID: 0}
+    - target: {fileID: 3373810798329254196, guid: 70615bf3458555642800cb5761a8b6ae, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.458
+      objectReference: {fileID: 0}
+    - target: {fileID: 3373810798329254196, guid: 70615bf3458555642800cb5761a8b6ae, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.194
+      objectReference: {fileID: 0}
+    - target: {fileID: 3980697859721526098, guid: 70615bf3458555642800cb5761a8b6ae, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.011
+      objectReference: {fileID: 0}
+    - target: {fileID: 3980697859721526098, guid: 70615bf3458555642800cb5761a8b6ae, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.346
+      objectReference: {fileID: 0}
+    - target: {fileID: 3980697859721526098, guid: 70615bf3458555642800cb5761a8b6ae, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.148
+      objectReference: {fileID: 0}
+    - target: {fileID: 4569518308084685685, guid: 70615bf3458555642800cb5761a8b6ae, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.002
+      objectReference: {fileID: 0}
+    - target: {fileID: 4569518308084685685, guid: 70615bf3458555642800cb5761a8b6ae, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.118
+      objectReference: {fileID: 0}
+    - target: {fileID: 4569518308084685685, guid: 70615bf3458555642800cb5761a8b6ae, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.055
+      objectReference: {fileID: 0}
     - target: {fileID: 5752019990001433342, guid: 70615bf3458555642800cb5761a8b6ae, type: 3}
       propertyPath: m_RootOrder
       value: 1
@@ -152,6 +192,22 @@ PrefabInstance:
     - target: {fileID: 6140971145009665817, guid: 70615bf3458555642800cb5761a8b6ae, type: 3}
       propertyPath: m_Name
       value: PlankTube
+      objectReference: {fileID: 0}
+    - target: {fileID: 6240478935649142691, guid: 70615bf3458555642800cb5761a8b6ae, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.06
+      objectReference: {fileID: 0}
+    - target: {fileID: 6728229665682295217, guid: 70615bf3458555642800cb5761a8b6ae, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.006
+      objectReference: {fileID: 0}
+    - target: {fileID: 6728229665682295217, guid: 70615bf3458555642800cb5761a8b6ae, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.23
+      objectReference: {fileID: 0}
+    - target: {fileID: 6728229665682295217, guid: 70615bf3458555642800cb5761a8b6ae, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.101
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 70615bf3458555642800cb5761a8b6ae, type: 3}
