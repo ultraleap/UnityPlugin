@@ -235,7 +235,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &15153570
 Transform:
   m_ObjectHideFlags: 0
@@ -4098,6 +4098,10 @@ PrefabInstance:
     - target: {fileID: 6636654956868851386, guid: bc0e964e8fdef39419504d5dfb897ada, type: 3}
       propertyPath: m_Name
       value: Catapult
+      objectReference: {fileID: 0}
+    - target: {fileID: 6636654956868851386, guid: bc0e964e8fdef39419504d5dfb897ada, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bc0e964e8fdef39419504d5dfb897ada, type: 3}
@@ -13589,7 +13593,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1671344257
 Transform:
   m_ObjectHideFlags: 0
@@ -20118,6 +20122,10 @@ PrefabInstance:
     - target: {fileID: 3031406767718400999, guid: 59c1e3a283ecf6e43875782998d176eb, type: 3}
       propertyPath: m_Name
       value: Lamp
+      objectReference: {fileID: 0}
+    - target: {fileID: 3031406767718400999, guid: 59c1e3a283ecf6e43875782998d176eb, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 59c1e3a283ecf6e43875782998d176eb, type: 3}

@@ -8,17 +8,24 @@ public class PhysicalHandsRocket : MonoBehaviour
     public GameObject buttonObject;
     public GameObject noseCone;
     [Tooltip("The local position which the button will be limited to and will try to return to.")]
-    public float buttonHeightLimit = 0.02f;
-    public float rocketPower = 30;
+    [SerializeField]
+    private float buttonHeightLimit = 0.02f;
+    [SerializeField]
+    private float rocketPower = 30;
+    [SerializeField]
+    private float burnTime = 3;
 
     private const float BUTTON_PRESS_THRESHOLD = 0.01F;
-    private const float BUTTON_PRESS_EXIT_THRESHOLD = 0.15F;
+    private const float BUTTON_PRESS_EXIT_THRESHOLD = 0.09F;
 
     private bool _isButtonPressed = false;
 
     private Rigidbody _rigidbody;
 
     bool launching = false;
+
+    [SerializeField]
+    ParticleSystem _particleSystem;
 
     void Start()
     {
@@ -30,12 +37,15 @@ public class PhysicalHandsRocket : MonoBehaviour
         if (buttonObject.transform.localPosition.y <= buttonHeightLimit * BUTTON_PRESS_THRESHOLD
             && !_isButtonPressed)
         {
+
+            Debug.Log("Rocket Button Pressed");
             _isButtonPressed = true;
             ButtonPressed();
         }
 
         if (_isButtonPressed && buttonObject.transform.localPosition.y >= buttonHeightLimit * BUTTON_PRESS_EXIT_THRESHOLD)
         {
+            Debug.Log("Rocket Button UnPressed");
             _isButtonPressed = false;
         }
     }
@@ -53,10 +63,12 @@ public class PhysicalHandsRocket : MonoBehaviour
     {
         launching = true;
 
+        _particleSystem.Play();
+
         _rigidbody.angularDrag = 20;
         _rigidbody.useGravity = true;
         float timePassed = 0;
-        while (timePassed < 3)
+        while (timePassed < burnTime)
         {
             var heading = noseCone.transform.position - this.transform.position;
             _rigidbody.AddForceAtPosition(heading.normalized * rocketPower, transform.position, ForceMode.Acceleration);
@@ -65,11 +77,13 @@ public class PhysicalHandsRocket : MonoBehaviour
         }
 
         launching = false;
+        _particleSystem.Stop();
     }
 
     public void StopLaunch()
     {
         StopAllCoroutines();
         launching = false;
+        _particleSystem.Stop();
     }
 }
