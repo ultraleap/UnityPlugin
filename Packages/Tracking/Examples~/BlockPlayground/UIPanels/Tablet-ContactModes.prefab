@@ -26,7 +26,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8134623799120668407}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -0}
+  m_LocalPosition: {x: 0, y: 0, z: 0.015}
   m_LocalScale: {x: 0.0039655613, y: 0.0039655594, z: 0.003965561}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -35,7 +35,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.009, y: 0.033}
+  m_AnchoredPosition: {x: 0.009, y: 0.0294}
   m_SizeDelta: {x: 66.2979, y: 5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!23 &8134623799120668402
@@ -58,7 +58,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  - {fileID: 556829042121458119, guid: 342802517badcf44c811584e5b42a888, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -102,8 +102,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Test out different contact modes for the interactable objects in the environment.
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 342802517badcf44c811584e5b42a888, type: 2}
+  m_sharedMaterial: {fileID: 556829042121458119, guid: 342802517badcf44c811584e5b42a888, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -134,7 +134,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
+  m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -581,7 +581,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8134623799706540696}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0.014}
   m_LocalScale: {x: 0.0043500634, y: 0.0043500615, z: 0.004350063}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -590,7 +590,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0, y: 0.054}
+  m_AnchoredPosition: {x: -0, y: 0.0537}
   m_SizeDelta: {x: 56.68094, y: 5.10178}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!23 &8134623799706540699
@@ -613,7 +613,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  - {fileID: -2052639064183078298, guid: 8e284a199df826847a55dad22f66db6d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -657,8 +657,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Compare contact modes
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 8e284a199df826847a55dad22f66db6d, type: 2}
+  m_sharedMaterial: {fileID: -2052639064183078298, guid: 8e284a199df826847a55dad22f66db6d, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -689,7 +689,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 1
-  m_HorizontalAlignment: 1
+  m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -1419,6 +1419,26 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 8134623800898365424}
     m_Modifications:
+    - target: {fileID: 919871099257604495, guid: dafee6aef10cc784394cd59ee277d091, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1568742435851884829, guid: dafee6aef10cc784394cd59ee277d091, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3286578780287814941, guid: dafee6aef10cc784394cd59ee277d091, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3461729854329802858, guid: dafee6aef10cc784394cd59ee277d091, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3461729854753930324, guid: dafee6aef10cc784394cd59ee277d091, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 3461729854966666435, guid: dafee6aef10cc784394cd59ee277d091, type: 3}
       propertyPath: m_RootOrder
       value: 10
@@ -1437,15 +1457,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3461729854966666435, guid: dafee6aef10cc784394cd59ee277d091, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.065
+      value: 0.0583
       objectReference: {fileID: 0}
     - target: {fileID: 3461729854966666435, guid: dafee6aef10cc784394cd59ee277d091, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.069999926
+      value: -0.07
       objectReference: {fileID: 0}
     - target: {fileID: 3461729854966666435, guid: dafee6aef10cc784394cd59ee277d091, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.009058565
+      value: 0.0091
       objectReference: {fileID: 0}
     - target: {fileID: 3461729854966666435, guid: dafee6aef10cc784394cd59ee277d091, type: 3}
       propertyPath: m_LocalRotation.w
@@ -1479,6 +1499,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: PhysicalHands Button (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 3461729854966666460, guid: dafee6aef10cc784394cd59ee277d091, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3461729855275826582, guid: dafee6aef10cc784394cd59ee277d091, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3935224189183323336, guid: dafee6aef10cc784394cd59ee277d091, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 7c6d69ae2aabcee4fbe56e4fb2638238, type: 2}
     - target: {fileID: 3973722649934473950, guid: dafee6aef10cc784394cd59ee277d091, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -1509,9 +1541,29 @@ PrefabInstance:
       propertyPath: m_text
       value: The hands will not go through object surfaces.
       objectReference: {fileID: 0}
+    - target: {fileID: 919871099257604495, guid: dafee6aef10cc784394cd59ee277d091, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1568742435851884829, guid: dafee6aef10cc784394cd59ee277d091, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3286578780287814941, guid: dafee6aef10cc784394cd59ee277d091, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 3461729854329802856, guid: dafee6aef10cc784394cd59ee277d091, type: 3}
       propertyPath: m_text
       value: Hard contact
+      objectReference: {fileID: 0}
+    - target: {fileID: 3461729854329802858, guid: dafee6aef10cc784394cd59ee277d091, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3461729854753930324, guid: dafee6aef10cc784394cd59ee277d091, type: 3}
+      propertyPath: m_Layer
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 3461729854966666435, guid: dafee6aef10cc784394cd59ee277d091, type: 3}
       propertyPath: m_RootOrder
@@ -1531,7 +1583,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3461729854966666435, guid: dafee6aef10cc784394cd59ee277d091, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.0695
+      value: -0.052
       objectReference: {fileID: 0}
     - target: {fileID: 3461729854966666435, guid: dafee6aef10cc784394cd59ee277d091, type: 3}
       propertyPath: m_LocalPosition.y
@@ -1539,7 +1591,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3461729854966666435, guid: dafee6aef10cc784394cd59ee277d091, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.009058565
+      value: 0.009
       objectReference: {fileID: 0}
     - target: {fileID: 3461729854966666435, guid: dafee6aef10cc784394cd59ee277d091, type: 3}
       propertyPath: m_LocalRotation.w
@@ -1577,6 +1629,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: PhysicalHands Button (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 3461729854966666460, guid: dafee6aef10cc784394cd59ee277d091, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3461729855275826582, guid: dafee6aef10cc784394cd59ee277d091, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3935224189183323336, guid: dafee6aef10cc784394cd59ee277d091, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 7c6d69ae2aabcee4fbe56e4fb2638238, type: 2}
     - target: {fileID: 3973722649934473950, guid: dafee6aef10cc784394cd59ee277d091, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
