@@ -289,12 +289,42 @@ namespace Leap.Unity.PhysicalHands
                 _xForceLimit = Mathf.Lerp(_xForceLimit, hardContactParent.maxFingerVelocity, Time.fixedDeltaTime * (1.0f / 0.5f));
             }
 
+            if(contactHand.ghosted)
+            {
+                SetDefaultArticulationDrives(prevBone, bone); // we are currenlty ghosted, so allow free movement
+            }
+            else
+            {
+                ArticulationDrive xDrive = articulation.xDrive;
+                xDrive.stiffness = hardContactHand.fingerStiffness[finger];
+                xDrive.damping = _xDampening;
+                xDrive.forceLimit = _xForceLimit * Time.fixedDeltaTime;
+                xDrive.upperLimit = hardContactHand.grabbingFingers[finger] >= joint ? _grabbingXDrive : _originalXDriveUpper;
+                xDrive.target = _wasBoneGrabbing ? Mathf.Clamp(_xTargetAngle, articulation.xDrive.lowerLimit, _grabbingXDrive) : _xTargetAngle;
+                articulation.xDrive = xDrive;
+
+                if (joint == 0)
+                {
+                    _yTargetAngle = CalculateYJointAngle(prevBone.Rotation, bone.Rotation);
+
+                    ArticulationDrive yDrive = articulation.yDrive;
+                    yDrive.damping = _xDampening * .75f;
+                    yDrive.stiffness = hardContactHand.fingerStiffness[finger];
+                    yDrive.forceLimit = hardContactParent.maxPalmVelocity * Time.fixedDeltaTime;
+                    yDrive.target = _yTargetAngle;
+                    articulation.yDrive = yDrive;
+                }
+            }
+        }
+
+        private void SetDefaultArticulationDrives(Bone prevBone, Bone bone)
+        {
             ArticulationDrive xDrive = articulation.xDrive;
-            xDrive.stiffness = hardContactHand.fingerStiffness[finger];
-            xDrive.damping = _xDampening;
-            xDrive.forceLimit = _xForceLimit * Time.fixedDeltaTime;
-            xDrive.upperLimit = hardContactHand.grabbingFingers[finger] >= joint ? _grabbingXDrive : _originalXDriveUpper;
-            xDrive.target = _wasBoneGrabbing ? Mathf.Clamp(_xTargetAngle, articulation.xDrive.lowerLimit, _grabbingXDrive) : _xTargetAngle;
+            xDrive.stiffness = hardContactParent.boneStiffness;
+            xDrive.damping = hardContactParent.boneDamping;
+            xDrive.forceLimit = hardContactParent.maxFingerVelocity * Time.fixedDeltaTime;
+            xDrive.upperLimit = _originalXDriveUpper;
+            xDrive.target = _xTargetAngle;
             articulation.xDrive = xDrive;
 
             if (joint == 0)
@@ -302,8 +332,8 @@ namespace Leap.Unity.PhysicalHands
                 _yTargetAngle = CalculateYJointAngle(prevBone.Rotation, bone.Rotation);
 
                 ArticulationDrive yDrive = articulation.yDrive;
-                yDrive.damping = _xDampening * .75f;
-                yDrive.stiffness = hardContactHand.fingerStiffness[finger];
+                yDrive.damping = hardContactParent.boneDamping * .75f;
+                yDrive.stiffness = hardContactParent.boneStiffness;
                 yDrive.forceLimit = hardContactParent.maxPalmVelocity * Time.fixedDeltaTime;
                 yDrive.target = _yTargetAngle;
                 articulation.yDrive = yDrive;
@@ -470,7 +500,7 @@ namespace Leap.Unity.PhysicalHands
             _overRotationCount = 0;
 
             _wasBoneGrabbing = false;
-            _xDampening = 1f;
+            _xDampening = hardContactParent.boneDamping;
 
             if (transform.parent != null)
             {

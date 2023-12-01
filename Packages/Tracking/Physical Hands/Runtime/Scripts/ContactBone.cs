@@ -30,12 +30,6 @@ namespace Leap.Unity.PhysicalHands
         internal ContactParent contactParent => contactHand.contactParent;
         #endregion
 
-        #region Physics Data
-
-        private const int DISTANCE_CHECK_REDUCTION = 5; // How many fixed frames should we skip between distance checks
-
-        #endregion
-
         #region Interaction Data
         private static float SAFETY_CLOSE_DISTANCE = 0.005f;
 
@@ -170,17 +164,8 @@ namespace Leap.Unity.PhysicalHands
             IsBoneReadyToGrab = _grabObjects.Count > 0;
         }
 
-        int frameReductionCounter = 0;
-
         private void UpdateObjectDistances(Collider[] colliderCache, int count)
         {
-            frameReductionCounter++;
-
-            if (frameReductionCounter % DISTANCE_CHECK_REDUCTION != 0)
-                return;
-
-            frameReductionCounter = 0;
-
             _nearestObjectDistance = float.MaxValue;
 
             float distance, singleObjectDistance, boneDistance;
@@ -195,10 +180,6 @@ namespace Leap.Unity.PhysicalHands
             for (int i = 0; i < count; i++)
             {
                 collider = colliderCache[i];
-
-                // Make sure we don't add invalid objects
-                if (collider.attachedRigidbody == null)
-                    continue;
 
                 if (IsPalm)
                 {
@@ -229,30 +210,48 @@ namespace Leap.Unity.PhysicalHands
 
                 hover = boneDistance <= contactParent.PhysicalHandsManager.HoverDistance;
 
-                if (hover)
+                // Only add valid objects
+                if (collider.attachedRigidbody != null)
                 {
-                    bool contacting = boneDistance <= (IsPalm ? contactParent.PhysicalHandsManager.ContactDistance * 2f : contactParent.PhysicalHandsManager.ContactDistance);
-
-                    IsBoneHovering = true;
-                    contactHand.isHovering = true;
-
-                    if (contacting)
+                    if (hover)
                     {
-                        IsBoneContacting = true;
-                        contactHand.isContacting = true;
-                    }
+                        bool contacting = boneDistance <= (IsPalm ? contactParent.PhysicalHandsManager.ContactDistance * 2f : contactParent.PhysicalHandsManager.ContactDistance);
 
-                    if (_nearbyObjects.ContainsKey(collider.attachedRigidbody))
-                    {
-                        if (_nearbyObjects[collider.attachedRigidbody].ContainsKey(collider))
+                        IsBoneHovering = true;
+                        contactHand.isHovering = true;
+
+                        if (contacting)
                         {
-                            _nearbyObjects[collider.attachedRigidbody][collider].isContactingCollider = contacting;
-                            _nearbyObjects[collider.attachedRigidbody][collider].direction = direction;
-                            _nearbyObjects[collider.attachedRigidbody][collider].bonePos = bonePos + (direction * width);
-                            _nearbyObjects[collider.attachedRigidbody][collider].distance = boneDistance;
+                            IsBoneContacting = true;
+                            contactHand.isContacting = true;
+                        }
+
+                        if (_nearbyObjects.ContainsKey(collider.attachedRigidbody))
+                        {
+                            if (_nearbyObjects[collider.attachedRigidbody].ContainsKey(collider))
+                            {
+                                _nearbyObjects[collider.attachedRigidbody][collider].isContactingCollider = contacting;
+                                _nearbyObjects[collider.attachedRigidbody][collider].direction = direction;
+                                _nearbyObjects[collider.attachedRigidbody][collider].bonePos = bonePos + (direction * width);
+                                _nearbyObjects[collider.attachedRigidbody][collider].distance = boneDistance;
+                            }
+                            else
+                            {
+                                ClosestColliderDirection closestColliderDirectionPoolObj = Pool<ClosestColliderDirection>.Spawn();
+                                closestColliderDirectionPoolObj.isContactingCollider = contacting;
+                                closestColliderDirectionPoolObj.direction = direction;
+                                closestColliderDirectionPoolObj.bonePos = bonePos + (direction * width);
+                                closestColliderDirectionPoolObj.distance = boneDistance;
+
+                                _nearbyObjects[collider.attachedRigidbody].Add(
+                                    collider, closestColliderDirectionPoolObj);
+                            }
                         }
                         else
                         {
+                            Dictionary<Collider, ClosestColliderDirection> colliderDictPoolObj = Pool<Dictionary<Collider, ClosestColliderDirection>>.Spawn();
+                            _nearbyObjects.Add(collider.attachedRigidbody, colliderDictPoolObj);
+
                             ClosestColliderDirection closestColliderDirectionPoolObj = Pool<ClosestColliderDirection>.Spawn();
                             closestColliderDirectionPoolObj.isContactingCollider = contacting;
                             closestColliderDirectionPoolObj.direction = direction;
@@ -265,24 +264,10 @@ namespace Leap.Unity.PhysicalHands
                     }
                     else
                     {
-                        Dictionary<Collider, ClosestColliderDirection> colliderDictPoolObj = Pool<Dictionary<Collider, ClosestColliderDirection>>.Spawn();
-                        _nearbyObjects.Add(collider.attachedRigidbody, colliderDictPoolObj);
-
-                        ClosestColliderDirection closestColliderDirectionPoolObj = Pool<ClosestColliderDirection>.Spawn();
-                        closestColliderDirectionPoolObj.isContactingCollider = contacting;
-                        closestColliderDirectionPoolObj.direction = direction;
-                        closestColliderDirectionPoolObj.bonePos = bonePos + (direction * width);
-                        closestColliderDirectionPoolObj.distance = boneDistance;
-
-                        _nearbyObjects[collider.attachedRigidbody].Add(
-                            collider, closestColliderDirectionPoolObj);
-                    }
-                }
-                else
-                {
-                    if (_nearbyObjects.ContainsKey(collider.attachedRigidbody))
-                    {
-                        _nearbyObjects[collider.attachedRigidbody].Remove(collider);
+                        if (_nearbyObjects.ContainsKey(collider.attachedRigidbody))
+                        {
+                            _nearbyObjects[collider.attachedRigidbody].Remove(collider);
+                        }
                     }
                 }
 
@@ -458,7 +443,7 @@ namespace Leap.Unity.PhysicalHands
             {
                 return false;
             }
-            if (collider.attachedRigidbody != null || collider != null)
+            if (collider != null)
             {
                 return true;
             }

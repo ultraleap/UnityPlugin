@@ -25,7 +25,7 @@ namespace Leap.Unity.PhysicalHands
         [SerializeField]
         internal float maxWeight = 15f;
         [SerializeField]
-        internal float boneMass = 0.1f, boneStiffness = 100f;
+        internal float boneMass = 0.1f, boneStiffness = 100f, boneDamping = 1f;
 
         [SerializeField]
         internal bool useProjectPhysicsIterations = false;
