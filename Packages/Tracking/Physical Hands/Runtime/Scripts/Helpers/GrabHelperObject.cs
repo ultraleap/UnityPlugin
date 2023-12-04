@@ -283,7 +283,7 @@ namespace Leap.Unity.PhysicalHands
                         if (!Ignored && ignoreGrabTime < Time.time)
                         {
                             MoveObject();
-                            ThrowingOnHold();
+                            TrackThrowingVelocities();
                         }
                     }
                     else
@@ -905,38 +905,34 @@ namespace Leap.Unity.PhysicalHands
 
         #region Throwing
 
-        // the time before release to ignore velocities when throwing
-        private const float WINDOW_DELAY = 0.015f;
-        // the time before WINDOW_DELAY to capture velocities to be applied to objects when throwing
-        private const float WINDOW_LENGTH = 0.045f;
+        // the time to capture velocities to be applied to objects when throwing
+        private const float VELOCITY_HISTORY_LENGTH = 0.045f;
 
-        private const float MAX_THROW_VELOCITY = 3f;
-
-        private Queue<VelocitySample> _velocityQueue = new Queue<VelocitySample>(16);
+        private Queue<VelocitySample> _velocityQueue = new Queue<VelocitySample>();
 
         private struct VelocitySample
         {
-            public float time;
-            public Vector3 position;
+            public float removeTime;
+            public Vector3 velocity;
 
-            public VelocitySample(Vector3 position, float time)
+            public VelocitySample(Vector3 velocity, float time)
             {
-                this.position = position;
-                this.time = time;
+                this.velocity = velocity;
+                this.removeTime = time;
             }
         }
 
-        private void ThrowingOnHold()
+        private void TrackThrowingVelocities()
         {
-            _velocityQueue.Enqueue(new VelocitySample(_rigid.position,
-                                                      Time.fixedTime));
-
+            _velocityQueue.Enqueue(new VelocitySample(_rigid.velocity,
+                                                      Time.time + VELOCITY_HISTORY_LENGTH));
+            
             while (true)
             {
                 VelocitySample oldestVelocity = _velocityQueue.Peek();
-
+                
                 // Dequeue conservatively
-                if (oldestVelocity.time < (Time.fixedTime - WINDOW_LENGTH - WINDOW_DELAY))
+                if (Time.time > oldestVelocity.removeTime)
                 {
                     _velocityQueue.Dequeue();
                 }
@@ -946,24 +942,10 @@ namespace Leap.Unity.PhysicalHands
                 }
             }
         }
-
+        
         private void ThrowingOnRelease()
         {
-            // Ensure that they are at least 4 frames to average
-            if (_velocityQueue.Count < 4)
-            {
-                _velocityQueue.Clear();
-
-                _rigid.velocity = Vector3.zero;
-                _rigid.angularVelocity = Vector3.zero;
-                return;
-            }
-
-            // The last frame time to use to avoid using deceleration frames
-            float windowEnd = Time.fixedTime - WINDOW_DELAY;
-
             Vector3 averageVelocity = Vector3.zero;
-            VelocitySample initialVelocity = _velocityQueue.Peek();
 
             int velocityCount = 0;
 
@@ -971,29 +953,12 @@ namespace Leap.Unity.PhysicalHands
             {
                 VelocitySample oldestVelocity = _velocityQueue.Dequeue();
 
-                if (oldestVelocity.time < windowEnd)
-                {
-                    averageVelocity += oldestVelocity.position;
-                    velocityCount++;
-                }
-                else
-                {
-                    // We are in the WINDOW_DELAY time, ignore the remaining frames
-                    _velocityQueue.Clear();
-                    break;
-                }
+                averageVelocity += oldestVelocity.velocity;
+                velocityCount++;
             }
 
             // average the frames to get the average positional change
             averageVelocity /= velocityCount;
-
-            // remove the initial position to get the delta
-            averageVelocity -= initialVelocity.position;
-
-            // convert the positional change to a velocity
-            averageVelocity /= Time.fixedDeltaTime;
-
-            averageVelocity = Vector3.ClampMagnitude(averageVelocity, MAX_THROW_VELOCITY);
 
             if (averageVelocity.magnitude > 0.5f)
             {
@@ -1003,7 +968,7 @@ namespace Leap.Unity.PhysicalHands
                     // Ignore collision after throwing so we don't knock the object
                     foreach (var hand in _grabbableHands)
                     {
-                        hand.IgnoreCollision(_rigid, _colliders, 0, 0.01f);
+                        hand.IgnoreCollision(_rigid, _colliders, 0.1f, 0.01f);
                     }
 
                     // Ignore Grabbing after throwing
