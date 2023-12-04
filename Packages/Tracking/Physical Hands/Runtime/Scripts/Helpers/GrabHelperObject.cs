@@ -10,7 +10,7 @@ namespace Leap.Unity.PhysicalHands
         private const float THOWN_GRAB_COOLDOWNTIME = 0.5f;
         private const float MINIMUM_STRENGTH = 0.25f, MINIMUM_THUMB_STRENGTH = 0.2f;
         private const float REQUIRED_ENTRY_STRENGTH = 0.15f, REQUIRED_EXIT_STRENGTH = 0.05f, REQUIRED_THUMB_EXIT_STRENGTH = 0.1f, REQUIRED_PINCH_DISTANCE = 0.012f;
-        private const float GRABBABLE_DIRECTIONS_DOT = -0.7f, FORWARD_DIRECTION_DOT = 0.25f;
+        private const float GRABBABLE_DIRECTIONS_DOT = -0.5f, FORWARD_DIRECTION_DOT = 0.5f;
 
         /// <summary>
         /// The current state of the grasp helper.
@@ -824,10 +824,11 @@ namespace Leap.Unity.PhysicalHands
                  */
 
                 ContactHand hand = null;
+                int grabHandndex = -1;
 
                 for (int i = _grabbingHands.Count - 1; i > 0; i--)
                 {
-                    int grabHandndex = _grabbableHands.IndexOf(_grabbingHands[i]);
+                    grabHandndex = _grabbableHands.IndexOf(_grabbingHands[i]);
 
                     if (_grabbableHandsValues[grabHandndex].handGrabbing)
                     {
@@ -839,17 +840,13 @@ namespace Leap.Unity.PhysicalHands
                 if (hand == null)
                 {
                     hand = _grabbingHands[_grabbingHands.Count - 1];
+                    grabHandndex = _grabbableHands.IndexOf(hand);
                 }
 
-                if (hand.dataHand != null)
+                if (grabHandndex != -1)
                 {
-                    int grabHandndex = _grabbableHands.IndexOf(hand);
-
-                    if (grabHandndex != -1)
-                    {
-                        _newPosition = hand.palmBone.transform.position + (hand.Velocity * Time.fixedDeltaTime) + (hand.palmBone.transform.rotation * Quaternion.Inverse(_grabbableHandsValues[grabHandndex].originalHandRotation) * _grabbableHandsValues[grabHandndex].offset);
-                        _newRotation = hand.palmBone.transform.rotation * Quaternion.Euler(hand.AngularVelocity * Time.fixedDeltaTime) * _grabbableHandsValues[grabHandndex].rotationOffset;
-                    }
+                    _newPosition = hand.palmBone.transform.position + (hand.Velocity * Time.fixedDeltaTime) + (hand.palmBone.transform.rotation * Quaternion.Inverse(_grabbableHandsValues[grabHandndex].originalHandRotation) * _grabbableHandsValues[grabHandndex].offset);
+                    _newRotation = hand.palmBone.transform.rotation * Quaternion.Euler(hand.AngularVelocity * Time.fixedDeltaTime) * _grabbableHandsValues[grabHandndex].rotationOffset;
                 }
             }
         }
