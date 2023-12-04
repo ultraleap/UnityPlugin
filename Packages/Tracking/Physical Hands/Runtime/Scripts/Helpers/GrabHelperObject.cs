@@ -9,7 +9,7 @@ namespace Leap.Unity.PhysicalHands
     {
         private const float THOWN_GRAB_COOLDOWNTIME = 0.5f;
         private const float MINIMUM_STRENGTH = 0.25f, MINIMUM_THUMB_STRENGTH = 0.2f;
-        private const float REQUIRED_ENTRY_STRENGTH = 0.15f, REQUIRED_EXIT_STRENGTH = 0.05f, REQUIRED_THUMB_EXIT_STRENGTH = 0.1f, REQUIRED_PINCH_DISTANCE = 0.012f;
+        private const float REQUIRED_ENTRY_STRENGTH = 0.15f, REQUIRED_EXIT_STRENGTH = 0.05f, REQUIRED_THUMB_EXIT_STRENGTH = 0.1f, REQUIRED_PINCH_DISTANCE = 0.005f;
         private const float GRABBABLE_DIRECTIONS_DOT = -0.5f, FORWARD_DIRECTION_DOT = 0.5f;
 
         /// <summary>
@@ -564,15 +564,17 @@ namespace Leap.Unity.PhysicalHands
                                                 {
                                                     _grabbableHandsValues[grabHandIndex1].handGrabbing = true;
                                                     _grabbableHandsValues[grabHandIndex2].handGrabbing = true;
+
+                                                    RegisterGrabbingHand(bone1.contactHand);
                                                 }
                                                 else
                                                 {
                                                     _grabbableHandsValues[grabHandIndex1].facingOppositeHand = true;
                                                     _grabbableHandsValues[grabHandIndex2].facingOppositeHand = true;
-                                                }
 
-                                                RegisterGrabbingHand(bone1.contactHand);
-                                                RegisterGrabbingHand(bone2.contactHand);
+                                                    RegisterGrabbingHand(bone1.contactHand);
+                                                    RegisterGrabbingHand(bone2.contactHand);
+                                                }
 
                                                 return;
                                             }
@@ -605,10 +607,7 @@ namespace Leap.Unity.PhysicalHands
 
             _grabbingHands.Add(hand);
 
-            if (_grabbingHands.Count > 0)
-            {
-                GrabState = State.Grab;
-            }
+            GrabState = State.Grab;
 
             int grabHandIndex = _grabbableHands.IndexOf(hand);
 
@@ -629,7 +628,7 @@ namespace Leap.Unity.PhysicalHands
             for(int grabHandIndex = 0; grabHandIndex < _grabbableHands.Count; grabHandIndex++)
             {
                 // Check if this hand was grabbing and is now not grabbing
-                if (_grabbingHands.Count > 1
+                if (_grabbingHands.Count > 0
                     && !_grabbableHandsValues[grabHandIndex].handGrabbing
                     && !_grabbableHandsValues[grabHandIndex].facingOppositeHand
                     // Hand has moved significantly far away from the object
@@ -830,7 +829,7 @@ namespace Leap.Unity.PhysicalHands
                 {
                     grabHandndex = _grabbableHands.IndexOf(_grabbingHands[i]);
 
-                    if (_grabbableHandsValues[grabHandndex].handGrabbing)
+                    if (_grabbableHandsValues[grabHandndex].handGrabbing || _grabbableHandsValues[grabHandndex].facingOppositeHand)
                     {
                         hand = _grabbingHands[i];
                         break;
