@@ -35,7 +35,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.009, y: 0.0294}
+  m_AnchoredPosition: {x: 0.005, y: 0.037}
   m_SizeDelta: {x: 66.2979, y: 5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!23 &8134623799120668402
@@ -135,7 +135,7 @@ MonoBehaviour:
   m_fontSizeMax: 72
   m_fontStyle: 0
   m_HorizontalAlignment: 2
-  m_VerticalAlignment: 256
+  m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
@@ -163,7 +163,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: -4.2411804, y: 0, z: -6.303215, w: -3.0910506}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   _SortingLayer: 0
@@ -199,8 +199,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8134623799314947105}
   m_LocalRotation: {x: -0.097652875, y: 0.70033133, z: -0.097652875, w: 0.70033133}
-  m_LocalPosition: {x: -0.14606936, y: -0.1409738, z: 0.019391}
-  m_LocalScale: {x: 0.016273338, y: 0.016273335, z: 0.01627334}
+  m_LocalPosition: {x: -0.1442, y: -0.1395, z: 0.019}
+  m_LocalScale: {x: 0.008793786, y: 0.008793784, z: 0.008793788}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8134623800898365424}
@@ -590,7 +590,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0, y: 0.0537}
+  m_AnchoredPosition: {x: 0.011, y: 0.059}
   m_SizeDelta: {x: 56.68094, y: 5.10178}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!23 &8134623799706540699
@@ -682,15 +682,15 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 30
+  m_fontSizeBase: 30
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 1
   m_HorizontalAlignment: 2
-  m_VerticalAlignment: 256
+  m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
@@ -718,7 +718,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: -10.179203, y: 0, z: -7.8755016, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   _SortingLayer: 0
@@ -754,8 +754,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8134623799884484381}
   m_LocalRotation: {x: -0.097652875, y: 0.70033133, z: -0.097652875, w: 0.70033133}
-  m_LocalPosition: {x: 0.15654331, y: 0.07742238, z: 0.01811713}
-  m_LocalScale: {x: 0.016273338, y: 0.016273335, z: 0.01627334}
+  m_LocalPosition: {x: 0.159, y: 0.0774, z: 0.0181}
+  m_LocalScale: {x: 0.008793786, y: 0.008793784, z: 0.008793788}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8134623800898365424}
@@ -851,8 +851,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8134623799967773583}
   m_LocalRotation: {x: -0.097652875, y: 0.70033133, z: -0.097652875, w: 0.70033133}
-  m_LocalPosition: {x: 0.15442021, y: -0.1426723, z: 0.018400192}
-  m_LocalScale: {x: 0.016273338, y: 0.016273335, z: 0.01627334}
+  m_LocalPosition: {x: 0.1592, y: -0.1402, z: 0.0177}
+  m_LocalScale: {x: 0.008793786, y: 0.008793784, z: 0.008793788}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8134623800898365424}
@@ -1062,8 +1062,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8134623800474458933}
   m_LocalRotation: {x: -0.097652875, y: 0.70033133, z: -0.097652875, w: 0.70033133}
-  m_LocalPosition: {x: -0.14026621, y: 0.07416701, z: 0.018966377}
-  m_LocalScale: {x: 0.016273338, y: 0.016273335, z: 0.01627334}
+  m_LocalPosition: {x: -0.1454, y: 0.0786, z: 0.0178}
+  m_LocalScale: {x: 0.008793786, y: 0.008793784, z: 0.008793788}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8134623800898365424}
