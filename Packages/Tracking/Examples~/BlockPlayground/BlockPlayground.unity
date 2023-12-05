@@ -14,20 +14,20 @@ OcclusionCullingSettings:
 RenderSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 9
-  m_Fog: 0
-  m_FogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  m_Fog: 1
+  m_FogColor: {r: 0.84313726, g: 0.84313726, b: 0.84313726, a: 1}
   m_FogMode: 3
-  m_FogDensity: 0.01
+  m_FogDensity: 0.07
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
   m_AmbientSkyColor: {r: 0.212, g: 0.227, b: 0.259, a: 1}
   m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
   m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
-  m_AmbientIntensity: 1
+  m_AmbientIntensity: 0.6
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
-  m_HaloStrength: 0.5
+  m_SkyboxMaterial: {fileID: 2100000, guid: a19f3d584ac09014da308d07437d1077, type: 2}
+  m_HaloStrength: 0.7
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
   m_HaloTexture: {fileID: 0}
@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.1762811, g: 0.2206278, b: 0.30295098, a: 1}
+  m_IndirectSpecularColor: {r: 0.5194276, g: 0.5725949, b: 0.588477, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -138,7 +138,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &15153570
 Transform:
   m_ObjectHideFlags: 0
@@ -1262,11 +1262,6 @@ CanvasRenderer:
 Transform:
   m_CorrespondingSourceObject: {fileID: 3799475124276905864, guid: d12d025fdf1470648822be162a8f98b0, type: 3}
   m_PrefabInstance: {fileID: 738762235}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &376933821 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 4677399195784895774, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
-  m_PrefabInstance: {fileID: 8134623799061944076}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &381255983 stripped
 Transform:
@@ -4076,11 +4071,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4459870147495250034, guid: 082b410248efe504fa129955c7dfaba5, type: 3}
   m_PrefabInstance: {fileID: 158812057}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1245173093 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8536735543952960114, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
-  m_PrefabInstance: {fileID: 8134623799061944076}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1274120073
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5653,7 +5643,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 476095682220995105, guid: 7c877a94518df394bb200ddc9ccc50c9, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.09
+      value: -0.117
       objectReference: {fileID: 0}
     - target: {fileID: 476095682220995105, guid: 7c877a94518df394bb200ddc9ccc50c9, type: 3}
       propertyPath: m_LocalRotation.w
@@ -5691,6 +5681,46 @@ PrefabInstance:
       propertyPath: m_text
       value: Exit
       objectReference: {fileID: 0}
+    - target: {fileID: 476095682927097482, guid: 7c877a94518df394bb200ddc9ccc50c9, type: 3}
+      propertyPath: m_fontSize
+      value: 70
+      objectReference: {fileID: 0}
+    - target: {fileID: 476095682927097482, guid: 7c877a94518df394bb200ddc9ccc50c9, type: 3}
+      propertyPath: m_fontColor.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 476095682927097482, guid: 7c877a94518df394bb200ddc9ccc50c9, type: 3}
+      propertyPath: m_fontColor.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 476095682927097482, guid: 7c877a94518df394bb200ddc9ccc50c9, type: 3}
+      propertyPath: m_fontColor.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 476095682927097482, guid: 7c877a94518df394bb200ddc9ccc50c9, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 70
+      objectReference: {fileID: 0}
+    - target: {fileID: 476095682927097482, guid: 7c877a94518df394bb200ddc9ccc50c9, type: 3}
+      propertyPath: m_fontColor32.rgba
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 476095682927097483, guid: 7c877a94518df394bb200ddc9ccc50c9, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 476095682927097483, guid: 7c877a94518df394bb200ddc9ccc50c9, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -0.017
+      objectReference: {fileID: 0}
+    - target: {fileID: 476095682927097483, guid: 7c877a94518df394bb200ddc9ccc50c9, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0.51
+      objectReference: {fileID: 0}
+    - target: {fileID: 476095683074382522, guid: 7c877a94518df394bb200ddc9ccc50c9, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 3bc675f1f552e064286aafc934a96e82, type: 2}
     - target: {fileID: 476095683074382523, guid: 7c877a94518df394bb200ddc9ccc50c9, type: 3}
       propertyPath: m_Material
       value: 
@@ -11203,8 +11233,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ButtonActiveColor: {r: 0.27971298, g: 0.08705943, b: 0.6886792, a: 1}
   ButtonInActiveColor: {r: 1, g: 1, b: 1, a: 0}
-  HardContactButton: {fileID: 376933821}
-  SoftContactButton: {fileID: 1245173093}
+  HardContactButton: {fileID: 2063098400}
+  SoftContactButton: {fileID: 2055850537}
 --- !u!4 &1605294540
 Transform:
   m_ObjectHideFlags: 0
@@ -16855,6 +16885,16 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2055850537 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2018652588032238341, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+  m_PrefabInstance: {fileID: 8134623799061944076}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &2063098400 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3067610655480943721, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+  m_PrefabInstance: {fileID: 8134623799061944076}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2084919558 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8303385558253576036, guid: f57ae577a6f107341841142389c84835, type: 3}
@@ -17499,6 +17539,10 @@ PrefabInstance:
       propertyPath: m_LocalPosition.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2018652588032238341, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+      propertyPath: m_Name
+      value: BaseRoundedObject
+      objectReference: {fileID: 0}
     - target: {fileID: 2439129175980068563, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -17511,6 +17555,10 @@ PrefabInstance:
       propertyPath: m_LocalPosition.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3067610655480943721, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+      propertyPath: m_Name
+      value: BaseRoundedObject
+      objectReference: {fileID: 0}
     - target: {fileID: 4677399194488223129, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
       propertyPath: m_LocalScale.y
       value: 0.022
@@ -17518,6 +17566,10 @@ PrefabInstance:
     - target: {fileID: 4677399194488223129, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
       propertyPath: m_LocalPosition.y
       value: 0.022
+      objectReference: {fileID: 0}
+    - target: {fileID: 4677399194488223130, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4677399195784895745, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
       propertyPath: m_LocalScale.x
@@ -17639,9 +17691,25 @@ PrefabInstance:
       propertyPath: m_LocalScale.z
       value: 0.95
       objectReference: {fileID: 0}
+    - target: {fileID: 8536735543952960109, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.0704
+      objectReference: {fileID: 0}
+    - target: {fileID: 8536735543952960109, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.068
+      objectReference: {fileID: 0}
+    - target: {fileID: 8536735543952960109, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.009
+      objectReference: {fileID: 0}
     - target: {fileID: 8536735543952960114, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
       propertyPath: m_Name
       value: Soft Contact Mode Selection Button
+      objectReference: {fileID: 0}
+    - target: {fileID: 8536735544165991221, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8536735544165991224, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
       propertyPath: m_IsActive
