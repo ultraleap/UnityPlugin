@@ -11,6 +11,14 @@ using UnityEngine;
 
 namespace Leap.Unity
 {
+    public enum ChiralitySelection
+    {
+        LEFT = 0,
+        RIGHT = 1,
+        BOTH = 2,
+        NONE = 3
+    }
+
     /// <summary>
     /// Static convenience methods and extension methods for getting useful Hand data.
     /// </summary>

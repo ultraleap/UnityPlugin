@@ -123,10 +123,13 @@ namespace Leap.Unity.PhysicalHands
 
             float radiusAmount = PhysExts.MaxVec3(Vector3.Scale(hand.palmBone.palmCollider.size, PhysExts.AbsVec3(hand.palmBone.transform.lossyScale)));
 
-            int results = Physics.OverlapCapsuleNonAlloc(hand.palmBone.transform.position + (-hand.palmBone.transform.up * 0.025f) + ((hand.Handedness == Chirality.Left ? hand.palmBone.transform.right : -hand.palmBone.transform.right) * 0.015f),
+            int results = Physics.OverlapCapsuleNonAlloc(hand.palmBone.transform.position + 
+                (-hand.palmBone.transform.up * 0.025f) + ((hand.Handedness == Chirality.Left ? hand.palmBone.transform.right : -hand.palmBone.transform.right) * 0.015f),
                 // Interpolate the tip position so we keep it relative to the straightest finger
                 hand.palmBone.transform.position + (-hand.palmBone.transform.up * Mathf.Lerp(0.025f, 0.07f, lerp)) + (hand.palmBone.transform.forward * Mathf.Lerp(0.06f, 0.02f, lerp)),
-                radiusAmount + (physicalHandsManager.HoverDistance * 2f), _colliderCache, physicalHandsManager.InteractionMask);
+                radiusAmount + (physicalHandsManager.HoverDistance * 2f), 
+                _colliderCache, 
+                physicalHandsManager.InteractionMask);
 
             GrabHelperObject tempHelper;
             for (int i = 0; i < results; i++)

@@ -305,7 +305,20 @@ namespace Leap.Unity.PhysicalHands
                 return;
             }
 
-            List<SingleLayer> _interactableLayers = new List<SingleLayer>() { 0 };
+            List<SingleLayer> _interactableLayers = new List<SingleLayer>() { };
+
+            for (int i = 0; i < 32; i++)
+            {
+                if(i == HandsLayer ||  i == HandsResetLayer)
+                {
+                    continue;
+                }
+
+                if(!Physics.GetIgnoreLayerCollision(_handsLayer.layerIndex, i))
+                {
+                    _interactableLayers.Add(i);
+                }
+            }
 
             if (_interHandCollisions)
             {
