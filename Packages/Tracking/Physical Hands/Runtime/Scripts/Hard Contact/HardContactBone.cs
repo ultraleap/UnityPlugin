@@ -22,7 +22,7 @@ namespace Leap.Unity.PhysicalHands
         internal float DisplacementDistance => _displacementDistance;
         internal float DisplacementRotation => _displacementRotation;
 
-        private const float SIZE_UPDATE_INTERVAL = 1;
+        private const float SIZE_UPDATE_INTERVAL = 0.1f;
         private float nextSizeUpdate = 0;
 
         #region Setup
@@ -250,13 +250,13 @@ namespace Leap.Unity.PhysicalHands
                 if (joint > 0)
                 {
                     InterpolateBoneSize(prevBone.PrevJoint, prevBone.Rotation, bone.PrevJoint,
-                        bone.Width, bone.Length, Mathf.Lerp(Time.fixedDeltaTime * 10f, Time.fixedDeltaTime, hardContactHand.currentResetLerp));
+                        bone.Width, bone.Length, Mathf.Lerp(Time.fixedDeltaTime * 20f, Time.fixedDeltaTime, hardContactHand.currentResetLerp));
                 }
                 else
                 {
                     InterpolateKnucklePosition(prevBone, contactHand.dataHand, hardContactHand.currentResetLerp);
                     InterpolateBoneSize(contactHand.dataHand.PalmPosition, contactHand.dataHand.Rotation, finger == 0 ? prevBone.PrevJoint : prevBone.NextJoint,
-                        bone.Width, bone.Length, Mathf.Lerp(Time.fixedDeltaTime * 10f, Time.fixedDeltaTime, hardContactHand.currentResetLerp));
+                        bone.Width, bone.Length, Mathf.Lerp(Time.fixedDeltaTime * 20f, Time.fixedDeltaTime, hardContactHand.currentResetLerp));
                 }
             }
         }
