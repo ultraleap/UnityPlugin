@@ -175,56 +175,26 @@ namespace Leap.Unity.PhysicalHands
                 ContactUtils.InterpolatePalmBones(palmCollider, palmEdgeColliders, hand, hardContactHand.currentResetLerp);
             }
 
-            if (contactHand.isContacting || contactHand.isGrabbing)
+            if ((contactHand.isContacting || contactHand.isGrabbing) && hardContactHand.FingerContactDisplacement > 0.8f)
             {
-                // Reduce the hand velocity if we're pushing through an object
-                hardContactHand.currentPalmVelocityInterp = Mathf.InverseLerp(hardContactParent.teleportDistance * 0.2f, hardContactParent.teleportDistance * 0.95f, hardContactHand.computedHandDistance).EaseOut();
-                hardContactHand.currentPalmVelocity = Mathf.Lerp(hardContactHand.currentPalmVelocity,
-                    Mathf.Lerp(hardContactParent.maxPalmVelocity, hardContactParent.minPalmVelocity, hardContactHand.currentPalmVelocityInterp),
-                    Time.fixedDeltaTime * (1.0f / 0.025f));
-                hardContactHand.currentPalmAngularVelocity = Mathf.Lerp(hardContactHand.currentPalmAngularVelocity,
-                    Mathf.Lerp(hardContactParent.maxPalmAngularVelocity, hardContactParent.minPalmAngularVelocity, hardContactHand.currentPalmVelocityInterp),
-                    Time.fixedDeltaTime * (1.0f / 0.025f));
+                hardContactHand.contactForceModifier = hardContactHand.FingerContactDisplacement.Map(0.8f, 8f, 1f, 0.1f);
             }
             else
             {
-                hardContactHand.currentPalmVelocity = Mathf.Lerp(hardContactHand.currentPalmVelocity, hardContactParent.maxPalmVelocity, Time.fixedDeltaTime * (1.0f / 0.025f));
-                hardContactHand.currentPalmAngularVelocity = Mathf.Lerp(hardContactHand.currentPalmAngularVelocity, hardContactParent.maxPalmAngularVelocity, Time.fixedDeltaTime * (1.0f / 0.025f));
-                hardContactHand.currentPalmVelocityInterp = 0f;
-            }
-
-            if (contactHand.isGrabbing)
-            {
-                // Reduce the overall delta amount when the weight is heigher
-                hardContactHand.currentPalmWeightInterp = Mathf.InverseLerp(Mathf.Min(hardContactParent.maxWeight * 0.1f, 1f), hardContactParent.maxWeight, 0).EaseOut();
-            }
-            else if (hardContactHand.FingerContactDisplacement > 0.8f)
-            {
-                hardContactHand.currentPalmWeightInterp = Mathf.InverseLerp(0.8f, 8f, hardContactHand.FingerContactDisplacement).EaseOut();
-            }
-            else
-            {
-                hardContactHand.currentPalmWeightInterp = 0f;
-            }
-
-            if (hardContactHand.currentPalmWeightInterp > hardContactHand.currentPalmWeight)
-            {
-                hardContactHand.currentPalmWeight = Mathf.Lerp(hardContactHand.currentPalmWeight, hardContactHand.currentPalmWeightInterp, Time.fixedDeltaTime * (1.0f / 0.025f));
-            }
-            else
-            {
-                hardContactHand.currentPalmWeight = Mathf.Lerp(hardContactHand.currentPalmWeight, hardContactHand.currentPalmWeightInterp, Time.fixedDeltaTime * (1.0f / 0.075f));
+                hardContactHand.contactForceModifier = 1;
             }
 
             Vector3 delta = hand.PalmPosition - transform.position;
+            delta = delta / Time.fixedDeltaTime;
+            delta = delta * hardContactHand.contactForceModifier;
 
-            articulation.velocity = Vector3.ClampMagnitude(Vector3.MoveTowards(articulation.velocity, delta * Mathf.Lerp(1.0f, 0.05f, hardContactHand.currentPalmWeight) / Time.fixedDeltaTime, 15f), hardContactHand.currentPalmVelocity * Time.fixedDeltaTime);
+            articulation.velocity = delta;
 
-            Quaternion rotationDelta = Quaternion.Normalize(Quaternion.Slerp(Quaternion.identity, hand.Rotation * Quaternion.Inverse(transform.rotation), Mathf.Lerp(1.0f, 0.1f, hardContactHand.currentPalmWeight)));
+            Quaternion rotationDelta =  Quaternion.Normalize(Quaternion.Slerp(Quaternion.identity, hand.Rotation * Quaternion.Inverse(transform.rotation), hardContactHand.contactForceModifier));
 
             rotationDelta.ToAngleAxis(out float angleInDeg, out Vector3 rotationAxis);
 
-            Vector3 angularVelocity = Vector3.ClampMagnitude((rotationAxis * angleInDeg * Mathf.Deg2Rad) / Time.fixedDeltaTime, hardContactHand.currentPalmAngularVelocity * Time.fixedDeltaTime);
+            Vector3 angularVelocity = (rotationAxis * angleInDeg * Mathf.Deg2Rad) / Time.fixedDeltaTime;
 
             if (angularVelocity.IsValid())
             {
@@ -283,16 +253,7 @@ namespace Leap.Unity.PhysicalHands
                     _originalXDriveLower, _originalXDriveUpper);
             }
 
-            if (hardContactHand.currentPalmVelocityInterp > 0)
-            {
-                _xForceLimit = Mathf.Lerp(_xForceLimit,
-                    Mathf.Lerp(hardContactParent.maxFingerVelocity, hardContactParent.minFingerVelocity, hardContactHand.currentPalmVelocityInterp),
-                    Time.fixedDeltaTime * (1.0f / 0.05f));
-            }
-            else
-            {
-                _xForceLimit = Mathf.Lerp(_xForceLimit, hardContactParent.maxFingerVelocity, Time.fixedDeltaTime * (1.0f / 0.5f));
-            }
+            _xForceLimit = Mathf.Lerp(hardContactParent.minFingerVelocity, hardContactParent.maxFingerVelocity, hardContactHand.contactForceModifier);
 
             if(contactHand.ghosted)
             {

@@ -36,14 +36,12 @@ namespace Leap.Unity.PhysicalHands
         }
 
         #region Settings
-        internal float currentPalmVelocity, currentPalmAngularVelocity;
-        internal float currentPalmVelocityInterp, currentPalmWeightInterp;
 
         internal Vector3 computedPhysicsPosition;
         internal Quaternion computedPhysicsRotation;
         internal float computedHandDistance;
 
-        internal float graspingWeight, currentPalmWeight;
+        internal float contactForceModifier; // a value between 0.1 and 1 relating to how far the tracked hand is from the articulation hand. 0.1 is far away, 1 is near. Only changes when in contact/grabbing
 
         internal int[] grabbingFingers;
         internal float[] grabbingFingerDistances, fingerStiffness;
@@ -126,8 +124,6 @@ namespace Leap.Unity.PhysicalHands
             if (gameObject.activeInHierarchy)
             {
                 CacheHandData(dataHand);
-
-                currentPalmVelocity = hardContactParent.maxPalmVelocity;
 
                 ((HardContactBone)palmBone).ResetPalm();
 
@@ -369,7 +365,7 @@ namespace Leap.Unity.PhysicalHands
 
             modifiedHand.WristPosition = palmBone.transform.position - (palmBone.transform.rotation * Quaternion.Inverse(dataHand.Rotation) * (dataHand.PalmPosition - dataHand.WristPosition));
 
-            Vector3 direction = Vector3.Lerp(modifiedHand.Arm.Direction, dataHand.Arm.Direction, Mathf.Lerp(1.0f, 0.1f, currentPalmWeight));
+            Vector3 direction = dataHand.Arm.Direction;
 
             modifiedHand.Arm.PrevJoint = modifiedHand.WristPosition + (-dataHand.Arm.Length * direction);
             modifiedHand.Arm.NextJoint = modifiedHand.WristPosition;

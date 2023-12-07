@@ -105,7 +105,7 @@ namespace Leap.Unity.PhysicalHands
         {
             dataHand.CopyFrom(hand);
             UpdateHandLogic(hand);
-            // Update the bones
+            // Update the bones. Palm first
             palmBone.UpdatePalmBone(hand);
             for (int i = 0; i < bones.Length; i++)
             {
