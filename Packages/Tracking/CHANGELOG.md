@@ -20,7 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 
 
 ### Fixed
-- 
+- LeapXRServiceProvider and XRLeapProviderManager prefabs using old offset defaults
 
 ### Known issues
 - Repeatedly opening scenes can cause memory use increase
