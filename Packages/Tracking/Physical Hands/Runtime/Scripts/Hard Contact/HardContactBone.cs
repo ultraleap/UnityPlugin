@@ -245,11 +245,13 @@ namespace Leap.Unity.PhysicalHands
 
             _xTargetAngle = CalculateXJointAngle(prevBone.Rotation, bone.Direction);
 
+            _xDampening = Mathf.Lerp(_xDampening, hardContactParent.boneDamping, Time.fixedDeltaTime * 10);
+
             if (hardContactHand.grabbingFingerDistances[finger] != 1 && 
                 hardContactHand.grabbingFingerDistances[finger] > (finger == 0 ? hardContactParent.contactThumbEnterDistance : hardContactParent.contactEnterDistance) && 
                 _xTargetAngle > _grabbingXDrive)
             {
-                _grabbingXDrive = Mathf.Clamp(Mathf.Lerp(_grabbingXDrive, _xTargetAngle, Time.fixedDeltaTime * (1.0f / 0.25f)),
+                _grabbingXDrive = Mathf.Clamp(Mathf.Lerp(_grabbingXDrive, _xTargetAngle, Time.fixedDeltaTime * 4),
                     _originalXDriveLower, _originalXDriveUpper);
             }
 
