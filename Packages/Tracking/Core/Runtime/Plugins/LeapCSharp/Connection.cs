@@ -131,6 +131,7 @@ namespace LeapInternal
         public EventHandler<ImageEventArgs> LeapImage;
         public EventHandler<PointMappingChangeEventArgs> LeapPointMappingChange;
         public EventHandler<HeadPoseEventArgs> LeapHeadPoseChange;
+        public EventHandler<PolicyEventArgs> LeapNewDeviceTransform;
 
         public Action<BeginProfilingForThreadArgs> LeapBeginProfilingForThread;
         public Action<EndProfilingForThreadArgs> LeapEndProfilingForThread;
@@ -383,6 +384,11 @@ namespace LeapInternal
                             LEAP_DEVICE_STATUS_CHANGE_EVENT status_evt;
                             StructMarshal<LEAP_DEVICE_STATUS_CHANGE_EVENT>.PtrToStruct(_msg.eventStructPtr, out status_evt);
                             handleDeviceStatusEvent(ref status_evt);
+                            break;
+                        case eLeapEventType.eLeapEventType_NewDeviceTransform:
+                            LEAP_NEW_DEVICE_TRANSFORM new_transform_evt;
+                            StructMarshal<LEAP_NEW_DEVICE_TRANSFORM>.PtrToStruct(_msg.eventStructPtr, out new_transform_evt);
+                            handleNewDeviceTransform(ref new_transform_evt, _msg.deviceID);
                             break;
                     } //switch on _msg.type
 
@@ -864,6 +870,15 @@ namespace LeapInternal
             }
 
             _activePolicies[deviceID] = policyMsg.current_policy;
+        }
+
+        private void handleNewDeviceTransform(ref LEAP_NEW_DEVICE_TRANSFORM deviceTransformMsg, UInt32 deviceID)
+        {
+            Device device = _devices.FindDeviceByID(deviceID);
+            if (device != null)
+            {
+                device.
+            }
         }
 
         public void SetAndClearPolicy(Controller.PolicyFlag set, Controller.PolicyFlag clear, Device device = null)

@@ -179,7 +179,7 @@ namespace Leap
     /// Provides the configuration key, whether the change was successful, and the id of the original change request.
     /// @since 3.0
     /// </summary>
-    [Obsolete("Config.cs is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
+    [Obsolete("Config is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
     public class SetConfigResponseEventArgs : LeapEventArgs
     {
         public SetConfigResponseEventArgs(string config_key, Config.ValueType dataType, object value, uint requestId) : base(LeapEvent.EVENT_CONFIG_RESPONSE)
@@ -299,6 +299,18 @@ namespace Leap
     public class HeadPoseEventArgs : LeapEventArgs
     {
         public HeadPoseEventArgs(LEAP_VECTOR head_position, LEAP_QUATERNION head_orientation) : base(LeapEvent.EVENT_POINT_MAPPING_CHANGE)
+        {
+            this.headPosition = head_position;
+            this.headOrientation = head_orientation;
+        }
+
+        public LEAP_VECTOR headPosition { get; set; }
+        public LEAP_QUATERNION headOrientation { get; set; }
+    }
+    
+    public class NewDeviceTransformEventArgs : LeapEventArgs
+    {
+        public NewDeviceTransformEventArgs(LEAP_VECTOR head_position, LEAP_QUATERNION head_orientation) : base(LeapEvent.EVENT_POINT_MAPPING_CHANGE)
         {
             this.headPosition = head_position;
             this.headOrientation = head_orientation;

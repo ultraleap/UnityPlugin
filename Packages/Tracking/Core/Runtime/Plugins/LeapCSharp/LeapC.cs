@@ -532,15 +532,22 @@ namespace LeapInternal
         /// <summary>
         /// A new head pose is available.
         /// </summary>
+        [Obsolete("Head pose events are not supported and will never be raised")]
         eLeapEventType_HeadPose,
         /// <summary>
-        /// A new head pose is available.
+        /// A new eye pose is available.
         /// </summary>
+        [Obsolete("Eye pose events are not supported and will never be raised")]
         eLeapEventType_Eyes,
         /// <summary>
-        /// A new head pose is available.
+        /// A new IMU information frame is available.
         /// </summary>
-        eLeapEventType_IMU
+        eLeapEventType_IMU,
+        /// <summary>
+        /// Notification that the service received a new device transformation matrix
+        /// Use LeapGetDeviceTransform to update your cached information.
+        /// </summary>
+        eLeapEventType_NewDeviceTransform,
     };
 
     public enum eLeapDeviceFlag : uint
@@ -716,6 +723,12 @@ namespace LeapInternal
         public LEAP_QUATERNION head_orientation;
         public LEAP_VECTOR head_linear_velocity;
         public LEAP_VECTOR head_angular_velocity;
+    }
+    
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct LEAP_NEW_DEVICE_TRANSFORM
+    {
+        public UInt32 reserved;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
