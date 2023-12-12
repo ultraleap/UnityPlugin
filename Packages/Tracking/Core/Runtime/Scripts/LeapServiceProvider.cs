@@ -614,37 +614,20 @@ namespace Leap.Unity
                 updateDevice();
             }
 
-            if (_useInterpolation)
-            {
-#if !UNITY_ANDROID || UNITY_EDITOR
-                _smoothedTrackingLatency.value = Mathf.Min(_smoothedTrackingLatency.value, 30000f);
-                _smoothedTrackingLatency.Update((float)(_leapController.Now() - _leapController.FrameTimestamp()), Time.deltaTime);
-#endif
-                long timestamp = CalculateInterpolationTime() + (ExtrapolationAmount * 1000);
-                _unityToLeapOffset = timestamp - (long)(Time.time * S_TO_US);
+            HandleUpdateFrameInterpolationAndTransformation();
 
-                _leapController.GetInterpolatedFrameFromTime(_untransformedUpdateFrame, timestamp, CalculateInterpolationTime() - (BounceAmount * 1000), _currentDevice);
-            }
-            else
-            {
-                _leapController.Frame(_untransformedUpdateFrame);
-            }
-
-            if (_untransformedUpdateFrame != null)
-            {
-                transformFrame(_untransformedUpdateFrame, _transformedUpdateFrame);
-
-                DispatchUpdateFrameEvent(_transformedUpdateFrame);
-            }
+            DispatchUpdateFrameEvent(_transformedUpdateFrame);
         }
 
         protected virtual void FixedUpdate()
         {
             if (_frameOptimization == FrameOptimizationMode.ReuseUpdateForPhysics)
             {
+                HandleUpdateFrameInterpolationAndTransformation();
+
                 DispatchFixedFrameEvent(_transformedUpdateFrame);
                 return;
-            }
+            } 
 
             if (_useInterpolation)
             {
@@ -724,6 +707,30 @@ namespace Leap.Unity
                 default:
                     throw new System.InvalidOperationException(
                       "Unexpected physics extrapolation mode: " + _physicsExtrapolation);
+            }
+        }
+
+        void HandleUpdateFrameInterpolationAndTransformation()
+        {
+            if (_useInterpolation)
+            {
+#if !UNITY_ANDROID || UNITY_EDITOR
+                _smoothedTrackingLatency.value = Mathf.Min(_smoothedTrackingLatency.value, 30000f);
+                _smoothedTrackingLatency.Update((float)(_leapController.Now() - _leapController.FrameTimestamp()), Time.deltaTime);
+#endif
+                long timestamp = CalculateInterpolationTime() + (ExtrapolationAmount * 1000);
+                _unityToLeapOffset = timestamp - (long)(Time.time * S_TO_US);
+
+                _leapController.GetInterpolatedFrameFromTime(_untransformedUpdateFrame, timestamp, CalculateInterpolationTime() - (BounceAmount * 1000), _currentDevice);
+            }
+            else
+            {
+                _leapController.Frame(_untransformedUpdateFrame);
+            }
+
+            if (_untransformedUpdateFrame != null)
+            {
+                transformFrame(_untransformedUpdateFrame, _transformedUpdateFrame);
             }
         }
 

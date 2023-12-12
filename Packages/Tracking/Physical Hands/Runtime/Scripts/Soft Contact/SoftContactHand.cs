@@ -92,8 +92,6 @@ namespace Leap.Unity.PhysicalHands
         {
             GenerateHandObjects(typeof(SoftContactBone));
 
-            isHandPhysical = false;
-
             ((SoftContactBone)palmBone).SetupBone();
             var rbody = palmBone.gameObject.AddComponent<Rigidbody>();
             rbody.useGravity = false;

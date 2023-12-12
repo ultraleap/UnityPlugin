@@ -282,8 +282,8 @@ namespace Leap.Unity.PhysicalHands
                         UpdateHandPositions();
                         if (!Ignored && ignoreGrabTime < Time.time)
                         {
-                            MoveObject();
                             TrackThrowingVelocities();
+                            MoveObject();
                         }
                     }
                     else
@@ -974,6 +974,11 @@ namespace Leap.Unity.PhysicalHands
 
                 // Set the new velocty. Allow physics to solve for rotational change
                 _rigid.velocity = averageVelocity;
+            }
+            else
+            {
+                _rigid.velocity = Vector3.zero;
+                _rigid.angularVelocity = Vector3.zero;
             }
         }
 
