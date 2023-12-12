@@ -829,14 +829,15 @@ namespace Leap.Unity.PhysicalHands
                 {
                     grabHandndex = _grabbableHands.IndexOf(_grabbingHands[i]);
 
-                    if (_grabbableHandsValues[grabHandndex].handGrabbing || _grabbableHandsValues[grabHandndex].facingOppositeHand)
+                    if (_grabbableHandsValues[grabHandndex].handGrabbing || _grabbableHandsValues[grabHandndex].facingOppositeHand
+                        && _grabbingHands[i].tracked)
                     {
                         hand = _grabbingHands[i];
                         break;
                     }
                 }
 
-                if (hand == null)
+                if (hand == null && _grabbingHands[_grabbingHands.Count - 1].tracked)
                 {
                     hand = _grabbingHands[_grabbingHands.Count - 1];
                     grabHandndex = _grabbableHands.IndexOf(hand);

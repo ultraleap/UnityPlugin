@@ -64,17 +64,10 @@ namespace Leap.Unity.PhysicalHands
             {
                 UpdateHandStatistics(_leftContactHand);
             }
-            else
-            {
-                UntrackedHand(_leftContactHand);
-            }
+
             if (_rightContactHand.tracked)
             {
                 UpdateHandStatistics(_rightContactHand);
-            }
-            else
-            {
-                UntrackedHand(_rightContactHand);
             }
         }
 
