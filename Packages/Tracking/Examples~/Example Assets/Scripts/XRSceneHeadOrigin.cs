@@ -1,4 +1,3 @@
-using Leap.Unity.Interaction;
 using System.Collections;
 
 using Unity.XR.CoreUtils;
@@ -15,6 +14,9 @@ public class XRSceneHeadOrigin : MonoBehaviour
 
     [Tooltip("Maximum distance the cameraTransform can be from the sceneOrigin during setOnStartLength after startup (in Meters)")]
     public float setOnStartDistance = 0.2f;
+
+    [Tooltip("Should the Y rotation be set when starting up too?")]
+    public bool includeRotationInStartup = false;
 
     [Space, Tooltip("A keyboard key to reposition the cameraTransform to the sceneOrigin")]
     public KeyCode resetKey = KeyCode.R;
@@ -77,14 +79,6 @@ public class XRSceneHeadOrigin : MonoBehaviour
         }
     }
 
-    private void Update()
-    {
-        if(Input.GetKeyDown(resetKey))
-        {
-            SetHeadOrigin();
-        }
-    }
-
     // Set the origin to this transform if the head becomes more than 20cm 
     IEnumerator SetOriginDuringStartup()
     {
@@ -98,21 +92,25 @@ public class XRSceneHeadOrigin : MonoBehaviour
 
             if (Vector3.Distance(cameraTransform.position, sceneOrigin.position) > setOnStartDistance)
             {
-                SetHeadOrigin();
+                SetHeadOrigin(includeRotationInStartup);
             }
         }
     }
 
-    public void SetHeadOrigin()
+    public void SetHeadOrigin(bool includeRotation = false)
     {
-        SetHeadOrigin(sceneOrigin);
+        SetHeadOrigin(sceneOrigin, includeRotation);
     }
 
-    public void SetHeadOrigin(Transform target)
+    public void SetHeadOrigin(Transform target, bool includeRotation = false)
     {
-        float rotationY = (target.transform.rotation * Quaternion.Inverse(cameraTransform.transform.rotation) * gameObject.transform.rotation).eulerAngles.y;
 
-        cameraOffsetOrigin.transform.rotation = Quaternion.Euler(cameraOffsetOrigin.transform.eulerAngles.x, cameraOffsetOrigin.transform.eulerAngles.y + rotationY, cameraOffsetOrigin.transform.eulerAngles.z);
+        if (includeRotation)
+        {
+            float rotationY = (target.transform.rotation * Quaternion.Inverse(cameraTransform.transform.rotation) * gameObject.transform.rotation).eulerAngles.y;
+            cameraOffsetOrigin.transform.rotation = Quaternion.Euler(cameraOffsetOrigin.transform.eulerAngles.x, cameraOffsetOrigin.transform.eulerAngles.y + rotationY, cameraOffsetOrigin.transform.eulerAngles.z);
+        }
+
         cameraOffsetOrigin.transform.position += target.position - cameraTransform.position;
     }
 }
