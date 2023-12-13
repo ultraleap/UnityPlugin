@@ -325,7 +325,7 @@ ConfigurableJoint:
   m_BreakTorque: Infinity
   m_EnableCollision: 0
   m_EnablePreprocessing: 1
-  m_MassScale: 10
+  m_MassScale: 1
   m_ConnectedMassScale: 1
 --- !u!1 &4484806314189009148
 GameObject:
@@ -644,7 +644,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6636654956868851386}
-  m_LocalRotation: {x: -0, y: 0.9992676, z: -0, w: 0.03826776}
+  m_LocalRotation: {x: 0, y: 0.99926764, z: 0, w: 0.038265835}
   m_LocalPosition: {x: 0.494, y: 0.928, z: 0.192}
   m_LocalScale: {x: 0.030000007, y: 0.05, z: 0.050000016}
   m_ConstrainProportionsScale: 0
