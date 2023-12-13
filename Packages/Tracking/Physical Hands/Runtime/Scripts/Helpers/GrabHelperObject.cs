@@ -187,7 +187,7 @@ namespace Leap.Unity.PhysicalHands
                             physicalHandContact.OnHandContactExit(_grabbableHands[i]);
                         }
 
-                        _grabbableHands[i].physicalHandsManager.OnHandContactExit(_rigid);
+                        _grabbableHands[i].physicalHandsManager.OnHandContactExit(_grabbableHands[i], _rigid);
                     }
 
                     if (_rigid.TryGetComponent<IPhysicalHandHover>(out var physicalHandHover))
@@ -195,7 +195,7 @@ namespace Leap.Unity.PhysicalHands
                         physicalHandHover.OnHandHoverExit(_grabbableHands[i]);
                     }
 
-                    _grabbableHands[i].physicalHandsManager.OnHandHoverExit(_rigid);
+                    _grabbableHands[i].physicalHandsManager.OnHandHoverExit(_grabbableHands[i], _rigid);
                 }
             }
 
@@ -371,7 +371,7 @@ namespace Leap.Unity.PhysicalHands
                         handContactEvent.OnHandContactExit(_grabbableHands[handIndex]);
                     }
 
-                    _grabbableHands[handIndex].physicalHandsManager.OnHandContactExit(_rigid);
+                    _grabbableHands[handIndex].physicalHandsManager.OnHandContactExit(_grabbableHands[handIndex], _rigid);
                 }
             }
 
@@ -383,7 +383,7 @@ namespace Leap.Unity.PhysicalHands
                     handContactEvent.OnHandContact(_grabbableHands[handIndex]);
                 }
 
-                _grabbableHands[handIndex].physicalHandsManager.OnHandContact(_rigid);
+                _grabbableHands[handIndex].physicalHandsManager.OnHandContact(_grabbableHands[handIndex], _rigid);
             }
 
             // Fire the hovering event
@@ -392,7 +392,7 @@ namespace Leap.Unity.PhysicalHands
                 physicalHandHover.OnHandHover(_grabbableHands[handIndex]);
             }
 
-            _grabbableHands[handIndex].physicalHandsManager.OnHandHover(_rigid);
+            _grabbableHands[handIndex].physicalHandsManager.OnHandHover(_grabbableHands[handIndex], _rigid);
         }
 
         private void GrabbingContactCheck()
@@ -620,7 +620,7 @@ namespace Leap.Unity.PhysicalHands
                 physicalHandGrab.OnHandGrab(hand);
             }
 
-            hand.physicalHandsManager.OnHandGrab(_rigid);
+            hand.physicalHandsManager.OnHandGrab(hand, _rigid);
         }
 
         private void UpdateGrabbingValues()
@@ -642,7 +642,7 @@ namespace Leap.Unity.PhysicalHands
                         physicalHandGrab.OnHandGrabExit(_grabbableHands[grabHandIndex]);
                     }
 
-                    _grabbableHands[grabHandIndex].physicalHandsManager.OnHandGrabExit(_rigid);
+                    _grabbableHands[grabHandIndex].physicalHandsManager.OnHandGrabExit(_grabbableHands[grabHandIndex], _rigid);
 
                     continue;
                 }
@@ -695,7 +695,7 @@ namespace Leap.Unity.PhysicalHands
                         physicalHandGrab.OnHandGrabExit(_grabbableHands[grabHandIndex]);
                     }
 
-                    _grabbableHands[grabHandIndex].physicalHandsManager.OnHandGrabExit(_rigid);
+                    _grabbableHands[grabHandIndex].physicalHandsManager.OnHandGrabExit(_grabbableHands[grabHandIndex], _rigid);
                 }
                 else
                 {
@@ -732,7 +732,7 @@ namespace Leap.Unity.PhysicalHands
                     physicalHandGrab.OnHandGrab(hand);
                 }
 
-                hand.physicalHandsManager.OnHandGrab(_rigid);
+                hand.physicalHandsManager.OnHandGrab(hand, _rigid);
             }
             else
             {

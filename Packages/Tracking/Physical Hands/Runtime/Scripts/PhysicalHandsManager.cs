@@ -359,47 +359,47 @@ namespace Leap.Unity.PhysicalHands
         #region Events
 
         [Space, Header("Hover Events"), Space]
-        public UnityEvent<Rigidbody> onHover;
-        public UnityEvent<Rigidbody> onHoverExit;
+        public UnityEvent<ContactHand, Rigidbody> onHover;
+        public UnityEvent<ContactHand, Rigidbody> onHoverExit;
 
         [Space, Header("Contact Events"), Space]
-        public UnityEvent<Rigidbody> onContact;
-        public UnityEvent<Rigidbody> onContactExit;
+        public UnityEvent<ContactHand, Rigidbody> onContact;
+        public UnityEvent<ContactHand, Rigidbody> onContactExit;
 
         [Space, Header("Grab Events"), Space]
-        public UnityEvent<Rigidbody> onGrab;
-        public UnityEvent<Rigidbody> onGrabExit;
+        public UnityEvent<ContactHand, Rigidbody> onGrab;
+        public UnityEvent<ContactHand, Rigidbody> onGrabExit;
 
         internal UnityEvent onHandsInitiated;
 
-        internal void OnHandHover(Rigidbody rbody)
+        internal void OnHandHover(ContactHand contacthand, Rigidbody rbody)
         {
-            onHover?.Invoke(rbody);
+            onHover?.Invoke(contacthand, rbody);
         }
 
-        internal void OnHandHoverExit(Rigidbody rbody)
+        internal void OnHandHoverExit(ContactHand contacthand, Rigidbody rbody)
         {
-            onHoverExit?.Invoke(rbody);
+            onHoverExit?.Invoke(contacthand, rbody);
         }
 
-        internal void OnHandContact(Rigidbody rbody)
+        internal void OnHandContact(ContactHand contacthand, Rigidbody rbody)
         {
-            onContact?.Invoke(rbody);
+            onContact?.Invoke(contacthand, rbody);
         }
 
-        internal void OnHandContactExit(Rigidbody rbody)
+        internal void OnHandContactExit(ContactHand contacthand, Rigidbody rbody)
         {
-            onContactExit?.Invoke(rbody);
+            onContactExit?.Invoke(contacthand, rbody);
         }
 
-        internal void OnHandGrab(Rigidbody rbody)
+        internal void OnHandGrab(ContactHand contacthand, Rigidbody rbody)
         {
-            onGrab?.Invoke(rbody);
+            onGrab?.Invoke(contacthand, rbody);
         }
 
-        internal void OnHandGrabExit(Rigidbody rbody)
+        internal void OnHandGrabExit(ContactHand contacthand, Rigidbody rbody)
         {
-            onGrabExit?.Invoke(rbody);
+            onGrabExit?.Invoke(contacthand, rbody);
         }
 
         #endregion
