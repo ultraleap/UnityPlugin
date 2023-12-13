@@ -11911,7 +11911,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chirality: 1
   rendererToChange: {fileID: 649321055}
-  grabbedColor: {r: 0, g: 1, b: 0.59217, a: 0.5372549}
+  grabbedColor: {r: 0, g: 1, b: 0.59217, a: 0.29803923}
 --- !u!114 &1920359932
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11926,7 +11926,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chirality: 0
   rendererToChange: {fileID: 494037729}
-  grabbedColor: {r: 0, g: 1, b: 0.59217, a: 0.5372549}
+  grabbedColor: {r: 0, g: 1, b: 0.59217, a: 0.29803923}
 --- !u!1001 &2009636561
 PrefabInstance:
   m_ObjectHideFlags: 0
