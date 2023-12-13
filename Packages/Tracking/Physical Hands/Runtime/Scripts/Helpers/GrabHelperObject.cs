@@ -837,19 +837,10 @@ namespace Leap.Unity.PhysicalHands
                     }
                 }
 
-                // Backup check to find the last hand to be added to grabbingHands that is tracked if the previous check failed
-                if (hand == null)
+                if (hand == null && _grabbingHands[_grabbingHands.Count - 1].tracked)
                 {
-                    for (int i = _grabbingHands.Count - 1; i > 0; i--)
-                    {
-                        grabHandndex = _grabbableHands.IndexOf(_grabbingHands[i]);
-
-                        if (_grabbingHands[i].tracked)
-                        {
-                            hand = _grabbingHands[i];
-                            break;
-                        }
-                    }
+                    hand = _grabbingHands[_grabbingHands.Count - 1];
+                    grabHandndex = _grabbableHands.IndexOf(hand);
                 }
 
                 if (hand != null)
