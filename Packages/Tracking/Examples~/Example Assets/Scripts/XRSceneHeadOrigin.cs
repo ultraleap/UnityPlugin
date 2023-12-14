@@ -113,4 +113,14 @@ public class XRSceneHeadOrigin : MonoBehaviour
 
         cameraOffsetOrigin.transform.position += target.position - cameraTransform.position;
     }
+
+    public void SetHeight()
+    {
+        Vector3 heightOffset = sceneOrigin.position - cameraTransform.position;
+
+        heightOffset.x = 0;
+        heightOffset.z = 0;
+
+        cameraOffsetOrigin.transform.position += heightOffset;
+    }
 }
