@@ -10,11 +10,16 @@ public class HandGrabHighlighter : MonoBehaviour
 
     public Renderer rendererToChange;
 
+    public Color grabActivatedColor;
     public Color grabbedColor;
+
+    public float grabActivatedTime = 0.1f;
 
     Color ungrabbedColor;
 
     bool grabbing = false;
+
+    public AnimationCurve grabActivationEaseCurve;
 
     private void Awake()
     {
@@ -23,26 +28,40 @@ public class HandGrabHighlighter : MonoBehaviour
 
     public void OnGrabBegin(ContactHand contacthand, Rigidbody rbody)
     {
-        if (contacthand.Handedness == chirality)
+        if (!grabbing && contacthand.Handedness == chirality)
         {
-            grabbing = true;
-        }
+            StopAllCoroutines();
 
-        UpdateMaterial();
+            grabbing = true;
+
+            StartCoroutine(HandleGrabActivation());
+        }
     }
 
     public void OnGrabEnd(ContactHand contacthand, Rigidbody rbody)
     {
-        if (contacthand.Handedness == chirality)
+        if (grabbing && contacthand.Handedness == chirality)
         {
-            grabbing = false;
-        }
+            StopAllCoroutines();
 
-        UpdateMaterial();
+            grabbing = false;
+            rendererToChange.material.SetColor("_MainColor", ungrabbedColor);
+
+        }
     }
 
-    void UpdateMaterial()
+    IEnumerator HandleGrabActivation()
     {
-        rendererToChange.material.SetColor("_MainColor", grabbing ? grabbedColor : ungrabbedColor);
+        float t = grabActivatedTime;
+        while (t > 0)
+        {
+            t -= Time.deltaTime;
+
+            Color color = Color.Lerp(grabbedColor, grabActivatedColor, grabActivationEaseCurve.Evaluate(t / grabActivatedTime));
+
+            rendererToChange.material.SetColor("_MainColor", color);
+
+            yield return null;
+        }
     }
 }
