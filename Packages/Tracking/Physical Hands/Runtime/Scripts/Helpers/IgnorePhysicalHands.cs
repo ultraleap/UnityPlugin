@@ -20,7 +20,7 @@ namespace Leap.Unity.PhysicalHands
 
                 if (GrabHelperObject != null)
                 {
-                    GrabHelperObject.Ignored = _disableAllGrabbing;
+                    GrabHelperObject._grabbingIgnored = _disableAllGrabbing;
                 }
             }
         }
@@ -46,7 +46,7 @@ namespace Leap.Unity.PhysicalHands
             set 
             { 
                 _grabHelperObject = value;
-                _grabHelperObject.Ignored = _disableAllGrabbing;
+                _grabHelperObject._grabbingIgnored = _disableAllGrabbing;
             } 
         }
 
@@ -105,19 +105,15 @@ namespace Leap.Unity.PhysicalHands
 
         private void Start()
         {
-            //_physicalHandsManager = (PhysicalHandsManager)FindAnyObjectByType(typeof(PhysicalHandsManager));
-            //if( _physicalHandsManager != null )
-            //{
-            //    if (_physicalHandsManager.onHandsInitiated == null)
-            //    {
-            //        _physicalHandsManager.onHandsInitiated = new UnityEngine.Events.UnityEvent();
-            //    }
-            //    _physicalHandsManager.onHandsInitiated.AddListener(HandsInitiated);
-            //}
-            //else
-            //{
-            //    Debug.Log("did not find physical hands manager");
-            //}
+            _physicalHandsManager = (PhysicalHandsManager)FindAnyObjectByType(typeof(PhysicalHandsManager));
+            if (_physicalHandsManager != null)
+            {
+                PhysicalHandsManager.onHandsInitiated += HandsInitiated;
+            }
+            else
+            {
+                Debug.Log("did not find physical hands manager");
+            }
         }
     }
 }

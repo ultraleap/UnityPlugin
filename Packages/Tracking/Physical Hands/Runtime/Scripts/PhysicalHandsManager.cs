@@ -370,7 +370,7 @@ namespace Leap.Unity.PhysicalHands
         public UnityEvent<ContactHand, Rigidbody> onGrab;
         public UnityEvent<ContactHand, Rigidbody> onGrabExit;
 
-        internal UnityEvent onHandsInitiated;
+        internal static Action onHandsInitiated;
 
         internal void OnHandHover(ContactHand contacthand, Rigidbody rbody)
         {
