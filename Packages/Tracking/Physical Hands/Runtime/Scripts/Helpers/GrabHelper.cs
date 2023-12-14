@@ -15,7 +15,7 @@ namespace Leap.Unity.PhysicalHands
         private Collider[] _colliderCache = new Collider[128];
 
         #region Interaction Data
-        private Dictionary<ContactHand, float[]> _fingerStrengths = new Dictionary<ContactHand, float[]>();
+        private Dictionary<ContactHand, float[]> _fingerStrengths = new Dictionary<ContactHand, float[]>(); // Values are from 0-1 where 1 in fully curled
         internal Dictionary<ContactHand, float[]> FingerStrengths => _fingerStrengths;
 
         // Helpers

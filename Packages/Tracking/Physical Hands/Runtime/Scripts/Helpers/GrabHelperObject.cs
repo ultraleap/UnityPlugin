@@ -7,10 +7,11 @@ namespace Leap.Unity.PhysicalHands
     [System.Serializable]
     public class GrabHelperObject
     {
-        private const float THOWN_GRAB_COOLDOWNTIME = 0.5f;
-        private const float MINIMUM_STRENGTH = 0.15f, MINIMUM_THUMB_STRENGTH = 0.1f;
-        private const float REQUIRED_ENTRY_STRENGTH = 0.15f, REQUIRED_EXIT_STRENGTH = 0.05f, REQUIRED_THUMB_EXIT_STRENGTH = 0.1f, REQUIRED_PINCH_DISTANCE = 0.02f;
-        private const float GRABBABLE_DIRECTIONS_DOT = -0.2f;
+        private const float THOWN_GRAB_COOLDOWNTIME = 0.5f; // How long after a detected throw that grabbing will be ignored (in seconds)
+        private const float MINIMUM_STRENGTH = 0.1f, MINIMUM_THUMB_STRENGTH = 0.1f; // Minimum finger strength to consider a grab (finger strength is 0-1 where 1 is fully curled)
+        private const float REQUIRED_EXIT_STRENGTH = 0.05f, REQUIRED_THUMB_EXIT_STRENGTH = 0.08f; // Finger strength to consider a grab (finger strength is 0-1 where 1 is fully curled)
+        private const float REQUIRED_PINCH_DISTANCE = 0.01f; // Distance required between a finger and the thumb to detect a pinch (in metres)
+        private const float GRABBABLE_DIRECTIONS_DOT = -0.2f; // The normalized dot product required to consider one bone facing another while attempting to grab (-1 = directly facing, 1 = directly facing away)
 
         /// <summary>
         /// The current state of the grasp helper.
@@ -82,7 +83,7 @@ namespace Leap.Unity.PhysicalHands
         private float _originalMass = 1f;
         internal float OriginalMass => _originalMass;
 
-        internal bool Ignored;
+        internal bool _grabbingIgnored;
         private IgnorePhysicalHands _ignorePhysicalHands;
 
         private float ignoreGrabTime = 0f;
@@ -90,12 +91,12 @@ namespace Leap.Unity.PhysicalHands
         private bool anyBoneGrabbable = false;
 
         /// <summary>
-        /// Returns true if the provided hand is grabbing an object.
-        /// Requires thumb or palm grabbing, and at least one (non-thumb) finger
+        /// Returns true if the provided hand is capable of grabbing an object.
+        /// Requires thumb or palm contacting, and at least one (non-thumb) finger
         /// </summary>
         /// <param name="hand">The hand to check</param>
-        /// <returns>If the provided hand is grabbing</returns>
-        private bool Grabbed(ContactHand hand)
+        /// <returns>If the provided hand is capable of grabbing</returns>
+        private bool IsHandGrabbable(ContactHand hand)
         {
             if (_grabbableBones.TryGetValue(hand, out var bones))
             {
@@ -110,32 +111,30 @@ namespace Leap.Unity.PhysicalHands
         }
 
         /// <summary>
-        /// Returns true if the finger on the provided hand is grabbing, and false if not
+        /// Returns true if the finger on the provided hand is capable of grabbing, and false if not
         /// </summary>
         /// <param name="hand">The hand to check</param>
         /// <param name="finger">The finger to check</param>
-        /// <returns>If the finger on the provided hand is grabbed</returns>
-        internal bool isFingerGrabbed(ContactHand hand, int finger)
+        /// <returns>If the finger on the provided hand is capable of grabbing</returns>
+        internal bool IsFingerGrabbable(ContactHand hand, int finger)
         {
             if (_grabbableBones.TryGetValue(hand, out var bones))
             {
-                return bones[finger].Count > 0; // return true if any of the bones are grabbed
+                switch (finger)
+                {
+                    case 0: // thumb
+                    case 5: // palm
+                        return bones[finger].Count > 0;
 
-                //switch (finger)
-                //{
-                //    case 0: // thumb
-                //    case 5: // palm
-                //        return bones[finger].Count > 0;
+                    case 1:
+                    case 2:
+                    case 3:
+                        return bones[finger].Count > 0 && bones[finger].Any(x => x.Joint != 0);
 
-                //    case 1:
-                //    case 2:
-                //    case 3:
-                //        return bones[finger].Count > 0 && bones[finger].Any(x => x.Joint != 0);
-
-                //    case 4:
-                //        return bones[finger].Count > 0 && bones[finger].Any(x => x.Joint == 2);
-                //}
-                //return false;
+                    case 4:
+                        return bones[finger].Count > 0 && bones[finger].Any(x => x.Joint == 2);
+                }
+                return false;
             }
             return false;
         }
@@ -249,7 +248,7 @@ namespace Leap.Unity.PhysicalHands
             // Make sure the object hasn't been destroyed
             if (_rigid != null)
             {
-                if (!Ignored)
+                if (!_grabbingIgnored)
                 {
                     // Only ever unset the rigidbody values here otherwise outside logic will get confused
                     _rigid.isKinematic = _oldKinematic;
@@ -268,7 +267,10 @@ namespace Leap.Unity.PhysicalHands
                 return GrabState = State.Hover;
             }
 
-            GrabbingContactCheck();
+            if (!_grabbingIgnored)
+            {
+                GrabbingCheck();
+            }
 
             switch (GrabState)
             {
@@ -283,7 +285,7 @@ namespace Leap.Unity.PhysicalHands
                     if (_grabbingHands.Count > 0)
                     {
                         UpdateHandPositions();
-                        if (!Ignored && ignoreGrabTime < Time.time)
+                        if (!_grabbingIgnored && ignoreGrabTime < Time.time)
                         {
                             TrackThrowingVelocities();
                             MoveObject();
@@ -398,7 +400,7 @@ namespace Leap.Unity.PhysicalHands
             _grabbableHands[handIndex].physicalHandsManager.OnHandHover(_grabbableHands[handIndex], _rigid);
         }
 
-        private void GrabbingContactCheck()
+        private void GrabbingCheck()
         {
             //Reset grab bools
             foreach (var grabValue in _grabbableHandsValues)
@@ -419,7 +421,7 @@ namespace Leap.Unity.PhysicalHands
 
                 for (int i = 0; i < 5; i++)
                 {
-                    if (isFingerGrabbed(hand, i) && _manager.FingerStrengths[hand][i] > (i == 0 ? MINIMUM_THUMB_STRENGTH : MINIMUM_STRENGTH))
+                    if (IsFingerGrabbable(hand, i) && _manager.FingerStrengths[hand][i] > (i == 0 ? MINIMUM_THUMB_STRENGTH : MINIMUM_STRENGTH))
                     {
                         grabValues.fingerStrength[i] = _manager.FingerStrengths[hand][i];
                         if (grabValues.originalFingerStrength[i] == -1)
@@ -438,9 +440,9 @@ namespace Leap.Unity.PhysicalHands
                     }
                 }
 
-                if (Grabbed(hand))
+                if (IsHandGrabbable(hand))
                 {
-                    // if two fingers are greater than 20% of their remaining distance when they grasped difference
+                    // Check for how many fingers are pinching
                     int pinchingFingers = 0;
                     for (int i = 0; i < 5; i++)
                     {
@@ -449,7 +451,7 @@ namespace Leap.Unity.PhysicalHands
                             continue;
                         }
 
-                        if (i == 0)
+                        if (i == 0) // check the thumb differently
                         {
                             bool unpinched = true;
                             for (int j = 1; j < 5; j++)
@@ -490,7 +492,7 @@ namespace Leap.Unity.PhysicalHands
 
                         // if waiting for ungrab AND no contact 
                         // ungrab == required ungrab strength 2
-                        if (grabValues.fingerStrength[i] > grabValues.originalFingerStrength[i] + ((1 - grabValues.originalFingerStrength[i]) * REQUIRED_ENTRY_STRENGTH))
+                        if (grabValues.fingerStrength[i] > grabValues.originalFingerStrength[i] + ((1 - grabValues.originalFingerStrength[i]) * MINIMUM_STRENGTH))
                         {
                             pinchingFingers++;
                         }
@@ -553,7 +555,7 @@ namespace Leap.Unity.PhysicalHands
 
                                         if (dot >= GRABBABLE_DIRECTIONS_DOT) // As a backup, try bone directions rather than directions towards the object center
                                         {
-                                            dot = Mathf.Min(Vector3.Dot(-bone1.transform.up, -bone2.transform.up), dot);
+                                            dot = Vector3.Dot(-bone1.transform.up, -bone2.transform.up);
                                         }
 
                                         //If the two bones are facing opposite directions (i.e. pushing towards each other), they're grabbing
@@ -588,7 +590,7 @@ namespace Leap.Unity.PhysicalHands
             if (_grabbingHands.Contains(hand))
                 return;
 
-            if (!Ignored)
+            if (!_grabbingIgnored)
             {
                 // Store the original rigidbody variables
                 _oldKinematic = _rigid.isKinematic;
@@ -643,7 +645,7 @@ namespace Leap.Unity.PhysicalHands
                     // Was the finger not contacting before?
                     if (_grabbableHandsValues[grabHandIndex].fingerStrength[i] == -1)
                     {
-                        if (_manager.FingerStrengths[_grabbableHands[grabHandIndex]][i] > (i == 0 ? MINIMUM_THUMB_STRENGTH : MINIMUM_STRENGTH) && isFingerGrabbed(_grabbableHands[grabHandIndex], i))
+                        if (_manager.FingerStrengths[_grabbableHands[grabHandIndex]][i] > (i == 0 ? MINIMUM_THUMB_STRENGTH : MINIMUM_STRENGTH) && IsFingerGrabbable(_grabbableHands[grabHandIndex], i))
                         {
                             // Store the strength value on contact
                             _grabbableHandsValues[grabHandIndex].fingerStrength[i] = _manager.FingerStrengths[_grabbableHands[grabHandIndex]][i];
