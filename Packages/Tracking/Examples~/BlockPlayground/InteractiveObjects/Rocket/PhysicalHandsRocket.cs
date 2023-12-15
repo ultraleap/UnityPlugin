@@ -37,15 +37,12 @@ public class PhysicalHandsRocket : MonoBehaviour
         if (buttonObject.transform.localPosition.y <= buttonHeightLimit * BUTTON_PRESS_THRESHOLD
             && !_isButtonPressed)
         {
-
-            Debug.Log("Rocket Button Pressed");
             _isButtonPressed = true;
             ButtonPressed();
         }
 
         if (_isButtonPressed && buttonObject.transform.localPosition.y >= buttonHeightLimit * BUTTON_PRESS_EXIT_THRESHOLD)
         {
-            Debug.Log("Rocket Button UnPressed");
             _isButtonPressed = false;
         }
     }

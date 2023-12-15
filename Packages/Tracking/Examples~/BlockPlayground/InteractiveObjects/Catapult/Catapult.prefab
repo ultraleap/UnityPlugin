@@ -325,7 +325,7 @@ ConfigurableJoint:
   m_BreakTorque: Infinity
   m_EnableCollision: 0
   m_EnablePreprocessing: 1
-  m_MassScale: 1
+  m_MassScale: 3
   m_ConnectedMassScale: 1
 --- !u!1 &4484806314189009148
 GameObject:
