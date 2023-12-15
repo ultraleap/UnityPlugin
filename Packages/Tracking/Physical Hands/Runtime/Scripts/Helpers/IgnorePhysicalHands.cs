@@ -81,17 +81,21 @@ namespace Leap.Unity.PhysicalHands
 
         private void SetCollisionHand(bool collisionDisabled, ContactHand contactHand)
         {
-            foreach (var objectCollider in GetComponentsInChildren<Collider>())
+            if (this != null)
             {
-                foreach (var bone in contactHand.bones)
+
+                foreach (var objectCollider in GetComponentsInChildren<Collider>())
                 {
-                    Physics.IgnoreCollision(bone.Collider, objectCollider, collisionDisabled);
+                    foreach (var bone in contactHand.bones)
+                    {
+                        Physics.IgnoreCollision(bone.Collider, objectCollider, collisionDisabled);
+                    }
+                    foreach (var palmCollider in contactHand.palmBone.palmEdgeColliders)
+                    {
+                        Physics.IgnoreCollision(palmCollider, objectCollider, collisionDisabled);
+                    }
+                    Physics.IgnoreCollision(contactHand.palmBone.Collider, objectCollider, collisionDisabled);
                 }
-                foreach (var palmCollider in contactHand.palmBone.palmEdgeColliders)
-                {
-                    Physics.IgnoreCollision(palmCollider, objectCollider, collisionDisabled);
-                }
-                Physics.IgnoreCollision(contactHand.palmBone.Collider, objectCollider, collisionDisabled);
             }
         }
 

@@ -1375,7 +1375,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1425814782421875418, guid: b19d51e6a7ac86045884866247967cc6, type: 3}
       propertyPath: m_RootOrder
-      value: 22
+      value: 21
       objectReference: {fileID: 0}
     - target: {fileID: 1425814782421875418, guid: b19d51e6a7ac86045884866247967cc6, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2223,6 +2223,17 @@ Transform:
   m_Father: {fileID: 384914468}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: -70}
+--- !u!114 &464908057 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8810489104910744151, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+  m_PrefabInstance: {fileID: 8134623799061944076}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cd4cd2218a9d1694bb00926ae50322f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &468595244 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4459870147495250033, guid: 082b410248efe504fa129955c7dfaba5, type: 3}
@@ -2844,6 +2855,17 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &737946942 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5536264655608466747, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+  m_PrefabInstance: {fileID: 8134623799061944076}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cd4cd2218a9d1694bb00926ae50322f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &738762235
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3362,7 +3384,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2498387265858749825, guid: bc0e964e8fdef39419504d5dfb897ada, type: 3}
       propertyPath: m_RootOrder
-      value: 23
+      value: 22
       objectReference: {fileID: 0}
     - target: {fileID: 2498387265858749825, guid: bc0e964e8fdef39419504d5dfb897ada, type: 3}
       propertyPath: m_LocalPosition.x
@@ -4582,6 +4604,129 @@ Transform:
   m_Father: {fileID: 480831413}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1088920945 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8536735542557770490, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+  m_PrefabInstance: {fileID: 8134623799061944076}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1088920952
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1088920945}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05a21360bd573d44ba7d6ff4e9e213e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onHoverEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onHover:
+    m_PersistentCalls:
+      m_Calls: []
+  onHoverExit:
+    m_PersistentCalls:
+      m_Calls: []
+  onContactEnter:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 464908057}
+        m_TargetAssemblyTypeName: PhysicalHandsButton, Assembly-CSharp
+        m_MethodName: ContactHandNearbyEnter
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onContact:
+    m_PersistentCalls:
+      m_Calls: []
+  onContactExit:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 464908057}
+        m_TargetAssemblyTypeName: PhysicalHandsButton, Assembly-CSharp
+        m_MethodName: ContactHandNearbyExit
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: Leap.Unity.PhysicalHands.ContactHand,
+            Ultraleap.Tracking.PhysicalHands
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onGrabEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onGrab:
+    m_PersistentCalls:
+      m_Calls: []
+  onGrabExit:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeftHandHoverEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeftHandHover:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeftHandHoverExit:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeftHandContactEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeftHandContact:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeftHandContactExit:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeftHandGrabEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeftHandGrab:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeftHandGrabExit:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandHoverEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandHover:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandHoverExit:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandContactEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandContact:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandContactExit:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandGrabEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandGrab:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandGrabExit:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1102819695
 GameObject:
   m_ObjectHideFlags: 0
@@ -8582,6 +8727,128 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _disableAllGrabbing: 1
   _disableAllHandCollisions: 1
+--- !u!1 &2039711328 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4677399194488223126, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+  m_PrefabInstance: {fileID: 8134623799061944076}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2039711335
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2039711328}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05a21360bd573d44ba7d6ff4e9e213e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onHoverEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onHover:
+    m_PersistentCalls:
+      m_Calls: []
+  onHoverExit:
+    m_PersistentCalls:
+      m_Calls: []
+  onContactEnter:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 737946942}
+        m_TargetAssemblyTypeName: PhysicalHandsButton, Assembly-CSharp
+        m_MethodName: ContactHandNearbyEnter
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onContact:
+    m_PersistentCalls:
+      m_Calls: []
+  onContactExit:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 737946942}
+        m_TargetAssemblyTypeName: PhysicalHandsButton, Assembly-CSharp
+        m_MethodName: ContactHandNearbyExit
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onGrabEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onGrab:
+    m_PersistentCalls:
+      m_Calls: []
+  onGrabExit:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeftHandHoverEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeftHandHover:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeftHandHoverExit:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeftHandContactEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeftHandContact:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeftHandContactExit:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeftHandGrabEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeftHandGrab:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeftHandGrabExit:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandHoverEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandHover:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandHoverExit:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandContactEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandContact:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandContactExit:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandGrabEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandGrab:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandGrabExit:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &2053968234
 GameObject:
   m_ObjectHideFlags: 0
@@ -8838,7 +9105,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1207188469440071037, guid: 59c1e3a283ecf6e43875782998d176eb, type: 3}
       propertyPath: m_RootOrder
-      value: 21
+      value: 23
       objectReference: {fileID: 0}
     - target: {fileID: 1207188469440071037, guid: 59c1e3a283ecf6e43875782998d176eb, type: 3}
       propertyPath: m_LocalPosition.x
@@ -9408,6 +9675,10 @@ PrefabInstance:
       value: BaseRoundedObject
       objectReference: {fileID: 0}
     - target: {fileID: 2018652588032238341, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2018652588032238341, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 0
       objectReference: {fileID: 0}
@@ -9426,6 +9697,10 @@ PrefabInstance:
     - target: {fileID: 3067610655480943721, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
       propertyPath: m_Name
       value: BaseRoundedObject
+      objectReference: {fileID: 0}
+    - target: {fileID: 3067610655480943721, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+      propertyPath: m_Layer
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 3067610655480943721, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -9481,6 +9756,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5536264655608466747, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
       propertyPath: _buttonShouldDelayRebound
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5536264655608466747, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+      propertyPath: _shouldOnlyBePressedByHand
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5536264655608466747, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
@@ -9725,6 +10004,10 @@ PrefabInstance:
       objectReference: {fileID: 1079808636}
     - target: {fileID: 8810489104910744151, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
       propertyPath: _buttonShouldDelayRebound
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8810489104910744151, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+      propertyPath: _shouldOnlyBePressedByHand
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8810489104910744151, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
