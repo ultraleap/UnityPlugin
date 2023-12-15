@@ -77,14 +77,6 @@ namespace Leap.Unity.PhysicalHands
             HandOverlaps(_rightContactHand);
         }
 
-        private void UntrackedHand(ContactHand hand)
-        {
-            foreach (var helper in _grabHelpers)
-            {
-                helper.Value.RemoveHand(hand);
-            }
-        }
-
         private void HandOverlaps(ContactHand hand)
         {
             hand.isHovering = false;

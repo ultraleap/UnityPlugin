@@ -6,6 +6,9 @@ using UnityEngine;
 
 public class HandGrabHighlighter : MonoBehaviour
 {
+    [Tooltip("Automatically listen to the grab events from the Physical Hands Manager in the scene on start")]
+    public bool automaticEvents = true;
+
     public Chirality chirality;
 
     public Renderer rendererToChange;
@@ -30,6 +33,17 @@ public class HandGrabHighlighter : MonoBehaviour
     private void Awake()
     {
         ungrabbedColor = rendererToChange.material.GetColor(materialColorName);
+
+        if (automaticEvents)
+        {
+            PhysicalHandsManager physManager = FindObjectOfType<PhysicalHandsManager>();
+
+            if (physManager != null)
+            {
+                physManager.onGrab.AddListener(OnGrabBegin);
+                physManager.onGrabExit.AddListener(OnGrabEnd);
+            }
+        }
     }
 
     public void OnGrabBegin(ContactHand contacthand, Rigidbody rbody)
