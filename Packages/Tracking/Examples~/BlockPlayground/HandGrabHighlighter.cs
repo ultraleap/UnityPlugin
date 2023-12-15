@@ -13,7 +13,11 @@ public class HandGrabHighlighter : MonoBehaviour
     public Color grabActivatedColor;
     public Color grabbedColor;
 
-    public float grabActivatedTime = 0.1f;
+    public float grabActivatedFadeTime = 0.1f;
+    public float grabDeactivatedFadeTime = 0.1f;
+
+    public bool fadeIn = false;
+    public bool fadeOut = true;
 
     Color ungrabbedColor;
 
@@ -21,9 +25,11 @@ public class HandGrabHighlighter : MonoBehaviour
 
     public AnimationCurve grabActivationEaseCurve;
 
+    public string materialColorName = "_MainColor";
+
     private void Awake()
     {
-        ungrabbedColor = rendererToChange.material.GetColor("_MainColor");
+        ungrabbedColor = rendererToChange.material.GetColor(materialColorName);
     }
 
     public void OnGrabBegin(ContactHand contacthand, Rigidbody rbody)
@@ -45,21 +51,48 @@ public class HandGrabHighlighter : MonoBehaviour
             StopAllCoroutines();
 
             grabbing = false;
-            rendererToChange.material.SetColor("_MainColor", ungrabbedColor);
 
+            StartCoroutine(HandleGrabDeactivation());
         }
     }
 
     IEnumerator HandleGrabActivation()
     {
-        float t = grabActivatedTime;
+        if(!fadeIn)
+        {
+            rendererToChange.material.SetColor(materialColorName, grabbedColor);
+            yield break;
+        }
+
+        float t = grabActivatedFadeTime;
         while (t > 0)
         {
             t -= Time.deltaTime;
 
-            Color color = Color.Lerp(grabbedColor, grabActivatedColor, grabActivationEaseCurve.Evaluate(t / grabActivatedTime));
+            Color color = Color.Lerp(grabbedColor, grabActivatedColor, grabActivationEaseCurve.Evaluate(t / grabActivatedFadeTime));
 
-            rendererToChange.material.SetColor("_MainColor", color);
+            rendererToChange.material.SetColor(materialColorName, color);
+
+            yield return null;
+        }
+    }
+
+    IEnumerator HandleGrabDeactivation()
+    {
+        if (!fadeOut)
+        {
+            rendererToChange.material.SetColor(materialColorName, ungrabbedColor);
+            yield break;
+        }
+
+        float t = grabDeactivatedFadeTime;
+        while (t > 0)
+        {
+            t -= Time.deltaTime;
+
+            Color color = Color.Lerp(ungrabbedColor, grabbedColor, grabActivationEaseCurve.Evaluate(t / grabDeactivatedFadeTime));
+
+            rendererToChange.material.SetColor(materialColorName, color);
 
             yield return null;
         }
