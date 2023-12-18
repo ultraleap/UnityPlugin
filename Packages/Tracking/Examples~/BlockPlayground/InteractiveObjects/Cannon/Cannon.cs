@@ -29,13 +29,16 @@ public class Cannon : MonoBehaviour
         {
             obj.AddForce(transform.up * explosionForce);
         }
+
+        innerObjects.Clear ();
     }
 
     private void OnTriggerEnter(Collider other)
     {
         var rbod = other.attachedRigidbody;
+        var joint = other.GetComponent<Joint>();
 
-        if(rbod != null && !innerObjects.Contains(rbod))
+        if(rbod != null && joint == null && !innerObjects.Contains(rbod))
         {
             innerObjects.Add(rbod);
         }
