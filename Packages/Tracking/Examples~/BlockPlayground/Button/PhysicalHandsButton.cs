@@ -97,30 +97,37 @@ public class PhysicalHandsButton : MonoBehaviour
 
     public void ContactHandNearbyEnter(ContactHand contactHand)
     {
-        //if((int)contactHand.Handedness != (int)_whichHandCanPressButton)
-        //{
-        //    return;
-        //}
+        if (contactHand != null)
+        {
+            if (contactHand.Handedness == Chirality.Left)
+            {
+                _leftHandContacting = true;
+            }
+            else if (contactHand.Handedness == Chirality.Right)
+            {
+                _rightHandContacting = true;
+            }
+        }
 
-        if (contactHand.Handedness == Chirality.Left)
-        {
-            _leftHandContacting = true;
-        }
-        else if (contactHand.Handedness == Chirality.Right)
-        {
-            _rightHandContacting = true;
-        }
         _contactHandPressing = GetChosenHandInContact();
     }
 
     public void ContactHandNearbyExit(ContactHand contactHand)
     {
-        if (contactHand.Handedness == Chirality.Left)
+        if (contactHand != null)
+        {
+            if (contactHand.Handedness == Chirality.Left)
+            {
+                _leftHandContacting = false;
+            }
+            else if (contactHand.Handedness == Chirality.Right)
+            {
+                _rightHandContacting = false;
+            }
+        }
+        else
         {
             _leftHandContacting = false;
-        }
-        else if (contactHand.Handedness == Chirality.Right)
-        {
             _rightHandContacting = false;
         }
 
