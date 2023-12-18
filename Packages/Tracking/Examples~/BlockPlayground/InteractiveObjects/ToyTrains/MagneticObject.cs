@@ -9,6 +9,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using System.Collections;
 
 namespace Leap.Unity.Interaction
 {
@@ -126,6 +127,16 @@ namespace Leap.Unity.Interaction
                     }
                 }
             }
+        }
+
+        public void ForceDetatchMagnets()
+        {
+            foreach (var magnet in magneticPoints)
+            {
+                magnet.RemoveAllAttachments();
+            }
+
+            nearbyMagneticObjects.Clear();
         }
     }
 }

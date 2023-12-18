@@ -37,14 +37,22 @@ public class ObjectResetter : MonoBehaviour
     {
         if (transform.position.y < originalPos.y - distanceToReset)
         {
+            OnReset?.Invoke();
+
             if (rbs != null)
             {
                 for (int i = 0; i < rbs.Length; i++)
                 {
-                    rbs[i].position = rbPositions[i];
-                    rbs[i].rotation = rbRotations[i];
+                    var joint = rbs[i].GetComponent<Joint>();
+
+                    if (joint != null)
+                    {
+                    }
+
                     rbs[i].velocity = Vector3.zero;
                     rbs[i].angularVelocity = Vector3.zero;
+                    rbs[i].MovePosition(rbPositions[i]);
+                    rbs[i].MoveRotation(rbRotations[i]);
                 }
             }
             else
@@ -52,8 +60,6 @@ public class ObjectResetter : MonoBehaviour
                 transform.position = originalPos;
                 transform.rotation = originalRot;
             }
-
-            OnReset?.Invoke();
         }
     }
 }

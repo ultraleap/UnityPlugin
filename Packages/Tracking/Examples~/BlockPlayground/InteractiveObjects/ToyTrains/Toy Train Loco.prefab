@@ -1411,7 +1411,19 @@ MonoBehaviour:
   distanceToReset: 2
   OnReset:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 6912313046245989022}
+        m_TargetAssemblyTypeName: Leap.Unity.Interaction.MagneticObject, Assembly-CSharp
+        m_MethodName: ForceDetatchMagnets
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &6912313046245989022
 MonoBehaviour:
   m_ObjectHideFlags: 0

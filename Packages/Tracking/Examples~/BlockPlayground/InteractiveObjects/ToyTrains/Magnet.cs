@@ -84,5 +84,18 @@ namespace Leap.Unity.Interaction
                 }
             }
         }
+
+        public void RemoveAllAttachments()
+        {
+            for (int i = 0; i < attachedMagnets.Length; i++)
+            {
+                if (attachedMagnets[i].Item1 != null)
+                {
+                    Destroy(attachedMagnets[i].Item1);
+                    attachedMagnets[i].Item1 = null;
+                    attachedMagnets[i].Item2.RemoveAllAttachments();
+                }
+            }
+        }
     }
 }

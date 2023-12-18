@@ -162,7 +162,7 @@ MeshRenderer:
   m_RenderingLayerMask: 257
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: d17cd2adfec53d84ba1dfd1ac88ceb87, type: 2}
+  - {fileID: 2100000, guid: edb93464e810ee64db89cab2df4fba1a, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -411,7 +411,7 @@ MeshRenderer:
   m_RenderingLayerMask: 257
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: d17cd2adfec53d84ba1dfd1ac88ceb87, type: 2}
+  - {fileID: 2100000, guid: edb93464e810ee64db89cab2df4fba1a, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -914,7 +914,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6088525732661566743}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.1208, y: 1.1919185, z: 0.342}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -964,7 +964,19 @@ MonoBehaviour:
   distanceToReset: 2
   OnReset:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1118965137586500593}
+        m_TargetAssemblyTypeName: Leap.Unity.Interaction.MagneticObject, Assembly-CSharp
+        m_MethodName: ForceDetatchMagnets
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1118965137586500593
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1045,7 +1057,7 @@ MeshRenderer:
   m_RenderingLayerMask: 257
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: d17cd2adfec53d84ba1dfd1ac88ceb87, type: 2}
+  - {fileID: 2100000, guid: edb93464e810ee64db89cab2df4fba1a, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1294,7 +1306,7 @@ MeshRenderer:
   m_RenderingLayerMask: 257
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: d17cd2adfec53d84ba1dfd1ac88ceb87, type: 2}
+  - {fileID: 2100000, guid: edb93464e810ee64db89cab2df4fba1a, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
