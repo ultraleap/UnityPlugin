@@ -615,6 +615,21 @@ namespace Leap.Unity.PhysicalHands
             hand.physicalHandsManager.OnHandGrab(hand, _rigid);
         }
 
+        internal void SendGrabExitEvents(ContactHand hand)
+        {
+            if(GrabState != State.Grab)
+            {
+                return;
+            }
+
+            if (_rigid.TryGetComponent<IPhysicalHandGrab>(out var physicalHandGrab))
+            {
+                physicalHandGrab.OnHandGrabExit(hand);
+            }
+
+            hand.physicalHandsManager.OnHandGrabExit(hand, _rigid);
+        }
+
         private void UpdateGrabbingValues()
         {
             for(int grabHandIndex = 0; grabHandIndex < _grabbableHands.Count; grabHandIndex++)
@@ -628,14 +643,7 @@ namespace Leap.Unity.PhysicalHands
                 {
                     SetBoneGrabbing(_grabbableHands[grabHandIndex], false);
                     _grabbingHands.Remove(_grabbableHands[grabHandIndex]);
-
-                    if (_rigid.TryGetComponent<IPhysicalHandGrab>(out var physicalHandGrab))
-                    {
-                        physicalHandGrab.OnHandGrabExit(_grabbableHands[grabHandIndex]);
-                    }
-
-                    _grabbableHands[grabHandIndex].physicalHandsManager.OnHandGrabExit(_grabbableHands[grabHandIndex], _rigid);
-
+                    SendGrabExitEvents(_grabbableHands[grabHandIndex]);
                     continue;
                 }
 

@@ -34,6 +34,9 @@ namespace Leap.Unity.PhysicalHands
                 physicalHandsManager.OnPrePhysicsUpdate += OnPrePhysicsUpdate;
                 physicalHandsManager.OnFixedFrame -= OnFixedFrame;
                 physicalHandsManager.OnFixedFrame += OnFixedFrame;
+
+                physicalHandsManager.OnContactModeChanged -= ResetHelper;
+                physicalHandsManager.OnContactModeChanged += ResetHelper;
             }
         }
 
@@ -55,6 +58,30 @@ namespace Leap.Unity.PhysicalHands
             UpdateHandHeuristics();
             UpdateHelpers();
             UpdateHandStates();
+        }
+
+        internal void ResetHelper()
+        {
+            // The current hands need to be cleared, including firing all relevand exit events on all grab helper objects
+            foreach (var helper in _grabHelpers.Values)
+            {
+                if (helper.GrabState == GrabHelperObject.State.Grab)
+                {
+                    helper.SendGrabExitEvents(_rightContactHand);
+                    helper.SendGrabExitEvents(_leftContactHand);
+                    helper.ReleaseObject();
+                }
+
+                helper.ReleaseHelper();
+            }
+
+            _grabHelpers.Clear();
+            _grabRigids.Clear();
+            _hoveredItems.Clear();
+            _hoveringHands.Clear();
+
+            _fingerStrengths.Clear();
+            _colliderCache = new Collider[128];
         }
 
         #region Hand Updating

@@ -109,6 +109,11 @@ namespace Leap.Unity.PhysicalHands
         /// </summary>
         public Action OnPrePhysicsUpdate;
 
+        /// <summary>
+        /// Called when the contact mode has been changed, but before the mode change has completed
+        /// </summary>
+        public Action OnContactModeChanged;
+
         private void Awake()
         {
             if (ContactParent == null)
@@ -226,6 +231,9 @@ namespace Leap.Unity.PhysicalHands
 
         public void SetContactMode(ContactMode mode)
         {
+            _contactMode = mode;
+            OnContactModeChanged?.Invoke();
+
             if (ContactParent != null) // delete old contact hands
             {
                 if (Application.isPlaying)
@@ -239,8 +247,6 @@ namespace Leap.Unity.PhysicalHands
 
                 _contactParent = null;
             }
-
-            _contactMode = mode;
 
             // Make new hands hand add their component
             GameObject newContactParent = new GameObject(_contactMode.ToString());

@@ -62,7 +62,7 @@ public class PhysicalHandsButton : MonoBehaviour
 
     void ButtonPressed()
     {
-        OnButtonPressed.Invoke();
+        OnButtonPressed?.Invoke();
         if (_buttonShouldDelayRebound)
         {
             StartCoroutine(ButtonCollisionReset());
@@ -71,7 +71,7 @@ public class PhysicalHandsButton : MonoBehaviour
 
     void ButtonUnpressed()
     {
-        OnButtonUnPressed.Invoke();
+        OnButtonUnPressed?.Invoke();
     }
 
     IEnumerator ButtonCollisionReset()
