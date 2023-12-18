@@ -141,7 +141,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1425814782601253775}
-  m_Mesh: {fileID: 7675518871592984526, guid: 6f3a44435e9d0634388359c7f01be8a6, type: 3}
+  m_Mesh: {fileID: 7675518871592984526, guid: a68cdb794a30eb24b84d8a1b57f9cd24, type: 3}
 --- !u!23 &1425814782601253762
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -5405,7 +5405,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2302522947457424395}
-  m_Mesh: {fileID: 874583982344239233, guid: e1ec346df17c88b42b5794f2e405105b, type: 3}
+  m_Mesh: {fileID: 874583982344239233, guid: 84041dd6335d02141b495cc8cb17595b, type: 3}
 --- !u!23 &2302522947455156939
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -5513,6 +5513,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -8369445156035277549, guid: 2077eeed1b68901438fcfd2da9c413de, type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: -5951841855076568074, guid: 29d9711bfc4ef2349a40adc199013393, type: 3}
     - target: {fileID: -6835604955573968862, guid: 2077eeed1b68901438fcfd2da9c413de, type: 3}
       propertyPath: m_LocalScale.x
       value: 1
@@ -5597,10 +5601,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: RocketFins
       objectReference: {fileID: 0}
+    - target: {fileID: 1477207937687789015, guid: 2077eeed1b68901438fcfd2da9c413de, type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: -1012395410306439865, guid: 29d9711bfc4ef2349a40adc199013393, type: 3}
     - target: {fileID: 6183495931405691014, guid: 2077eeed1b68901438fcfd2da9c413de, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: cd0ee427eb2d0024f81f7fcd3ad10a97, type: 2}
+    - target: {fileID: 8160617985934465652, guid: 2077eeed1b68901438fcfd2da9c413de, type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: -7371983002982548177, guid: 29d9711bfc4ef2349a40adc199013393, type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2077eeed1b68901438fcfd2da9c413de, type: 3}
 --- !u!1 &1151838045309311334 stripped
