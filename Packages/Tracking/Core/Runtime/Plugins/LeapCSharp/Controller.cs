@@ -232,6 +232,7 @@ namespace Leap
         /// Dispatched when a configuration setting changes.
         /// @since 3.0
         /// </summary>
+        [Obsolete("Config is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
         public event EventHandler<ConfigChangeEventArgs> ConfigChange
         {
             add
@@ -870,7 +871,7 @@ namespace Leap
         /// 
         /// @since 1.0
         /// </summary>
-        [Obsolete("Config.cs is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
+        [Obsolete("Config is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
         public Config Config
         {
             get

@@ -37,6 +37,7 @@ namespace Leap
 
         //new
         event EventHandler<PolicyEventArgs> PolicyChange;
+        [Obsolete("Config is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
         event EventHandler<ConfigChangeEventArgs> ConfigChange;
         event EventHandler<DistortionEventArgs> DistortionChange;
         event EventHandler<ImageEventArgs> ImageReady;
