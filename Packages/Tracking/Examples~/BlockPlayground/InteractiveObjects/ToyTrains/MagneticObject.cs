@@ -116,7 +116,7 @@ namespace Leap.Unity.Interaction
                         joint.projectionDistance = 0.01f;
                         joint.enableCollision = true;
 
-                        joint.breakForce = 300;
+                        joint.breakForce = 100;
 
                         magneticPoint.AddAttachment(joint, nearestOtherMagneticPoint);
                         nearestOtherMagneticPoint.AddAttachment(joint, magneticPoint);

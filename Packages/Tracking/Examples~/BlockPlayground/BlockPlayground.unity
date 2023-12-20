@@ -3337,7 +3337,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8681616449881122529, guid: d1c00f89ef60a3446ad9eef2d361e2a1, type: 3}
       propertyPath: _deviceOffsetMode
-      value: 0
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8681616449881122529, guid: d1c00f89ef60a3446ad9eef2d361e2a1, type: 3}
+      propertyPath: _deviceOffsetYAxis
+      value: 0.05
       objectReference: {fileID: 0}
     - target: {fileID: 8681616449881122529, guid: d1c00f89ef60a3446ad9eef2d361e2a1, type: 3}
       propertyPath: _deviceOffsetZAxis
