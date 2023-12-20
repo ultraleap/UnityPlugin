@@ -2356,11 +2356,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7fcb8aefe25f35842aa4c29338032258, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  automaticEvents: 1
   chirality: 1
   rendererToChange: {fileID: 5113074556463415270}
   grabActivatedColor: {r: 1, g: 1, b: 1, a: 0.6}
-  grabbedColor: {r: 1, g: 1, b: 1, a: 0.2}
-  grabActivatedTime: 0.5
+  grabbedColor: {r: 1, g: 1, b: 1, a: 0.2509804}
+  grabActivatedFadeTime: 0.1
+  grabDeactivatedFadeTime: 0.1
+  fadeIn: 0
+  fadeOut: 1
   grabActivationEaseCurve:
     serializedVersion: 2
     m_Curve:
@@ -2385,6 +2389,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  materialColorName: _MainColor
 --- !u!114 &1920359932
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2397,11 +2402,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7fcb8aefe25f35842aa4c29338032258, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  automaticEvents: 1
   chirality: 0
   rendererToChange: {fileID: 2392948496668633434}
   grabActivatedColor: {r: 1, g: 1, b: 1, a: 0.6}
-  grabbedColor: {r: 1, g: 1, b: 1, a: 0.2}
-  grabActivatedTime: 0.5
+  grabbedColor: {r: 1, g: 1, b: 1, a: 0.2509804}
+  grabActivatedFadeTime: 0.1
+  grabDeactivatedFadeTime: 0.1
+  fadeIn: 0
+  fadeOut: 1
   grabActivationEaseCurve:
     serializedVersion: 2
     m_Curve:
@@ -2426,6 +2435,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  materialColorName: _MainColor
 --- !u!1 &7063268548511624075
 GameObject:
   m_ObjectHideFlags: 0

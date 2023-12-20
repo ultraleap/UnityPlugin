@@ -4358,6 +4358,22 @@ PrefabInstance:
       propertyPath: m_Name
       value: Height Button
       objectReference: {fileID: 0}
+    - target: {fileID: 476095682927097482, guid: 7c877a94518df394bb200ddc9ccc50c9, type: 3}
+      propertyPath: m_text
+      value: Height Adjust
+      objectReference: {fileID: 0}
+    - target: {fileID: 476095682927097482, guid: 7c877a94518df394bb200ddc9ccc50c9, type: 3}
+      propertyPath: m_fontSize
+      value: 35
+      objectReference: {fileID: 0}
+    - target: {fileID: 476095682927097482, guid: 7c877a94518df394bb200ddc9ccc50c9, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 35
+      objectReference: {fileID: 0}
+    - target: {fileID: 476095683074382521, guid: 7c877a94518df394bb200ddc9ccc50c9, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.1
+      objectReference: {fileID: 0}
     - target: {fileID: 476095683074382523, guid: 7c877a94518df394bb200ddc9ccc50c9, type: 3}
       propertyPath: m_Material
       value: 
@@ -4366,6 +4382,10 @@ PrefabInstance:
       propertyPath: OnButtonPressed.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 1556226641}
+    - target: {fileID: 1520259861671275252, guid: 7c877a94518df394bb200ddc9ccc50c9, type: 3}
+      propertyPath: m_ConnectedAnchor.y
+      value: 0.01
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 476095683074382523, guid: 7c877a94518df394bb200ddc9ccc50c9, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 7c877a94518df394bb200ddc9ccc50c9, type: 3}
@@ -6526,6 +6546,10 @@ PrefabInstance:
       propertyPath: m_text
       value: Exit
       objectReference: {fileID: 0}
+    - target: {fileID: 476095683074382521, guid: 7c877a94518df394bb200ddc9ccc50c9, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.1
+      objectReference: {fileID: 0}
     - target: {fileID: 476095683074382523, guid: 7c877a94518df394bb200ddc9ccc50c9, type: 3}
       propertyPath: m_Material
       value: 
@@ -6541,6 +6565,10 @@ PrefabInstance:
     - target: {fileID: 767538377468813851, guid: 7c877a94518df394bb200ddc9ccc50c9, type: 3}
       propertyPath: OnButtonPressed.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
       value: SceneReset, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 1520259861671275252, guid: 7c877a94518df394bb200ddc9ccc50c9, type: 3}
+      propertyPath: m_ConnectedAnchor.y
+      value: 0.01
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 476095683074382523, guid: 7c877a94518df394bb200ddc9ccc50c9, type: 3}
@@ -8462,11 +8490,11 @@ PrefabInstance:
     - target: {fileID: 1746286255465515063, guid: 2ad4addaac7f722409024d613edf31dc, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 2fa05b03360a1fb4c933ebc7a30873ac, type: 2}
+      objectReference: {fileID: 2100000, guid: c7224e2b81832b043b0e08a164d3442a, type: 2}
     - target: {fileID: 3354336035236945374, guid: 2ad4addaac7f722409024d613edf31dc, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 2fa05b03360a1fb4c933ebc7a30873ac, type: 2}
+      objectReference: {fileID: 2100000, guid: c7224e2b81832b043b0e08a164d3442a, type: 2}
     - target: {fileID: 7224437392015622605, guid: 2ad4addaac7f722409024d613edf31dc, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
