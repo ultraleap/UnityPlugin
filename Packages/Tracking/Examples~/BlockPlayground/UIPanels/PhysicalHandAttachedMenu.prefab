@@ -343,6 +343,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   buttonObject: {fileID: 5467393138792240732}
   buttonHeightLimit: 0.2
+  _whichHandCanPressButton: 2
+  _buttonShouldDelayRebound: 0
+  _buttonStaydownTimer: 2
+  _shouldOnlyBePressedByHand: 0
   _isButtonPressed: 0
   OnButtonPressed:
     m_PersistentCalls:
@@ -362,8 +366,6 @@ MonoBehaviour:
   OnButtonUnPressed:
     m_PersistentCalls:
       m_Calls: []
-  _buttonShouldDelayRebound: 0
-  buttonStaydownTimer: 2
 --- !u!54 &5467393138456762699
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1791,6 +1793,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   buttonObject: {fileID: 5467393138620567951}
   buttonHeightLimit: 0.2
+  _whichHandCanPressButton: 2
+  _buttonShouldDelayRebound: 0
+  _buttonStaydownTimer: 2
+  _shouldOnlyBePressedByHand: 0
   _isButtonPressed: 0
   OnButtonPressed:
     m_PersistentCalls:
@@ -1810,8 +1816,6 @@ MonoBehaviour:
   OnButtonUnPressed:
     m_PersistentCalls:
       m_Calls: []
-  _buttonShouldDelayRebound: 0
-  buttonStaydownTimer: 2
 --- !u!54 &5467393139125278190
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1878,6 +1882,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   buttonObject: {fileID: 5467393138891686599}
   buttonHeightLimit: 0.2
+  _whichHandCanPressButton: 2
+  _buttonShouldDelayRebound: 0
+  _buttonStaydownTimer: 2
+  _shouldOnlyBePressedByHand: 0
   _isButtonPressed: 0
   OnButtonPressed:
     m_PersistentCalls:
@@ -1897,8 +1905,6 @@ MonoBehaviour:
   OnButtonUnPressed:
     m_PersistentCalls:
       m_Calls: []
-  _buttonShouldDelayRebound: 0
-  buttonStaydownTimer: 2
 --- !u!54 &5467393139726197997
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2371,14 +2377,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5467393139914262334}
-  m_LocalRotation: {x: 0.7071068, y: -0.000000007450581, z: 0.000000007450581, w: 0.7071068}
+  m_LocalRotation: {x: 0.76604444, y: 0, z: 0, w: 0.64278764}
   m_LocalPosition: {x: 0.008870049, y: -0.04970006, z: 0.08511999}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5467393138878524373}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 100, y: 0, z: 0}
 --- !u!1 &5467393139982282441
 GameObject:
   m_ObjectHideFlags: 0

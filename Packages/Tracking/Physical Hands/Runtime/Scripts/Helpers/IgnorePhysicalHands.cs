@@ -2,43 +2,16 @@ using System.Collections.Generic;
 
 using UnityEngine;
 
-using Leap.Unity.Attributes;
-
 namespace Leap.Unity.PhysicalHands
 {
     public class IgnorePhysicalHands: MonoBehaviour
     {
-        [Tooltip("This prevents the object from being grabbed by all Contact Hands.")]
-        [SerializeProperty("DisableAllGrabbing"), SerializeField]
-        private bool _disableAllGrabbing = true;
-        public bool DisableAllGrabbing 
-        { 
-            get { return _disableAllGrabbing; }
-            set
-            {
-                _disableAllGrabbing = value;
+        [SerializeField, Tooltip("Prevents the object from being grabbed by all Contact Hands.")]
+        internal bool disableAllGrabbing = true;
 
-                if (GrabHelperObject != null)
-                {
-                    GrabHelperObject._grabbingIgnored = _disableAllGrabbing;
-                }
-            }
-        }
+        [SerializeField, Tooltip("Prevents the object from being collided with all Contact Hands.")]
+        internal bool disableAllHandCollisions = true;
 
-        [Tooltip("This prevents the object from being collided with all Contact Hands."), UnityEngine.Serialization.FormerlySerializedAsAttribute("DisableHandCollisions")]
-        [SerializeProperty("DisableAllHandCollisions"), SerializeField]
-        private bool _disableAllHandCollisions = true;
-        public bool DisableAllHandCollisions
-        {
-            get { return _disableAllHandCollisions; }
-            set 
-            { 
-                _disableAllHandCollisions = value;
-                SetAllHandCollisions();
-            }
-        }
-
-        [HideInInspector]
         private GrabHelperObject _grabHelperObject = null;
         public GrabHelperObject GrabHelperObject
         { 
@@ -46,7 +19,7 @@ namespace Leap.Unity.PhysicalHands
             set 
             { 
                 _grabHelperObject = value;
-                _grabHelperObject._grabbingIgnored = _disableAllGrabbing;
+                _grabHelperObject._grabbingIgnored = disableAllGrabbing;
             } 
         }
 
@@ -54,12 +27,28 @@ namespace Leap.Unity.PhysicalHands
 
         List<ContactHand> contactHands = new List<ContactHand>();
 
+        public void SetDisableGrabbing(bool setTo = false)
+        {
+            disableAllGrabbing = setTo;
+
+            if (GrabHelperObject != null)
+            {
+                GrabHelperObject._grabbingIgnored = disableAllGrabbing;
+            }
+        }
+
+        public void SetDisableCollisions(bool setTo = false)
+        {
+            disableAllHandCollisions = setTo;
+            SetAllHandCollisions();
+        }
+
         internal void AddToHands(ContactHand contactHand)
         {
             if (!contactHands.Contains(contactHand))
             {
                 contactHands.Add(contactHand);
-                SetCollisionHand(_disableAllHandCollisions, contactHand);
+                SetCollisionHand(disableAllHandCollisions, contactHand);
             }
         }
 
@@ -69,7 +58,7 @@ namespace Leap.Unity.PhysicalHands
             {
                 if (contactHands[i] != null)
                 {
-                    SetCollisionHand(_disableAllHandCollisions, contactHands[i]);
+                    SetCollisionHand(disableAllHandCollisions, contactHands[i]);
                 }
                 else
                 {
