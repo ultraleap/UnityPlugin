@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 
 
 ### Changed
-- Allow use of any LeapProvider with the MRTK subsystem where before only LeapXRServierProvider could be used.
+- Allow use of any LeapServiceProvider with the MRTK subsystem where before only LeapXRServiceProvider could be used.
 
 ### Fixed
 - 
