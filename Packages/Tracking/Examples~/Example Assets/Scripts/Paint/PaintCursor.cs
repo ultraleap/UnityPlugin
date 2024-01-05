@@ -68,7 +68,15 @@ namespace Leap.Unity.Examples
                 hand = pinchDetector.HandModel.GetLeapHand();
             }
 
-            if (hand == null || hand.GetIndex() == null || hand.GetThumb() == null) return;
+            if (hand == null || hand.GetIndex() == null || hand.GetThumb() == null)
+            {
+                _rectToroidPinchTargetRenderer.enabled = false;
+                _rectToroidPinchStateRenderer.enabled = false;
+                return;
+            }
+
+            _rectToroidPinchTargetRenderer.enabled = true;
+            _rectToroidPinchStateRenderer.enabled = true;
 
             var indexPos = hand.GetIndex().TipPosition;
             var thumbPos = hand.GetThumb().TipPosition;

@@ -13,9 +13,7 @@ GameObject:
   - component: {fileID: 882061857553901800}
   - component: {fileID: 882061857553901801}
   - component: {fileID: 882061857553901802}
-  - component: {fileID: 882061857553901806}
   - component: {fileID: 2287780628418418854}
-  - component: {fileID: 6928925247276963121}
   m_Layer: 0
   m_Name: Pressable Object
   m_TagString: Untagged
@@ -33,6 +31,7 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0.02, z: 0}
   m_LocalScale: {x: 0.07, y: 0.02, z: 0.04}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 882061857767179481}
   m_Father: {fileID: 882061859479617651}
@@ -57,6 +56,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
@@ -116,21 +116,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 3
---- !u!114 &882061857553901806
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 882061857553901796}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5dfdc811f6b2f964f9839cad8ceba7ed, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  DisableAllHandCollisions: 0
-  DisableSpecificHandCollisions: 0
-  DisabledHandedness: 0
 --- !u!153 &2287780628418418854
 ConfigurableJoint:
   m_ObjectHideFlags: 0
@@ -227,23 +212,6 @@ ConfigurableJoint:
   m_EnablePreprocessing: 1
   m_MassScale: 1
   m_ConnectedMassScale: 1
---- !u!114 &6928925247276963121
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 882061857553901796}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: be7f20afa3eb5a9429ef5c89fbaaa5db, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _button: {fileID: 0}
-  <IgnoreHelpers>k__BackingField: {fileID: 882061857553901806}
-  <Rigid>k__BackingField: {fileID: 882061857553901802}
-  <Joint>k__BackingField: {fileID: 2287780628418418854}
-  _material: {fileID: 0}
 --- !u!1 &882061857767179482
 GameObject:
   m_ObjectHideFlags: 0
@@ -272,6 +240,7 @@ RectTransform:
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.050000004, y: 0.10000002, z: 0.05}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 882061857553901803}
   m_RootOrder: 0
@@ -292,6 +261,7 @@ MeshRenderer:
   m_CastShadows: 0
   m_ReceiveShadows: 0
   m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
@@ -408,12 +378,12 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 0
-  m_renderer: {fileID: 882061857767179487}
-  m_maskType: 0
   _SortingLayer: 0
   _SortingLayerID: 0
   _SortingOrder: 0
+  m_hasFontAssetChanged: 0
+  m_renderer: {fileID: 882061857767179487}
+  m_maskType: 0
 --- !u!1 &882061859166316838
 GameObject:
   m_ObjectHideFlags: 0
@@ -443,6 +413,7 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: -0.0001, z: 0}
   m_LocalScale: {x: 0.08, y: 0.02, z: 0.05}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 882061859479617651}
   m_RootOrder: 0
@@ -466,6 +437,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
@@ -518,7 +490,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 882061859479617651}
-  - component: {fileID: 882061859479617650}
+  - component: {fileID: 693571657}
   - component: {fileID: 7298562659095329044}
   m_Layer: 0
   m_Name: Physics Button
@@ -537,13 +509,14 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 882061859166316837}
   - {fileID: 882061857553901803}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &882061859479617650
+--- !u!114 &693571657
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -552,43 +525,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 882061859479617644}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 89a6155d1ade3a442a3c9a1ff5aa29c0, type: 3}
+  m_Script: {fileID: 11500000, guid: cd4cd2218a9d1694bb00926ae50322f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _rigidbody: {fileID: 7298562659095329044}
-  _buttonElement: {fileID: 6928925247276963121}
-  _ignoreHelper: {fileID: 882061857553901806}
-  _handsOnly: 0
-  _fingerTipsOnly: 0
-  _allowLeftHand: 1
-  _allowRightHand: 1
-  buttonHeightLimit: 0.02
-  _springForce: 100
-  _springDampening: 5
-  isToggleable: 0
-  buttonToggleHeightLimit: 0.01
-  _OnHover:
+  buttonObject: {fileID: 882061857553901796}
+  buttonHeightLimit: 0.2
+  _isButtonPressed: 0
+  OnButtonPressed:
     m_PersistentCalls:
       m_Calls: []
-  _OnUnhover:
-    m_PersistentCalls:
-      m_Calls: []
-  _OnContact:
-    m_PersistentCalls:
-      m_Calls: []
-  _OnUncontact:
-    m_PersistentCalls:
-      m_Calls: []
-  _OnPress:
-    m_PersistentCalls:
-      m_Calls: []
-  _OnUnpress:
-    m_PersistentCalls:
-      m_Calls: []
-  _OnPressedAmountChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  _OnToggle:
+  OnButtonUnPressed:
     m_PersistentCalls:
       m_Calls: []
 --- !u!54 &7298562659095329044

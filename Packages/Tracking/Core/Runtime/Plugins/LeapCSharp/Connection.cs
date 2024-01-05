@@ -359,9 +359,6 @@ namespace LeapInternal
                             StructMarshal<LEAP_CONFIG_CHANGE_EVENT>.PtrToStruct(_msg.eventStructPtr, out config_change_evt);
                             handleConfigChange(ref config_change_evt);
                             break;
-                        case eLeapEventType.eLeapEventType_ConfigResponse:
-                            handleConfigResponse(ref _msg);
-                            break;
                         case eLeapEventType.eLeapEventType_DroppedFrame:
                             LEAP_DROPPED_FRAME_EVENT dropped_frame_evt;
                             StructMarshal<LEAP_DROPPED_FRAME_EVENT>.PtrToStruct(_msg.eventStructPtr, out dropped_frame_evt);
@@ -746,55 +743,6 @@ namespace LeapInternal
             {
                 LeapConfigChange.DispatchOnContext(this, EventContext,
                   new ConfigChangeEventArgs(config_key, configEvent.status != false, configEvent.requestId));
-            }
-        }
-
-        private void handleConfigResponse(ref LEAP_CONNECTION_MESSAGE configMsg)
-        {
-            LEAP_CONFIG_RESPONSE_EVENT config_response_evt;
-            StructMarshal<LEAP_CONFIG_RESPONSE_EVENT>.PtrToStruct(configMsg.eventStructPtr, out config_response_evt);
-            string config_key = "";
-            _configRequests.TryGetValue(config_response_evt.requestId, out config_key);
-            if (config_key != null)
-                _configRequests.Remove(config_response_evt.requestId);
-
-            Config.ValueType dataType;
-            object value;
-            uint requestId = config_response_evt.requestId;
-            if (config_response_evt.value.type != eLeapValueType.eLeapValueType_String)
-            {
-                switch (config_response_evt.value.type)
-                {
-                    case eLeapValueType.eLeapValueType_Boolean:
-                        dataType = Config.ValueType.TYPE_BOOLEAN;
-                        value = config_response_evt.value.boolValue;
-                        break;
-                    case eLeapValueType.eLeapValueType_Int32:
-                        dataType = Config.ValueType.TYPE_INT32;
-                        value = config_response_evt.value.intValue;
-                        break;
-                    case eLeapValueType.eLeapValueType_Float:
-                        dataType = Config.ValueType.TYPE_FLOAT;
-                        value = config_response_evt.value.floatValue;
-                        break;
-                    default:
-                        dataType = Config.ValueType.TYPE_UNKNOWN;
-                        value = new object();
-                        break;
-                }
-            }
-            else
-            {
-                LEAP_CONFIG_RESPONSE_EVENT_WITH_REF_TYPE config_ref_value;
-                StructMarshal<LEAP_CONFIG_RESPONSE_EVENT_WITH_REF_TYPE>.PtrToStruct(configMsg.eventStructPtr, out config_ref_value);
-                dataType = Config.ValueType.TYPE_STRING;
-                value = config_ref_value.value.stringValue;
-            }
-            SetConfigResponseEventArgs args = new SetConfigResponseEventArgs(config_key, dataType, value, requestId);
-
-            if (LeapConfigResponse != null)
-            {
-                LeapConfigResponse.DispatchOnContext(this, EventContext, args);
             }
         }
 

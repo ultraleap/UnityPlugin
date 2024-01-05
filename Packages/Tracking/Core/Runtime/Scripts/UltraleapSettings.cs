@@ -55,7 +55,7 @@ namespace Leap.Unity
 
             EditorGUILayout.Space(10);
             EditorGUILayout.LabelField("Leap XRHands Subsystem", EditorStyles.boldLabel);
-            
+
             EditorGUILayout.Space(5);
             EditorGUILayout.HelpBox("If using OpenXR for hand input, use the Hand Tracking Subsystem in XR Plug-in Management/OpenXR. Do not enable both subsystems." +
                 "\r\n\nThis option can not be toggled at runtime.", MessageType.Info, true);
@@ -80,9 +80,19 @@ namespace Leap.Unity
             }
             EditorGUILayout.Space(30);
 
+            EditorGUILayout.LabelField("Notifications", EditorStyles.boldLabel);
+            using (new EditorGUI.IndentLevelScope())
+            {
+                SerializedProperty showAndroidBuildArchitectureWarning = settings.FindProperty("showAndroidBuildArchitectureWarning");
+                showAndroidBuildArchitectureWarning.boolValue = EditorGUILayout.ToggleLeft("Show Android Architecture build warning", showAndroidBuildArchitectureWarning.boolValue);
+            }
+
+
+            EditorGUILayout.Space(30);
+
             if (GUILayout.Button("Reset To Defaults"))
             {
-                if(EditorUtility.DisplayDialog("Reset all settings", "This will reset all settings in this Ultraleap settings file", "Yes", "No"))
+                if (EditorUtility.DisplayDialog("Reset all settings", "This will reset all settings in this Ultraleap settings file", "Yes", "No"))
                 {
                     UltraleapSettings.Instance.ResetToDefaults();
                 }
@@ -108,6 +118,7 @@ namespace Leap.Unity
             set { instance = value; }
         }
 
+        // XRHands and Input System
         [HideInInspector, SerializeField]
         public bool leapSubsystemEnabled;
 
@@ -117,6 +128,9 @@ namespace Leap.Unity
         [HideInInspector, SerializeField]
         public bool updateMetaInputSystem;
 
+        [HideInInspector, SerializeField]
+        public bool showAndroidBuildArchitectureWarning = true;
+
         public void ResetToDefaults()
         {
             leapSubsystemEnabled = false;
@@ -125,10 +139,34 @@ namespace Leap.Unity
         }
 
 #if UNITY_EDITOR
-        [MenuItem("Ultraleap/Open Ultraleap Settings")]
+        [MenuItem("Ultraleap/Open Ultraleap Settings", false, 50)]
         private static void SelectULSettingsDropdown()
         {
             SettingsService.OpenProjectSettings("Project/Ultraleap");
+        }
+
+        [MenuItem("Ultraleap/Help/Documentation", false, 100)]
+        private static void OpenDocs()
+        {
+            Application.OpenURL("https://docs.ultraleap.com/unity-api/");
+        }
+
+        [MenuItem("Ultraleap/Help/Report a Bug", false, 101)]
+        private static void OpenGithubNewIssueView()
+        {
+            Application.OpenURL("https://github.com/ultraleap/UnityPlugin/issues/new");
+        }
+
+        [MenuItem("Ultraleap/Help/Support/Submit a Support Request", false, 102)]
+        private static void OpenSupportRequest()
+        {
+            Application.OpenURL("https://support.leapmotion.com/hc/en-us/requests/new");
+        }
+
+        [MenuItem("Ultraleap/Help/Support/Join Our Discord", false, 103)]
+        private static void OpenDiscord()
+        {
+            Application.OpenURL("https://discord.com/invite/3VCndThqxS");
         }
 #endif
 

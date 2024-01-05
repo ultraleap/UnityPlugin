@@ -121,14 +121,6 @@ namespace Leap
                 IsStreaming = true;
             else
                 IsStreaming = false;
-            if ((status & eLeapDeviceStatus.eLeapDeviceStatus_Smudged) == eLeapDeviceStatus.eLeapDeviceStatus_Smudged)
-                IsSmudged = true;
-            else
-                IsSmudged = false;
-            if ((status & eLeapDeviceStatus.eLeapDeviceStatus_Robust) == eLeapDeviceStatus.eLeapDeviceStatus_Robust)
-                IsLightingBad = true;
-            else
-                IsLightingBad = false;
             if ((status & eLeapDeviceStatus.eLeapDeviceStatus_LowResource) == eLeapDeviceStatus.eLeapDeviceStatus_LowResource)
                 IsLowResource = true;
             else
@@ -263,6 +255,15 @@ namespace Leap
                     return devicePose;
                 }
 
+                bool deviceTransformAvailable = LeapC.GetDeviceTransformAvailable(Handle);
+
+                if (!deviceTransformAvailable)
+                {
+                    devicePose = Pose.identity;
+                    poseSet = true;
+                    return Pose.identity;
+                }
+
                 float[] data = new float[16];
                 eLeapRS result = LeapC.GetDeviceTransform(Handle, data);
 
@@ -340,6 +341,7 @@ namespace Leap
         /// over the Leap Motion cameras.
         /// @since 3.0
         /// </summary>
+        [Obsolete("IsSmudged is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
         public bool IsSmudged { get; internal set; }
 
         /// <summary>
@@ -354,6 +356,7 @@ namespace Leap
         /// isLightingBad() is true. 
         /// @since 3.0 
         /// </summary>
+        [Obsolete("IsLightingBad is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
         public bool IsLightingBad { get; internal set; }
 
         /// <summary>

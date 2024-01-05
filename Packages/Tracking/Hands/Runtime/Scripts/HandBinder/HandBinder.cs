@@ -82,6 +82,8 @@ namespace Leap.Unity.HandsModule
         public SerializedTransform[] DefaultHandPose;
 
 
+        private float lastHandFoundTime = 0;
+        private float instantScaleAfterHandFoundTime = 1f; // seconds
         #endregion
 
         #region Hand Model Base
@@ -96,11 +98,14 @@ namespace Leap.Unity.HandsModule
         /// The chirality or handedness of this hand (left or right).
         /// To set, change the public Chirality.
         /// </summary>
-        public override Chirality Handedness { get { return Chirality; } set { } }
+        public override Chirality Handedness { get { return Chirality; } set { Chirality = value; } }
+
+        [SerializeField]
+        private ModelType handUpdateType = ModelType.Graphics;
         /// <summary>
         /// The type of the Hand model (set to Graphics).
         /// </summary>
-        public override ModelType HandModelType { get { return ModelType.Graphics; } }
+        public override ModelType HandModelType { get { return handUpdateType; } }
 
         /// <summary>
         /// The Leap Hand object this hand model represents.
@@ -156,6 +161,8 @@ namespace Leap.Unity.HandsModule
             {
                 SetModelScale = false;
             }
+
+            lastHandFoundTime = Time.time;
         }
 
         /// <summary>
@@ -213,7 +220,17 @@ namespace Leap.Unity.HandsModule
             else // Lerp the scale during playmode
             {
                 var targetScale = BoundHand.startScale * scaleRatio;
-                transform.localScale = Vector3.Lerp(transform.localScale, targetScale, Time.deltaTime * ScalingSpeedMultiplier);
+
+                if (Time.time - lastHandFoundTime < instantScaleAfterHandFoundTime)
+                {
+                    // Instantly scale if it's not been long since the hand started tracking
+                    transform.localScale = targetScale;
+                }
+                else
+                {
+                    // Smoothly scale
+                    transform.localScale = Vector3.Lerp(transform.localScale, targetScale, Time.deltaTime * ScalingSpeedMultiplier);
+                }
             }
         }
 

@@ -26,6 +26,7 @@ namespace Leap.Unity.HandsModule
         private Texture dividerLine;
 
         private SerializedProperty chirality;
+        private SerializedProperty handUpdateType;
         private SerializedProperty debugLeapHand;
         private SerializedProperty DebugLeapRotationAxis;
         private SerializedProperty gizmoSize;
@@ -56,6 +57,7 @@ namespace Leap.Unity.HandsModule
         private void SetSerializedProperties()
         {
             chirality = serializedObject.FindProperty("Chirality");
+            handUpdateType = serializedObject.FindProperty("handUpdateType");
             debugLeapHand = serializedObject.FindProperty("DebugLeapHand");
             DebugLeapRotationAxis = serializedObject.FindProperty("DebugLeapRotationAxis");
             gizmoSize = serializedObject.FindProperty("GizmoSize");
@@ -88,11 +90,11 @@ namespace Leap.Unity.HandsModule
 
             if (myTarget.gameObject.name.ToUpper().Contains("Left".ToUpper()))
             {
-                myTarget.Handedness = Unity.Chirality.Left;
+                myTarget.Handedness = Chirality.Left;
             }
             if (myTarget.gameObject.name.ToUpper().Contains("Right".ToUpper()))
             {
-                myTarget.Handedness = Unity.Chirality.Right;
+                myTarget.Handedness = Chirality.Right;
             }
 
             SetSerializedProperties();
@@ -143,6 +145,8 @@ namespace Leap.Unity.HandsModule
             EditorGUILayout.PropertyField(leapProvider, editorSkin);
 
             EditorGUILayout.PropertyField(chirality, new GUIContent("Hand Type", "Which hand does this binder target?"), editorSkin);
+
+            EditorGUILayout.PropertyField(handUpdateType, new GUIContent("Hand Update Type", "What type of hands are these?"), editorSkin);
 
             EditorGUILayout.Space();
 
