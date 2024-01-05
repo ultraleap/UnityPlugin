@@ -75,7 +75,7 @@ namespace Leap.Unity.Interaction
         {
             if (property.boolValue && _runtimeGizmoManager == null)
             {
-                _runtimeGizmoManager = FindObjectOfType<RuntimeGizmoManager>();
+                _runtimeGizmoManager = FindAnyObjectByType<RuntimeGizmoManager>();
 
                 if (_runtimeGizmoManager == null)
                 {
@@ -306,7 +306,7 @@ namespace Leap.Unity.Interaction
                     // Check for a LeapProvider in the scene somewhere.
                     if (_provider == null)
                     {
-                        _provider = FindObjectOfType<LeapProvider>();
+                        _provider = FindAnyObjectByType<LeapProvider>();
                     }
                     if (_provider == null)
                     {

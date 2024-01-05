@@ -183,7 +183,7 @@ namespace Leap.Unity.Attachments
 
                 if (_leapProvider == null)
                 {
-                    _leapProvider = FindObjectOfType<LeapProvider>();
+                    _leapProvider = FindFirstObjectByType<LeapProvider>();
                 }
                 if (_leapProvider != null)
                 {

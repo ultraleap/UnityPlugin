@@ -165,7 +165,7 @@ namespace Leap.Unity.Preview.HandRays
 
         private void Start()
         {
-            LeapXRServiceProvider leapXRServiceProvider = FindObjectOfType<LeapXRServiceProvider>();
+            LeapXRServiceProvider leapXRServiceProvider = FindAnyObjectByType<LeapXRServiceProvider>();
             if (leapXRServiceProvider != null)
             {
                 Head = leapXRServiceProvider.mainCamera.transform;

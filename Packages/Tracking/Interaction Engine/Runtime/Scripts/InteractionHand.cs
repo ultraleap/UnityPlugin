@@ -171,7 +171,7 @@ namespace Leap.Unity.Interaction
             { // Otherwise, configure automatically.
                 if (leapProvider == null)
                 {
-                    leapProvider = FindObjectOfType<LeapProvider>();
+                    leapProvider = FindAnyObjectByType<LeapProvider>();
 
                     if (leapProvider == null)
                     {
@@ -889,7 +889,7 @@ namespace Leap.Unity.Interaction
                 var provider = leapProvider;
                 if (provider == null)
                 {
-                    provider = FindObjectOfType<LeapProvider>();
+                    provider = FindAnyObjectByType<LeapProvider>();
                 }
 
                 if (_testHand == null && provider != null)

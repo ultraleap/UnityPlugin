@@ -287,6 +287,7 @@ namespace Leap.Unity.Interaction.PhysicsHands
                 Mathf.Abs(_buttonElement.transform.localRotation.eulerAngles.z) > 0.002f)
             {
                 _buttonElement.transform.localRotation = Quaternion.identity;
+                SetupButton();
             }
             if (_buttonElement.transform.lossyScale != _elementScale)
             {
