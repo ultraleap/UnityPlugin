@@ -85,6 +85,9 @@ namespace Leap.Unity
             {
                 SerializedProperty showAndroidBuildArchitectureWarning = settings.FindProperty("showAndroidBuildArchitectureWarning");
                 showAndroidBuildArchitectureWarning.boolValue = EditorGUILayout.ToggleLeft("Show Android Architecture build warning", showAndroidBuildArchitectureWarning.boolValue);
+
+                SerializedProperty showPhysicalHandsPhysicsSettingsWarning = settings.FindProperty("showPhysicalHandsPhysicsSettingsWarning");
+                showPhysicalHandsPhysicsSettingsWarning.boolValue = EditorGUILayout.ToggleLeft("Show physical hands physics settings warning", showPhysicalHandsPhysicsSettingsWarning.boolValue);
             }
 
 
@@ -130,6 +133,9 @@ namespace Leap.Unity
 
         [HideInInspector, SerializeField]
         public bool showAndroidBuildArchitectureWarning = true;
+
+        [HideInInspector, SerializeField]
+        public bool showPhysicalHandsPhysicsSettingsWarning = true;
 
         public void ResetToDefaults()
         {
