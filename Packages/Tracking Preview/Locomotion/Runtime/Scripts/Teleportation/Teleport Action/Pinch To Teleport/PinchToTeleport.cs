@@ -46,7 +46,7 @@ namespace Leap.Unity.Preview.Locomotion
             base.Start();
             if (leapProvider == null)
             {
-                leapProvider = FindAnyObjectByType<LeapXRServiceProvider>(FindObjectsInactive.Include);
+                leapProvider = Hands.Provider;
             }
 
             _pinchTransformHelper = new GameObject("PinchToTeleport_PinchTransformHelper").transform;
@@ -184,7 +184,7 @@ namespace Leap.Unity.Preview.Locomotion
         {
             if (leapProvider == null)
             {
-                leapProvider = FindAnyObjectByType<LeapXRServiceProvider>(FindObjectsInactive.Include);
+                leapProvider = Hands.Provider;
             }
 
             if (_isFacingObject == null)

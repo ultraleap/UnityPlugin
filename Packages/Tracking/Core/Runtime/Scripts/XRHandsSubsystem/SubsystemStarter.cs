@@ -89,9 +89,11 @@ namespace Leap.Unity
             {
                 return;
             }
-
+#if UNITY_2021_3_18_OR_NEWER
             LeapProvider leapProvider = GameObject.FindAnyObjectByType<LeapXRServiceProvider>();
-
+#else
+            LeapProvider leapProvider = GameObject.FindObjectOfType<LeapXRServiceProvider>();
+#endif
             // If there is no leap provider in the scene
             if (leapProvider == null)
             {

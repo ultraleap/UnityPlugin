@@ -73,7 +73,11 @@ namespace Leap.Unity.Interaction.PhysicsHands
             }
             if (_handModel != null && _physicsHand == null)
             {
+#if UNITY_2021_3_18_OR_NEWER
                 _physicsHand = FindObjectsByType<PhysicsHand>(FindObjectsSortMode.None).Where(x => x.Handedness == _handModel.Handedness).DefaultIfEmpty(null).First();
+#else
+                _physicsHand = FindObjectsOfType<PhysicsHand>().Where(x => x.Handedness == _handModel.Handedness).DefaultIfEmpty(null).First();
+#endif
             }
         }
     }
