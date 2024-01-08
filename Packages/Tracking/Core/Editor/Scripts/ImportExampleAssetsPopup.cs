@@ -17,8 +17,8 @@ namespace Leap.Unity
 
         static RunOnStart()
         {
-            EditorApplication.delayCall += ExamplesDontExistDoOnce;
-            EditorApplication.delayCall += UpdateExamplesDoOnce;
+            //EditorApplication.delayCall += ExamplesDontExistDoOnce;
+            //EditorApplication.delayCall += UpdateExamplesDoOnce;
         }
 
         static void ExamplesDontExistDoOnce()
