@@ -11,6 +11,7 @@ public class PhysicalHandsButton : MonoBehaviour
     internal const float BUTTON_PRESS_THRESHOLD = 0.01F;
     internal const float BUTTON_PRESS_EXIT_THRESHOLD = 0.09F;
 
+    [SerializeField]
     internal GameObject buttonObject;
     [Tooltip("The local position which the button will be limited to and will try to return to.")]
     internal float buttonHeightLimit = 0.02f;
