@@ -229,8 +229,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b3763add1152ac4aab69357a419a664, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _disableAllGrabbing: 1
-  _disableAllHandCollisions: 0
+  disableAllGrabbing: 1
+  disableAllHandCollisions: 0
 --- !u!153 &5219034882949713201
 ConfigurableJoint:
   m_ObjectHideFlags: 0
@@ -715,5 +715,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b3763add1152ac4aab69357a419a664, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _disableAllGrabbing: 1
-  _disableAllHandCollisions: 0
+  disableAllGrabbing: 1
+  disableAllHandCollisions: 0

@@ -526,8 +526,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b3763add1152ac4aab69357a419a664, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _disableAllGrabbing: 1
-  _disableAllHandCollisions: 1
+  disableAllGrabbing: 1
+  disableAllHandCollisions: 0
 --- !u!1 &616860858674355726
 GameObject:
   m_ObjectHideFlags: 0
@@ -747,7 +747,7 @@ Transform:
   m_GameObject: {fileID: 616860859215618414}
   m_LocalRotation: {x: 0.66250384, y: 0.6628483, z: -0.24777833, w: -0.24561514}
   m_LocalPosition: {x: -0.7119, y: 1.181, z: 0.4684}
-  m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
+  m_LocalScale: {x: 0.10000001, y: 0.1, z: 0.10000001}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 616860857997294289}
@@ -1104,7 +1104,7 @@ PrefabInstance:
     - target: {fileID: -5987919607861509838, guid: f5d23df7834890b41970a0bbddc41006, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 263b75d525c918346a9ba2695f2e41ce, type: 2}
+      objectReference: {fileID: 2100000, guid: c7224e2b81832b043b0e08a164d3442a, type: 2}
     - target: {fileID: 262459555393675210, guid: f5d23df7834890b41970a0bbddc41006, type: 3}
       propertyPath: m_Layer
       value: 0
@@ -1120,7 +1120,7 @@ PrefabInstance:
     - target: {fileID: 1670204539512281313, guid: f5d23df7834890b41970a0bbddc41006, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 95c889baf756fd84ba2f1ab36adf3687, type: 2}
+      objectReference: {fileID: 2100000, guid: 8eca0b31e096dbb4e9ec168e385043a9, type: 2}
     - target: {fileID: 5712859240829085822, guid: f5d23df7834890b41970a0bbddc41006, type: 3}
       propertyPath: m_Layer
       value: 0
@@ -1186,7 +1186,7 @@ PrefabInstance:
     - target: {fileID: -7511558181221131132, guid: 2940b48ae53a0c2429ff7d1c1c9645ed, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 1f9e2e516e934804cbc8491888350676, type: 2}
+      objectReference: {fileID: 2100000, guid: 8eca0b31e096dbb4e9ec168e385043a9, type: 2}
     - target: {fileID: 919132149155446097, guid: 2940b48ae53a0c2429ff7d1c1c9645ed, type: 3}
       propertyPath: m_Name
       value: Barrel
@@ -1212,7 +1212,7 @@ PrefabInstance:
     - target: {fileID: -9101391815530459089, guid: 5de0327a940135a4da91b90736e47297, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 95c889baf756fd84ba2f1ab36adf3687, type: 2}
+      objectReference: {fileID: 2100000, guid: 8eca0b31e096dbb4e9ec168e385043a9, type: 2}
     - target: {fileID: -8679921383154817045, guid: 5de0327a940135a4da91b90736e47297, type: 3}
       propertyPath: m_RootOrder
       value: 4
@@ -1268,7 +1268,7 @@ PrefabInstance:
     - target: {fileID: -2083541111226090420, guid: 5de0327a940135a4da91b90736e47297, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 263b75d525c918346a9ba2695f2e41ce, type: 2}
+      objectReference: {fileID: 2100000, guid: c7224e2b81832b043b0e08a164d3442a, type: 2}
     - target: {fileID: 919132149155446097, guid: 5de0327a940135a4da91b90736e47297, type: 3}
       propertyPath: m_Name
       value: RightArm
