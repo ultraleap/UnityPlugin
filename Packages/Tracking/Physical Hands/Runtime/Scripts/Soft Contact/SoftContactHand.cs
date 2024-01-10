@@ -91,6 +91,7 @@ namespace Leap.Unity.PhysicalHands
         internal override void GenerateHandLogic()
         {
             GenerateHandObjects(typeof(SoftContactBone));
+            isHandPhysical = false;
 
             ((SoftContactBone)palmBone).SetupBone();
             var rbody = palmBone.gameObject.AddComponent<Rigidbody>();
