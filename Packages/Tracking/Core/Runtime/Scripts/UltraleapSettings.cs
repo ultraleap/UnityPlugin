@@ -214,7 +214,7 @@ namespace Leap.Unity
         }
 
 #if UNITY_EDITOR
-        internal static SerializedObject GetSerializedSettings()
+        public static SerializedObject GetSerializedSettings()
         {
             return new SerializedObject(FindSettingsSO());
         }

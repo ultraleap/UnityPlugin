@@ -1,82 +1,93 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using System;
-#if UNITY_EDITOR
-using System.IO;
-using System.Collections.Generic;
-using UnityEditor;
-using UnityEditor.PackageManager.UI;
-using Leap.Unity.PhysicalHands;
-using UnityEditor.SearchService;
-using UnityEditor.SceneManagement;
-using System.Linq;
-#endif
 
+#if UNITY_EDITOR
+using UnityEditor;
+using UnityEditor.SceneManagement;
+#endif
 
 namespace Leap.Unity.PhysicalHands
 {
 #if UNITY_EDITOR
     [InitializeOnLoad]
-    public class PhysicalHandsSettingsPopup
+    public static class PhysicalHandsSettingsPopup
     {
         static PhysicalHandsSettingsPopupWindow window;
 
         static PhysicalHandsSettingsPopup()
         {
-            UnityEditor.SceneManagement.EditorSceneManager.sceneOpened += OnAfterSceneLoad;
+            EditorSceneManager.sceneOpened -= OnAfterSceneLoad;
+            EditorSceneManager.sceneOpened += OnAfterSceneLoad;
+
+            if (SessionState.GetBool("editorStartupDelayedCalled", false) == false)
+            {
+                // Runs a delayed delegate which is fired when the editor finishes fully loading
+                //      this allows for the popup to appear on editor start, and when recompiling
+                //      We use editorStartupDelayedCalled to only fire this on editor start, to avoid recompiling annoyance
+                EditorApplication.delayCall += () =>
+                {
+                    SessionState.SetBool("editorStartupDelayedCalled", true);
+                    ShowPopupIfRequired();
+                };
+            }
         }
 
-        private static void OnAfterSceneLoad(UnityEngine.SceneManagement.Scene scene, OpenSceneMode mode)
+        private static void OnAfterSceneLoad(Scene scene, OpenSceneMode mode)
         {
-            PhysicsSettingsForPhysicalHands();
+            ShowPopupIfRequired();
         }
 
-
-
-        static void PhysicsSettingsForPhysicalHands()
+        private static void ShowPopupIfRequired()
         {
-
-            if (GameObject.FindFirstObjectByType<PhysicalHandsManager>() != null
+            if (GameObject.FindObjectOfType<PhysicalHandsManager>() != null
                 && UltraleapSettings.Instance.showPhysicalHandsPhysicsSettingsWarning == true
-                && !PhysicalHandsSettings.AllSettingsApplied()
-                && EditorWindow.GetWindow<PhysicalHandsSettingsPopupWindow>() == null)
+                && !PhysicalHandsSettings.AllSettingsApplied())
             {
                 window = EditorWindow.GetWindow<PhysicalHandsSettingsPopupWindow>();
-                if (window == null)
-                {
-                    window = new PhysicalHandsSettingsPopupWindow();
-                }
 
-                window.name = "Physical Hands Settings";
-                window.titleContent = new GUIContent("Physical Hands Settings");
-                window.position = new Rect(Screen.width / 2, Screen.height / 2, 400, 400);
+                window.name = "Physical Hands Settings Warning";
+                window.titleContent = new GUIContent("Physical Hands Settings Warning");
                 window.ShowUtility();
             }
         }
     }
 
-
     public class PhysicalHandsSettingsPopupWindow : EditorWindow
     {
         private void OnGUI()
         {
-            Texture _handTex = Resources.Load<Texture2D>("Ultraleap_Logo");
-            GUI.DrawTexture(new Rect(0, 0, EditorGUIUtility.currentViewWidth, EditorGUIUtility.currentViewWidth * ((float)_handTex.height / (float)_handTex.width)), _handTex, ScaleMode.ScaleToFit);
+            GUILayout.Space(10);
 
-            GUILayout.Space(EditorGUIUtility.currentViewWidth * ((float)_handTex.height / (float)_handTex.width));
+            Texture logoTexture = Resources.Load<Texture2D>("Ultraleap_Logo");
+
+            float imgWidth = EditorGUIUtility.currentViewWidth / 2;
+            float imgHeight = imgWidth * ((float)logoTexture.height / (float)logoTexture.width);
+
+            GUI.DrawTexture(new Rect((EditorGUIUtility.currentViewWidth / 2) - (imgWidth / 2), 0, imgWidth, imgHeight), logoTexture, ScaleMode.ScaleToFit);
+
+            GUILayout.Space(imgHeight);
+            GUILayout.Space(10);
+
+            EditorGUILayout.LabelField("You are using Ultraleap Physical Hands but do not have the recommended physics settings for: \n \n" +
+                "- Reducing physics issues \n" +
+                "- Improving interaction capabilities \n \n" +
+                "Would you like to open the settings panel?.", EditorStyles.wordWrappedLabel);
+
             GUILayout.Space(20);
 
-            EditorGUILayout.LabelField("We notice you dont have our recommended physics settings for using physical hands. \n \n" +
-                "These will give you the best experience when using Physical hands. \n \n" +
-                "Would you like to go to the settings page now?.", EditorStyles.wordWrappedLabel);
+            bool showAgain = UltraleapSettings.Instance.showPhysicalHandsPhysicsSettingsWarning;
+            showAgain = !GUILayout.Toggle(!showAgain, "Do not show this again?"); // convert to "do not show" for display, then convert back to show for the settings UI
 
+            if (showAgain != UltraleapSettings.Instance.showPhysicalHandsPhysicsSettingsWarning)
+            {
+                if(!showAgain)
+                {
+                    Debug.Log("You have chosen to not show the Physical Hands Recommended Settings warning, you can enable it via Ultraleap Settings in the Project Settings panel");
+                }
 
-            GUILayout.Space(20);
-
-
-            bool showAgain = !GUILayout.Toggle(UltraleapSettings.Instance.showPhysicalHandsPhysicsSettingsWarning, "Do not show this again?");
-            UltraleapSettings.Instance.showPhysicalHandsPhysicsSettingsWarning = showAgain;
-
+                UltraleapSettings.Instance.showPhysicalHandsPhysicsSettingsWarning = showAgain;
+                UltraleapSettings.GetSerializedSettings().ApplyModifiedPropertiesWithoutUndo();
+            }
 
             GUILayout.Space(20);
             GUILayout.BeginHorizontal();
@@ -93,8 +104,6 @@ namespace Leap.Unity.PhysicalHands
             }
 
             GUILayout.EndHorizontal();
-
-
         }
     }
 #endif
