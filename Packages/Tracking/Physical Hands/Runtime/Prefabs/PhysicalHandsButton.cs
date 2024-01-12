@@ -32,8 +32,8 @@ public class PhysicalHandsButton : MonoBehaviour
     internal List<Collider> _colliders;
 
     [Space(10)]
-    internal UnityEvent OnButtonPressed;
-    internal UnityEvent OnButtonUnPressed;
+    public UnityEvent OnButtonPressed;
+    public UnityEvent OnButtonUnPressed;
 
     internal bool _leftHandContacting = false;
     internal bool _rightHandContacting = false;
