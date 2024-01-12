@@ -923,6 +923,19 @@ namespace Leap.Unity
             return false;
         }
 
+        /// <summary>
+        /// Map a float from a range to the 0-1 range. E.g. (34 , 0, 100) returns as 0.34f 
+        /// </summary>
+        /// <param name="value"> The value which should be mapped between 0 and 1</param>
+        /// <param name="min"> Min value for the input range</param>
+        /// <param name="max"> Max value for the input range</param>
+        /// <returns></returns>
+        public static float map01(float value, float min, float max)
+        {
+            return (value - min) * 1f / (max - min);
+        }
+
+
         #endregion
 
         #region Array Utils
