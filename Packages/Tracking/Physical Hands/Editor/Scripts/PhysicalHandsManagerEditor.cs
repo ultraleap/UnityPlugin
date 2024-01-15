@@ -15,6 +15,12 @@ namespace Leap.Unity.PhysicalHands
             base.OnEnable();
             specifyConditionalDrawing(() => false, "editTimePose");
 
+            specifyConditionalDrawing("_contactMode", new int[]{
+                                            (int)PhysicalHandsManager.ContactMode.HardContact},
+                                            "_showFadingHandsWithTrackingData");
+
+            specifyConditionalDrawing("_showFadingHandsWithTrackingData", "fadingHands");
+
             specifyCustomDrawer("_contactMode", DrawCustomEnum);
 
             HandleEventsFoldout();

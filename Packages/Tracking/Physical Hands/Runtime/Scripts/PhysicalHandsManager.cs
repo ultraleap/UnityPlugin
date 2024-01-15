@@ -114,6 +114,14 @@ namespace Leap.Unity.PhysicalHands
         /// </summary>
         public Action OnContactModeChanged;
 
+        [Tooltip("When using hard contact hands, the tracking data can often differ from the hands that are shown to you. " +
+            "Tick this option to enable hands which fade in when the tracking data goes too far from the shown data.")]
+        [SerializeField]
+        private bool _showFadingHandsWithTrackingData;
+
+        [SerializeField]
+        private GameObject fadingHands;
+
         private void Awake()
         {
             if (ContactParent == null)
@@ -135,6 +143,11 @@ namespace Leap.Unity.PhysicalHands
                 InputProvider.OnFixedFrame += ProcessFrame;
 
                 StartCoroutine(PostFixedUpdate());
+            }
+
+            if (_showFadingHandsWithTrackingData)
+            {
+                EnableDistanceOutlineHands();
             }
         }
 
@@ -268,6 +281,23 @@ namespace Leap.Unity.PhysicalHands
             {
                 newContactParent.transform.parent = transform;
             }
+        }
+
+        public void EnableDistanceOutlineHands()
+        {
+            GameObject outlineHandsInit = Instantiate(fadingHands);
+
+            Transform outlineHandLeft = outlineHandsInit.transform.GetChild(0);
+            Transform outlineHandRight = outlineHandsInit.transform.GetChild(1);
+
+            HandFadeInAtDistanceFromRealData leftHand = outlineHandLeft.gameObject.AddComponent<HandFadeInAtDistanceFromRealData>();
+            HandFadeInAtDistanceFromRealData rightHand = outlineHandRight.gameObject.AddComponent<HandFadeInAtDistanceFromRealData>();
+
+            leftHand.chirality = Chirality.Left;
+            rightHand.chirality = Chirality.Right;
+
+            leftHand.Init();
+            rightHand.Init();
         }
 
         #region Layer Generation

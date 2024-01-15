@@ -1822,13 +1822,33 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1234652847329689333, guid: 710c6a51e481b5a419c8c7a3eae1bada, type: 3}
+      propertyPath: fadingHands
+      value: 
+      objectReference: {fileID: 4756413710029136320, guid: 81156ff5f1c52ee4a93f836d68840561, type: 3}
+    - target: {fileID: 1234652847329689333, guid: 710c6a51e481b5a419c8c7a3eae1bada, type: 3}
       propertyPath: _contactMode
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1234652847329689333, guid: 710c6a51e481b5a419c8c7a3eae1bada, type: 3}
+      propertyPath: outlineHands
+      value: 
+      objectReference: {fileID: 4756413710029136320, guid: 759fe10b9a0a056439f85ef5a088c861, type: 3}
+    - target: {fileID: 1234652847329689333, guid: 710c6a51e481b5a419c8c7a3eae1bada, type: 3}
       propertyPath: _inputProvider
       value: 
       objectReference: {fileID: 844312935}
+    - target: {fileID: 1234652847329689333, guid: 710c6a51e481b5a419c8c7a3eae1bada, type: 3}
+      propertyPath: baseHandObject
+      value: 
+      objectReference: {fileID: 1822924866}
+    - target: {fileID: 1234652847329689333, guid: 710c6a51e481b5a419c8c7a3eae1bada, type: 3}
+      propertyPath: _showFadingHandsWithTrackingData
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1234652847329689333, guid: 710c6a51e481b5a419c8c7a3eae1bada, type: 3}
+      propertyPath: _useOutlineHandsToShowTrueTrackingData
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1234652847329689333, guid: 710c6a51e481b5a419c8c7a3eae1bada, type: 3}
       propertyPath: onGrab.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
@@ -2344,7 +2364,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5270838610523157747, guid: d1c00f89ef60a3446ad9eef2d361e2a1, type: 3}
       propertyPath: trackingSource
-      value: 0
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 5270838610523157748, guid: d1c00f89ef60a3446ad9eef2d361e2a1, type: 3}
       propertyPath: m_RootOrder
@@ -6351,6 +6371,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Ghost Capsule Hands
       objectReference: {fileID: 0}
+    - target: {fileID: 6854387271831385556, guid: 49ca50e4105c201429b90b99c47b567b, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6854387271831385557, guid: 49ca50e4105c201429b90b99c47b567b, type: 3}
       propertyPath: m_RootOrder
       value: 2
@@ -6401,6 +6425,11 @@ PrefabInstance:
       objectReference: {fileID: 1234652847789266410}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 49ca50e4105c201429b90b99c47b567b, type: 3}
+--- !u!1 &1822924866 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6854387271831385556, guid: 49ca50e4105c201429b90b99c47b567b, type: 3}
+  m_PrefabInstance: {fileID: 1822924865}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1840771849
 GameObject:
   m_ObjectHideFlags: 0
@@ -7001,7 +7030,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1920359931, guid: 49ca50e4105c201429b90b99c47b567b, type: 3}
   m_PrefabInstance: {fileID: 1822924865}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 1822924866}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7fcb8aefe25f35842aa4c29338032258, type: 3}
@@ -7012,7 +7041,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1920359932, guid: 49ca50e4105c201429b90b99c47b567b, type: 3}
   m_PrefabInstance: {fileID: 1822924865}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 1822924866}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7fcb8aefe25f35842aa4c29338032258, type: 3}
