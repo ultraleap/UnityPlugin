@@ -6,8 +6,6 @@ using UnityEngine.Events;
 
 namespace Leap.Unity.PhysicalHands
 {
-
-
     public class PhysicalHandsManager : LeapProvider
     {
         public enum ContactMode
@@ -119,15 +117,10 @@ namespace Leap.Unity.PhysicalHands
         [Tooltip("When using hard contact hands, the tracking data can often differ from the hands that are shown to you. " +
             "Tick this option to enable hands which fade in when the tracking data goes too far from the shown data.")]
         [SerializeField]
-        private bool _useOutlineHandsToShowTrueTrackingData;
-
-
+        private bool _showFadingHandsWithTrackingData;
 
         [SerializeField]
-        private GameObject baseHandObject;
-        [SerializeField]
-        private GameObject outlineHands;
-
+        private GameObject fadingHands;
 
         private void Awake()
         {
@@ -152,7 +145,7 @@ namespace Leap.Unity.PhysicalHands
                 StartCoroutine(PostFixedUpdate());
             }
 
-            if (_useOutlineHandsToShowTrueTrackingData)
+            if (_showFadingHandsWithTrackingData)
             {
                 EnableDistanceOutlineHands();
             }
@@ -292,23 +285,19 @@ namespace Leap.Unity.PhysicalHands
 
         public void EnableDistanceOutlineHands()
         {
-            HandFadeInAtDistanceFromRealData leftHand =  baseHandObject.AddComponent<HandFadeInAtDistanceFromRealData>();
-            HandFadeInAtDistanceFromRealData rightHand = baseHandObject.AddComponent<HandFadeInAtDistanceFromRealData>();
+            GameObject outlineHandsInit = Instantiate(fadingHands);
 
-            var outlineHandsInit = Instantiate(outlineHands);
+            Transform outlineHandLeft = outlineHandsInit.transform.GetChild(0);
+            Transform outlineHandRight = outlineHandsInit.transform.GetChild(1);
 
-            var outlineHandLeft = outlineHandsInit.transform.GetChild(0);
-            var outlineHandRight = outlineHandsInit.transform.GetChild(1);
+            HandFadeInAtDistanceFromRealData leftHand = outlineHandLeft.gameObject.AddComponent<HandFadeInAtDistanceFromRealData>();
+            HandFadeInAtDistanceFromRealData rightHand = outlineHandRight.gameObject.AddComponent<HandFadeInAtDistanceFromRealData>();
 
             leftHand.chirality = Chirality.Left;
-            leftHand.rendererToChange = outlineHandLeft.GetComponentInChildren<Renderer>();
             rightHand.chirality = Chirality.Right;
-            rightHand.rendererToChange = outlineHandRight.GetComponentInChildren<Renderer>();
 
             leftHand.Init();
             rightHand.Init();
-
-
         }
 
         #region Layer Generation

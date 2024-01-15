@@ -1822,13 +1822,17 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1234652847329689333, guid: 710c6a51e481b5a419c8c7a3eae1bada, type: 3}
+      propertyPath: fadingHands
+      value: 
+      objectReference: {fileID: 4756413710029136320, guid: 81156ff5f1c52ee4a93f836d68840561, type: 3}
+    - target: {fileID: 1234652847329689333, guid: 710c6a51e481b5a419c8c7a3eae1bada, type: 3}
       propertyPath: _contactMode
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1234652847329689333, guid: 710c6a51e481b5a419c8c7a3eae1bada, type: 3}
       propertyPath: outlineHands
       value: 
-      objectReference: {fileID: 4756413710029136320, guid: 1b43d6eb40db60b419700fd2677e79c4, type: 3}
+      objectReference: {fileID: 4756413710029136320, guid: 759fe10b9a0a056439f85ef5a088c861, type: 3}
     - target: {fileID: 1234652847329689333, guid: 710c6a51e481b5a419c8c7a3eae1bada, type: 3}
       propertyPath: _inputProvider
       value: 
@@ -1837,6 +1841,10 @@ PrefabInstance:
       propertyPath: baseHandObject
       value: 
       objectReference: {fileID: 1822924866}
+    - target: {fileID: 1234652847329689333, guid: 710c6a51e481b5a419c8c7a3eae1bada, type: 3}
+      propertyPath: _showFadingHandsWithTrackingData
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1234652847329689333, guid: 710c6a51e481b5a419c8c7a3eae1bada, type: 3}
       propertyPath: _useOutlineHandsToShowTrueTrackingData
       value: 1
@@ -2356,7 +2364,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5270838610523157747, guid: d1c00f89ef60a3446ad9eef2d361e2a1, type: 3}
       propertyPath: trackingSource
-      value: 0
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 5270838610523157748, guid: d1c00f89ef60a3446ad9eef2d361e2a1, type: 3}
       propertyPath: m_RootOrder
@@ -6362,6 +6370,10 @@ PrefabInstance:
     - target: {fileID: 6854387271831385556, guid: 49ca50e4105c201429b90b99c47b567b, type: 3}
       propertyPath: m_Name
       value: Ghost Capsule Hands
+      objectReference: {fileID: 0}
+    - target: {fileID: 6854387271831385556, guid: 49ca50e4105c201429b90b99c47b567b, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6854387271831385557, guid: 49ca50e4105c201429b90b99c47b567b, type: 3}
       propertyPath: m_RootOrder

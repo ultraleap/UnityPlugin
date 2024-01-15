@@ -17,11 +17,9 @@ namespace Leap.Unity.PhysicalHands
 
             specifyConditionalDrawing("_contactMode", new int[]{
                                             (int)PhysicalHandsManager.ContactMode.HardContact},
-                                            "_useOutlineHandsToShowTrueTrackingData");
+                                            "_showFadingHandsWithTrackingData");
 
-            specifyConditionalDrawing("_useOutlineHandsToShowTrueTrackingData", new int[]{1},
-                                "baseHandObject",
-                                "outlineHands");
+            specifyConditionalDrawing("_showFadingHandsWithTrackingData", "fadingHands");
 
             specifyCustomDrawer("_contactMode", DrawCustomEnum);
 
