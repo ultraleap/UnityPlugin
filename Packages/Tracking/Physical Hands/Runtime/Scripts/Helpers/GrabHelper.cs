@@ -66,7 +66,6 @@ namespace Leap.Unity.PhysicalHands
             {
                 if (helper.GrabState == GrabHelperObject.State.Grab)
                 {
-                    helper.ClearGrabbingHands();
                     helper.ReleaseObject();
                 }
 
