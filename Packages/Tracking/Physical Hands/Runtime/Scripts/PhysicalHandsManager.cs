@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 namespace Leap.Unity.PhysicalHands
 {
@@ -119,8 +120,10 @@ namespace Leap.Unity.PhysicalHands
         [SerializeField]
         private bool _showFadingHandsWithTrackingData;
 
-        [SerializeField]
-        private GameObject fadingHands;
+        [SerializeField, FormerlySerializedAs("fadingHands")]
+        private GameObject fadingHandsPrefab;
+
+        private GameObject currentFadingHands;
 
         private void Awake()
         {
@@ -147,7 +150,7 @@ namespace Leap.Unity.PhysicalHands
 
             if (_showFadingHandsWithTrackingData)
             {
-                EnableDistanceOutlineHands();
+                InitializeDistanceFadeHands();
             }
         }
 
@@ -283,12 +286,17 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
-        public void EnableDistanceOutlineHands()
+        public void InitializeDistanceFadeHands()
         {
-            GameObject outlineHandsInit = Instantiate(fadingHands);
+            if(currentFadingHands != null)
+            {
+                return;
+            }
 
-            Transform outlineHandLeft = outlineHandsInit.transform.GetChild(0);
-            Transform outlineHandRight = outlineHandsInit.transform.GetChild(1);
+            currentFadingHands = Instantiate(fadingHandsPrefab);
+
+            Transform outlineHandLeft = currentFadingHands.transform.GetChild(0);
+            Transform outlineHandRight = currentFadingHands.transform.GetChild(1);
 
             HandFadeInAtDistanceFromRealData leftHand = outlineHandLeft.gameObject.AddComponent<HandFadeInAtDistanceFromRealData>();
             HandFadeInAtDistanceFromRealData rightHand = outlineHandRight.gameObject.AddComponent<HandFadeInAtDistanceFromRealData>();
@@ -298,6 +306,30 @@ namespace Leap.Unity.PhysicalHands
 
             leftHand.Init();
             rightHand.Init();
+
+            OnContactModeChanged -= HideShowDistanceFadeHandsOnContactModeChange;
+            OnContactModeChanged += HideShowDistanceFadeHandsOnContactModeChange;
+        }
+
+        void HideShowDistanceFadeHandsOnContactModeChange()
+        {
+            if (currentFadingHands == null)
+            {
+                return;
+            }
+
+            switch (contactMode)
+            {
+                case ContactMode.HardContact:
+                    currentFadingHands.SetActive(true);
+                    break;
+                case ContactMode.SoftContact:
+                    currentFadingHands.SetActive(false);
+                    break;
+                case ContactMode.NoContact:
+                    currentFadingHands.SetActive(false);
+                    break;
+            }
         }
 
         #region Layer Generation

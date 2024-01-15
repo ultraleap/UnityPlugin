@@ -19,7 +19,7 @@ namespace Leap.Unity.PhysicalHands
                                             (int)PhysicalHandsManager.ContactMode.HardContact},
                                             "_showFadingHandsWithTrackingData");
 
-            specifyConditionalDrawing("_showFadingHandsWithTrackingData", "fadingHands");
+            specifyConditionalDrawing("_showFadingHandsWithTrackingData", "fadingHandsPrefab");
 
             specifyCustomDrawer("_contactMode", DrawCustomEnum);
 

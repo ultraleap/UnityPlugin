@@ -16,9 +16,17 @@ namespace Leap.Unity.PhysicalHands
 
             rendererToChange = GetComponentInChildren<Renderer>();
 
-            Vector4 currentColor = rendererToChange.material.GetVector("_Color");
-            currentColor[3] = 0;
-            rendererToChange.material.SetVector("_Color", currentColor);
+            if (rendererToChange != null && rendererToChange.material.HasVector("_Color"))
+            {
+                Vector4 currentColor = rendererToChange.material.GetVector("_Color");
+                currentColor[3] = 0;
+                rendererToChange.material.SetVector("_Color", currentColor);
+            }
+            else
+            {
+                rendererToChange = null;
+                Debug.LogWarning($"The Renderer's Material for " + gameObject.name + " does not have the color property named _Color and cannot be faded.", gameObject);
+            }
         }
 
         void Update()
@@ -32,7 +40,7 @@ namespace Leap.Unity.PhysicalHands
                 currentColor[3] = Mathf.Clamp01(mappedData) + 0.05f;
                 rendererToChange.material.SetVector("_Color", currentColor);
 
-                if(currentColor[3] < 0.1f)
+                if(currentColor[3] < 0.08f)
                 {
                     rendererToChange.enabled = false;
                 }
