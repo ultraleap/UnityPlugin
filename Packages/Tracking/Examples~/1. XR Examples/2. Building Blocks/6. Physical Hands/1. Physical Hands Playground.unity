@@ -3405,7 +3405,6 @@ GameObject:
   - component: {fileID: 1102819699}
   - component: {fileID: 1102819698}
   - component: {fileID: 1102819701}
-  - component: {fileID: 1102819702}
   - component: {fileID: 1102819703}
   - component: {fileID: 1102819705}
   - component: {fileID: 1102819704}
@@ -3513,22 +3512,6 @@ MonoBehaviour:
   OnReset:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &1102819702
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1102819695}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1548f80b55edb7447a13a74a4146c57b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  distanceToReset: 2
-  OnReset:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!65 &1102819703
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3560,7 +3543,7 @@ MonoBehaviour:
       - m_Target: {fileID: 1102819705}
         m_TargetAssemblyTypeName: PhysicalHandsChangeColoursOnHandEvents, Assembly-CSharp
         m_MethodName: HoverEnter
-        m_Mode: 1
+        m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -3578,7 +3561,7 @@ MonoBehaviour:
       - m_Target: {fileID: 1102819705}
         m_TargetAssemblyTypeName: PhysicalHandsChangeColoursOnHandEvents, Assembly-CSharp
         m_MethodName: HoverExit
-        m_Mode: 1
+        m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -3593,7 +3576,7 @@ MonoBehaviour:
       - m_Target: {fileID: 1102819705}
         m_TargetAssemblyTypeName: PhysicalHandsChangeColoursOnHandEvents, Assembly-CSharp
         m_MethodName: ContactEnter
-        m_Mode: 1
+        m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -3611,7 +3594,7 @@ MonoBehaviour:
       - m_Target: {fileID: 1102819705}
         m_TargetAssemblyTypeName: PhysicalHandsChangeColoursOnHandEvents, Assembly-CSharp
         m_MethodName: ContactExit
-        m_Mode: 1
+        m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -3626,7 +3609,7 @@ MonoBehaviour:
       - m_Target: {fileID: 1102819705}
         m_TargetAssemblyTypeName: PhysicalHandsChangeColoursOnHandEvents, Assembly-CSharp
         m_MethodName: GrabEnter
-        m_Mode: 1
+        m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -3644,7 +3627,7 @@ MonoBehaviour:
       - m_Target: {fileID: 1102819705}
         m_TargetAssemblyTypeName: PhysicalHandsChangeColoursOnHandEvents, Assembly-CSharp
         m_MethodName: GrabExit
-        m_Mode: 1
+        m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
