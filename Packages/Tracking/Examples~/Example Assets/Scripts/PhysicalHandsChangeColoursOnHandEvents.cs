@@ -1,10 +1,10 @@
+using Leap.Unity.PhysicalHands;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class PhysicalHandsChangeColoursOnHandEvents : MonoBehaviour
 {
-
     Renderer objectRenderer;
 
     [SerializeField]
@@ -16,34 +16,121 @@ public class PhysicalHandsChangeColoursOnHandEvents : MonoBehaviour
     [SerializeField]
     Material grabMaterial;
 
+    bool leftHover = false;
+    bool leftContact = false;
+    bool leftGrab = false;
+
+    bool rightHover = false;
+    bool rightContact = false;
+    bool rightGrab = false;
 
     private void Start()
     {
         objectRenderer = GetComponent<Renderer>();
     }
 
-    public void HoverEnter()
+    public void HoverEnter(ContactHand hand)
     {
-        objectRenderer.material = hoverMaterial;
+        switch (hand.Handedness)
+        {
+            case Leap.Unity.Chirality.Left:
+                leftHover = true;
+                break;
+            case Leap.Unity.Chirality.Right:
+                rightHover = true;
+                break;
+        }
+
+        HandleStateChange();
     }
-    public void HoverExit()
+    public void HoverExit(ContactHand hand)
     {
-        objectRenderer.material = baseMaterial;
+        switch (hand.Handedness)
+        {
+            case Leap.Unity.Chirality.Left:
+                leftHover = false;
+                break;
+            case Leap.Unity.Chirality.Right:
+                rightHover = false;
+                break;
+        }
+
+        HandleStateChange();
     }
-    public void ContactEnter()
+    public void ContactEnter(ContactHand hand)
     {
-        objectRenderer.material = contactMaterial;
+        switch (hand.Handedness)
+        {
+            case Leap.Unity.Chirality.Left:
+                leftContact = true;
+                break;
+            case Leap.Unity.Chirality.Right:
+                rightContact = true;
+                break;
+        }
+
+        HandleStateChange();
     }
-    public void ContactExit()
+    public void ContactExit(ContactHand hand)
     {
-        objectRenderer.material = hoverMaterial;
+        switch (hand.Handedness)
+        {
+            case Leap.Unity.Chirality.Left:
+                leftContact = false;
+                break;
+            case Leap.Unity.Chirality.Right:
+                rightContact = false;
+                break;
+        }
+
+        HandleStateChange();
     }
-    public void GrabEnter()
+    public void GrabEnter(ContactHand hand)
     {
-        objectRenderer.material = grabMaterial;
+        switch (hand.Handedness)
+        {
+            case Leap.Unity.Chirality.Left:
+                leftGrab = true;
+                break;
+            case Leap.Unity.Chirality.Right:
+                rightGrab = true;
+                break;
+        }
+
+        HandleStateChange();
     }
-    public void GrabExit()
+    public void GrabExit(ContactHand hand)
     {
-        objectRenderer.material = contactMaterial;
+        switch (hand.Handedness)
+        {
+            case Leap.Unity.Chirality.Left:
+                leftGrab = false;
+                break;
+            case Leap.Unity.Chirality.Right:
+                rightGrab = false;
+                break;
+        }
+
+        HandleStateChange();
+    }
+
+    void HandleStateChange()
+    {
+        if (leftGrab || rightGrab)
+        {
+            objectRenderer.material = grabMaterial;
+        }
+        else if (leftContact || rightContact)
+        {
+            objectRenderer.material = contactMaterial;
+        }
+        else if (leftHover || rightHover)
+        {
+            objectRenderer.material = hoverMaterial;
+        }
+        else
+        {
+            objectRenderer.material = baseMaterial;
+        }
     }
 }

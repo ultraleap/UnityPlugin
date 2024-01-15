@@ -66,15 +66,15 @@ namespace Leap.Unity.PhysicalHands
 
         public void OnHandHover(ContactHand hand)
         {
-            if(!leftHandHovering && !rightHandHovering)
-                onHoverEnter?.Invoke(hand);
-
             onHover?.Invoke(hand);
 
             if (hand.Handedness == Chirality.Left)
             {
                 if (!leftHandHovering)
+                {
+                    onHoverEnter?.Invoke(hand);
                     onLeftHandHoverEnter?.Invoke(hand);
+                }
 
                 onLeftHandHover?.Invoke(hand);
                 leftHandHovering = true;
@@ -82,7 +82,10 @@ namespace Leap.Unity.PhysicalHands
             else
             {
                 if (!rightHandHovering)
+                {
+                    onHoverEnter?.Invoke(hand);
                     onRightHandHoverEnter?.Invoke(hand);
+                }
 
                 onRightHandHover?.Invoke(hand);
                 rightHandHovering = true;
@@ -107,24 +110,29 @@ namespace Leap.Unity.PhysicalHands
 
         public void OnHandContact(ContactHand hand)
         {
-            if (!leftHandContacting && !rightHandContacting)
-                onContactEnter?.Invoke(hand);
-
             onContact?.Invoke(hand);
 
             if (hand.Handedness == Chirality.Left)
             {
                 if (!leftHandContacting)
+                {
+                    onContactEnter?.Invoke(hand);
                     onLeftHandContactEnter?.Invoke(hand);
+                }
 
                 onLeftHandContact?.Invoke(hand);
+                leftHandContacting = true;
             }
             else
             {
                 if (!rightHandContacting)
+                {
+                    onContactEnter?.Invoke(hand);
                     onRightHandContactEnter?.Invoke(hand);
+                }
 
                 onRightHandContact?.Invoke(hand);
+                rightHandContacting = true;
             }
         }
 
@@ -146,24 +154,29 @@ namespace Leap.Unity.PhysicalHands
 
         public void OnHandGrab(ContactHand hand)
         {
-            if (!leftHandGrabbing && !rightHandGrabbing)
-                onGrabEnter?.Invoke(hand);
-
             onGrab?.Invoke(hand);
 
             if (hand.Handedness == Chirality.Left)
             {
                 if (!leftHandGrabbing)
+                {
                     onLeftHandGrabEnter?.Invoke(hand);
+                    onGrabEnter?.Invoke(hand);
+                }
 
                 onLeftHandGrab?.Invoke(hand);
+                leftHandGrabbing = true;
             }
             else
             {
                 if (!rightHandGrabbing)
+                {
                     onRightHandGrabEnter?.Invoke(hand);
+                    onGrabEnter?.Invoke(hand);
+                }
 
                 onRightHandGrab?.Invoke(hand);
+                rightHandGrabbing = true;
             }
         }
 

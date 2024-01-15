@@ -22,7 +22,6 @@ namespace Leap.Unity.PhysicalHands
         private Dictionary<Rigidbody, GrabHelperObject> _grabHelpers = new Dictionary<Rigidbody, GrabHelperObject>();
         private HashSet<Rigidbody> _grabRigids = new HashSet<Rigidbody>();
         private HashSet<Rigidbody> _hoveredItems = new HashSet<Rigidbody>();
-        private HashSet<ContactHand> _hoveringHands = new HashSet<ContactHand>();
 
         #endregion
 
@@ -67,8 +66,7 @@ namespace Leap.Unity.PhysicalHands
             {
                 if (helper.GrabState == GrabHelperObject.State.Grab)
                 {
-                    helper.SendGrabExitEvents(_rightContactHand);
-                    helper.SendGrabExitEvents(_leftContactHand);
+                    helper.ClearGrabbingHands();
                     helper.ReleaseObject();
                 }
 
@@ -78,7 +76,6 @@ namespace Leap.Unity.PhysicalHands
             _grabHelpers.Clear();
             _grabRigids.Clear();
             _hoveredItems.Clear();
-            _hoveringHands.Clear();
 
             _fingerStrengths.Clear();
             _colliderCache = new Collider[128];
@@ -148,7 +145,6 @@ namespace Leap.Unity.PhysicalHands
             {
                 if (_colliderCache[i].attachedRigidbody != null)
                 {
-                    _hoveringHands.Add(hand);
                     _hoveredItems.Add(_colliderCache[i].attachedRigidbody);
                     if (_grabHelpers.TryGetValue(_colliderCache[i].attachedRigidbody, out tempHelper))
                     {
