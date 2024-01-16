@@ -4138,6 +4138,320 @@ Transform:
   m_Father: {fileID: 1925369110}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 130.255, z: 0}
+--- !u!1 &1317909554
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1317909555}
+  - component: {fileID: 1317909562}
+  - component: {fileID: 1317909561}
+  - component: {fileID: 1317909560}
+  - component: {fileID: 1317909559}
+  - component: {fileID: 1317909558}
+  - component: {fileID: 1317909557}
+  - component: {fileID: 1317909556}
+  m_Layer: 0
+  m_Name: Cube (2)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1317909555
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1317909554}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.6, y: 0.72, z: 0.222}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1448342648}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1317909556
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1317909554}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05a21360bd573d44ba7d6ff4e9e213e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onHoverEnter:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1317909557}
+        m_TargetAssemblyTypeName: PhysicalHandsChangeColoursOnHandEvents, Assembly-CSharp
+        m_MethodName: HoverEnter
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onHover:
+    m_PersistentCalls:
+      m_Calls: []
+  onHoverExit:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1317909557}
+        m_TargetAssemblyTypeName: PhysicalHandsChangeColoursOnHandEvents, Assembly-CSharp
+        m_MethodName: HoverExit
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onContactEnter:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1317909557}
+        m_TargetAssemblyTypeName: PhysicalHandsChangeColoursOnHandEvents, Assembly-CSharp
+        m_MethodName: ContactEnter
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onContact:
+    m_PersistentCalls:
+      m_Calls: []
+  onContactExit:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1317909557}
+        m_TargetAssemblyTypeName: PhysicalHandsChangeColoursOnHandEvents, Assembly-CSharp
+        m_MethodName: ContactExit
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onGrabEnter:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1317909557}
+        m_TargetAssemblyTypeName: PhysicalHandsChangeColoursOnHandEvents, Assembly-CSharp
+        m_MethodName: GrabEnter
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onGrab:
+    m_PersistentCalls:
+      m_Calls: []
+  onGrabExit:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1317909557}
+        m_TargetAssemblyTypeName: PhysicalHandsChangeColoursOnHandEvents, Assembly-CSharp
+        m_MethodName: GrabExit
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onLeftHandHoverEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeftHandHover:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeftHandHoverExit:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeftHandContactEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeftHandContact:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeftHandContactExit:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeftHandGrabEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeftHandGrab:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeftHandGrabExit:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandHoverEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandHover:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandHoverExit:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandContactEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandContact:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandContactExit:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandGrabEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandGrab:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandGrabExit:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &1317909557
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1317909554}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45fbab9de5c63d743a3d6b0431691d1e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  baseMaterial: {fileID: 2100000, guid: 1b5c1411def6d344a93d23bf8720ead9, type: 2}
+  hoverMaterial: {fileID: 2100000, guid: 48db17d390781614ab09699507abd86e, type: 2}
+  contactMaterial: {fileID: 2100000, guid: afa9438a63d293440a5fc0c57d46941b, type: 2}
+  grabMaterial: {fileID: 2100000, guid: 3e7f1351bfdabc6488941e666aa02ad8, type: 2}
+--- !u!65 &1317909558
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1317909554}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &1317909559
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1317909554}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1548f80b55edb7447a13a74a4146c57b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  distanceToReset: 2
+  OnReset:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!54 &1317909560
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1317909554}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!23 &1317909561
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1317909554}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 257
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 1b5c1411def6d344a93d23bf8720ead9, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &1317909562
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1317909554}
+  m_Mesh: {fileID: 5151382180428610131, guid: ed2c706c936646a4e956039e522ae59e, type: 3}
 --- !u!1 &1362846482
 GameObject:
   m_ObjectHideFlags: 0
@@ -4682,6 +4996,8 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1102819696}
+  - {fileID: 1672487945}
+  - {fileID: 1317909555}
   m_Father: {fileID: 322199079}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -5650,6 +5966,320 @@ Transform:
   m_Father: {fileID: 1520545033}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: -50.084, z: 0}
+--- !u!1 &1672487944
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1672487945}
+  - component: {fileID: 1672487952}
+  - component: {fileID: 1672487951}
+  - component: {fileID: 1672487950}
+  - component: {fileID: 1672487949}
+  - component: {fileID: 1672487948}
+  - component: {fileID: 1672487947}
+  - component: {fileID: 1672487946}
+  m_Layer: 0
+  m_Name: Cube (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1672487945
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1672487944}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.6, y: -1.097, z: 0.48}
+  m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1448342648}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1672487946
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1672487944}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05a21360bd573d44ba7d6ff4e9e213e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onHoverEnter:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1672487947}
+        m_TargetAssemblyTypeName: PhysicalHandsChangeColoursOnHandEvents, Assembly-CSharp
+        m_MethodName: HoverEnter
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onHover:
+    m_PersistentCalls:
+      m_Calls: []
+  onHoverExit:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1672487947}
+        m_TargetAssemblyTypeName: PhysicalHandsChangeColoursOnHandEvents, Assembly-CSharp
+        m_MethodName: HoverExit
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onContactEnter:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1672487947}
+        m_TargetAssemblyTypeName: PhysicalHandsChangeColoursOnHandEvents, Assembly-CSharp
+        m_MethodName: ContactEnter
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onContact:
+    m_PersistentCalls:
+      m_Calls: []
+  onContactExit:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1672487947}
+        m_TargetAssemblyTypeName: PhysicalHandsChangeColoursOnHandEvents, Assembly-CSharp
+        m_MethodName: ContactExit
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onGrabEnter:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1672487947}
+        m_TargetAssemblyTypeName: PhysicalHandsChangeColoursOnHandEvents, Assembly-CSharp
+        m_MethodName: GrabEnter
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onGrab:
+    m_PersistentCalls:
+      m_Calls: []
+  onGrabExit:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1672487947}
+        m_TargetAssemblyTypeName: PhysicalHandsChangeColoursOnHandEvents, Assembly-CSharp
+        m_MethodName: GrabExit
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onLeftHandHoverEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeftHandHover:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeftHandHoverExit:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeftHandContactEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeftHandContact:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeftHandContactExit:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeftHandGrabEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeftHandGrab:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeftHandGrabExit:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandHoverEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandHover:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandHoverExit:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandContactEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandContact:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandContactExit:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandGrabEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandGrab:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandGrabExit:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &1672487947
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1672487944}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45fbab9de5c63d743a3d6b0431691d1e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  baseMaterial: {fileID: 2100000, guid: 1b5c1411def6d344a93d23bf8720ead9, type: 2}
+  hoverMaterial: {fileID: 2100000, guid: 48db17d390781614ab09699507abd86e, type: 2}
+  contactMaterial: {fileID: 2100000, guid: afa9438a63d293440a5fc0c57d46941b, type: 2}
+  grabMaterial: {fileID: 2100000, guid: 3e7f1351bfdabc6488941e666aa02ad8, type: 2}
+--- !u!65 &1672487948
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1672487944}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &1672487949
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1672487944}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1548f80b55edb7447a13a74a4146c57b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  distanceToReset: 2
+  OnReset:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!54 &1672487950
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1672487944}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!23 &1672487951
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1672487944}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 257
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 1b5c1411def6d344a93d23bf8720ead9, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &1672487952
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1672487944}
+  m_Mesh: {fileID: 5151382180428610131, guid: ed2c706c936646a4e956039e522ae59e, type: 3}
 --- !u!1 &1693708767 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4459870147495250033, guid: 082b410248efe504fa129955c7dfaba5, type: 3}
