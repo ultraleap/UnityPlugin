@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 767538377468813851}
   - component: {fileID: 8065784239118584646}
   m_Layer: 5
-  m_Name: PH_PhysicalHands Button
+  m_Name: PhysicalHands Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -48,18 +48,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   buttonObject: {fileID: 476095683074382518}
-  buttonHeightLimit: 0.2
-  _whichHandCanPressButton: 2
   _buttonShouldDelayRebound: 1
   _buttonStaydownTimer: 2
   _shouldOnlyBePressedByHand: 0
-  _isButtonPressed: 0
+  _whichHandCanPressButton: 2
   OnButtonPressed:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: XRSceneHeadOrigin, Assembly-CSharp
-        m_MethodName: SetHeight
+        m_TargetAssemblyTypeName: SceneReset, Assembly-CSharp
+        m_MethodName: ExitApplication
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -151,7 +149,7 @@ MeshRenderer:
   m_RenderingLayerMask: 257
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: d1e91ea596969854e998c70991538eb7, type: 2}
+  - {fileID: 2100000, guid: 8eca0b31e096dbb4e9ec168e385043a9, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -299,7 +297,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Height
+  m_text: Press Me
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -326,8 +324,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 55
-  m_fontSizeBase: 55
+  m_fontSize: 47.13
+  m_fontSizeBase: 47.13
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -382,9 +380,9 @@ GameObject:
   - component: {fileID: 476095683074382521}
   - component: {fileID: 476095683074382525}
   - component: {fileID: 476095683074382522}
-  - component: {fileID: 476095683074382523}
   - component: {fileID: 476095683074382520}
   - component: {fileID: 1520259861671275252}
+  - component: {fileID: 991559591}
   m_Layer: 5
   m_Name: Pressable Object
   m_TagString: Untagged
@@ -401,7 +399,7 @@ Transform:
   m_GameObject: {fileID: 476095683074382518}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0.02, z: 0}
-  m_LocalScale: {x: 3.61, y: 1, z: 1.98}
+  m_LocalScale: {x: 3.61, y: 1.1, z: 1.98}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 476095682927097483}
@@ -458,19 +456,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &476095683074382523
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 476095683074382518}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &476095683074382520
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -583,3 +568,16 @@ ConfigurableJoint:
   m_EnablePreprocessing: 1
   m_MassScale: 1
   m_ConnectedMassScale: 1
+--- !u!65 &991559591
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 476095683074382518}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.019999998, y: 0.020000001, z: 0.02}
+  m_Center: {x: 0.000000007450581, y: -0.000000059604645, z: -0.000000059604645}

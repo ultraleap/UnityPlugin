@@ -343,12 +343,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   buttonObject: {fileID: 5467393138792240732}
-  buttonHeightLimit: 0.2
-  _whichHandCanPressButton: 2
   _buttonShouldDelayRebound: 0
   _buttonStaydownTimer: 2
   _shouldOnlyBePressedByHand: 0
-  _isButtonPressed: 0
+  _whichHandCanPressButton: 2
   OnButtonPressed:
     m_PersistentCalls:
       m_Calls:
@@ -1808,12 +1806,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   buttonObject: {fileID: 5467393138620567951}
-  buttonHeightLimit: 0.2
-  _whichHandCanPressButton: 2
   _buttonShouldDelayRebound: 0
   _buttonStaydownTimer: 2
   _shouldOnlyBePressedByHand: 0
-  _isButtonPressed: 0
+  _whichHandCanPressButton: 2
   OnButtonPressed:
     m_PersistentCalls:
       m_Calls:
@@ -1912,12 +1908,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   buttonObject: {fileID: 5467393138891686599}
-  buttonHeightLimit: 0.2
-  _whichHandCanPressButton: 2
   _buttonShouldDelayRebound: 0
   _buttonStaydownTimer: 2
   _shouldOnlyBePressedByHand: 0
-  _isButtonPressed: 0
+  _whichHandCanPressButton: 2
   OnButtonPressed:
     m_PersistentCalls:
       m_Calls:

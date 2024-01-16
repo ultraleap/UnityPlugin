@@ -38,7 +38,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: -0, y: 0.56}
-  m_SizeDelta: {x: 1920, y: 1080}
+  m_SizeDelta: {x: 192, y: 108}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &7971081848749085831
 Canvas:
@@ -113,7 +113,7 @@ GameObject:
   - component: {fileID: 4456976651649274659}
   - component: {fileID: 3973722649934473950}
   - component: {fileID: 2744082216515364118}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -214,7 +214,7 @@ GameObject:
   - component: {fileID: 1982368223337039464}
   - component: {fileID: 6425346346445177084}
   - component: {fileID: 575397727892507198}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Text (TMP) (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -303,8 +303,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: The hand will go through an object surface when grabbed or enough force
-    is used.
+  m_text: The hands will not go through object surfaces.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 342802517badcf44c811584e5b42a888, type: 2}
   m_sharedMaterial: {fileID: 556829042121458119, guid: 342802517badcf44c811584e5b42a888, type: 2}
@@ -387,7 +386,7 @@ GameObject:
   - component: {fileID: 3461729854329802857}
   - component: {fileID: 3461729854329802863}
   - component: {fileID: 3461729854329802856}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -476,7 +475,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Soft Contact
+  m_text: Hard contact
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 342802517badcf44c811584e5b42a888, type: 2}
   m_sharedMaterial: {fileID: 556829042121458119, guid: 342802517badcf44c811584e5b42a888, type: 2}
@@ -562,7 +561,9 @@ GameObject:
   - component: {fileID: 3461729854753930329}
   - component: {fileID: 3461729854753930330}
   - component: {fileID: 2560553933549685782}
-  m_Layer: 0
+  - component: {fileID: 2039711335}
+  - component: {fileID: 1088920952}
+  m_Layer: 5
   m_Name: Pressable Object
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -577,8 +578,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3461729854753930324}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.02, z: 0}
-  m_LocalScale: {x: 0.091380104, y: 0.02, z: 0.120442875}
+  m_LocalPosition: {x: 0, y: 0.022, z: 0}
+  m_LocalScale: {x: 0.091380104, y: 0.022, z: 0.120442875}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3461729854329802857}
@@ -680,7 +681,7 @@ ConfigurableJoint:
   m_Anchor: {x: 0, y: 0, z: 0}
   m_Axis: {x: 1, y: 0, z: 0}
   m_AutoConfigureConnectedAnchor: 0
-  m_ConnectedAnchor: {x: 0, y: 0.01, z: 0}
+  m_ConnectedAnchor: {x: 0, y: 0.011, z: 0}
   serializedVersion: 2
   m_SecondaryAxis: {x: 0, y: 1, z: 0}
   m_XMotion: 0
@@ -718,7 +719,7 @@ ConfigurableJoint:
     limit: 0
     bounciness: 0
     contactDistance: 0
-  m_TargetPosition: {x: 0, y: -0.02, z: 0}
+  m_TargetPosition: {x: 0, y: -0.022, z: 0}
   m_TargetVelocity: {x: 0, y: 0, z: 0}
   m_XDrive:
     serializedVersion: 3
@@ -764,6 +765,240 @@ ConfigurableJoint:
   m_EnablePreprocessing: 1
   m_MassScale: 1
   m_ConnectedMassScale: 1
+--- !u!114 &2039711335
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3461729854753930324}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05a21360bd573d44ba7d6ff4e9e213e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onHoverEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onHover:
+    m_PersistentCalls:
+      m_Calls: []
+  onHoverExit:
+    m_PersistentCalls:
+      m_Calls: []
+  onContactEnter:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 4339005348515153145}
+        m_TargetAssemblyTypeName: PhysicalHandsButton, Assembly-CSharp
+        m_MethodName: ContactHandNearbyEnter
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onContact:
+    m_PersistentCalls:
+      m_Calls: []
+  onContactExit:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 4339005348515153145}
+        m_TargetAssemblyTypeName: PhysicalHandsButton, Assembly-CSharp
+        m_MethodName: ContactHandNearbyExit
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onGrabEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onGrab:
+    m_PersistentCalls:
+      m_Calls: []
+  onGrabExit:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeftHandHoverEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeftHandHover:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeftHandHoverExit:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeftHandContactEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeftHandContact:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeftHandContactExit:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeftHandGrabEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeftHandGrab:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeftHandGrabExit:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandHoverEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandHover:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandHoverExit:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandContactEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandContact:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandContactExit:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandGrabEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandGrab:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandGrabExit:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &1088920952
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3461729854753930324}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05a21360bd573d44ba7d6ff4e9e213e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onHoverEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onHover:
+    m_PersistentCalls:
+      m_Calls: []
+  onHoverExit:
+    m_PersistentCalls:
+      m_Calls: []
+  onContactEnter:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 4339005348515153145}
+        m_TargetAssemblyTypeName: PhysicalHandsButton, Assembly-CSharp
+        m_MethodName: ContactHandNearbyEnter
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onContact:
+    m_PersistentCalls:
+      m_Calls: []
+  onContactExit:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 4339005348515153145}
+        m_TargetAssemblyTypeName: PhysicalHandsButton, Assembly-CSharp
+        m_MethodName: ContactHandNearbyExit
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onGrabEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onGrab:
+    m_PersistentCalls:
+      m_Calls: []
+  onGrabExit:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeftHandHoverEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeftHandHover:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeftHandHoverExit:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeftHandContactEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeftHandContact:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeftHandContactExit:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeftHandGrabEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeftHandGrab:
+    m_PersistentCalls:
+      m_Calls: []
+  onLeftHandGrabExit:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandHoverEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandHover:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandHoverExit:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandContactEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandContact:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandContactExit:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandGrabEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandGrab:
+    m_PersistentCalls:
+      m_Calls: []
+  onRightHandGrabExit:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &3461729854966666460
 GameObject:
   m_ObjectHideFlags: 0
@@ -775,7 +1010,9 @@ GameObject:
   - component: {fileID: 3461729854966666435}
   - component: {fileID: 4339005348515153145}
   - component: {fileID: 6448743937059171748}
-  m_Layer: 0
+  - component: {fileID: 417764909}
+  - component: {fileID: 266932154}
+  m_Layer: 5
   m_Name: PH_PhysicalHandsButton-LargeWithText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -791,7 +1028,7 @@ Transform:
   m_GameObject: {fileID: 3461729854966666460}
   m_LocalRotation: {x: -0.5, y: -0.5, z: -0.5, w: 0.5}
   m_LocalPosition: {x: -0.0064, y: 0.0228, z: 0.0634}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_LocalScale: {x: 0.95, y: 0.7077, z: 0.95}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3461729855275826581}
@@ -813,8 +1050,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   buttonObject: {fileID: 3461729854753930324}
-  buttonHeightLimit: 0.2
-  _isButtonPressed: 0
+  _buttonShouldDelayRebound: 1
+  _buttonStaydownTimer: 2
+  _shouldOnlyBePressedByHand: 1
+  _whichHandCanPressButton: 2
   OnButtonPressed:
     m_PersistentCalls:
       m_Calls:
@@ -826,7 +1065,7 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 1
+          m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -838,7 +1077,7 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 1
+          m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -846,8 +1085,6 @@ MonoBehaviour:
   OnButtonUnPressed:
     m_PersistentCalls:
       m_Calls: []
-  _buttonShouldDelayRebound: 0
-  buttonStaydownTimer: 2
 --- !u!54 &6448743937059171748
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -864,6 +1101,34 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 126
   m_CollisionDetection: 3
+--- !u!114 &417764909
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3461729854966666460}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b3763add1152ac4aab69357a419a664, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  disableAllGrabbing: 1
+  disableAllHandCollisions: 0
+--- !u!114 &266932154
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3461729854966666460}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b3763add1152ac4aab69357a419a664, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  disableAllGrabbing: 1
+  disableAllHandCollisions: 0
 --- !u!1 &3461729855275826582
 GameObject:
   m_ObjectHideFlags: 0
@@ -876,7 +1141,7 @@ GameObject:
   - component: {fileID: 3461729855275826586}
   - component: {fileID: 3461729855275826587}
   - component: {fileID: 7136187071146562366}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Border
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1027,7 +1292,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: 4362900a582fc3e4583c8a86f4ee6d90, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -1100,9 +1365,17 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 920bda1c94dbacd4fa4b38c310d4dc4b, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 7c6d69ae2aabcee4fbe56e4fb2638238, type: 2}
     - target: {fileID: 919132149155446097, guid: 920bda1c94dbacd4fa4b38c310d4dc4b, type: 3}
       propertyPath: m_Name
       value: rounded
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 920bda1c94dbacd4fa4b38c310d4dc4b, type: 3}
+      propertyPath: m_Layer
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 920bda1c94dbacd4fa4b38c310d4dc4b, type: 3}
@@ -1136,15 +1409,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 920bda1c94dbacd4fa4b38c310d4dc4b, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 920bda1c94dbacd4fa4b38c310d4dc4b, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.004
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 920bda1c94dbacd4fa4b38c310d4dc4b, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 920bda1c94dbacd4fa4b38c310d4dc4b, type: 3}
       propertyPath: m_LocalRotation.w
@@ -1180,7 +1453,11 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: 8bf483d1467d72c418541702679a30a2, type: 2}
     - target: {fileID: 919132149155446097, guid: 920bda1c94dbacd4fa4b38c310d4dc4b, type: 3}
       propertyPath: m_Name
-      value: rounded (1)
+      value: BaseRoundedObject
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 920bda1c94dbacd4fa4b38c310d4dc4b, type: 3}
+      propertyPath: m_Layer
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 920bda1c94dbacd4fa4b38c310d4dc4b, type: 3}

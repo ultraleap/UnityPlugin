@@ -111,6 +111,12 @@ namespace Leap
         {
             CreatePrefab("Attachment Hands");
         }
+        [MenuItem("GameObject/Ultraleap/Hands/Ghost Capsule Hands", false, 27),
+    MenuItem("Ultraleap/Hands/Ghost Capsule Hands", false, 27)]
+        public static void CreateGhostCapsuleHands()
+        {
+            CreatePrefab("Ghost Capsule Hands");
+        }
 
         #endregion
 
@@ -192,6 +198,13 @@ namespace Leap
             }
 
         }
+        [MenuItem("GameObject/Ultraleap/Interaction/PhysicalHandsButton", false, 41),
+            MenuItem("Ultraleap/Interaction/PhysicalHandsButton", false, 41)]
+        public static void CreatePhysicalHandsButton()
+        {
+            CreatePrefab("PhysicalHands Button");
+        }
+
         #endregion
 
         public static GameObject CreatePrefab(string prefabName)

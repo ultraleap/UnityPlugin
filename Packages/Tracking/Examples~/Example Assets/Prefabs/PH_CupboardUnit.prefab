@@ -57,6 +57,7 @@ GameObject:
   - component: {fileID: 7006568577709944802}
   - component: {fileID: 5117438675933496782}
   - component: {fileID: 4991301506816713395}
+  - component: {fileID: 2054656382}
   m_Layer: 0
   m_Name: HandleParts
   m_TagString: Untagged
@@ -143,6 +144,20 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0.00000011920929, y: 0, z: -0.00000009872022}
+--- !u!114 &2054656382
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 850912404356049424}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b3763add1152ac4aab69357a419a664, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  disableAllGrabbing: 1
+  disableAllHandCollisions: 0
 --- !u!1 &1773182224460359070
 GameObject:
   m_ObjectHideFlags: 0
@@ -157,6 +172,7 @@ GameObject:
   - component: {fileID: 1303978630443764875}
   - component: {fileID: 934347331961097139}
   - component: {fileID: 1257576323}
+  - component: {fileID: 439590551}
   m_Layer: 0
   m_Name: CupboardUnitDoor
   m_TagString: Untagged
@@ -271,7 +287,7 @@ ConfigurableJoint:
   m_Anchor: {x: 0, y: 0, z: -0.07522}
   m_Axis: {x: 1, y: 0, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: -0.24600005, y: 0, z: -0.07702005}
+  m_ConnectedAnchor: {x: 0.59945685, y: 1.259201, z: 0.31502342}
   serializedVersion: 2
   m_SecondaryAxis: {x: 0, y: 1, z: 0}
   m_XMotion: 0
@@ -355,6 +371,20 @@ ConfigurableJoint:
   m_EnablePreprocessing: 1
   m_MassScale: 1
   m_ConnectedMassScale: 1
+--- !u!114 &439590551
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1773182224460359070}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b3763add1152ac4aab69357a419a664, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  disableAllGrabbing: 1
+  disableAllHandCollisions: 0
 --- !u!1 &2163937770391798397
 GameObject:
   m_ObjectHideFlags: 0
@@ -367,6 +397,7 @@ GameObject:
   - component: {fileID: 5573593077415399523}
   - component: {fileID: 539385281997273595}
   - component: {fileID: 7228487877201167180}
+  - component: {fileID: 339883082}
   m_Layer: 0
   m_Name: CupboardUnitHandle
   m_TagString: Untagged
@@ -454,6 +485,20 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.02, y: 0.172842, z: 0.006}
   m_Center: {x: 0.007454516, y: 0.015558999, z: -0.103}
+--- !u!114 &339883082
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2163937770391798397}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b3763add1152ac4aab69357a419a664, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  disableAllGrabbing: 1
+  disableAllHandCollisions: 0
 --- !u!1 &2871490848069798368
 GameObject:
   m_ObjectHideFlags: 0
@@ -473,6 +518,7 @@ GameObject:
   - component: {fileID: 1142283598873783903}
   - component: {fileID: 5191390893409904759}
   - component: {fileID: 5615807542952421759}
+  - component: {fileID: 1477429153975317415}
   m_Layer: 0
   m_Name: PH_CupboardUnit
   m_TagString: Untagged
@@ -495,6 +541,7 @@ Transform:
   - {fileID: 7362739602808977061}
   - {fileID: 8254661009487706328}
   - {fileID: 808762275}
+  - {fileID: 3762721914616756129}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 72.678, z: 0}
@@ -654,8 +701,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b3763add1152ac4aab69357a419a664, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _disableAllGrabbing: 1
-  _disableAllHandCollisions: 0
+  disableAllGrabbing: 1
+  disableAllHandCollisions: 0
+--- !u!114 &1477429153975317415
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2871490848069798368}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b3763add1152ac4aab69357a419a664, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  disableAllGrabbing: 1
+  disableAllHandCollisions: 1
 --- !u!1 &5454054454493990974
 GameObject:
   m_ObjectHideFlags: 0
@@ -668,6 +729,7 @@ GameObject:
   - component: {fileID: 7471280493842251629}
   - component: {fileID: 756475868078220634}
   - component: {fileID: 6401709091353825824}
+  - component: {fileID: 469771220}
   m_Layer: 0
   m_Name: HandleParts (1)
   m_TagString: Untagged
@@ -754,6 +816,65 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0.00000011920929, y: 0, z: -0.00000009872022}
+--- !u!114 &469771220
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5454054454493990974}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b3763add1152ac4aab69357a419a664, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  disableAllGrabbing: 1
+  disableAllHandCollisions: 0
+--- !u!1 &7799492519538206000
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3762721914616756129}
+  - component: {fileID: 4835827728446897988}
+  m_Layer: 0
+  m_Name: Cube
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3762721914616756129
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7799492519538206000}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.00522, y: 0, z: -0.00598}
+  m_LocalScale: {x: 0.012388634, y: 0.36732, z: 0.1312264}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6444574959999277787}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &4835827728446897988
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7799492519538206000}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &8799875479137297233
 GameObject:
   m_ObjectHideFlags: 0
