@@ -28,7 +28,6 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8681616449881122558}
   - {fileID: 5879262598706049439}
@@ -50,7 +49,7 @@ MonoBehaviour:
   editTimePose: 1
   openXRLeapProvider: {fileID: 1276715513614782159}
   leapXRServiceProvider: {fileID: 8681616449881122529}
-  trackingSource: 2
+  trackingSource: 0
 --- !u!114 &2683451079520186211
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -133,28 +132,8 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 3557434566810426996, guid: 15d3b5cf5cea75344a4482323bc124a8, type: 3}
-      propertyPath: _deviceTiltXAxis
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3557434566810426996, guid: 15d3b5cf5cea75344a4482323bc124a8, type: 3}
       propertyPath: FOV_Visualization
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3557434566810426996, guid: 15d3b5cf5cea75344a4482323bc124a8, type: 3}
-      propertyPath: _deviceOffsetMode
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3557434566810426996, guid: 15d3b5cf5cea75344a4482323bc124a8, type: 3}
-      propertyPath: _deviceOffsetYAxis
-      value: 0.05
-      objectReference: {fileID: 0}
-    - target: {fileID: 3557434566810426996, guid: 15d3b5cf5cea75344a4482323bc124a8, type: 3}
-      propertyPath: _deviceOffsetZAxis
-      value: 0.08
-      objectReference: {fileID: 0}
-    - target: {fileID: 3557434566810426996, guid: 15d3b5cf5cea75344a4482323bc124a8, type: 3}
-      propertyPath: _frameOptimization
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3557434566810426996, guid: 15d3b5cf5cea75344a4482323bc124a8, type: 3}
       propertyPath: _multipleDeviceMode
@@ -182,6 +161,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 15d3b5cf5cea75344a4482323bc124a8, type: 3}
+--- !u!4 &8681616449881122558 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3557434566810426987, guid: 15d3b5cf5cea75344a4482323bc124a8, type: 3}
+  m_PrefabInstance: {fileID: 5270838609458788501}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &8681616449881122529 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3557434566810426996, guid: 15d3b5cf5cea75344a4482323bc124a8, type: 3}
@@ -193,11 +177,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: abb0e8dd6c809854f8fea5e0976884f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!4 &8681616449881122558 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 3557434566810426987, guid: 15d3b5cf5cea75344a4482323bc124a8, type: 3}
-  m_PrefabInstance: {fileID: 5270838609458788501}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &5270838609767631475
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -267,6 +246,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d774afbb462004749918d3e350ef43ff, type: 3}
+--- !u!4 &5879262598706049439 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1779645215674481644, guid: d774afbb462004749918d3e350ef43ff, type: 3}
+  m_PrefabInstance: {fileID: 5270838609767631475}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &1276715513614782159 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6382174844009596092, guid: d774afbb462004749918d3e350ef43ff, type: 3}
@@ -278,8 +262,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1479f13a962fb02499189f2982b6c5ed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!4 &5879262598706049439 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 1779645215674481644, guid: d774afbb462004749918d3e350ef43ff, type: 3}
-  m_PrefabInstance: {fileID: 5270838609767631475}
-  m_PrefabAsset: {fileID: 0}

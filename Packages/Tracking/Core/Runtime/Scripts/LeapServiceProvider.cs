@@ -615,33 +615,22 @@ namespace Leap.Unity
             }
 
             HandleUpdateFrameInterpolationAndTransformation();
-
             DispatchUpdateFrameEvent(_transformedUpdateFrame);
         }
 
         protected virtual void FixedUpdate()
         {
-            if (_frameOptimization == FrameOptimizationMode.ReuseUpdateForPhysics)
-            {
-                HandleUpdateFrameInterpolationAndTransformation();
-
-                DispatchFixedFrameEvent(_transformedUpdateFrame);
-                return;
-            } 
-
             if (_useInterpolation)
             {
-
                 long timestamp;
                 switch (_frameOptimization)
                 {
                     case FrameOptimizationMode.None:
-                        // By default we use Time.fixedTime to ensure that our hands are on the same
-                        // timeline as Update.  We add an extrapolation value to help compensate
-                        // for latency.
-                        float extrapolatedTime = Time.fixedTime + CalculatePhysicsExtrapolation();
-                        timestamp = (long)(extrapolatedTime * S_TO_US) + _unityToLeapOffset;
-                        break;
+                    case FrameOptimizationMode.ReuseUpdateForPhysics:
+                        // Caculate a new frame and then dispatch it
+                        HandleUpdateFrameInterpolationAndTransformation();
+                        DispatchFixedFrameEvent(_transformedUpdateFrame);
+                        return;
                     case FrameOptimizationMode.ReusePhysicsForUpdate:
                         // If we are re-using physics frames for update, we don't even want to care
                         // about Time.fixedTime, just grab the most recent interpolated timestamp
@@ -663,7 +652,6 @@ namespace Leap.Unity
             if (_untransformedFixedFrame != null)
             {
                 transformFrame(_untransformedFixedFrame, _transformedFixedFrame);
-
                 DispatchFixedFrameEvent(_transformedFixedFrame);
             }
         }
