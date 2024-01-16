@@ -1,56 +1,67 @@
-using System.Collections;
+/******************************************************************************
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
+ *                                                                            *
+ * Use subject to the terms of the Apache License 2.0 available at            *
+ * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
+ * between Ultraleap and you, your company or other organization.             *
+ ******************************************************************************/
+
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Cannon : MonoBehaviour
+
+namespace Leap.Unity.Examples
 {
-    List<Rigidbody> innerObjects = new List<Rigidbody> ();
-
-    public float launchTimer = 2;
-
-    public float explosionForce = 100;
-
-    float timer = 0;
-
-    private void Update()
+    public class Cannon : MonoBehaviour
     {
-        timer -= Time.deltaTime;
+        List<Rigidbody> innerObjects = new List<Rigidbody>();
 
-        if (timer <= 0)
-        {
-            timer = launchTimer;
-            Launch();
-        }
-    }
+        public float launchTimer = 2;
 
-    public void Launch()
-    {
-        foreach (var obj in innerObjects)
+        public float explosionForce = 100;
+
+        float timer = 0;
+
+        private void Update()
         {
-            obj.AddForce(transform.up * explosionForce);
+            timer -= Time.deltaTime;
+
+            if (timer <= 0)
+            {
+                timer = launchTimer;
+                Launch();
+            }
         }
 
-        innerObjects.Clear ();
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        var rbod = other.attachedRigidbody;
-        var joint = other.GetComponent<Joint>();
-
-        if(rbod != null && joint == null && !innerObjects.Contains(rbod))
+        public void Launch()
         {
-            innerObjects.Add(rbod);
+            foreach (var obj in innerObjects)
+            {
+                obj.AddForce(transform.up * explosionForce);
+            }
+
+            innerObjects.Clear();
         }
-    }
 
-    private void OnTriggerExit(Collider other)
-    {
-        var rbod = other.attachedRigidbody;
-
-        if (rbod != null && innerObjects.Contains(rbod))
+        private void OnTriggerEnter(Collider other)
         {
-            innerObjects.Remove(rbod);
+            var rbod = other.attachedRigidbody;
+            var joint = other.GetComponent<Joint>();
+
+            if (rbod != null && joint == null && !innerObjects.Contains(rbod))
+            {
+                innerObjects.Add(rbod);
+            }
+        }
+
+        private void OnTriggerExit(Collider other)
+        {
+            var rbod = other.attachedRigidbody;
+
+            if (rbod != null && innerObjects.Contains(rbod))
+            {
+                innerObjects.Remove(rbod);
+            }
         }
     }
 }

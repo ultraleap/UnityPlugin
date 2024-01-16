@@ -1,114 +1,123 @@
-using Leap.Unity;
-using Leap.Unity.PhysicalHands;
+/******************************************************************************
+ * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
+ *                                                                            *
+ * Use subject to the terms of the Apache License 2.0 available at            *
+ * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
+ * between Ultraleap and you, your company or other organization.             *
+ ******************************************************************************/
+
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class HandGrabHighlighter : MonoBehaviour
+
+namespace Leap.Unity.PhysicalHands.Examples
 {
-    [Tooltip("Automatically listen to the grab events from the Physical Hands Manager in the scene on start")]
-    public bool automaticEvents = true;
-
-    public Chirality chirality;
-
-    public Renderer rendererToChange;
-
-    public Color grabActivatedColor;
-    public Color grabbedColor;
-
-    public float grabActivatedFadeTime = 0.1f;
-    public float grabDeactivatedFadeTime = 0.1f;
-
-    public bool fadeIn = false;
-    public bool fadeOut = true;
-
-    Color ungrabbedColor;
-
-    bool grabbing = false;
-
-    public AnimationCurve grabActivationEaseCurve;
-
-    public string materialColorName = "_MainColor";
-
-    private void Awake()
+    public class HandGrabHighlighter : MonoBehaviour
     {
-        ungrabbedColor = rendererToChange.material.GetColor(materialColorName);
+        [Tooltip("Automatically listen to the grab events from the Physical Hands Manager in the scene on start")]
+        public bool automaticEvents = true;
 
-        if (automaticEvents)
+        public Chirality chirality;
+
+        public Renderer rendererToChange;
+
+        public Color grabActivatedColor;
+        public Color grabbedColor;
+
+        public float grabActivatedFadeTime = 0.1f;
+        public float grabDeactivatedFadeTime = 0.1f;
+
+        public bool fadeIn = false;
+        public bool fadeOut = true;
+
+        Color ungrabbedColor;
+
+        bool grabbing = false;
+
+        public AnimationCurve grabActivationEaseCurve;
+
+        public string materialColorName = "_MainColor";
+
+        private void Awake()
         {
-            PhysicalHandsManager physManager = FindObjectOfType<PhysicalHandsManager>();
+            ungrabbedColor = rendererToChange.material.GetColor(materialColorName);
 
-            if (physManager != null)
+            if (automaticEvents)
             {
-                physManager.onGrab.AddListener(OnGrabBegin);
-                physManager.onGrabExit.AddListener(OnGrabEnd);
+                PhysicalHandsManager physManager = FindObjectOfType<PhysicalHandsManager>();
+
+                if (physManager != null)
+                {
+                    physManager.onGrab.AddListener(OnGrabBegin);
+                    physManager.onGrabExit.AddListener(OnGrabEnd);
+                }
             }
         }
-    }
 
-    public void OnGrabBegin(ContactHand contacthand, Rigidbody rbody)
-    {
-        if (!grabbing && contacthand.Handedness == chirality)
+        public void OnGrabBegin(ContactHand contacthand, Rigidbody rbody)
         {
-            StopAllCoroutines();
+            if (!grabbing && contacthand.Handedness == chirality)
+            {
+                StopAllCoroutines();
 
-            grabbing = true;
+                grabbing = true;
 
-            StartCoroutine(HandleGrabActivation());
-        }
-    }
-
-    public void OnGrabEnd(ContactHand contacthand, Rigidbody rbody)
-    {
-        if (grabbing && contacthand.Handedness == chirality)
-        {
-            StopAllCoroutines();
-
-            grabbing = false;
-
-            StartCoroutine(HandleGrabDeactivation());
-        }
-    }
-
-    IEnumerator HandleGrabActivation()
-    {
-        if(!fadeIn)
-        {
-            rendererToChange.material.SetColor(materialColorName, grabbedColor);
-            yield break;
+                StartCoroutine(HandleGrabActivation());
+            }
         }
 
-        float t = grabActivatedFadeTime;
-        while (t > 0)
+        public void OnGrabEnd(ContactHand contacthand, Rigidbody rbody)
         {
-            t -= Time.deltaTime;
+            if (grabbing && contacthand.Handedness == chirality)
+            {
+                StopAllCoroutines();
 
-            Color color = Color.Lerp(grabbedColor, grabActivatedColor, grabActivationEaseCurve.Evaluate(t / grabActivatedFadeTime));
+                grabbing = false;
 
-            rendererToChange.material.SetColor(materialColorName, color);
-
-            yield return null;
-        }
-    }
-
-    IEnumerator HandleGrabDeactivation()
-    {
-        if (!fadeOut)
-        {
-            rendererToChange.material.SetColor(materialColorName, ungrabbedColor);
-            yield break;
+                StartCoroutine(HandleGrabDeactivation());
+            }
         }
 
-        float t = grabDeactivatedFadeTime;
-        while (t > 0)
+        IEnumerator HandleGrabActivation()
         {
-            t -= Time.deltaTime;
+            if (!fadeIn)
+            {
+                rendererToChange.material.SetColor(materialColorName, grabbedColor);
+                yield break;
+            }
 
-            Color color = Color.Lerp(ungrabbedColor, grabbedColor, grabActivationEaseCurve.Evaluate(t / grabDeactivatedFadeTime));
+            float t = grabActivatedFadeTime;
+            while (t > 0)
+            {
+                t -= Time.deltaTime;
 
-            rendererToChange.material.SetColor(materialColorName, color);
+                Color color = Color.Lerp(grabbedColor, grabActivatedColor, grabActivationEaseCurve.Evaluate(t / grabActivatedFadeTime));
 
-            yield return null;
+                rendererToChange.material.SetColor(materialColorName, color);
+
+                yield return null;
+            }
+        }
+
+        IEnumerator HandleGrabDeactivation()
+        {
+            if (!fadeOut)
+            {
+                rendererToChange.material.SetColor(materialColorName, ungrabbedColor);
+                yield break;
+            }
+
+            float t = grabDeactivatedFadeTime;
+            while (t > 0)
+            {
+                t -= Time.deltaTime;
+
+                Color color = Color.Lerp(ungrabbedColor, grabbedColor, grabActivationEaseCurve.Evaluate(t / grabDeactivatedFadeTime));
+
+                rendererToChange.material.SetColor(materialColorName, color);
+
+                yield return null;
+            }
         }
     }
 }
