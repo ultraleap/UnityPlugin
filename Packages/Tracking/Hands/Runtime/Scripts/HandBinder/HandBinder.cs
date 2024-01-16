@@ -98,14 +98,12 @@ namespace Leap.Unity.HandsModule
         /// The chirality or handedness of this hand (left or right).
         /// To set, change the public Chirality.
         /// </summary>
-        public override Chirality Handedness { get { return Chirality; } set { Chirality = value; } }
+        public override Chirality Handedness { get { return Chirality; } set { } }
 
-        [SerializeField]
-        private ModelType handUpdateType = ModelType.Graphics;
         /// <summary>
         /// The type of the Hand model (set to Graphics).
         /// </summary>
-        public override ModelType HandModelType { get { return handUpdateType; } }
+        public override ModelType HandModelType { get { return ModelType.Graphics; } }
 
         /// <summary>
         /// The Leap Hand object this hand model represents.
