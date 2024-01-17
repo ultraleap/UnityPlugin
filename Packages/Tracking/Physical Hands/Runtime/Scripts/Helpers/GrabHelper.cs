@@ -143,7 +143,7 @@ namespace Leap.Unity.PhysicalHands
                 (-hand.palmBone.transform.up * 0.025f) + ((hand.Handedness == Chirality.Left ? hand.palmBone.transform.right : -hand.palmBone.transform.right) * 0.015f),
                 // Interpolate the tip position so we keep it relative to the straightest finger
                 hand.palmBone.transform.position + (-hand.palmBone.transform.up * Mathf.Lerp(0.025f, 0.07f, lerp)) + (hand.palmBone.transform.forward * Mathf.Lerp(0.06f, 0.02f, lerp)),
-                radiusAmount + (physicalHandsManager.HoverDistance * 2f), 
+                radiusAmount + physicalHandsManager.HoverDistance, 
                 _colliderCache, 
                 physicalHandsManager.InteractionMask);
 

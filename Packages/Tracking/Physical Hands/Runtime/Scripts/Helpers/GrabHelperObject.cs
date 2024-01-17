@@ -50,7 +50,6 @@ namespace Leap.Unity.PhysicalHands
 
         // Indexes of each list should always match
         private List<ContactHand> _grabbableHands = new List<ContactHand>();
-        private List<bool> _grabbableHandsContacting = new List<bool>();
         private List<GrabValues> _grabbableHandsValues = new List<GrabValues>();
 
         internal List<ContactHand> GrabbingHands => _grabbingHands;
@@ -61,6 +60,9 @@ namespace Leap.Unity.PhysicalHands
         [System.Serializable]
         private class GrabValues
         {
+            public bool wasContacting = false;
+            public bool isContacting = false;
+
             public float[] fingerStrength = new float[5];
             public float[] originalFingerStrength = new float[5];
             public Vector3 offset;
@@ -191,9 +193,9 @@ namespace Leap.Unity.PhysicalHands
             //// Remove any lingering contact and hover events
             if (_rigid != null)
             {
-                for (int i = 0; i < _grabbableHandsContacting.Count; i++)
+                for (int i = 0; i < _grabbableHandsValues.Count; i++)
                 {
-                    if (_grabbableHandsContacting[i])
+                    if (_grabbableHandsValues[i].isContacting)
                     {
                         if (_rigid.TryGetComponent<IPhysicalHandContact>(out var physicalHandContact))
                         {
@@ -214,7 +216,6 @@ namespace Leap.Unity.PhysicalHands
 
             _grabbableHandsValues.Clear();
             _grabbableHands.Clear();
-            _grabbableHandsContacting.Clear();
             foreach (var pair in _grabbableBones)
             {
                 for (int j = 0; j < pair.Value.Length; j++)
@@ -237,7 +238,6 @@ namespace Leap.Unity.PhysicalHands
                     GrabState = State.Hover;
                 }
                 _grabbableHands.Add(hand);
-                _grabbableHandsContacting.Add(false);
                 _grabbableHandsValues.Add(new GrabValues());
 
                 if (_ignorePhysicalHands)
@@ -251,8 +251,10 @@ namespace Leap.Unity.PhysicalHands
         {
             if (_grabbableHands.Contains(hand))
             {
-                _grabbableHandsContacting.RemoveAt(_grabbableHands.IndexOf(hand));
-                _grabbableHands.Remove(hand);
+                int index = _grabbableHands.IndexOf(hand);
+
+                _grabbableHands.RemoveAt(index);
+                _grabbableHandsValues.RemoveAt(index);
             }
         }
 
@@ -340,7 +342,7 @@ namespace Leap.Unity.PhysicalHands
             for (int i = 0; i < _grabbableHands.Count; i++)
             {
                 // Update references to _grabbableBones
-                UpdateGrabbableBones(_grabbableHands[i]);
+                UpdateGrabbableBones(i);
 
                 // Update the hand contact and hover events
                 UpdateContactAndHoverEvents(i);
@@ -349,13 +351,19 @@ namespace Leap.Unity.PhysicalHands
             UpdateGrabEvents();
         }
 
-        private void UpdateGrabbableBones(ContactHand hand)
+        private void UpdateGrabbableBones(int handID)
         {
-            foreach (var bone in hand.bones)
+            _grabbableHandsValues[handID].wasContacting = _grabbableHandsValues[handID].isContacting;
+            _grabbableHandsValues[handID].isContacting = false;
+
+            foreach (var bone in _grabbableHands[handID].bones)
             {
                 if (bone.GrabbableObjects.Contains(_rigid))
                 {
                     anyBoneGrabbable = true;
+
+                    _grabbableHandsValues[handID].isContacting = true;
+
                     if (_grabbableBones.TryGetValue(bone.contactHand, out List<ContactBone>[] storedBones))
                     {
                         storedBones[bone.Finger].Add(bone);
@@ -379,33 +387,25 @@ namespace Leap.Unity.PhysicalHands
 
         void UpdateContactAndHoverEvents(int handIndex)
         {
-            IPhysicalHandContact handContactEvent = null;
-
-            if (_grabbableHandsContacting[handIndex] != _grabbableHands[handIndex].IsContacting)
-            {
-                _grabbableHandsContacting[handIndex] = _grabbableHands[handIndex].IsContacting;
-
-                // We stopped contacting, so fire the contact exit event
-                if (!_grabbableHands[handIndex].IsContacting)
-                {
-                    if (_rigid.TryGetComponent<IPhysicalHandContact>(out handContactEvent))
-                    {
-                        handContactEvent.OnHandContactExit(_grabbableHands[handIndex]);
-                    }
-
-                    _grabbableHands[handIndex].physicalHandsManager.OnHandContactExit(_grabbableHands[handIndex], _rigid);
-                }
-            }
-
             // Fire the contacting event whether it changed or not
-            if (_grabbableHands[handIndex].IsContacting)
+            if (_grabbableHandsValues[handIndex].isContacting)
             {
-                if (handContactEvent != null || _rigid.TryGetComponent<IPhysicalHandContact>(out handContactEvent))
+                if (_rigid.TryGetComponent<IPhysicalHandContact>(out var handContactEvent))
                 {
                     handContactEvent.OnHandContact(_grabbableHands[handIndex]);
                 }
 
                 _grabbableHands[handIndex].physicalHandsManager.OnHandContact(_grabbableHands[handIndex], _rigid);
+            }
+            else if(_grabbableHandsValues[handIndex].wasContacting)
+            {
+                // We stopped contacting, so fire the contact exit event
+                if (_rigid.TryGetComponent<IPhysicalHandContact>(out var handContactEvent))
+                {
+                    handContactEvent.OnHandContactExit(_grabbableHands[handIndex]);
+                }
+
+                _grabbableHands[handIndex].physicalHandsManager.OnHandContactExit(_grabbableHands[handIndex], _rigid);
             }
 
             // Fire the hovering event
