@@ -17,10 +17,8 @@ namespace Leap.Unity.PhysicalHands
             transform.position = hand.PalmPosition;
             transform.rotation = hand.Rotation;
             width = hand.PalmWidth;
-            palmThickness = hand.Fingers[2].Bone(0).Width;
             tipPosition = hand.CalculateAverageKnucklePosition();
-            wristPosition = hand.WristPosition;
-            length = Vector3.Distance(tipPosition, wristPosition);
+            length = Vector3.Distance(tipPosition, hand.WristPosition);
             ContactUtils.SetupPalmCollider(palmCollider, palmEdgeColliders, hand);
         }
 
@@ -32,11 +30,6 @@ namespace Leap.Unity.PhysicalHands
             width = bone.Width;
             length = bone.Length;
             ContactUtils.SetupBoneCollider(boneCollider, bone);
-        }
-
-        internal override void PostFixedUpdateBone()
-        {
-
         }
 
         private void OnDrawGizmos()

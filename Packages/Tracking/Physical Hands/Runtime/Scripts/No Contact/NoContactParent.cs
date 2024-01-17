@@ -14,9 +14,5 @@ namespace Leap.Unity.PhysicalHands
         {
             GenerateHandsObjects(typeof(NoContactHand));
         }
-
-        internal override void PostFixedUpdateFrameLogic()
-        {
-        }
     }
 }

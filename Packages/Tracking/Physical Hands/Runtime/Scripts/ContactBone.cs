@@ -20,10 +20,8 @@ namespace Leap.Unity.PhysicalHands
         public int Joint => joint;
         public bool IsPalm => isPalm;
 
-        internal float width = 0f, length = 0f, palmThickness = 0f;
+        internal float width = 0f, length = 0f;
         internal Vector3 tipPosition = Vector3.zero;
-        internal Vector3 wristPosition = Vector3.zero;
-        internal Vector3 center = Vector3.zero;
 
         internal Rigidbody rigid;
         internal ArticulationBody articulation;
@@ -138,8 +136,6 @@ namespace Leap.Unity.PhysicalHands
         internal abstract void UpdatePalmBone(Hand hand);
         internal abstract void UpdateBone(Bone prevBone, Bone bone);
 
-        internal abstract void PostFixedUpdateBone();
-
 
         #region Interaction Functions
         internal void ProcessColliderQueue(Collider[] colliderCache, int count)
@@ -159,6 +155,7 @@ namespace Leap.Unity.PhysicalHands
                 _palmPoints[3] = _palmColCenter - (_palmColRotation * _palmExtentsReducedFlipped);
 
                 width = palmEdgeColliders[0].radius;
+                tipPosition = _palmColCenter + (_palmColRotation * (Vector3.forward * _palmColHalfExtents.z));
             }
             else
             {

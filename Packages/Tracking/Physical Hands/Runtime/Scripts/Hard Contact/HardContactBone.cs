@@ -159,18 +159,12 @@ namespace Leap.Unity.PhysicalHands
         #endregion
 
         #region Updating
-        internal override void PostFixedUpdateBone()
-        {
-            UpdateBoneWorldSpace();
-        }
 
         internal override void UpdateBone(Bone prevBone, Bone bone)
         {
             UpdateBoneSizes(prevBone, bone);
 
             UpdateBoneAngle(prevBone, bone);
-
-            UpdateBoneWorldSpace();
         }
 
         internal override void UpdatePalmBone(Hand hand)
@@ -206,8 +200,6 @@ namespace Leap.Unity.PhysicalHands
             {
                 articulation.angularVelocity = angularVelocity;
             }
-
-            UpdateBoneWorldSpace();
         }
 
         private void UpdateBoneSizes(Bone prevBone, Bone bone, bool forceUpdate = false)
@@ -311,26 +303,6 @@ namespace Leap.Unity.PhysicalHands
                 yDrive.forceLimit = hardContactParent.maxPalmVelocity * Time.fixedDeltaTime;
                 yDrive.target = _yTargetAngle;
                 articulation.yDrive = yDrive;
-            }
-        }
-
-        private void UpdateBoneWorldSpace()
-        {
-            if (isPalm)
-            {
-                PhysExts.ToWorldSpaceBox(palmCollider, out Vector3 center, out Vector3 halfExtents, out Quaternion orientation);
-                this.center = center;
-                this.tipPosition = center + (orientation * (Vector3.forward * halfExtents.z));
-                this.palmThickness = halfExtents.y * 2f;
-                this.wristPosition = transform.position - (transform.rotation * Quaternion.Inverse(contactHand.dataHand.Rotation) * (contactHand.dataHand.PalmPosition - contactHand.dataHand.WristPosition));
-            }
-            else
-            {
-                PhysExts.ToWorldSpaceCapsule(boneCollider, out Vector3 tip, out Vector3 bottom, out float radius);
-                this.tipPosition = tip;
-                this.width = radius;
-                this.length = Vector3.Distance(bottom, tip);
-                this.center = Vector3.Lerp(bottom, tip, 0.5f);
             }
         }
 

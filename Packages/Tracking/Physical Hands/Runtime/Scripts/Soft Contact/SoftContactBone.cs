@@ -21,10 +21,8 @@ namespace Leap.Unity.PhysicalHands
         internal override void UpdatePalmBone(Hand hand)
         {
             width = hand.PalmWidth;
-            palmThickness = hand.Fingers[2].Bone(0).Width;
             tipPosition = hand.CalculateAverageKnucklePosition();
-            wristPosition = hand.WristPosition;
-            length = Vector3.Distance(tipPosition, wristPosition);
+            length = Vector3.Distance(tipPosition, hand.WristPosition);
 
             UpdateWithInteractionEngineLogic(hand.PalmPosition, hand.Rotation);
 
@@ -119,31 +117,6 @@ namespace Leap.Unity.PhysicalHands
             }
 
             return deltaAxis * deltaAngle * Mathf.Deg2Rad / deltaTime;
-        }
-
-        internal override void PostFixedUpdateBone()
-        {
-            UpdateBoneWorldSpace();
-        }
-
-        private void UpdateBoneWorldSpace()
-        {
-            if (isPalm)
-            {
-                PhysExts.ToWorldSpaceBox(palmCollider, out Vector3 center, out Vector3 halfExtents, out Quaternion orientation);
-                this.center = center;
-                this.tipPosition = center + (orientation * (Vector3.forward * halfExtents.z));
-                this.palmThickness = halfExtents.y * 2f;
-                this.wristPosition = transform.position - (transform.rotation * Quaternion.Inverse(contactHand.dataHand.Rotation) * (contactHand.dataHand.PalmPosition - contactHand.dataHand.WristPosition));
-            }
-            else
-            {
-                PhysExts.ToWorldSpaceCapsule(boneCollider, out Vector3 tip, out Vector3 bottom, out float radius);
-                this.tipPosition = tip;
-                this.width = radius;
-                this.length = Vector3.Distance(bottom, tip);
-                this.center = Vector3.Lerp(bottom, tip, 0.5f);
-            }
         }
 
         #endregion

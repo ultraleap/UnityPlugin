@@ -160,11 +160,6 @@ namespace Leap.Unity.PhysicalHands
         internal void PostFixedUpdateHand()
         {
             PostFixedUpdateHandLogic();
-            palmBone.PostFixedUpdateBone();
-            for (int i = 0; i < bones.Length; i++)
-            {
-                bones[i].PostFixedUpdateBone();
-            }
         }
 
         internal abstract void PostFixedUpdateHandLogic();

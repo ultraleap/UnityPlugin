@@ -109,15 +109,9 @@ namespace Leap.Unity.PhysicalHands
 
         internal void PostFixedUpdateFrame()
         {
-            PostFixedUpdateFrameLogic();
             _leftHand.PostFixedUpdateHand();
             _rightHand.PostFixedUpdateHand();
         }
-
-        /// <summary>
-        /// Happens before the hands update is called.
-        /// </summary>
-        internal abstract void PostFixedUpdateFrameLogic();
 
         protected virtual void OnValidate()
         {

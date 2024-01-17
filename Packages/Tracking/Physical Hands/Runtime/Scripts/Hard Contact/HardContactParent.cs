@@ -49,11 +49,6 @@ namespace Leap.Unity.PhysicalHands
             GenerateHandsObjects(typeof(HardContactHand));
         }
 
-        internal override void PostFixedUpdateFrameLogic()
-        {
-            
-        }
-
         private static PhysicMaterial CreateHandPhysicsMaterial()
         {
             PhysicMaterial material = new PhysicMaterial("HandPhysics");
