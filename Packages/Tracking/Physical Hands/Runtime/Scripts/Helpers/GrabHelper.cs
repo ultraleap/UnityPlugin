@@ -245,21 +245,20 @@ namespace Leap.Unity.PhysicalHands
             }
 
             bool found = false;
-            float mass = 0;
+
             foreach (var item in _grabHelpers)
             {
                 if (item.Value.GrabbingHands.Contains(hand))
                 {
                     found = true;
-                    mass += item.Value.OriginalMass;
                     break;
                 }
             }
+
             if (found != hand.IsGrabbing)
             {
                 hand.isGrabbing = found;
             }
-            hand.grabMass = mass;
         }
         #endregion
 

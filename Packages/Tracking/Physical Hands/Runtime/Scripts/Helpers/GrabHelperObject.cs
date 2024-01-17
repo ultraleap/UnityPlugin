@@ -92,8 +92,6 @@ namespace Leap.Unity.PhysicalHands
         private Quaternion _newRotation;
 
         private bool _oldKinematic;
-        private float _originalMass = 1f;
-        internal float OriginalMass => _originalMass;
 
         internal bool _grabbingIgnored;
         private IgnorePhysicalHands _ignorePhysicalHands;
@@ -154,7 +152,6 @@ namespace Leap.Unity.PhysicalHands
         internal GrabHelperObject(Rigidbody rigid, GrabHelper manager)
         {
             _rigid = rigid;
-            _originalMass = _rigid.mass;
             // Doing this prevents objects from misaligning during rotation
             if (_rigid.maxAngularVelocity < 100f)
             {
@@ -652,6 +649,9 @@ namespace Leap.Unity.PhysicalHands
                 return;
 
             if (_grabbingHands.Contains(hand))
+                return;
+
+            if (hand.ghosted)
                 return;
 
             if (!_grabbingIgnored)

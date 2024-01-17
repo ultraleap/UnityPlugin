@@ -18,16 +18,21 @@ namespace Leap.Unity.PhysicalHands
         private ContactHand _rightHand;
         public ContactHand RightHand => _rightHand;
 
-        public PhysicalHandsManager _physicalHandsManager;
-
-        public PhysicalHandsManager PhysicalHandsManager => _physicalHandsManager;
+        public PhysicalHandsManager physicalHandsManager;
 
         private void Start()
         {
-            _physicalHandsManager = GetComponentInParent<PhysicalHandsManager>();
-            GenerateHands();
+            physicalHandsManager = GetComponentInParent<PhysicalHandsManager>();
 
-            PhysicalHandsManager.HandsInitiated();
+            if (physicalHandsManager != null)
+            {
+                GenerateHands();
+                physicalHandsManager.HandsInitiated();
+            }
+            else
+            {
+                Debug.LogWarning("No PhysicalHandsManager has been assigned to the ContactParent. Physical Hands will not work as the ContactParent can not be initialized");
+            }
         }
 
         internal abstract void GenerateHands();
@@ -55,13 +60,13 @@ namespace Leap.Unity.PhysicalHands
 
         internal void UpdateFrame(Frame inputFrame)
         {
-            UpdateHand(PhysicalHandsManager._leftHandIndex, _leftHand, inputFrame);
-            UpdateHand(PhysicalHandsManager._rightHandIndex, _rightHand, inputFrame);
+            UpdateHand(physicalHandsManager._leftHandIndex, _leftHand, inputFrame);
+            UpdateHand(physicalHandsManager._rightHandIndex, _rightHand, inputFrame);
         }
 
         private void UpdateHand(int index, ContactHand hand, Frame inputFrame)
         {
-            if (hand.IsHandPhysical && !Time.inFixedTimeStep)
+            if (hand.isHandPhysical && !Time.inFixedTimeStep)
             {
                 return;
             }
@@ -92,8 +97,8 @@ namespace Leap.Unity.PhysicalHands
 
         internal void OutputFrame(ref Frame inputFrame)
         {
-            OutputHand(PhysicalHandsManager._leftHandIndex, _leftHand, ref inputFrame);
-            OutputHand(PhysicalHandsManager._rightHandIndex, _rightHand, ref inputFrame);
+            OutputHand(physicalHandsManager._leftHandIndex, _leftHand, ref inputFrame);
+            OutputHand(physicalHandsManager._rightHandIndex, _rightHand, ref inputFrame);
         }
 
         private void OutputHand(int index, ContactHand hand, ref Frame inputFrame)
@@ -115,9 +120,9 @@ namespace Leap.Unity.PhysicalHands
 
         protected virtual void OnValidate()
         {
-            if (PhysicalHandsManager == null)
+            if (physicalHandsManager == null)
             {
-                _physicalHandsManager = GetComponentInParent<PhysicalHandsManager>();
+                physicalHandsManager = GetComponentInParent<PhysicalHandsManager>();
             }
         }
     }

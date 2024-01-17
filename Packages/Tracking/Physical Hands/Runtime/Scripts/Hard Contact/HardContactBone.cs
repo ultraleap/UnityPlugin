@@ -124,7 +124,7 @@ namespace Leap.Unity.PhysicalHands
                 upperLimit = 15f
             };
 
-            if (finger == 0)
+            if (finger == 0) // This is the Thumb, it requires a different Y drive too
             {
                 yDrive.lowerLimit = contactHand.Handedness == Chirality.Left ? -10f : -50f;
                 yDrive.upperLimit = contactHand.Handedness == Chirality.Left ? 50f : 10f;
@@ -132,7 +132,7 @@ namespace Leap.Unity.PhysicalHands
 
             articulation.yDrive = yDrive;
 
-            // Set Z limits to 0, locking them causes insane jittering
+            // Set Z limits to 0, locking them causes insane jittering, reuse the yDrive above to save on garbage
             yDrive.lowerLimit = 0f;
             yDrive.upperLimit = 0f;
             articulation.zDrive = yDrive;
@@ -175,8 +175,11 @@ namespace Leap.Unity.PhysicalHands
                 ContactUtils.InterpolatePalmBones(palmCollider, palmEdgeColliders, hand, hardContactHand.currentResetLerp);
             }
 
+            // If we are contacting and in total, the fingers have displaced above a magic threshold,
+            // reduce the force applied to the hardContactHand relative to how far it is from the tracking data
             if ((contactHand.isContacting || contactHand.isGrabbing) && hardContactHand.FingerContactDisplacement > 0.8f)
             {
+                // Reduce the force applied to the hardContactHand relative to how far it is from the tracking data
                 hardContactHand.contactForceModifier = hardContactHand.FingerContactDisplacement.Map(0.8f, 8f, 1f, 0.1f);
             }
             else
@@ -202,8 +205,17 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
+        /// <summary>
+        /// Update the sizes of the colliders that represent the hand to align best with the tracked data
+        /// Interpolates to the new size to avoid sudden jumps in size
+        /// </summary>
+        /// <param name="prevBone">The previous bone in the finger</param>
+        /// <param name="bone">The bone to update</param>
+        /// <param name="forceUpdate">Should this update always happen, or on a reduced frametime?</param>
         private void UpdateBoneSizes(Bone prevBone, Bone bone, bool forceUpdate = false)
         {
+            // If it is not a forced update, and we aren't in fixed timestep
+            // also ensure we aren't over-updating the size, it'snot necessary to change the colliders every update
             if (!forceUpdate &&
                 (!Time.inFixedTimeStep ||
                 Time.time < nextSizeUpdate))
@@ -211,11 +223,11 @@ namespace Leap.Unity.PhysicalHands
                 return;
             }
 
-            // set the time that the next size update is allowed when not resetting
+            // Set the time that the next size update is allowed when not resetting
+            // this avoids running this logic more often than necessary
             nextSizeUpdate = Time.time + SIZE_UPDATE_INTERVAL;
 
             float timeDelta = Time.time - prevSizeUpdate;
-
             prevSizeUpdate = Time.time;
 
             if (!IsBoneContacting)
@@ -225,7 +237,7 @@ namespace Leap.Unity.PhysicalHands
                     InterpolateBoneSize(prevBone.PrevJoint, prevBone.Rotation, bone.PrevJoint,
                         bone.Width, bone.Length, Mathf.Lerp(timeDelta * 10f, timeDelta, hardContactHand.currentResetLerp));
                 }
-                else
+                else // This is the proximal, we should work out where the bone is relative to the top of the palm
                 {
                     InterpolateKnucklePosition(prevBone, contactHand.dataHand, hardContactHand.currentResetLerp);
                     InterpolateBoneSize(contactHand.dataHand.PalmPosition, contactHand.dataHand.Rotation, finger == 0 ? prevBone.PrevJoint : prevBone.NextJoint,
@@ -245,8 +257,10 @@ namespace Leap.Unity.PhysicalHands
 
             _xDampening = Mathf.Lerp(_xDampening, hardContactParent.boneDamping, Time.fixedDeltaTime * 10);
 
+            float thumbEnterDistance = finger == 0 ? hardContactParent.contactThumbEnterDistance : hardContactParent.contactEnterDistance;
+
             if (hardContactHand.grabbingFingerDistances[finger] != 1 && 
-                hardContactHand.grabbingFingerDistances[finger] > (finger == 0 ? hardContactParent.contactThumbEnterDistance : hardContactParent.contactEnterDistance) && 
+                hardContactHand.grabbingFingerDistances[finger] > thumbEnterDistance && 
                 _xTargetAngle > _grabbingXDrive)
             {
                 _grabbingXDrive = Mathf.Clamp(Mathf.Lerp(_grabbingXDrive, _xTargetAngle, Time.fixedDeltaTime * 4),
@@ -269,7 +283,7 @@ namespace Leap.Unity.PhysicalHands
                 xDrive.target = _wasBoneGrabbing ? Mathf.Clamp(_xTargetAngle, articulation.xDrive.lowerLimit, _grabbingXDrive) : _xTargetAngle;
                 articulation.xDrive = xDrive;
 
-                if (joint == 0)
+                if (joint == 0) // Allow proximals to have some abduction too
                 {
                     _yTargetAngle = CalculateYJointAngle(prevBone.Rotation, bone.Rotation);
 
@@ -283,6 +297,10 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
+        /// <summary>
+        /// Set the default movement to follow the hand as closely as possible
+        /// Usually call this when there will not be any collisions expected, e.g.When ghosted 
+        /// </summary>
         private void SetDefaultArticulationDrives(Bone prevBone, Bone bone)
         {
             ArticulationDrive xDrive = articulation.xDrive;
@@ -306,12 +324,15 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
+        /// <summary>
+        /// Determine the displacement of the bone from the tracked hand, this will impact forces applied
+        /// </summary>
         internal void UpdateBoneDisplacement(Bone bone = null)
         {
             _displacementDistance = 0f;
             _displacementRotation = 0f;
 
-            if (bone == null && Finger != 5)
+            if (bone == null && !isPalm)
             {
                 return;
             }

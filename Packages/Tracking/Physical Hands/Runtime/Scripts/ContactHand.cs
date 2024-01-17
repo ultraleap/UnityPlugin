@@ -18,6 +18,9 @@ namespace Leap.Unity.PhysicalHands
         internal ContactBone[] bones;
         internal ContactBone palmBone;
 
+        /// <summary>
+        /// Is the hand tracked from a visual sense?
+        /// </summary>
         internal Chirality _handedness = Chirality.Left;
         public Chirality Handedness => _handedness;
 
@@ -25,7 +28,13 @@ namespace Leap.Unity.PhysicalHands
         internal Hand dataHand = new Hand();
         [SerializeField]
         internal bool tracked = false, resetting = false, ghosted = false;
+
+        /// <summary>
+        /// Is the hand going to apply physics forces or should it pass through objects?
+        /// If false, ignores advanced grabbing approaches like bones facing eachother, falling back to finger distances
+        /// </summary>
         internal bool isHandPhysical = true;
+
         /// <summary>
         /// Is the hand tracked from a visual sense?
         /// </summary>
@@ -35,28 +44,19 @@ namespace Leap.Unity.PhysicalHands
         /// </summary>
         public bool Ghosted => ghosted;
 
-        /// <summary>
-        /// Is the hand going to apply physics forces or should it pass through objects?
-        /// </summary>
-        public bool IsHandPhysical => isHandPhysical;
-
         internal ContactParent contactParent = null;
-        internal PhysicalHandsManager physicalHandsManager => contactParent.PhysicalHandsManager;
+        internal PhysicalHandsManager physicalHandsManager => contactParent.physicalHandsManager;
 
         #region Interaction Data
-        internal bool isContacting = false, isHovering = false, isCloseToObject = false, isGrabbing = false, isIntersecting = false;
+        internal bool isContacting = false, isHovering = false, isCloseToObject = false, isGrabbing = false;
         public bool IsHovering => isHovering;
         public bool IsContacting => isContacting;
         public bool IsCloseToObject => isCloseToObject;
-        public bool IsIntersecting => isIntersecting;
 
         public bool IsGrabbing => isGrabbing;
 
         protected Vector3 _oldDataPosition, _oldContactPosition;
         protected Quaternion _oldDataRotation, _oldContactRotation;
-
-        internal float grabMass = 0f;
-        public float GrabMass => grabMass;
 
         /// <summary>
         /// These values will need to be manually calculated if there are no rigidbodies on the bones.
@@ -107,18 +107,25 @@ namespace Leap.Unity.PhysicalHands
         /// <param name="hand">The original data hand coming from the input frame</param>
         internal abstract void BeginHand(Hand hand);
 
-
+        /// <summary>
+        /// Update the hand using new tracking data. Updated each bone includin the palm and tidies up any old data that may need to be updated
+        /// </summary>
+        /// <param name="hand">The tracking data hand to update with</param>
         internal void UpdateHand(Hand hand)
         {
             dataHand.CopyFrom(hand);
             UpdateHandLogic(hand);
+
             // Update the bones. Palm first
             palmBone.UpdatePalmBone(hand);
+
             for (int i = 0; i < bones.Length; i++)
             {
                 bones[i].UpdateBone(hand.Fingers[bones[i].Finger].bones[bones[i].joint], hand.Fingers[bones[i].Finger].bones[bones[i].joint + 1]);
             }
+
             CacheHandData(dataHand);
+
             if (Time.inFixedTimeStep)
             {
                 HandleIgnoredObjects();
@@ -179,7 +186,7 @@ namespace Leap.Unity.PhysicalHands
             Leap.Hand leapHand = TestHandFactory.MakeTestHand(isLeft: Handedness == Chirality.Left ? true : false, pose: TestHandFactory.TestHandPose.HeadMountedB);
             palmBone = new GameObject($"{(Handedness == Chirality.Left ? "Left" : "Right")} Palm", boneType, typeof(BoxCollider), typeof(CapsuleCollider), typeof(CapsuleCollider), typeof(CapsuleCollider)).GetComponent<ContactBone>();
 
-            palmBone.gameObject.layer = contactParent.PhysicalHandsManager.HandsResetLayer;
+            palmBone.gameObject.layer = contactParent.physicalHandsManager.HandsResetLayer;
             palmBone.transform.SetParent(transform);
             palmBone.transform.position = leapHand.PalmPosition;
             palmBone.transform.rotation = leapHand.Rotation;
@@ -209,7 +216,7 @@ namespace Leap.Unity.PhysicalHands
 
                     bones[boneArrayIndex] = new GameObject($"{HandUtils.FingerIndexToName(fingerIndex)} {HandUtils.JointIndexToName(jointIndex + 1)}", boneType, typeof(CapsuleCollider)).GetComponent<ContactBone>();
                     bone = bones[boneArrayIndex];
-                    bone.gameObject.layer = contactParent.PhysicalHandsManager.HandsResetLayer;
+                    bone.gameObject.layer = contactParent.physicalHandsManager.HandsResetLayer;
                     bone.transform.SetParent(lastTransform);
 
                     bone.finger = fingerIndex;

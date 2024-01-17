@@ -37,12 +37,15 @@ namespace Leap.Unity.PhysicalHands
         #endregion
 
         #region Interaction Data
+        // The distance from any collider that the bone must be to allow the hand to re-enable collision after a teleportation event
         private static float SAFETY_CLOSE_DISTANCE = 0.005f;
 
         internal class ClosestColliderDirection
         {
+            /// <summary>
+            /// Is this bone contacting the collider associated with this ClosestColliderDirection?
+            /// </summary>
             public bool isContactingCollider;
-
             /// <summary>
             /// The closest position on the hovering bone
             /// </summary>
@@ -86,6 +89,11 @@ namespace Leap.Unity.PhysicalHands
         [field: SerializeField, Tooltip("Is the bone contacting with an object? The contact distances are set in the Physics Provider.")]
         public bool IsBoneContacting { get; private set; } = false;
 
+        /// <summary>
+        /// Determine if this ContactBone is touching a given Rigidbody
+        /// </summary>
+        /// <param name="rigid">The rigidbody to check</param>
+        /// <returns>Whether the bone is contacting the given RigidBody</returns>
         public bool IsBoneContactingRigid(Rigidbody rigid)
         {
             _nearbyObjects.TryGetValue(rigid, out Dictionary<Collider, ClosestColliderDirection> result);
@@ -169,6 +177,12 @@ namespace Leap.Unity.PhysicalHands
             IsBoneReadyToGrab = _grabObjects.Count > 0;
         }
 
+        /// <summary>
+        /// Find which colliders near the hand should be tracked in terms of contact possibilities and cache them.
+        /// Populate a copy of <see cref="ClosestColliderDirection"/> for each collider for use in contact and grab detection.
+        /// </summary>
+        /// <param name="colliderCache">A cached array of colliders that are considered close enough to the ContactBone</param>
+        /// <param name="count">The number of colliders to look through</param>
         private void UpdateObjectDistances(Collider[] colliderCache, int count)
         {
             _nearestObjectDistance = float.MaxValue;
@@ -213,14 +227,14 @@ namespace Leap.Unity.PhysicalHands
 
                 boneDistance = Mathf.Clamp(distance - width, 0, float.MaxValue);
 
-                hover = boneDistance <= contactParent.PhysicalHandsManager.HoverDistance;
+                hover = boneDistance <= contactParent.physicalHandsManager.HoverDistance;
 
                 // Only add valid objects
                 if (collider.attachedRigidbody != null)
                 {
                     if (hover)
                     {
-                        bool contacting = boneDistance <= (IsPalm ? contactParent.PhysicalHandsManager.ContactDistance * 2f : contactParent.PhysicalHandsManager.ContactDistance);
+                        bool contacting = boneDistance <= (IsPalm ? contactParent.physicalHandsManager.ContactDistance * 2f : contactParent.physicalHandsManager.ContactDistance);
 
                         IsBoneHovering = true;
                         contactHand.isHovering = true;
@@ -276,8 +290,11 @@ namespace Leap.Unity.PhysicalHands
                     }
                 }
 
-                // Safety
-                UpdateSafetyCollider(collider, boneDistance == 0, boneDistance <= SAFETY_CLOSE_DISTANCE);
+                // Check if we are close to the collider to ignore collisions after a teleport
+                if (boneDistance <= SAFETY_CLOSE_DISTANCE)
+                {
+                    contactHand.isCloseToObject = true;
+                }
             }
 
             foreach (var colliderPairs in _nearbyObjects)
@@ -295,21 +312,6 @@ namespace Leap.Unity.PhysicalHands
                             _debugB = col.Value.bonePos + (col.Value.direction * (col.Value.distance));
                         }
                     }
-                }
-            }
-        }
-
-        private void UpdateSafetyCollider(Collider collider, bool intersect, bool closeToObject)
-        {
-            if (WillColliderAffectBone(collider))
-            {
-                if (closeToObject)
-                {
-                    contactHand.isCloseToObject = true;
-                }
-                if (intersect)
-                {
-                    contactHand.isIntersecting = true;
                 }
             }
         }
@@ -440,19 +442,6 @@ namespace Leap.Unity.PhysicalHands
         {
             _grabbedObjects.Remove(rigid);
             IsBoneGrabbing = _grabbedObjects.Count > 0;
-        }
-
-        private bool WillColliderAffectBone(Collider collider)
-        {
-            if (contactHand.physicalHandsManager.InterHandCollisions && collider.gameObject.TryGetComponent<ContactBone>(out var bone)/* && collider.attachedRigidbody.TryGetComponent<PhysicsIgnoreHelpers>(out var temp) && temp.IsThisHandIgnored(this)*/)
-            {
-                return false;
-            }
-            if (collider != null)
-            {
-                return true;
-            }
-            return false;
         }
 
         private void OnDrawGizmos()
