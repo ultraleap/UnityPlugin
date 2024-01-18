@@ -10,7 +10,7 @@ namespace Leap.Unity.PhysicalHands
 {
 #if UNITY_EDITOR
     [InitializeOnLoad]
-    public static class PhysicalHandsSettingsPopup
+    internal static class PhysicalHandsSettingsPopup
     {
         static PhysicalHandsSettingsPopupWindow window;
 
@@ -52,7 +52,7 @@ namespace Leap.Unity.PhysicalHands
         }
     }
 
-    public class PhysicalHandsSettingsPopupWindow : EditorWindow
+    internal class PhysicalHandsSettingsPopupWindow : EditorWindow
     {
         private void OnGUI()
         {

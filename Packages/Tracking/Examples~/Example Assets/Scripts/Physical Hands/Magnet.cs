@@ -12,8 +12,10 @@ namespace Leap.Unity.Examples
 {
     public class Magnet : MonoBehaviour
     {
-        public float DISTANCE_TO_DETACH = 0.1f;
+        [Tooltip("How far away from each other can the magnets get before they stop being magnetic.")]
+        public float distanceToDetach = 0.1f;
 
+        [Tooltip("How many magnets can be attached to this one?")]
         public int maximumAttachedMagnets = 4;
 
         (ConfigurableJoint, Magnet)[] attachedMagnets; 
@@ -77,7 +79,7 @@ namespace Leap.Unity.Examples
             {
                 if (attachedMagnets[i].Item1 != null)
                 {
-                    if (Vector3.Distance(transform.position, attachedMagnets[i].Item2.transform.position) > DISTANCE_TO_DETACH)
+                    if (Vector3.Distance(transform.position, attachedMagnets[i].Item2.transform.position) > distanceToDetach)
                     {
                         Destroy(attachedMagnets[i].Item1);
                     }
@@ -85,6 +87,9 @@ namespace Leap.Unity.Examples
             }
         }
 
+        /// <summary>
+        /// Remove all attached objects, great for resetting objects and turning of magnet all together
+        /// </summary>
         public void RemoveAllAttachments()
         {
             for (int i = 0; i < attachedMagnets.Length; i++)

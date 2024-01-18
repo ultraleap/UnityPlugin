@@ -23,7 +23,13 @@ namespace Leap.Unity.Examples
         [Tooltip("The nearest two magnets can be before they are joined")]
         public float minimumMagneticPullDistance = 0.002f;
 
-        public float magneticPullStrength = 5;
+        [SerializeField]
+        private float magneticPullStrength = 5;
+        [SerializeField, Tooltip("How much force can the magnetic joint take before it breaks?")]
+        private float jointBreakForce = 100;
+
+
+        private float magneticAngularLimitDampening = 1;
 
         List<MagneticObject> nearbyMagneticObjects = new List<MagneticObject>();
 
@@ -98,7 +104,7 @@ namespace Leap.Unity.Examples
                     {
                         SoftJointLimitSpring angularLimits = new SoftJointLimitSpring();
 
-                        angularLimits.damper = 1;
+                        angularLimits.damper = magneticAngularLimitDampening;
 
                         var joint = gameObject.AddComponent<ConfigurableJoint>();
                         joint.connectedBody = otherMagnet.rbody;
@@ -115,7 +121,7 @@ namespace Leap.Unity.Examples
                         joint.projectionDistance = 0.01f;
                         joint.enableCollision = true;
 
-                        joint.breakForce = 100;
+                        joint.breakForce = jointBreakForce;
 
                         magneticPoint.AddAttachment(joint, nearestOtherMagneticPoint);
                         nearestOtherMagneticPoint.AddAttachment(joint, magneticPoint);
@@ -128,6 +134,9 @@ namespace Leap.Unity.Examples
             }
         }
 
+        /// <summary>
+        /// Force this magnetic object to detach from all attached magnets
+        /// </summary>
         public void ForceDetatchMagnets()
         {
             foreach (var magnet in magneticPoints)

@@ -17,7 +17,8 @@ namespace Leap.Unity.PhysicalHands
 
             specifyConditionalDrawing("_contactMode", new int[]{
                                             (int)PhysicalHandsManager.ContactMode.HardContact},
-                                            "_showFadingHandsWithTrackingData");
+                                            "_showFadingHandsWithTrackingData",
+                                            "fadingHandsPrefab");
 
             specifyConditionalDrawing("_showFadingHandsWithTrackingData", "fadingHandsPrefab");
 

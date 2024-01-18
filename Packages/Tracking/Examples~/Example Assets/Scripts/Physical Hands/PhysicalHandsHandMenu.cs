@@ -44,21 +44,5 @@ namespace Leap.Unity.PhysicalHands.Examples
             }
             ButtonsEnabled = !ButtonsEnabled;
         }
-
-        //private IEnumerator ScaleButton(GameObject button, Vector3 targetScale, Vector3 startScale)
-        //{
-        //    button.transform.localScale = startScale;
-
-        //    float timeTakes = 1f; // animation will take one second
-        //    float elapsedTime = 0;
-
-        //    while (elapsedTime < timeTakes)
-        //    {
-        //        button.transform.localScale = Vector3.Lerp(button.transform.localScale, targetScale, (elapsedTime / timeTakes));
-
-        //        elapsedTime += Time.deltaTime;
-        //        yield return new WaitForEndOfFrame();
-        //    }
-        //}
     }
 }

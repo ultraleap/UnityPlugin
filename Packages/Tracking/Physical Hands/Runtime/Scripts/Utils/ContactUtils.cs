@@ -34,6 +34,7 @@ namespace Leap.Unity.PhysicalHands
             Vector3 palmSize = CalculatePalmSize(hand);
             if (palmEdges != null)
             {
+                // This code places colliders around the palm to get a better representation of the palm than a single box collider
                 collider.center = new Vector3(0f, palmSize.y * 0.1f, -0.015f);
                 collider.size = new Vector3(palmSize.x - palmSize.y, palmSize.y - (palmSize.y * 0.2f), palmSize.z - (palmSize.y / 2f));
 

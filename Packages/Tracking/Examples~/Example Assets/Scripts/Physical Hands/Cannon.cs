@@ -33,6 +33,10 @@ namespace Leap.Unity.Examples
             }
         }
 
+
+        /// <summary>
+        /// Add force to all objects which are within the cannon trigger volume
+        /// </summary>
         public void Launch()
         {
             foreach (var obj in innerObjects)

@@ -249,6 +249,10 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
+        /// <summary>
+        /// Sets the contact mode of the PhysicalHandsManager. This will destroy the previous contact parent and clear all values associated with it then create a new contact parent.
+        /// </summary>
+        /// <param name="mode">Which contact mode should we switch to?</param>
         public void SetContactMode(ContactMode mode)
         {
             _contactMode = mode;
@@ -290,7 +294,7 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
-        public void InitializeDistanceFadeHands()
+        void InitializeDistanceFadeHands()
         {
             if(currentFadingHands != null)
             {

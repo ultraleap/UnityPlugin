@@ -85,6 +85,9 @@ namespace Leap.Unity.PhysicalHands.Examples
             _particleSystem.Stop();
         }
 
+        /// <summary>
+        /// Stops rocket from adding force and stops the particle effect
+        /// </summary>
         public void StopLaunch()
         {
             StopAllCoroutines();

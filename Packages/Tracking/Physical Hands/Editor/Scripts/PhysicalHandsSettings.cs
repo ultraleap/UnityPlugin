@@ -13,9 +13,9 @@ namespace Leap.Unity.PhysicalHands
     {
         internal struct RecommendedSetting
         {
-            public string recommended, description;
-            public SerializedProperty property;
-            public bool impactsPerformance;
+            internal string recommended, description;
+            internal SerializedProperty property;
+            internal bool impactsPerformance;
         }
 
         private const string PHYSICS_SETTINGS_ASSET_PATH = "ProjectSettings/DynamicsManager.asset";
