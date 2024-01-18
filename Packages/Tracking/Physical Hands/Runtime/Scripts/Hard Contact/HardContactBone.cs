@@ -177,7 +177,7 @@ namespace Leap.Unity.PhysicalHands
 
             // If we are contacting and in total, the fingers have displaced above a magic threshold,
             // reduce the force applied to the hardContactHand relative to how far it is from the tracking data
-            if ((contactHand.isContacting || contactHand.isGrabbing) && hardContactHand.FingerContactDisplacement > 0.8f)
+            if (contactHand.isContacting || contactHand.isGrabbing)
             {
                 // Reduce the force applied to the hardContactHand relative to how far it is from the tracking data
                 hardContactHand.contactForceModifier = hardContactHand.FingerContactDisplacement.Map(0.8f, 8f, 1f, 0.1f);

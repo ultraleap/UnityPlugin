@@ -42,10 +42,6 @@ namespace Leap.Unity.PhysicalHands
 
         #region Settings
 
-        internal Vector3 computedPhysicsPosition;
-        internal Quaternion computedPhysicsRotation;
-        internal float computedHandDistance;
-
         internal float contactForceModifier; // a value between 0.1 and 1 relating to how far the tracked hand is from the articulation hand. 0.1 is far away, 1 is near. Only changes when in contact/grabbing
 
         internal int[] grabbingFingers;
@@ -163,17 +159,13 @@ namespace Leap.Unity.PhysicalHands
         {
             _velocity = ((HardContactBone)palmBone).articulation.velocity;
             _angularVelocity = ((HardContactBone)palmBone).articulation.angularVelocity;
-            CacheComputedPositions();
             CalculateDisplacementsAndLimits();
         }
 
-        private void CacheComputedPositions()
-        {
-            computedPhysicsPosition = palmBone.transform.position;
-            computedPhysicsRotation = palmBone.transform.rotation;
-            computedHandDistance = Vector3.Distance(_oldDataPosition, computedPhysicsPosition);
-        }
-
+        /// <summary>
+        /// Calculate the displacement of each bone/finger.
+        /// This will be used to determine what forces should be applied to the articulation bodies
+        /// </summary>
         private void CalculateDisplacementsAndLimits()
         {
             _overallFingerDisplacement = 0f;
@@ -188,16 +180,12 @@ namespace Leap.Unity.PhysicalHands
                 contactingFingers++;
             }
 
-            bool contacting;
-            bool hasFingerGrasped;
             for (int fingerIndex = 0; fingerIndex < FINGERS; fingerIndex++)
             {
-                contacting = false;
-
-                hasFingerGrasped = false;
+                bool contacting = false;
+                bool hasFingerGrasped = false;
 
                 grabbingFingerDistances[fingerIndex] = 1f;
-
                 grabbingFingers[fingerIndex] = -1;
 
                 for (int jointIndex = FINGER_BONES - 1; jointIndex >= 0; jointIndex--)
@@ -215,6 +203,7 @@ namespace Leap.Unity.PhysicalHands
 
                     hasFingerGrasped = ((HardContactBone)bones[boneArrayIndex]).CalculateGrabbingLimits(hasFingerGrasped);
                 }
+
                 if (contacting)
                 {
                     contactingFingers++;
@@ -229,26 +218,22 @@ namespace Leap.Unity.PhysicalHands
             if (IsGrabbing)
             {
                 _displacementGrabCooldownCurrent = _displacementGrabCooldown;
+                _contactFingerDisplacement = 0f;
             }
-
-            if (contactingFingers > 0)
+            else
             {
-                if (IsGrabbing)
-                {
-                    _contactFingerDisplacement = 0f;
-                }
-                else
-                {
-                    _contactFingerDisplacement = _overallFingerDisplacement * Mathf.Max(6 - contactingFingers, 1);
+                _contactFingerDisplacement = _overallFingerDisplacement * contactingFingers;
 
-                    if (_displacementGrabCooldown > 0)
+                if (_displacementGrabCooldown > 0)
+                {
+                    _displacementGrabCooldownCurrent -= Time.fixedDeltaTime;
+
+                    if (contactingFingers > 0)
                     {
-                        _displacementGrabCooldownCurrent -= Time.fixedDeltaTime;
-                        if (_displacementGrabCooldownCurrent <= 0)
-                        {
-                            _displacementGrabCooldownCurrent = 0f;
-                        }
-                        _contactFingerDisplacement = Mathf.Lerp(_contactFingerDisplacement, 0, Mathf.InverseLerp(0.5f, 1.0f, (_displacementGrabCooldownCurrent / _displacementGrabCooldown).EaseOut()));
+                        // Lerp based on the current cooldown after releasing a grab
+                        // as the _displacementGrabCooldownCurrent counts down, t also reduces - so over time moves from 0 to _contactFingerDisplacement in the lerp
+                        float t = Mathf.Clamp01((_displacementGrabCooldownCurrent / _displacementGrabCooldown).EaseOut());
+                        _contactFingerDisplacement = Mathf.Lerp(_contactFingerDisplacement, 0, t);
                     }
                 }
             }
@@ -276,6 +261,10 @@ namespace Leap.Unity.PhysicalHands
             _wasGrabbing = IsGrabbing;
         }
 
+        /// <summary>
+        /// When the tracked hand gets too far from the articulation bodies, we should teleport the hand and mark it as "Ghosted"
+        /// This causes it to not interact with the objects until it is moved to an open space
+        /// </summary>
         private void HandleTeleportingHands()
         {
             _justGhosted = false;
@@ -294,7 +283,6 @@ namespace Leap.Unity.PhysicalHands
             if (Time.frameCount - _lastFrameTeleport >= _teleportFrameCount && ghosted && !isCloseToObject)
             {
                 ChangeHandLayer(physicalHandsManager.HandsLayer);
-
                 ghosted = false;
             }
         }

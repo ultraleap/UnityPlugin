@@ -27,9 +27,10 @@ namespace Leap.Unity.PhysicalHands
         internal Dictionary<ContactHand, float[]> FingerStrengths => _fingerStrengths;
 
         // Helpers
-        private Dictionary<Rigidbody, GrabHelperObject> _grabHelpers = new Dictionary<Rigidbody, GrabHelperObject>();
-        private HashSet<Rigidbody> _grabRigids = new HashSet<Rigidbody>();
-        private HashSet<Rigidbody> _hoveredItems = new HashSet<Rigidbody>();
+        private Dictionary<Rigidbody, GrabHelperObject> _grabHelperObjects = new Dictionary<Rigidbody, GrabHelperObject>();
+
+        private HashSet<Rigidbody> _hoveredRigids = new HashSet<Rigidbody>(); // A per-frame cache of hovered rigidbodies to check for adding/removing vs previous frames
+        private HashSet<Rigidbody> _previousHoveredRigids = new HashSet<Rigidbody>();
 
         #endregion
 
@@ -57,7 +58,8 @@ namespace Leap.Unity.PhysicalHands
 
         private void OnPrePhysicsUpdate()
         {
-            UpdateOverlaps();
+            HandleHandOverlapChecks(_leftContactHand);
+            HandleHandOverlapChecks(_rightContactHand);
         }
 
         private void OnFixedFrame(Frame frame)
@@ -70,7 +72,7 @@ namespace Leap.Unity.PhysicalHands
         internal void ResetHelper()
         {
             // The current hands need to be cleared, including firing all relevand exit events on all grab helper objects
-            foreach (var helper in _grabHelpers.Values)
+            foreach (var helper in _grabHelperObjects.Values)
             {
                 if (helper.GrabState == GrabHelperObject.State.Grab)
                 {
@@ -80,9 +82,9 @@ namespace Leap.Unity.PhysicalHands
                 helper.ReleaseHelper();
             }
 
-            _grabHelpers.Clear();
-            _grabRigids.Clear();
-            _hoveredItems.Clear();
+            _grabHelperObjects.Clear();
+            _previousHoveredRigids.Clear();
+            _hoveredRigids.Clear();
 
             _fingerStrengths.Clear();
             _colliderCache = new Collider[128];
@@ -102,26 +104,16 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
-        private void UpdateOverlaps()
-        {
-            HandOverlaps(_leftContactHand);
-            HandOverlaps(_rightContactHand);
-        }
-
-        private void HandOverlaps(ContactHand hand)
+        /// <summary>
+        /// Used to create helper objects to assist with hover/contact/grabbing detection and fire events
+        /// Also trigger collision checks on bones
+        /// </summary>
+        private void HandleHandOverlapChecks(ContactHand hand)
         {
             hand.isHovering = false;
             hand.isContacting = false;
             hand.isCloseToObject = false;
 
-            HelperOverlaps(hand);
-        }
-
-        /// <summary>
-        /// Used to create helper objects.
-        /// </summary>
-        private void HelperOverlaps(ContactHand hand)
-        {
             float lerp = float.MaxValue;
             if (_fingerStrengths.ContainsKey(hand))
             {
@@ -147,22 +139,26 @@ namespace Leap.Unity.PhysicalHands
                 _colliderCache, 
                 physicalHandsManager.InteractionMask);
 
-            GrabHelperObject tempHelper;
+            // Clear and repopulate for this frame to compare to the prevous frame later
+            _hoveredRigids.Clear();
+
             for (int i = 0; i < results; i++)
             {
-                if (_colliderCache[i].attachedRigidbody != null)
+                // Cache this to avoid repeatedly calling native unity functions
+                Rigidbody collidersRigid = _colliderCache[i].attachedRigidbody;
+
+                if (collidersRigid != null)
                 {
-                    _hoveredItems.Add(_colliderCache[i].attachedRigidbody);
-                    if (_grabHelpers.TryGetValue(_colliderCache[i].attachedRigidbody, out tempHelper))
+                    _hoveredRigids.Add(collidersRigid);
+
+                    // Find the associated GrabHelperObject, if there isn't one, make one
+                    if (!_grabHelperObjects.TryGetValue(collidersRigid, out var helper))
                     {
-                        tempHelper.AddHand(hand);
+                        helper = new GrabHelperObject(collidersRigid, this);
+                        _grabHelperObjects.Add(collidersRigid, helper);
                     }
-                    else
-                    {
-                        GrabHelperObject helper = new GrabHelperObject(_colliderCache[i].attachedRigidbody, this);
-                        helper.AddHand(hand);
-                        _grabHelpers.Add(_colliderCache[i].attachedRigidbody, helper);
-                    }
+
+                    helper.AddHand(hand);
                 }
             }
 
@@ -190,39 +186,48 @@ namespace Leap.Unity.PhysicalHands
         #region Helper Updating
         private void UpdateHelpers()
         {
-            ApplyHovers();
+            RemoveUnhoveredGrabHelperObjects();
 
-            foreach (var helper in _grabHelpers)
+            foreach (var helper in _grabHelperObjects)
             {
                 helper.Value.UpdateHelper();
             }
         }
 
-        private void ApplyHovers()
+        /// <summary>
+        /// Handle any changes to the hover state of nearby rigidbodies
+        /// </summary>
+        private void RemoveUnhoveredGrabHelperObjects()
         {
-            _grabRigids.RemoveWhere(ValidateUnhoverRigids);
+            // Remove GrabHelperObjects where they are no longer in range of the hand
+            _previousHoveredRigids.RemoveWhere(ValidateUnhoverRigids);
 
-            foreach (var rigid in _hoveredItems)
+            // Update _previousHoveredRigids with newly hovered rigidbodies, ready for next frame
+            foreach (var rigid in _hoveredRigids)
             {
-                _grabRigids.Add(rigid);
+                _previousHoveredRigids.Add(rigid);
             }
-
-            _hoveredItems.Clear();
         }
 
+        /// <summary>
+        /// Remove GrabHelperObjects where they are no longer in range of the hand
+        /// Also release/drop any grabbed objects
+        /// </summary>
+        /// <param name="rigid">The rigidbody to check against</param>
+        /// <returns>True if the rigidbody is not hovered</returns>
         private bool ValidateUnhoverRigids(Rigidbody rigid)
         {
-            if (!_hoveredItems.Contains(rigid))
+            if (!_hoveredRigids.Contains(rigid))
             {
-                if (_grabHelpers.ContainsKey(rigid))
+                if (_grabHelperObjects.ContainsKey(rigid))
                 {
-                    if (_grabHelpers[rigid].GrabState == GrabHelperObject.State.Grab)
+                    if (_grabHelperObjects[rigid].GrabState == GrabHelperObject.State.Grab)
                     {
                         // Ensure we release the object first
-                        _grabHelpers[rigid].ReleaseObject();
+                        _grabHelperObjects[rigid].ReleaseObject();
                     }
-                    _grabHelpers[rigid].ReleaseHelper();
-                    _grabHelpers.Remove(rigid);
+                    _grabHelperObjects[rigid].ReleaseHelper();
+                    _grabHelperObjects.Remove(rigid);
                 }
                 return true;
             }
@@ -246,7 +251,7 @@ namespace Leap.Unity.PhysicalHands
 
             bool found = false;
 
-            foreach (var item in _grabHelpers)
+            foreach (var item in _grabHelperObjects)
             {
                 if (item.Value.GrabbingHands.Contains(hand))
                 {

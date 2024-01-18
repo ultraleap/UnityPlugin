@@ -445,6 +445,11 @@ namespace Leap.Unity.PhysicalHands
             _grabbingHandsPrevious.AddRange(_grabbingHands);
         }
 
+        /// <summary>
+        /// First check if a standard distance-based grab is occuring
+        /// Then check if bones are contacting the object and facing eachother for an advanced/gentle grab detection
+        ///     (Thumb or palm facing any other finger bone)
+        /// </summary>
         private void GrabbingCheck()
         {
             //Reset grab bools
@@ -565,19 +570,23 @@ namespace Leap.Unity.PhysicalHands
                 }
             }
 
-            int bone1Index = 0;
-
-            foreach (ContactHand hand in _grabbableHands)
+            for(int handIndex = 0; handIndex < _grabbableHands.Count; handIndex++)
             {
-                foreach (ContactBone bone1 in hand.bones)
+                // This hand is already grabbing, we don't need to check again
+                if (_grabbableHandsValues[handIndex].handGrabbing || _grabbingHands.Contains(_grabbableHands[handIndex]))
+                {
+                    continue;
+                }
+
+                int bone1Index = 0;
+
+                foreach (ContactBone bone1 in _grabbableHands[handIndex].bones)
                 {
                     if (bone1.GrabbableDirections.TryGetValue(_rigid, out var grabbableDirectionsB1))
                     {
                         int bone2Index = 0;
 
-                        int grabHandIndex1 = _grabbableHands.IndexOf(bone1.contactHand);
-
-                        foreach (ContactBone bone2 in hand.bones)
+                        foreach (ContactBone bone2 in _grabbableHands[handIndex].bones)
                         {
                             if (bone2Index < bone1Index) // Avoid double-checking the same index combinations
                             {
@@ -590,8 +599,6 @@ namespace Leap.Unity.PhysicalHands
 
                             if (bone2.GrabbableDirections.TryGetValue(_rigid, out var grabbableDirectionsB2))
                             {
-                                int grabHandIndex2 = _grabbableHands.IndexOf(bone2.contactHand);
-
                                 foreach (var directionPairB1 in grabbableDirectionsB1)
                                 {
                                     foreach (var directionPairB2 in grabbableDirectionsB2)
@@ -608,9 +615,7 @@ namespace Leap.Unity.PhysicalHands
                                         {
                                             if (bone1.contactHand == bone2.contactHand)
                                             {
-                                                _grabbableHandsValues[grabHandIndex1].handGrabbing = true;
-                                                _grabbableHandsValues[grabHandIndex2].handGrabbing = true;
-
+                                                _grabbableHandsValues[handIndex].handGrabbing = true;
                                                 RegisterGrabbingHand(bone1.contactHand);
                                             }
 
@@ -774,7 +779,6 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
-        //TODO try the bone within object checks WITH width passed in
         private bool DataHandIntersection(ContactHand hand)
         {
             if (!hand.isHandPhysical)
@@ -890,46 +894,33 @@ namespace Leap.Unity.PhysicalHands
             {
                 _rigid.isKinematic = false;
             }
-            PhysicsMovement(_newPosition, _newRotation, _rigid);
+            PhysicsMovement(_newPosition, _newRotation);
         }
 
-        // Ripped from IE
-        protected float _maxVelocity = 15F;
+        private const float MAX_VELOCITY_SQUARED = 100;
 
-        private void PhysicsMovement(Vector3 solvedPosition, Quaternion solvedRotation,
-                               Rigidbody intObj)
+        private void PhysicsMovement(Vector3 solvedPosition, Quaternion solvedRotation)
         {
-            Vector3 solvedCenterOfMass = solvedRotation * intObj.centerOfMass + solvedPosition;
-            Vector3 currCenterOfMass = intObj.rotation * intObj.centerOfMass + intObj.position;
+            Vector3 solvedCenterOfMass = solvedRotation * _rigid.centerOfMass + solvedPosition;
+            Vector3 currCenterOfMass = _rigid.rotation * _rigid.centerOfMass + _rigid.position;
 
             Vector3 targetVelocity = ContactUtils.ToLinearVelocity(currCenterOfMass, solvedCenterOfMass, Time.fixedDeltaTime);
+            Vector3 targetAngularVelocity = ContactUtils.ToAngularVelocity(_rigid.rotation, solvedRotation, Time.fixedDeltaTime);
 
-            Vector3 targetAngularVelocity = ContactUtils.ToAngularVelocity(intObj.rotation, solvedRotation, Time.fixedDeltaTime);
-
-            // Clamp targetVelocity by _maxVelocity.
+            // Clamp targetVelocity by MAX_VELOCITY_SQUARED.
             float targetSpeedSqrd = targetVelocity.sqrMagnitude;
-            if (targetSpeedSqrd > _maxVelocity * _maxVelocity)
+            if (targetSpeedSqrd > MAX_VELOCITY_SQUARED)
             {
-                float targetPercent = _maxVelocity / Mathf.Sqrt(targetSpeedSqrd);
+                float targetPercent = MAX_VELOCITY_SQUARED / targetSpeedSqrd;
                 targetVelocity *= targetPercent;
-                targetAngularVelocity *= targetPercent;
             }
 
-            intObj.velocity = targetVelocity;
+            _rigid.velocity = targetVelocity;
             if (targetAngularVelocity.IsValid())
             {
-                intObj.angularVelocity = targetAngularVelocity;
+                _rigid.angularVelocity = targetAngularVelocity;
             }
         }
-
-        // It's more stable to use physics movement currently
-        // Using this will result in large amounts of spaghetti
-        //private void KinematicMovement(Vector3 solvedPosition, Quaternion solvedRotation,
-        //                       Rigidbody intObj)
-        //{
-        //    intObj.MovePosition(solvedPosition);
-        //    intObj.MoveRotation(solvedRotation);
-        //}
 
         #region Throwing
 
