@@ -131,18 +131,23 @@ namespace Leap.Unity.PhysicalHands
 
             float radiusAmount = PhysExts.MaxVec3(Vector3.Scale(hand.palmBone.palmCollider.size, PhysExts.AbsVec3(hand.palmBone.transform.lossyScale)));
 
-            int results = Physics.OverlapCapsuleNonAlloc(hand.palmBone.transform.position + 
+            // Create a capsule that spans across the length of the hand and is inflated by the hover distance. Detect all interactable colliders it contains
+            //      Point0 = at the base of the palm
+            //      Point1 = at the tip of the most extended finger
+            //      Radius = the size of the palm + the hover distance
+            //      Cache the result
+            //      Use the interaction mask that the hands use to collide
+            int nearbyObjectCount = Physics.OverlapCapsuleNonAlloc(hand.palmBone.transform.position + 
                 (-hand.palmBone.transform.up * 0.025f) + ((hand.Handedness == Chirality.Left ? hand.palmBone.transform.right : -hand.palmBone.transform.right) * 0.015f),
-                // Interpolate the tip position so we keep it relative to the straightest finger
                 hand.palmBone.transform.position + (-hand.palmBone.transform.up * Mathf.Lerp(0.025f, 0.07f, lerp)) + (hand.palmBone.transform.forward * Mathf.Lerp(0.06f, 0.02f, lerp)),
                 radiusAmount + physicalHandsManager.HoverDistance, 
                 _colliderCache, 
                 physicalHandsManager.InteractionMask);
 
-            // Clear and repopulate for this frame to compare to the prevous frame later
+            // Clear and repopulate for this frame to compare to the prevous frame
             _hoveredRigids.Clear();
 
-            for (int i = 0; i < results; i++)
+            for (int i = 0; i < nearbyObjectCount; i++)
             {
                 // Cache this to avoid repeatedly calling native unity functions
                 Rigidbody collidersRigid = _colliderCache[i].attachedRigidbody;
@@ -162,10 +167,10 @@ namespace Leap.Unity.PhysicalHands
                 }
             }
 
-            hand.palmBone.ProcessColliderQueue(_colliderCache, results);
+            hand.palmBone.ProcessColliderQueue(_colliderCache, nearbyObjectCount);
             foreach (var bone in hand.bones)
             {
-                bone.ProcessColliderQueue(_colliderCache, results);
+                bone.ProcessColliderQueue(_colliderCache, nearbyObjectCount);
             }
         }
 
