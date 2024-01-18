@@ -95,12 +95,12 @@ namespace Leap.Unity.PhysicalHands
         {
             if (_leftContactHand.tracked)
             {
-                UpdateHandStatistics(_leftContactHand);
+                UpdateFingerStrengthValues(_leftContactHand);
             }
 
             if (_rightContactHand.tracked)
             {
-                UpdateHandStatistics(_rightContactHand);
+                UpdateFingerStrengthValues(_rightContactHand);
             }
         }
 
@@ -169,7 +169,7 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
-        private void UpdateHandStatistics(ContactHand hand)
+        private void UpdateFingerStrengthValues(ContactHand hand)
         {
             if (!_fingerStrengths.ContainsKey(hand))
             {

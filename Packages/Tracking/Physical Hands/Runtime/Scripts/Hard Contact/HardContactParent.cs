@@ -17,19 +17,12 @@ namespace Leap.Unity.PhysicalHands
         internal PhysicMaterial PhysicsMaterial => _physicsMaterial;
 
         #region Settings
-        [SerializeField, HideInInspector, Tooltip("The velocity that the hand will reduce down to, the further it gets away from the original data hand. " +
-                "Increasing this number will cause the hand to appear \"stronger\" when pushing into objects, if less stable.")]
-        internal float minPalmVelocity = 50f;
         [SerializeField, HideInInspector, Tooltip("The velocity at which the hand will move when not contacting or grabbing any object. Reducing this number may result in additional hand latency.")]
         internal float maxPalmVelocity = 300f;
-        [SerializeField, HideInInspector]
-        internal float minPalmAngularVelocity = 6000, maxPalmAngularVelocity = 8000f;
         [SerializeField, HideInInspector]
         internal float minFingerVelocity = 50f, maxFingerVelocity = 200f;
         [SerializeField, HideInInspector, Range(0.01f, 0.5f), Tooltip("The maximum distance at which the hand will then jump back to the data hand.")]
         internal float teleportDistance = 0.1f;
-        [SerializeField, HideInInspector]
-        internal float maxWeight = 15f;
         [SerializeField, HideInInspector]
         internal float boneMass = 0.1f, boneStiffness = 100f, boneDamping = 1f;
 
@@ -38,7 +31,7 @@ namespace Leap.Unity.PhysicalHands
         [SerializeField, HideInInspector]
         internal int handSolverIterations = 30, handSolverVelocityIterations = 20;
 
-        internal float contactEnterDistance = 0.004f, contactExitDistance = 0.012f;
+        internal float contactEnterDistance = 0.002f, contactExitDistance = 0.012f;
         internal float contactThumbEnterDistance = 0.005f, contactThumbExitDistance = 0.02f;
 
         #endregion

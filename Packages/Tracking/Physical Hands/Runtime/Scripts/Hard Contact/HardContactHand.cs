@@ -12,13 +12,14 @@ namespace Leap.Unity.PhysicalHands
 {
     public class HardContactHand : ContactHand
     {
-        private const int RESET_FRAME_COUNT = 2, TELEPORT_FRAME_COUNT = 5, RESET_FRAME_TELEPORT_COUNT = 10;
+        // Values used to delay the enabling of Hard Contact Hands after a teleport
+        private const int TELEPORT_FRAME_COUNT = 5, RESET_FRAME_TELEPORT_COUNT = 10;
 
         private HardContactParent hardContactParent => contactParent as HardContactParent;
 
-        private int _resetCounter = 2, _teleportFrameCount = 10;
-        private int _layerMask = 0;
-        private int _lastFrameTeleport;
+        private bool resetHandled = false;
+
+        private int _teleportCooldownFrame = 10; // The frame that we can safely re-enable hands after teleporting
 
         private bool _wasGrabbing, _justGhosted;
         private float _timeOnReset;
@@ -51,35 +52,30 @@ namespace Leap.Unity.PhysicalHands
         internal override void BeginHand(Hand hand)
         {
             dataHand.CopyFrom(hand);
-            if(!resetting)
+
+            if(resetting)
             {
-                _resetCounter = RESET_FRAME_COUNT;
-                resetting = true;
-                _teleportFrameCount = RESET_FRAME_TELEPORT_COUNT;
-                
-                ghosted = true;
-                for (int i = 0; i < 32; i++)
+                if (!resetHandled) // First reset the Hard Contact Hand
                 {
-                    if (!Physics.GetIgnoreLayerCollision(physicalHandsManager.HandsLayer, i))
-                    {
-                        _layerMask = _layerMask | 1 << i;
-                    }
+                    ResetHardContactHand();
+                    resetHandled = true;
                 }
+                else // Finish the reset
+                {
+                    CompleteReset();
+                    resetting = false;
+                }
+            }
+            else // Begin resetting
+            {
+                ghosted = true;
+                resetting = true;
+                resetHandled = false;
+
+                _teleportCooldownFrame = Time.frameCount + RESET_FRAME_TELEPORT_COUNT;
+
                 gameObject.SetActive(true);
                 palmBone.gameObject.SetActive(false);
-            }
-            else
-            {
-                _resetCounter--;
-                switch (_resetCounter)
-                {
-                    case 1:
-                        ResetHardContactHand();
-                        break;
-                    case 0:
-                        CompleteReset();
-                        break;
-                }
             }
         }
 
@@ -119,7 +115,6 @@ namespace Leap.Unity.PhysicalHands
 
         private void ResetHardContactHand()
         {
-            _lastFrameTeleport = Time.frameCount;
             ghosted = true;
             ChangeHandLayer(physicalHandsManager.HandsResetLayer);
             if (gameObject.activeInHierarchy)
@@ -268,19 +263,19 @@ namespace Leap.Unity.PhysicalHands
         private void HandleTeleportingHands()
         {
             _justGhosted = false;
+
             // Fix the hand if it gets into a bad situation by teleporting and holding in place until its bad velocities disappear
             if (DistanceFromDataHand > hardContactParent.teleportDistance ||
                 AreBonesRotatedBeyondThreshold())
             {
                 ResetHardContactHand();
                 // Don't need to wait for the hand to reset as much here
-                _teleportFrameCount = TELEPORT_FRAME_COUNT;
+                _teleportCooldownFrame = Time.frameCount + TELEPORT_FRAME_COUNT;
 
                 ghosted = true;
                 _justGhosted = true;
             }
-
-            if (Time.frameCount - _lastFrameTeleport >= _teleportFrameCount && ghosted && !isCloseToObject)
+            else if (ghosted && !isCloseToObject && Time.frameCount >= _teleportCooldownFrame) // Can we re-enable the hands?
             {
                 ChangeHandLayer(physicalHandsManager.HandsLayer);
                 ghosted = false;
@@ -319,6 +314,11 @@ namespace Leap.Unity.PhysicalHands
         }
 
         #region Output Hand
+
+        /// <summary>
+        /// Generate the a Leap Hand to output from the articulation bodies that represent the Hard Contact Hand
+        /// This outpur will be used to render the hand at the physics position as opposed to the raw tracking data position
+        /// </summary>
         protected override void ProcessOutputHand(ref Hand modifiedHand)
         {
             modifiedHand.SetTransform(palmBone.transform.position, palmBone.transform.rotation);

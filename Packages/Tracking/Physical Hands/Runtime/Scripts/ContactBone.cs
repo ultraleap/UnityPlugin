@@ -110,12 +110,15 @@ namespace Leap.Unity.PhysicalHands
             return false;
         }
 
-        private HashSet<Rigidbody> _grabObjects = new HashSet<Rigidbody>();
+        /// <summary>
+        /// Objects this bone is contacting and could possibly grab
+        /// </summary>
+        private HashSet<Rigidbody> _grabbableObjects = new HashSet<Rigidbody>();
 
         /// <summary>
         /// Objects that *can* be grabbed, not ones that are
         /// </summary>
-        public HashSet<Rigidbody> GrabbableObjects => _grabObjects;
+        public HashSet<Rigidbody> GrabbableObjects => _grabbableObjects;
         [field: SerializeField, Tooltip("Is the bone ready to grab an object that sits in front of it?")]
         public bool IsBoneReadyToGrab { get; private set; } = false;
 
@@ -174,7 +177,7 @@ namespace Leap.Unity.PhysicalHands
 
             UpdateContactHoverGrabs();
 
-            IsBoneReadyToGrab = _grabObjects.Count > 0;
+            IsBoneReadyToGrab = _grabbableObjects.Count > 0;
         }
 
         /// <summary>
@@ -335,11 +338,8 @@ namespace Leap.Unity.PhysicalHands
                     {
                         if(value.isContactingCollider)
                         {
-                            if (IsObjectGrabbable(rigid))
-                            {
-                                isGrabable = true;
-                                break;
-                            }
+                            isGrabable = true;
+                            break;
                         }
                     }
 
@@ -347,7 +347,7 @@ namespace Leap.Unity.PhysicalHands
                     if (isGrabable)
                     {
                         // add to grabbable rb dicts
-                        _grabObjects.Add(rigid);
+                        _grabbableObjects.Add(rigid);
 
                         if (_grabbableDirections.ContainsKey(rigid))
                         {
@@ -360,8 +360,8 @@ namespace Leap.Unity.PhysicalHands
                     }
                     else
                     {
-                        // Remove ungrabbed objects
-                        _grabObjects.Remove(rigid);
+                        // Remove ungrabbable objects
+                        _grabbableObjects.Remove(rigid);
                         _grabbableDirections.Remove(rigid);
                     }
                 }
@@ -376,60 +376,10 @@ namespace Leap.Unity.PhysicalHands
                     Pool<Dictionary<Collider, ClosestColliderDirection>>.Recycle(disposePoolObj);
                 }
                 _nearbyObjects.Remove(_oldRigids[i]);
-                _grabObjects.Remove(_oldRigids[i]);
+                _grabbableObjects.Remove(_oldRigids[i]);
 
 
             }
-        }
-
-        private bool IsObjectGrabbable(Rigidbody rigidbody)
-        {
-            if (_nearbyObjects.TryGetValue(rigidbody, out var hoveredColliders))
-            {
-                Vector3 bonePosCenter, closestPoint, boneCenterToColliderDirection, jointDirection;
-                foreach (var hoveredColliderDirection in hoveredColliders)
-                {
-                    bonePosCenter = transform.TransformPoint(0, 0, transform.InverseTransformPoint(hoveredColliderDirection.Value.bonePos).z);
-
-                    bool boneInsideCollider = hoveredColliderDirection.Key.IsSphereWithinCollider(bonePosCenter, width);
-                    if (boneInsideCollider)
-                    {
-                        return true;
-                    }
-
-                    closestPoint = hoveredColliderDirection.Key.ClosestPoint(bonePosCenter);
-                    boneCenterToColliderDirection = (closestPoint - bonePosCenter).normalized;
-
-                    if (joint == 2)
-                    {
-                        // Rotate the direction forward if the contact is closer to the tip
-                        jointDirection = Quaternion.AngleAxis(Mathf.InverseLerp(length, 0, Vector3.Distance(bonePosCenter, tipPosition)) * 45f, -transform.right) * -transform.up;
-                    }
-                    else
-                    {
-                        jointDirection = -transform.up;
-                    }
-
-                    switch (Finger)
-                    {
-                        case 0:
-                            // Point the thumb closer to the index
-                            jointDirection = Quaternion.AngleAxis(contactHand.Handedness == Chirality.Left ? -45f : 45f, transform.forward) * jointDirection;
-                            break;
-                        case 1:
-                            // Point the index closer to the thumb
-                            jointDirection = Quaternion.AngleAxis(contactHand.Handedness == Chirality.Left ? 25f : -25f, transform.forward) * jointDirection;
-                            break;
-                    }
-
-                    if (Vector3.Dot(boneCenterToColliderDirection, jointDirection) > (Finger == 0 ? 0.04f : 0.18f))
-                    {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
         }
 
         internal void AddGrabbing(Rigidbody rigid)

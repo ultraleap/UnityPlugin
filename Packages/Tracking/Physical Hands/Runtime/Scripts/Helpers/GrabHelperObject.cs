@@ -45,7 +45,7 @@ namespace Leap.Unity.PhysicalHands
         }
         internal State GrabState { get; private set; } = State.Idle;
 
-        // A dictionary of each hand, with an array[5] of lists that represents each bone in each finger
+        // A dictionary of each hand, with an array[5] of lists that represents each bone in each finger that is contacting and capable of grabbing this object
         private Dictionary<ContactHand, List<ContactBone>[]> _grabbableBones = new Dictionary<ContactHand, List<ContactBone>[]>();
 
         // Indexes of each list should always match
@@ -134,18 +134,16 @@ namespace Leap.Unity.PhysicalHands
                 {
                     case 0: // thumb
                     case 5: // palm
-                        return bones[finger].Count > 0;
-
+                        return bones[finger].Count > 0; // return true if the thumb or palm are contacting at all
                     case 1:
                     case 2:
                     case 3:
-                        return bones[finger].Count > 0 && bones[finger].Any(x => x.Joint != 0);
-
+                        return bones[finger].Count > 0 && bones[finger].Any(x => x.Joint != 0); // return true if the fingers (except pinky) intermediat or distal are contacting and capable of grabbing this object
                     case 4:
-                        return bones[finger].Count > 0 && bones[finger].Any(x => x.Joint == 2);
+                        return bones[finger].Count > 0 && bones[finger].Any(x => x.Joint == 2); // return true if the pinky distal is contacting and capable of grabbing this object
                 }
-                return false;
             }
+
             return false;
         }
 
@@ -318,13 +316,13 @@ namespace Leap.Unity.PhysicalHands
         {
             // Loop through each hand in our bone array, then the finger, then the bones in that finger
             // If we're no longer in a grabbing state with that bone we want to add it to the cooldowns
-            foreach (var pair in _grabbableBones)
+            foreach (var pair in _grabbableBones) // Loop through the hands
             {
-                for (int i = 0; i < _grabbableBones[pair.Key].Length; i++)
+                for (int i = 0; i < _grabbableBones[pair.Key].Length; i++) // loop through the fingers
                 {
-                    for (int j = 0; j < _grabbableBones[pair.Key][i].Count; j++)
+                    for (int j = 0; j < _grabbableBones[pair.Key][i].Count; j++) // loop through the bones
                     {
-                        if (!_grabbableBones[pair.Key][i][j].GrabbableObjects.Contains(_rigid))
+                        if (!_grabbableBones[pair.Key][i][j].GrabbableObjects.Contains(_rigid)) // Remove bones if it has stopped being capable of grabbing this object
                         {
                             _grabbableBones[pair.Key][i].RemoveAt(j);
                             j--;
