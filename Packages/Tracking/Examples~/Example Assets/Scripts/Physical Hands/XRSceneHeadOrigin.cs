@@ -29,9 +29,6 @@ namespace Leap.Unity.Examples
         [SerializeField, Tooltip("Should the Y rotation be set when starting up too?")]
         private bool includeRotationInStartup = false;
 
-        [SerializeField, Space, Tooltip("A keyboard key to reposition the cameraTransform to the sceneOrigin")]
-        private KeyCode resetKey = KeyCode.R;
-
         [Header("Optional Transforms")]
         [SerializeField, Space, Tooltip("Where the camera should move to by default. If this is not set, the Transform that this XRSceneHeadOrigin component is attached to will be used")]
         private Transform sceneOrigin;

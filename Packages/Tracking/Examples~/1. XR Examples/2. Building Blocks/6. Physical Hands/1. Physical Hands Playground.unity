@@ -5756,7 +5756,6 @@ MonoBehaviour:
   setOnStartLength: 2
   setOnStartDistance: 0.2
   includeRotationInStartup: 0
-  resetKey: 114
   sceneOrigin: {fileID: 0}
   cameraOffsetOrigin: {fileID: 0}
   cameraTransform: {fileID: 0}
@@ -6936,16 +6935,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 751b0fa5afa099c43854eca01d767798, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _physicalHandsManager: {fileID: 1234652847789266410}
+  physicalHandsManager: {fileID: 1234652847789266410}
   _physicsMaterial: {fileID: 0}
-  minPalmVelocity: 50
   maxPalmVelocity: 300
-  minPalmAngularVelocity: 6000
-  maxPalmAngularVelocity: 8000
   minFingerVelocity: 50
   maxFingerVelocity: 200
   teleportDistance: 0.1
-  maxWeight: 15
   boneMass: 0.1
   boneStiffness: 100
   boneDamping: 1
@@ -7677,6 +7672,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1520545033}
     m_Modifications:
+    - target: {fileID: 4677399194340858282, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+      propertyPath: m_text
+      value: Hard Contact
+      objectReference: {fileID: 0}
+    - target: {fileID: 4723750882669950096, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+      propertyPath: m_text
+      value: Hands can push objects, but will go through the surface when grabbing
+      objectReference: {fileID: 0}
     - target: {fileID: 5536264655608466747, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
       propertyPath: OnButtonPressed.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
@@ -7733,6 +7736,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Tablet-ContactModes
       objectReference: {fileID: 0}
+    - target: {fileID: 8536735542443912902, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+      propertyPath: m_text
+      value: Soft Contact
+      objectReference: {fileID: 0}
+    - target: {fileID: 8583794989925549052, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+      propertyPath: m_text
+      value: Hands will not go through object surfaces
+      objectReference: {fileID: 0}
     - target: {fileID: 8810489104910744151, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
       propertyPath: OnButtonPressed.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
@@ -7741,6 +7752,14 @@ PrefabInstance:
       propertyPath: OnButtonPressed.m_PersistentCalls.m_Calls.Array.data[1].m_Target
       value: 
       objectReference: {fileID: 1605294539}
+    - target: {fileID: 8810489104910744151, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+      propertyPath: OnButtonPressed.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_IntArgument
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8810489104910744151, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+      propertyPath: OnButtonPressed.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_IntArgument
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
 --- !u!4 &8134623799061944077 stripped
