@@ -182,8 +182,8 @@ namespace Leap
             CreatePrefab("Anchor");
         }
 
-        [MenuItem("GameObject/Ultraleap/Interaction/Physical Hands Manager", false, 40),
-            MenuItem("Ultraleap/Interaction/Physical Hands Manager", false, 40)]
+        [MenuItem("GameObject/Ultraleap/Physical Hands/Physical Hands Manager", false, 20),
+            MenuItem("Ultraleap/Physical Hands/Physical Hands Manager", false, 20)]
         public static void CreatePhysicalHandsManagerMenu()
         {
             GameObject physicalHandsManager = CreatePrefab("Physical Hands Manager");
@@ -196,13 +196,13 @@ namespace Leap
                     physHandsManager.SetContactMode(physHandsManager.contactMode);
                 }
             }
-
         }
-        [MenuItem("GameObject/Ultraleap/Interaction/PhysicalHandsButton", false, 41),
-            MenuItem("Ultraleap/Interaction/PhysicalHandsButton", false, 41)]
+
+        [MenuItem("GameObject/Ultraleap/Physical Hands/Physical Hands Button", false, 21),
+            MenuItem("Ultraleap/Physical Hands/Physical Hands Button", false, 21)]
         public static void CreatePhysicalHandsButton()
         {
-            CreatePrefab("PhysicalHands Button");
+            CreatePrefab("Physical Hands Button");
         }
 
         #endregion

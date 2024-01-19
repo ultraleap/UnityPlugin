@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 767538377468813851}
   - component: {fileID: 8065784239118584646}
   m_Layer: 5
-  m_Name: PhysicalHands Button
+  m_Name: Physical Hands Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
