@@ -980,7 +980,7 @@ namespace Leap.Unity.PhysicalHands
             if (averageVelocity.magnitude > 0.5f)
             {
                 // Check if we are safe to temporaily ignore collisions
-                if (_ignorePhysicalHands == null || !_ignorePhysicalHands.disableAllHandCollisions)
+                if (_ignorePhysicalHands == null || !_ignorePhysicalHands.DisableAllHandCollisions)
                 {
                     // Ignore collision after throwing so we don't knock the object
                     foreach (var hand in _grabbableHands)

@@ -199,7 +199,7 @@ namespace Leap.Unity.PhysicalHands
 
         internal void HandsInitiated()
         {
-            onHandsInitiated?.Invoke();
+            OnHandsInitialized?.Invoke();
         }
 
         private void ProcessFrame(Frame inputFrame)
@@ -294,10 +294,20 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
+        /// <summary>
+        /// Handle initializing the Fade Hands if a user as chosen to enable them
+        /// This generates a clone of the fadingHandsPrefab and apply HandFadeInAtDistanceFromRealData to it.
+        /// </summary>
         void InitializeDistanceFadeHands()
         {
             if(currentFadingHands != null)
             {
+                return;
+            }
+
+            if(fadingHandsPrefab == null)
+            {
+                Debug.LogWarning("No Fading Hands Prefab selected. Fading hands will not be initialized");
                 return;
             }
 
@@ -441,7 +451,7 @@ namespace Leap.Unity.PhysicalHands
         public UnityEvent<ContactHand, Rigidbody> onGrab;
         public UnityEvent<ContactHand, Rigidbody> onGrabExit;
 
-        internal static Action onHandsInitiated;
+        internal static Action OnHandsInitialized;
 
         internal void OnHandHover(ContactHand contacthand, Rigidbody rbody)
         {
