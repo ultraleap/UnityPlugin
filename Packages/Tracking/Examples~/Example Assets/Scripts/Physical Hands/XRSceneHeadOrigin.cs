@@ -7,9 +7,11 @@
  ******************************************************************************/
 
 using System.Collections;
-using Unity.XR.CoreUtils;
-using UnityEditor.XR.LegacyInputHelpers;
 using UnityEngine;
+
+#if XR_UTILS_AVAILABLE
+using Unity.XR.CoreUtils;
+#endif
 
 namespace Leap.Unity.Examples
 {
@@ -53,6 +55,7 @@ namespace Leap.Unity.Examples
                 cameraTransform = Camera.main.transform;
             }
 
+#if XR_UTILS_AVAILABLE
             // Look for an XROrigin
             XROrigin xROrigin = FindAnyObjectByType<XROrigin>();
 
@@ -62,23 +65,15 @@ namespace Leap.Unity.Examples
                 cameraOffsetOrigin = xROrigin.transform;
             }
             else
+#endif
             {
-                CameraOffset camOffset = FindAnyObjectByType<CameraOffset>();
-
-                if (camOffset != null)
+                if (cameraTransform.parent != null)
                 {
-                    cameraOffsetOrigin = camOffset.transform;
+                    cameraOffsetOrigin = cameraTransform.parent;
                 }
                 else
                 {
-                    if (cameraTransform.parent != null)
-                    {
-                        cameraOffsetOrigin = cameraTransform.parent;
-                    }
-                    else
-                    {
-                        cameraOffsetOrigin = cameraTransform;
-                    }
+                    cameraOffsetOrigin = cameraTransform;
                 }
             }
 
