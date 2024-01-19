@@ -37,9 +37,12 @@ namespace Leap.Unity.PhysicalHands.Examples
         [SerializeField, Tooltip("Particle system spawned from the rocket when launching. Usually smoke or engine particles.")]
         ParticleSystem _particleSystem;
 
+        IgnorePhysicalHands _ignoreHands;
+
         void Start()
         {
             _rigidbody = this.GetComponent<Rigidbody>();
+            _ignoreHands = this.GetComponent<IgnorePhysicalHands>();
         }
 
         void FixedUpdate()
@@ -66,6 +69,12 @@ namespace Leap.Unity.PhysicalHands.Examples
             {
                 _rigidbody.isKinematic = false;
                 StartCoroutine(RocketBurn());
+
+                if (_ignoreHands != null)
+                {
+                    _ignoreHands.DisableAllGrabbing = true;
+                    _ignoreHands.DisableAllHandCollisions = true;
+                }
             }
         }
 
@@ -88,11 +97,7 @@ namespace Leap.Unity.PhysicalHands.Examples
                 yield return null;
             }
 
-            launching = false;
-            if (_particleSystem != null)
-            {
-                _particleSystem.Stop();
-            }
+            StopLaunch();
         }
 
         /// <summary>
@@ -102,9 +107,16 @@ namespace Leap.Unity.PhysicalHands.Examples
         {
             StopAllCoroutines();
             launching = false;
+
             if (_particleSystem != null)
             {
                 _particleSystem.Stop();
+            }
+
+            if (_ignoreHands != null)
+            {
+                _ignoreHands.DisableAllGrabbing = false;
+                _ignoreHands.DisableAllHandCollisions = false;
             }
         }
     }

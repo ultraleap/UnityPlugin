@@ -478,7 +478,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46ce00400858bea4b94e1d8bdcec3356, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ExpandingButtons:
+  ExpandingMenuObjects:
   - {fileID: 5467393139726197995}
   - {fileID: 5467393139125278188}
 --- !u!1 &5467393138620567951
