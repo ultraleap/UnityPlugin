@@ -32,7 +32,7 @@ namespace Leap.Unity.PhysicalHands
         internal float _buttonStaydownTimer = 2;
         [SerializeField, Tooltip("Can this button only be activated by pressing it with a hand?")]
         internal bool _shouldOnlyBePressedByHand = false;
-        [SerializeField, Tooltip("Which hand should be able to press this button?"]
+        [SerializeField, Tooltip("Which hand should be able to press this button?")]
         ChiralitySelection _whichHandCanPressButton = ChiralitySelection.BOTH;
 
         internal bool _isButtonPressed = false;
