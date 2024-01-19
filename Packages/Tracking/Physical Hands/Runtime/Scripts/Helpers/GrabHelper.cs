@@ -110,6 +110,11 @@ namespace Leap.Unity.PhysicalHands
         /// </summary>
         private void HandleHandOverlapChecks(ContactHand hand)
         {
+            if (hand == null)
+            {
+                return;
+            }
+
             hand.isHovering = false;
             hand.isContacting = false;
             hand.isCloseToObject = false;
