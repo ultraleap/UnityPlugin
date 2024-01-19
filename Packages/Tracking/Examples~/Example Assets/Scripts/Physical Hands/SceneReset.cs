@@ -11,12 +11,19 @@ using UnityEngine.SceneManagement;
 
 namespace Leap.Unity.PhysicalHands.Examples
 {
+    /// <summary>
+    /// This class is very specific for the Ultraleap demo scene and should not be used in your own scenes
+    /// </summary>
     public class SceneReset : MonoBehaviour
     {
-        public Color ButtonActiveColor;
-        public Color ButtonInActiveColor;
+        [SerializeField, Tooltip("When button is active, which colour should be used?")]
+        private Color ButtonActiveColor;
+        [SerializeField, Tooltip("When button is inactive, which colour should be used?")]
+        private Color ButtonInActiveColor;
 
+        [SerializeField, Tooltip("Hard contact button which should change color")]
         public GameObject HardContactButton;
+        [SerializeField, Tooltip("Soft contact button which should change color")]
         public GameObject SoftContactButton;
 
         public enum SceneContactMode
@@ -44,6 +51,10 @@ namespace Leap.Unity.PhysicalHands.Examples
             SceneActiveContactModeChanged((int)SceneContactMode.HardContact);
         }
 
+        /// <summary>
+        /// Set colors for the buttons to show which one is currently active
+        /// </summary>
+        /// <param name="contactMode"></param>
         public void SceneActiveContactModeChanged(int contactMode)
         {
             switch (contactMode)

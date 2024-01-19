@@ -14,6 +14,9 @@ namespace Leap.Unity.Examples
 {
     public class ObjectResetter : MonoBehaviour
     {
+        /// <summary>
+        /// (metres) If this object moves this distance on the Y axis from where it started then we should reset it.
+        /// </summary>
         public float distanceToReset = 2;
 
         Vector3 originalPos;
@@ -23,7 +26,7 @@ namespace Leap.Unity.Examples
         Vector3[] rbPositions;
         Quaternion[] rbRotations;
 
-        [Space]
+        [Space, Tooltip("Event called when the object is reset to its starting position. Should be used to stop any scripts currently affecting this object.")]
         public UnityEvent OnReset;
 
         void Start()
@@ -52,12 +55,6 @@ namespace Leap.Unity.Examples
                 {
                     for (int i = 0; i < rbs.Length; i++)
                     {
-                        var joint = rbs[i].GetComponent<Joint>();
-
-                        if (joint != null)
-                        {
-                        }
-
                         rbs[i].velocity = Vector3.zero;
                         rbs[i].angularVelocity = Vector3.zero;
                         rbs[i].MovePosition(rbPositions[i]);

@@ -13,25 +13,23 @@ namespace Leap.Unity.PhysicalHands.Examples
 {
     public class PhysicalHandsHandMenu : MonoBehaviour
     {
-        [SerializeField]
-        List<GameObject> ExpandingButtons = new List<GameObject>();
-        Vector3 buttonScale = new Vector3();
+        [SerializeField, Tooltip("Which objects should be toggled when 'ToggleMenu()' is called?")]
+        List<GameObject> ExpandingMenuObjects = new List<GameObject>();
 
         bool ButtonsEnabled = false;
 
         // Start is called before the first frame update
         void Start()
         {
-            foreach (var button in ExpandingButtons)
+            foreach (var button in ExpandingMenuObjects)
             {
                 button.SetActive(false);
-                buttonScale = button.transform.localScale;
             }
         }
 
         public void ToggleMenu()
         {
-            foreach (var button in ExpandingButtons)
+            foreach (var button in ExpandingMenuObjects)
             {
                 if (ButtonsEnabled)
                 {

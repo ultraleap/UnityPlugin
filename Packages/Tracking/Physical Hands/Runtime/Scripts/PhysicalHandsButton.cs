@@ -20,19 +20,19 @@ namespace Leap.Unity.PhysicalHands
         internal const float BUTTON_PRESS_THRESHOLD = 0.01F;
         internal const float BUTTON_PRESS_EXIT_THRESHOLD = 0.09F;
 
-        [SerializeField]
+        [SerializeField, Tooltip("The pressable part of the button.")]
         internal GameObject buttonObject;
         [Tooltip("The local position which the button will be limited to and will try to return to.")]
         internal float buttonHeightLimit = 0.02f;
 
 
-        [SerializeField]
+        [SerializeField, Tooltip("Should the button stay down for a time after it is pressed?")]
         internal bool _buttonShouldDelayRebound = false;
-        [SerializeField]
+        [SerializeField, Tooltip("How long should the button stay down for after it is pressed?")]
         internal float _buttonStaydownTimer = 2;
-        [SerializeField]
+        [SerializeField, Tooltip("Can this button only be activated by pressing it with a hand?")]
         internal bool _shouldOnlyBePressedByHand = false;
-        [SerializeField]
+        [SerializeField, Tooltip("Which hand should be able to press this button?"]
         ChiralitySelection _whichHandCanPressButton = ChiralitySelection.BOTH;
 
         internal bool _isButtonPressed = false;

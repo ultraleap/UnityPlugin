@@ -15,13 +15,13 @@ namespace Leap.Unity.PhysicalHands.Examples
     {
         Renderer objectRenderer;
 
-        [SerializeField]
+        [SerializeField, Tooltip("The base material for the object. Will be applied when hand is not interacting with the object at all")]
         Material baseMaterial;
-        [SerializeField]
+        [SerializeField, Tooltip("The material to apply to this object when hand is hovering over an object.")]
         Material hoverMaterial;
-        [SerializeField]
+        [SerializeField, Tooltip("The material to apply to this object when hand is contacting an object.")]
         Material contactMaterial;
-        [SerializeField]
+        [SerializeField, Tooltip("The material to apply to this object when hand is grabbing an object.")]
         Material grabMaterial;
 
         bool leftHover = false;

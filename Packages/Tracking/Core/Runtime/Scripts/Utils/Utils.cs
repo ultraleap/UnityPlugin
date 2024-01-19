@@ -924,8 +924,6 @@ namespace Leap.Unity
         }
 
 
-
-
         #endregion
 
         #region Array Utils
@@ -2864,7 +2862,7 @@ namespace Leap.Unity
         /// <param name="min"> Min value for the input range</param>
         /// <param name="max"> Max value for the input range</param>
         /// <returns></returns>
-        public static float map01(float value, float min, float max)
+        public static float Map01(float value, float min, float max)
         {
             return (value - min) * 1f / (max - min);
         }

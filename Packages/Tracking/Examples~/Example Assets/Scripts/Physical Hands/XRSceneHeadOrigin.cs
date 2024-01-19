@@ -17,30 +17,30 @@ namespace Leap.Unity.Examples
 {
     public class XRSceneHeadOrigin : MonoBehaviour
     {
-        [Tooltip("If true, the cameraTransform will try to move to the sceneOrigin during startup")]
-        public bool setOnStart = true;
+        [SerializeField, Tooltip("If true, the cameraTransform will try to move to the sceneOrigin during startup")]
+        private bool setOnStart = true;
 
-        [Tooltip("Length of time that the cameraTransform will try to move to the sceneOrigin after startup (in Seconds)")]
-        public float setOnStartLength = 2f;
+        [SerializeField, Tooltip("Length of time that the cameraTransform will try to move to the sceneOrigin after startup (in Seconds)")]
+        private float setOnStartLength = 2f;
 
-        [Tooltip("Maximum distance the cameraTransform can be from the sceneOrigin during setOnStartLength after startup (in Meters)")]
-        public float setOnStartDistance = 0.2f;
+        [SerializeField, Tooltip("Maximum distance the cameraTransform can be from the sceneOrigin during setOnStartLength after startup (in Meters)")]
+        private float setOnStartDistance = 0.2f;
 
-        [Tooltip("Should the Y rotation be set when starting up too?")]
-        public bool includeRotationInStartup = false;
+        [SerializeField, Tooltip("Should the Y rotation be set when starting up too?")]
+        private bool includeRotationInStartup = false;
 
-        [Space, Tooltip("A keyboard key to reposition the cameraTransform to the sceneOrigin")]
-        public KeyCode resetKey = KeyCode.R;
+        [SerializeField, Space, Tooltip("A keyboard key to reposition the cameraTransform to the sceneOrigin")]
+        private KeyCode resetKey = KeyCode.R;
 
         [Header("Optional Transforms")]
-        [Space, Tooltip("Where the camera should move to by default. If this is not set, the Transform that this XRSceneHeadOrigin component is attached to will be used")]
-        public Transform sceneOrigin;
+        [SerializeField, Space, Tooltip("Where the camera should move to by default. If this is not set, the Transform that this XRSceneHeadOrigin component is attached to will be used")]
+        private Transform sceneOrigin;
 
-        [Space, Tooltip("Usually an XROrigin or CameraOffset. If this is not set, a suitable Transform will be found")]
-        public Transform cameraOffsetOrigin;
+        [SerializeField, Space, Tooltip("Usually an XROrigin or CameraOffset. If this is not set, a suitable Transform will be found")]
+        private Transform cameraOffsetOrigin;
 
-        [Tooltip("The main camera being used. If this is not set, a suitable Transform will be found")]
-        public Transform cameraTransform;
+        [SerializeField, Tooltip("The main camera being used. If this is not set, a suitable Transform will be found")]
+        private Transform cameraTransform;
 
         void Start()
         {
@@ -101,11 +101,20 @@ namespace Leap.Unity.Examples
             }
         }
 
+        /// <summary>
+        /// Reset head to the location that it was in when the scene loaded.
+        /// </summary>
+        /// <param name="includeRotation">Should this rotate the head to the original place as well?</param>
         public void SetHeadOrigin(bool includeRotation = false)
         {
             SetHeadOrigin(sceneOrigin, includeRotation);
         }
 
+        /// <summary>
+        /// Reset head to the target location.
+        /// </summary>
+        /// <param name="target">Where the heads position should be set to</param>
+        /// <param name="includeRotation">Should this rotate the head to the original place as well?</param>
         public void SetHeadOrigin(Transform target, bool includeRotation = false)
         {
 
@@ -118,6 +127,9 @@ namespace Leap.Unity.Examples
             cameraOffsetOrigin.transform.position += target.position - cameraTransform.position;
         }
 
+        /// <summary>
+        /// Set height of the scene for the current user. Use this to adjust for height difference between users.
+        /// </summary>
         public void SetHeight()
         {
             Vector3 heightOffset = sceneOrigin.position - cameraTransform.position;

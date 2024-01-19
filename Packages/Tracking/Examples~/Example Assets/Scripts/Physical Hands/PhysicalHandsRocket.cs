@@ -13,14 +13,16 @@ namespace Leap.Unity.PhysicalHands.Examples
 {
     public class PhysicalHandsRocket : MonoBehaviour
     {
-        public GameObject buttonObject;
-        public GameObject noseCone;
+        [SerializeField, Tooltip("The pressable part of the rocket, which is used as a form of button")]
+        private GameObject buttonObject;
+        [SerializeField, Tooltip("Should be at the front of the rocket, used to calculate which direction the rocket should travel in.")]
+        private GameObject noseCone;
         [Tooltip("The local position which the button will be limited to and will try to return to.")]
         [SerializeField]
         private float buttonHeightLimit = 0.02f;
-        [SerializeField]
+        [SerializeField, Tooltip("Force to add to the rocket when launching.")]
         private float rocketPower = 30;
-        [SerializeField]
+        [SerializeField, Tooltip("How long should the rocket add force for? (In seconds)")]
         private float burnTime = 3;
 
         private const float BUTTON_PRESS_THRESHOLD = 0.01F;
@@ -32,7 +34,7 @@ namespace Leap.Unity.PhysicalHands.Examples
 
         bool launching = false;
 
-        [SerializeField]
+        [SerializeField, Tooltip("Particle system spawned from the rocket when launching. Usually smoke or engine particles.")]
         ParticleSystem _particleSystem;
 
         void Start()
@@ -60,15 +62,20 @@ namespace Leap.Unity.PhysicalHands.Examples
             if (launching)
                 return;
 
-            _rigidbody.isKinematic = false;
-            StartCoroutine(RocketBurn());
+            if (_rigidbody != null)
+            {
+                _rigidbody.isKinematic = false;
+                StartCoroutine(RocketBurn());
+            }
         }
 
         IEnumerator RocketBurn()
         {
             launching = true;
-
-            _particleSystem.Play();
+            if (_particleSystem != null)
+            {
+                _particleSystem.Play();
+            }
 
             _rigidbody.angularDrag = 20;
             _rigidbody.useGravity = true;
@@ -82,7 +89,10 @@ namespace Leap.Unity.PhysicalHands.Examples
             }
 
             launching = false;
-            _particleSystem.Stop();
+            if (_particleSystem != null)
+            {
+                _particleSystem.Stop();
+            }
         }
 
         /// <summary>
@@ -92,7 +102,10 @@ namespace Leap.Unity.PhysicalHands.Examples
         {
             StopAllCoroutines();
             launching = false;
-            _particleSystem.Stop();
+            if (_particleSystem != null)
+            {
+                _particleSystem.Stop();
+            }
         }
     }
 }
