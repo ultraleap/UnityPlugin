@@ -58,6 +58,9 @@ namespace Leap.Unity.PhysicalHands
 
         private void OnPrePhysicsUpdate()
         {
+            // Clear and repopulate for this frame to compare to the prevous frame
+            _hoveredRigids.Clear();
+
             HandleHandOverlapChecks(_leftContactHand);
             HandleHandOverlapChecks(_rightContactHand);
         }
@@ -149,8 +152,7 @@ namespace Leap.Unity.PhysicalHands
                 _colliderCache, 
                 physicalHandsManager.InteractionMask);
 
-            // Clear and repopulate for this frame to compare to the prevous frame
-            _hoveredRigids.Clear();
+            RemoveUnhoveredHandsFromGrabHelperObjects(nearbyObjectCount, hand);
 
             for (int i = 0; i < nearbyObjectCount; i++)
             {
@@ -216,6 +218,41 @@ namespace Leap.Unity.PhysicalHands
             foreach (var rigid in _hoveredRigids)
             {
                 _previousHoveredRigids.Add(rigid);
+            }
+        }
+
+        /// <summary>
+        /// Handle any changes to the hover state of apeciic hands from nearby rigidbodies
+        /// </summary>
+        private void RemoveUnhoveredHandsFromGrabHelperObjects(int nearbyObjectCount, ContactHand hand)
+        {
+            // Loop through the current GrabHelperObejcts
+            foreach (var helperObject in _grabHelperObjects.Values)
+            {
+                // Check if the GrabHelperObject has reference to the hand we should see if we have stopped hovering
+                if (helperObject.GrabbableHands.Contains(hand))
+                {
+                    bool rbodyFound = false;
+
+                    // Loop through all of the nearby RigidBodies to see if it matches the GrabHelperObject's RigidBody
+                    for (int i = 0; i < nearbyObjectCount; i++)
+                    {
+                        // Cache this to avoid repeatedly calling native unity functions
+                        Rigidbody collidersRigid = _colliderCache[i].attachedRigidbody;
+
+                        if (collidersRigid != null && collidersRigid == helperObject.RigidBody)
+                        {
+                            rbodyFound = true;
+                            break;
+                        }
+                    }
+
+                    // We didn't find a match so should remove the hand from the GrabHelperObject to trigger Hover Exit events
+                    if (!rbodyFound)
+                    {
+                        helperObject.RemoveHand(hand);
+                    }
+                }
             }
         }
 

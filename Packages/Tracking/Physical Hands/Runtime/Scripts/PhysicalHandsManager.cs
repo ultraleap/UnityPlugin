@@ -240,7 +240,6 @@ namespace Leap.Unity.PhysicalHands
         public void SetContactMode(ContactMode mode)
         {
             _contactMode = mode;
-            OnContactModeChanged?.Invoke();
 
             if (ContactParent != null) // delete old contact hands
             {
@@ -276,6 +275,8 @@ namespace Leap.Unity.PhysicalHands
             {
                 newContactParent.transform.parent = transform;
             }
+
+            OnContactModeChanged?.Invoke();
         }
 
         #region Layer Generation

@@ -48,6 +48,7 @@ namespace Leap.Unity.PhysicalHands
         // A dictionary of each hand, with an array[5] of lists that represents each bone in each finger that is contacting and capable of grabbing this object
         private Dictionary<ContactHand, List<ContactBone>[]> _grabbableBones = new Dictionary<ContactHand, List<ContactBone>[]>();
 
+        internal List<ContactHand> GrabbableHands => _grabbableHands;
         // Indexes of each list should always match
         private List<ContactHand> _grabbableHands = new List<ContactHand>();
         private List<GrabValues> _grabbableHandsValues = new List<GrabValues>();
@@ -85,6 +86,7 @@ namespace Leap.Unity.PhysicalHands
 
         private GrabHelper _manager;
 
+        internal Rigidbody RigidBody => _rigid;
         private Rigidbody _rigid;
         private Collider[] _colliders;
 
@@ -250,6 +252,13 @@ namespace Leap.Unity.PhysicalHands
 
                 _grabbableHands.RemoveAt(index);
                 _grabbableHandsValues.RemoveAt(index);
+
+                if (_rigid.TryGetComponent<IPhysicalHandHover>(out var physicalHandHover))
+                {
+                    physicalHandHover.OnHandHoverExit(hand);
+                }
+
+                hand.physicalHandsManager.OnHandHoverExit(hand, _rigid);
             }
         }
 
