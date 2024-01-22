@@ -11,6 +11,7 @@ using UnityEngine.Events;
 
 namespace Leap.Unity.PhysicalHands
 {
+    [RequireComponent(typeof(Rigidbody))]
     public class PhysicalHandEvents : MonoBehaviour, IPhysicalHandHover, IPhysicalHandContact, IPhysicalHandGrab
     {
         [Space, Header("Hover Events"), Space]
@@ -69,6 +70,13 @@ namespace Leap.Unity.PhysicalHands
         public bool rightHandHovering { get; private set; }
         public bool rightHandContacting { get; private set; }
         public bool rightHandGrabbing { get; private set; }
+
+        public Rigidbody rigidBody { get; private set; }
+
+        private void Awake()
+        {
+            rigidBody = GetComponent<Rigidbody>();
+        }
 
         public void OnHandHover(ContactHand hand)
         {

@@ -118,6 +118,11 @@ namespace Leap.Unity.PhysicalHands
         /// </summary>
         public Action OnContactModeChanged;
 
+        #region Quick Accessors
+        public ContactHand LeftHand { get { return ContactParent?.LeftHand; } }
+        public ContactHand RightHand { get { return ContactParent?.RightHand; } }
+        #endregion
+
         private void Awake()
         {
             if (ContactParent == null)
@@ -153,7 +158,7 @@ namespace Leap.Unity.PhysicalHands
 
         private void Reset()
         {
-            foreach(var parent in GetComponentsInChildren<ContactParent>())
+            foreach (var parent in GetComponentsInChildren<ContactParent>())
             {
                 if (parent != null) // delete old contact hands
                 {
@@ -324,12 +329,12 @@ namespace Leap.Unity.PhysicalHands
 
             for (int i = 0; i < 32; i++)
             {
-                if(i == HandsLayer ||  i == HandsResetLayer)
+                if (i == HandsLayer || i == HandsResetLayer)
                 {
                     continue;
                 }
 
-                if(!Physics.GetIgnoreLayerCollision(_handsLayer.layerIndex, i))
+                if (!Physics.GetIgnoreLayerCollision(_handsLayer.layerIndex, i))
                 {
                     _interactableLayers.Add(i);
                 }
