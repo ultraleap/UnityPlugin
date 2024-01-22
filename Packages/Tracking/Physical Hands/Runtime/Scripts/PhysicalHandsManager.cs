@@ -11,7 +11,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.Serialization;
 
 namespace Leap.Unity.PhysicalHands
 {
@@ -119,16 +118,6 @@ namespace Leap.Unity.PhysicalHands
         /// </summary>
         public Action OnContactModeChanged;
 
-        [Tooltip("When using hard contact hands, the tracking data can often differ from the hands that are shown to you. " +
-            "Tick this option to enable hands which fade in when the tracking data goes too far from the shown data.")]
-        [SerializeField]
-        private bool _showFadingHandsWithTrackingData;
-
-        [SerializeField, FormerlySerializedAs("fadingHands")]
-        private GameObject fadingHandsPrefab;
-
-        private GameObject currentFadingHands;
-
         private void Awake()
         {
             if (ContactParent == null)
@@ -150,11 +139,6 @@ namespace Leap.Unity.PhysicalHands
                 InputProvider.OnFixedFrame += ProcessFrame;
 
                 StartCoroutine(PostFixedUpdate());
-            }
-
-            if (_showFadingHandsWithTrackingData)
-            {
-                InitializeDistanceFadeHands();
             }
         }
 
@@ -291,62 +275,6 @@ namespace Leap.Unity.PhysicalHands
             if (transform != null) // catches some edit-time issues
             {
                 newContactParent.transform.parent = transform;
-            }
-        }
-
-        /// <summary>
-        /// Handle initializing the Fade Hands if a user as chosen to enable them
-        /// This generates a clone of the fadingHandsPrefab and apply HandFadeInAtDistanceFromRealData to it.
-        /// </summary>
-        void InitializeDistanceFadeHands()
-        {
-            if(currentFadingHands != null)
-            {
-                return;
-            }
-
-            if(fadingHandsPrefab == null)
-            {
-                Debug.LogWarning("No Fading Hands Prefab selected. Fading hands will not be initialized");
-                return;
-            }
-
-            currentFadingHands = Instantiate(fadingHandsPrefab);
-
-            Transform outlineHandLeft = currentFadingHands.transform.GetChild(0);
-            Transform outlineHandRight = currentFadingHands.transform.GetChild(1);
-
-            HandFadeInAtDistanceFromRealData leftHand = outlineHandLeft.gameObject.AddComponent<HandFadeInAtDistanceFromRealData>();
-            HandFadeInAtDistanceFromRealData rightHand = outlineHandRight.gameObject.AddComponent<HandFadeInAtDistanceFromRealData>();
-
-            leftHand.chirality = Chirality.Left;
-            rightHand.chirality = Chirality.Right;
-
-            leftHand.Init();
-            rightHand.Init();
-
-            OnContactModeChanged -= HideShowDistanceFadeHandsOnContactModeChange;
-            OnContactModeChanged += HideShowDistanceFadeHandsOnContactModeChange;
-        }
-
-        void HideShowDistanceFadeHandsOnContactModeChange()
-        {
-            if (currentFadingHands == null)
-            {
-                return;
-            }
-
-            switch (contactMode)
-            {
-                case ContactMode.HardContact:
-                    currentFadingHands.SetActive(true);
-                    break;
-                case ContactMode.SoftContact:
-                    currentFadingHands.SetActive(false);
-                    break;
-                case ContactMode.NoContact:
-                    currentFadingHands.SetActive(false);
-                    break;
             }
         }
 

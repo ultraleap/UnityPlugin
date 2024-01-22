@@ -15,7 +15,7 @@ namespace Leap.Unity.PhysicalHands
         // Values used to delay the enabling of Hard Contact Hands after a teleport
         private const int TELEPORT_FRAME_COUNT = 5, RESET_FRAME_TELEPORT_COUNT = 10;
 
-        private HardContactParent hardContactParent => contactParent as HardContactParent;
+        internal HardContactParent hardContactParent => contactParent as HardContactParent;
 
         private bool resetHandled = false;
 

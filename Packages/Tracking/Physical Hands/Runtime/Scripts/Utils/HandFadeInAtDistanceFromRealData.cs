@@ -14,21 +14,24 @@ namespace Leap.Unity.PhysicalHands
     {
         public Chirality chirality;
 
+        [Tooltip("The name of the color property you woud like to fade on the hand shader")]
+        public string shaderFadingColorName = "_Color";
+
         PhysicalHandsManager physManager;
         Renderer rendererToChange;
         HardContactHand hardContactHand;
 
-        public void Init()
+        void Start()
         {
             FindContactHand();
 
             rendererToChange = GetComponentInChildren<Renderer>();
 
-            if (rendererToChange != null && rendererToChange.material.HasVector("_Color"))
+            if (rendererToChange != null && rendererToChange.material.HasVector(shaderFadingColorName))
             {
-                Vector4 currentColor = rendererToChange.material.GetVector("_Color");
+                Vector4 currentColor = rendererToChange.material.GetVector(shaderFadingColorName);
                 currentColor[3] = 0;
-                rendererToChange.material.SetVector("_Color", currentColor);
+                rendererToChange.material.SetVector(shaderFadingColorName, currentColor);
             }
             else
             {
@@ -43,12 +46,12 @@ namespace Leap.Unity.PhysicalHands
 
             if(hardContactHand != null && rendererToChange != null)
             {
-                Vector4 currentColor = rendererToChange.material.GetVector("_Color");
-                float mappedData = Utils.Map01(hardContactHand.DistanceFromDataHand, 0, (hardContactHand.contactParent as HardContactParent).teleportDistance);
+                Vector4 currentColor = rendererToChange.material.GetVector(shaderFadingColorName);
+                float mappedData = Utils.Map01(hardContactHand.DistanceFromDataHand, 0, hardContactHand.hardContactParent.teleportDistance);
                 currentColor[3] = Mathf.Clamp01(mappedData) + 0.05f;
-                rendererToChange.material.SetVector("_Color", currentColor);
+                rendererToChange.material.SetVector(shaderFadingColorName, currentColor);
 
-                if(currentColor[3] < 0.08f)
+                if (currentColor[3] < 0.08f)
                 {
                     rendererToChange.enabled = false;
                 }

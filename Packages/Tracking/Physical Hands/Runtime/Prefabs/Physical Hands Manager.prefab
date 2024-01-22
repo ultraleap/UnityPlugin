@@ -50,8 +50,8 @@ MonoBehaviour:
   _contactMode: 0
   _hoverDistance: 0.04
   _contactDistance: 0.002
-  _showFadingHandsWithTrackingData: 0
-  fadingHandsPrefab: {fileID: 0}
+  _showFadingHandsWithTrackingData: 1
+  fadingHandsPrefab: {fileID: 4756413710029136320, guid: 81156ff5f1c52ee4a93f836d68840561, type: 3}
   onHover:
     m_PersistentCalls:
       m_Calls: []

@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5539325652059363028}
   m_Layer: 0
-  m_Name: SimpleOutlineHands
+  m_Name: Fading Outline Hands
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -74,7 +74,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8844986755636336731, guid: 4577231256ebec149ac8882d93c98cda, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.9999998
+      value: 0.99999994
       objectReference: {fileID: 0}
     - target: {fileID: -8844986755636336731, guid: 4577231256ebec149ac8882d93c98cda, type: 3}
       propertyPath: m_LocalScale.z
@@ -438,7 +438,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -5126624976731154518, guid: 4577231256ebec149ac8882d93c98cda, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.9999991
+      value: 0.99999994
       objectReference: {fileID: 0}
     - target: {fileID: -5126624976731154518, guid: 4577231256ebec149ac8882d93c98cda, type: 3}
       propertyPath: m_LocalScale.z
@@ -974,11 +974,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2555608097127290070, guid: 4577231256ebec149ac8882d93c98cda, type: 3}
       propertyPath: m_LocalScale.y
-      value: 1.0000001
+      value: 1.0000002
       objectReference: {fileID: 0}
     - target: {fileID: 2555608097127290070, guid: 4577231256ebec149ac8882d93c98cda, type: 3}
       propertyPath: m_LocalScale.z
-      value: 1
+      value: 1.0000001
       objectReference: {fileID: 0}
     - target: {fileID: 2555608097127290070, guid: 4577231256ebec149ac8882d93c98cda, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1146,11 +1146,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5301290396021236526, guid: 4577231256ebec149ac8882d93c98cda, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.9999997
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5301290396021236526, guid: 4577231256ebec149ac8882d93c98cda, type: 3}
       propertyPath: m_LocalScale.z
-      value: 1
+      value: 0.99999976
       objectReference: {fileID: 0}
     - target: {fileID: 5301290396021236526, guid: 4577231256ebec149ac8882d93c98cda, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1298,11 +1298,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8400642944751065630, guid: 4577231256ebec149ac8882d93c98cda, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.9999998
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8400642944751065630, guid: 4577231256ebec149ac8882d93c98cda, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.99999994
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8400642944751065630, guid: 4577231256ebec149ac8882d93c98cda, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1900,7 +1900,6 @@ MonoBehaviour:
       scale: {x: 0, y: 0, z: 0}
     reference: {fileID: 0}
   Chirality: 1
-  handUpdateType: 0
   LeapHand:
     FrameId: 0
     Id: 0
@@ -2146,6 +2145,20 @@ MonoBehaviour:
   DebugModelRotationAxis: 0
   FineTuning: 1
   DebugOptions: 0
+--- !u!114 &2879556447873347463
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8496954193924291185}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8e540e81e7e8a547b1de2cf1cad023d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  chirality: 1
+  shaderFadingColorName: _Color
 --- !u!114 &8524905651843177826
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2201,11 +2214,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8844986755636336731, guid: 4577231256ebec149ac8882d93c98cda, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.9999997
+      value: 0.9999999
       objectReference: {fileID: 0}
     - target: {fileID: -8844986755636336731, guid: 4577231256ebec149ac8882d93c98cda, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.99999994
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -8844986755636336731, guid: 4577231256ebec149ac8882d93c98cda, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2565,11 +2578,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -5126624976731154518, guid: 4577231256ebec149ac8882d93c98cda, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.9999999
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -5126624976731154518, guid: 4577231256ebec149ac8882d93c98cda, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.99999994
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -5126624976731154518, guid: 4577231256ebec149ac8882d93c98cda, type: 3}
       propertyPath: m_LocalPosition.x
@@ -3097,7 +3110,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2555608097127290070, guid: 4577231256ebec149ac8882d93c98cda, type: 3}
       propertyPath: m_LocalScale.y
-      value: 1.0000002
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2555608097127290070, guid: 4577231256ebec149ac8882d93c98cda, type: 3}
       propertyPath: m_LocalScale.z
@@ -3269,11 +3282,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5301290396021236526, guid: 4577231256ebec149ac8882d93c98cda, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.9999998
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5301290396021236526, guid: 4577231256ebec149ac8882d93c98cda, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.9999998
+      value: 0.99999994
       objectReference: {fileID: 0}
     - target: {fileID: 5301290396021236526, guid: 4577231256ebec149ac8882d93c98cda, type: 3}
       propertyPath: m_LocalPosition.x
@@ -3421,11 +3434,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8400642944751065630, guid: 4577231256ebec149ac8882d93c98cda, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.9999999
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8400642944751065630, guid: 4577231256ebec149ac8882d93c98cda, type: 3}
       propertyPath: m_LocalScale.z
-      value: 1
+      value: 0.99999994
       objectReference: {fileID: 0}
     - target: {fileID: 8400642944751065630, guid: 4577231256ebec149ac8882d93c98cda, type: 3}
       propertyPath: m_LocalPosition.x
@@ -3523,20 +3536,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: -927199367670048503, guid: 4577231256ebec149ac8882d93c98cda, type: 3}
   m_PrefabInstance: {fileID: 6992660885218784708}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &3870808388242681184
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1309141287801498829}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8bcd03e00992e084c8be61565d44b8bd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  disableOnAwake: 1
-  FreezeHandState: 0
 --- !u!114 &4104340998506250245
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3927,7 +3926,6 @@ MonoBehaviour:
       scale: {x: 0, y: 0, z: 0}
     reference: {fileID: 0}
   Chirality: 0
-  handUpdateType: 0
   LeapHand:
     FrameId: 0
     Id: 0
@@ -4173,6 +4171,34 @@ MonoBehaviour:
   DebugModelRotationAxis: 0
   FineTuning: 1
   DebugOptions: 0
+--- !u!114 &6655216000542615447
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1309141287801498829}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8e540e81e7e8a547b1de2cf1cad023d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  chirality: 0
+  shaderFadingColorName: _Color
+--- !u!114 &8976325770526766072
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1309141287801498829}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8bcd03e00992e084c8be61565d44b8bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  disableOnAwake: 1
+  FreezeHandState: 0
 --- !u!4 &1558236920545062874 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8400642944751065630, guid: 4577231256ebec149ac8882d93c98cda, type: 3}
