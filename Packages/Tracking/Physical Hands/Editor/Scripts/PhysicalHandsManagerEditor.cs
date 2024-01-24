@@ -6,7 +6,7 @@ namespace Leap.Unity.PhysicalHands
     [CustomEditor(typeof(PhysicalHandsManager))]
     public class PhysicalHandsManagerEditor : CustomEditorBase<PhysicalHandsManager>
     {
-        private readonly string[] contactModeNames = { "Hard Contact", "Soft Contact", "No Contact"};
+        private readonly string[] contactModeNames = { "Hard Contact", "Soft Contact", "No Contact" };
 
         bool layersExist = false;
 
@@ -20,7 +20,7 @@ namespace Leap.Unity.PhysicalHands
             HandleEventsFoldout();
 
             if (CreateContactHandLayers())
-            { 
+            {
                 layersExist = true;
             }
         }

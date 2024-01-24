@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -51,13 +51,13 @@ namespace Leap.Unity.PhysicalHands
 
         private GrabHelperObject _grabHelperObject = null;
         public GrabHelperObject GrabHelperObject
-        { 
+        {
             get { return _grabHelperObject; }
-            set 
-            { 
+            set
+            {
                 _grabHelperObject = value;
                 _grabHelperObject._grabbingIgnored = disableAllGrabbing;
-            } 
+            }
         }
 
         private PhysicalHandsManager _physicalHandsManager = null;
@@ -88,7 +88,7 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
-        private void SetAllHandCollisions() 
+        private void SetAllHandCollisions()
         {
             for (int i = 0; i < contactHands.Count; i++)
             {
