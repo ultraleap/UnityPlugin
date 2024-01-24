@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  * Ultraleap proprietary and confidential.                                    *
  *                                                                            *
  * Use subject to the terms of the Leap Motion SDK Agreement available at     *
