@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -53,7 +53,7 @@ namespace Leap.Unity.PhysicalHands
         {
             dataHand.CopyFrom(hand);
 
-            if(resetting)
+            if (resetting)
             {
                 if (!resetHandled) // First reset the Hard Contact Hand
                 {
@@ -204,7 +204,7 @@ namespace Leap.Unity.PhysicalHands
                     contactingFingers++;
                 }
 
-                if(!hasFingerGrasped)
+                if (!hasFingerGrasped)
                 {
                     fingerStiffness[fingerIndex] = hardContactParent.boneStiffness;
                 }
@@ -248,7 +248,7 @@ namespace Leap.Unity.PhysicalHands
             // Fix the hand if it gets into a bad situation by teleporting and holding in place until its bad velocities disappear
             HandleTeleportingHands();
 
-            if(!IsGrabbing && _wasGrabbing)
+            if (!IsGrabbing && _wasGrabbing)
             {
                 _timeOnReset = Time.time;
             }

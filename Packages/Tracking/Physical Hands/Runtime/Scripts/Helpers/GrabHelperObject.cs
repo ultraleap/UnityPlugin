@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -401,7 +401,7 @@ namespace Leap.Unity.PhysicalHands
 
                 _grabbableHands[handIndex].physicalHandsManager.OnHandContact(_grabbableHands[handIndex], _rigid);
             }
-            else if(_grabbableHandsValues[handIndex].wasContacting)
+            else if (_grabbableHandsValues[handIndex].wasContacting)
             {
                 // We stopped contacting, so fire the contact exit event
                 if (_rigid.TryGetComponent<IPhysicalHandContact>(out var handContactEvent))
@@ -424,7 +424,7 @@ namespace Leap.Unity.PhysicalHands
         void UpdateGrabEvents()
         {
             // Send any active grabbing events
-            foreach(var hand in _grabbingHands)
+            foreach (var hand in _grabbingHands)
             {
                 if (_rigid.TryGetComponent<IPhysicalHandGrab>(out var physicalHandGrab))
                 {
@@ -577,7 +577,7 @@ namespace Leap.Unity.PhysicalHands
                 }
             }
 
-            for(int handIndex = 0; handIndex < _grabbableHands.Count; handIndex++)
+            for (int handIndex = 0; handIndex < _grabbableHands.Count; handIndex++)
             {
                 // This hand is already grabbing, we don't need to check again
                 if (_grabbableHandsValues[handIndex].handGrabbing || _grabbingHands.Contains(_grabbableHands[handIndex]))
@@ -641,7 +641,7 @@ namespace Leap.Unity.PhysicalHands
 
         private void ClearGrabbingHands()
         {
-            foreach(var grabHand in _grabbingHands)
+            foreach (var grabHand in _grabbingHands)
             {
                 if (_rigid.TryGetComponent<IPhysicalHandGrab>(out var physicalHandGrab))
                 {
@@ -686,7 +686,7 @@ namespace Leap.Unity.PhysicalHands
 
         private void UpdateGrabbingValues()
         {
-            for(int grabHandIndex = 0; grabHandIndex < _grabbableHands.Count; grabHandIndex++)
+            for (int grabHandIndex = 0; grabHandIndex < _grabbableHands.Count; grabHandIndex++)
             {
                 // Check if this hand was grabbing and is now not grabbing
                 if (_grabbingHands.Count > 0
@@ -718,7 +718,7 @@ namespace Leap.Unity.PhysicalHands
                     else
                     {
                         // If the finger was contacting but has uncurled by the exit percentage then it is no longer "grabbed"
-                        if (_manager.FingerStrengths[_grabbableHands[grabHandIndex]][i] < (i == 0 ? MINIMUM_THUMB_STRENGTH : MINIMUM_STRENGTH) || 
+                        if (_manager.FingerStrengths[_grabbableHands[grabHandIndex]][i] < (i == 0 ? MINIMUM_THUMB_STRENGTH : MINIMUM_STRENGTH) ||
                             _grabbableHandsValues[grabHandIndex].fingerStrength[i] * (1 - (i == 0 ? REQUIRED_THUMB_EXIT_STRENGTH : REQUIRED_EXIT_STRENGTH)) >= _manager.FingerStrengths[_grabbableHands[grabHandIndex]][i])
                         {
                             _grabbableHandsValues[grabHandIndex].fingerStrength[i] = -1;
@@ -952,11 +952,11 @@ namespace Leap.Unity.PhysicalHands
         {
             _velocityQueue.Enqueue(new VelocitySample(_rigid.velocity,
                                                       Time.time + VELOCITY_HISTORY_LENGTH));
-            
+
             while (true)
             {
                 VelocitySample oldestVelocity = _velocityQueue.Peek();
-                
+
                 // Dequeue conservatively
                 if (Time.time > oldestVelocity.removeTime)
                 {
@@ -968,7 +968,7 @@ namespace Leap.Unity.PhysicalHands
                 }
             }
         }
-        
+
         private void ThrowingOnRelease()
         {
             Vector3 averageVelocity = Vector3.zero;
