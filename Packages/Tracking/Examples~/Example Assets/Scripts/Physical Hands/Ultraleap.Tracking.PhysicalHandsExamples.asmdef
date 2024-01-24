@@ -1,0 +1,27 @@
+{
+    "name": "Ultraleap.Tracking.PhysicalHandsExamples",
+    "rootNamespace": "",
+    "references": [
+        "GUID:2ee0542102ac1084e8d9a910885c1e81",
+        "GUID:ba171b3dd2a51234ab864770f99741a5",
+        "GUID:e40ba710768534012815d3193fa296cb",
+        "GUID:5d2bbb4763a30e54ebe3c25d112247b1",
+        "GUID:cec9848704c49724192ff47f9b3e9156",
+        "GUID:dc960734dc080426fa6612f1c5fe95f3"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.xr.core-utils",
+            "expression": "1.0",
+            "define": "XR_UTILS_AVAILABLE"
+        }
+    ],
+    "noEngineReferences": false
+}

@@ -5,13 +5,20 @@
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
-
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Leap.Unity
 {
+    public enum ChiralitySelection
+    {
+        LEFT = 0,
+        RIGHT = 1,
+        BOTH = 2,
+        NONE = 3
+    }
+
     /// <summary>
     /// Static convenience methods and extension methods for getting useful Hand data.
     /// </summary>
@@ -42,7 +49,8 @@ namespace Leap.Unity
                         s_provider = UnityEngine.Object.FindAnyObjectByType<LeapProvider>();
                         if (s_provider == null)
                         {
-                            Debug.Log("There are no Leap Providers in the scene, please assign one manually");
+                            Debug.Log("There are no Leap Providers in the scene, please assign one manually." +
+                                "Alternatively, use Hands.CreateXRLeapProvider() to automatically create an XRLeapProvider");
                             return;
                         }
                     }
@@ -50,6 +58,21 @@ namespace Leap.Unity
             }
 
             Debug.Log("LeapProvider was not assigned. Auto assigning: " + s_provider);
+        }
+
+        /// <summary>
+        /// Assign a static reference to the most suitable provider in the scene.
+        /// 
+        /// Order:
+        /// - First PostProcessProvider found
+        /// - First XRLeapProviderManager found
+        /// - First LeapProvider found
+        /// </summary>
+        public static LeapXRServiceProvider CreateXRLeapProviderManager()
+        {
+            GameObject leapProviderGO = new GameObject("Leap XR Service Provider");
+            LeapXRServiceProvider leapXRServiceProvider = leapProviderGO.AddComponent<LeapXRServiceProvider>();
+            return leapXRServiceProvider;
         }
 
         /// <summary>
@@ -824,5 +847,42 @@ namespace Leap.Unity
 
         #endregion
 
+        #region Misc Utils
+
+        public static string FingerIndexToName(int fingerIndex)
+        {
+            switch (fingerIndex)
+            {
+                case 0:
+                    return "Thumb";
+                case 1:
+                    return "Index";
+                case 2:
+                    return "Middle";
+                case 3:
+                    return "Ring";
+                case 4:
+                    return "Pinky";
+            }
+            return "";
+        }
+
+        public static string JointIndexToName(int jointIndex)
+        {
+            switch (jointIndex)
+            {
+                case 0:
+                    return "Metacarpal";
+                case 1:
+                    return "Proximal";
+                case 2:
+                    return "Intermediate";
+                case 3:
+                    return "Distal";
+            }
+            return "";
+        }
+
+        #endregion
     }
 }

@@ -99,6 +99,7 @@ namespace Leap.Unity.HandsModule
         /// To set, change the public Chirality.
         /// </summary>
         public override Chirality Handedness { get { return Chirality; } set { } }
+
         /// <summary>
         /// The type of the Hand model (set to Graphics).
         /// </summary>

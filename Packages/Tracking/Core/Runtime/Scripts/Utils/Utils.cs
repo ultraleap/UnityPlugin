@@ -618,6 +618,38 @@ namespace Leap.Unity
             return count;
         }
 
+        /// <summary>
+        /// Converts a string of three floats (e.g. "(1.0, 2.0, 3.0)") to a Vector3
+        /// Credit: https://discussions.unity.com/t/string-to-vector3/158166/2
+        /// Returns Vector3.zero if incorrect string passed in
+        /// </summary>
+        public static Vector3 ToVector3(this string str)
+        {
+            // Remove the parentheses
+            if (str.StartsWith("(") && str.EndsWith(")"))
+            {
+                str = str.Substring(1, str.Length - 2);
+            }
+
+            // split the items
+            string[] sArray = str.Split(',');
+
+            Vector3 result = Vector3.zero;
+            try
+            {
+                result = new Vector3(
+                                float.Parse(sArray[0]),
+                                float.Parse(sArray[1]),
+                                float.Parse(sArray[2]));
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning(e.Message);
+            }
+
+            return result;
+        }
+
         #endregion
 
         #region Print Utils
@@ -890,6 +922,7 @@ namespace Leap.Unity
 
             return false;
         }
+
 
         #endregion
 
@@ -2820,6 +2853,18 @@ namespace Leap.Unity
         {
             if (valueMin == valueMax) return resultMin;
             return Mathf.LerpUnclamped(resultMin, resultMax, ((value - valueMin) / (valueMax - valueMin)));
+        }
+
+        /// <summary>
+        /// Map a float from a range to the 0-1 range. E.g. (34 , 0, 100) returns as 0.34f 
+        /// </summary>
+        /// <param name="value"> The value which should be mapped between 0 and 1</param>
+        /// <param name="min"> Min value for the input range</param>
+        /// <param name="max"> Max value for the input range</param>
+        /// <returns></returns>
+        public static float Map01(float value, float min, float max)
+        {
+            return (value - min) * 1f / (max - min);
         }
 
         /// <summary>

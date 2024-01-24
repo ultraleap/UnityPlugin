@@ -88,11 +88,11 @@ namespace Leap.Unity.HandsModule
 
             if (myTarget.gameObject.name.ToUpper().Contains("Left".ToUpper()))
             {
-                myTarget.Handedness = Unity.Chirality.Left;
+                myTarget.Handedness = Chirality.Left;
             }
             if (myTarget.gameObject.name.ToUpper().Contains("Right".ToUpper()))
             {
-                myTarget.Handedness = Unity.Chirality.Right;
+                myTarget.Handedness = Chirality.Right;
             }
 
             SetSerializedProperties();
