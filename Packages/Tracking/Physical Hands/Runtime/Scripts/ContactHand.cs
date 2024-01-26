@@ -16,6 +16,10 @@ namespace Leap.Unity.PhysicalHands
         internal const int FINGERS = 5, FINGER_BONES = 3;
 
         internal ContactBone[] bones;
+        /// <summary>
+        /// Allows you to quickly iterate over the bones in a loop
+        /// </summary>
+        public ContactBone[] contactBones => bones;
         internal ContactBone palmBone;
 
         /// <summary>
@@ -259,6 +263,11 @@ namespace Leap.Unity.PhysicalHands
         public ContactBone GetBone(int fingerIndex, int jointIndex)
         {
             return bones[fingerIndex * FINGER_BONES + jointIndex];
+        }
+
+        public ContactBone GetPalmBone()
+        {
+            return palmBone;
         }
 
         protected void CacheHandData(Hand dataHand)
