@@ -314,6 +314,22 @@ namespace Leap.Unity.PhysicalHands
         }
         #endregion
 
+        #region Object Information
+        public bool IsObjectGrabbing(Rigidbody rigid, out ContactHand hand)
+        {
+            hand = null;
+            if (_grabHelperObjects.TryGetValue(rigid, out GrabHelperObject helper))
+            {
+                if (helper.GrabState == GrabHelperObject.State.Grab && helper.GrabbingHands.Count > 0)
+                {
+                    hand = helper.GrabbingHands[helper.GrabbingHands.Count - 1];
+                    return true;
+                }
+            }
+            return false;
+        }
+        #endregion
+
         private void OnValidate()
         {
             if (physicalHandsManager == null)
