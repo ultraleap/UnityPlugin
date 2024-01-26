@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -121,14 +121,6 @@ namespace Leap
                 IsStreaming = true;
             else
                 IsStreaming = false;
-            if ((status & eLeapDeviceStatus.eLeapDeviceStatus_Smudged) == eLeapDeviceStatus.eLeapDeviceStatus_Smudged)
-                IsSmudged = true;
-            else
-                IsSmudged = false;
-            if ((status & eLeapDeviceStatus.eLeapDeviceStatus_Robust) == eLeapDeviceStatus.eLeapDeviceStatus_Robust)
-                IsLightingBad = true;
-            else
-                IsLightingBad = false;
             if ((status & eLeapDeviceStatus.eLeapDeviceStatus_LowResource) == eLeapDeviceStatus.eLeapDeviceStatus_LowResource)
                 IsLowResource = true;
             else
@@ -349,6 +341,7 @@ namespace Leap
         /// over the Leap Motion cameras.
         /// @since 3.0
         /// </summary>
+        [Obsolete("IsSmudged is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
         public bool IsSmudged { get; internal set; }
 
         /// <summary>
@@ -363,6 +356,7 @@ namespace Leap
         /// isLightingBad() is true. 
         /// @since 3.0 
         /// </summary>
+        [Obsolete("IsLightingBad is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
         public bool IsLightingBad { get; internal set; }
 
         /// <summary>

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -614,51 +614,23 @@ namespace Leap.Unity
                 updateDevice();
             }
 
-            if (_useInterpolation)
-            {
-#if !UNITY_ANDROID || UNITY_EDITOR
-                _smoothedTrackingLatency.value = Mathf.Min(_smoothedTrackingLatency.value, 30000f);
-                _smoothedTrackingLatency.Update((float)(_leapController.Now() - _leapController.FrameTimestamp()), Time.deltaTime);
-#endif
-                long timestamp = CalculateInterpolationTime() + (ExtrapolationAmount * 1000);
-                _unityToLeapOffset = timestamp - (long)(Time.time * S_TO_US);
-
-                _leapController.GetInterpolatedFrameFromTime(_untransformedUpdateFrame, timestamp, CalculateInterpolationTime() - (BounceAmount * 1000), _currentDevice);
-            }
-            else
-            {
-                _leapController.Frame(_untransformedUpdateFrame);
-            }
-
-            if (_untransformedUpdateFrame != null)
-            {
-                transformFrame(_untransformedUpdateFrame, _transformedUpdateFrame);
-
-                DispatchUpdateFrameEvent(_transformedUpdateFrame);
-            }
+            HandleUpdateFrameInterpolationAndTransformation();
+            DispatchUpdateFrameEvent(_transformedUpdateFrame);
         }
 
         protected virtual void FixedUpdate()
         {
-            if (_frameOptimization == FrameOptimizationMode.ReuseUpdateForPhysics)
-            {
-                DispatchFixedFrameEvent(_transformedUpdateFrame);
-                return;
-            }
-
             if (_useInterpolation)
             {
-
                 long timestamp;
                 switch (_frameOptimization)
                 {
                     case FrameOptimizationMode.None:
-                        // By default we use Time.fixedTime to ensure that our hands are on the same
-                        // timeline as Update.  We add an extrapolation value to help compensate
-                        // for latency.
-                        float extrapolatedTime = Time.fixedTime + CalculatePhysicsExtrapolation();
-                        timestamp = (long)(extrapolatedTime * S_TO_US) + _unityToLeapOffset;
-                        break;
+                    case FrameOptimizationMode.ReuseUpdateForPhysics:
+                        // Caculate a new frame and then dispatch it
+                        HandleUpdateFrameInterpolationAndTransformation();
+                        DispatchFixedFrameEvent(_transformedUpdateFrame);
+                        return;
                     case FrameOptimizationMode.ReusePhysicsForUpdate:
                         // If we are re-using physics frames for update, we don't even want to care
                         // about Time.fixedTime, just grab the most recent interpolated timestamp
@@ -680,7 +652,6 @@ namespace Leap.Unity
             if (_untransformedFixedFrame != null)
             {
                 transformFrame(_untransformedFixedFrame, _transformedFixedFrame);
-
                 DispatchFixedFrameEvent(_transformedFixedFrame);
             }
         }
@@ -724,6 +695,30 @@ namespace Leap.Unity
                 default:
                     throw new System.InvalidOperationException(
                       "Unexpected physics extrapolation mode: " + _physicsExtrapolation);
+            }
+        }
+
+        void HandleUpdateFrameInterpolationAndTransformation()
+        {
+            if (_useInterpolation)
+            {
+#if !UNITY_ANDROID || UNITY_EDITOR
+                _smoothedTrackingLatency.value = Mathf.Min(_smoothedTrackingLatency.value, 30000f);
+                _smoothedTrackingLatency.Update((float)(_leapController.Now() - _leapController.FrameTimestamp()), Time.deltaTime);
+#endif
+                long timestamp = CalculateInterpolationTime() + (ExtrapolationAmount * 1000);
+                _unityToLeapOffset = timestamp - (long)(Time.time * S_TO_US);
+
+                _leapController.GetInterpolatedFrameFromTime(_untransformedUpdateFrame, timestamp, CalculateInterpolationTime() - (BounceAmount * 1000), _currentDevice);
+            }
+            else
+            {
+                _leapController.Frame(_untransformedUpdateFrame);
+            }
+
+            if (_untransformedUpdateFrame != null)
+            {
+                transformFrame(_untransformedUpdateFrame, _transformedUpdateFrame);
             }
         }
 

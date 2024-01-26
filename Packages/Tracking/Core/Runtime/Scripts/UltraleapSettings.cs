@@ -1,5 +1,5 @@
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
 using System.IO;
@@ -80,6 +80,19 @@ namespace Leap.Unity
             }
             EditorGUILayout.Space(30);
 
+            EditorGUILayout.LabelField("Notifications", EditorStyles.boldLabel);
+            using (new EditorGUI.IndentLevelScope())
+            {
+                SerializedProperty showAndroidBuildArchitectureWarning = settings.FindProperty("showAndroidBuildArchitectureWarning");
+                showAndroidBuildArchitectureWarning.boolValue = EditorGUILayout.ToggleLeft("Show Android Architecture build warning", showAndroidBuildArchitectureWarning.boolValue);
+
+                SerializedProperty showPhysicalHandsPhysicsSettingsWarning = settings.FindProperty("showPhysicalHandsPhysicsSettingsWarning");
+                showPhysicalHandsPhysicsSettingsWarning.boolValue = EditorGUILayout.ToggleLeft("Show physical hands physics settings warning", showPhysicalHandsPhysicsSettingsWarning.boolValue);
+            }
+
+
+            EditorGUILayout.Space(30);
+
             if (GUILayout.Button("Reset To Defaults"))
             {
                 if (EditorUtility.DisplayDialog("Reset all settings", "This will reset all settings in this Ultraleap settings file", "Yes", "No"))
@@ -108,6 +121,7 @@ namespace Leap.Unity
             set { instance = value; }
         }
 
+        // XRHands and Input System
         [HideInInspector, SerializeField]
         public bool leapSubsystemEnabled;
 
@@ -116,6 +130,12 @@ namespace Leap.Unity
 
         [HideInInspector, SerializeField]
         public bool updateMetaInputSystem;
+
+        [HideInInspector, SerializeField]
+        public bool showAndroidBuildArchitectureWarning = true;
+
+        [HideInInspector, SerializeField]
+        public bool showPhysicalHandsPhysicsSettingsWarning = true;
 
         public void ResetToDefaults()
         {
@@ -194,7 +214,7 @@ namespace Leap.Unity
         }
 
 #if UNITY_EDITOR
-        internal static SerializedObject GetSerializedSettings()
+        public static SerializedObject GetSerializedSettings()
         {
             return new SerializedObject(FindSettingsSO());
         }

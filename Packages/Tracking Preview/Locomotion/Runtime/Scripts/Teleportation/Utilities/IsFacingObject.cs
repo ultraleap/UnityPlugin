@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -7,7 +7,7 @@
  ******************************************************************************/
 
 using Leap.Unity.Interaction;
-using Leap.Unity.Interaction.PhysicsHands;
+using Leap.Unity.PhysicalHands;
 using Leap.Unity.Preview.HandRays;
 using System.Collections.Generic;
 using UnityEngine;
@@ -66,15 +66,16 @@ namespace Leap.Unity.Preview.Locomotion
                 // Ignore any grasped objects 
                 _layerMask ^= interactionManager.interactionNoContactLayer.layerMask;
             }
-            PhysicsProvider physicsProvider = FindAnyObjectByType<PhysicsProvider>();
-            if (physicsProvider != null)
+
+            PhysicalHandsManager physicalHandsManager = FindAnyObjectByType<PhysicalHandsManager>();
+            if (physicalHandsManager != null)
             {
-                _layerMask ^= physicsProvider.HandsLayer.layerMask;
-                _layerMask ^= physicsProvider.HandsResetLayer.layerMask;
+                _layerMask ^= physicalHandsManager.HandsLayer.layerMask;
+                _layerMask ^= physicalHandsManager.HandsResetLayer.layerMask;
             }
 
             FarFieldLayerManager farFieldLayerManager = FindAnyObjectByType<FarFieldLayerManager>();
-            if (physicsProvider != null)
+            if (farFieldLayerManager != null)
             {
                 _layerMask ^= farFieldLayerManager.FarFieldObjectLayer.layerMask;
                 _layerMask ^= farFieldLayerManager.FloorLayer.layerMask;

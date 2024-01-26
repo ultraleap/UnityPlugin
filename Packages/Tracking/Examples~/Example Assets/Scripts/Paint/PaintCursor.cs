@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -68,7 +68,15 @@ namespace Leap.Unity.Examples
                 hand = pinchDetector.HandModel.GetLeapHand();
             }
 
-            if (hand == null || hand.GetIndex() == null || hand.GetThumb() == null) return;
+            if (hand == null || hand.GetIndex() == null || hand.GetThumb() == null)
+            {
+                _rectToroidPinchTargetRenderer.enabled = false;
+                _rectToroidPinchStateRenderer.enabled = false;
+                return;
+            }
+
+            _rectToroidPinchTargetRenderer.enabled = true;
+            _rectToroidPinchStateRenderer.enabled = true;
 
             var indexPos = hand.GetIndex().TipPosition;
             var thumbPos = hand.GetThumb().TipPosition;
