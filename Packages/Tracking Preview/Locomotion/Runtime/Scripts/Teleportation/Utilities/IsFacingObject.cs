@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -7,8 +7,8 @@
  ******************************************************************************/
 
 using Leap.Unity.Interaction;
-using Leap.Unity.Preview.HandRays;
 using Leap.Unity.PhysicalHands;
+using Leap.Unity.Preview.HandRays;
 using System.Collections.Generic;
 using UnityEngine;
 

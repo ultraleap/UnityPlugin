@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -193,7 +193,7 @@ namespace Leap.Unity.PhysicalHands
 
             articulation.velocity = delta;
 
-            Quaternion rotationDelta =  Quaternion.Normalize(Quaternion.Slerp(Quaternion.identity, hand.Rotation * Quaternion.Inverse(transform.rotation), hardContactHand.contactForceModifier));
+            Quaternion rotationDelta = Quaternion.Normalize(Quaternion.Slerp(Quaternion.identity, hand.Rotation * Quaternion.Inverse(transform.rotation), hardContactHand.contactForceModifier));
 
             rotationDelta.ToAngleAxis(out float angleInDeg, out Vector3 rotationAxis);
 
@@ -248,7 +248,7 @@ namespace Leap.Unity.PhysicalHands
 
         private void UpdateBoneAngle(Bone prevBone, Bone bone, bool forceUpdate = false)
         {
-            if(!forceUpdate && !Time.inFixedTimeStep)
+            if (!forceUpdate && !Time.inFixedTimeStep)
             {
                 return;
             }
@@ -259,8 +259,8 @@ namespace Leap.Unity.PhysicalHands
 
             float thumbEnterDistance = finger == 0 ? hardContactParent.contactThumbEnterDistance : hardContactParent.contactEnterDistance;
 
-            if (hardContactHand.grabbingFingerDistances[finger] != 1 && 
-                hardContactHand.grabbingFingerDistances[finger] > thumbEnterDistance && 
+            if (hardContactHand.grabbingFingerDistances[finger] != 1 &&
+                hardContactHand.grabbingFingerDistances[finger] > thumbEnterDistance &&
                 _xTargetAngle > _grabbingXDrive)
             {
                 _grabbingXDrive = Mathf.Clamp(Mathf.Lerp(_grabbingXDrive, _xTargetAngle, Time.fixedDeltaTime * 4),
@@ -269,7 +269,7 @@ namespace Leap.Unity.PhysicalHands
 
             _xForceLimit = Mathf.Lerp(hardContactParent.minFingerVelocity, hardContactParent.maxFingerVelocity, hardContactHand.contactForceModifier);
 
-            if(contactHand.ghosted)
+            if (contactHand.ghosted)
             {
                 SetDefaultArticulationDrives(prevBone, bone); // we are currenlty ghosted, so allow free movement
             }
@@ -428,7 +428,7 @@ namespace Leap.Unity.PhysicalHands
                         _xDampening = 10f;
                     }
                     hardContactHand.grabbingFingers[finger] = joint;
-                    
+
                 }
                 else if (_wasBoneGrabbing)
                 {

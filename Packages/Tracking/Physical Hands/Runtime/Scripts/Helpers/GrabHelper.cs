@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -128,7 +128,7 @@ namespace Leap.Unity.PhysicalHands
                 // Get the least curled finger excluding the thumb
                 var curls = _fingerStrengths[hand];
 
-                for(int i = 1; i < curls.Length; i++)
+                for (int i = 1; i < curls.Length; i++)
                 {
                     if (curls[i] < lerp)
                     {
@@ -145,11 +145,11 @@ namespace Leap.Unity.PhysicalHands
             //      Radius = the size of the palm + the hover distance
             //      Cache the result
             //      Use the interaction mask that the hands use to collide
-            int nearbyObjectCount = Physics.OverlapCapsuleNonAlloc(hand.palmBone.transform.position + 
+            int nearbyObjectCount = Physics.OverlapCapsuleNonAlloc(hand.palmBone.transform.position +
                 (-hand.palmBone.transform.up * 0.025f) + ((hand.Handedness == Chirality.Left ? hand.palmBone.transform.right : -hand.palmBone.transform.right) * 0.015f),
                 hand.palmBone.transform.position + (-hand.palmBone.transform.up * Mathf.Lerp(0.025f, 0.07f, lerp)) + (hand.palmBone.transform.forward * Mathf.Lerp(0.06f, 0.02f, lerp)),
-                radiusAmount + physicalHandsManager.HoverDistance, 
-                _colliderCache, 
+                radiusAmount + physicalHandsManager.HoverDistance,
+                _colliderCache,
                 physicalHandsManager.InteractionMask);
 
             RemoveUnhoveredHandsFromGrabHelperObjects(nearbyObjectCount, hand);

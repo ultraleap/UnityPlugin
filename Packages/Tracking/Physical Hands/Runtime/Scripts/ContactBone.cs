@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -335,7 +335,7 @@ namespace Leap.Unity.PhysicalHands
 
                     foreach (var value in _nearbyObjects[rigid].Values)
                     {
-                        if(value.isContactingCollider)
+                        if (value.isContactingCollider)
                         {
                             isGrabable = true;
                             break;
@@ -369,7 +369,7 @@ namespace Leap.Unity.PhysicalHands
             for (int i = 0; i < oldRigidCount; i++)
             {
                 // Remove no longer contacting objects
-                if(_nearbyObjects.TryGetValue(_oldRigids[i], out Dictionary<Collider, ClosestColliderDirection> disposePoolObj));
+                if (_nearbyObjects.TryGetValue(_oldRigids[i], out Dictionary<Collider, ClosestColliderDirection> disposePoolObj)) ;
                 {
                     disposePoolObj.Clear();
                     Pool<Dictionary<Collider, ClosestColliderDirection>>.Recycle(disposePoolObj);

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -52,7 +52,7 @@ namespace Leap.Unity.PhysicalHands
             // Calculate how far off its target the contact bone is.
             float errorDistance = Vector3.Distance(lastTargetPosition, Collider.attachedRigidbody.position);
 
-            if(errorDistance > teleportDistance)
+            if (errorDistance > teleportDistance)
             {
                 Collider.attachedRigidbody.position = targetPosition;
                 Collider.attachedRigidbody.rotation = targetRotation;

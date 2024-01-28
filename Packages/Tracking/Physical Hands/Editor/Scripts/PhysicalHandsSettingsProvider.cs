@@ -51,6 +51,19 @@ namespace Leap.Unity.PhysicalHands
 
             GUILayout.Space(LARGE_SPACE);
 
+            GUIStyle textAreaStyle = new GUIStyle(EditorStyles.textArea);
+            textAreaStyle.wordWrap = true;
+            EditorGUILayout.HelpBox($"Note, these settings will affect your entire project. \n\n" +
+                "We recommend that you have them enabled when using Physical Hands. \n" +
+                "However, they may negatively effect non-physics hands scenes. \n\n" +
+                "If you wish to revert these and all physics settings go here: \n" +
+                "Project settings > Physics > kebab menu > reset. \n" +
+                "Project settings > Time > kebab menu > reset. \n\n" +
+                "(Kebab menu refers to the three dots in the top right corner) \n\n" +
+                "This will also reset any changes you have made to physics settings independent of these recommended settings.", MessageType.Warning);
+
+            GUILayout.Space(LARGE_SPACE);
+
             if (PhysicalHandsSettings.AllSettingsApplied())
             {
                 EditorGUILayout.LabelField("All recommended settings have been applied");
