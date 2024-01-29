@@ -1079,7 +1079,7 @@ namespace Leap.Unity.Interaction
             {
                 if (!hasColliders) hasColliders = true;
 
-                if (collider is MeshCollider)
+                if (collider is MeshCollider && collider.attachedRigidbody != null)
                 {
                     // Native, faster ClosestPoint, but no support for off-center colliders; use to
                     // support MeshColliders.
