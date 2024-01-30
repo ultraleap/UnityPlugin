@@ -34,7 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Physical Hands. This introduces a new way of interacting with object in the virtual world using your hands and unitys physics engine.
 
 ### Changed
-- Removed Physics Hands from the preview package as Physics Hands has replaced it.
+- Removed Physics Hands from the preview package as Physical Hands has replaced it.
 
 ### Known issues
 - Repeatedly opening scenes can cause memory use increase
