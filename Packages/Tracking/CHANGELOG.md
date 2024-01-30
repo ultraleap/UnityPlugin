@@ -18,7 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - (Config) Additional uses of Config marked as Obsolete
-- 
+- Any LeapServiceProvider can be used with MRTK subsystem
 
 ### Fixed
 - 
