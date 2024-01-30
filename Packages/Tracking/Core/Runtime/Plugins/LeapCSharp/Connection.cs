@@ -88,6 +88,7 @@ namespace LeapInternal
         private Dictionary<uint, UInt64> _activePolicies = new Dictionary<uint, ulong>();
 
         //Config change status
+        [Obsolete("Config is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
         private Dictionary<uint, string> _configRequests = new Dictionary<uint, string>();
 
         //Connection events
@@ -124,7 +125,9 @@ namespace LeapInternal
         public EventHandler<FrameEventArgs> LeapFrame;
         public EventHandler<InternalFrameEventArgs> LeapInternalFrame;
         public EventHandler<LogEventArgs> LeapLogEvent;
+        [Obsolete("Config is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
         public EventHandler<SetConfigResponseEventArgs> LeapConfigResponse;
+        [Obsolete("Config is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
         public EventHandler<ConfigChangeEventArgs> LeapConfigChange;
         public EventHandler<DistortionEventArgs> LeapDistortionChange;
         public EventHandler<DroppedFrameEventArgs> LeapDroppedFrame;
@@ -353,11 +356,6 @@ namespace LeapInternal
                             LEAP_DEVICE_EVENT device_lost_evt;
                             StructMarshal<LEAP_DEVICE_EVENT>.PtrToStruct(_msg.eventStructPtr, out device_lost_evt);
                             handleLostDevice(ref device_lost_evt);
-                            break;
-                        case eLeapEventType.eLeapEventType_ConfigChange:
-                            LEAP_CONFIG_CHANGE_EVENT config_change_evt;
-                            StructMarshal<LEAP_CONFIG_CHANGE_EVENT>.PtrToStruct(_msg.eventStructPtr, out config_change_evt);
-                            handleConfigChange(ref config_change_evt);
                             break;
                         case eLeapEventType.eLeapEventType_DroppedFrame:
                             LEAP_DROPPED_FRAME_EVENT dropped_frame_evt;
@@ -733,19 +731,6 @@ namespace LeapInternal
             }
         }
 
-        private void handleConfigChange(ref LEAP_CONFIG_CHANGE_EVENT configEvent)
-        {
-            string config_key = "";
-            _configRequests.TryGetValue(configEvent.requestId, out config_key);
-            if (config_key != null)
-                _configRequests.Remove(configEvent.requestId);
-            if (LeapConfigChange != null)
-            {
-                LeapConfigChange.DispatchOnContext(this, EventContext,
-                  new ConfigChangeEventArgs(config_key, configEvent.status != false, configEvent.requestId));
-            }
-        }
-
         private void reportLogMessage(ref LEAP_LOG_EVENT logMsg)
         {
             if (LeapLogEvent != null)
@@ -1071,6 +1056,7 @@ namespace LeapInternal
             return _activePolicies.ContainsKey(deviceID);
         }
 
+        [Obsolete("Config is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
         public uint GetConfigValue(string config_key)
         {
             uint requestId = 0;
@@ -1080,6 +1066,7 @@ namespace LeapInternal
             return requestId;
         }
 
+        [Obsolete("Config is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
         public uint SetConfigValue<T>(string config_key, T value) where T : IConvertible
         {
             uint requestId = 0;
