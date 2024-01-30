@@ -17,10 +17,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 
 
 ### Changed
-- Allow use of any LeapServiceProvider with the MRTK subsystem where before only LeapXRServiceProvider could be used.
+- (Config) Additional uses of Config marked as Obsolete
+- Any LeapServiceProvider can be used with MRTK subsystem
 
 ### Fixed
 - 
+
+## [6.14.0] - 24/01/24
+
+### Tracking Client versions
+- Windows 	v5.17.1
+- MacOS 	v5.17.1
+- Android 	v5.17.1
+
+### Added
+- Physical Hands. This introduces a new way of interacting with object in the virtual world using your hands and unitys physics engine.
+
+### Changed
+- Removed Physics Hands from the preview package as Physical Hands has replaced it.
 
 ### Known issues
 - Repeatedly opening scenes can cause memory use increase
