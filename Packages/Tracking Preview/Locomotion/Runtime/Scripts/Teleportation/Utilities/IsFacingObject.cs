@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -7,7 +7,7 @@
  ******************************************************************************/
 
 using Leap.Unity.Interaction;
-using Leap.Unity.Interaction.PhysicsHands;
+using Leap.Unity.PhysicalHands;
 using Leap.Unity.Preview.HandRays;
 using System.Collections.Generic;
 using UnityEngine;
@@ -70,23 +70,24 @@ namespace Leap.Unity.Preview.Locomotion
                 // Ignore any grasped objects 
                 _layerMask ^= interactionManager.interactionNoContactLayer.layerMask;
             }
-#if UNITY_2021_3_18_OR_NEWER
-            PhysicsProvider physicsProvider = FindAnyObjectByType<PhysicsProvider>();
-#else
-            PhysicsProvider physicsProvider = FindObjectOfType<PhysicsProvider>();
-#endif
 
-            if (physicsProvider != null)
+#if UNITY_2021_3_18_OR_NEWER
+            PhysicalHandsManager physicalHandsManager = FindAnyObjectByType<PhysicalHandsManager>();
+#else
+            PhysicalHandsManager physicalHandsManager = FindObjectOfType<PhysicalHandsManager>();
+#endif
+            if (physicalHandsManager != null)
             {
-                _layerMask ^= physicsProvider.HandsLayer.layerMask;
-                _layerMask ^= physicsProvider.HandsResetLayer.layerMask;
+                _layerMask ^= physicalHandsManager.HandsLayer.layerMask;
+                _layerMask ^= physicalHandsManager.HandsResetLayer.layerMask;
             }
+
 #if UNITY_2021_3_18_OR_NEWER
             FarFieldLayerManager farFieldLayerManager = FindAnyObjectByType<FarFieldLayerManager>();
 #else
             FarFieldLayerManager farFieldLayerManager = FindObjectOfType<FarFieldLayerManager>();
 #endif
-            if (physicsProvider != null)
+            if (farFieldLayerManager != null)
             {
                 _layerMask ^= farFieldLayerManager.FarFieldObjectLayer.layerMask;
                 _layerMask ^= farFieldLayerManager.FloorLayer.layerMask;

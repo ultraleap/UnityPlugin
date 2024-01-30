@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -65,7 +65,12 @@ namespace Leap.Unity.Preview.HandRays
 
         protected void AssignLayers()
         {
+#if UNITY_2021_3_18_OR_NEWER
             FarFieldObject[] farFieldObjects = FindObjectsByType<FarFieldObject>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+#else
+            FarFieldObject[] farFieldObjects = FindObjectsOfType<FarFieldObject>(true);
+#endif
+
             foreach (FarFieldObject ffo in farFieldObjects)
             {
                 ffo.gameObject.layer = FarFieldObjectLayer;

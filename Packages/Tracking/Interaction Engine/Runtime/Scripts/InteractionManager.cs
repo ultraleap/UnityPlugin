@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -264,13 +264,17 @@ namespace Leap.Unity.Interaction
         {
             get
             {
+#if UNITY_2021_3_18_OR_NEWER
                 if (s_instance == null) { s_instance = FindAnyObjectByType<InteractionManager>(); }
+#else
+                if (s_instance == null) { s_instance = FindObjectOfType<InteractionManager>(); }
+#endif
                 return s_instance;
             }
             set { s_instance = value; }
         }
 
-        #endregion
+#endregion
 
         #region Unity Events
 
@@ -304,12 +308,21 @@ namespace Leap.Unity.Interaction
 #if UNITY_EDITOR
             if (_drawControllerRuntimeGizmos == true)
             {
+#if UNITY_2021_3_18_OR_NEWER
                 if (FindAnyObjectByType<RuntimeGizmoManager>() == null)
                 {
                     Debug.LogWarning("'_drawControllerRuntimeGizmos' is enabled, but there is no "
                                    + "RuntimeGizmoManager in your scene. Please add one if you'd "
                                    + "like to render gizmos in the editor and in your headset.");
                 }
+#else
+                if (FindObjectOfType<RuntimeGizmoManager>() == null)
+                {
+                    Debug.LogWarning("'_drawControllerRuntimeGizmos' is enabled, but there is no "
+                                   + "RuntimeGizmoManager in your scene. Please add one if you'd "
+                                   + "like to render gizmos in the editor and in your headset.");
+                }
+#endif
             }
 #endif
         }

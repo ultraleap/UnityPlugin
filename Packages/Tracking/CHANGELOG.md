@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
 
-## [NEXT] - xx/xx/xx
+## [6.13.0] - 24/01/24
 
 ### Tracking Client versions
 - Windows 	v5.17.1
@@ -14,13 +14,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Android 	v5.17.1
 
 ### Added
-- 
+- Physical Hands. This introduces a new way of interacting with object in the virtual world using your hands and unitys physics engine.
 
 ### Changed
-- 
+- Removed Physics Hands from the preview package as Physics Hands has replaced it.
 
-### Fixed
-- 
 
 ### Known issues
 - Repeatedly opening scenes can cause memory use increase
