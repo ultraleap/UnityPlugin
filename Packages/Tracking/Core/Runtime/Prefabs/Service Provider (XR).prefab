@@ -59,8 +59,8 @@ MonoBehaviour:
   _preventInitializingTrackingMode: 0
   _serverNameSpace: Leap Service
   _useInterpolation: 1
-  _reconnectionAttempts: 5
-  _reconnectionInterval: 180
+  _reconnectionAttempts: 10
+  _reconnectionInterval: 360
   _deviceOffsetMode: 0
   _deviceOffsetYAxis: 0
   _deviceOffsetZAxis: 0.08
