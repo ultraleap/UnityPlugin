@@ -54,8 +54,11 @@ namespace Leap.Unity.Examples
 
 #if XR_UTILS_AVAILABLE
             // Look for an XROrigin
+#if UNITY_2021_3_18_OR_NEWER
             XROrigin xROrigin = FindAnyObjectByType<XROrigin>();
-
+#else
+            XROrigin xROrigin = FindObjectOfType<XROrigin>();
+#endif
             if (xROrigin != null)
             {
                 // use the XROrigin and exit out

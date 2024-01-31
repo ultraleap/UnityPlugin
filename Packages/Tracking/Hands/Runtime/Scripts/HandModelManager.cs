@@ -43,8 +43,11 @@ namespace Leap.Unity.HandsModule
         /// </summary>
         public void RegisterAllUnregisteredHandModels()
         {
+#if UNITY_2021_3_18_OR_NEWER
             HandModelBase[] potentiallyUnpairedHandModels = FindObjectsByType<HandModelBase>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-
+#else
+            HandModelBase[] potentiallyUnpairedHandModels = FindObjectsOfType<HandModelBase>(true);
+#endif
             for (int i = 0; i < potentiallyUnpairedHandModels.Length; i++)
             {
                 if (!IsRegistered(potentiallyUnpairedHandModels[i]))

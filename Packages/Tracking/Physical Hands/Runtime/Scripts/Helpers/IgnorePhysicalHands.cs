@@ -66,7 +66,11 @@ namespace Leap.Unity.PhysicalHands
 
         private void Start()
         {
+#if UNITY_2021_3_18_OR_NEWER
             _physicalHandsManager = (PhysicalHandsManager)FindAnyObjectByType(typeof(PhysicalHandsManager));
+#else
+            _physicalHandsManager = (PhysicalHandsManager)FindObjectOfType<PhysicalHandsManager>();
+#endif
 
             if (_physicalHandsManager != null)
             {

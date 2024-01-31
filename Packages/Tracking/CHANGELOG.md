@@ -21,7 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Any LeapServiceProvider can be used with MRTK subsystem
 
 ### Fixed
-- 
+- Errors in Editor when using pre-2023.3.18 LTS due to FindObjectByType issue
 
 ## [6.14.0] - 24/01/24
 

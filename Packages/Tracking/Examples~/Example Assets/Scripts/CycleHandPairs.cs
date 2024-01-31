@@ -22,7 +22,11 @@ namespace Leap.Unity.HandsModule.Examples
         {
             if (handModelManager == null)
             {
+#if UNITY_2021_3_18_OR_NEWER
                 handModelManager = FindAnyObjectByType<HandModelManager>();
+#else
+                handModelManager = FindObjectOfType<HandModelManager>();
+#endif
                 if (handModelManager == null)
                 {
                     Debug.LogWarning("CycleHandPairs needs a HandModelManager in the scene");
