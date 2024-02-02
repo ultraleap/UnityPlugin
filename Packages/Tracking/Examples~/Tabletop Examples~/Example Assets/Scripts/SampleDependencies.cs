@@ -15,7 +15,7 @@ namespace Leap.Examples.Tabletop
     {
         const string SAMPLE_NAME = "Tabletop Examples";                                 // The name of the sample this script relates to
         const string PACKAGE_NAME = "com.ultraleap.tracking";                           // The name of the package this sample is dependent on
-        static readonly string[] DEPENDENCIES = new string[] { "Core Example Assets" }; // The samples SAMPLE_NAME is dependent on
+        static readonly string[] DEPENDENCIES = new string[] { "Shared Example Assets [Required]" }; // The samples SAMPLE_NAME is dependent on
 
         static SampleDependencies()
         {

@@ -21,14 +21,9 @@
   },
   "samples": [
     {
-      "displayName": "Interaction Examples",
-      "description": "A collection of XR and non-XR interaction examples for the Ultraleap Tracking package",
-      "path": "Examples Old~"
-    },
-    {
-      "displayName": "Core Example Assets",
+      "displayName": "Shared Example Assets [Required]",
       "description": "Shared core example assets for all other Ultraleap Sample content.",
-      "path": "Examples~/Core Example Assets~"
+      "path": "Examples~/Shared Example Assets~"
     },
     {
       "displayName": "XR Examples",
