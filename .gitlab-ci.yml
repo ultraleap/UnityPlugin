@@ -247,7 +247,8 @@ dependencies-libtrack:
     
     # Relative path from project directory to the project this job matches
     UNITY_PROJECT_PATH: "$CI_UNITY_PROJECTS_PATH/$UNITY_PROJECT_FOLDER"
-
+    UNITY_PROJECT_UNITYPLUGIN_ASSETS_PATH: "$UNITY_PROJECT_PATH/$UNITYPLUGIN_ASSETS_PATH"
+    
   cache:
     key: "$CACHE_LIBRARY_KEY"
     paths:
@@ -381,7 +382,7 @@ dependencies-libtrack:
 # This job moves/modifies content to be more suitable for .unitypackage and exports multiple .unitypackage artifacts.
 #
 export-unitypackages:
-  extends: .base
+  extends: .unity-template
   stage: build
 
   needs:
