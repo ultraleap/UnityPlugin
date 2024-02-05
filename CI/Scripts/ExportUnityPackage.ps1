@@ -76,7 +76,7 @@ function global:Export-UnityPackage
                 $Path)
 
             # Also replaces backslashes with forward slashes and removes leading "./"
-            return $($(Resolve-Path -Relative $Path) -replace '\\', '/').Substring(2)
+            return $($(Resolve-Path -Relative $Path)) # -replace '\\', '/').Substring(2)
         }
 
         Write-Host "Exporting '$ExportPath' to '$Output' at import path '$ImportPath'"
