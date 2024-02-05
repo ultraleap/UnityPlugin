@@ -23,22 +23,22 @@
     {
       "displayName": "Shared Example Assets [Required]",
       "description": "Shared core example assets for all other Ultraleap Sample content.",
-      "path": "Examples~/Shared Example Assets~"
+      "path": "Examples~/Shared Example Assets"
     },
     {
       "displayName": "XR Examples",
       "description": "XR-focussed examples for head mounted Ultraleap hand tracking cameras and Ultraleap-enabled HMDs.",
-      "path": "Examples~/XR Examples~"
+      "path": "Examples~/XR Examples"
     },
     {
       "displayName": "Tabletop Examples",
       "description": "Tabletop-focussed examples for Desktop and Screentop mounted Ultraleap hand tracking cameras.",
-      "path": "Examples~/Tabletop Examples~"
+      "path": "Examples~/Tabletop Examples"
     },
     {
       "displayName": "URP Examples",
       "description": "Example URP-specific content. Note: Other example content will also work with URP after upgrading materials.",
-      "path": "Examples~/URP Examples~"
+      "path": "Examples~/URP Examples"
     }
   ]
 }
