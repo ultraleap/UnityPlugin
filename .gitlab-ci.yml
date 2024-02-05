@@ -387,62 +387,104 @@ export-unitypackages:
      artifacts: true
 
   variables:
-  
-    # Path to UnityPlugin within a unity project
-    # Changing this will change the root where all generated .unitypackages import to in a project
-    UNITYPLUGIN_ASSETS_PATH: "Assets/ThirdParty/Ultraleap"
+    PLUGIN_LIBS_PATH: "$UNITY_PROJECT_UNITYPLUGIN_ASSETS_PATH/Core/Runtime/Plugins"
+    UNITYPACKAGES_OUTPUT_PATH: "$CI_PROJECT_DIR/$ARTIFACTS_PATH_UNITY_PROJECT/Ultraleap.UnityPlugin"
 
-    EXPORT_UNITYPACKAGE_SCRIPT: "$CI_SCRIPTS_PATH/ExportUnityPackage.ps1"
+    # These are the paths that the corresponding .unitypackage will export within the project
+    UNITYPACKAGE_EXPORT_PATH_Tracking:                  "$UNITYPLUGIN_ASSETS_PATH/Tracking"
+    UNITYPACKAGE_EXPORT_PATH_Tracking_Examples:         "$UNITYPLUGIN_ASSETS_PATH/Tracking/Examples"
+    UNITYPACKAGE_EXPORT_PATH_Tracking_Preview:          "$UNITYPLUGIN_ASSETS_PATH/Tracking Preview"
+    UNITYPACKAGE_EXPORT_PATH_Tracking_Preview_Examples: "$UNITYPLUGIN_ASSETS_PATH/Tracking Preview/Examples"
 
-    PLUGIN_LIBS_PATH: "$PACKAGE_PATH_Tracking/Core/Runtime/Plugins"
-    UNITYPACKAGES_OUTPUT_PATH: "$CI_PROJECT_DIR/$ARTIFACTS_PATH/Ultraleap.UnityPlugin"
+    UNITYPACKAGE_OUTPUT_PATH_Tracking:                   "$UNITYPACKAGES_OUTPUT_PATH/Tracking.unitypackage"
+    UNITYPACKAGE_OUTPUT_PATH_Tracking_Examples:          "$UNITYPACKAGES_OUTPUT_PATH/Tracking Examples.unitypackage"
+    UNITYPACKAGE_OUTPUT_PATH_Tracking_Preview:           "$UNITYPACKAGES_OUTPUT_PATH/Tracking Preview.unitypackage"
+    UNITYPACKAGE_OUTPUT_PATH_Tracking_Preview_Examples:  "$UNITYPACKAGES_OUTPUT_PATH/Tracking Preview Examples.unitypackage"
 
-    # These are the paths that the corresponding .unitypackage will export from
-    PACKAGE_IMPORT_PATH_Tracking:               "$UNITYPLUGIN_ASSETS_PATH/Tracking"
-    EXAMPLES_SUBPATH_Tracking:                  "Examples~"
-    UNITYPACKAGE_OUTPUT_PATH_Tracking:          "$UNITYPACKAGES_OUTPUT_PATH/Tracking.unitypackage"
-
-    PACKAGE_IMPORT_PATH_Tracking_Preview:       "$UNITYPLUGIN_ASSETS_PATH/Tracking Preview"
-    EXAMPLES_SUBPATH_Tracking_Preview:          "Examples~"
-    UNITYPACKAGE_OUTPUT_PATH_Tracking_Preview:  "$UNITYPACKAGES_OUTPUT_PATH/Tracking Preview.unitypackage"
+    UNITYPACKAGE_LOG_FILE_Tracking:                   "$CI_PROJECT_DIR/$ARTIFACTS_PATH_UNITY_PROJECT/Tracking_unitypackage.log"
+    UNITYPACKAGE_LOG_FILE_Tracking_Examples:          "$CI_PROJECT_DIR/$ARTIFACTS_PATH_UNITY_PROJECT/Tracking_Examples_unitypackage.log"
+    UNITYPACKAGE_LOG_FILE_Tracking_Preview:           "$CI_PROJECT_DIR/$ARTIFACTS_PATH_UNITY_PROJECT/Tracking_Preview_unitypackage.log"
+    UNITYPACKAGE_LOG_FILE_Tracking_Preview_Examples:  "$CI_PROJECT_DIR/$ARTIFACTS_PATH_UNITY_PROJECT/Tracking_Preview_Examples_unitypackage.log"
 
     LEAPC_SOURCE_PATH: "$ARTIFACTS_PATH/Windows/LeapC.dll"
     LEAPC_DESTINATION_PATH: "$PLUGIN_LIBS_PATH/x86_64/LeapC.dll"
-
   script:
-
     # We only replace libtrack dependencies if there is an upstream branch ref or we are explicitly using the latest stable artifacts.
     # Upstream branch ref takes precedence, see the libtrack dependencies job.
     - $REPLACE_LIBTRACK_DEPENDENCIES = "$UPSTREAM_UPSTREAM_BRANCH_REF" -or "$USE_LIBTRACK_STABLE"
-
     #  Copy libs from libtrack dependencies, overwritting anything already there
     #- if ($REPLACE_LIBTRACK_DEPENDENCIES) { Copy-Item "$ARTIFACTS_PATH/Android/libLeapC.so" -Destination "$PLUGIN_LIBS_PATH/Android/libLeapC.so" -Force
     #- if ($REPLACE_LIBTRACK_DEPENDENCIES) { Copy-Item "$ARTIFACTS_PATH/Android/UltraleapTrackingServiceBinder.aar" -Destination "$PLUGIN_LIBS_PATH/Android/libs/UltraleapTrackingServiceBinder.aar" -Force }
     - if ($REPLACE_LIBTRACK_DEPENDENCIES) { Copy-Item "$LEAPC_SOURCE_PATH" -Destination "$LEAPC_DESTINATION_PATH" -Force }
 
     - New-Item -Path "$UNITYPACKAGES_OUTPUT_PATH" -ItemType Directory -Force
+    # Ensure UnityPlugin assets path within the project
+    - echo "Creating Unity project UnityPlugin assets path at '$UNITY_PROJECT_UNITYPLUGIN_ASSETS_PATH'"
+    - New-Item -Path "$UNITY_PROJECT_UNITYPLUGIN_ASSETS_PATH" -ItemType Directory -Force
 
-    # Import functions required below by calling script to define global functions
-    - . $EXPORT_UNITYPACKAGE_SCRIPT
+    ##################################################
+    # Copy UPM packages to Unity project assets path #
+    ##################################################
+    - Push-Location $UNITY_PROJECT_UNITYPLUGIN_ASSETS_PATH
 
-    ######################################################
-    # Creates version.txt and deletes package.json files #
-    ######################################################
-    - Export-VersionTxt $PACKAGE_PATH_Tracking
-    - Export-VersionTxt $PACKAGE_PATH_Tracking_Preview
+    - ls
+
+    - echo "Copying $PACKAGES_PATH_Tracking to Tracking"
+    - New-Item -Path "Tracking" -ItemType Directory
+    - Push-Location Tracking
+    - Copy-Item -Path "$PACKAGES_PATH_Tracking/*" -Recurse # Copy Tracking
+    - (Get-Content package.json) | ConvertFrom-Json | Select -ExpandProperty "version" > Version.txt # Generate version.txt using version from package.json
+    - Pop-Location
+
+    - echo "Copying $PACKAGES_PATH_Tracking to Tracking Preview"
+    - New-Item -Path "Tracking Preview" -ItemType Directory
+    - Push-Location "Tracking Preview"
+    - Copy-Item -Path "$PACKAGES_PATH_Tracking_Preview/*" -Recurse # Copy Tracking Preview
+    - (Get-Content package.json) | ConvertFrom-Json | Select -ExpandProperty "version" > Version.txt # Generate version.txt using version from package.json
+    - Pop-Location
+
+    # Delete package.json files before exporting .unitypackages
+    - Get-ChildItem * -Include *package.json* -Recurse | Remove-Item
+
+    - ls
+    - Pop-Location
 
     #########################
     # Export .unitypackages #
     #########################
-    - Export-UnityPackage -PackageRootPath "$PACKAGE_PATH_Tracking" -PackageImportPath "$PACKAGE_IMPORT_PATH_Tracking" -PackageOutputPath "$UNITYPACKAGE_OUTPUT_PATH_Tracking" -ExtraHiddenSubPaths "$EXAMPLES_SUBPATH_Tracking" -ErrorVariable ExportErrors
-    - if ($ExportErrors) { echo "Failed to generate Tracking.unitypackage"; exit 1; }
-    - Export-UnityPackage -PackageRootPath "$PACKAGE_PATH_Tracking_Preview" -PackageImportPath "$PACKAGE_IMPORT_PATH_Tracking_Preview" -PackageOutputPath "$UNITYPACKAGE_OUTPUT_PATH_Tracking_Preview" -ExtraHiddenSubPaths "$EXAMPLES_SUBPATH_Tracking_Preview" -ErrorVariable ExportErrors
-    - if ($ExportErrors) { echo "Failed to generate Tracking Preview.unitypackage"; exit 1; }
+    - | # Exports a unitypackage from the unity project this job is running in.
+      function Export-UnityPackage
+      {
+        Param(
+          [string] $LogPath,
+          [string] $UnityPackageExportPath,
+          [string] $UnityPackageOutputPath
+        )
+        $process = Start-Process -Wait -PassThru -FilePath "$UNITY_PATH" -ArgumentList "-batchmode -quit -logFile `"$LogPath`" -projectPath `"$UNITY_PROJECT_PATH`" -exportPackage `"$UnityPackageExportPath`" `"$UnityPackageOutputPath`""
+        $processExitCode = $process.ExitCode
+        if (-not ($process.ExitCode -eq 0)) { echo "Failed to generate $UnityPackageOutputPath (Exit Code '$processExitCode'), check $LogPath"; exit $processExitCode; }
+      }
+    # Export Tracking and Tracking Preview .unitypackages
+    - Export-UnityPackage -LogPath "$UNITYPACKAGE_LOG_FILE_Tracking" -UnityPackageExportPath "$UNITYPACKAGE_EXPORT_PATH_Tracking" -UnityPackageOutputPath "$UNITYPACKAGE_OUTPUT_PATH_Tracking"
+    - Export-UnityPackage -LogPath "$UNITYPACKAGE_LOG_FILE_Tracking_Preview" -UnityPackageExportPath "$UNITYPACKAGE_EXPORT_PATH_Tracking_Preview" -UnityPackageOutputPath "$UNITYPACKAGE_OUTPUT_PATH_Tracking_Preview"
+
+    # Unhide hidden Examples folder paths - we do this after the main unitypackage so it's not included with them
+    - Push-Location $UNITY_PROJECT_UNITYPLUGIN_ASSETS_PATH
+    - ls
+    - Move-Item "Tracking/Examples~" "Tracking/Examples"
+    - ls "Tracking"
+    - Move-Item "Tracking Preview/Examples~" "Tracking Preview/Examples"
+    - ls "Tracking Preview"
+    - Pop-Location
+
+    # Export Example .unitypackages
+    - Export-UnityPackage -LogPath "$UNITYPACKAGE_LOG_FILE_Tracking_Examples" -UnityPackageExportPath "$UNITYPACKAGE_EXPORT_PATH_Tracking_Examples" -UnityPackageOutputPath "$UNITYPACKAGE_OUTPUT_PATH_Tracking_Examples"
+    - Export-UnityPackage -LogPath "$UNITYPACKAGE_LOG_FILE_Tracking_Preview_Examples" -UnityPackageExportPath "$UNITYPACKAGE_EXPORT_PATH_Tracking_Preview_Examples" -UnityPackageOutputPath "$UNITYPACKAGE_OUTPUT_PATH_Tracking_Preview_Examples"
 
     ############################
     # Tidy up artifacts folder #
     ############################
-    - $package_version = Get-Content "$PACKAGE_PATH_Tracking/Version.txt"
+    - $package_version = Get-Content "$UNITY_PROJECT_UNITYPLUGIN_ASSETS_PATH/Tracking/Version.txt"
     - echo "Version - $package_version"
     - ls $UNITYPACKAGES_OUTPUT_PATH
     - Move-Item "$UNITYPACKAGES_OUTPUT_PATH" "$UNITYPACKAGES_OUTPUT_PATH-$package_version"
