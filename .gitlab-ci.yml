@@ -33,6 +33,8 @@ variables:
 
   # Name of output artifacts including the .unitypackage
   OUTPUT_NAME: "$CI_PROJECT_TITLE"
+  
+  UNITYPLUGIN_ASSETS_PATH: "Assets/ThirdParty/Ultraleap"
 
 stages:
   - test
