@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Errors in Editor when using pre-2023.3.18 LTS due to FindObjectByType issue
+- (Physical Hands) Objects are sticky when they ignore collision with hard contact hands
 
 ## [6.14.0] - 24/01/24
 
