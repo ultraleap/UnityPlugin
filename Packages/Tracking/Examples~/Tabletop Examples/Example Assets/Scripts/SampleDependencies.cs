@@ -71,7 +71,7 @@ namespace Leap.Examples.Tabletop
                 if (DEPENDENCIES.Contains(sample.displayName) && !sample.isImported)
                 {
                     sample.Import();
-                    Debug.Log("Ultraleap: " + sample.displayName + " was imported to " + sample.importPath + " as a dependency of " + SAMPLE_NAME);
+                    Debug.Log("Ultraleap: " + SAMPLE_NAME + " has a dependency on " + sample.displayName + ". This dependency has been imported to " + sample.importPath);
                     sampleImported = true;
                 }
             }
