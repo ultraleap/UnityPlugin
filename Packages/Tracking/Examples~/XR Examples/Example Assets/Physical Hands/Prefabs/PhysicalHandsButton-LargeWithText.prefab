@@ -562,7 +562,6 @@ GameObject:
   - component: {fileID: 3461729854753930330}
   - component: {fileID: 2560553933549685782}
   - component: {fileID: 2039711335}
-  - component: {fileID: 1088920952}
   m_Layer: 5
   m_Name: Pressable Object
   m_TagString: Untagged
@@ -882,123 +881,6 @@ MonoBehaviour:
   onRightHandGrabExit:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &1088920952
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3461729854753930324}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 05a21360bd573d44ba7d6ff4e9e213e6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  onHoverEnter:
-    m_PersistentCalls:
-      m_Calls: []
-  onHover:
-    m_PersistentCalls:
-      m_Calls: []
-  onHoverExit:
-    m_PersistentCalls:
-      m_Calls: []
-  onContactEnter:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 4339005348515153145}
-        m_TargetAssemblyTypeName: PhysicalHandsButton, Assembly-CSharp
-        m_MethodName: ContactHandNearbyEnter
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  onContact:
-    m_PersistentCalls:
-      m_Calls: []
-  onContactExit:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 4339005348515153145}
-        m_TargetAssemblyTypeName: PhysicalHandsButton, Assembly-CSharp
-        m_MethodName: ContactHandNearbyExit
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  onGrabEnter:
-    m_PersistentCalls:
-      m_Calls: []
-  onGrab:
-    m_PersistentCalls:
-      m_Calls: []
-  onGrabExit:
-    m_PersistentCalls:
-      m_Calls: []
-  onLeftHandHoverEnter:
-    m_PersistentCalls:
-      m_Calls: []
-  onLeftHandHover:
-    m_PersistentCalls:
-      m_Calls: []
-  onLeftHandHoverExit:
-    m_PersistentCalls:
-      m_Calls: []
-  onLeftHandContactEnter:
-    m_PersistentCalls:
-      m_Calls: []
-  onLeftHandContact:
-    m_PersistentCalls:
-      m_Calls: []
-  onLeftHandContactExit:
-    m_PersistentCalls:
-      m_Calls: []
-  onLeftHandGrabEnter:
-    m_PersistentCalls:
-      m_Calls: []
-  onLeftHandGrab:
-    m_PersistentCalls:
-      m_Calls: []
-  onLeftHandGrabExit:
-    m_PersistentCalls:
-      m_Calls: []
-  onRightHandHoverEnter:
-    m_PersistentCalls:
-      m_Calls: []
-  onRightHandHover:
-    m_PersistentCalls:
-      m_Calls: []
-  onRightHandHoverExit:
-    m_PersistentCalls:
-      m_Calls: []
-  onRightHandContactEnter:
-    m_PersistentCalls:
-      m_Calls: []
-  onRightHandContact:
-    m_PersistentCalls:
-      m_Calls: []
-  onRightHandContactExit:
-    m_PersistentCalls:
-      m_Calls: []
-  onRightHandGrabEnter:
-    m_PersistentCalls:
-      m_Calls: []
-  onRightHandGrab:
-    m_PersistentCalls:
-      m_Calls: []
-  onRightHandGrabExit:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!1 &3461729854966666460
 GameObject:
   m_ObjectHideFlags: 0
@@ -1011,7 +893,6 @@ GameObject:
   - component: {fileID: 4339005348515153145}
   - component: {fileID: 6448743937059171748}
   - component: {fileID: 417764909}
-  - component: {fileID: 266932154}
   m_Layer: 5
   m_Name: PhysicalHandsButton-LargeWithText
   m_TagString: Untagged
@@ -1102,20 +983,6 @@ Rigidbody:
   m_Constraints: 126
   m_CollisionDetection: 3
 --- !u!114 &417764909
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3461729854966666460}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0b3763add1152ac4aab69357a419a664, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  disableAllGrabbing: 1
-  disableAllHandCollisions: 0
---- !u!114 &266932154
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
