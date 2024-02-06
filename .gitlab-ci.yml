@@ -157,7 +157,6 @@ generate-api-docs:
 # -----------------------------------------------------------------------------
 #
 # This job retrieves artifacts from the libtrack repository and selects files required for the UnityPlugin.
-# Not based on the .unity-template as it only needs run once for any amount of unity projects.
 # Output is artifacts which can be consumed by later jobs in specific unity projects.
 #
 dependencies-libtrack:
@@ -220,158 +219,6 @@ dependencies-libtrack:
 
     when: on_success
 
-
-
-# -----------------------------------------------------------------------------
-# Unity Project Job Templates & Usages
-# -----------------------------------------------------------------------------
-#
-# This template is intended to be used for jobs that require a unity project.
-#
-# Usage:
-#   Create a derived template extending this template to implement job behaviour
-#   Create a job extending the derived template and set the "UNITY_PROJECT_FOLDER" variable to a Unity project folder within CI_UNITY_PROJECTS_PATH
-#   
-#
-.unity-template:
-  extends: .base
-
-  variables:
-
-    UNITY_PROJECT_FOLDER: "" # This must be set by derived jobs to one of the folders within CI_UNITY_PROJECTS_PATH
-
-    # Relative path from project directory to artifacts folder for this unity project
-    ARTIFACTS_PATH_UNITY_PROJECT: "$ARTIFACTS_PATH/$UNITY_PROJECT_FOLDER"
-    
-    # Relative path from project directory to the project this job matches
-    UNITY_PROJECT_PATH: "$CI_UNITY_PROJECTS_PATH/$UNITY_PROJECT_FOLDER"
-
-  cache:
-    key: "$CACHE_LIBRARY_KEY"
-    paths:
-      - $UNITY_PROJECT_PATH/Library/
-    when: always
-
-  before_script:
-
-    # Check UNITY_PROJECT_PATH is set to an existing project and yell otherwise
-    - if (-not ($UNITY_PROJECT_FOLDER)) { echo "UNITY_PROJECT_FOLDER variable has not been set for this job"; exit 1; }
-    - if (-not (Test-Path "$UNITY_PROJECT_PATH")) { echo "Specified Unity project folder '$UNITY_PROJECT_PATH' not found"; exit 1; }
-    - echo "Using Unity project at '$UNITY_PROJECT_PATH'"
-
-    # Ensure job artifacts folder exists
-    - echo "Creating Unity project artifacts path at '$ARTIFACTS_PATH_UNITY_PROJECT'"
-    - New-Item -Path "$ARTIFACTS_PATH_UNITY_PROJECT" -ItemType Directory -Force
-
-    # Get Unity version and changeset from the project.
-    - $line = Get-Content $UNITY_PROJECT_PATH/ProjectSettings/ProjectVersion.txt | Select -Index 1
-    - $UNITY_VERSION = $line -Split " " | Select -Index 1
-    - $UNITY_CHANGESET = $line -Match '\((.+)\)' | ForEach-Object { $Matches[1] }
-    - echo "UNITY_VERSION - $UNITY_VERSION"
-    - echo "UNITY_CHANGESET - $UNITY_CHANGESET"
-
-    # Set up some variables commonly used by derived scripts
-    - $UNITY_PATH = "C:/Unity/$UNITY_VERSION/Editor/Unity.exe"
-    - $UNITY_LOG_FILE = "$CI_PROJECT_DIR/$ARTIFACTS_PATH_UNITY_PROJECT/${CI_JOB_NAME}_unity.log"
-    - echo "UNITY_PATH - $UNITY_PATH"
-    - echo "UNITY_LOG_FILE - $UNITY_LOG_FILE"
-
-    # Check whether the required Unity version is installed. If not, install it.
-    - $editors = "unity_hub_stdout.txt"
-    - Start-Process -Wait -RedirectStandardOutput "$editors" -FilePath "$UNITY_HUB" -ArgumentList "-- --headless editors --installed"
-    - Get-Content "$editors"
-    - Start-Process -Wait -RedirectStandardOutput "$editors" -FilePath "$UNITY_HUB" -ArgumentList "-- --headless install-path --set C:/Unity"
-    - Get-Content "$editors"
-    - if (-not (Test-Path "C:/Unity/$UNITY_VERSION")) { Start-Process -Wait -RedirectStandardOutput "$editors" -FilePath "$UNITY_HUB" -ArgumentList "-- --headless install --version $UNITY_VERSION --changeset $UNITY_CHANGESET" }
-    - Get-Content "$editors"
-
-# -----------------------------------------------------------------------------
-# Tests Template
-# -----------------------------------------------------------------------------
-# This job is responsible for running all automated tests defined within the project using the Unity test runner framework (based on NUnit).
-#
-# .run-tests:
-
-#   extends: .unity-template
-#   stage: test
-#   allow_failure: true
-#   needs: []
-#   variables:
-
-#     UNITY_TEST_RESULTS_NUNIT: "$CI_PROJECT_DIR/$ARTIFACTS_PATH_UNITY_PROJECT/unity_test_results_nunit.xml"
-#     UNITY_TEST_RESULTS_JUNIT: "$CI_PROJECT_DIR/$ARTIFACTS_PATH_UNITY_PROJECT/unity_test_results_junit.xml"
-#     CONVERTER_XSLT_PATH: "$CI_PROJECT_DIR/$CI_PATH/nunit-to-junit/nunit3-junit.xslt"
-
-#   script:
-
-#     # Run tests
-#     - echo "Running tests - log file outputting to '$UNITY_LOG_FILE'"
-#     - echo "Running tests - test report outputting to '$UNITY_TEST_RESULTS_NUNIT'"
-#     - $process = Start-Process -Wait -PassThru -FilePath "$UNITY_PATH" -ArgumentList "-runTests -batchmode -logFile `"$UNITY_LOG_FILE`" -projectPath `"$UNITY_PROJECT_PATH`" -testResults `"$UNITY_TEST_RESULTS_NUNIT`" -testPlatform EditMode"
-#     - echo $process.ExitCode
-#     - if (-not ($process.ExitCode -eq 0)) { exit $process.ExitCode }
-#     - if ( -not (Test-Path "$UNITY_TEST_RESULTS_NUNIT")) { echo "Error generating test report"; exit 1; }
-
-#     - $xslt = New-Object System.Xml.Xsl.XslCompiledTransform;
-#     - $xslt.Load("$CONVERTER_XSLT_PATH");
-#     - $xslt.Transform("$UNITY_TEST_RESULTS_NUNIT", "$UNITY_TEST_RESULTS_JUNIT");
-
-#   artifacts:
-#     name: "$ARTIFACTS_NAME-test-results"
-#     paths:
-#       - "$ARTIFACTS_PATH/"
-#     reports:
-#       junit: "$UNITY_TEST_RESULTS_JUNIT"
-
-#     when: always
-    
-# -----------------------------------------------------------------------------
-# License Headers Template
-# -----------------------------------------------------------------------------
-#
-# This job checks for the presence of license headers conforming to the format defined in AutoCopywriteHeader.cs
-# The job will not make changes on it's own - failure will produce a diff artifact which can be applied in a later commit.
-#
-# TODO: Update this job
-#
-# .license-headers:
-#   extends: .unity-template
-
-#   stage: test
-#   allow_failure: true
-#   needs: []
-#   rules:
-#     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "develop"'
-#       when: always
-#       allow_failure: false
-
-#     - if: $CI_PIPELINE_SOURCE == "pipeline" || $CI_COMMIT_BRANCH
-#       when: manual
-#       allow_failure: true
-
-#   script:
-
-#     # Build the project, output requires absolute path
-#     - $process = Start-Process -Wait -PassThru -FilePath "$UNITY_PATH" -ArgumentList "-batchmode -quit -logFile $UNITY_LOG_FILE -projectPath `"$UNITY_PROJECT_PATH`" -executeMethod `"AutoCopywriteHeader.PopulateAutoHeaders`""
-#     - if ($UNITY_LOG_FILE) { echo "Moving $UNITY_LOG_FILE to $CI_PROJECT_DIR/$ARTIFACTS_PATH_UNITY_PROJECT/${OUTPUT_NAME}_headers.log..."; Move-Item $UNITY_LOG_FILE $CI_PROJECT_DIR/$ARTIFACTS_PATH_UNITY_PROJECT/${OUTPUT_NAME}_headers.log }
-
-#     - Push-Location $UNITYPLUGIN_ASSETS_PATH
-#     - git status
-
-#     - $CHANGES = git diff --cached --numstat | Measure-Object -Line
-#     - if(-not ($CHANGES.lines -eq 0)) { echo "$CHANGES files without valid headers, please update all headers and retry"; cmd /c "git diff > $CI_PROJECT_DIR/$ARTIFACTS_PATH_UNITY_PROJECT/${OUTPUT_NAME}_headers.diff"; exit 1 }
-
-#     - Pop-Location
-
-#   artifacts:
-#     name: "$ARTIFACTS_NAME-header-results"
-#     paths:
-#       - "$UNITY_LOG_FILE" 
-#       - "$ARTIFACTS_PATH_UNITY_PROJECT/${OUTPUT_NAME}_headers.log"
-#       - "$ARTIFACTS_PATH_UNITY_PROJECT/${OUTPUT_NAME}_headers.diff"
-
-#     when: on_failure
-
 # -----------------------------------------------------------------------------
 # Exports all .unitypackages
 # -----------------------------------------------------------------------------
@@ -399,12 +246,10 @@ export-unitypackages:
 
     # These are the paths that the corresponding .unitypackage will export from
     PACKAGE_IMPORT_PATH_Tracking:               "$UNITYPLUGIN_ASSETS_PATH/Tracking"
-    EXAMPLES_SUBPATH_Tracking:                  "Examples~"
-    UNITYPACKAGE_OUTPUT_PATH_Tracking:          "$UNITYPACKAGES_OUTPUT_PATH/Tracking.unitypackage"
+    UNITYPACKAGE_OUTPUT_PATH_Tracking:          "$UNITYPACKAGES_OUTPUT_PATH/Ultraleap Tracking.unitypackage"
 
     PACKAGE_IMPORT_PATH_Tracking_Preview:       "$UNITYPLUGIN_ASSETS_PATH/Tracking Preview"
-    EXAMPLES_SUBPATH_Tracking_Preview:          "Examples~"
-    UNITYPACKAGE_OUTPUT_PATH_Tracking_Preview:  "$UNITYPACKAGES_OUTPUT_PATH/Tracking Preview.unitypackage"
+    UNITYPACKAGE_OUTPUT_PATH_Tracking_Preview:  "$UNITYPACKAGES_OUTPUT_PATH/Ultraleap Tracking Preview.unitypackage"
 
     LEAPC_SOURCE_PATH: "$ARTIFACTS_PATH/Windows/LeapC.dll"
     LEAPC_DESTINATION_PATH: "$PLUGIN_LIBS_PATH/x86_64/LeapC.dll"
@@ -416,8 +261,6 @@ export-unitypackages:
     - $REPLACE_LIBTRACK_DEPENDENCIES = "$UPSTREAM_UPSTREAM_BRANCH_REF" -or "$USE_LIBTRACK_STABLE"
 
     #  Copy libs from libtrack dependencies, overwritting anything already there
-    #- if ($REPLACE_LIBTRACK_DEPENDENCIES) { Copy-Item "$ARTIFACTS_PATH/Android/libLeapC.so" -Destination "$PLUGIN_LIBS_PATH/Android/libLeapC.so" -Force
-    #- if ($REPLACE_LIBTRACK_DEPENDENCIES) { Copy-Item "$ARTIFACTS_PATH/Android/UltraleapTrackingServiceBinder.aar" -Destination "$PLUGIN_LIBS_PATH/Android/libs/UltraleapTrackingServiceBinder.aar" -Force }
     - if ($REPLACE_LIBTRACK_DEPENDENCIES) { Copy-Item "$LEAPC_SOURCE_PATH" -Destination "$LEAPC_DESTINATION_PATH" -Force }
 
     - New-Item -Path "$UNITYPACKAGES_OUTPUT_PATH" -ItemType Directory -Force
@@ -434,9 +277,9 @@ export-unitypackages:
     #########################
     # Export .unitypackages #
     #########################
-    - Export-UnityPackage -PackageRootPath "$PACKAGE_PATH_Tracking" -PackageImportPath "$PACKAGE_IMPORT_PATH_Tracking" -PackageOutputPath "$UNITYPACKAGE_OUTPUT_PATH_Tracking" -ExtraHiddenSubPaths "$EXAMPLES_SUBPATH_Tracking" -ErrorVariable ExportErrors
+    - Export-UnityPackage -PackageRootPath "$PACKAGE_PATH_Tracking" -PackageImportPath "$PACKAGE_IMPORT_PATH_Tracking" -PackageOutputPath "$UNITYPACKAGE_OUTPUT_PATH_Tracking" -ErrorVariable ExportErrors
     - if ($ExportErrors) { echo "Failed to generate Tracking.unitypackage"; exit 1; }
-    - Export-UnityPackage -PackageRootPath "$PACKAGE_PATH_Tracking_Preview" -PackageImportPath "$PACKAGE_IMPORT_PATH_Tracking_Preview" -PackageOutputPath "$UNITYPACKAGE_OUTPUT_PATH_Tracking_Preview" -ExtraHiddenSubPaths "$EXAMPLES_SUBPATH_Tracking_Preview" -ErrorVariable ExportErrors
+    - Export-UnityPackage -PackageRootPath "$PACKAGE_PATH_Tracking_Preview" -PackageImportPath "$PACKAGE_IMPORT_PATH_Tracking_Preview" -PackageOutputPath "$UNITYPACKAGE_OUTPUT_PATH_Tracking_Preview" -ErrorVariable ExportErrors
     - if ($ExportErrors) { echo "Failed to generate Tracking Preview.unitypackage"; exit 1; }
 
     ############################
@@ -453,23 +296,6 @@ export-unitypackages:
       - "$ARTIFACTS_PATH/"
 
     when: always
-
-# -----------------------------------------------------------------------------
-# 2019.4 Project Jobs
-# -----------------------------------------------------------------------------
-#
-# These are the jobs generated using all the templates above for the 2019.4 unity project.
-#
-.unity-project-2019.4:
-  variables:
-    UNITY_PROJECT_FOLDER: "2019.4"
-
-# It's important to extend from the specific job templates first! Otherwise the empty UNITY_PROJECT_FOLDER variable in .unity-template will overwrite the one from here.
-# run-tests-2019.4:
-#   extends: ['.run-tests', '.unity-project-2019.4']
-#license-headers-2019.4:
-#  extends: ['.license-headers', '.unity-project-2019.4']
-
 
 # -----------------------------------------------------------------------------
 # Consolidate artifacts
@@ -490,12 +316,6 @@ consolidate:
       optional: true
     - job: dependencies-libtrack
       artifacts: true
-    # - job: run-tests-2019.4
-    #   artifacts: true
-    #   optional: true
-    # - job: license-headers-2019.4
-    #   artifacts: true
-    #   optional: true
     - job: export-unitypackages
       artifacts: true
 
