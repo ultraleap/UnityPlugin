@@ -19,6 +19,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - (Config) Additional uses of Config marked as Obsolete
 - Any LeapServiceProvider can be used with MRTK subsystem
+- Example content to be split by XR, Tabletop and URP Examples
+- Combined example content to be part of the main Ultraleap Tracking .unitypackage when importing via .unitypackage
+- Added fog and gradient sky for all XR example scenes
 
 ### Fixed
 - Errors in Editor when using pre-2023.3.18 LTS due to FindObjectByType issue
