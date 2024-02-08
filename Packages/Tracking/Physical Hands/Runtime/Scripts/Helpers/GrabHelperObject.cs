@@ -576,6 +576,13 @@ namespace Leap.Unity.PhysicalHands
                     return;
                 }
             }
+			
+            // If the object we are connected to is ignoring collision with the hands, we should not do joint facing checks
+            //  this will avoid issues with these objects being too sticky
+			if(_ignorePhysicalHands != null && _ignorePhysicalHands.DisableAllHandCollisions)
+			{
+				return;
+			}
 
             for (int handIndex = 0; handIndex < _grabbableHands.Count; handIndex++)
             {
