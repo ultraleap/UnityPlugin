@@ -404,6 +404,21 @@ namespace Leap
             }
         }
 
+        /// <summary>
+        /// Dispatched when a Fiducial Marker has been tracked.
+        /// </summary>
+        public event EventHandler<FiducialPoseEventArgs> FiducialPose
+        {
+            add
+            {
+                _connection.LeapFiducialPose += value;
+            }
+            remove
+            {
+                _connection.LeapFiducialPose -= value;
+            }
+        }
+
         public void Dispose()
         {
             Dispose(true);
