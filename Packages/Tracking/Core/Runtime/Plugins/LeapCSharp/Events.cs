@@ -312,7 +312,7 @@ namespace Leap
 
     public class FiducialPoseEventArgs : LeapEventArgs
     {
-        public FiducialPoseEventArgs(UInt64 id, float estimated_error, LEAP_VECTOR translation, LEAP_MATRIX_3x3 rotation) : base(LeapEvent.EVENT_FIDUCIAL_POSE)
+        public FiducialPoseEventArgs(int id, float estimated_error, LEAP_VECTOR translation, LEAP_MATRIX_3x3 rotation) : base(LeapEvent.EVENT_FIDUCIAL_POSE)
         {
             this.id = id;
             this.estimated_error = estimated_error;
@@ -320,10 +320,10 @@ namespace Leap
             this.rotation = rotation;
         }
 
-        public UInt64 id { get; set; }
+        public int id { get; set; }
         public float estimated_error { get; set; }
-        LEAP_VECTOR translation { get; set; }
-        LEAP_MATRIX_3x3 rotation { get; set; }
+        public LEAP_VECTOR translation { get; set; }
+        public LEAP_MATRIX_3x3 rotation { get; set; }
     }
 
     public struct BeginProfilingForThreadArgs

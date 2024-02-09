@@ -986,7 +986,7 @@ namespace LeapInternal
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct LEAP_FIDUCIAL_POSE_EVENT
     {
-        public UInt64 id;
+        public int id;
         public float estimated_error;
         public LEAP_VECTOR translation;
         public LEAP_MATRIX_3x3 rotation;
