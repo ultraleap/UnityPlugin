@@ -67,14 +67,8 @@ namespace Leap.Unity.PhysicalHands
 #if UNITY_EDITOR
         private void OnValidate()
         {
-            if (DisableAllGrabbing != _disableAllGrabbing)
-            {
-                DisableAllGrabbing = _disableAllGrabbing;
-            }
-            if (DisableAllHandCollisions != _disableAllHandCollisions)
-            {
-                DisableAllHandCollisions = _disableAllHandCollisions;
-            }
+            DisableAllGrabbing = _disableAllGrabbing;
+            DisableAllHandCollisions = _disableAllHandCollisions;
         }
 #endif
 
