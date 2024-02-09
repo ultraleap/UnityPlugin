@@ -1309,6 +1309,15 @@ namespace LeapInternal
             Marshal.FreeHGlobal(buffer);
         }
 
+        public void SetDeviceHints(IntPtr hDevice, string[] hints)
+        {
+            eLeapRS result;
+
+            result = LeapC.SetDeviceHints(_leapConnection, hDevice, hints);
+
+            reportAbnormalResults("LeapC SetDeviceHints call was ", result);
+        }
+
         private eLeapRS _lastResult; //Used to avoid repeating the same log message, ie. for events like time out
         private void reportAbnormalResults(string context, eLeapRS result)
         {

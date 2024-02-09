@@ -10,6 +10,7 @@ namespace Leap
 {
     using LeapInternal;
     using System;
+    using System.Linq;
     using System.Threading;
     using UnityEngine;
 
@@ -620,6 +621,16 @@ namespace Leap
         public bool IsDeviceAvailable(Device device = null)
         {
             return _connection.IsDeviceAvailable(device);
+        }
+
+        public void SetHints(string[] hints, Device device = null)
+        {
+            if(device == null)
+            {
+                device = Devices.ActiveDevices.FirstOrDefault();
+            }
+
+            _connection.SetDeviceHints(device.Handle, hints);
         }
 
         /// <summary>
