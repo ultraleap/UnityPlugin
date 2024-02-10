@@ -77,7 +77,7 @@ namespace Leap.Unity.Preview.HandRays
         /// <summary>
         /// The min dot product allowed when calculating if the hand is facing the camera
         /// </summary>
-        private float minDotProductAllowedForFacingCamera = 0.55f;
+        public float minDotProductAllowedForFacingCamera = 0.55f;
 
         // Start is called before the first frame update
         protected override void Start()
