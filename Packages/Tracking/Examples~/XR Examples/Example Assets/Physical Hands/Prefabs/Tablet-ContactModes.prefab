@@ -941,8 +941,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b3763add1152ac4aab69357a419a664, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  disableAllGrabbing: 1
-  disableAllHandCollisions: 0
+  _disableAllGrabbing: 1
+  _disableAllHandCollisions: 1
+  _disableCollisionOnChildren: 1
 --- !u!1001 &5076149731141582510
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -950,6 +951,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 8134623800898365424}
     m_Modifications:
+    - target: {fileID: 417764909, guid: dafee6aef10cc784394cd59ee277d091, type: 3}
+      propertyPath: _disableCollisionOnChildren
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 575397727892507198, guid: dafee6aef10cc784394cd59ee277d091, type: 3}
       propertyPath: m_text
       value: Hands can push objects, but will go through the surface when grabbing
@@ -957,6 +962,26 @@ PrefabInstance:
     - target: {fileID: 3461729854329802856, guid: dafee6aef10cc784394cd59ee277d091, type: 3}
       propertyPath: m_text
       value: Soft Contact
+      objectReference: {fileID: 0}
+    - target: {fileID: 3461729854753930329, guid: dafee6aef10cc784394cd59ee277d091, type: 3}
+      propertyPath: m_Size.x
+      value: 0.9999999
+      objectReference: {fileID: 0}
+    - target: {fileID: 3461729854753930329, guid: dafee6aef10cc784394cd59ee277d091, type: 3}
+      propertyPath: m_Size.y
+      value: 0.31146833
+      objectReference: {fileID: 0}
+    - target: {fileID: 3461729854753930329, guid: dafee6aef10cc784394cd59ee277d091, type: 3}
+      propertyPath: m_Center.x
+      value: -0.000000014005624
+      objectReference: {fileID: 0}
+    - target: {fileID: 3461729854753930329, guid: dafee6aef10cc784394cd59ee277d091, type: 3}
+      propertyPath: m_Center.y
+      value: 0.34426644
+      objectReference: {fileID: 0}
+    - target: {fileID: 3461729854753930329, guid: dafee6aef10cc784394cd59ee277d091, type: 3}
+      propertyPath: m_Center.z
+      value: -0.0000000079904305
       objectReference: {fileID: 0}
     - target: {fileID: 3461729854966666435, guid: dafee6aef10cc784394cd59ee277d091, type: 3}
       propertyPath: m_RootOrder
@@ -1033,6 +1058,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 8134623800898365424}
     m_Modifications:
+    - target: {fileID: 417764909, guid: dafee6aef10cc784394cd59ee277d091, type: 3}
+      propertyPath: _disableCollisionOnChildren
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 575397727892507198, guid: dafee6aef10cc784394cd59ee277d091, type: 3}
       propertyPath: m_text
       value: Hands will not go through object surfaces
@@ -1048,6 +1077,26 @@ PrefabInstance:
     - target: {fileID: 3461729854329802856, guid: dafee6aef10cc784394cd59ee277d091, type: 3}
       propertyPath: m_text
       value: Hard Contact
+      objectReference: {fileID: 0}
+    - target: {fileID: 3461729854753930329, guid: dafee6aef10cc784394cd59ee277d091, type: 3}
+      propertyPath: m_Size.x
+      value: 0.9999999
+      objectReference: {fileID: 0}
+    - target: {fileID: 3461729854753930329, guid: dafee6aef10cc784394cd59ee277d091, type: 3}
+      propertyPath: m_Size.y
+      value: 0.31146833
+      objectReference: {fileID: 0}
+    - target: {fileID: 3461729854753930329, guid: dafee6aef10cc784394cd59ee277d091, type: 3}
+      propertyPath: m_Center.x
+      value: -0.000000014005624
+      objectReference: {fileID: 0}
+    - target: {fileID: 3461729854753930329, guid: dafee6aef10cc784394cd59ee277d091, type: 3}
+      propertyPath: m_Center.y
+      value: 0.34426644
+      objectReference: {fileID: 0}
+    - target: {fileID: 3461729854753930329, guid: dafee6aef10cc784394cd59ee277d091, type: 3}
+      propertyPath: m_Center.z
+      value: -0.0000000079904305
       objectReference: {fileID: 0}
     - target: {fileID: 3461729854966666435, guid: dafee6aef10cc784394cd59ee277d091, type: 3}
       propertyPath: m_RootOrder

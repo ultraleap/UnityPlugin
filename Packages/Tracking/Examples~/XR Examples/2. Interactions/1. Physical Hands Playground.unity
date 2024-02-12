@@ -1144,6 +1144,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   disableAllGrabbing: 1
   disableAllHandCollisions: 1
+  _disableCollisionOnChildren: 1
 --- !u!65 &345004532
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4038,6 +4039,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   disableAllGrabbing: 1
   disableAllHandCollisions: 1
+  _disableCollisionOnChildren: 1
 --- !u!65 &976428060
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4291,6 +4293,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   disableAllGrabbing: 1
   disableAllHandCollisions: 1
+  _disableCollisionOnChildren: 1
 --- !u!114 &994121837
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4456,6 +4459,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   disableAllGrabbing: 1
   disableAllHandCollisions: 1
+  _disableCollisionOnChildren: 1
 --- !u!65 &999173876
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -5126,6 +5130,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   disableAllGrabbing: 0
   disableAllHandCollisions: 1
+  _disableCollisionOnChildren: 1
 --- !u!114 &1147510548
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5488,6 +5493,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   disableAllGrabbing: 1
   disableAllHandCollisions: 1
+  _disableCollisionOnChildren: 1
 --- !u!65 &1300330825
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -5664,6 +5670,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   disableAllGrabbing: 1
   disableAllHandCollisions: 1
+  _disableCollisionOnChildren: 1
 --- !u!54 &1301439454
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -6985,6 +6992,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   disableAllGrabbing: 1
   disableAllHandCollisions: 0
+  _disableCollisionOnChildren: 1
 --- !u!114 &1495116601
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7235,6 +7243,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   disableAllGrabbing: 1
   disableAllHandCollisions: 1
+  _disableCollisionOnChildren: 1
 --- !u!54 &1530142552
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -9012,6 +9021,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   disableAllGrabbing: 1
   disableAllHandCollisions: 1
+  _disableCollisionOnChildren: 1
 --- !u!54 &1850344970
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -9617,6 +9627,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   disableAllGrabbing: 1
   disableAllHandCollisions: 1
+  _disableCollisionOnChildren: 1
 --- !u!54 &2012823011
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -10300,6 +10311,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   disableAllGrabbing: 1
   disableAllHandCollisions: 0
+  _disableCollisionOnChildren: 1
 --- !u!114 &5467393139232196114
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10314,6 +10326,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   disableAllGrabbing: 1
   disableAllHandCollisions: 0
+  _disableCollisionOnChildren: 1
 --- !u!54 &5467393139232196115
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -10360,6 +10373,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   disableAllGrabbing: 1
   disableAllHandCollisions: 0
+  _disableCollisionOnChildren: 1
 --- !u!224 &5488722742737292378
 RectTransform:
   m_ObjectHideFlags: 0
@@ -10584,6 +10598,26 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1520545033}
     m_Modifications:
+    - target: {fileID: 4677399194488223131, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+      propertyPath: m_Size.y
+      value: 0.5675214
+      objectReference: {fileID: 0}
+    - target: {fileID: 4677399194488223131, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+      propertyPath: m_Center.x
+      value: -0.000000018103488
+      objectReference: {fileID: 0}
+    - target: {fileID: 4677399194488223131, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+      propertyPath: m_Center.y
+      value: 0.47229353
+      objectReference: {fileID: 0}
+    - target: {fileID: 4677399194488223131, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+      propertyPath: m_Center.z
+      value: -0.00000001135681
+      objectReference: {fileID: 0}
+    - target: {fileID: 5076149731278055555, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+      propertyPath: _disableCollisionOnChildren
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5536264655608466747, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
       propertyPath: buttonObject
       value: 
@@ -10596,6 +10630,10 @@ PrefabInstance:
       propertyPath: OnButtonPressed.m_PersistentCalls.m_Calls.Array.data[1].m_Target
       value: 
       objectReference: {fileID: 1605294539}
+    - target: {fileID: 8134623799794819055, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+      propertyPath: _disableCollisionOnChildren
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8134623800898365424, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
       propertyPath: m_RootOrder
       value: 4
@@ -10643,6 +10681,22 @@ PrefabInstance:
     - target: {fileID: 8134623800898365431, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
       propertyPath: m_Name
       value: Tablet-ContactModes
+      objectReference: {fileID: 0}
+    - target: {fileID: 8536735542557770487, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+      propertyPath: m_Size.y
+      value: 0.5675214
+      objectReference: {fileID: 0}
+    - target: {fileID: 8536735542557770487, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+      propertyPath: m_Center.x
+      value: -0.000000018103488
+      objectReference: {fileID: 0}
+    - target: {fileID: 8536735542557770487, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+      propertyPath: m_Center.y
+      value: 0.47229353
+      objectReference: {fileID: 0}
+    - target: {fileID: 8536735542557770487, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+      propertyPath: m_Center.z
+      value: -0.00000001135681
       objectReference: {fileID: 0}
     - target: {fileID: 8810489104910744151, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
       propertyPath: buttonObject

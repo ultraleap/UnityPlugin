@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Android 	v5.17.1
 
 ### Added
-- 
+- (Physical hands) Ability to ignore collisions on single object or all children
 
 ### Changed
 - (Config) Additional uses of Config marked as Obsolete
@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Errors in Editor when using pre-2023.3.18 LTS due to FindObjectByType issue
 - (Physical Hands) Objects are sticky when they ignore collision with hard contact hands
+- (Physical Hands) Soft contact button hard to press in physical hands playground when not using UI layer
 
 ## [6.14.0] - 24/01/24
 
