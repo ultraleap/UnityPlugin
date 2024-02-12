@@ -36,6 +36,12 @@ namespace Leap.Unity.Preview.HandRays
             " - Keep the value central for a blend between the two.")]
         [Range(0f, 1)] public float wristShoulderBlendAmount = 0.532f;
 
+        /// <summary>
+        /// The min dot product allowed when calculating if the hand is facing the camera
+        /// </summary>
+        [Tooltip("The min dot product allowed when calculating if the hand is facing the camera")]
+        [Range(-1f, 1)] public float facingCamMinDotProd = 0.55f;
+
         [SerializeField] protected InferredBodyPositions inferredBodyPositions;
 
         [Header("Debug Gizmos")]
@@ -73,11 +79,6 @@ namespace Leap.Unity.Preview.HandRays
         private float oneEuroMinCutoff = 5;
 
         private readonly float oneEurofreq = 30;
-
-        /// <summary>
-        /// The min dot product allowed when calculating if the hand is facing the camera
-        /// </summary>
-        [Range(-1f, 1)] public float facingCamMinDotProd = 0.55f;
 
         // Start is called before the first frame update
         protected override void Start()
