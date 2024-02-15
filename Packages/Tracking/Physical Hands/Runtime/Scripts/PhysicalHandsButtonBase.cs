@@ -8,7 +8,6 @@ namespace Leap.Unity.PhysicalHands
 {
     public class PhysicalHandsButtonBase: MonoBehaviour, IPhysicalHandContact
     {
-        internal const float BUTTON_PRESS_THRESHOLD = 0.01F;
         internal const float BUTTON_PRESS_EXIT_THRESHOLD = 0.09F;
 
         [Space(10)]
@@ -16,21 +15,24 @@ namespace Leap.Unity.PhysicalHands
         [Space(5)]
         //[SerializeField, Tooltip("The pressable part of the button.")]
         //internal GameObject pressableObject;
-        [Tooltip("Travel of the button (How far does the button need to move before it is activated).")]
-        internal float buttonTravelDistance = 0.02f;
+        [SerializeField, Tooltip("Travel of the button (How far does the button need to move before it is activated).")]
+        internal float buttonTravelDistance = 0.017f;
 
         [SerializeField, Tooltip("Can this button only be activated by pressing it with a hand?")]
         internal bool _shouldOnlyBePressedByHand = false;
         [SerializeField, Tooltip("Which hand should be able to press this button?")]
         ChiralitySelection _whichHandCanPressButton = ChiralitySelection.BOTH;
 
-        internal bool _isButtonPressed = false;
+        internal bool _isButtonPressed = true;
 
         internal bool _contactHandPressing = false;
         internal List<Collider> _colliders;
         internal Transform _parent;
         internal Joint _joint;
 
+        [SerializeField, Tooltip("This should be the starting position i.e. the position the button sits when fully un-pressed. \n" +
+            "If left at (0,0,0), this will default to getting the current button position on awake. \n" +
+            "This is the position where distance checks for button travel distance are performed from. \n")]
         internal Vector3 _initialButtonPosition = Vector3.zero;
 
         [Space(10)]
@@ -48,15 +50,21 @@ namespace Leap.Unity.PhysicalHands
             _colliders = this.transform.GetComponentsInChildren<Collider>().ToList();
             _parent = this.transform.parent;
             _joint = this.transform.GetComponent<Joint>();
-            _initialButtonPosition = this.transform.localPosition;
+            if (_initialButtonPosition == Vector3.zero)
+            {
+                _initialButtonPosition = this.transform.localPosition;
+            }
+            Debug.Log(_initialButtonPosition);
         }
 
         void FixedUpdate()
         {
-            if((!_isButtonPressed
-                && Vector3.Distance(this.transform.localPosition, _initialButtonPosition) > buttonTravelDistance * BUTTON_PRESS_THRESHOLD)
+
+            if ((!_isButtonPressed
+                && Vector3.Distance(this.transform.localPosition, _initialButtonPosition) > buttonTravelDistance)
                 && (_contactHandPressing || !_shouldOnlyBePressedByHand))
             {
+                //Debug.Log("ButtonPressed"+ Vector3.Distance(this.transform.localPosition, _initialButtonPosition));
                 _isButtonPressed = true;
                 ButtonPressed();
             }
@@ -64,6 +72,7 @@ namespace Leap.Unity.PhysicalHands
             if (_isButtonPressed 
                 && Vector3.Distance(this.transform.localPosition, _initialButtonPosition) < buttonTravelDistance * BUTTON_PRESS_EXIT_THRESHOLD)
             {
+                //Debug.Log("ButtonUnPressed" + Vector3.Distance(this.transform.localPosition, _initialButtonPosition));
                 _isButtonPressed = false;
                 ButtonUnpressed();
             }
@@ -72,13 +81,11 @@ namespace Leap.Unity.PhysicalHands
         protected virtual void ButtonPressed()
         {
             OnButtonPressed?.Invoke();
-            Debug.Log("Button Pressed");
         }
 
         protected virtual void ButtonUnpressed()
         {
-            OnButtonUnPressed?.Invoke(); 
-            Debug.Log("Button Unpressed");
+            OnButtonUnPressed?.Invoke();
         }
 
         public void OnHandContact(ContactHand hand)
