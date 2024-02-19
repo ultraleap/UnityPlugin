@@ -23,11 +23,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Combined example content to be part of the main Ultraleap Tracking .unitypackage when importing via .unitypackage
 - Added fog and gradient sky for all XR example scenes
 - (Hand Rays) Exposed dot product used to test if the hand is facing camera
-- (Locomotion) Fix issue where IsPinching wouldn't always fire in LightweightPinchDetector
 
 ### Fixed
 - Errors in Editor when using pre-2023.3.18 LTS due to FindObjectByType issue
 - (Physical Hands) Objects are sticky when they ignore collision with hard contact hands
+- (Locomotion) IsPinching wouldn't fire when between Activate and Deactivate values in LightweightPinchDetector
 
 ## [6.14.0] - 24/01/24
 
