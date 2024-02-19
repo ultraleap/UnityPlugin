@@ -56,6 +56,21 @@ public static class HintManager
     }
 
     /// <summary>
+    /// Remove a hint from the existing hints and then send them all to the Service for the current device of the current controller
+    /// </summary>
+    public static void RemoveHint(string hint)
+    {
+        if (currentHints.Remove(hint))
+        {
+            SetHints(currentHints.ToArray());
+        }
+        else
+        {
+            Debug.Log("Hand Tracking Hint: " + hint + " was not previously set. No hints were changed.");
+        }
+    }
+
+    /// <summary>
     /// Add a hint to the existing hints and then send them all to the Service for the current device of the current controller
     /// </summary>
     public static void AddHint(string hint)
@@ -71,18 +86,20 @@ public static class HintManager
     /// <summary>
     /// Send a specific set of hints, if this does not include previously set ones, they will be cleared
     /// </summary>
-    /// <param name="hints">The hints tou wish to send</param>
+    /// <param name="hints">The hints you wish to send</param>
     /// <param name="device">An optional specific Device, otherwise the first found Device of the first Controller will be used</param>
     public static void SetHints(string[] hints, Device device = null)
     {
         LeapController.SetHints(hints, device);
 
-        string logString = "Hints have been requested:";
+        string logString = "Hand Tracking Hints have been requested:";
 
         foreach (string hint in hints)
         {
             logString += " " + hint + ",";
         }
+
+        logString.Remove(logString.Length - 1);
 
         Debug.Log(logString);
     }

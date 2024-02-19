@@ -27,6 +27,8 @@ namespace Leap.Unity
 #if UNITY_EDITOR
     static class UltraleapProjectSettings
     {
+        static SerializedObject settings = UltraleapSettings.GetSerializedSettings();
+
         [SettingsProvider]
         public static SettingsProvider CreateUltraleapSettingsProvider()
         {
@@ -39,7 +41,10 @@ namespace Leap.Unity
                 // Create the SettingsProvider and initialize its drawing (IMGUI) function in place:
                 guiHandler = (searchContext) =>
                 {
-                    SerializedObject settings = UltraleapSettings.GetSerializedSettings();
+                    if (settings == null)
+                    {
+                        settings = UltraleapSettings.GetSerializedSettings();
+                    }
 
                     LeapSubSystemSection(settings);
                     InputActionsSection(settings);
@@ -48,6 +53,7 @@ namespace Leap.Unity
                     ResetSection(settings);
 
                     settings.ApplyModifiedProperties();
+                    settings.UpdateIfRequiredOrScript();
                 },
 
                 // Populate the search keywords to enable smart search filtering and label highlighting:
@@ -100,49 +106,16 @@ namespace Leap.Unity
 
         private static void HintingSection(SerializedObject settings)
         {
-            EditorGUILayout.LabelField("Leap Motion Feature Hinting", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("Hand Tracking Hints", EditorStyles.boldLabel);
             EditorGUILayout.Space(5);
 
             using (new EditorGUI.IndentLevelScope())
             {
-                EditorGUILayout.LabelField("Startup Hints");
-
                 SerializedProperty hints = settings.FindProperty("startupHints");
-
-                // Ideally we would use this one line and get auto-layout reorderable arrays
-                //  but it does not save the text changes, even when using includeChildren :(
-                //EditorGUILayout.PropertyField(hints, true);
-
-                for (int i = 0; i < hints.arraySize; i++)
-                {
-                    var someArrayItem = hints.GetArrayElementAtIndex(i);
-                    EditorGUILayout.PropertyField(someArrayItem);
-                }
-
-                EditorGUILayout.BeginHorizontal();
-                GUILayout.FlexibleSpace();
-                if (GUILayout.Button("+", GUILayout.MaxWidth(20)))
-                {
-                    hints.arraySize++;
-                }
-
-                if (hints.arraySize > 0)
-                {
-                    if (GUILayout.Button("-", GUILayout.MaxWidth(20)))
-                    {
-                        hints.arraySize--;
-                    }
-                }
-                else
-                {
-                    EditorGUI.BeginDisabledGroup(true);
-                    GUILayout.Button("-", GUILayout.MaxWidth(20));
-                    EditorGUI.EndDisabledGroup();
-                }
-                EditorGUILayout.EndHorizontal();
+                EditorGUILayout.PropertyField(hints, true);
             }
 
-            EditorGUILayout.Space(30);
+            EditorGUILayout.Space(10);
 
             settings.ApplyModifiedProperties();
         }
@@ -211,7 +184,7 @@ namespace Leap.Unity
         public bool updateMetaInputSystem = false;
 
         [HideInInspector, SerializeField]
-        public string[] startupHints = new string[] { "" };
+        public string[] startupHints = new string[] { };
 
         [HideInInspector, SerializeField]
         public bool showAndroidBuildArchitectureWarning = true;
@@ -225,7 +198,7 @@ namespace Leap.Unity
             updateLeapInputSystem = false;
             updateMetaInputSystem = false;
 
-            startupHints = new string[] { "" };
+            startupHints = new string[] { };
 
             showAndroidBuildArchitectureWarning = true;
             showPhysicalHandsPhysicsSettingsWarning = true;
@@ -303,7 +276,7 @@ namespace Leap.Unity
 #if UNITY_EDITOR
         public static SerializedObject GetSerializedSettings()
         {
-            return new SerializedObject(FindSettingsSO());
+            return new SerializedObject(Instance);
         }
 #endif
     }
