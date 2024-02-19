@@ -1309,10 +1309,14 @@ namespace LeapInternal
             Marshal.FreeHGlobal(buffer);
         }
 
-        public void SetDeviceHints(IntPtr hDevice, string[] hints)
+        /// <summary>
+        /// Send a specific set of hints to hDevice, if this does not include previously set ones, they will be cleared.
+        /// </summary>
+        /// <param name="hDevice">The Device pointer for the trcking device to set the hints for</param>
+        /// <param name="hints">The array of hints</param>
+        public void RequestHandTrackingHintsOnDevice(IntPtr hDevice, string[] hints)
         {
             eLeapRS result;
-
             result = LeapC.SetDeviceHints(_leapConnection, hDevice, hints);
 
             reportAbnormalResults("LeapC SetDeviceHints call was ", result);
