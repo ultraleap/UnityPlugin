@@ -1240,5 +1240,8 @@ namespace LeapInternal
 
         [DllImport("LeapC", EntryPoint = "LeapGetVersion")]
         public static extern eLeapRS GetVersion(IntPtr hConnection, eLeapVersionPart versionPart, ref LEAP_VERSION pVersion);
+
+        [DllImport("LeapC", EntryPoint = "LeapSetDeviceHints")]
+        public static extern eLeapRS SetDeviceHints(IntPtr hConnection, IntPtr hDevice, string[] hints);
     }
 }
