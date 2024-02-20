@@ -29,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Errors in Editor when using pre-2023.3.18 LTS due to FindObjectByType issue
 - (Physical Hands) Objects are sticky when they ignore collision with hard contact hands
+- (Physical Hands) Ability to toggle ignore Physical hands options from the inspector at runtime.
 - (Locomotion) IsPinching wouldn't fire when between Activate and Deactivate values in LightweightPinchDetector
 
 ## [6.14.0] - 24/01/24

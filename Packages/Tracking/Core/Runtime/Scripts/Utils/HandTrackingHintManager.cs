@@ -52,8 +52,11 @@ namespace Leap.Unity
         /// </summary>
         private static void NewLeapDevice(object sender, DeviceEventArgs e)
         {
-            LeapController.Device -= NewLeapDevice;
-            RequestHandTrackingHints(currentHints.ToArray());
+            if (currentHints.Count != 0)
+            {
+                LeapController.Device -= NewLeapDevice;
+                RequestHandTrackingHints(currentHints.ToArray());
+            }
         }
 
         /// <summary>
@@ -97,12 +100,19 @@ namespace Leap.Unity
             // Log the requeste hints
             string logString = "Hand Tracking Hints have been requested:";
 
-            foreach (string hint in hints)
+            if (hints.Length > 0)
             {
-                logString += " " + hint + ",";
-            }
+                foreach (string hint in hints)
+                {
+                    logString += " " + hint + ",";
+                }
 
-            logString.Remove(logString.Length - 1);
+                logString = logString.Remove(logString.Length - 1);
+            }
+            else
+            {
+                logString = "Hand Tracking Hints have been cleared";
+            }
 
             Debug.Log(logString);
         }
