@@ -1,10 +1,12 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
+
+using UnityEngine;
 
 namespace Leap
 {
@@ -53,7 +55,6 @@ namespace Leap
                       uint deviceID)
         {
             Handle = deviceHandle;
-            InternalHandle = internalHandle;
             HorizontalViewAngle = horizontalViewAngle;
             VerticalViewAngle = verticalViewAngle;
             Range = range;
@@ -120,14 +121,6 @@ namespace Leap
                 IsStreaming = true;
             else
                 IsStreaming = false;
-            if ((status & eLeapDeviceStatus.eLeapDeviceStatus_Smudged) == eLeapDeviceStatus.eLeapDeviceStatus_Smudged)
-                IsSmudged = true;
-            else
-                IsSmudged = false;
-            if ((status & eLeapDeviceStatus.eLeapDeviceStatus_Robust) == eLeapDeviceStatus.eLeapDeviceStatus_Robust)
-                IsLightingBad = true;
-            else
-                IsLightingBad = false;
             if ((status & eLeapDeviceStatus.eLeapDeviceStatus_LowResource) == eLeapDeviceStatus.eLeapDeviceStatus_LowResource)
                 IsLowResource = true;
             else
@@ -139,12 +132,10 @@ namespace Leap
         /// </summary>
         public IntPtr Handle { get; private set; }
 
-        private IntPtr InternalHandle;
-
+        [Obsolete("Use LeapC.SetLeapPause instead")]
         public bool SetPaused(bool pause)
         {
-            eLeapRS result = LeapC.LeapSetPause(Handle, pause);
-            return result == eLeapRS.eLeapRS_Success;
+            return false;
         }
 
         /// <summary>
@@ -246,9 +237,84 @@ namespace Leap
 
         /// <summary>
         /// Reports the ID assoicated with the device
-        /// 
         /// </summary>
         public uint DeviceID { get; private set; }
+
+        private bool poseSet = false;
+        private Pose devicePose = Pose.identity;
+
+        /// <summary>
+        /// The transform to world coordinates from 3D Leap coordinates.
+        /// </summary>
+        public Pose DevicePose
+        {
+            get
+            {
+                if (poseSet) // Assumes the devicePose never changes and so, uses the cached pose.
+                {
+                    return devicePose;
+                }
+
+                bool deviceTransformAvailable = LeapC.GetDeviceTransformAvailable(Handle);
+
+                if (!deviceTransformAvailable)
+                {
+                    devicePose = Pose.identity;
+                    poseSet = true;
+                    return Pose.identity;
+                }
+
+                float[] data = new float[16];
+                eLeapRS result = LeapC.GetDeviceTransform(Handle, data);
+
+                if (result != eLeapRS.eLeapRS_Success || data == null)
+                {
+                    devicePose = Pose.identity;
+                    poseSet = true;
+                    return Pose.identity;
+                }
+
+                // Using the LEAP->OPENXR device transform matrix
+                // Unitys matrices are generated as 4 columns:
+                Matrix4x4 deviceTransform = new Matrix4x4(
+                                                    new Vector4(data[0], data[1], data[2], data[3]),
+                                                    new Vector4(data[4], data[5], data[6], data[7]),
+                                                    new Vector4(data[8], data[9], data[10], data[11]),
+                                                    new Vector4(data[12], data[13], data[14], data[15]));
+
+
+                // An example of the expected matrix if it were 8cm forward from the head origin
+                // Unitys matrices are generated as 4 columns:
+                //Matrix4x4 deviceTransform = new Matrix4x4(
+                //                                    new Vector4(-0.001f, 0, 0, 0),
+                //                                    new Vector4(0, 0, -0.001f, 0),
+                //                                    new Vector4(0, -0.001f, 0, 0),
+                //                                    new Vector4(0, 0, -0.08f, 1));
+
+                if (deviceTransform == Matrix4x4.identity)
+                {
+                    devicePose = Pose.identity;
+                    poseSet = true;
+                    return Pose.identity;
+                }
+
+                Matrix4x4 openXRToUnity = new Matrix4x4(
+                                                    new Vector4(1f, 0, 0, 0),
+                                                    new Vector4(0, 1f, 0, 0),
+                                                    new Vector4(0, 0, -1f, 0),
+                                                    new Vector4(0, 0, 0, 1));
+
+                deviceTransform = openXRToUnity * deviceTransform;
+
+                Vector3 outputPos = deviceTransform.GetPosition();
+                //Quaternion outputRot = deviceTransform.rotation; // Note: the matrices we receive are not rotatrion matrices. This produces unexpected results
+
+                devicePose = new Pose(outputPos, Quaternion.identity);
+
+                poseSet = true;
+                return devicePose;
+            }
+        }
 
         /// <summary>
         /// Returns the internal status field of the current device
@@ -260,7 +326,7 @@ namespace Leap
             LEAP_DEVICE_INFO deviceInfo = new LEAP_DEVICE_INFO();
             deviceInfo.serial = IntPtr.Zero;
             deviceInfo.size = (uint)System.Runtime.InteropServices.Marshal.SizeOf(deviceInfo);
-            result = LeapC.GetDeviceInfo(InternalHandle, ref deviceInfo);
+            result = LeapC.GetDeviceInfo(Handle, ref deviceInfo);
 
             if (result != eLeapRS.eLeapRS_Success)
                 return 0;
@@ -275,6 +341,7 @@ namespace Leap
         /// over the Leap Motion cameras.
         /// @since 3.0
         /// </summary>
+        [Obsolete("IsSmudged is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
         public bool IsSmudged { get; internal set; }
 
         /// <summary>
@@ -289,6 +356,7 @@ namespace Leap
         /// isLightingBad() is true. 
         /// @since 3.0 
         /// </summary>
+        [Obsolete("IsLightingBad is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
         public bool IsLightingBad { get; internal set; }
 
         /// <summary>
@@ -328,6 +396,11 @@ namespace Leap
             /// The Ultraleap 3Di hand tracking camera.
             /// </summary>
             TYPE_3DI = (int)eLeapDeviceType.eLeapDevicePID_3Di,
+
+            /// <summary>
+            /// The Ultraleap Leap Motion Controller 2 hand tracking camera.
+            /// </summary>
+            TYPE_LMC2 = (int)eLeapDeviceType.eLeapDevicePID_LMC2
         }
     }
 }

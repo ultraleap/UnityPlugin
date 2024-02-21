@@ -1,53 +1,111 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
-
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace Leap.Unity
 {
+    public enum ChiralitySelection
+    {
+        LEFT = 0,
+        RIGHT = 1,
+        BOTH = 2,
+        NONE = 3
+    }
+
     /// <summary>
     /// Static convenience methods and extension methods for getting useful Hand data.
     /// </summary>
     public static class Hands
     {
-
         private static LeapProvider s_provider;
         private static GameObject s_leapRig;
 
-        static Hands()
+        /// <summary>
+        /// Assign a static reference to the most suitable provider in the scene.
+        /// 
+        /// Order:
+        /// - First PostProcessProvider found
+        /// - First XRLeapProviderManager found
+        /// - First LeapProvider found
+        /// </summary>
+        private static void AssignBestLeapProvider()
         {
-            InitStatic();
-            SceneManager.activeSceneChanged += InitStaticOnNewScene;
-        }
-
-        private static void InitStaticOnNewScene(Scene unused, Scene unused2)
-        {
-            InitStatic();
-        }
-
-        private static void InitStatic()
-        {
-            s_provider = Object.FindObjectOfType<LeapServiceProvider>();
+            // Fall through to the best available Leap Provider if none is assigned
             if (s_provider == null)
             {
-                s_provider = Object.FindObjectOfType<LeapProvider>();
+#if UNITY_2021_3_18_OR_NEWER
+                s_provider = UnityEngine.Object.FindAnyObjectByType<PostProcessProvider>();
+
                 if (s_provider == null)
                 {
-                    return;
+                    s_provider = UnityEngine.Object.FindAnyObjectByType<XRLeapProviderManager>();
+                    if (s_provider == null)
+                    {
+                        s_provider = UnityEngine.Object.FindAnyObjectByType<LeapProvider>();
+                        if (s_provider == null)
+                        {
+                            Debug.Log("There are no Leap Providers in the scene, please assign one manually." +
+                                "Alternatively, use Hands.CreateXRLeapProvider() to automatically create an XRLeapProvider");
+                            return;
+                        }
+                    }
                 }
+#else
+                s_provider = UnityEngine.Object.FindObjectOfType<PostProcessProvider>();
+
+                if (s_provider == null)
+                {
+                    s_provider = UnityEngine.Object.FindObjectOfType<XRLeapProviderManager>();
+                    if (s_provider == null)
+                    {
+                        s_provider = UnityEngine.Object.FindObjectOfType<LeapProvider>();
+                        if (s_provider == null)
+                        {
+                            Debug.Log("There are no Leap Providers in the scene, please assign one manually");
+                            return;
+                        }
+                    }
+                }
+#endif
             }
 
-            Camera providerCamera = s_provider.GetComponentInParent<Camera>();
-            if (providerCamera == null) return;
-            if (providerCamera.transform.parent == null) return;
+            Debug.Log("LeapProvider was not assigned. Auto assigning: " + s_provider);
+        }
+
+        /// <summary>
+        /// Assign a static reference to the most suitable provider in the scene.
+        /// 
+        /// Order:
+        /// - First PostProcessProvider found
+        /// - First XRLeapProviderManager found
+        /// - First LeapProvider found
+        /// </summary>
+        public static LeapXRServiceProvider CreateXRLeapProviderManager()
+        {
+            GameObject leapProviderGO = new GameObject("Leap XR Service Provider");
+            LeapXRServiceProvider leapXRServiceProvider = leapProviderGO.AddComponent<LeapXRServiceProvider>();
+            return leapXRServiceProvider;
+        }
+
+        /// <summary>
+        /// Finds the Camera Rig; Assuming a Camera is a child of the Camera Rig and the static Provider is a child of the Camera.
+        /// </summary>
+        private static void AssignCameraRig()
+        {
+            Camera providerCamera = Provider?.GetComponentInParent<Camera>();
+
+            if (providerCamera == null || providerCamera.transform.parent == null)
+            {
+                return;
+            }
+
             s_leapRig = providerCamera.transform.parent.gameObject;
         }
 
@@ -62,10 +120,11 @@ namespace Leap.Unity
             {
                 if (s_leapRig == null)
                 {
-                    InitStatic();
+                    AssignCameraRig();
                 }
                 return s_leapRig;
             }
+            set { s_leapRig = value; }
         }
 
         /// <summary>
@@ -86,7 +145,7 @@ namespace Leap.Unity
             {
                 if (s_provider == null)
                 {
-                    InitStatic();
+                    AssignBestLeapProvider();
                 }
                 return s_provider;
             }
@@ -97,6 +156,7 @@ namespace Leap.Unity
         /// Returns the first hand of the argument Chirality in the current frame,
         /// otherwise returns null if no such hand is found.
         /// </summary>
+        [Obsolete("Specifying Providers is highly recommended. Use LeapProvider.GetHand() instead")]
         public static Hand Get(Chirality chirality)
         {
             if (chirality == Chirality.Left) return Left;
@@ -106,6 +166,7 @@ namespace Leap.Unity
         /// <summary>
         /// As Get, but returns the FixedUpdate (physics timestep) hand as opposed to the Update hand.
         /// </summary>
+        [Obsolete("Specifying Providers is highly recommended. Use LeapProvider.GetHand() instead")]
         public static Hand GetFixed(Chirality chirality)
         {
             if (chirality == Chirality.Left) return FixedLeft;
@@ -116,13 +177,14 @@ namespace Leap.Unity
         /// Returns the first left hand found by Leap in the current frame, otherwise
         /// returns null if no such hand is found.
         /// </summary>
+        [Obsolete("Specifying Providers is highly recommended. Use LeapProvider.GetHand(Chirality.Left) instead")]
         public static Hand Left
         {
             get
             {
                 if (Provider == null) return null;
                 if (Provider.CurrentFrame == null) return null;
-                return Provider.CurrentFrame.Hands.FirstOrDefault(hand => hand.IsLeft);
+                return Provider.CurrentFrame.GetHand(Chirality.Left);
             }
         }
 
@@ -130,13 +192,14 @@ namespace Leap.Unity
         /// Returns the first right hand found by Leap in the current frame, otherwise
         /// returns null if no such hand is found.
         /// </summary>
+        [Obsolete("Specifying Providers is highly recommended. Use LeapProvider.GetHand(Chirality.Right) instead")]
         public static Hand Right
         {
             get
             {
                 if (Provider == null) return null;
                 if (Provider.CurrentFrame == null) return null;
-                else return Provider.CurrentFrame.Hands.FirstOrDefault(hand => hand.IsRight);
+                return Provider.CurrentFrame.GetHand(Chirality.Right);
             }
         }
 
@@ -144,13 +207,14 @@ namespace Leap.Unity
         /// Returns the first left hand found by Leap in the current fixed frame, otherwise
         /// returns null if no such hand is found. The fixed frame is aligned with the physics timestep.
         /// </summary>
+        [Obsolete("Specifying Providers is highly recommended. Use LeapProvider.GetHand(Chirality.Left) instead")]
         public static Hand FixedLeft
         {
             get
             {
                 if (Provider == null) return null;
                 if (Provider.CurrentFixedFrame == null) return null;
-                return Provider.CurrentFixedFrame.Hands.FirstOrDefault(hand => hand.IsLeft);
+                return Provider.CurrentFixedFrame.GetHand(Chirality.Left);
             }
         }
 
@@ -158,13 +222,14 @@ namespace Leap.Unity
         /// Returns the first right hand found by Leap in the current fixed frame, otherwise
         /// returns null if no such hand is found. The fixed frame is aligned with the physics timestep.
         /// </summary>
+        [Obsolete("Specifying Providers is highly recommended. Use LeapProvider.GetHand(Chirality.Right) instead")]
         public static Hand FixedRight
         {
             get
             {
                 if (Provider == null) return null;
                 if (Provider.CurrentFixedFrame == null) return null;
-                else return Provider.CurrentFixedFrame.Hands.FirstOrDefault(hand => hand.IsRight);
+                return Provider.CurrentFixedFrame.GetHand(Chirality.Right);
             }
         }
 
@@ -377,6 +442,143 @@ namespace Leap.Unity
             }
 
             return Vector3.Dot(hand.Fingers[finger].Direction, -hand.DistalAxis()).Map(-1, 1, 0, 1);
+        }
+
+        /// <summary>
+        /// Returns the distance between the tip of the finger and the tip of the thumb.
+        /// Finger 0 (thumb) will always return float.MaxValue.
+        /// </summary>
+        public static float GetFingerPinchDistance(this Hand hand, int finger)
+        {
+            if (hand == null || finger == 0)
+            {
+                return float.MaxValue;
+            }
+
+            return Vector3.Distance(hand.Fingers[0].TipPosition, hand.Fingers[finger].TipPosition);
+        }
+
+        /// <summary>
+        /// Returns the Chirality of the hand
+        /// </summary>
+        public static Chirality GetChirality(this Hand hand)
+        {
+            return hand.IsLeft ? Chirality.Left : Chirality.Right;
+        }
+
+        // Magic numbers for palm width and PinchStrength calculation
+        private static readonly float[] DefaultMetacarpalLengths = { 0, 0.06812f, 0.06460f, 0.05800f, 0.05369f };
+
+        /// <summary>
+        /// Returns a relative scale to a default scale. Can be used to calculate palm width and pinch strength
+        /// </summary>
+        public static float CalculateHandScale(ref Hand hand)
+        {
+            // Iterate through the fingers, skipping the thumb and accumulate the scale.
+            float scale = 0.0f;
+            for (var i = 1; i < hand.Fingers.Count; ++i)
+            {
+                scale += (hand.Fingers[i].Bone(Bone.BoneType.TYPE_METACARPAL).Length / DefaultMetacarpalLengths[i]) / 4.0f;
+            }
+
+            return scale;
+        }
+
+        /// <summary>
+        /// Returns a pinch strength for the hand based on the provided joint data. Value ranges from 0 to 1 where 1 is fully pinched.
+        /// 
+        /// Only use this where the pinch strength has not already been provided. Alternatively, use the provided Hand.PinchStrength.
+        /// </summary>
+        public static float CalculatePinchStrength(ref Hand hand)
+        {
+            // Get the thumb position.
+            Vector3 thumbTipPosition = hand.GetThumb().TipPosition;
+
+            // Compute the distance midpoints between the thumb and the each finger and find the smallest.
+            float minDistanceSquared = float.MaxValue;
+
+            // Iterate through the fingers, skipping the thumb.
+            for (var i = 1; i < hand.Fingers.Count; ++i)
+            {
+                float distanceSquared = (hand.Fingers[i].TipPosition - thumbTipPosition).sqrMagnitude;
+                minDistanceSquared = Mathf.Min(distanceSquared, minDistanceSquared);
+            }
+
+            float scale = CalculateHandScale(ref hand);
+
+            // Compute the pinch strength. Magic values taken from existing LeapC implementation (scaled to metres)
+            float distanceZero = 0.0600f * scale;
+            float distanceOne = 0.0220f * scale;
+            return Mathf.Clamp01((Mathf.Sqrt(minDistanceSquared) - distanceZero) / (distanceOne - distanceZero));
+        }
+
+        /// <summary>
+        /// Returns a pinch distance (in mm) for the hand based on the provided joint data.
+        /// 
+        /// Only use this where the pinch distance has not already been provided. Alternatively, use the provided Hand.PinchDistance.
+        /// </summary>
+        public static float CalculatePinchDistance(ref Hand hand)
+        {
+            // Get the farthest 2 segments of thumb and index finger, respectively, and compute distances.
+            float minDistanceSquared = float.MaxValue;
+            for (var thumbBoneIndex = 2; thumbBoneIndex < hand.GetThumb().bones.Length; ++thumbBoneIndex)
+            {
+                for (var indexBoneIndex = 2; indexBoneIndex < hand.GetIndex().bones.Length; ++indexBoneIndex)
+                {
+                    var distanceSquared = CalculateBoneDistanceSquared(
+                        hand.GetThumb().bones[thumbBoneIndex],
+                        hand.GetIndex().bones[indexBoneIndex]);
+                    minDistanceSquared = Mathf.Min(distanceSquared, minDistanceSquared);
+                }
+            }
+
+            // Return the pinch distance, converted to millimeters to match other providers.
+            return Mathf.Sqrt(minDistanceSquared) * 1000.0f;
+        }
+
+        static float CalculateBoneDistanceSquared(Bone boneA, Bone boneB)
+        {
+            // Denormalize directions to bone length.
+            Vector3 boneAJoint = boneA.PrevJoint;
+            Vector3 boneBJoint = boneB.PrevJoint;
+            Vector3 boneADirection = boneA.Direction * boneA.Length;
+            Vector3 boneBDirection = boneB.Direction * boneB.Length;
+
+            // Compute the minimum (squared) distance between two bones.
+            Vector3 diff = boneBJoint - boneAJoint;
+            float d1 = Vector3.Dot(boneADirection, diff);
+            float d2 = Vector3.Dot(boneBDirection, diff);
+            float a = boneADirection.sqrMagnitude;
+            float b = Vector3.Dot(boneADirection, boneBDirection);
+            float c = boneBDirection.sqrMagnitude;
+            float det = b * b - a * c;
+            float t1 = Mathf.Clamp01((b * d2 - c * d1) / det);
+            float t2 = Mathf.Clamp01((a * d2 - b * d1) / det);
+            Vector3 pa = boneAJoint + t1 * boneADirection;
+            Vector3 pb = boneBJoint + t2 * boneBDirection;
+            return (pa - pb).sqrMagnitude;
+        }
+
+        /// <summary>
+        /// Returns a grab strength for the hand based on the provided joint data. Value ranges from 0 to 1 where 1 is fully grabbed.
+        /// 
+        /// Only use this where the grab strength has not already been provided. Alternatively, use the provided Hand.GrabStrength.
+        /// </summary>
+        public static float CalculateGrabStrength(ref Hand hand)
+        {
+            // magic numbers so it approximately lines up with the leap results
+            const float bendZero = 0.25f;
+            const float bendOne = 0.85f;
+
+            // Find the minimum bend angle for the non-thumb fingers.
+            float minBend = float.MaxValue;
+            for (int finger_idx = 1; finger_idx < 5; finger_idx++)
+            {
+                minBend = Mathf.Min(hand.GetFingerStrength(finger_idx), minBend);
+            }
+
+            // Return the grab strength.
+            return Mathf.Clamp01((minBend - bendZero) / (bendOne - bendZero));
         }
 
         /// <summary>
@@ -604,9 +806,20 @@ namespace Leap.Unity
         /// <returns>The first hand of the argument whichHand found in the argument frame.</returns>
         public static Hand GetHand(this Frame frame, Chirality whichHand)
         {
-            if (frame.Hands == null) { return null; }
-            return frame.Hands.FirstOrDefault(
-              h => h.IsLeft == (whichHand == Chirality.Left));
+            if (frame == null || frame.Hands == null)
+            {
+                return null;
+            }
+
+            foreach (var hand in frame.Hands)
+            {
+                if (hand.IsLeft && whichHand == Chirality.Left || hand.IsRight && whichHand == Chirality.Right)
+                {
+                    return hand;
+                }
+            }
+
+            return null;
         }
 
         #endregion
@@ -618,6 +831,7 @@ namespace Leap.Unity
         /// </summary>
         /// <returns>The first hand of the argument whichHand found in the current frame of 
         /// the argument provider.</returns>
+        [Obsolete("Naming updated. Use LeapProvider.GetHand() instead")]
         public static Hand Get(this LeapProvider provider, Chirality whichHand)
         {
             Frame frame;
@@ -633,7 +847,61 @@ namespace Leap.Unity
             return frame.GetHand(whichHand);
         }
 
+        /// <summary>
+        /// Finds a hand in the current frame.
+        /// </summary>
+        /// <returns>The first hand of the argument whichHand found in the current frame of 
+        /// the argument provider.</returns>
+        public static Hand GetHand(this LeapProvider provider, Chirality whichHand)
+        {
+            if (Time.inFixedTimeStep)
+            {
+                return provider.CurrentFixedFrame.GetHand(whichHand);
+            }
+            else
+            {
+                return provider.CurrentFrame.GetHand(whichHand);
+            }
+        }
+
         #endregion
 
+        #region Misc Utils
+
+        public static string FingerIndexToName(int fingerIndex)
+        {
+            switch (fingerIndex)
+            {
+                case 0:
+                    return "Thumb";
+                case 1:
+                    return "Index";
+                case 2:
+                    return "Middle";
+                case 3:
+                    return "Ring";
+                case 4:
+                    return "Pinky";
+            }
+            return "";
+        }
+
+        public static string JointIndexToName(int jointIndex)
+        {
+            switch (jointIndex)
+            {
+                case 0:
+                    return "Metacarpal";
+                case 1:
+                    return "Proximal";
+                case 2:
+                    return "Intermediate";
+                case 3:
+                    return "Distal";
+            }
+            return "";
+        }
+
+        #endregion
     }
 }

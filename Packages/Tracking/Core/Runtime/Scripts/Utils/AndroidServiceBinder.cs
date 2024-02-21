@@ -14,6 +14,8 @@ namespace Leap.Unity
         static AndroidJavaObject context;
         static ServiceCallbacks serviceCallbacks;
 
+        public static AndroidJavaObject ServiceBinder => _serviceBinder;
+
         public static bool Bind()
         {
             bool isBound = _serviceBinder?.Call<bool>("isBound") ?? false;
@@ -29,6 +31,7 @@ namespace Leap.Unity
                 }
             }
 
+            IsBound = isBound;
             return isBound;
         }
 

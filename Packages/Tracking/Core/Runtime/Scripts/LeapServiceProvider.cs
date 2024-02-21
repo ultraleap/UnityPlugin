@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -30,15 +30,21 @@ namespace Leap.Unity
     {
         #region Constants
 
-        /// <summary>
-        /// Converts nanoseconds to seconds.
-        /// </summary>
+        [Obsolete("This const is named incorrectly. Use US_TO_S instead.")]
         protected const double NS_TO_S = 1e-6;
 
-        /// <summary>
-        /// Converts seconds to nanoseconds.
-        /// </summary>
+        [Obsolete("This const is named incorrectly. Use S_TO_US instead.")]
         protected const double S_TO_NS = 1e6;
+
+        /// <summary>
+        /// Converts Microseconds to seconds.
+        /// </summary>
+        protected const double US_TO_S = 1e-6;
+
+        /// <summary>
+        /// Converts seconds to Microseconds.
+        /// </summary>
+        protected const double S_TO_US = 1e6;
 
         /// <summary>
         /// The transform array used for late-latching.
@@ -78,7 +84,8 @@ namespace Leap.Unity
             LeapMotionController,
             StereoIR170,
             Device_3Di,
-            Automatic
+            Automatic,
+            LeapMotionController2,
         }
         [Tooltip("Displays a representation of the traking device")]
         [SerializeField]
@@ -267,20 +274,29 @@ namespace Leap.Unity
         [EditTimeOnly]
         protected string _serverNameSpace = "Leap Service";
 
-        #endregion
-
-        #region Internal Settings & Memory
+        public override TrackingSource TrackingDataSource { get { return CheckLeapServiceAvailable(); } }
 
         /// <summary>
         /// Determines if the service provider should temporally resample frames for smoothness.
         /// </summary>
-        protected bool _useInterpolation = true;
+        [SerializeField]
+        public bool _useInterpolation = true;
+
+        [SerializeField, Min(-1), Tooltip("The maximum number of attempts to connect to the service. Infinite attempts if -1.")]
+        public int _reconnectionAttempts = MAX_RECONNECTION_ATTEMPTS;
+
+        [SerializeField, Min(1), Tooltip("The interval in frames between service connection attempts.")]
+        public int _reconnectionInterval = RECONNECTION_INTERVAL;
+
+        #endregion
+
+        #region Internal Settings & Memory
 
         // Extrapolate on Android to compensate for the latency introduced by its graphics
         // pipeline.
 #if UNITY_ANDROID && !UNITY_EDITOR
-    protected int ExtrapolationAmount = 0; // 15;
-    protected int BounceAmount = 70;
+        protected int ExtrapolationAmount = 0; // 15;
+        protected int BounceAmount = 70;
 #else
         protected int ExtrapolationAmount = 0;
         protected int BounceAmount = 0;
@@ -598,51 +614,23 @@ namespace Leap.Unity
                 updateDevice();
             }
 
-            if (_useInterpolation)
-            {
-#if !UNITY_ANDROID || UNITY_EDITOR
-                _smoothedTrackingLatency.value = Mathf.Min(_smoothedTrackingLatency.value, 30000f);
-                _smoothedTrackingLatency.Update((float)(_leapController.Now() - _leapController.FrameTimestamp()), Time.deltaTime);
-#endif
-                long timestamp = CalculateInterpolationTime() + (ExtrapolationAmount * 1000);
-                _unityToLeapOffset = timestamp - (long)(Time.time * S_TO_NS);
-
-                _leapController.GetInterpolatedFrameFromTime(_untransformedUpdateFrame, timestamp, CalculateInterpolationTime() - (BounceAmount * 1000), _currentDevice);
-            }
-            else
-            {
-                _leapController.Frame(_untransformedUpdateFrame);
-            }
-
-            if (_untransformedUpdateFrame != null)
-            {
-                transformFrame(_untransformedUpdateFrame, _transformedUpdateFrame);
-
-                DispatchUpdateFrameEvent(_transformedUpdateFrame);
-            }
+            HandleUpdateFrameInterpolationAndTransformation();
+            DispatchUpdateFrameEvent(_transformedUpdateFrame);
         }
 
         protected virtual void FixedUpdate()
         {
-            if (_frameOptimization == FrameOptimizationMode.ReuseUpdateForPhysics)
-            {
-                DispatchFixedFrameEvent(_transformedUpdateFrame);
-                return;
-            }
-
             if (_useInterpolation)
             {
-
                 long timestamp;
                 switch (_frameOptimization)
                 {
                     case FrameOptimizationMode.None:
-                        // By default we use Time.fixedTime to ensure that our hands are on the same
-                        // timeline as Update.  We add an extrapolation value to help compensate
-                        // for latency.
-                        float extrapolatedTime = Time.fixedTime + CalculatePhysicsExtrapolation();
-                        timestamp = (long)(extrapolatedTime * S_TO_NS) + _unityToLeapOffset;
-                        break;
+                    case FrameOptimizationMode.ReuseUpdateForPhysics:
+                        // Caculate a new frame and then dispatch it
+                        HandleUpdateFrameInterpolationAndTransformation();
+                        DispatchFixedFrameEvent(_transformedUpdateFrame);
+                        return;
                     case FrameOptimizationMode.ReusePhysicsForUpdate:
                         // If we are re-using physics frames for update, we don't even want to care
                         // about Time.fixedTime, just grab the most recent interpolated timestamp
@@ -664,7 +652,6 @@ namespace Leap.Unity
             if (_untransformedFixedFrame != null)
             {
                 transformFrame(_untransformedFixedFrame, _transformedFixedFrame);
-
                 DispatchFixedFrameEvent(_transformedFixedFrame);
             }
         }
@@ -708,6 +695,30 @@ namespace Leap.Unity
                 default:
                     throw new System.InvalidOperationException(
                       "Unexpected physics extrapolation mode: " + _physicsExtrapolation);
+            }
+        }
+
+        void HandleUpdateFrameInterpolationAndTransformation()
+        {
+            if (_useInterpolation)
+            {
+#if !UNITY_ANDROID || UNITY_EDITOR
+                _smoothedTrackingLatency.value = Mathf.Min(_smoothedTrackingLatency.value, 30000f);
+                _smoothedTrackingLatency.Update((float)(_leapController.Now() - _leapController.FrameTimestamp()), Time.deltaTime);
+#endif
+                long timestamp = CalculateInterpolationTime() + (ExtrapolationAmount * 1000);
+                _unityToLeapOffset = timestamp - (long)(Time.time * S_TO_US);
+
+                _leapController.GetInterpolatedFrameFromTime(_untransformedUpdateFrame, timestamp, CalculateInterpolationTime() - (BounceAmount * 1000), _currentDevice);
+            }
+            else
+            {
+                _leapController.Frame(_untransformedUpdateFrame);
+            }
+
+            if (_untransformedUpdateFrame != null)
+            {
+                transformFrame(_untransformedUpdateFrame, _transformedUpdateFrame);
             }
         }
 
@@ -1002,17 +1013,17 @@ namespace Leap.Unity
                 _numberOfReconnectionAttempts = 0;
                 return true;
             }
-            else if (_numberOfReconnectionAttempts < MAX_RECONNECTION_ATTEMPTS)
+            else if (_numberOfReconnectionAttempts < _reconnectionAttempts || _reconnectionAttempts == -1)
             {
                 _framesSinceServiceConnectionChecked++;
 
-                if (_framesSinceServiceConnectionChecked > RECONNECTION_INTERVAL)
+                if (_framesSinceServiceConnectionChecked > _reconnectionInterval)
                 {
                     _framesSinceServiceConnectionChecked = 0;
                     _numberOfReconnectionAttempts++;
 
                     Debug.LogWarning("Leap Service not connected; attempting to reconnect for try " +
-                                     _numberOfReconnectionAttempts + "/" + MAX_RECONNECTION_ATTEMPTS +
+                                     _numberOfReconnectionAttempts + "/" + _reconnectionAttempts +
                                      "...", this);
                     destroyController();
                     createController();
@@ -1034,6 +1045,33 @@ namespace Leap.Unity
         protected virtual void transformFrame(Frame source, Frame dest)
         {
             dest.CopyFrom(source).Transform(new LeapTransform(transform));
+        }
+
+        private TrackingSource CheckLeapServiceAvailable()
+        {
+            if (_trackingSource != TrackingSource.NONE)
+            {
+                return _trackingSource;
+            }
+
+#if UNITY_ANDROID && !UNITY_EDITOR
+            if(AndroidServiceBinder.Bind())
+            {
+                _trackingSource = TrackingSource.LEAPC;
+                return _trackingSource;
+            }
+#endif
+
+            if (LeapInternal.Connection.IsConnectionAvailable(_serverNameSpace))
+            {
+                _trackingSource = TrackingSource.LEAPC;
+            }
+            else
+            {
+                _trackingSource = TrackingSource.NONE;
+            }
+
+            return _trackingSource;
         }
 
         #endregion
@@ -1071,6 +1109,9 @@ namespace Leap.Unity
                 case LeapServiceProvider.InteractionVolumeVisualization.Device_3Di:
                     DrawTrackingDevice(targetTransform, "3Di");
                     break;
+                case LeapServiceProvider.InteractionVolumeVisualization.LeapMotionController2:
+                    DrawTrackingDevice(targetTransform, "Leap Motion Controller 2");
+                    break;
                 case LeapServiceProvider.InteractionVolumeVisualization.Automatic:
                     DetectConnectedDevice(targetTransform);
                     break;
@@ -1082,29 +1123,24 @@ namespace Leap.Unity
 
         private void DetectConnectedDevice(Transform targetTransform)
         {
-            string deviceType = "";
-            
-            if(_multipleDeviceMode == MultipleDeviceMode.Disabled)
+            string deviceName = "";
+
+            if (_multipleDeviceMode == MultipleDeviceMode.Disabled)
             {
-                deviceType = LeapInternal.ServerStatus.GetDeviceType("");
+                deviceName = LeapInternal.ServerStatus.GetDeviceType("");
             }
             else
             {
-                deviceType = LeapInternal.ServerStatus.GetDeviceType(_specificSerialNumber);
+                deviceName = LeapInternal.ServerStatus.GetDeviceType(_specificSerialNumber);
             }
 
-            if (deviceType == "SIR170")
+            // adjust to readable name
+            if (deviceName == "SIR170")
             {
-                DrawTrackingDevice(targetTransform, "Stereo IR 170");
+                deviceName = "Stereo IR 170";
             }
-            else if (deviceType == "3Di")
-            {
-                DrawTrackingDevice(targetTransform, "3Di");
-            }
-            else
-            {
-                DrawTrackingDevice(targetTransform, "Leap Motion Controller");
-            }
+
+            DrawTrackingDevice(targetTransform, deviceName);
         }
 
 
@@ -1118,7 +1154,6 @@ namespace Leap.Unity
                 deviceModelMatrix *= Matrix4x4.Translate(new Vector3(0, xrProvider.deviceOffsetYAxis, xrProvider.deviceOffsetZAxis));
                 deviceModelMatrix *= Matrix4x4.Rotate(Quaternion.Euler(-90 - xrProvider.deviceTiltXAxis, 180, 0));
             }
-
 
             LeapFOVInfo info = null;
             foreach (var leapInfo in leapFOVInfos.SupportedDevices)
@@ -1153,12 +1188,10 @@ namespace Leap.Unity
 
         private void DrawInteractionZone(Matrix4x4 deviceModelMatrix)
         {
-
             _visualFOV.UpdateFOVS();
 
             optimalFOVMesh = _visualFOV.OptimalFOVMesh;
             maxFOVMesh = _visualFOV.MaxFOVMesh;
-
 
             if (OptimalFOV_Visualization && optimalFOVMesh != null)
             {
@@ -1178,12 +1211,14 @@ namespace Leap.Unity
             }
         }
 
-
         private void LoadFOVData()
         {
             leapFOVInfos = JsonUtility.FromJson<LeapFOVInfos>(Resources.Load<TextAsset>("TrackingVolumeVisualization/SupportedTrackingDevices").text);
 
-            if (_visualFOV == null) _visualFOV = new VisualFOV();
+            if (_visualFOV == null)
+            {
+                _visualFOV = new VisualFOV();
+            }
         }
 
         public void SetDeviceInfo(LeapFOVInfo leapInfo)
@@ -1213,6 +1248,5 @@ namespace Leap.Unity
         }
 
         #endregion
-
     }
 }

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -264,13 +264,17 @@ namespace Leap.Unity.Interaction
         {
             get
             {
+#if UNITY_2021_3_18_OR_NEWER
+                if (s_instance == null) { s_instance = FindAnyObjectByType<InteractionManager>(); }
+#else
                 if (s_instance == null) { s_instance = FindObjectOfType<InteractionManager>(); }
+#endif
                 return s_instance;
             }
             set { s_instance = value; }
         }
 
-        #endregion
+#endregion
 
         #region Unity Events
 
@@ -304,12 +308,21 @@ namespace Leap.Unity.Interaction
 #if UNITY_EDITOR
             if (_drawControllerRuntimeGizmos == true)
             {
+#if UNITY_2021_3_18_OR_NEWER
+                if (FindAnyObjectByType<RuntimeGizmoManager>() == null)
+                {
+                    Debug.LogWarning("'_drawControllerRuntimeGizmos' is enabled, but there is no "
+                                   + "RuntimeGizmoManager in your scene. Please add one if you'd "
+                                   + "like to render gizmos in the editor and in your headset.");
+                }
+#else
                 if (FindObjectOfType<RuntimeGizmoManager>() == null)
                 {
                     Debug.LogWarning("'_drawControllerRuntimeGizmos' is enabled, but there is no "
                                    + "RuntimeGizmoManager in your scene. Please add one if you'd "
                                    + "like to render gizmos in the editor and in your headset.");
                 }
+#endif
             }
 #endif
         }
@@ -807,9 +820,7 @@ namespace Leap.Unity.Interaction
         {
             get
             {
-                return (this.transform.position - _prevPosition).magnitude > 0.0001F
-                    || Quaternion.Angle(transform.rotation * Quaternion.Inverse(_prevRotation),
-                                        Quaternion.identity) > 0.01F;
+                return (transform.position - _prevPosition).magnitude > 0.0001F;
             }
         }
 
@@ -819,8 +830,8 @@ namespace Leap.Unity.Interaction
 
         private void updateMovingFrameOfReferenceSupport()
         {
-            _prevPosition = this.transform.position;
-            _prevRotation = this.transform.rotation;
+            _prevPosition = transform.position;
+            _prevRotation = transform.rotation;
         }
 
         /// <summary>
@@ -831,9 +842,9 @@ namespace Leap.Unity.Interaction
         /// </summary>
         public void TransformAheadByFixedUpdate(Vector3 position, Quaternion rotation, out Vector3 newPosition, out Quaternion newRotation)
         {
-            Vector3 worldDisplacement = this.transform.position - _prevPosition;
-            Quaternion worldRotation = this.transform.rotation * Quaternion.Inverse(_prevRotation);
-            newPosition = ((worldRotation * (position - this.transform.position + worldDisplacement))) + this.transform.position;
+            Vector3 worldDisplacement = transform.position - _prevPosition;
+            Quaternion worldRotation = transform.rotation * Quaternion.Inverse(_prevRotation);
+            newPosition = ((worldRotation * (position - transform.position + worldDisplacement))) + transform.position;
             newRotation = worldRotation * rotation;
         }
 
@@ -845,9 +856,9 @@ namespace Leap.Unity.Interaction
         /// </summary>
         public void TransformAheadByFixedUpdate(Vector3 position, out Vector3 newPosition)
         {
-            Vector3 worldDisplacement = this.transform.position - _prevPosition;
-            Quaternion worldRotation = this.transform.rotation * Quaternion.Inverse(_prevRotation);
-            newPosition = ((worldRotation * (position - this.transform.position + worldDisplacement))) + this.transform.position;
+            Vector3 worldDisplacement = transform.position - _prevPosition;
+            Quaternion worldRotation = transform.rotation * Quaternion.Inverse(_prevRotation);
+            newPosition = ((worldRotation * (position - transform.position + worldDisplacement))) + transform.position;
         }
 
         #endregion

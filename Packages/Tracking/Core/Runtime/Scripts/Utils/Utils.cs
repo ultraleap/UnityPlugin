@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -90,7 +90,7 @@ namespace Leap.Unity
         {
             for (int i = 0; i < list.Count; i++)
             {
-                Utils.Swap(list, i, UnityEngine.Random.Range(i, list.Count));
+                Leap.Unity.Utils.Swap(list, i, UnityEngine.Random.Range(i, list.Count));
             }
         }
 
@@ -618,6 +618,38 @@ namespace Leap.Unity
             return count;
         }
 
+        /// <summary>
+        /// Converts a string of three floats (e.g. "(1.0, 2.0, 3.0)") to a Vector3
+        /// Credit: https://discussions.unity.com/t/string-to-vector3/158166/2
+        /// Returns Vector3.zero if incorrect string passed in
+        /// </summary>
+        public static Vector3 ToVector3(this string str)
+        {
+            // Remove the parentheses
+            if (str.StartsWith("(") && str.EndsWith(")"))
+            {
+                str = str.Substring(1, str.Length - 2);
+            }
+
+            // split the items
+            string[] sArray = str.Split(',');
+
+            Vector3 result = Vector3.zero;
+            try
+            {
+                result = new Vector3(
+                                float.Parse(sArray[0]),
+                                float.Parse(sArray[1]),
+                                float.Parse(sArray[2]));
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning(e.Message);
+            }
+
+            return result;
+        }
+
         #endregion
 
         #region Print Utils
@@ -819,14 +851,14 @@ namespace Leap.Unity
 
         public static bool IsBetween(this float f, float f0, float f1)
         {
-            if (f0 > f1) Utils.Swap(ref f0, ref f1);
+            if (f0 > f1) Leap.Unity.Utils.Swap(ref f0, ref f1);
 
             return f0 <= f && f <= f1;
         }
 
         public static bool IsBetween(this double d, double d0, double d1)
         {
-            if (d0 > d1) Utils.Swap(ref d0, ref d1);
+            if (d0 > d1) Leap.Unity.Utils.Swap(ref d0, ref d1);
 
             return d0 <= d && d <= d1;
         }
@@ -890,6 +922,7 @@ namespace Leap.Unity
 
             return false;
         }
+
 
         #endregion
 
@@ -1276,11 +1309,11 @@ namespace Leap.Unity
             return null;
         }
 
-        /// <summary> Returns the first child whose name includes the 'withName' argument string. Optionally pass caseSensitive: false to ignore case. Children are scanned deeply using Utils.GetAllChildren. If no such child exists, returns null. </summary>
+        /// <summary> Returns the first child whose name includes the 'withName' argument string. Optionally pass caseSensitive: false to ignore case. Children are scanned deeply using Leap.Unity.Utils.GetAllChildren. If no such child exists, returns null. </summary>
         public static Transform FindChild(this Transform t, string withName,
           bool caseSensitive = true)
         {
-            var children = Utils.Require(ref _b_findChildBuffer);
+            var children = Leap.Unity.Utils.Require(ref _b_findChildBuffer);
             children.Clear();
             t.GetAllChildren(children);
             if (!caseSensitive) { withName = withName.ToLower(); }
@@ -1691,7 +1724,7 @@ namespace Leap.Unity
         /// Fills the provided bytes buffer starting at the offset with a compressed form
         /// of the argument quaternion. The offset is also shifted by 4 bytes.
         /// 
-        /// Use Utils.DecompressBytesToQuat to decode this representation. This encoding ONLY
+        /// Use Leap.Unity.Utils.DecompressBytesToQuat to decode this representation. This encoding ONLY
         /// works with normalized Quaternions, taking advantage of the fact that their
         /// components sum to 1 to only encode three of Quaternion components. As a result,
         /// this method encodes a Quaternion as a single unsigned integer (4 bytes).
@@ -1771,10 +1804,10 @@ namespace Leap.Unity
 
         /// <summary>
         /// Reads 4 bytes from the argument bytes array (starting at the provided offset) and
-        /// returns a Quaternion as encoded by the Utils.CompressedQuatToBytes function. Also
+        /// returns a Quaternion as encoded by the Leap.Unity.Utils.CompressedQuatToBytes function. Also
         /// increments the provided offset by 4.
         /// 
-        /// See the Utils.CompressedQuatToBytes documentation for more details on the
+        /// See the Leap.Unity.Utils.CompressedQuatToBytes documentation for more details on the
         /// byte representation this method expects.
         /// 
         /// Sources:
@@ -2820,6 +2853,18 @@ namespace Leap.Unity
         {
             if (valueMin == valueMax) return resultMin;
             return Mathf.LerpUnclamped(resultMin, resultMax, ((value - valueMin) / (valueMax - valueMin)));
+        }
+
+        /// <summary>
+        /// Map a float from a range to the 0-1 range. E.g. (34 , 0, 100) returns as 0.34f 
+        /// </summary>
+        /// <param name="value"> The value which should be mapped between 0 and 1</param>
+        /// <param name="min"> Min value for the input range</param>
+        /// <param name="max"> Max value for the input range</param>
+        /// <returns></returns>
+        public static float Map01(float value, float min, float max)
+        {
+            return (value - min) * 1f / (max - min);
         }
 
         /// <summary>

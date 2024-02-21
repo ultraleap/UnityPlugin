@@ -1,0 +1,85 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &5481279275633608576
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1234652847329689332}
+  - component: {fileID: 1234652847329689333}
+  - component: {fileID: 3154357538699184579}
+  m_Layer: 0
+  m_Name: Physical Hands Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1234652847329689332
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5481279275633608576}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.5904409, y: -2.3161733, z: 4.1941853}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1234652847329689333
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5481279275633608576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d69077fd953cb86488e8a7b2090e7754, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  editTimePose: 1
+  _inputProvider: {fileID: 0}
+  _contactMode: 0
+  _hoverDistance: 0.04
+  _contactDistance: 0.002
+  _showFadingHandsWithTrackingData: 1
+  fadingHandsPrefab: {fileID: 4756413710029136320, guid: 81156ff5f1c52ee4a93f836d68840561, type: 3}
+  onHover:
+    m_PersistentCalls:
+      m_Calls: []
+  onHoverExit:
+    m_PersistentCalls:
+      m_Calls: []
+  onContact:
+    m_PersistentCalls:
+      m_Calls: []
+  onContactExit:
+    m_PersistentCalls:
+      m_Calls: []
+  onGrab:
+    m_PersistentCalls:
+      m_Calls: []
+  onGrabExit:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &3154357538699184579
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5481279275633608576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7bd79d111731a5841886cf2a4736ff1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  physicalHandsManager: {fileID: 1234652847329689333}

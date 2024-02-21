@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -50,6 +50,10 @@ namespace Leap.Unity.HandsModule
         [Tooltip("Set the assigned transforms to the same position as the Leap Hand")]
         public bool SetPositions = true;
 
+
+        [Tooltip("Moves the elbow so that when the forearm scales the bone doesnt clip into the hand model. Particularly useful for non-skinned hands.")]
+        public bool UseScaleToPositionElbow = false;
+
         /// <summary> 
         /// Set the assigned transforms to the same position as the Leap Hand 
         /// </summary>
@@ -60,6 +64,12 @@ namespace Leap.Unity.HandsModule
         /// Should the hand binder modify the scale of the hand
         /// </summary>
         public bool SetModelScale = true;
+
+        /// <summary>
+        /// A multiplier to the base speed of the lerp when scaling hands
+        /// </summary>
+        [Tooltip("A multiplier used to adjust the default interpolation of hand scaling, 1 = default, 0.01 = slowest, 100 = fastest"), Range(0.01f, 100f)]
+        public float ScalingSpeedMultiplier = 1;
 
         /// <summary> 
         /// User defined offsets in editor script 
@@ -72,6 +82,8 @@ namespace Leap.Unity.HandsModule
         public SerializedTransform[] DefaultHandPose;
 
 
+        private float lastHandFoundTime = 0;
+        private float instantScaleAfterHandFoundTime = 1f; // seconds
         #endregion
 
         #region Hand Model Base
@@ -87,6 +99,7 @@ namespace Leap.Unity.HandsModule
         /// To set, change the public Chirality.
         /// </summary>
         public override Chirality Handedness { get { return Chirality; } set { } }
+
         /// <summary>
         /// The type of the Hand model (set to Graphics).
         /// </summary>
@@ -146,6 +159,8 @@ namespace Leap.Unity.HandsModule
             {
                 SetModelScale = false;
             }
+
+            lastHandFoundTime = Time.time;
         }
 
         /// <summary>
@@ -203,7 +218,17 @@ namespace Leap.Unity.HandsModule
             else // Lerp the scale during playmode
             {
                 var targetScale = BoundHand.startScale * scaleRatio;
-                transform.localScale = Vector3.Lerp(transform.localScale, targetScale, Time.deltaTime);
+
+                if (Time.time - lastHandFoundTime < instantScaleAfterHandFoundTime)
+                {
+                    // Instantly scale if it's not been long since the hand started tracking
+                    transform.localScale = targetScale;
+                }
+                else
+                {
+                    // Smoothly scale
+                    transform.localScale = Vector3.Lerp(transform.localScale, targetScale, Time.deltaTime * ScalingSpeedMultiplier);
+                }
             }
         }
 
@@ -234,9 +259,12 @@ namespace Leap.Unity.HandsModule
                 float ratio = leapFingerLength / fingerTipLength;
                 //Adjust the ratio by an offset value exposed in the inspector and the overal scale that has been calculated
                 float adjustedRatio = (ratio * (finger.fingerTipScaleOffset) - BoundHand.scaleOffset);
-
+                //Adjust the ratio to account for service provider scale, assuming the service provider is uniformly scaled
+                var serviceProviderScale = leapProvider?.gameObject.transform.lossyScale.x ?? 1f;
+                adjustedRatio /= serviceProviderScale;
                 //Calculate the direction that goes up the bone towards the next bone
                 Vector3 direction = (intermediateBone.boundTransform.position - distalBone.boundTransform.position).normalized;
+
                 //Calculate which axis to scale along
                 Vector3 axis = CalculateAxis(distalBone.boundTransform, direction);
                 //Calculate the scale by ensuring all axis are 1 apart from the axis to scale along
@@ -250,7 +278,7 @@ namespace Leap.Unity.HandsModule
                 else // Lerp the scale during playmode
                 {
                     //Lerp the scale to the target scale
-                    distalBone.boundTransform.localScale = Vector3.Lerp(distalBone.boundTransform.localScale, scale, Time.deltaTime);
+                    distalBone.boundTransform.localScale = Vector3.Lerp(distalBone.boundTransform.localScale, scale, Time.deltaTime * ScalingSpeedMultiplier);
                 }
             }
         }
@@ -260,13 +288,22 @@ namespace Leap.Unity.HandsModule
         /// </summary>
         void TransformElbow()
         {
+
+
             if (BoundHand.elbow.boundTransform != null)
             {
+
+                float scaleElbowLength = 1;
+                if (UseScaleToPositionElbow)
+                {
+                    scaleElbowLength = BoundHand.elbow.boundTransform.lossyScale.z;
+                }
+
                 //Calculate the direction of the elbow 
                 Vector3 dir = -LeapHand.Arm.Direction.normalized;
 
                 //Position the elbow at the models elbow length
-                Vector3 position = LeapHand.WristPosition + dir * (ElbowLength);
+                Vector3 position = LeapHand.WristPosition + dir * (ElbowLength * scaleElbowLength);
 
                 if (SetModelScale)
                 {
@@ -278,7 +315,7 @@ namespace Leap.Unity.HandsModule
                     else
                     {
                         //Use the models length to position the elbow and allow it to be mofied by elbow offset
-                        position = LeapHand.WristPosition + dir * (ElbowLength * BoundHand.elbowOffset);
+                        position = LeapHand.WristPosition + dir * ((ElbowLength * scaleElbowLength) * BoundHand.elbowOffset);
                     }
                 }
                 else
@@ -416,6 +453,10 @@ namespace Leap.Unity.HandsModule
         Vector3 CalculateAxis(Transform t, Vector3 dir)
         {
             var boneForward = t.InverseTransformDirection(dir.normalized).normalized;
+            // Ensure axes are positive to account for negative model scaling
+            boneForward.x = Mathf.Abs(boneForward.x);
+            boneForward.y = Mathf.Abs(boneForward.y);
+            boneForward.z = Mathf.Abs(boneForward.z);
             return boneForward;
         }
         #endregion

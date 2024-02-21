@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -137,7 +137,7 @@ namespace Leap.Unity.Attachments
         void Update()
         {
 #if UNITY_EDITOR
-            if (Utils.IsObjectPartOfPrefabAsset(this.gameObject))
+            if (Leap.Unity.Utils.IsObjectPartOfPrefabAsset(this.gameObject))
             {
                 return;
             }
@@ -183,7 +183,7 @@ namespace Leap.Unity.Attachments
 
                 if (_leapProvider == null)
                 {
-                    _leapProvider = FindObjectOfType<LeapProvider>();
+                    _leapProvider = Hands.Provider;
                 }
                 if (_leapProvider != null)
                 {
@@ -303,7 +303,7 @@ namespace Leap.Unity.Attachments
 #if UNITY_EDITOR
         private bool getIsPrefab()
         {
-            return Utils.IsObjectPartOfPrefabAsset(this.gameObject);
+            return Leap.Unity.Utils.IsObjectPartOfPrefabAsset(this.gameObject);
         }
 #endif
 

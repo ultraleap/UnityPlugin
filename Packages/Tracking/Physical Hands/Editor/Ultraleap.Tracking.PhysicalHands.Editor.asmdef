@@ -1,0 +1,32 @@
+{
+    "name": "Ultraleap.Tracking.PhysicalHands.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:2ee0542102ac1084e8d9a910885c1e81",
+        "GUID:cec9848704c49724192ff47f9b3e9156",
+        "GUID:5d2bbb4763a30e54ebe3c25d112247b1",
+        "GUID:db4e617c04f44c144bc19216a63dd19b"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.burst",
+            "expression": "",
+            "define": "BURST_AVAILABLE"
+        },
+        {
+            "name": "Unity",
+            "expression": "2021.3.18f1",
+            "define": "UNITY_2021_3_18_OR_NEWER"
+        }
+    ],
+    "noEngineReferences": false
+}

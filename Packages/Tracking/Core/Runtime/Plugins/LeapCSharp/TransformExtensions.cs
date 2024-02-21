@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -42,6 +42,17 @@ namespace Leap
         }
 
         /**
+         * Returns a new frame that is a copy of a frame, with an additional rigid
+         * transformation applied to it.
+         *
+         * @param transform The transformation to be applied to the copied frame.
+         */
+        public static Frame TransformedCopy(this Frame frame, Vector3 position, Quaternion rotation)
+        {
+            return new Frame().CopyFrom(frame).Transform(new LeapTransform(position, rotation));
+        }
+
+        /**
          * Does an in-place rigid transformation of a Hand.
          *
          * @param transform A LeapTransform containing the desired translation, rotation, and scale
@@ -77,6 +88,17 @@ namespace Leap
         public static Hand TransformedCopy(this Hand hand, LeapTransform transform)
         {
             return new Hand().CopyFrom(hand).Transform(transform);
+        }
+
+        /**
+         * Returns a new hand that is a copy of a hand, with an additional rigid
+         * transformation applied to it.
+         *
+         * @param transform The transformation to be applied to the copied hand.
+         */
+        public static Hand TransformedCopy(this Hand hand, Vector3 position, Quaternion rotation)
+        {
+            return new Hand().CopyFrom(hand).Transform(new LeapTransform(position, rotation));
         }
 
         /**

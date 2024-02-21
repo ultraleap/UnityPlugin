@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -603,7 +603,7 @@ namespace Leap.Unity.Interaction
             _contactBoneBuffer.Clear();
 
             // Scan for existing colliders and construct contact bones out of them.
-            Utils.FindColliders<Collider>(this.gameObject, _colliderBuffer,
+            Leap.Unity.Utils.FindColliders<Collider>(this.gameObject, _colliderBuffer,
               includeInactiveObjects: true);
 
             foreach (var collider in _colliderBuffer)

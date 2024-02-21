@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -171,7 +171,7 @@ namespace Leap.Unity.Interaction
             { // Otherwise, configure automatically.
                 if (leapProvider == null)
                 {
-                    leapProvider = FindObjectOfType<LeapProvider>();
+                    leapProvider = Hands.Provider;
 
                     if (leapProvider == null)
                     {
@@ -237,7 +237,7 @@ namespace Leap.Unity.Interaction
 
         }
 
-        #endregion
+#endregion
 
         #region General InteractionController Implementation
 
@@ -527,6 +527,7 @@ namespace Leap.Unity.Interaction
                     capsule.radius = bone.Width * 0.5f;
                     capsule.height = bone.Length + bone.Width;
                     capsule.material = defaultContactBoneMaterial;
+                    capsule.contactOffset = 0.001f;
 
                     if (OnlyInitialiseIndexFinger)
                     {
@@ -561,6 +562,7 @@ namespace Leap.Unity.Interaction
                 box.center = new Vector3(_unwarpedHandData.IsLeft ? -0.005f : 0.005f, bone.Width * -0.3f, -0.01f);
                 box.size = new Vector3(bone.Length, bone.Width, bone.Length);
                 box.material = defaultContactBoneMaterial;
+                box.contactOffset = 0.001f;
 
                 if (OnlyInitialiseIndexFinger)
                 {
@@ -887,7 +889,8 @@ namespace Leap.Unity.Interaction
                 var provider = leapProvider;
                 if (provider == null)
                 {
-                    provider = FindObjectOfType<LeapProvider>();
+                    provider = Hands.Provider;
+
                 }
 
                 if (_testHand == null && provider != null)

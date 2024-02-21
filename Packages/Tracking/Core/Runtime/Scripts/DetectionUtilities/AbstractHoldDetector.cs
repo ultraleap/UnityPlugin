@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -232,7 +232,7 @@ namespace Leap.Unity
                 Vector3 axis;
                 float angle;
                 circleRotation.ToAngleAxis(out angle, out axis);
-                Utils.DrawCircle(centerPosition, Normal, Distance / 2, centerColor);
+                Leap.Unity.Utils.DrawCircle(centerPosition, Normal, Distance / 2, centerColor);
                 Gizmos.color = NormalColor;
                 Gizmos.DrawLine(centerPosition, centerPosition + Direction * Distance / 2);
                 Gizmos.color = DirectionColor;

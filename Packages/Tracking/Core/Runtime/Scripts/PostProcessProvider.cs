@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -25,7 +25,7 @@ namespace Leap.Unity
             get { return _inputLeapProvider; }
             set
             {
-                if (Application.isPlaying && _inputLeapProvider != null)
+                if (_inputLeapProvider != null)
                 {
                     _inputLeapProvider.OnFixedFrame -= processFixedFrame;
                     _inputLeapProvider.OnUpdateFrame -= processUpdateFrame;
@@ -34,7 +34,7 @@ namespace Leap.Unity
                 _inputLeapProvider = value;
                 validateInput();
 
-                if (Application.isPlaying && _inputLeapProvider != null)
+                if (_inputLeapProvider != null)
                 {
                     _inputLeapProvider.OnFixedFrame -= processFixedFrame; // safeguard double-subscription
                     _inputLeapProvider.OnFixedFrame += processFixedFrame;
@@ -103,6 +103,15 @@ namespace Leap.Unity
         protected virtual void OnValidate()
         {
             validateInput();
+        }
+
+        private void OnDestroy()
+        {
+            if (_inputLeapProvider != null)
+            {
+                _inputLeapProvider.OnFixedFrame -= processFixedFrame;
+                _inputLeapProvider.OnUpdateFrame -= processUpdateFrame;
+            }
         }
 
         public abstract void ProcessFrame(ref Frame inputFrame);

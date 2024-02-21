@@ -65,6 +65,12 @@ namespace Ultraleap.Tracking.OpenXR
             [DllImport(NativeDLL, EntryPoint = NativePrefix + "OnAppSpaceChange", ExactSpelling = true)]
             internal static extern void OnAppSpaceChange(ulong xrSpace);
 
+            [DllImport(NativeDLL, EntryPoint = NativePrefix + "IsHandTrackingSupported", ExactSpelling = true)]
+            internal static extern bool IsHandTrackingSupported();
+
+            [DllImport(NativeDLL, EntryPoint = NativePrefix + "IsUltraleapHandTracking", ExactSpelling = true)]
+            internal static extern bool IsUltraleapHandTracking();
+
             [DllImport(NativeDLL, EntryPoint = NativePrefix + "CreateHandTrackers", ExactSpelling = true)]
             internal static extern int CreateHandTrackers(HandJointSet jointSet);
 
@@ -85,12 +91,22 @@ namespace Ultraleap.Tracking.OpenXR
             internal static string ResultToString(int result) => Marshal.PtrToStringAnsi(XrResultToString(result));
         }
 
+        private bool _supportsHandTracking;
+        private bool _isUltraleapTracking;
+        [PublicAPI] public bool SupportsHandTracking => enabled && _supportsHandTracking;
+        [PublicAPI] public bool IsUltraleapHandTracking => enabled && _isUltraleapTracking;
+
         protected override IntPtr HookGetInstanceProcAddr(IntPtr func) => Native.HookGetInstanceProcAddr(func);
         protected override void OnInstanceDestroy(ulong xrInstance) => Native.OnInstanceDestroy(xrInstance);
         protected override void OnSessionCreate(ulong xrSession) => Native.OnSessionCreate(xrSession);
         protected override void OnSessionDestroy(ulong xrSession) => Native.OnSessionDestroy(xrSession);
-        protected override void OnSystemChange(ulong xrSystemId) => Native.OnSystemChange(xrSystemId);
         protected override void OnAppSpaceChange(ulong xrSpace) => Native.OnAppSpaceChange(xrSpace);
+
+        protected override void OnSystemChange(ulong xrSystemId)
+        {
+            Native.OnSystemChange(xrSystemId);
+            _supportsHandTracking = Native.IsHandTrackingSupported();
+        }
 
         protected override bool OnInstanceCreate(ulong xrInstance)
         {
@@ -110,11 +126,19 @@ namespace Ultraleap.Tracking.OpenXR
                 return false;
             }
 
-            return Native.OnInstanceCreate(xrInstance);
+            bool succeeded = Native.OnInstanceCreate(xrInstance);
+            _isUltraleapTracking = Native.IsUltraleapHandTracking();
+            return succeeded;
         }
 
         protected override void OnSubsystemStart()
         {
+            if (!SupportsHandTracking)
+            {
+                Debug.LogWarning("Hand tracking is not support currently on this device");
+                return;
+            }
+
             int result = Native.CreateHandTrackers(JointSet);
             if (IsResultFailure(result))
             {
@@ -124,6 +148,11 @@ namespace Ultraleap.Tracking.OpenXR
 
         protected override void OnSubsystemStop()
         {
+            if (!SupportsHandTracking)
+            {
+                return;
+            }
+
             int result = Native.DestroyHandTrackers();
             if (IsResultFailure(result))
             {
@@ -133,6 +162,11 @@ namespace Ultraleap.Tracking.OpenXR
 
         internal bool LocateHandJoints(Handedness handedness, HandJointLocation[] handJointLocations)
         {
+            if (!SupportsHandTracking)
+            {
+                return false;
+            }
+
             int result = Native.LocateHandJoints(handedness, out uint isActive, handJointLocations,
                 (uint)handJointLocations.Length);
             if (IsResultFailure(result))
@@ -181,7 +215,7 @@ namespace Ultraleap.Tracking.OpenXR
             // Check the active input handling supports New (for OpenXR) and Legacy (for Ultraleap Plugin support).
             rules.Add(new ValidationRule(this)
             {
-                message = "Active Input Handling is not set to Both. While New is required for OpenXR, Both is" +
+                message = "Active Input Handling is not set to Both. While New is required for OpenXR, Both is " +
                           "recommended as the Ultraleap Unity Plugin does not fully support the New Input System.",
                 error = false,
 #if !ENABLE_LEGACY_INPUT_MANAGER || !ENABLE_INPUT_SYSTEM

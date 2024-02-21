@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -181,8 +181,11 @@ namespace Leap.Unity.Attachments
                     position = hand.Fingers[4].bones[3].NextJoint;
                     rotation = hand.Fingers[4].bones[3].Rotation;
                     break;
+                case AttachmentPointFlags.PinchPoint:
+                    position = hand.GetPredictedPinchPosition();
+                    rotation = Quaternion.LookRotation(position - hand.Fingers[1].Bone(Bone.BoneType.TYPE_PROXIMAL).PrevJoint);
+                    break;
             }
         }
-
     }
 }

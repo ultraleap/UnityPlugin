@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -62,7 +62,7 @@ namespace Leap.Unity.Interaction
         private void drawHandEditor(Rect controlRect)
         {
             // Determine whether the target object is a prefab. AttachmentPoints cannot be edited on prefabs.
-            var isTargetPrefab = Utils.IsObjectPartOfPrefabAsset(target.gameObject);
+            var isTargetPrefab = Leap.Unity.Utils.IsObjectPartOfPrefabAsset(target.gameObject);
 
             // Image container.
             Rect imageContainerRect = controlRect;

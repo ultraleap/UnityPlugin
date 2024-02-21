@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -190,7 +190,7 @@ namespace Leap.Unity
             if (leapProvider == null)
             {
                 //Try to set the provider for the user
-                leapProvider = FindObjectOfType<LeapProvider>();
+                leapProvider = Hands.Provider;
 
                 if (leapProvider == null)
                 {
@@ -288,14 +288,12 @@ namespace Leap.Unity
                 if (leapProvider == null)
                 {
                     //Try to set the provider for the user
-                    leapProvider = FindObjectOfType<LeapProvider>();
+                    leapProvider = Hands.Provider;
+
                     if (leapProvider == null)
                     {
-                        //If we still have a null hand, construct one manually
-                        if (hand == null)
-                        {
-                            hand = TestHandFactory.MakeTestHand(Handedness == Chirality.Left);
-                        }
+                        //Construct a hand manually
+                        hand = TestHandFactory.MakeTestHand(Handedness == Chirality.Left);
                     }
                     else
                     {

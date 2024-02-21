@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -39,7 +39,7 @@ namespace Leap.Unity.Attachments
             EditorGUILayout.LabelField("Attachment Transforms", EditorStyles.boldLabel);
 
             // Determine whether the target object is a prefab. AttachmentPoints cannot be edited on prefabs.
-            var isTargetPrefab = Utils.IsObjectPartOfPrefabAsset(target.gameObject);
+            var isTargetPrefab = Leap.Unity.Utils.IsObjectPartOfPrefabAsset(target.gameObject);
 
             if (isTargetPrefab)
             {
@@ -97,9 +97,24 @@ namespace Leap.Unity.Attachments
             makeAttachmentPointsToggle("PinkyDistalJoint", new Vector2(0.380F, -0.130F));
             makeAttachmentPointsToggle("PinkyTip", new Vector2(0.410F, -0.210F));
 
+            makeAttachmentPointsToggle("PinchPoint", new Vector2(-0.235F, -0.135F));
+
             EditorGUI.EndDisabledGroup();
 
             EditorGUILayout.EndVertical();
+
+            EditorGUILayout.Space();
+
+            if (GUILayout.Button("Clear all attachments"))
+            {
+                if (EditorUtility.DisplayDialog("Delete all attachments?",
+                                                   "Doing so will destroy all child GameObjects of " + target.gameObject.name + ".",
+                                                   "Delete", "Cancel"))
+                {
+                    target.attachmentPoints = AttachmentPointFlags.None;
+                    GUIUtility.ExitGUI();
+                }
+            }
         }
 
         private void makeAttachmentPointsToggle(string attachmentFlagName, Vector2 offCenterPosImgSpace)

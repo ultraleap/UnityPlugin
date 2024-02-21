@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -198,8 +198,8 @@ namespace Leap.Unity
                     centerColor = OffColor;
                 }
                 Hand hand = HandModel.GetLeapHand();
-                Utils.DrawCone(hand.PalmPosition, hand.PalmNormal, OnAngle, hand.PalmWidth, centerColor, 8);
-                Utils.DrawCone(hand.PalmPosition, hand.PalmNormal, OffAngle, hand.PalmWidth, LimitColor, 8);
+                Leap.Unity.Utils.DrawCone(hand.PalmPosition, hand.PalmNormal, OnAngle, hand.PalmWidth, centerColor, 8);
+                Leap.Unity.Utils.DrawCone(hand.PalmPosition, hand.PalmNormal, OffAngle, hand.PalmWidth, LimitColor, 8);
                 Gizmos.color = DirectionColor;
                 Gizmos.DrawRay(hand.PalmPosition, selectedDirection(hand.PalmPosition));
             }

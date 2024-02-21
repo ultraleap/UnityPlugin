@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -55,7 +55,7 @@ namespace Leap.Unity
             else
             {
                 string fullFolder = System.IO.Path.GetFullPath(assetPath);
-                _relativePath = Utils.MakeRelativePath(Application.streamingAssetsPath, fullFolder);
+                _relativePath = Leap.Unity.Utils.MakeRelativePath(Application.streamingAssetsPath, fullFolder);
                 _relativePath = string.Join(System.IO.Path.DirectorySeparatorChar.ToString(),
                                             _relativePath.Split(System.IO.Path.DirectorySeparatorChar).Skip(1).ToArray());
             }

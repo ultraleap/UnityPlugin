@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -30,7 +30,7 @@ namespace Leap.Unity.Interaction
 
             bool nonzeroRotation = button.transform.localRotation != Quaternion.identity;
             bool isRoot = button.transform == button.transform.root;
-            var isPrefabAsset = Utils.IsObjectPartOfPrefabAsset(button.gameObject);
+            var isPrefabAsset = Leap.Unity.Utils.IsObjectPartOfPrefabAsset(button.gameObject);
 
             EditorGUILayout.BeginHorizontal();
             if ((nonzeroRotation || isRoot) && !isPrefabAsset)

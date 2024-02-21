@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -116,7 +116,7 @@ namespace Leap.Unity.Interaction
             updateAnchorCallbacks();
         }
 
-        void OnAnchorDisabled()
+        void OnDisable()
         {
             if (matchActiveStateWithAttachedObjects)
             {
@@ -217,7 +217,7 @@ namespace Leap.Unity.Interaction
                 {
                     continue;
                 }
-                Utils.DrawCircle(pos, dir, radius, AnchorGizmoColor, quality: 24, depthTest: true);
+                Leap.Unity.Utils.DrawCircle(pos, dir, radius, AnchorGizmoColor, quality: 24, depthTest: true);
             }
         }
 
@@ -229,7 +229,7 @@ namespace Leap.Unity.Interaction
             for (int i = 0; i < numCircles; i++)
             {
                 float curTheta = (dTheta * i) + halfTheta;
-                Utils.DrawCircle(pos + poleDir * Mathf.Cos(curTheta * Mathf.Deg2Rad) * radius, poleDir, Mathf.Sin(curTheta * Mathf.Deg2Rad) * radius, AnchorGizmoColor, quality: 16, depthTest: true);
+                Leap.Unity.Utils.DrawCircle(pos + poleDir * Mathf.Cos(curTheta * Mathf.Deg2Rad) * radius, poleDir, Mathf.Sin(curTheta * Mathf.Deg2Rad) * radius, AnchorGizmoColor, quality: 16, depthTest: true);
             }
         }
 

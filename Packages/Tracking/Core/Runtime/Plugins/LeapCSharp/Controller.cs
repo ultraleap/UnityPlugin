@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -10,6 +10,7 @@ namespace Leap
 {
     using LeapInternal;
     using System;
+    using System.Linq;
     using System.Threading;
     using UnityEngine;
 
@@ -43,7 +44,6 @@ namespace Leap
         bool _disposed = false;
         bool _supportsMultipleDevices = true;
         string _serverNamespace = "Leap Service";
-        Config _config;
 
         /// <summary>
         /// The SynchronizationContext used for dispatching events.
@@ -233,6 +233,7 @@ namespace Leap
         /// Dispatched when a configuration setting changes.
         /// @since 3.0
         /// </summary>
+        [Obsolete("Config is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
         public event EventHandler<ConfigChangeEventArgs> ConfigChange
         {
             add
@@ -623,6 +624,21 @@ namespace Leap
         }
 
         /// <summary>
+        /// Send a specific set of hints, if this does not include previously set ones, they will be cleared.
+        /// </summary>
+        /// <param name="hints">The hints you wish to send</param>
+        /// <param name="device">An optional specific Device, otherwise the first found will be used</param>
+        public void RequestHandTrackingHints(string[] hints, Device device = null)
+        {
+            if(device == null)
+            {
+                device = Devices.ActiveDevices.FirstOrDefault();
+            }
+
+            _connection.RequestHandTrackingHintsOnDevice(device.Handle, hints);
+        }
+
+        /// <summary>
         /// In most cases you should get Frame objects using the LeapProvider.CurrentFrame
         /// property. The data in Frame objects taken directly from a Leap.Controller instance
         /// is still in the Leap Motion frame of reference and will not match the hands
@@ -871,13 +887,12 @@ namespace Leap
         /// 
         /// @since 1.0
         /// </summary>
+        [Obsolete("Config is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
         public Config Config
         {
             get
             {
-                if (_config == null)
-                    _config = new Config(this._connection.ConnectionKey);
-                return _config;
+                return null;
             }
         }
 

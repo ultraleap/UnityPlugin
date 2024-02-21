@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -224,8 +224,8 @@ namespace Leap.Unity
                 }
                 Finger finger = HandModel.GetLeapHand().Fingers[selectedFingerOrdinal()];
                 Vector3 fingerDirection = finger.Bone(Bone.BoneType.TYPE_DISTAL).Direction;
-                Utils.DrawCone(finger.TipPosition, fingerDirection, OnAngle, finger.Length, innerColor);
-                Utils.DrawCone(finger.TipPosition, fingerDirection, OffAngle, finger.Length, LimitColor);
+                Leap.Unity.Utils.DrawCone(finger.TipPosition, fingerDirection, OnAngle, finger.Length, innerColor);
+                Leap.Unity.Utils.DrawCone(finger.TipPosition, fingerDirection, OffAngle, finger.Length, LimitColor);
                 Gizmos.color = DirectionColor;
                 Gizmos.DrawRay(finger.TipPosition, selectedDirection(finger.TipPosition));
             }
