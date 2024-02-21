@@ -315,7 +315,7 @@ namespace Leap.Unity.PhysicalHands
         #endregion
 
         #region Object Information
-        public bool IsObjectGrabbing(Rigidbody rigid, out ContactHand hand)
+        public bool IsObjectGrabbed(Rigidbody rigid, out ContactHand hand)
         {
             hand = null;
             if (_grabHelperObjects.TryGetValue(rigid, out GrabHelperObject helper))
