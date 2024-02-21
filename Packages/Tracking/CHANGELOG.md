@@ -31,6 +31,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (Physical Hands) Objects are sticky when they ignore collision with hard contact hands
 - (Physical Hands) Ability to toggle ignore Physical hands options from the inspector at runtime.
 - (Locomotion) IsPinching wouldn't fire when between Activate and Deactivate values in LightweightPinchDetector
+- Memory increase when repeatedly opening Tabletop scenes
+- ThreadAbort when changing scenes in editor that use multidevice or display the tracking device gizmo
+
+### Known issues
+- After using Ultraleap OpenXR in Unity Editor, the tracking mode of device 0 will be set to HMD until the Unity Editor session ends. This can stop the testing of non-XR scenes until the Unity Editor is re-opened
+
 
 ## [6.14.0] - 24/01/24
 
