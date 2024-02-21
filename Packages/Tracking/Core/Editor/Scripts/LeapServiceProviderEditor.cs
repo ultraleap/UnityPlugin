@@ -29,19 +29,25 @@ namespace Leap.Unity
             base.OnEnable();
 
             specifyConditionalDrawing("_interactionVolumeVisualization",
-                                        new int[]{
+                            new int[]{
                                         (int)LeapServiceProvider.InteractionVolumeVisualization.StereoIR170,
                                         (int)LeapServiceProvider.InteractionVolumeVisualization.Device_3Di,
                                         (int)LeapServiceProvider.InteractionVolumeVisualization.LeapMotionController,
                                         (int)LeapServiceProvider.InteractionVolumeVisualization.LeapMotionController2,
                                         (int)LeapServiceProvider.InteractionVolumeVisualization.Automatic},
-                                        "FOV_Visualization",
-                                        "OptimalFOV_Visualization",
-                                        "MaxFOV_Visualization");
+                            "FOV_Visualization",
+                            "OptimalFOV_Visualization",
+                            "MaxFOV_Visualization");
+
+            specifyCustomDrawer("_interactionVolumeVisualization", deviceVisualGizmo);
 
             specifyConditionalDrawing("FOV_Visualization",
                                         "OptimalFOV_Visualization",
                                         "MaxFOV_Visualization");
+
+            specifyCustomDrawer("FOV_Visualization", DeviceFOVGizmo);
+            specifyCustomDrawer("OptimalFOV_Visualization", IndendProperty);
+            specifyCustomDrawer("MaxFOV_Visualization", IndendProperty);
 
             specifyCustomDecorator("_frameOptimization", frameOptimizationWarning);
 
@@ -75,6 +81,7 @@ namespace Leap.Unity
             {
                 hideField("_trackingOptimization");
             }
+
             addPropertyToFoldout("_useInterpolation", "Advanced Options");
             addPropertyToFoldout("_serverNameSpace", "Advanced Options");
 
@@ -102,6 +109,24 @@ namespace Leap.Unity
             }
 
             EditorGUILayout.HelpBox(warningText, MessageType.Warning);
+        }
+
+        private void deviceVisualGizmo(SerializedProperty property)
+        {
+            EditorGUILayout.PropertyField(property, new GUIContent("Device Visual Gizmo"));
+        }
+
+        private void DeviceFOVGizmo(SerializedProperty property)
+        {
+            EditorGUILayout.PropertyField(property, new GUIContent("Device Field Of View Gizmo"));
+        }
+
+        private void IndendProperty(SerializedProperty property)
+        {
+            using (new EditorGUI.IndentLevelScope())
+            {
+                EditorGUILayout.PropertyField(property);
+            }
         }
 
         private void multiDeviceToggleWithVersionCheck(SerializedProperty property)

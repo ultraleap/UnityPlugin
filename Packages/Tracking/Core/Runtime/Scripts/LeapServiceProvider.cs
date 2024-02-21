@@ -87,8 +87,7 @@ namespace Leap.Unity
             Automatic,
             LeapMotionController2,
         }
-        [Tooltip("Displays a representation of the traking device")]
-        [SerializeField]
+        [Space, Tooltip("Displays a representation of the traking device"), SerializeField]
         protected InteractionVolumeVisualization _interactionVolumeVisualization = InteractionVolumeVisualization.Automatic;
 
         /// <summary>
@@ -96,14 +95,11 @@ namespace Leap.Unity
         /// </summary>
         public InteractionVolumeVisualization SelectedInteractionVolumeVisualization => _interactionVolumeVisualization;
 
-        [Tooltip("Displays a visualization of the Field Of View of the chosen device as a Gizmo")]
-        [SerializeField]
+        [Tooltip("Displays a visualization of the Field Of View of the chosen device as a Gizmo"), SerializeField]
         protected bool FOV_Visualization = false;
-        [Tooltip("Displays the optimal FOV for tracking")]
-        [SerializeField]
+        [Tooltip("Displays the optimal FOV for tracking"), SerializeField]
         protected bool OptimalFOV_Visualization = true;
-        [Tooltip("Displays the maximum FOV for tracking")]
-        [SerializeField]
+        [Tooltip("Displays the maximum FOV for tracking"), SerializeField]
         protected bool MaxFOV_Visualization = true;
 
         [SerializeField, HideInInspector]
@@ -140,7 +136,7 @@ namespace Leap.Unity
             + "ReuseUpdateForPhysics - Android users should choose Reuse Update for Physics.\n"
             + "ReusePhysicsForUpdate - Provides the option to reinterpolate the hand data for the physics timestep, improving the movement of objects being "
             + "manipulated by hands when using the interaction engine. Enabling this incurs a small time penalty (fraction of a ms).")]
-        [SerializeField]
+        [SerializeField, Space]
         protected FrameOptimizationMode _frameOptimization = FrameOptimizationMode.None;
 
         /// <summary>
@@ -182,7 +178,7 @@ namespace Leap.Unity
         [Tooltip("When set to 'Default', provider will receive data from the first connected device. \n" +
             "When set to `Specific`, provider will receive data from the device specified by 'Specific Serial Number'.")]
         [EditTimeOnly]
-        [SerializeField]
+        [SerializeField, Space]
         protected MultipleDeviceMode _multipleDeviceMode = MultipleDeviceMode.Disabled;
 
         public MultipleDeviceMode CurrentMultipleDeviceMode
@@ -192,7 +188,7 @@ namespace Leap.Unity
 
         [Tooltip("When Multiple Device Mode is set to `Specific`, the provider will " +
           "receive data from only the devices that contain this in their serial number.")]
-        [SerializeField]
+        [Space, SerializeField]
         protected string _specificSerialNumber = "";
 
         /// <summary>
