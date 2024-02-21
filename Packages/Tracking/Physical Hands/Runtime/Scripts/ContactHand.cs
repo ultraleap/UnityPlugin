@@ -15,12 +15,8 @@ namespace Leap.Unity.PhysicalHands
     {
         internal const int FINGERS = 5, FINGER_BONES = 3;
 
-        internal ContactBone[] bones;
-        /// <summary>
-        /// Allows you to quickly iterate over the bones in a loop
-        /// </summary>
-        public ContactBone[] contactBones => bones;
-        internal ContactBone palmBone;
+        public ContactBone[] bones { get; internal set; }
+        public ContactBone palmBone { get; internal set; }
 
         /// <summary>
         /// Is the hand tracked from a visual sense?
@@ -52,11 +48,10 @@ namespace Leap.Unity.PhysicalHands
         internal PhysicalHandsManager physicalHandsManager => contactParent.physicalHandsManager;
 
         #region Interaction Data
-        internal bool isContacting = false, isHovering = false, isCloseToObject = false, isGrabbing = false;
+        internal bool isHovering = false, isCloseToObject = false, isContacting = false, isGrabbing = false;
         public bool IsHovering => isHovering;
         public bool IsContacting => isContacting;
         public bool IsCloseToObject => isCloseToObject;
-
         public bool IsGrabbing => isGrabbing;
 
         protected Vector3 _oldDataPosition, _oldContactPosition;
@@ -263,11 +258,6 @@ namespace Leap.Unity.PhysicalHands
         public ContactBone GetBone(int fingerIndex, int jointIndex)
         {
             return bones[fingerIndex * FINGER_BONES + jointIndex];
-        }
-
-        public ContactBone GetPalmBone()
-        {
-            return palmBone;
         }
 
         protected void CacheHandData(Hand dataHand)

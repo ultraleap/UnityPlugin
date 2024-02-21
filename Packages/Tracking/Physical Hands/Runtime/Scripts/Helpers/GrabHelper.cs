@@ -315,6 +315,12 @@ namespace Leap.Unity.PhysicalHands
         #endregion
 
         #region Object Information
+        /// <summary>
+        /// Find out if the given rigidbody is being grabbed and by which hand
+        /// </summary>
+        /// <param name="rigid">Rigidbody to check</param>
+        /// <param name="hand">Contact Hand that is grabbing, null if no hand is grabbing</param>
+        /// <returns>True if this object is being grabbed</returns>
         public bool IsObjectGrabbed(Rigidbody rigid, out ContactHand hand)
         {
             hand = null;
