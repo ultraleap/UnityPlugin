@@ -6,7 +6,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
 
-## [6.13.0] - 24/01/24
+## [NEXT] - xx/xx/xx
+
+### Tracking Client versions
+- Windows 	v5.17.1
+- MacOS 	v5.17.1
+- Android 	v5.17.1
+
+### Added
+- 
+
+### Changed
+- (Config) Additional uses of Config marked as Obsolete
+- Any LeapServiceProvider can be used with MRTK subsystem
+- Example content to be split by XR, Tabletop and URP Examples
+- Combined example content to be part of the main Ultraleap Tracking .unitypackage when importing via .unitypackage
+- Added fog and gradient sky for all XR example scenes
+- (Hand Rays) Exposed dot product used to test if the hand is facing camera
+- (Hinting) Added support for startup setting of Hand Tracking Hints via the Ultraleap Settings window
+- (Hinting) Added support for runtime changing of Hand Tracking Hints via static HandTrackingHintManager
+
+### Fixed
+- Errors in Editor when using pre-2023.3.18 LTS due to FindObjectByType issue
+- (Physical Hands) Objects are sticky when they ignore collision with hard contact hands
+- (Physical Hands) Ability to toggle ignore Physical hands options from the inspector at runtime.
+- (Locomotion) IsPinching wouldn't fire when between Activate and Deactivate values in LightweightPinchDetector
+
+## [6.14.0] - 24/01/24
 
 ### Tracking Client versions
 - Windows 	v5.17.1
@@ -17,8 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Physical Hands. This introduces a new way of interacting with object in the virtual world using your hands and unitys physics engine.
 
 ### Changed
-- Removed Physics Hands from the preview package as Physics Hands has replaced it.
-
+- Removed Physics Hands from the preview package as Physical Hands has replaced it.
 
 ### Known issues
 - Repeatedly opening scenes can cause memory use increase

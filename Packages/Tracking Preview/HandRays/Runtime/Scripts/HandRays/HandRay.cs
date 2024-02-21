@@ -58,18 +58,9 @@ namespace Leap.Unity.Preview.HandRays
         // Start is called before the first frame update
         protected virtual void Start()
         {
-
             if (leapProvider == null)
             {
-                leapProvider = FindAnyObjectByType<LeapServiceProvider>();
-                if (leapProvider == null)
-                {
-                    leapProvider = FindAnyObjectByType<LeapProvider>();
-                    if (leapProvider == null)
-                    {
-                        Debug.LogWarning("No leap provider in scene - HandRay is dependent on one.");
-                    }
-                }
+                leapProvider = Hands.Provider;
             }
         }
 
