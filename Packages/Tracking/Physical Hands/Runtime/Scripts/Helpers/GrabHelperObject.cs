@@ -867,32 +867,22 @@ namespace Leap.Unity.PhysicalHands
             {
                 /*
                  * Grab priority
-                 * Last hand to grab object
-                 * Otherwise, last hand to be added to grabbingHands
+                 * First hand to grab object
                  */
 
                 ContactHand hand = null;
                 int grabHandndex = -1;
 
-                for (int i = _grabbingHands.Count - 1; i > 0; i--)
+                for (int i = 0; i < _grabbingHands.Count; i++)
                 {
-                    grabHandndex = _grabbableHands.IndexOf(_grabbingHands[i]);
-
-                    if (_grabbableHandsValues[grabHandndex].handGrabbing || _grabbableHandsValues[grabHandndex].facingOppositeHand
-                        && _grabbingHands[i].tracked)
-                    {
-                        hand = _grabbingHands[i];
-                        break;
-                    }
-                }
-
-                if (hand == null && _grabbingHands[_grabbingHands.Count - 1].tracked)
-                {
-                    hand = _grabbingHands[_grabbingHands.Count - 1];
+                    hand = _grabbingHands[i];
                     grabHandndex = _grabbableHands.IndexOf(hand);
+
+                    if (hand != null && grabHandndex != -1)
+                        break;
                 }
 
-                if (hand != null)
+                if (hand != null && grabHandndex != -1)
                 {
                     _newPosition = hand.palmBone.transform.position + (hand.Velocity * Time.fixedDeltaTime) + (hand.palmBone.transform.rotation * Quaternion.Inverse(_grabbableHandsValues[grabHandndex].originalHandRotation) * _grabbableHandsValues[grabHandndex].offset);
                     _newRotation = hand.palmBone.transform.rotation * Quaternion.Euler(hand.AngularVelocity * Time.fixedDeltaTime) * _grabbableHandsValues[grabHandndex].rotationOffset;
