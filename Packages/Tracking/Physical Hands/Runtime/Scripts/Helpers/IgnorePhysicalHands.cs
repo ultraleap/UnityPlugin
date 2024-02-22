@@ -8,6 +8,7 @@
 
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Leap.Unity.PhysicalHands
 {
@@ -33,23 +34,23 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
-        [SerializeField, Tooltip("Prevents the object from being collided with all Contact Hands.")]
-        private bool _disableAllHandCollisions = true;
+        [SerializeField, Tooltip("Prevents colliders on this gameobject from colliding with Contact Hands."), FormerlySerializedAs("_disableAllHandCollisions")]
+        private bool _disableHandCollisions = true;
 
         /// <summary>
         /// Prevents the object from being collided with all Contact Hands
         /// </summary>
         public bool DisableAllHandCollisions
         {
-            get { return _disableAllHandCollisions; }
+            get { return _disableHandCollisions; }
             set
             {
-                _disableAllHandCollisions = value;
+                _disableHandCollisions = value;
                 SetAllHandCollisions();
             }
         }
 
-        [SerializeField, Tooltip("Should this ignore apply to all child objects?")]
+        [SerializeField, Tooltip("Prevents colliders on all child gameobjects of this gameobject from colliding with Contact Hands.")]
         private bool _disableCollisionOnChildren = true;
 
         /// <summary>
@@ -61,6 +62,7 @@ namespace Leap.Unity.PhysicalHands
             set
             {
                 _disableCollisionOnChildren = value;
+                SetAllHandCollisions();
             }
         }
 
@@ -83,7 +85,8 @@ namespace Leap.Unity.PhysicalHands
         private void OnValidate()
         {
             DisableAllGrabbing = _disableAllGrabbing;
-            DisableAllHandCollisions = _disableAllHandCollisions;
+            DisableAllHandCollisions = _disableHandCollisions;
+            DisableCollisionOnChildObjects = _disableCollisionOnChildren;
         }
 #endif
 
@@ -111,7 +114,7 @@ namespace Leap.Unity.PhysicalHands
             if (!contactHands.Contains(contactHand))
             {
                 contactHands.Add(contactHand);
-                SetHandCollision(_disableAllHandCollisions, contactHand);
+                SetHandCollision(contactHand);
             }
         }
 
@@ -121,7 +124,7 @@ namespace Leap.Unity.PhysicalHands
             {
                 if (contactHands[i] != null)
                 {
-                    SetHandCollision(_disableAllHandCollisions, contactHands[i]);
+                    SetHandCollision(contactHands[i]);
                 }
                 else
                 {
@@ -131,27 +134,21 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
-        private void SetHandCollision(bool collisionDisabled, ContactHand contactHand)
+        private void SetHandCollision(ContactHand contactHand)
         {
             if (this != null)
             {
-
-                var thisCollider = GetComponent<Collider>();
-
-                if (thisCollider != null)
+                foreach (var objectCollider in GetComponentsInChildren<Collider>(true))
                 {
-                    IgnoreCollisionOnAllHandBones(contactHand, thisCollider, collisionDisabled);
-                }
-
-                if (_disableCollisionOnChildren)
-                {
-                    foreach (var objectCollider in GetComponentsInChildren<Collider>(true))
+                    if(objectCollider.gameObject == gameObject)
                     {
-                        IgnoreCollisionOnAllHandBones(contactHand, objectCollider, collisionDisabled);
+                        IgnoreCollisionOnAllHandBones(contactHand, objectCollider, _disableHandCollisions);
+                    }
+                    else
+                    {
+                        IgnoreCollisionOnAllHandBones(contactHand, objectCollider, _disableCollisionOnChildren);
                     }
                 }
-
-
             }
         }
 
