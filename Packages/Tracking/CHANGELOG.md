@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - LeapServiceProvider accessor for world space psoition of the Tracking Camera
 - LeapXRServiceProvider accessor for world space psoition of the Tracking Camera
+- (Physical hands) Ability to ignore collisions on single object or all children
 
 ### Changed
 - (Config) Additional uses of Config marked as Obsolete
@@ -34,6 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (Physical Hands) Objects are sticky when they ignore collision with hard contact hands
 - (Physical Hands) Ability to toggle ignore Physical hands options from the inspector at runtime.
 - (Locomotion) IsPinching wouldn't fire when between Activate and Deactivate values in LightweightPinchDetector
+- (Physical Hands) Soft contact button difficult to press in physical hands playground scene when not using UI layer
 
 ## [6.14.0] - 24/01/24
 
