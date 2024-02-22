@@ -561,6 +561,9 @@ namespace Leap.Unity
             }
 
             dest.CopyFrom(source).Transform(leapTransform);
+
+            // Take the transform that we apply to the frame that moves it to world space, and allow it to be available externally
+            DeviceOriginWorldSpace = leapTransform;
         }
 
         #endregion

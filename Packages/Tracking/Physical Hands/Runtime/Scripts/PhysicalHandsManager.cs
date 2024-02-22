@@ -118,6 +118,11 @@ namespace Leap.Unity.PhysicalHands
         /// </summary>
         public Action OnContactModeChanged;
 
+        #region Quick Accessors
+        public ContactHand LeftHand { get { return ContactParent?.LeftHand; } }
+        public ContactHand RightHand { get { return ContactParent?.RightHand; } }
+        #endregion
+
         private void Awake()
         {
             if (ContactParent == null)
