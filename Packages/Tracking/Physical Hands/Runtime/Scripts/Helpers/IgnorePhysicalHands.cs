@@ -38,7 +38,7 @@ namespace Leap.Unity.PhysicalHands
         private bool _disableHandCollisions = true;
 
         /// <summary>
-        /// Prevents the object from being collided with all Contact Hands
+        /// Prevents the object from being collided with Contact Hands
         /// </summary>
         public bool DisableAllHandCollisions
         {
@@ -54,7 +54,7 @@ namespace Leap.Unity.PhysicalHands
         private bool _disableCollisionOnChildren = true;
 
         /// <summary>
-        /// Prevents the object from being collided with all Contact Hands
+        /// Prevents child objects from being collided with Contact Hands
         /// </summary>
         public bool DisableCollisionOnChildObjects
         {
