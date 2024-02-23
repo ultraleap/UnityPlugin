@@ -58,6 +58,8 @@ namespace Leap.Unity.PhysicalHands
 
         private List<ContactHand> _grabbingHandsPrevious = new List<ContactHand>();
 
+        internal ContactHand currentlyGrabbingHand;
+
         [System.Serializable]
         private class GrabValues
         {
@@ -67,7 +69,7 @@ namespace Leap.Unity.PhysicalHands
             public float[] fingerStrength = new float[5];
             public float[] originalFingerStrength = new float[5];
             public Vector3 offset;
-            public Quaternion originalHandRotation, rotationOffset;
+            public Quaternion originalHandRotationInverse, rotationOffset;
 
             /// <summary>
             /// True while hand pinching on contact
@@ -93,7 +95,7 @@ namespace Leap.Unity.PhysicalHands
         private Vector3 _newPosition;
         private Quaternion _newRotation;
 
-        private bool _oldKinematic;
+        private Vector3 oldCenterOfMass;
 
         internal bool _grabbingIgnored;
         private IgnorePhysicalHands _ignorePhysicalHands;
@@ -160,6 +162,8 @@ namespace Leap.Unity.PhysicalHands
             _colliders = rigid.GetComponentsInChildren<Collider>(true);
             HandleIgnoreContactHelper();
             _manager = manager;
+
+            oldCenterOfMass = rigid.centerOfMass;
         }
 
 
@@ -271,7 +275,7 @@ namespace Leap.Unity.PhysicalHands
                 if (!_grabbingIgnored)
                 {
                     // Only ever unset the rigidbody values here otherwise outside logic will get confused
-                    _rigid.isKinematic = _oldKinematic;
+                    _rigid.centerOfMass = oldCenterOfMass;
                     ThrowingOnRelease();
                 }
             }
@@ -279,6 +283,8 @@ namespace Leap.Unity.PhysicalHands
 
         internal State UpdateHelper()
         {
+            currentlyGrabbingHand = null;
+
             UpdateHands();
 
             if (!anyBoneGrabbable && GrabState != State.Grab)
@@ -576,13 +582,13 @@ namespace Leap.Unity.PhysicalHands
                     return;
                 }
             }
-			
+
             // If the object we are connected to is ignoring collision with the hands, we should not do joint facing checks
             //  this will avoid issues with these objects being too sticky
-			if(_ignorePhysicalHands != null && _ignorePhysicalHands.DisableAllHandCollisions)
-			{
-				return;
-			}
+            if (_ignorePhysicalHands != null && _ignorePhysicalHands.DisableAllHandCollisions)
+            {
+                return;
+            }
 
             for (int handIndex = 0; handIndex < _grabbableHands.Count; handIndex++)
             {
@@ -673,12 +679,8 @@ namespace Leap.Unity.PhysicalHands
             if (hand.ghosted)
                 return;
 
-            if (!_grabbingIgnored)
-            {
-                // Store the original rigidbody variables
-                _oldKinematic = _rigid.isKinematic;
-                _rigid.isKinematic = false;
-            }
+            if (_grabbingIgnored)
+                return;
 
             _grabbingHands.Add(hand);
 
@@ -688,7 +690,7 @@ namespace Leap.Unity.PhysicalHands
 
             _grabbableHandsValues[grabHandIndex].offset = _rigid.position - hand.palmBone.transform.position;
             _grabbableHandsValues[grabHandIndex].rotationOffset = Quaternion.Inverse(hand.palmBone.transform.rotation) * _rigid.rotation;
-            _grabbableHandsValues[grabHandIndex].originalHandRotation = hand.palmBone.transform.rotation;
+            _grabbableHandsValues[grabHandIndex].originalHandRotationInverse = Quaternion.Inverse(hand.palmBone.transform.rotation);
         }
 
         private void UpdateGrabbingValues()
@@ -865,50 +867,67 @@ namespace Leap.Unity.PhysicalHands
         {
             if (_grabbingHands.Count > 0)
             {
-                /*
-                 * Grab priority
-                 * Last hand to grab object
-                 * Otherwise, last hand to be added to grabbingHands
-                 */
-
                 ContactHand hand = null;
                 int grabHandndex = -1;
 
-                for (int i = _grabbingHands.Count - 1; i > 0; i--)
+                // Find the newest grabbing hand
+                for (int i = _grabbingHands.Count - 1; i >= 0; i--)
                 {
-                    grabHandndex = _grabbableHands.IndexOf(_grabbingHands[i]);
+                    hand = _grabbingHands[i];
+                    grabHandndex = _grabbableHands.IndexOf(hand);
 
-                    if (_grabbableHandsValues[grabHandndex].handGrabbing || _grabbableHandsValues[grabHandndex].facingOppositeHand
-                        && _grabbingHands[i].tracked)
+                    if (hand != null && grabHandndex != -1)
                     {
-                        hand = _grabbingHands[i];
                         break;
+                    }
+                    else
+                    {
+                        hand = null;
                     }
                 }
 
-                if (hand == null && _grabbingHands[_grabbingHands.Count - 1].tracked)
-                {
-                    hand = _grabbingHands[_grabbingHands.Count - 1];
-                    grabHandndex = _grabbableHands.IndexOf(hand);
-                }
+                // Find the oldest grabbing hand
+                //for (int i = 0; i < _grabbingHands.Count; i++)
+                //{
+                //    hand = _grabbingHands[i];
+                //    grabHandndex = _grabbableHands.IndexOf(hand);
+
+                //    if (hand != null && grabHandndex != -1)
+                //    {
+                //        break;
+                //    }
+                //    else
+                //    {
+                //        hand = null;
+                //    }
+                //}
 
                 if (hand != null)
                 {
-                    _newPosition = hand.palmBone.transform.position + (hand.Velocity * Time.fixedDeltaTime) + (hand.palmBone.transform.rotation * Quaternion.Inverse(_grabbableHandsValues[grabHandndex].originalHandRotation) * _grabbableHandsValues[grabHandndex].offset);
-                    _newRotation = hand.palmBone.transform.rotation * Quaternion.Euler(hand.AngularVelocity * Time.fixedDeltaTime) * _grabbableHandsValues[grabHandndex].rotationOffset;
+                    if(hand != currentlyGrabbingHand)
+                    {
+                        currentlyGrabbingHand = hand;
+                        _rigid.centerOfMass = _grabbableHandsValues[grabHandndex].offset;
+                    }
+
+                    _newRotation = hand.palmBone.transform.rotation * Quaternion.Euler(hand.AngularVelocity * Time.fixedDeltaTime); // for use in positioning
+
+                    _newPosition = hand.palmBone.transform.position + (hand.Velocity * Time.fixedDeltaTime) + (_newRotation * _grabbableHandsValues[grabHandndex].originalHandRotationInverse * _grabbableHandsValues[grabHandndex].offset);
+                    _newRotation = _newRotation * _grabbableHandsValues[grabHandndex].rotationOffset; // Include the original rotation offset
                 }
             }
         }
 
         private void MoveObject()
         {
-            // Fixes issues with kinematic objects
-            // Making them affected by physics instead of kinematic is much more stable
             if (_rigid.isKinematic)
             {
-                _rigid.isKinematic = false;
+                KinematicMovement(_newPosition, _newRotation);
             }
-            PhysicsMovement(_newPosition, _newRotation);
+            else
+            {
+                PhysicsMovement(_newPosition, _newRotation);
+            }
         }
 
         private const float MAX_VELOCITY_SQUARED = 100;
@@ -934,6 +953,12 @@ namespace Leap.Unity.PhysicalHands
             {
                 _rigid.angularVelocity = targetAngularVelocity;
             }
+        }
+
+        private void KinematicMovement(Vector3 solvedPosition, Quaternion solvedRotation)
+        {
+            _rigid.MovePosition(solvedPosition);
+            _rigid.MoveRotation(solvedRotation);
         }
 
         #region Throwing
