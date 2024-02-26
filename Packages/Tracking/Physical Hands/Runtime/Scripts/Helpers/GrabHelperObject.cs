@@ -268,12 +268,9 @@ namespace Leap.Unity.PhysicalHands
             // Make sure the object hasn't been destroyed
             if (_rigid != null)
             {
-                if (!_grabbingIgnored)
-                {
-                    // Only ever unset the rigidbody values here otherwise outside logic will get confused
-                    _rigid.isKinematic = _oldKinematic;
-                    ThrowingOnRelease();
-                }
+                // Only ever unset the rigidbody values here otherwise outside logic will get confused
+                _rigid.isKinematic = _oldKinematic;
+                ThrowingOnRelease();
             }
         }
 
@@ -287,10 +284,7 @@ namespace Leap.Unity.PhysicalHands
                 return GrabState = State.Hover;
             }
 
-            if (!_grabbingIgnored)
-            {
-                GrabbingCheck();
-            }
+            GrabbingCheck();
 
             switch (GrabState)
             {
@@ -468,7 +462,12 @@ namespace Leap.Unity.PhysicalHands
 
             for (int handIndex = 0; handIndex < _grabbableHands.Count; handIndex++)
             {
+
                 ContactHand hand = _grabbableHands[handIndex];
+                if (_grabbingIgnored && ((int)_ignorePhysicalHands.HandToIgnore == (int)hand.Handedness || _ignorePhysicalHands.HandToIgnore == ChiralitySelection.BOTH))
+                {
+                    return;
+                }
                 GrabValues grabValues = _grabbableHandsValues[handIndex];
 
                 if (_grabbingHands.Contains(hand))
@@ -673,12 +672,15 @@ namespace Leap.Unity.PhysicalHands
             if (hand.ghosted)
                 return;
 
-            if (!_grabbingIgnored)
+            if (_grabbingIgnored && ((int)_ignorePhysicalHands.HandToIgnore == (int)hand.Handedness) || _ignorePhysicalHands.HandToIgnore == ChiralitySelection.BOTH)
             {
+                return;
+            }
+
+
                 // Store the original rigidbody variables
                 _oldKinematic = _rigid.isKinematic;
-                _rigid.isKinematic = false;
-            }
+            _rigid.isKinematic = false;
 
             _grabbingHands.Add(hand);
 
