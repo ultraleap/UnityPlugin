@@ -299,7 +299,7 @@ namespace Leap.Unity.PhysicalHands
                     if (_grabbingHands.Count > 0)
                     {
                         UpdateHandPositions();
-                        if (!_grabbingIgnored && ignoreGrabTime < Time.time)
+                        if (ignoreGrabTime < Time.time)
                         {
                             TrackThrowingVelocities();
                             MoveObject();
@@ -464,9 +464,12 @@ namespace Leap.Unity.PhysicalHands
             {
 
                 ContactHand hand = _grabbableHands[handIndex];
-                if (_grabbingIgnored && ((int)_ignorePhysicalHands.HandToIgnore == (int)hand.Handedness || _ignorePhysicalHands.HandToIgnore == ChiralitySelection.BOTH))
+                if (_ignorePhysicalHands)
                 {
-                    return;
+                    if (_grabbingIgnored && ((int)_ignorePhysicalHands.HandToIgnore == (int)hand.Handedness || _ignorePhysicalHands.HandToIgnore == ChiralitySelection.BOTH))
+                    {
+                        continue;
+                    }
                 }
                 GrabValues grabValues = _grabbableHandsValues[handIndex];
 
@@ -574,17 +577,24 @@ namespace Leap.Unity.PhysicalHands
                 {
                     return;
                 }
+
             }
-			
+
             // If the object we are connected to is ignoring collision with the hands, we should not do joint facing checks
             //  this will avoid issues with these objects being too sticky
-			if(_ignorePhysicalHands != null && _ignorePhysicalHands.DisableAllHandCollisions)
-			{
-				return;
-			}
+
+
+
 
             for (int handIndex = 0; handIndex < _grabbableHands.Count; handIndex++)
             {
+                if (_ignorePhysicalHands != null
+                    && (_grabbingIgnored &&
+                    ((int)_ignorePhysicalHands.HandToIgnore == (int)_grabbableHands[handIndex].Handedness || _ignorePhysicalHands.HandToIgnore == ChiralitySelection.BOTH)))
+                {
+                    continue;
+                }
+
                 // This hand is already grabbing, we don't need to check again
                 if (_grabbableHandsValues[handIndex].handGrabbing || _grabbingHands.Contains(_grabbableHands[handIndex]))
                 {
@@ -672,9 +682,12 @@ namespace Leap.Unity.PhysicalHands
             if (hand.ghosted)
                 return;
 
-            if (_grabbingIgnored && ((int)_ignorePhysicalHands.HandToIgnore == (int)hand.Handedness) || _ignorePhysicalHands.HandToIgnore == ChiralitySelection.BOTH)
+            if (_ignorePhysicalHands)
             {
-                return;
+                if (_grabbingIgnored && ((int)_ignorePhysicalHands.HandToIgnore == (int)hand.Handedness) || _ignorePhysicalHands.HandToIgnore == ChiralitySelection.BOTH)
+                {
+                    return;
+                }
             }
 
 
