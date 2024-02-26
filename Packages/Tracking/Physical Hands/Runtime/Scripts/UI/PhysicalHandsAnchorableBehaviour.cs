@@ -324,7 +324,11 @@ namespace Leap.Unity.PhysicalHands
 
         void OnValidate()
         {
-            refreshInteractionBehaviour();
+            if (_rigidbody == null)
+            {
+                _rigidbody = GetComponent<Rigidbody>();
+            }
+                refreshInteractionBehaviour();
             refreshInspectorConveniences();
         }
 
@@ -342,7 +346,10 @@ namespace Leap.Unity.PhysicalHands
             {
                 anchorGroup.NotifyAnchorableObjectAdded(this);
             }
-            _rigidbody = GetComponent<Rigidbody>();
+            if (_rigidbody == null)
+            {
+                _rigidbody = GetComponent<Rigidbody>();
+            }
             initUnityEvents();
         }
 
@@ -357,7 +364,7 @@ namespace Leap.Unity.PhysicalHands
 
         private bool _reactivateGravityOnDetach = false;
 
-        void Update()
+        void FixedUpdate()
         {
             updateAttractionToHand();
 
