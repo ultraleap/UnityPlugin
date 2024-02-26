@@ -276,11 +276,13 @@ namespace Leap.Unity.PhysicalHands
                     break;
             }
 
+
             if (transform != null) // catches some edit-time issues
             {
                 newContactParent.transform.parent = transform;
             }
 
+            _contactParent.Initialize();
             OnContactModeChanged?.Invoke();
         }
 
