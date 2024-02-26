@@ -86,7 +86,7 @@ namespace Leap.Unity.PhysicalHands
             public bool facingOppositeHand = false;
         }
 
-        private GrabHelper _manager;
+        private GrabHelper _grabHelperManager;
 
         internal Rigidbody RigidBody => _rigid;
         private Rigidbody _rigid;
@@ -96,6 +96,7 @@ namespace Leap.Unity.PhysicalHands
         private Quaternion _newRotation;
 
         private Vector3 oldCenterOfMass;
+        private bool oldKinematic;
 
         internal bool _grabbingIgnored;
         private IgnorePhysicalHands _ignorePhysicalHands;
@@ -161,9 +162,10 @@ namespace Leap.Unity.PhysicalHands
             }
             _colliders = rigid.GetComponentsInChildren<Collider>(true);
             HandleIgnoreContactHelper();
-            _manager = manager;
+            _grabHelperManager = manager;
 
             oldCenterOfMass = rigid.centerOfMass;
+            oldKinematic = rigid.isKinematic;
         }
 
 
@@ -275,6 +277,9 @@ namespace Leap.Unity.PhysicalHands
                 if (!_grabbingIgnored)
                 {
                     // Only ever unset the rigidbody values here otherwise outside logic will get confused
+                    if(_grabHelperManager.useNonKinematicMovementOnly)
+                        _rigid.isKinematic = oldKinematic;
+
                     _rigid.centerOfMass = oldCenterOfMass;
                     ThrowingOnRelease();
                 }
@@ -484,12 +489,12 @@ namespace Leap.Unity.PhysicalHands
 
                 for (int i = 0; i < 5; i++)
                 {
-                    if (IsFingerGrabbable(hand, i) && _manager.FingerStrengths[hand][i] > (i == 0 ? MINIMUM_THUMB_STRENGTH : MINIMUM_STRENGTH))
+                    if (IsFingerGrabbable(hand, i) && _grabHelperManager.FingerStrengths[hand][i] > (i == 0 ? MINIMUM_THUMB_STRENGTH : MINIMUM_STRENGTH))
                     {
-                        grabValues.fingerStrength[i] = _manager.FingerStrengths[hand][i];
+                        grabValues.fingerStrength[i] = _grabHelperManager.FingerStrengths[hand][i];
                         if (grabValues.originalFingerStrength[i] == -1)
                         {
-                            grabValues.originalFingerStrength[i] = _manager.FingerStrengths[hand][i];
+                            grabValues.originalFingerStrength[i] = _grabHelperManager.FingerStrengths[hand][i];
                         }
                     }
                     else
@@ -718,17 +723,17 @@ namespace Leap.Unity.PhysicalHands
                     // Was the finger not contacting before?
                     if (_grabbableHandsValues[grabHandIndex].fingerStrength[i] == -1)
                     {
-                        if (_manager.FingerStrengths[_grabbableHands[grabHandIndex]][i] > (i == 0 ? MINIMUM_THUMB_STRENGTH : MINIMUM_STRENGTH) && IsFingerGrabbable(_grabbableHands[grabHandIndex], i))
+                        if (_grabHelperManager.FingerStrengths[_grabbableHands[grabHandIndex]][i] > (i == 0 ? MINIMUM_THUMB_STRENGTH : MINIMUM_STRENGTH) && IsFingerGrabbable(_grabbableHands[grabHandIndex], i))
                         {
                             // Store the strength value on contact
-                            _grabbableHandsValues[grabHandIndex].fingerStrength[i] = _manager.FingerStrengths[_grabbableHands[grabHandIndex]][i];
+                            _grabbableHandsValues[grabHandIndex].fingerStrength[i] = _grabHelperManager.FingerStrengths[_grabbableHands[grabHandIndex]][i];
                         }
                     }
                     else
                     {
                         // If the finger was contacting but has uncurled by the exit percentage then it is no longer "grabbed"
-                        if (_manager.FingerStrengths[_grabbableHands[grabHandIndex]][i] < (i == 0 ? MINIMUM_THUMB_STRENGTH : MINIMUM_STRENGTH) ||
-                            _grabbableHandsValues[grabHandIndex].fingerStrength[i] * (1 - (i == 0 ? REQUIRED_THUMB_EXIT_STRENGTH : REQUIRED_EXIT_STRENGTH)) >= _manager.FingerStrengths[_grabbableHands[grabHandIndex]][i])
+                        if (_grabHelperManager.FingerStrengths[_grabbableHands[grabHandIndex]][i] < (i == 0 ? MINIMUM_THUMB_STRENGTH : MINIMUM_STRENGTH) ||
+                            _grabbableHandsValues[grabHandIndex].fingerStrength[i] * (1 - (i == 0 ? REQUIRED_THUMB_EXIT_STRENGTH : REQUIRED_EXIT_STRENGTH)) >= _grabHelperManager.FingerStrengths[_grabbableHands[grabHandIndex]][i])
                         {
                             _grabbableHandsValues[grabHandIndex].fingerStrength[i] = -1;
                         }
@@ -886,22 +891,6 @@ namespace Leap.Unity.PhysicalHands
                     }
                 }
 
-                // Find the oldest grabbing hand
-                //for (int i = 0; i < _grabbingHands.Count; i++)
-                //{
-                //    hand = _grabbingHands[i];
-                //    grabHandndex = _grabbableHands.IndexOf(hand);
-
-                //    if (hand != null && grabHandndex != -1)
-                //    {
-                //        break;
-                //    }
-                //    else
-                //    {
-                //        hand = null;
-                //    }
-                //}
-
                 if (hand != null)
                 {
                     if(hand != currentlyGrabbingHand)
@@ -920,6 +909,11 @@ namespace Leap.Unity.PhysicalHands
 
         private void MoveObject()
         {
+            if (_grabHelperManager.useNonKinematicMovementOnly)
+            {
+                _rigid.isKinematic = false;
+            }
+
             if (_rigid.isKinematic)
             {
                 KinematicMovement(_newPosition, _newRotation);

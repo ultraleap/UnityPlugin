@@ -17,6 +17,12 @@ namespace Leap.Unity.PhysicalHands
         [SerializeField]
         private PhysicalHandsManager physicalHandsManager;
 
+        [Tooltip("Should kinematic objects be changed to non-kinematic for movement?" +
+                "\n\nIf true, rigidbodies will be changed to non-kinematic when grabbed, and returned to kinematic when released" +
+                "\n\nIf false, kinematic objects will be positioned through kinematic methods" +
+                "\n\nWarning: Hard Contact hands can jitter when moving a kinematic object")]
+        public bool useNonKinematicMovementOnly = true;
+
         private ContactHand _leftContactHand { get { return physicalHandsManager.ContactParent.LeftHand; } }
         private ContactHand _rightContactHand { get { return physicalHandsManager.ContactParent.RightHand; } }
 
