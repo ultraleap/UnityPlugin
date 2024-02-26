@@ -14,9 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Android 	v5.17.1
 
 ### Added
-- LeapServiceProvider accessor for world space psoition of the Tracking Camera
-- LeapXRServiceProvider accessor for world space psoition of the Tracking Camera
-- (Physical hands) Ability to ignore collisions on single object or all children
+- LeapServiceProvider accessor for world space position of the Tracking Camera
+- LeapXRServiceProvider accessor for world space position of the Tracking Camera
+- (Physical Hands) Ability to ignore collisions on single object or all children
+- (Physical Hands) Added toggle to GrabHelper to allow kinematic object movement
 
 ### Changed
 - (Config) Additional uses of Config marked as Obsolete
