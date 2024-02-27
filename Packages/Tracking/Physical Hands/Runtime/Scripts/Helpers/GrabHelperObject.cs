@@ -171,7 +171,7 @@ namespace Leap.Unity.PhysicalHands
         {
             _ignorePhysicalHands = _rigid.GetComponentInChildren<IgnorePhysicalHands>();
 
-            if (_ignorePhysicalHands != null)
+            if (_ignorePhysicalHands != null && _ignorePhysicalHands.enabled)
             {
                 _ignorePhysicalHands.GrabHelperObject = this;
             }
@@ -237,7 +237,7 @@ namespace Leap.Unity.PhysicalHands
                 _grabbableHands.Add(hand);
                 _grabbableHandsValues.Add(new GrabValues());
 
-                if (_ignorePhysicalHands)
+                if (_ignorePhysicalHands && _ignorePhysicalHands.enabled)
                 {
                     _ignorePhysicalHands.AddToHands(hand);
                 }
@@ -464,7 +464,7 @@ namespace Leap.Unity.PhysicalHands
             {
 
                 ContactHand hand = _grabbableHands[handIndex];
-                if (_ignorePhysicalHands)
+                if (_ignorePhysicalHands && _ignorePhysicalHands.enabled)
                 {
                     if (_grabbingIgnored && ((int)_ignorePhysicalHands.HandToIgnore == (int)hand.Handedness || _ignorePhysicalHands.HandToIgnore == ChiralitySelection.BOTH))
                     {
@@ -588,7 +588,7 @@ namespace Leap.Unity.PhysicalHands
 
             for (int handIndex = 0; handIndex < _grabbableHands.Count; handIndex++)
             {
-                if (_ignorePhysicalHands != null
+                if (_ignorePhysicalHands != null && _ignorePhysicalHands.enabled
                     && (_grabbingIgnored &&
                     ((int)_ignorePhysicalHands.HandToIgnore == (int)_grabbableHands[handIndex].Handedness || _ignorePhysicalHands.HandToIgnore == ChiralitySelection.BOTH)))
                 {
@@ -682,7 +682,7 @@ namespace Leap.Unity.PhysicalHands
             if (hand.ghosted)
                 return;
 
-            if (_ignorePhysicalHands)
+            if (_ignorePhysicalHands && _ignorePhysicalHands.enabled)
             {
                 if (_grabbingIgnored && ((int)_ignorePhysicalHands.HandToIgnore == (int)hand.Handedness || _ignorePhysicalHands.HandToIgnore == ChiralitySelection.BOTH))
                 {
@@ -1011,7 +1011,7 @@ namespace Leap.Unity.PhysicalHands
             if (averageVelocity.magnitude > 0.5f)
             {
                 // Check if we are safe to temporaily ignore collisions
-                if (_ignorePhysicalHands == null || !_ignorePhysicalHands.DisableAllHandCollisions)
+                if (_ignorePhysicalHands == null && _ignorePhysicalHands.enabled || !_ignorePhysicalHands.DisableAllHandCollisions)
                 {
                     // Ignore collision after throwing so we don't knock the object
                     foreach (var hand in _grabbableHands)

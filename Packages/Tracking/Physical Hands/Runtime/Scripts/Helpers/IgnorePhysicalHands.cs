@@ -93,7 +93,20 @@ namespace Leap.Unity.PhysicalHands
         }
 #endif
 
-        private void Start()
+        /// <summary>
+        /// Clean up code, re-enables all collision and grabbing on this object and all children
+        /// </summary>
+        void OnDisable()
+        {
+            if (_grabHelperObject != null)
+            {
+                _grabHelperObject._grabbingIgnored = false;
+            }
+            SetAllHandCollisions(false);
+
+        }
+
+        private void OnEnable()
         {
 #if UNITY_2021_3_18_OR_NEWER
             _physicalHandsManager = (PhysicalHandsManager)FindAnyObjectByType(typeof(PhysicalHandsManager));
@@ -138,6 +151,23 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
+        private void SetAllHandCollisions(bool collisionEnabled)
+        {
+            for (int i = 0; i < contactHands.Count; i++)
+            {
+                if (contactHands[i] != null
+                    && ((int)contactHands[i].Handedness == (int)HandToIgnore || HandToIgnore == ChiralitySelection.BOTH))
+                {
+                    SetHandCollision(contactHands[i], collisionEnabled);
+                }
+                else
+                {
+                    contactHands.RemoveAt(i);
+                    i--;
+                }
+            }
+        }
+
         private void SetHandCollision(ContactHand contactHand)
         {
             if (this != null)
@@ -147,6 +177,24 @@ namespace Leap.Unity.PhysicalHands
                     if(objectCollider.gameObject == gameObject)
                     {
                         IgnoreCollisionOnAllHandBones(contactHand, objectCollider, _disableHandCollisions);
+                    }
+                    else
+                    {
+                        IgnoreCollisionOnAllHandBones(contactHand, objectCollider, _disableCollisionOnChildren);
+                    }
+                }
+            }
+        }
+
+        private void SetHandCollision(ContactHand contactHand, bool collisionEnabled)
+        {
+            if (this != null)
+            {
+                foreach (var objectCollider in GetComponentsInChildren<Collider>(true))
+                {
+                    if (objectCollider.gameObject == gameObject)
+                    {
+                        IgnoreCollisionOnAllHandBones(contactHand, objectCollider, collisionEnabled);
                     }
                     else
                     {
