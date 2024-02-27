@@ -684,7 +684,7 @@ namespace Leap.Unity.PhysicalHands
 
             if (_ignorePhysicalHands)
             {
-                if (_grabbingIgnored && ((int)_ignorePhysicalHands.HandToIgnore == (int)hand.Handedness) || _ignorePhysicalHands.HandToIgnore == ChiralitySelection.BOTH)
+                if (_grabbingIgnored && ((int)_ignorePhysicalHands.HandToIgnore == (int)hand.Handedness || _ignorePhysicalHands.HandToIgnore == ChiralitySelection.BOTH))
                 {
                     return;
                 }
