@@ -227,7 +227,7 @@ namespace Ultraleap.Tracking.OpenXR
                             metacarpalPosition,
                             _joints[(int)HandJoint.ThumbMetacarpal].Pose.forward,
                             0f,
-                            _joints[(int)HandJoint.ThumbMetacarpal].Radius * 2f,
+                            _joints[(int)HandJoint.ThumbMetacarpal].Radius * 1.5f, // 1.5 to convert from joint radius to bone width (joints bigger than bones)
                             (Bone.BoneType)boneIndex,
                             (_joints[(int)HandJoint.Palm].Pose.rotation * PalmOffset[hand.IsLeft ? 0 : 1].rotation) * ThumbMetacarpalRotationOffset[hand.IsLeft ? 0 : 1]);
                         continue;
@@ -241,7 +241,7 @@ namespace Ultraleap.Tracking.OpenXR
                         ((prevJoint.Pose.position + nextJoint.Pose.position) / 2f),
                         prevJoint.Pose.forward,
                         (prevJoint.Pose.position - nextJoint.Pose.position).magnitude,
-                        prevJoint.Radius * 2f,
+                        prevJoint.Radius * 1.5f, // 1.5 to convert from joint radius to bone width (joints bigger than bones)
                         (Bone.BoneType)boneIndex,
                         prevJoint.Pose.rotation);
                     fingerWidth = Mathf.Max(fingerWidth, bone.Width);

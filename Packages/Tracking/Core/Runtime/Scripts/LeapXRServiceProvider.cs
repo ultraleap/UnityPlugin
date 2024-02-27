@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -561,6 +561,9 @@ namespace Leap.Unity
             }
 
             dest.CopyFrom(source).Transform(leapTransform);
+
+            // Take the transform that we apply to the frame that moves it to world space, and allow it to be available externally
+            DeviceOriginWorldSpace = leapTransform;
         }
 
         #endregion

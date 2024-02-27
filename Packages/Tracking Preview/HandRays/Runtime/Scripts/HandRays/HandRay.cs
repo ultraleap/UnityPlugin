@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -58,18 +58,9 @@ namespace Leap.Unity.Preview.HandRays
         // Start is called before the first frame update
         protected virtual void Start()
         {
-
             if (leapProvider == null)
             {
-                leapProvider = FindAnyObjectByType<LeapServiceProvider>();
-                if (leapProvider == null)
-                {
-                    leapProvider = FindAnyObjectByType<LeapProvider>();
-                    if (leapProvider == null)
-                    {
-                        Debug.LogWarning("No leap provider in scene - HandRay is dependent on one.");
-                    }
-                }
+                leapProvider = Hands.Provider;
             }
         }
 

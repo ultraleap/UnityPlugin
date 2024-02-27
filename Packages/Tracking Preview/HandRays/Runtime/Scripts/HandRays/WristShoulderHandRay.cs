@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -35,6 +35,12 @@ namespace Leap.Unity.Preview.HandRays
             " - For a more stable far field ray, blend towards the shoulder.\n" +
             " - Keep the value central for a blend between the two.")]
         [Range(0f, 1)] public float wristShoulderBlendAmount = 0.532f;
+
+        /// <summary>
+        /// The min dot product allowed when calculating if the hand is facing the camera
+        /// </summary>
+        [Tooltip("The min dot product allowed when calculating if the hand is facing the camera")]
+        [Range(-1f, 1)] public float facingCamMinDotProd = 0.55f;
 
         [SerializeField] protected InferredBodyPositions inferredBodyPositions;
 
@@ -74,11 +80,6 @@ namespace Leap.Unity.Preview.HandRays
 
         private readonly float oneEurofreq = 30;
 
-        /// <summary>
-        /// The min dot product allowed when calculating if the hand is facing the camera
-        /// </summary>
-        private float minDotProductAllowedForFacingCamera = 0.55f;
-
         // Start is called before the first frame update
         protected override void Start()
         {
@@ -106,7 +107,7 @@ namespace Leap.Unity.Preview.HandRays
             transformHelper.position = leapProvider.CurrentFrame.GetHand(chirality).PalmPosition;
             Quaternion palmForwardRotation = leapProvider.CurrentFrame.GetHand(chirality).Rotation * Quaternion.Euler(90, 0, 0);
             transformHelper.rotation = palmForwardRotation;
-            return !IsFacingTransform(transformHelper, inferredBodyPositions.Head, minDotProductAllowedForFacingCamera);
+            return !IsFacingTransform(transformHelper, inferredBodyPositions.Head, facingCamMinDotProd);
         }
 
         protected virtual Vector3 GetWristOffsetPosition(Hand hand)

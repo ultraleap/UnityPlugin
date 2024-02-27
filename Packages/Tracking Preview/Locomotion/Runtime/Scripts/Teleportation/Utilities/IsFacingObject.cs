@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -7,7 +7,7 @@
  ******************************************************************************/
 
 using Leap.Unity.Interaction;
-using Leap.Unity.Interaction.PhysicsHands;
+using Leap.Unity.PhysicalHands;
 using Leap.Unity.Preview.HandRays;
 using System.Collections.Generic;
 using UnityEngine;
@@ -56,8 +56,12 @@ namespace Leap.Unity.Preview.Locomotion
         private void SetLayerMask()
         {
             _layerMask = -1;
-            InteractionManager interactionManager = FindAnyObjectByType<InteractionManager>();
 
+#if UNITY_2021_3_18_OR_NEWER
+            InteractionManager interactionManager = FindAnyObjectByType<InteractionManager>();
+#else
+            InteractionManager interactionManager = FindObjectOfType<InteractionManager>();
+#endif
             // Ignore any interaction objects 
             if (interactionManager != null)
             {
@@ -66,15 +70,24 @@ namespace Leap.Unity.Preview.Locomotion
                 // Ignore any grasped objects 
                 _layerMask ^= interactionManager.interactionNoContactLayer.layerMask;
             }
-            PhysicsProvider physicsProvider = FindAnyObjectByType<PhysicsProvider>();
-            if (physicsProvider != null)
+
+#if UNITY_2021_3_18_OR_NEWER
+            PhysicalHandsManager physicalHandsManager = FindAnyObjectByType<PhysicalHandsManager>();
+#else
+            PhysicalHandsManager physicalHandsManager = FindObjectOfType<PhysicalHandsManager>();
+#endif
+            if (physicalHandsManager != null)
             {
-                _layerMask ^= physicsProvider.HandsLayer.layerMask;
-                _layerMask ^= physicsProvider.HandsResetLayer.layerMask;
+                _layerMask ^= physicalHandsManager.HandsLayer.layerMask;
+                _layerMask ^= physicalHandsManager.HandsResetLayer.layerMask;
             }
 
+#if UNITY_2021_3_18_OR_NEWER
             FarFieldLayerManager farFieldLayerManager = FindAnyObjectByType<FarFieldLayerManager>();
-            if (physicsProvider != null)
+#else
+            FarFieldLayerManager farFieldLayerManager = FindObjectOfType<FarFieldLayerManager>();
+#endif
+            if (farFieldLayerManager != null)
             {
                 _layerMask ^= farFieldLayerManager.FarFieldObjectLayer.layerMask;
                 _layerMask ^= farFieldLayerManager.FloorLayer.layerMask;

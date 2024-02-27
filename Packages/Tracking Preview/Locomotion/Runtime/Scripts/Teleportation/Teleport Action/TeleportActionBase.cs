@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -101,7 +101,11 @@ namespace Leap.Unity.Preview.Locomotion
             if (Player == null) Player = Head.parent.gameObject == null ? Head.gameObject : Head.parent.gameObject;
             if (farFieldLayerManager == null)
             {
+#if UNITY_2021_3_18_OR_NEWER
                 farFieldLayerManager = FindAnyObjectByType<FarFieldLayerManager>();
+#else
+                farFieldLayerManager = FindObjectOfType<FarFieldLayerManager>();
+#endif
             }
 
             if (handRayInteractor != null)
@@ -111,7 +115,11 @@ namespace Leap.Unity.Preview.Locomotion
 
             if (findTeleportAnchorsOnStart)
             {
+#if UNITY_2021_3_18_OR_NEWER
                 _teleportAnchors = new List<TeleportAnchor>(FindObjectsByType<TeleportAnchor>(FindObjectsInactive.Include, FindObjectsSortMode.None));
+#else
+                _teleportAnchors = new List<TeleportAnchor>(FindObjectsOfType<TeleportAnchor>(true));
+#endif
             }
 
             if (freeTeleportAnchor.TryGetComponent(out MeshCollider anchorCollider))
@@ -145,7 +153,11 @@ namespace Leap.Unity.Preview.Locomotion
 
             if (farFieldLayerManager == null)
             {
+#if UNITY_2021_3_18_OR_NEWER
                 farFieldLayerManager = FindAnyObjectByType<FarFieldLayerManager>();
+#else
+                farFieldLayerManager = FindObjectOfType<FarFieldLayerManager>();
+#endif
             }
         }
 

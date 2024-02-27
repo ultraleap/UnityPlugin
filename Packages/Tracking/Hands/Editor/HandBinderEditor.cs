@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -88,11 +88,11 @@ namespace Leap.Unity.HandsModule
 
             if (myTarget.gameObject.name.ToUpper().Contains("Left".ToUpper()))
             {
-                myTarget.Handedness = Unity.Chirality.Left;
+                myTarget.Handedness = Chirality.Left;
             }
             if (myTarget.gameObject.name.ToUpper().Contains("Right".ToUpper()))
             {
-                myTarget.Handedness = Unity.Chirality.Right;
+                myTarget.Handedness = Chirality.Right;
             }
 
             SetSerializedProperties();
