@@ -10,6 +10,8 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Leap.Unity.Attachments;
+
 
 namespace Leap.Unity.PhysicalHands
 {
@@ -46,6 +48,22 @@ namespace Leap.Unity.PhysicalHands
         private HashSet<PhysicalHandsAnchorableBehaviour> _preferringAnchorables = new HashSet<PhysicalHandsAnchorableBehaviour>();
 
         private HashSet<PhysicalHandsAnchorableBehaviour> _anchoredObjects = new HashSet<PhysicalHandsAnchorableBehaviour>();
+
+        /// <summary>
+        /// returns ChiralitySelection.NONE if no attachemt hand found in parents
+        /// </summary>
+        internal ChiralitySelection AttahedHandChirality
+        {
+            get
+            {
+                return GetChiralityOfAttachedHand();
+            }
+            private set
+            {
+                _attachedHandChirality = value;
+            }
+        }
+        private ChiralitySelection _attachedHandChirality = ChiralitySelection.NONE;
         /// <summary>
         /// Gets the set of PhysicalHandsAnchorableBehaviours currently attached to this anchor.
         /// </summary>
@@ -109,11 +127,31 @@ namespace Leap.Unity.PhysicalHands
         void Start()
         {
             initUnityEvents();
+            _attachedHandChirality = GetChiralityOfAttachedHand();
         }
 
         void Update()
         {
             updateAnchorCallbacks();
+        }
+
+        /// <summary>
+        /// Gets the chirality of the hand which this object is attached to if any
+        /// </summary>
+        /// <returns>Chirality of the attached hand</returns>
+        ChiralitySelection GetChiralityOfAttachedHand()
+        {
+            AttachmentHand handObject = transform.root.GetComponentInChildren<AttachmentHand>();
+
+            if (handObject != null)
+            {
+                return (ChiralitySelection)((int)handObject.chirality);
+            }
+            else
+            {
+                return ChiralitySelection.NONE;
+            }
+            
         }
 
         void OnDisable()

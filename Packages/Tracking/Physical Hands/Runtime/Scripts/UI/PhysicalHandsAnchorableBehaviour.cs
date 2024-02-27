@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+
 namespace Leap.Unity.PhysicalHands
 {
     /// <summary>
@@ -20,7 +21,6 @@ namespace Leap.Unity.PhysicalHands
     /// pick up and place in specific locations, specified by other GameObjects with an
     /// Anchor component.
     /// </summary>
-
     public class PhysicalHandsAnchorableBehaviour : MonoBehaviour, IPhysicalHandContact, IPhysicalHandHover
     {
 
@@ -322,6 +322,8 @@ namespace Leap.Unity.PhysicalHands
         private bool _isHovered;
         private List<Leap.Hand> _hoveringHands = new List<Hand>();
 
+        private IgnorePhysicalHands _ignorePhysicalHands = null;
+
         void OnValidate()
         {
             if (_rigidbody == null)
@@ -355,6 +357,20 @@ namespace Leap.Unity.PhysicalHands
 
         void Start()
         {
+
+            if (!TryGetComponent<IgnorePhysicalHands>( out _ignorePhysicalHands))
+            {
+                _ignorePhysicalHands = this.gameObject.AddComponent<IgnorePhysicalHands>();
+            }
+
+            if(anchor != null && anchor.AttahedHandChirality != ChiralitySelection.NONE)
+            { 
+
+                _ignorePhysicalHands.HandToIgnore = anchor.AttahedHandChirality;
+            }
+
+            
+
             if (anchor != null && _isAttached)
             {
                 anchor.NotifyAttached(this);
@@ -697,6 +713,15 @@ namespace Leap.Unity.PhysicalHands
                 _preferredAnchor = preferredAnchor;
                 anchor = preferredAnchor;
                 isAttached = true;
+                if (anchor != null && anchor.AttahedHandChirality != ChiralitySelection.NONE)
+                {
+                    _ignorePhysicalHands.HandToIgnore = anchor.AttahedHandChirality;
+                }
+                else if(anchor.AttahedHandChirality != ChiralitySelection.NONE)
+                {
+                    _ignorePhysicalHands.HandToIgnore = ChiralitySelection.NONE;
+
+                }
             }
         }
 
