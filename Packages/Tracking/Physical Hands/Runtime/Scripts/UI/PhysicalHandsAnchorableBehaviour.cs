@@ -21,7 +21,7 @@ namespace Leap.Unity.PhysicalHands
     /// pick up and place in specific locations, specified by other GameObjects with an
     /// Anchor component.
     /// </summary>
-    public class PhysicalHandsAnchorableBehaviour : MonoBehaviour, IPhysicalHandContact, IPhysicalHandHover
+    public class PhysicalHandsAnchorableBehaviour : MonoBehaviour, IPhysicalHandGrab, IPhysicalHandHover
     {
 
         //[Disable]
@@ -430,12 +430,12 @@ namespace Leap.Unity.PhysicalHands
             endAnchorPreference();
         }
 
-        void IPhysicalHandContact.OnHandContact(ContactHand hand)
+        void IPhysicalHandGrab.OnHandGrab(ContactHand hand)
         {
             detachAnchorOnGraspBegin();
         }
 
-        void IPhysicalHandContact.OnHandContactExit(ContactHand hand)
+        void IPhysicalHandGrab.OnHandGrabExit(ContactHand hand)
         {
             tryToAnchorOnGraspEnd();
         }
