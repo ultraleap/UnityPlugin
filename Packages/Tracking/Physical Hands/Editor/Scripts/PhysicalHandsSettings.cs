@@ -181,6 +181,7 @@ namespace Leap.Unity.PhysicalHands
                         impactsPerformance = true
                     }
                 },
+#if UNITY_2021
                 {
                     ID_SOLVER_TYPE,
                     new RecommendedSetting()
@@ -191,6 +192,7 @@ namespace Leap.Unity.PhysicalHands
                         impactsPerformance = true
                     }
                 },
+#endif
                 {
                     ID_FIXED_TIMESTEP,
                     new RecommendedSetting()

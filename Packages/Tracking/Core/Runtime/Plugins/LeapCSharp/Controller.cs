@@ -10,6 +10,7 @@ namespace Leap
 {
     using LeapInternal;
     using System;
+    using System.Linq;
     using System.Threading;
     using UnityEngine;
 
@@ -635,6 +636,21 @@ namespace Leap
         public bool IsDeviceAvailable(Device device = null)
         {
             return _connection.IsDeviceAvailable(device);
+        }
+
+        /// <summary>
+        /// Send a specific set of hints, if this does not include previously set ones, they will be cleared.
+        /// </summary>
+        /// <param name="hints">The hints you wish to send</param>
+        /// <param name="device">An optional specific Device, otherwise the first found will be used</param>
+        public void RequestHandTrackingHints(string[] hints, Device device = null)
+        {
+            if(device == null)
+            {
+                device = Devices.ActiveDevices.FirstOrDefault();
+            }
+
+            _connection.RequestHandTrackingHintsOnDevice(device.Handle, hints);
         }
 
         /// <summary>

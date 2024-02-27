@@ -31,8 +31,7 @@ namespace Leap.Unity.PhysicalHands
         internal CapsuleCollider[] palmEdgeColliders;
         public Collider Collider { get { return IsPalm ? palmCollider : boneCollider; } }
 
-
-        internal ContactHand contactHand;
+        public ContactHand contactHand { get; internal set; }
         internal ContactParent contactParent => contactHand.contactParent;
         #endregion
 
@@ -370,7 +369,7 @@ namespace Leap.Unity.PhysicalHands
             for (int i = 0; i < oldRigidCount; i++)
             {
                 // Remove no longer contacting objects
-                if (_nearbyObjects.TryGetValue(_oldRigids[i], out Dictionary<Collider, ClosestColliderDirection> disposePoolObj)) ;
+                if (_nearbyObjects.TryGetValue(_oldRigids[i], out Dictionary<Collider, ClosestColliderDirection> disposePoolObj))
                 {
                     disposePoolObj.Clear();
                     Pool<Dictionary<Collider, ClosestColliderDirection>>.Recycle(disposePoolObj);
