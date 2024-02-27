@@ -8244,6 +8244,7 @@ GameObject:
   - component: {fileID: 54108310025223239}
   - component: {fileID: 678785161}
   - component: {fileID: 54108310025223240}
+  - component: {fileID: 54108310025223241}
   m_Layer: 0
   m_Name: Dynamic UI Object (Blue)
   m_TagString: Untagged
@@ -9413,6 +9414,7 @@ GameObject:
   - component: {fileID: 54580840728406171}
   - component: {fileID: 1640027422}
   - component: {fileID: 54580840728406172}
+  - component: {fileID: 54580840728406173}
   m_Layer: 0
   m_Name: Dynamic UI Object (Red)
   m_TagString: Untagged
@@ -18596,6 +18598,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   workstation: {fileID: 1234304108763247}
   workstationState: 0
+--- !u!114 &54108310025223241
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1284443916174701}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b3763add1152ac4aab69357a419a664, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  HandToIgnore: 2
+  _disableAllGrabbing: 1
+  _disableHandCollisions: 1
+  _disableCollisionOnChildren: 1
 --- !u!54 &54111659029676544
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -18656,6 +18674,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   workstation: {fileID: 1949619841592477}
   workstationState: 0
+--- !u!114 &54580840728406173
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1694852693125703}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b3763add1152ac4aab69357a419a664, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  HandToIgnore: 2
+  _disableAllGrabbing: 1
+  _disableHandCollisions: 1
+  _disableCollisionOnChildren: 1
 --- !u!65 &65099339268751331
 BoxCollider:
   m_ObjectHideFlags: 0
