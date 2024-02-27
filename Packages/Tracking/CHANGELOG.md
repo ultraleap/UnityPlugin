@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - LeapServiceProvider accessor for world space psoition of the Tracking Camera
 - LeapXRServiceProvider accessor for world space psoition of the Tracking Camera
 - (Physical hands) Ability to ignore collisions on single object or all children
+- (Physical Hands) Ignore Physical hands script can now choose which hand(s) it should be applied to
 
 ### Changed
 - (Config) Additional uses of Config marked as Obsolete
@@ -30,12 +31,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Access of Physical Hands extensions
 - Added public accessors to various Physical Hands utilities
 
+
+
 ### Fixed
 - Errors in Editor when using pre-2023.3.18 LTS due to FindObjectByType issue
 - (Physical Hands) Objects are sticky when they ignore collision with hard contact hands
 - (Physical Hands) Ability to toggle ignore Physical hands options from the inspector at runtime.
 - (Locomotion) IsPinching wouldn't fire when between Activate and Deactivate values in LightweightPinchDetector
 - (Physical Hands) Soft contact button difficult to press in physical hands playground scene when not using UI layer
+- (Physical Hands) Ignore Physical hands script still affecting grab and collision at runtime
 
 ## [6.14.0] - 24/01/24
 
