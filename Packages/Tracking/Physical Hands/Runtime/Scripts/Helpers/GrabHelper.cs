@@ -332,9 +332,9 @@ namespace Leap.Unity.PhysicalHands
             hand = null;
             if (_grabHelperObjects.TryGetValue(rigid, out GrabHelperObject helper))
             {
-                if(helper.currentlyGrabbingHand != null)
+                if(helper.currentGrabbingHand != null)
                 {
-                    hand = helper.currentlyGrabbingHand;
+                    hand = helper.currentGrabbingHand;
                     return true;
                 }
             }
