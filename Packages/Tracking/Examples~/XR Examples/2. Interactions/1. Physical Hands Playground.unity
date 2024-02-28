@@ -5051,7 +5051,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b3763add1152ac4aab69357a419a664, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  HandToIgnore: 0
+  HandToIgnore: 1
   _disableAllGrabbing: 0
   _disableHandCollisions: 1
   _disableCollisionOnChildren: 1
@@ -8949,6 +8949,7 @@ MonoBehaviour:
   teleportDistance: 0.1
   boneMass: 0.1
   boneStiffness: 100
+  grabbedBoneStiffness: 10
   boneDamping: 1
   useProjectPhysicsIterations: 0
   handSolverIterations: 30
