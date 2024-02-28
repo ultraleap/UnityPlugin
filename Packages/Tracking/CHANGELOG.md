@@ -37,6 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (Physical Hands) Ability to toggle ignore Physical hands options from the inspector at runtime.
 - (Locomotion) IsPinching wouldn't fire when between Activate and Deactivate values in LightweightPinchDetector
 - (Physical Hands) Soft contact button difficult to press in physical hands playground scene when not using UI layer
+- (UI Input Preview) Null UIInput events cause unnecessary error logs
 
 ## [6.14.0] - 24/01/24
 
