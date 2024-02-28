@@ -14,6 +14,9 @@ namespace Leap.Unity.PhysicalHands
 {
     public class IgnorePhysicalHands : MonoBehaviour
     {
+
+        public ChiralitySelection HandToIgnore = ChiralitySelection.BOTH;
+
         [SerializeField, Tooltip("Prevents the object from being grabbed by all Contact Hands.")]
         private bool _disableAllGrabbing = true;
 
@@ -111,7 +114,7 @@ namespace Leap.Unity.PhysicalHands
 
         internal void AddToHands(ContactHand contactHand)
         {
-            if (!contactHands.Contains(contactHand))
+            if (!contactHands.Contains(contactHand) && ((int)contactHand.Handedness == (int)HandToIgnore || HandToIgnore == ChiralitySelection.BOTH))
             {
                 contactHands.Add(contactHand);
                 SetHandCollision(contactHand);
@@ -122,7 +125,8 @@ namespace Leap.Unity.PhysicalHands
         {
             for (int i = 0; i < contactHands.Count; i++)
             {
-                if (contactHands[i] != null)
+                if (contactHands[i] != null
+                    && ((int)contactHands[i].Handedness == (int)HandToIgnore || HandToIgnore == ChiralitySelection.BOTH))
                 {
                     SetHandCollision(contactHands[i]);
                 }
