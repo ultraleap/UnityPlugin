@@ -202,7 +202,7 @@ namespace Leap.Unity.PhysicalHands
         /// <returns>true if chirality is correct or Hand to ignore is set to BOTH</returns>
         public bool IsHandIgnored(ContactHand hand)
         {
-            if (this.enabled &&
+            if (this.enabled && hand != null &&
                 ((int)HandToIgnore == (int)hand.Handedness || HandToIgnore == ChiralitySelection.BOTH))
             {
                 return true;
@@ -217,7 +217,7 @@ namespace Leap.Unity.PhysicalHands
         /// <returns>true if ignore grabbing is true and chirality is correct or Hand to ignore is set to BOTH</returns>
         public bool IsGrabbingIgnoredForHand(ContactHand hand)
         {
-            if (this.enabled && _disableAllGrabbing && IsHandIgnored(hand))
+            if (this.enabled && hand != null && _disableAllGrabbing && IsHandIgnored(hand))
             {
                 return true;
             }
@@ -231,7 +231,7 @@ namespace Leap.Unity.PhysicalHands
         /// <returns>true if ignore collisions is true and chirality is correct or Hand to ignore is set to BOTH</returns>
         public bool IsCollisionIgnoredForHand(ContactHand hand)
         {
-            if (this.enabled && _disableHandCollisions && IsHandIgnored(hand))
+            if (this.enabled && hand != null && _disableHandCollisions && IsHandIgnored(hand))
             {
                 return true;
             }
