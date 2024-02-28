@@ -18,6 +18,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - LeapXRServiceProvider accessor for world space psoition of the Tracking Camera
 - (Physical hands) Ability to ignore collisions on single object or all children
 - (Physical Hands) Ignore Physical hands script can now choose which hand(s) it should be applied to
+- LeapServiceProvider accessor for world space position of the Tracking Camera
+- LeapXRServiceProvider accessor for world space position of the Tracking Camera
+- (Physical Hands) Ability to ignore collisions on single object or all children
+- (Physical Hands) Added toggle to GrabHelper to allow kinematic object movement
 
 ### Changed
 - (Config) Additional uses of Config marked as Obsolete
@@ -40,6 +44,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (Locomotion) IsPinching wouldn't fire when between Activate and Deactivate values in LightweightPinchDetector
 - (Physical Hands) Soft contact button difficult to press in physical hands playground scene when not using UI layer
 - (Physical Hands) Ignore Physical hands script still affecting grab and collision at runtime
+- (Physical Hands) Button Prefab uses mesh from example assets
+- (Physical Hands) Button gets stuck down if disabled after pressing
+- (UI Input Preview) Null UIInput events cause unnecessary error logs
+- Memory increase when repeatedly opening scenes with LeapServiceProviders
+- ThreadAbort when changing scenes in editor that use multidevice or display the tracking device gizmo
 
 ## [6.14.0] - 24/01/24
 
