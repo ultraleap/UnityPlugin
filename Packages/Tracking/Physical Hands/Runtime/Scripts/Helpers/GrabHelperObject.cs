@@ -58,7 +58,7 @@ namespace Leap.Unity.PhysicalHands
 
         private List<ContactHand> _grabbingHandsPrevious = new List<ContactHand>();
 
-        internal ContactHand currentlyGrabbingHand;
+        internal ContactHand currentGrabbingHand;
 
         [System.Serializable]
         private class GrabValues
@@ -98,12 +98,31 @@ namespace Leap.Unity.PhysicalHands
         private Vector3 oldCenterOfMass;
         private bool oldKinematic;
 
-        internal bool _grabbingIgnored;
         private IgnorePhysicalHands _ignorePhysicalHands;
 
         private float ignoreGrabTime = 0f;
 
         private bool anyBoneGrabbable = false;
+
+        private bool IsGrabbingIgnored(ContactHand hand)
+        {
+            if (_ignorePhysicalHands != null && _ignorePhysicalHands.IsGrabbingIgnoredForHand(hand))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool IsContactIgnored(ContactHand hand)
+        {
+            if (_ignorePhysicalHands != null && _ignorePhysicalHands.IsCollisionIgnoredForHand(hand))
+            {
+                return true;
+            }
+
+            return false;
+        }
 
         /// <summary>
         /// Returns true if the provided hand is capable of grabbing an object.
@@ -155,13 +174,17 @@ namespace Leap.Unity.PhysicalHands
         internal GrabHelperObject(Rigidbody rigid, GrabHelper manager)
         {
             _rigid = rigid;
+
             // Doing this prevents objects from misaligning during rotation
             if (_rigid.maxAngularVelocity < 100f)
             {
                 _rigid.maxAngularVelocity = 100f;
             }
+
             _colliders = rigid.GetComponentsInChildren<Collider>(true);
+
             HandleIgnoreContactHelper();
+
             _grabHelperManager = manager;
 
             oldCenterOfMass = rigid.centerOfMass;
@@ -240,10 +263,11 @@ namespace Leap.Unity.PhysicalHands
                 {
                     GrabState = State.Hover;
                 }
+
                 _grabbableHands.Add(hand);
                 _grabbableHandsValues.Add(new GrabValues());
 
-                if (_ignorePhysicalHands)
+                if (_ignorePhysicalHands != null)
                 {
                     _ignorePhysicalHands.AddToHands(hand);
                 }
@@ -274,21 +298,19 @@ namespace Leap.Unity.PhysicalHands
             // Make sure the object hasn't been destroyed
             if (_rigid != null)
             {
-                if (!_grabbingIgnored)
-                {
-                    // Only ever unset the rigidbody values here otherwise outside logic will get confused
-                    if(_grabHelperManager.useNonKinematicMovementOnly)
-                        _rigid.isKinematic = oldKinematic;
+                // Only ever unset the rigidbody values here otherwise outside logic will get confused
+                if (_grabHelperManager.useNonKinematicMovementOnly)
+                    _rigid.isKinematic = oldKinematic;
 
-                    _rigid.centerOfMass = oldCenterOfMass;
-                    ThrowingOnRelease();
-                }
+                _rigid.centerOfMass = oldCenterOfMass;
+
+                ThrowingOnRelease();
             }
         }
 
         internal State UpdateHelper()
         {
-            currentlyGrabbingHand = null;
+            currentGrabbingHand = null;
 
             UpdateHands();
 
@@ -298,10 +320,7 @@ namespace Leap.Unity.PhysicalHands
                 return GrabState = State.Hover;
             }
 
-            if (!_grabbingIgnored)
-            {
-                GrabbingCheck();
-            }
+            GrabbingCheck();
 
             switch (GrabState)
             {
@@ -313,10 +332,12 @@ namespace Leap.Unity.PhysicalHands
                     break;
                 case State.Grab:
                     UpdateGrabbingValues();
+
                     if (_grabbingHands.Count > 0)
                     {
                         UpdateHandPositions();
-                        if (!_grabbingIgnored && ignoreGrabTime < Time.time)
+
+                        if (ignoreGrabTime < Time.time)
                         {
                             TrackThrowingVelocities();
                             MoveObject();
@@ -482,7 +503,7 @@ namespace Leap.Unity.PhysicalHands
                 ContactHand hand = _grabbableHands[handIndex];
                 GrabValues grabValues = _grabbableHandsValues[handIndex];
 
-                if (_grabbingHands.Contains(hand))
+                if (_grabbingHands.Contains(hand) || IsGrabbingIgnored(hand))
                 {
                     continue;
                 }
@@ -508,7 +529,7 @@ namespace Leap.Unity.PhysicalHands
                     }
                 }
 
-                if (IsHandGrabbable(hand))
+                if (!IsGrabbingIgnored(hand) && IsHandGrabbable(hand))
                 {
                     // Check for how many fingers are pinching
                     int pinchingFingers = 0;
@@ -588,17 +609,19 @@ namespace Leap.Unity.PhysicalHands
                 }
             }
 
-            // If the object we are connected to is ignoring collision with the hands, we should not do joint facing checks
-            //  this will avoid issues with these objects being too sticky
-            if (_ignorePhysicalHands != null && _ignorePhysicalHands.DisableAllHandCollisions)
-            {
-                return;
-            }
-
             for (int handIndex = 0; handIndex < _grabbableHands.Count; handIndex++)
             {
+                // If grabbing or contact is ignored for this object,
+                // we should not use per-bone checks for grabbing
+                if (IsGrabbingIgnored(_grabbableHands[handIndex]) ||
+                    IsContactIgnored(_grabbableHands[handIndex]))
+                {
+                    continue;
+                }
+
                 // This hand is already grabbing, we don't need to check again
-                if (_grabbableHandsValues[handIndex].handGrabbing || _grabbingHands.Contains(_grabbableHands[handIndex]))
+                if (_grabbableHandsValues[handIndex].handGrabbing ||
+                    _grabbingHands.Contains(_grabbableHands[handIndex]))
                 {
                     continue;
                 }
@@ -678,13 +701,13 @@ namespace Leap.Unity.PhysicalHands
             if (ignoreGrabTime > Time.time)
                 return;
 
-            if (_grabbingHands.Contains(hand))
-                return;
-
             if (hand.ghosted)
                 return;
 
-            if (_grabbingIgnored)
+            if (IsGrabbingIgnored(hand))
+                return;
+
+            if (_grabbingHands.Contains(hand))
                 return;
 
             _grabbingHands.Add(hand);
@@ -870,9 +893,10 @@ namespace Leap.Unity.PhysicalHands
 
         private void UpdateHandPositions()
         {
+            ContactHand hand = null;
+
             if (_grabbingHands.Count > 0)
             {
-                ContactHand hand = null;
                 int grabHandndex = -1;
 
                 // Find the newest grabbing hand
@@ -893,9 +917,8 @@ namespace Leap.Unity.PhysicalHands
 
                 if (hand != null)
                 {
-                    if(hand != currentlyGrabbingHand)
+                    if (hand != currentGrabbingHand)
                     {
-                        currentlyGrabbingHand = hand;
                         _rigid.centerOfMass = _grabbableHandsValues[grabHandndex].offset;
                     }
 
@@ -905,6 +928,8 @@ namespace Leap.Unity.PhysicalHands
                     _newRotation = _newRotation * _grabbableHandsValues[grabHandndex].rotationOffset; // Include the original rotation offset
                 }
             }
+
+            currentGrabbingHand = hand;
         }
 
         private void MoveObject()
@@ -1014,18 +1039,15 @@ namespace Leap.Unity.PhysicalHands
 
             if (averageVelocity.magnitude > 0.5f)
             {
-                // Check if we are safe to temporaily ignore collisions
-                if (_ignorePhysicalHands == null || !_ignorePhysicalHands.DisableAllHandCollisions)
+                // Ignore collision after throwing so we don't knock the object
+                foreach (var hand in _grabbableHands)
                 {
-                    // Ignore collision after throwing so we don't knock the object
-                    foreach (var hand in _grabbableHands)
-                    {
+                    if (!IsContactIgnored(hand)) // Ensure we don't overwrite existing ignore settings
                         hand.IgnoreCollision(_rigid, _colliders, 0.1f, 0.01f);
-                    }
-
-                    // Ignore Grabbing after throwing
-                    ignoreGrabTime = Time.time + THOWN_GRAB_COOLDOWNTIME;
                 }
+
+                // Ignore Grabbing after throwing
+                ignoreGrabTime = Time.time + THOWN_GRAB_COOLDOWNTIME;
 
                 // Set the new velocty. Allow physics to solve for rotational change
                 _rigid.velocity = averageVelocity;
