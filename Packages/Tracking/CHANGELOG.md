@@ -40,6 +40,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (Physical Hands) Button Prefab uses mesh from example assets
 - (Physical Hands) Button gets stuck down if disabled after pressing
 - (UI Input Preview) Null UIInput events cause unnecessary error logs
+- Memory increase when repeatedly opening scenes with LeapServiceProviders
+- ThreadAbort when changing scenes in editor that use multidevice or display the tracking device gizmo
 
 ## [6.14.0] - 24/01/24
 
