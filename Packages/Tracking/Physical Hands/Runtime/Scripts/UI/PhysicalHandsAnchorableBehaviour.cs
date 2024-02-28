@@ -357,16 +357,18 @@ namespace Leap.Unity.PhysicalHands
 
         void Start()
         {
-
-            if (!TryGetComponent<IgnorePhysicalHands>( out _ignorePhysicalHands))
+            if (anchor.GetChiralityOfAttachedHand() != ChiralitySelection.NONE)
             {
-                _ignorePhysicalHands = this.gameObject.AddComponent<IgnorePhysicalHands>();
-            }
+                if (!TryGetComponent<IgnorePhysicalHands>(out _ignorePhysicalHands))
+                {
+                    _ignorePhysicalHands = this.gameObject.AddComponent<IgnorePhysicalHands>();
+                }
 
-            if(anchor != null && anchor.AttahedHandChirality != ChiralitySelection.NONE)
-            { 
+                if (anchor != null && anchor.AttahedHandChirality != ChiralitySelection.NONE)
+                {
 
-                _ignorePhysicalHands.HandToIgnore = anchor.AttahedHandChirality;
+                    _ignorePhysicalHands.HandToIgnore = anchor.AttahedHandChirality;
+                }
             }
 
             

@@ -139,7 +139,7 @@ namespace Leap.Unity.PhysicalHands
         /// Gets the chirality of the hand which this object is attached to if any
         /// </summary>
         /// <returns>Chirality of the attached hand</returns>
-        ChiralitySelection GetChiralityOfAttachedHand()
+        internal ChiralitySelection GetChiralityOfAttachedHand()
         {
             AttachmentHand handObject = transform.root.GetComponentInChildren<AttachmentHand>();
 
