@@ -14,7 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Android 	v5.17.1
 
 ### Added
-- 
+- LeapServiceProvider accessor for world space position of the Tracking Camera
+- LeapXRServiceProvider accessor for world space position of the Tracking Camera
+- (Physical Hands) Ability to ignore collisions on single object or all children
+- (Physical Hands) Added toggle to GrabHelper to allow kinematic object movement
 
 ### Changed
 - (Config) Additional uses of Config marked as Obsolete
@@ -25,18 +28,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (Hand Rays) Exposed dot product used to test if the hand is facing camera
 - (Hinting) Added support for startup setting of Hand Tracking Hints via the Ultraleap Settings window
 - (Hinting) Added support for runtime changing of Hand Tracking Hints via static HandTrackingHintManager
+- Access of Physical Hands extensions
+- Added public accessors to various Physical Hands utilities
 
 ### Fixed
 - Errors in Editor when using pre-2023.3.18 LTS due to FindObjectByType issue
 - (Physical Hands) Objects are sticky when they ignore collision with hard contact hands
 - (Physical Hands) Ability to toggle ignore Physical hands options from the inspector at runtime.
 - (Locomotion) IsPinching wouldn't fire when between Activate and Deactivate values in LightweightPinchDetector
-- Memory increase when repeatedly opening Tabletop scenes
+- (Physical Hands) Soft contact button difficult to press in physical hands playground scene when not using UI layer
+- (Physical Hands) Button Prefab uses mesh from example assets
+- (Physical Hands) Button gets stuck down if disabled after pressing
+- (UI Input Preview) Null UIInput events cause unnecessary error logs
+- Memory increase when repeatedly opening scenes with LeapServiceProviders
 - ThreadAbort when changing scenes in editor that use multidevice or display the tracking device gizmo
-
-### Known issues
-- After using Ultraleap OpenXR in Unity Editor, the tracking mode of device 0 will be set to HMD until the Unity Editor session ends. This can stop the testing of non-XR scenes until the Unity Editor is re-opened
-
 
 ## [6.14.0] - 24/01/24
 

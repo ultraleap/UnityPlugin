@@ -31,8 +31,7 @@ namespace Leap.Unity.PhysicalHands
         internal CapsuleCollider[] palmEdgeColliders;
         public Collider Collider { get { return IsPalm ? palmCollider : boneCollider; } }
 
-
-        internal ContactHand contactHand;
+        public ContactHand contactHand { get; internal set; }
         internal ContactParent contactParent => contactHand.contactParent;
         #endregion
 

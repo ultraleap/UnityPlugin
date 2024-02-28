@@ -521,6 +521,16 @@ namespace Leap.Unity
             }
         }
 
+        /// <summary>
+        /// The world space position of the Tracking Camera Origin that was
+        /// last used to position the hands in world space
+        /// </summary>
+        public LeapTransform DeviceOriginWorldSpace
+        {
+            get;
+            protected set;
+        }
+
         #endregion
 
         #region Android Support
@@ -1041,6 +1051,9 @@ namespace Leap.Unity
         protected virtual void transformFrame(Frame source, Frame dest)
         {
             dest.CopyFrom(source).Transform(new LeapTransform(transform));
+
+            // Take the transform that we apply to the frame that moves it to world space, and allow it to be available externally
+            DeviceOriginWorldSpace = new LeapTransform(transform);
         }
 
         private TrackingSource CheckLeapServiceAvailable()
