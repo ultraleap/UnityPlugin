@@ -82,12 +82,15 @@ namespace LeapInternal
         public static string GetDeviceType(string _serial)
         {
             GetStatus();
-
-            for (int i = 0; i < lastDevices.Length; i++)
+            
+            if(lastDevices != null)
             {
-                if(_serial == "" || _serial == lastDevices[i].serial)
+                for (int i = 0; i < lastDevices.Length; i++)
                 {
-                    return lastDevices[i].type;
+                    if(_serial == "" || _serial == lastDevices[i].serial)
+                    {
+                        return lastDevices[i].type;
+                    }
                 }
             }
 
