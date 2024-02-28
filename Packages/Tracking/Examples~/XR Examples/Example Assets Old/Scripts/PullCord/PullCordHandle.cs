@@ -11,14 +11,16 @@ using Leap.Unity.Interaction;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using Leap.Unity.PhysicalHands;
+using System.Linq;
 
 namespace Leap.Unity.Examples
 {
     /// <summary>
     /// PullCordHandle keeps track of the handle's position and moves it according to hand attraction and pinching.
     /// </summary>
-    [RequireComponent(typeof(InteractionBehaviour))]
-    public class PullCordHandle : MonoBehaviour
+
+    public class PullCordHandle : MonoBehaviour, IPhysicalHandHover, IPhysicalHandGrab
     {
         public enum PullCordState
         {
@@ -67,6 +69,11 @@ namespace Leap.Unity.Examples
 
         private bool _wasHovered = false;
 
+        private List<Hand> _relevanthands = new List<Hand>();
+        private Hand _mostRelevantHand = null;
+        private bool _isHovered = false;
+        private bool _isGrabbed = false;
+
 
         private void OnEnable()
         {
@@ -80,16 +87,29 @@ namespace Leap.Unity.Examples
         {
             _handlePositionTarget = RestingPos;
 
-            if (_intBeh.isPrimaryHovered)
+            if ((_intBeh && _intBeh.isPrimaryHovered) || _relevanthands.Count() != 0)
             {
+                Hand hand;
+                if (_intBeh)
+                {
+                    hand = _intBeh.primaryHoveringHand;
+                }
+                else
+                {
+                    hand = _mostRelevantHand;
+                }
+                
+
                 if (!_wasHovered)
                 {
                     _wasHovered = true;
                     if (OnStateChanged != null) OnStateChanged.Invoke(PullCordState.Hovered);
                 }
-                Vector3 midpoint = Midpoint(_intBeh.primaryHoveringHand);
+                Vector3 midpoint = Vector3.zero;
+
+                midpoint = Midpoint(hand);
                 float distance = Vector3.Distance(midpoint, RestingPos);
-                UpdatePinching(_intBeh.primaryHoveringHand, distance);
+                UpdatePinching(hand, distance);
 
                 if (_isPinching || distance < _distanceToHandThreshold)
                 {
@@ -156,12 +176,68 @@ namespace Leap.Unity.Examples
 
         private void StopPinching()
         {
-            if (OnStateChanged != null) OnStateChanged.Invoke(_intBeh.isPrimaryHovered ? PullCordState.Hovered : PullCordState.Default);
+            bool hovered;
+            if (_intBeh)
+            {
+                hovered = _intBeh.isPrimaryHovered;
+            }
+            else
+            {
+                hovered = _mostRelevantHand != null;
+            }
+            if (OnStateChanged != null) OnStateChanged.Invoke(hovered ? PullCordState.Hovered : PullCordState.Default);
 
             if (OnPinchEnd != null) OnPinchEnd.Invoke();
 
             _isPinching = false;
         }
 
+        void IPhysicalHandHover.OnHandHover(ContactHand hand)
+        {
+            if(!_relevanthands.Contains(hand.GetDataHand()))
+            {
+                _relevanthands.Add(hand.GetDataHand());
+            }
+            _mostRelevantHand = GetClosestHand();
+        }
+
+        void IPhysicalHandHover.OnHandHoverExit(ContactHand hand)
+        {
+            _relevanthands.Remove(hand.GetDataHand());
+            _mostRelevantHand = GetClosestHand();
+        }
+
+        void IPhysicalHandGrab.OnHandGrab(ContactHand hand)
+        {
+            _mostRelevantHand = hand.GetDataHand();
+        }
+
+        void IPhysicalHandGrab.OnHandGrabExit(ContactHand hand)
+        {
+            _mostRelevantHand = GetClosestHand();
+        }
+
+        Hand GetClosestHand()
+        {
+            Hand closestHand = null;
+            float closestDist = float.PositiveInfinity;
+            if (_relevanthands.Count > 0)
+            {
+                foreach (var hand in _relevanthands)
+                {
+                    float distanceFromHand = Vector3.Distance(hand.PalmPosition, this.transform.position);
+                    if (closestHand == null || distanceFromHand < closestDist)
+                    {
+                        closestHand = hand;
+                        closestDist = distanceFromHand;
+                    }
+                }
+                return closestHand;
+            }
+            else
+            {
+                return null;
+            }
+        }
     }
 }
