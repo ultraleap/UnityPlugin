@@ -74,6 +74,7 @@ namespace Leap.Unity.PhysicalHands.Examples
                 {
                     _ignoreHands.DisableAllGrabbing = true;
                     _ignoreHands.DisableAllHandCollisions = true;
+                    _ignoreHands.DisableCollisionOnChildObjects = true;
                 }
             }
         }
@@ -117,6 +118,7 @@ namespace Leap.Unity.PhysicalHands.Examples
             {
                 _ignoreHands.DisableAllGrabbing = false;
                 _ignoreHands.DisableAllHandCollisions = false;
+                _ignoreHands.DisableCollisionOnChildObjects = false;
             }
         }
     }

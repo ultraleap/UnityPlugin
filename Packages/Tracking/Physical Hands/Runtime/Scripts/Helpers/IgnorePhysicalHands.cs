@@ -14,7 +14,6 @@ namespace Leap.Unity.PhysicalHands
 {
     public class IgnorePhysicalHands : MonoBehaviour
     {
-
         public ChiralitySelection HandToIgnore = ChiralitySelection.BOTH;
 
         [SerializeField, Tooltip("Prevents the object from being grabbed by all Contact Hands.")]
@@ -29,11 +28,6 @@ namespace Leap.Unity.PhysicalHands
             set
             {
                 _disableAllGrabbing = value;
-
-                if (GrabHelperObject != null)
-                {
-                    GrabHelperObject._grabbingIgnored = _disableAllGrabbing;
-                }
             }
         }
 
@@ -76,7 +70,6 @@ namespace Leap.Unity.PhysicalHands
             set
             {
                 _grabHelperObject = value;
-                _grabHelperObject._grabbingIgnored = _disableAllGrabbing;
             }
         }
 
@@ -93,7 +86,15 @@ namespace Leap.Unity.PhysicalHands
         }
 #endif
 
-        private void Start()
+        /// <summary>
+        /// Clean up code, re-enables all collision and grabbing on this object and all children
+        /// </summary>
+        void OnDisable()
+        {
+            SetAllHandCollisions(forceEnable : true);
+        }
+
+        private void OnEnable()
         {
 #if UNITY_2021_3_18_OR_NEWER
             _physicalHandsManager = (PhysicalHandsManager)FindAnyObjectByType(typeof(PhysicalHandsManager));
@@ -114,21 +115,17 @@ namespace Leap.Unity.PhysicalHands
 
         internal void AddToHands(ContactHand contactHand)
         {
-            if (!contactHands.Contains(contactHand) && ((int)contactHand.Handedness == (int)HandToIgnore || HandToIgnore == ChiralitySelection.BOTH))
-            {
-                contactHands.Add(contactHand);
-                SetHandCollision(contactHand);
-            }
+            contactHands.Add(contactHand);
+            SetHandCollision(contactHand);
         }
 
-        private void SetAllHandCollisions()
+        private void SetAllHandCollisions(bool forceEnable = false, bool forceDisable = false)
         {
             for (int i = 0; i < contactHands.Count; i++)
             {
-                if (contactHands[i] != null
-                    && ((int)contactHands[i].Handedness == (int)HandToIgnore || HandToIgnore == ChiralitySelection.BOTH))
+                if (contactHands[i] != null)
                 {
-                    SetHandCollision(contactHands[i]);
+                    SetHandCollision(contactHands[i], forceEnable, forceDisable);
                 }
                 else
                 {
@@ -138,19 +135,38 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
-        private void SetHandCollision(ContactHand contactHand)
+        private void SetHandCollision(ContactHand contactHand, bool forceEnable = false, bool forceDisable = false)
         {
+            bool shouldDisableCollisionWithHand = false;
+
+            if(forceEnable) // Force the collision to be enabled
+            {
+                shouldDisableCollisionWithHand = false;
+            }
+            else if(forceDisable) // Force the collision to be disabled
+            {
+                shouldDisableCollisionWithHand = true;
+            }
+            else if (IsHandIgnored(contactHand)) // Enable/disable based on chosen chirality
+            {
+                shouldDisableCollisionWithHand = true;
+            }
+
             if (this != null)
             {
+                bool disableOnParent = shouldDisableCollisionWithHand && _disableHandCollisions;
+                bool disableOnChild = shouldDisableCollisionWithHand && _disableCollisionOnChildren;
+
                 foreach (var objectCollider in GetComponentsInChildren<Collider>(true))
                 {
-                    if(objectCollider.gameObject == gameObject)
+                    if ((disableOnParent && objectCollider.gameObject == gameObject) || 
+                        (disableOnChild && objectCollider.gameObject != gameObject))
                     {
-                        IgnoreCollisionOnAllHandBones(contactHand, objectCollider, _disableHandCollisions);
+                        IgnoreCollisionOnAllHandBones(contactHand, objectCollider, true);
                     }
                     else
                     {
-                        IgnoreCollisionOnAllHandBones(contactHand, objectCollider, _disableCollisionOnChildren);
+                        IgnoreCollisionOnAllHandBones(contactHand, objectCollider, false);
                     }
                 }
             }
@@ -177,6 +193,49 @@ namespace Leap.Unity.PhysicalHands
             AddToHands(_physicalHandsManager.ContactParent.RightHand);
 
             SetAllHandCollisions();
+        }
+
+        /// <summary>
+        /// Checks whether this hand will be ignored via this component when considering grabbign or collisions
+        /// </summary>
+        /// <param name="hand"></param>
+        /// <returns>true if chirality is correct or Hand to ignore is set to BOTH</returns>
+        public bool IsHandIgnored(ContactHand hand)
+        {
+            if (this.enabled && hand != null &&
+                ((int)HandToIgnore == (int)hand.Handedness || HandToIgnore == ChiralitySelection.BOTH))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Checks whether grabbing is dissabled and weather its chirality match the ignored chirality
+        /// </summary>
+        /// <param name="hand"></param>
+        /// <returns>true if ignore grabbing is true and chirality is correct or Hand to ignore is set to BOTH</returns>
+        public bool IsGrabbingIgnoredForHand(ContactHand hand)
+        {
+            if (this.enabled && hand != null && _disableAllGrabbing && IsHandIgnored(hand))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Checks whether collisions are dissabled and weather its chirality match the ignored chirality
+        /// </summary>
+        /// <param name="hand"></param>
+        /// <returns>true if ignore collisions is true and chirality is correct or Hand to ignore is set to BOTH</returns>
+        public bool IsCollisionIgnoredForHand(ContactHand hand)
+        {
+            if (this.enabled && hand != null && _disableHandCollisions && IsHandIgnored(hand))
+            {
+                return true;
+            }
+            return false;
         }
     }
 }
