@@ -21,8 +21,6 @@ public class TrackingMarkerManager : MonoBehaviour
 
     private void Start()
     {
-        SetMarkerOffsets();
-
         leapToUnityTransform = new LeapTransform(Vector3.zero, Quaternion.identity, new Vector3(MM_TO_M, MM_TO_M, MM_TO_M));
         leapToUnityTransform.MirrorZ();
 
@@ -31,7 +29,7 @@ public class TrackingMarkerManager : MonoBehaviour
             leapServiceProvider = FindObjectOfType<LeapServiceProvider>();
         }
 
-        if(leapServiceProvider != null)
+        if (leapServiceProvider != null)
         {
             leapServiceProvider.GetLeapController().FiducialPose -= OnFiducialMarkerPose;
             leapServiceProvider.GetLeapController().FiducialPose += OnFiducialMarkerPose;
@@ -39,18 +37,6 @@ public class TrackingMarkerManager : MonoBehaviour
         else
         {
             Debug.Log("Unable to begin Fiducial Marker tracking. Cannot connect to a Leap Service Provider.");
-        }
-    }
-
-    /// <summary>
-    /// Set the offset values for each marker to be re-applied when positioning the parent objects relative to the tracked markers at runtime
-    /// </summary>
-    void SetMarkerOffsets()
-    {
-        foreach (var marker in markers)
-        {
-            marker.poitionOffset = marker.transform.position - trackedObject.position;
-            marker.rotationOffset = Quaternion.Inverse(trackedObject.rotation) * marker.transform.rotation;
         }
     }
 
@@ -98,10 +84,15 @@ public class TrackingMarkerManager : MonoBehaviour
         unityRotation = leapToUnityTransform.TransformQuaternion(unityRotation);
         markerRot = trackerPosWorldSpace.TransformQuaternion(unityRotation);
 
+
+
+        Vector3 posOffset = trackedObject.position - markerObject.transform.position;
+        Quaternion rotOffset = Quaternion.Inverse(trackedObject.rotation) * markerObject.transform.rotation;
+
         //////////
         // Place trackedObjectParent relative to the tracked marker position
         // Apply the target position and rotation to the parent object
-        trackedObject.position = markerPos - markerRot * markerObject.poitionOffset;
-        trackedObject.rotation = markerRot * Quaternion.Inverse(markerObject.rotationOffset);
+        trackedObject.position = markerPos + posOffset;
+        trackedObject.rotation = markerRot * Quaternion.Inverse(rotOffset);
     }
 }
