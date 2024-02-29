@@ -37,6 +37,7 @@ namespace Leap.Unity.PhysicalHands
         {
             Collider.material = ((HardContactParent)contactHand.contactParent).PhysicsMaterial;
             articulation = gameObject.AddComponent<ArticulationBody>();
+
             if (isPalm)
             {
                 SetupPalmArticulation();
@@ -44,25 +45,17 @@ namespace Leap.Unity.PhysicalHands
             else
             {
                 SetupBoneArticulation();
-                if (joint == 0)
-                {
-                    SetupKnuckleDrives();
-                }
-                else
-                {
-                    SetupBoneDrives();
-                }
             }
+
+            UpdateIterations();
         }
 
         private void SetupPalmArticulation()
         {
-            articulation.immovable = false;
+            articulation.immovable = true;
             articulation.matchAnchors = false;
 
             articulation.mass = hardContactParent.boneMass * 3f;
-
-            UpdateIterations();
 
             articulation.angularDamping = 50f;
             articulation.linearDamping = 0f;
@@ -79,14 +72,21 @@ namespace Leap.Unity.PhysicalHands
 
             articulation.mass = hardContactParent.boneMass;
 
-            UpdateIterations();
-
             articulation.maxAngularVelocity = 1.75f;
             articulation.maxDepenetrationVelocity = 3f;
             articulation.useGravity = false;
             articulation.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
             articulation.maxDepenetrationVelocity = 0.001f;
             articulation.linearDamping = 0f;
+
+            if (joint == 0)
+            {
+                SetupKnuckleDrives();
+            }
+            else
+            {
+                SetupBoneDrives();
+            }
         }
 
         private void SetupKnuckleDrives()
@@ -279,7 +279,7 @@ namespace Leap.Unity.PhysicalHands
                 xDrive.stiffness = hardContactHand.fingerStiffness[finger];
                 xDrive.damping = _xDampening;
                 xDrive.forceLimit = _xForceLimit * Time.fixedDeltaTime;
-                xDrive.upperLimit = hardContactHand.grabbingFingers[finger] >= joint ? _grabbingXDrive : _originalXDriveUpper;
+                xDrive.upperLimit = _wasBoneGrabbing ? _grabbingXDrive : _originalXDriveUpper;
                 xDrive.target = _wasBoneGrabbing ? Mathf.Clamp(_xTargetAngle, articulation.xDrive.lowerLimit, _grabbingXDrive) : _xTargetAngle;
                 articulation.xDrive = xDrive;
 
@@ -288,8 +288,8 @@ namespace Leap.Unity.PhysicalHands
                     _yTargetAngle = CalculateYJointAngle(prevBone.Rotation, bone.Rotation);
 
                     ArticulationDrive yDrive = articulation.yDrive;
-                    yDrive.damping = _xDampening * .75f;
                     yDrive.stiffness = hardContactHand.fingerStiffness[finger];
+                    yDrive.damping = _xDampening;
                     yDrive.forceLimit = hardContactParent.maxPalmVelocity * Time.fixedDeltaTime;
                     yDrive.target = _yTargetAngle;
                     articulation.yDrive = yDrive;
@@ -316,8 +316,8 @@ namespace Leap.Unity.PhysicalHands
                 _yTargetAngle = CalculateYJointAngle(prevBone.Rotation, bone.Rotation);
 
                 ArticulationDrive yDrive = articulation.yDrive;
-                yDrive.damping = hardContactParent.boneDamping * .75f;
                 yDrive.stiffness = hardContactParent.boneStiffness;
+                yDrive.damping = hardContactParent.boneDamping;
                 yDrive.forceLimit = hardContactParent.maxPalmVelocity * Time.fixedDeltaTime;
                 yDrive.target = _yTargetAngle;
                 articulation.yDrive = yDrive;
@@ -411,7 +411,7 @@ namespace Leap.Unity.PhysicalHands
                     _grabbingXDrive = _originalXDriveUpper;
                     _wasBoneGrabbing = true;
                     _grabbingFrames = 3;
-                    hardContactHand.fingerStiffness[finger] = 10f;
+                    hardContactHand.fingerStiffness[finger] = hardContactParent.grabbedBoneStiffness;
                     _xDampening = 10f;
                 }
             }
@@ -424,7 +424,7 @@ namespace Leap.Unity.PhysicalHands
                         _grabbingXDrive = _originalXDriveUpper;
                         _wasBoneGrabbing = true;
                         _grabbingFrames = 3;
-                        hardContactHand.fingerStiffness[finger] = 10f;
+                        hardContactHand.fingerStiffness[finger] = hardContactParent.grabbedBoneStiffness;
                         _xDampening = 10f;
                     }
                     hardContactHand.grabbingFingers[finger] = joint;

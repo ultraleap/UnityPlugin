@@ -87,8 +87,7 @@ namespace Leap.Unity
             Automatic,
             LeapMotionController2,
         }
-        [Tooltip("Displays a representation of the traking device")]
-        [SerializeField]
+        [Space, Tooltip("Displays a representation of the traking device"), SerializeField]
         protected InteractionVolumeVisualization _interactionVolumeVisualization = InteractionVolumeVisualization.Automatic;
 
         /// <summary>
@@ -96,14 +95,11 @@ namespace Leap.Unity
         /// </summary>
         public InteractionVolumeVisualization SelectedInteractionVolumeVisualization => _interactionVolumeVisualization;
 
-        [Tooltip("Displays a visualization of the Field Of View of the chosen device as a Gizmo")]
-        [SerializeField]
+        [Tooltip("Displays a visualization of the Field Of View of the chosen device as a Gizmo"), SerializeField]
         protected bool FOV_Visualization = false;
-        [Tooltip("Displays the optimal FOV for tracking")]
-        [SerializeField]
+        [Tooltip("Displays the optimal FOV for tracking"), SerializeField]
         protected bool OptimalFOV_Visualization = true;
-        [Tooltip("Displays the maximum FOV for tracking")]
-        [SerializeField]
+        [Tooltip("Displays the maximum FOV for tracking"), SerializeField]
         protected bool MaxFOV_Visualization = true;
 
         [SerializeField, HideInInspector]
@@ -140,7 +136,7 @@ namespace Leap.Unity
             + "ReuseUpdateForPhysics - Android users should choose Reuse Update for Physics.\n"
             + "ReusePhysicsForUpdate - Provides the option to reinterpolate the hand data for the physics timestep, improving the movement of objects being "
             + "manipulated by hands when using the interaction engine. Enabling this incurs a small time penalty (fraction of a ms).")]
-        [SerializeField]
+        [SerializeField, Space]
         protected FrameOptimizationMode _frameOptimization = FrameOptimizationMode.None;
 
         /// <summary>
@@ -182,7 +178,7 @@ namespace Leap.Unity
         [Tooltip("When set to 'Default', provider will receive data from the first connected device. \n" +
             "When set to `Specific`, provider will receive data from the device specified by 'Specific Serial Number'.")]
         [EditTimeOnly]
-        [SerializeField]
+        [SerializeField, Space]
         protected MultipleDeviceMode _multipleDeviceMode = MultipleDeviceMode.Disabled;
 
         public MultipleDeviceMode CurrentMultipleDeviceMode
@@ -192,7 +188,7 @@ namespace Leap.Unity
 
         [Tooltip("When Multiple Device Mode is set to `Specific`, the provider will " +
           "receive data from only the devices that contain this in their serial number.")]
-        [SerializeField]
+        [Space, SerializeField]
         protected string _specificSerialNumber = "";
 
         /// <summary>
@@ -1148,59 +1144,24 @@ namespace Leap.Unity
 
         private void DetectConnectedDevice(Transform targetTransform)
         {
-            if (GetLeapController() != null && GetLeapController().Devices?.Count >= 1)
+            string deviceName = "";
+
+            if (_multipleDeviceMode == MultipleDeviceMode.Disabled)
             {
-                Device currentDevice = _currentDevice;
-                if (currentDevice == null || (_multipleDeviceMode == LeapServiceProvider.MultipleDeviceMode.Specific && currentDevice.SerialNumber != _specificSerialNumber))
-                {
-                    foreach (Device d in GetLeapController().Devices)
-                    {
-                        if (d.SerialNumber.Contains(_specificSerialNumber))
-                        {
-                            currentDevice = d;
-                            break;
-                        }
-                    }
-                }
-
-                if (currentDevice == null && _multipleDeviceMode == MultipleDeviceMode.Disabled)
-                {
-                    currentDevice = GetLeapController().Devices[0];
-                }
-
-                if (currentDevice == null || (_multipleDeviceMode == LeapServiceProvider.MultipleDeviceMode.Specific && currentDevice.SerialNumber != _specificSerialNumber))
-                {
-                    return;
-                }
-
-                Device.DeviceType deviceType = currentDevice.Type;
-                if (deviceType == Device.DeviceType.TYPE_RIGEL || deviceType == Device.DeviceType.TYPE_SIR170)
-                {
-                    DrawTrackingDevice(targetTransform, "Stereo IR 170");
-                    return;
-                }
-                else if (deviceType == Device.DeviceType.TYPE_3DI)
-                {
-                    DrawTrackingDevice(targetTransform, "3Di");
-                    return;
-                }
-                else if (deviceType == Device.DeviceType.TYPE_PERIPHERAL)
-                {
-                    DrawTrackingDevice(targetTransform, "Leap Motion Controller");
-                    return;
-                }
-                else if (deviceType == Device.DeviceType.TYPE_LMC2)
-                {
-                    DrawTrackingDevice(targetTransform, "Leap Motion Controller 2");
-                }
+                deviceName = LeapInternal.ServerStatus.GetDeviceType("");
+            }
+            else
+            {
+                deviceName = LeapInternal.ServerStatus.GetDeviceType(_specificSerialNumber);
             }
 
-            // if no devices connected, no serial number selected or the connected device type isn't matching one of the above,
-            // delete any device model that is currently displayed
-            if (targetTransform.Find("DeviceModel") != null)
+            // adjust to readable name
+            if (deviceName == "SIR170")
             {
-                GameObject.DestroyImmediate(targetTransform.Find("DeviceModel").gameObject);
+                deviceName = "Stereo IR 170";
             }
+
+            DrawTrackingDevice(targetTransform, deviceName);
         }
 
 
