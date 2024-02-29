@@ -793,13 +793,26 @@ namespace Leap.Unity
         public void ChangeTrackingMode(TrackingOptimizationMode trackingMode)
         {
             _trackingOptimization = trackingMode;
-            StartCoroutine(ChangeTrackingMode_Coroutine(trackingMode));
+
+            if (_leapController != null && _leapController.IsConnected)
+            {
+                SetTrackingMode(trackingMode);
+            }
+            else
+            {
+                StartCoroutine(ChangeTrackingMode_Coroutine(trackingMode));
+            }
         }
 
         private IEnumerator ChangeTrackingMode_Coroutine(TrackingOptimizationMode trackingMode)
         {
             yield return new WaitWhile(() => _leapController == null || !_leapController.IsConnected);
 
+            SetTrackingMode(trackingMode);
+        }
+
+        private void SetTrackingMode(TrackingOptimizationMode trackingMode)
+        {
             Device deviceToChange = _multipleDeviceMode == MultipleDeviceMode.Disabled ? null : _currentDevice;
 
             switch (trackingMode)
@@ -876,7 +889,6 @@ namespace Leap.Unity
         protected virtual void initializeFlags()
         {
             if (_preventInitializingTrackingMode) return;
-
             ChangeTrackingMode(_trackingOptimization);
         }
 
