@@ -19,16 +19,22 @@ public class TrackingMarkerManager : MonoBehaviour
     LeapTransform leapToUnityTransform;
     LeapTransform trackerPosWorldSpace;
 
+    Vector3 targetPos;
+    Quaternion targetRot;
+
     private void Start()
     {
+        // Produce a reusable LeapTransform to convert from Leap coordinate space and units to Unity
         leapToUnityTransform = new LeapTransform(Vector3.zero, Quaternion.identity, new Vector3(MM_TO_M, MM_TO_M, MM_TO_M));
         leapToUnityTransform.MirrorZ();
 
+        // Ensure the LeapServiceProvider exists for us to position the device in world space
         if (leapServiceProvider == null)
         {
             leapServiceProvider = FindObjectOfType<LeapServiceProvider>();
         }
 
+        // Listen to events for the new marker poses
         if (leapServiceProvider != null)
         {
             leapServiceProvider.GetLeapController().FiducialPose -= OnFiducialMarkerPose;
@@ -38,10 +44,20 @@ public class TrackingMarkerManager : MonoBehaviour
         {
             Debug.Log("Unable to begin Fiducial Marker tracking. Cannot connect to a Leap Service Provider.");
         }
+
+        targetPos = trackedObject.position;
+        targetRot = trackedObject.rotation;
     }
 
     private void OnFiducialMarkerPose(object sender, FiducialPoseEventArgs poseEvent)
     {
+        // We cannot place the marker properly while the ServiceProvider does not exist
+        if (leapServiceProvider == null || leapServiceProvider.enabled == false)
+        {
+            return;
+        }
+
+        // Find a matching TrackingMarker to the one from the event by matching ids
         TrackingMarker markerObject = null;
 
         for(int i = 0; i < markers.Length; i++)
@@ -55,44 +71,53 @@ public class TrackingMarkerManager : MonoBehaviour
 
         if(markerObject == null)
         {
-            // We don't have this marker as a child
+            // We don't have this marker
             return;
         }
 
-        Vector3 markerPos;
-        Quaternion markerRot;
-
-        // Get the device position in world space as a LeapTransform
+        // Get the device position in world space as a LeapTransform to use in future calculations
         trackerPosWorldSpace = leapServiceProvider.DeviceOriginWorldSpace;
-
-        //
-
-        // Access the translation and rotation of the marker in Leap coordinates
-        Vector3 unityTranslation = poseEvent.translation.ToVector3();
-
-        // Apply the leapToUnityTransform Transform and then apply the trackerPosWorldSpace Transform
-        unityTranslation = leapToUnityTransform.TransformPoint(unityTranslation);
-        markerPos = trackerPosWorldSpace.TransformPoint(unityTranslation);
-
-        //
 
         // Convert the LeapMatrix3x3 into something we can access the rotation from
         Matrix4x4 rotationMatrix = poseEvent.rotation.ToUnityRotationMatrix();
-        Quaternion unityRotation = rotationMatrix.rotation;
 
-        // Apply the leapToUnityTransform Transform and then apply the trackerPosWorldSpace Transform
-        unityRotation = leapToUnityTransform.TransformQuaternion(unityRotation);
-        markerRot = trackerPosWorldSpace.TransformQuaternion(unityRotation);
+        // Convert the Leap Pose to worldspace Unity units
+        Vector3 markerPos = GetMarkerWorldSpacePosition(poseEvent.translation.ToVector3());
+        Quaternion markerRot = GetMarkerWorldSpaceRotation(rotationMatrix.rotation);
 
-
-
+        // Find the offset from the marker to the tracked object, to apply the inverse to the tracked transform
         Vector3 posOffset = trackedObject.position - markerObject.transform.position;
         Quaternion rotOffset = Quaternion.Inverse(trackedObject.rotation) * markerObject.transform.rotation;
 
-        //////////
-        // Place trackedObjectParent relative to the tracked marker position
-        // Apply the target position and rotation to the parent object
-        trackedObject.position = markerPos + posOffset;
-        trackedObject.rotation = markerRot * Quaternion.Inverse(rotOffset);
+        targetPos = markerPos + posOffset;
+        targetRot = markerRot * Quaternion.Inverse(rotOffset);
     }
+
+    private void Update()
+    {
+        trackedObject.position = targetPos;
+        trackedObject.rotation = targetRot;
+    }
+
+    #region Utilities
+
+    Vector3 GetMarkerWorldSpacePosition(Vector3 trackedMarkerPosition)
+    {
+        // Apply the leapToUnityTransform Transform and then apply the trackerPosWorldSpace Transform
+        trackedMarkerPosition = leapToUnityTransform.TransformPoint(trackedMarkerPosition);
+        trackedMarkerPosition = trackerPosWorldSpace.TransformPoint(trackedMarkerPosition);
+
+        return trackedMarkerPosition;
+    }
+
+    Quaternion GetMarkerWorldSpaceRotation(Quaternion trackedMarkerRotation)
+    {
+        // Apply the leapToUnityTransform Transform and then apply the trackerPosWorldSpace Transform
+        trackedMarkerRotation = leapToUnityTransform.TransformQuaternion(trackedMarkerRotation);
+        trackedMarkerRotation = trackerPosWorldSpace.TransformQuaternion(trackedMarkerRotation);
+
+        return trackedMarkerRotation;
+    }
+
+    #endregion
 }
