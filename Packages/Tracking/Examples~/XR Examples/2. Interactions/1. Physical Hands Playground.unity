@@ -1129,6 +1129,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b3763add1152ac4aab69357a419a664, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  HandToIgnore: 2
   _disableAllGrabbing: 1
   _disableHandCollisions: 1
   _disableCollisionOnChildren: 1
@@ -1582,6 +1583,18 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1520545033}
     m_Modifications:
+    - target: {fileID: 1767427943, guid: b19d51e6a7ac86045884866247967cc6, type: 3}
+      propertyPath: _disableAllGrabbing
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1767427943, guid: b19d51e6a7ac86045884866247967cc6, type: 3}
+      propertyPath: _disableHandCollisions
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1767427943, guid: b19d51e6a7ac86045884866247967cc6, type: 3}
+      propertyPath: _disableCollisionOnChildren
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1425814782421875397, guid: b19d51e6a7ac86045884866247967cc6, type: 3}
       propertyPath: m_Name
       value: Rocket
@@ -3720,6 +3733,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1520545033}
     m_Modifications:
+    - target: {fileID: 887009821, guid: bc0e964e8fdef39419504d5dfb897ada, type: 3}
+      propertyPath: _disableHandCollisions
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 887009821, guid: bc0e964e8fdef39419504d5dfb897ada, type: 3}
+      propertyPath: _disableCollisionOnChildren
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2498387265858749825, guid: bc0e964e8fdef39419504d5dfb897ada, type: 3}
       propertyPath: m_RootOrder
       value: 12
@@ -4022,6 +4043,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b3763add1152ac4aab69357a419a664, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  HandToIgnore: 2
   _disableAllGrabbing: 1
   _disableHandCollisions: 1
   _disableCollisionOnChildren: 1
@@ -4276,6 +4298,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b3763add1152ac4aab69357a419a664, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  HandToIgnore: 2
   _disableAllGrabbing: 1
   _disableHandCollisions: 1
   _disableCollisionOnChildren: 1
@@ -4442,6 +4465,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b3763add1152ac4aab69357a419a664, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  HandToIgnore: 2
   _disableAllGrabbing: 1
   _disableHandCollisions: 1
   _disableCollisionOnChildren: 1
@@ -5027,7 +5051,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b3763add1152ac4aab69357a419a664, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _disableAllGrabbing: 1
+  HandToIgnore: 2
+  _disableAllGrabbing: 0
   _disableHandCollisions: 1
   _disableCollisionOnChildren: 1
 --- !u!114 &1147510548
@@ -5259,6 +5284,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b3763add1152ac4aab69357a419a664, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  HandToIgnore: 2
   _disableAllGrabbing: 1
   _disableHandCollisions: 1
   _disableCollisionOnChildren: 1
@@ -5436,6 +5462,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b3763add1152ac4aab69357a419a664, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  HandToIgnore: 2
   _disableAllGrabbing: 1
   _disableHandCollisions: 1
   _disableCollisionOnChildren: 1
@@ -6583,9 +6610,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b3763add1152ac4aab69357a419a664, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  HandToIgnore: 2
   _disableAllGrabbing: 1
-  _disableHandCollisions: 1
-  _disableCollisionOnChildren: 1
+  _disableHandCollisions: 0
+  _disableCollisionOnChildren: 0
 --- !u!114 &1495116601
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6834,6 +6862,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b3763add1152ac4aab69357a419a664, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  HandToIgnore: 2
   _disableAllGrabbing: 1
   _disableHandCollisions: 1
   _disableCollisionOnChildren: 1
@@ -8612,6 +8641,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b3763add1152ac4aab69357a419a664, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  HandToIgnore: 2
   _disableAllGrabbing: 1
   _disableHandCollisions: 1
   _disableCollisionOnChildren: 1
@@ -8919,6 +8949,7 @@ MonoBehaviour:
   teleportDistance: 0.1
   boneMass: 0.1
   boneStiffness: 100
+  grabbedBoneStiffness: 10
   boneDamping: 1
   useProjectPhysicsIterations: 0
   handSolverIterations: 30
@@ -9218,6 +9249,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b3763add1152ac4aab69357a419a664, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  HandToIgnore: 2
   _disableAllGrabbing: 1
   _disableHandCollisions: 1
   _disableCollisionOnChildren: 1
@@ -9902,6 +9934,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b3763add1152ac4aab69357a419a664, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  HandToIgnore: 2
   _disableAllGrabbing: 1
   _disableHandCollisions: 0
   _disableCollisionOnChildren: 0
@@ -9917,6 +9950,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b3763add1152ac4aab69357a419a664, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  HandToIgnore: 2
   _disableAllGrabbing: 1
   _disableHandCollisions: 0
   _disableCollisionOnChildren: 0
@@ -9964,6 +9998,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b3763add1152ac4aab69357a419a664, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  HandToIgnore: 2
   _disableAllGrabbing: 1
   _disableHandCollisions: 0
   _disableCollisionOnChildren: 0
@@ -9994,9 +10029,29 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 322199079}
     m_Modifications:
+    - target: {fileID: 439590551, guid: 8478052d128657b4ba91bd03e188bb9a, type: 3}
+      propertyPath: _disableHandCollisions
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 439590551, guid: 8478052d128657b4ba91bd03e188bb9a, type: 3}
+      propertyPath: _disableCollisionOnChildren
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2871490848069798368, guid: 8478052d128657b4ba91bd03e188bb9a, type: 3}
       propertyPath: m_Name
       value: CupboardUnit
+      objectReference: {fileID: 0}
+    - target: {fileID: 5615807542952421759, guid: 8478052d128657b4ba91bd03e188bb9a, type: 3}
+      propertyPath: _disableAllGrabbing
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5615807542952421759, guid: 8478052d128657b4ba91bd03e188bb9a, type: 3}
+      propertyPath: _disableHandCollisions
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5615807542952421759, guid: 8478052d128657b4ba91bd03e188bb9a, type: 3}
+      propertyPath: _disableCollisionOnChildren
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6444574959999277787, guid: 8478052d128657b4ba91bd03e188bb9a, type: 3}
       propertyPath: m_RootOrder
