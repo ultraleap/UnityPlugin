@@ -1185,7 +1185,6 @@ namespace Leap.Unity
             }
             else
             {
-                Debug.LogError("Tried to load invalid device type: " + deviceType);
                 return;
             }
 
