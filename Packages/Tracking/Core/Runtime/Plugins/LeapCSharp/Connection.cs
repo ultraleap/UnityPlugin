@@ -213,7 +213,18 @@ namespace LeapInternal
                     return;
                 }
             }
+
+            //
+            var str = MetadataUtil.GetMetaData();
+            UIntPtr uIntPtr = new UIntPtr((uint)str.Length);
+
+            if (str != null && str != "")
+            {
+                LeapC.SetConnectionMetadata(_leapConnection, str, uIntPtr);
+            }
+
             result = LeapC.OpenConnection(_leapConnection);
+
             if (result != eLeapRS.eLeapRS_Success)
             {
                 reportAbnormalResults("LeapC OpenConnection call was ", result);
