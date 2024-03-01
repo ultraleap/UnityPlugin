@@ -6,10 +6,11 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
+using Leap.Unity.Interaction;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Leap.Unity.PhysicalHands
+namespace Leap.InteractionEngine.Examples
 {
 
     /// <summary>
@@ -18,10 +19,8 @@ namespace Leap.Unity.PhysicalHands
     /// The panel is closed when the object is moved at or over a given speed.
     /// The anchorable object is set to kinematic when in workstation mode.
     /// </summary>
-    //[RequireComponent(typeof(InteractionBehaviour))]
-    [RequireComponent(typeof(PhysicalHandsAnchorableBehaviour))]
-    [RequireComponent(typeof(Rigidbody))]
-    public class PhysicalHandsWorkstationBehaviourExample : MonoBehaviour, IPhysicalHandGrab
+    [RequireComponent(typeof(AnchorableBehaviour))]
+    public class WorkstationBehaviourExample : MonoBehaviour
     {
 
         /// <summary>
@@ -35,17 +34,14 @@ namespace Leap.Unity.PhysicalHands
         /// </summary>
         public GameObject workstation;
 
-        //private InteractionBehaviour _intObj;
-        private PhysicalHandsAnchorableBehaviour _anchObj;
+        private InteractionBehaviour _intObj;
+        private AnchorableBehaviour _anchObj;
 
         private bool _wasKinematicBeforeActivation = false;
 
 
         public enum WorkstationState { Closed, Open }
         public WorkstationState workstationState;
-
-        private bool _grabbed;
-        private Rigidbody _rigidbody;
 
 
         void OnValidate()
@@ -55,27 +51,27 @@ namespace Leap.Unity.PhysicalHands
 
         void Start()
         {
-
-            _rigidbody = GetComponent<Rigidbody>();
             refreshRequiredComponents();
 
             if (!_anchObj.tryAnchorNearestOnGraspEnd)
             {
-                Debug.LogWarning("WorkstationBehaviour expects its PhysicalHandsAnchorableBehaviour's tryAnchorNearestOnGraspEnd property to be enabled.", this.gameObject);
+                Debug.LogWarning("WorkstationBehaviour expects its AnchorableBehaviour's tryAnchorNearestOnGraspEnd property to be enabled.", this.gameObject);
             }
         }
 
         void OnDestroy()
         {
+            _intObj.OnGraspedMovement -= onGraspedMovement;
 
+            _anchObj.OnPostTryAnchorOnGraspEnd -= onPostObjectGraspEnd;
         }
 
         public void ActivateWorkstation()
         {
             if (workstationState != WorkstationState.Open)
             {
-                _wasKinematicBeforeActivation = _rigidbody.isKinematic;
-                _rigidbody.isKinematic = true;
+                _wasKinematicBeforeActivation = _intObj.rigidbody.isKinematic;
+                _intObj.rigidbody.isKinematic = true;
             }
 
             workstation.SetActive(true);
@@ -84,7 +80,7 @@ namespace Leap.Unity.PhysicalHands
 
         public void DeactivateWorkstation()
         {
-            _rigidbody.isKinematic = _wasKinematicBeforeActivation;
+            _intObj.rigidbody.isKinematic = _wasKinematicBeforeActivation;
 
             workstation.SetActive(false);
             workstationState = WorkstationState.Closed;
@@ -92,25 +88,24 @@ namespace Leap.Unity.PhysicalHands
 
         private void refreshRequiredComponents()
         {
-            _anchObj = GetComponent<PhysicalHandsAnchorableBehaviour>();
+            _intObj = GetComponent<InteractionBehaviour>();
+            _anchObj = GetComponent<AnchorableBehaviour>();
+
+            _intObj.OnGraspedMovement -= onGraspedMovement;
+            _intObj.OnGraspedMovement += onGraspedMovement;
 
             _anchObj.OnPostTryAnchorOnGraspEnd -= onPostObjectGraspEnd;
             _anchObj.OnPostTryAnchorOnGraspEnd += onPostObjectGraspEnd;
         }
 
-        private void FixedUpdate()
-        {
-            if (_grabbed)
-            {
-                onGraspedMovement();
-            }
-        }
-
-        private void onGraspedMovement()
+        private void onGraspedMovement(Vector3 preSolvePos, Quaternion preSolveRot,
+                                       Vector3 curPos, Quaternion curRot,
+                                       List<InteractionController> controllers)
         {
             // If the velocity of the object while grasped is too large, exit workstation mode.
             if (workstationState == WorkstationState.Open
-                && (_rigidbody.velocity.magnitude > MAX_SPEED_AS_WORKSTATION))
+                && (_intObj.rigidbody.velocity.magnitude > MAX_SPEED_AS_WORKSTATION
+                || (_intObj.rigidbody.isKinematic && ((preSolvePos - curPos).magnitude / Time.fixedDeltaTime) > MAX_SPEED_AS_WORKSTATION)))
             {
                 DeactivateWorkstation();
             }
@@ -122,7 +117,7 @@ namespace Leap.Unity.PhysicalHands
             {
                 // Choose a good position and rotation for workstation mode
 
-                Vector3 targetPosition = _rigidbody.position;
+                Vector3 targetPosition = _intObj.rigidbody.position;
 
                 Quaternion targetRotation = determineWorkstationRotation(targetPosition);
 
@@ -147,16 +142,6 @@ namespace Leap.Unity.PhysicalHands
             return placementRotation;
         }
 
-        void IPhysicalHandGrab.OnHandGrab(ContactHand hand)
-        {
-            _grabbed = true;
-        }
-
-        void IPhysicalHandGrab.OnHandGrabExit(ContactHand hand)
-        {
-            _grabbed = false;
-            onPostObjectGraspEnd();
-        }
     }
 
 }
