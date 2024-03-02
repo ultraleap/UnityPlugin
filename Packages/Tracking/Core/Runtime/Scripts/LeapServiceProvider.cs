@@ -265,10 +265,33 @@ namespace Leap.Unity
         [SerializeField]
         protected bool _preventInitializingTrackingMode;
 
+        /// <summary>
+        /// The type of input to use for connection to the service
+        /// </summary>
+        public enum ServiceConnectionInput
+        {
+            NAME,
+            IP_PORT
+        }
+        [Tooltip("Which input to use for the service connection")]
+        [SerializeField]
+        [EditTimeOnly]
+        protected ServiceConnectionInput _serviceConnectionInput = ServiceConnectionInput.NAME;
+
         [Tooltip("Which Leap Service API Endpoint to connect to.  This is configured on the service with the 'api_namespace' argument.")]
         [SerializeField]
         [EditTimeOnly]
         protected string _serverNameSpace = "Leap Service";
+
+        [Tooltip("The IP address on which the Tracking service listens to. This is configured on the service with 'ip_address' in the 'leap_server_config' session of 'ServerConfig.json'")]
+        [SerializeField]
+        [EditTimeOnly]
+        protected string _serviceIP = "127.0.0.1";
+
+        [Tooltip("The port on which the Tracking service listens to. This is configured on the service with 'port' in the 'leap_server_config' session of 'ServerConfig.json'")]
+        [SerializeField]
+        [EditTimeOnly]
+        protected string _servicePort = "12345";
 
         public override TrackingSource TrackingDataSource { get { return CheckLeapServiceAvailable(); } }
 
@@ -846,6 +869,20 @@ namespace Leap.Unity
             throw new Exception("Unknown tracking optimization mode");
         }
 
+        /// <summary>
+        /// Set the _serviceConnectionInput mode to IP_PORT, set the target IP and port of the service to the parameters and connect to the new service address
+        /// </summary>
+        public void SetTargetServiceIPPortToConnectTo(string IP, string port)
+        {
+            _serviceConnectionInput = ServiceConnectionInput.IP_PORT;
+
+            _serviceIP = IP;
+            _servicePort = port;
+
+            destroyController();
+            createController();
+        }
+
         #endregion
 
         #region Internal Methods
@@ -888,6 +925,11 @@ namespace Leap.Unity
             }
 
             string serialNumber = _multipleDeviceMode != MultipleDeviceMode.Disabled ? SpecificSerialNumber : "";
+
+            if(_serviceConnectionInput == ServiceConnectionInput.IP_PORT)
+            {
+                _serverNameSpace = $"{{\"tracking_server_ip\": \"{_serviceIP}\", \"tracking_server_port\": {_servicePort}}}";
+            }
 
             _leapController = new Controller(serialNumber.GetHashCode(), _serverNameSpace, _multipleDeviceMode != MultipleDeviceMode.Disabled);
 
@@ -1070,6 +1112,10 @@ namespace Leap.Unity
                 return _trackingSource;
             }
 #endif
+            if (_serviceConnectionInput == ServiceConnectionInput.IP_PORT)
+            {
+                _serverNameSpace = $"{{\"tracking_server_ip\": \"{_serviceIP}\", \"tracking_server_port\": {_servicePort}}}";
+            }
 
             if (LeapInternal.Connection.IsConnectionAvailable(_serverNameSpace))
             {

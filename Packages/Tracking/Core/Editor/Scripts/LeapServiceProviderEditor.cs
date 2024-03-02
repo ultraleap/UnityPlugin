@@ -67,7 +67,10 @@ namespace Leap.Unity
 
             specifyCustomDrawer("_specificSerialNumber", drawSerialNumberToggle);
 
+            deferProperty("_serviceConnectionInput");
             deferProperty("_serverNameSpace");
+            deferProperty("_servicePort");
+            deferProperty("_serviceIP");
             deferProperty("_useInterpolation");
 
             deferProperty("_reconnectionAttempts");
@@ -83,7 +86,24 @@ namespace Leap.Unity
             }
 
             addPropertyToFoldout("_useInterpolation", "Advanced Options");
+
+            addPropertyToFoldout("_serviceConnectionInput", "Advanced Options");
+
+            specifyConditionalDrawing("_serviceConnectionInput",
+                (int)LeapServiceProvider.ServiceConnectionInput.NAME,
+                "_serverNameSpace");
+
+            specifyConditionalDrawing("_serviceConnectionInput",
+                (int)LeapServiceProvider.ServiceConnectionInput.IP_PORT,
+                "_serviceIP");
+
+            specifyConditionalDrawing("_serviceConnectionInput",
+                (int)LeapServiceProvider.ServiceConnectionInput.IP_PORT,
+                "_servicePort");
+
             addPropertyToFoldout("_serverNameSpace", "Advanced Options");
+            addPropertyToFoldout("_serviceIP", "Advanced Options");
+            addPropertyToFoldout("_servicePort", "Advanced Options");
 
             addPropertyToFoldout("_reconnectionAttempts", "Advanced Options");
             addPropertyToFoldout("_reconnectionInterval", "Advanced Options");

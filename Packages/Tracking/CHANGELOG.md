@@ -80,6 +80,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (XR Hands) Added XRHandsLeapProvider to convert the current XRHandsSubsystem data to a LeapProvider for use with the Ultraleap Unity Plugin features
 - Added the ability to suppress the Android build warnings
 - Help Menu that links out to docs, a place to report bugs & places to get support
+- (Service Provider) Expose service IP and port as user settable variables
 
 ### Changed
 - (Preview Teleportation) Lightweight Pinch Detector's finger detection can be configured
