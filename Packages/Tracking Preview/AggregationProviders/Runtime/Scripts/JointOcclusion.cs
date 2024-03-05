@@ -1,3 +1,7 @@
+
+// Tue this to log out the render colours seen by the camera in the render texture
+#define LOGGING_RENDER_COLOURS
+
 using Leap;
 using Leap.Unity;
 using Leap.Unity.Encoding;
@@ -19,11 +23,81 @@ public class JointOcclusion : MonoBehaviour
     Camera cam;
     Texture2D tex;
     Rect regionToReadFrom;
+
+    // Colours used for the capsule hand joint spheres
     Color[] occlusionSphereColorsLeft;
     Color[] occlusionSphereColorsRight;
+
+    /// <summary>
+    /// For some reason the capsule hand colours that are rendered to the occlusion camera are not the original colours, but appear darker
+    /// This set is based on the colours as viewed in the render texture. The ComputMajorColour codeis used to log out the colours 
+    /// found when looking for joints, when a hand is placed so all joints can be seen
+    /// </summary>
+    Color[] shiftedOcclusionSphereColorsLeft =
+    {
+         new Color(1, 0, 0, 1),
+         new Color(0.9294118f, 0.003921569f, 0, 1),
+         new Color(0.8627452f, 0.003921569f, 0, 1),
+         new Color(0.8000001f, 0.007843138f, 0, 1),
+         new Color(0.7372549f, 0.01568628f, 0, 1),
+         new Color(0.6784314f, 0.01960784f, 0, 1),
+         new Color(0.6235294f, 0.02745098f, 0, 1),
+         new Color(0.572549f, 0.03921569f, 0, 1),
+         new Color(0.0509804f, 0.5215687f, 0, 1),
+         new Color(0.4745098f, 0.0627451f, 0, 1),
+         new Color(0.4313726f, 0.07843138f, 0, 1),
+         new Color(0.3882353f, 0.09803922f, 0, 1),
+         new Color(0.0509804f, 0.5215687f, 0, 1),
+         new Color(0.3098039f, 0.1372549f, 0, 1),
+         new Color(0.2745098f, 0.1607843f, 0, 1),
+         new Color(0.2431373f, 0.1843137f, 0, 1),
+         new Color(0.2156863f, 0.2156863f, 0, 1),
+         new Color(0.1843137f, 0.2431373f, 0, 1),
+         new Color(0.1607843f, 0.2745098f, 0, 1),
+         new Color(0.1372549f, 0.3098039f, 0, 1)
+    };
+
+    /// <summary>
+    /// For some reason the capsule hand colours that are rendered to the occlusion camera are not the original colours, but appear darker
+    /// This set is based on the colours as viewed in the render texture. The ComputMajorColour codeis used to log out the colours 
+    /// found when looking for joints, when a hand is placed so all joints can be seen
+    /// </summary>
+    Color[] shiftedOcclusionSphereColorsRight =
+    {
+         new Color(1f, 0.8313726f, 0f, 1f),
+         new Color(0.9294118f, 0.7725491f, 0.003921569f, 1f),
+         new Color(0.8627452f, 0.7176471f, 0.007843138f, 1f),
+         new Color(0.8000001f, 0.6666667f, 0.01176471f, 1f),
+         new Color(0.7372549f, 0.6156863f, 0.01568628f, 1f),
+         new Color(0.6784314f, 0.5647059f, 0.02352941f, 1f),
+         new Color(0.6235294f, 0.5215687f, 0.03137255f, 1f),
+         new Color(0.572549f, 0.4784314f, 0.04313726f, 1f),
+         new Color(0.0509804f, 0.04313726f, 0.5294118f, 1f),
+         new Color(0.4745098f, 0.3960785f, 0.07058824f, 1f),
+         new Color(0.4313726f, 0.3607843f, 0.08627451f, 1f),
+         new Color(0.3882353f, 0.3254902f, 0.1019608f, 1f),
+         new Color(0.3490196f, 0.2901961f, 0.1215686f, 1f),
+         new Color(0.3098039f, 0.2588235f, 0.145098f, 1f),
+         new Color(0.2745098f, 0.2313726f, 0.1686275f, 1f),
+         new Color(0.2431373f, 0.2039216f, 0.1921569f, 1f),
+         new Color(0.2156863f, 0.1803922f, 0.2196079f, 1f),
+         new Color(0.1843137f, 0.1568628f, 0.2509804f, 1f),
+         new Color(0.1607843f, 0.1333333f, 0.282353f, 1f),
+         new Color(0.1372549f, 0.1137255f, 0.3176471f, 1f),
+    };
+
     Mesh cubeMesh;
     Material cubeMaterial;
     string layerName;
+
+    private bool setup = false;
+    public void Update()
+    {
+        if (!setup)
+        {
+            Setup();
+        }
+    }
 
     /// <summary>
     /// this sets everything up, so that joint occlusion works (eg. rendering layers)
@@ -65,11 +139,9 @@ public class JointOcclusion : MonoBehaviour
         occlusionHandLeft.SphereColors = occlusionSphereColorsLeft;
         occlusionHandRight.SphereColors = occlusionSphereColorsRight;
 
-
-
         cubeMesh = createCubeMesh();
         cubeMaterial = new Material(Shader.Find("Standard"));
-
+        setup = true;
     }
 
     private Mesh createCubeMesh()
@@ -139,12 +211,13 @@ public class JointOcclusion : MonoBehaviour
         tex.ReadPixels(regionToReadFrom, 0, 0);
         tex.Apply();
 
-
         // loop through all joints that are visible (all joints that are rendered on a capsule hand),
         // and save how many pixels of a joint can be seen (in pixelsSeenCount)
         // and how many pixels of a joint would be seen if the joint was not occluded at all (in optimalPixelsCount)
         int[] pixelsSeenCount = new int[confidences.Length];
         int[] optimalPixelsCount = new int[confidences.Length];
+        Color[] majorColours = new Color[occlusionSphereColorsLeft.Length];
+
         foreach (var finger in hand.Fingers)
         {
             for (int j = 0; j < 4; j++)
@@ -167,7 +240,6 @@ public class JointOcclusion : MonoBehaviour
 
                 optimalPixelsCount[key] = (int)(Mathf.PI * radius * radius);
 
-
                 // only count pixels around where the sphere is supposed to be (+5 pixel margin)
                 int margin = 5;
                 int x0 = Mathf.Clamp((int)(screenPosCenter.x - radius - margin), 0, tex.width);
@@ -179,11 +251,26 @@ public class JointOcclusion : MonoBehaviour
 
                 if (hand.IsLeft)
                 {
-                    pixelsSeenCount[key] = tempPixels.Where(x => DistanceBetweenColors(x, occlusionSphereColorsLeft[capsuleHandKey]) < 0.01f).Count();
+                    pixelsSeenCount[key] = tempPixels.Where(x => DistanceBetweenColors(x, shiftedOcclusionSphereColorsLeft[capsuleHandKey]) < 0.01f).Count();
+
+#if LOGGING_RENDER_COLOURS
+                    majorColours[capsuleHandKey] = FindDominantColourInTarget(tempPixels);
+
+                    Debug.Log($"{capsuleHandKey} Original sphere colour {occlusionSphereColorsLeft[capsuleHandKey].r},{occlusionSphereColorsLeft[capsuleHandKey].g},{occlusionSphereColorsLeft[capsuleHandKey].b}, {occlusionSphereColorsLeft[capsuleHandKey].a} " +
+                        $"Dominant colour actually found {majorColours[capsuleHandKey].r}, {majorColours[capsuleHandKey].g}, {majorColours[capsuleHandKey].b}, {majorColours[capsuleHandKey].a} " +
+                        $"Difference {DistanceBetweenColors(majorColours[capsuleHandKey], occlusionSphereColorsLeft[capsuleHandKey])}");
+#endif 
                 }
                 else
                 {
-                    pixelsSeenCount[key] = tempPixels.Where(x => DistanceBetweenColors(x, occlusionSphereColorsRight[capsuleHandKey]) < 0.01f).Count();
+                    pixelsSeenCount[key] = tempPixels.Where(x => DistanceBetweenColors(x, shiftedOcclusionSphereColorsRight[capsuleHandKey]) < 0.01f).Count();
+
+#if LOGGING_RENDER_COLOURS
+                    majorColours[capsuleHandKey] = FindDominantColourInTarget(tempPixels);
+                    Debug.Log($"{capsuleHandKey} Original sphere colour {occlusionSphereColorsLeft[capsuleHandKey].r},{occlusionSphereColorsLeft[capsuleHandKey].g},{occlusionSphereColorsLeft[capsuleHandKey].b}, {occlusionSphereColorsLeft[capsuleHandKey].a} " +
+                        $"Dominant colour actually found {majorColours[capsuleHandKey].r}, {majorColours[capsuleHandKey].g}, {majorColours[capsuleHandKey].b}, {majorColours[capsuleHandKey].a} " +
+                        $"Difference {DistanceBetweenColors(majorColours[capsuleHandKey], occlusionSphereColorsLeft[capsuleHandKey])}");
+#endif                 
                 }
             }
         }
@@ -199,10 +286,48 @@ public class JointOcclusion : MonoBehaviour
         return confidences;
     }
 
-    float DistanceBetweenColors(Color color1, Color color2)
+    private float DistanceBetweenColors(Color color1, Color color2)
     {
         Color colorDifference = color1 - color2;
         Vector3 diffVetor = new Vector3(colorDifference.r, colorDifference.g, colorDifference.b);
         return diffVetor.magnitude;
+    }
+
+    private Color FindDominantColourInTarget(Color[] targetPixelRegion)
+    {
+        Dictionary<Color, int> colourStats = new Dictionary<Color, int>();
+
+        // Can get both black defined as 0,0,0,0 and 0,0,0,1
+        Color black = new Color(0, 0, 0, 0);
+
+        foreach (Color pixel in targetPixelRegion)
+        {
+            // Screen out white and black pixel(s)
+            if (pixel != Color.white && pixel != black && pixel != Color.black)
+            {
+                if (colourStats.ContainsKey(pixel))
+                {
+                    colourStats[pixel] = colourStats[pixel] + 1;
+                }
+                else
+                {
+                    colourStats.Add(pixel, 1);
+                }
+            }
+        }
+
+        int maxCount = 0;
+        Color mostCommonColor = Color.black;
+
+        foreach (Color color in colourStats.Keys)
+        {
+            if (colourStats[color] > maxCount)
+            {
+                maxCount = colourStats[color];
+                mostCommonColor = color;
+            }
+        }
+
+        return mostCommonColor;
     }
 }
