@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Android 	v5.17.1
 
 ### Added
-- 
+- Support for reading the camera matrix
 
 ### Changed
 - (Config) Additional uses of Config marked as Obsolete
@@ -37,7 +37,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Physical Hands. This introduces a new way of interacting with object in the virtual world using your hands and unitys physics engine.
-- Support for reading the camera matrix
 
 ### Changed
 - Removed Physics Hands from the preview package as Physical Hands has replaced it.
