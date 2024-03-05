@@ -647,6 +647,11 @@ namespace Leap.Unity
             else
             {
                 _leapController.Frame(_untransformedFixedFrame);
+
+                if (_currentDevice != null)
+                {
+                    _untransformedFixedFrame.DeviceID = _currentDevice.DeviceID;
+                }
             }
 
             if (_untransformedFixedFrame != null)

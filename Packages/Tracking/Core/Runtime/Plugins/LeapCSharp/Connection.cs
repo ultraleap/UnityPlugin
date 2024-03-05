@@ -444,8 +444,6 @@ namespace LeapInternal
             return size;
         }
 
-
-
         public void GetInterpolatedFrame(Frame toFill, Int64 time, Device device = null)
         {
             UInt64 size = GetInterpolatedFrameSize(time, device);
@@ -467,6 +465,11 @@ namespace LeapInternal
                 LEAP_TRACKING_EVENT tracking_evt;
                 StructMarshal<LEAP_TRACKING_EVENT>.PtrToStruct(trackingBuffer, out tracking_evt);
                 toFill.CopyFrom(ref tracking_evt);
+
+                if (device != null)
+                {
+                    toFill.DeviceID = device.DeviceID;
+                }
             }
             Marshal.FreeHGlobal(trackingBuffer);
         }
@@ -493,6 +496,11 @@ namespace LeapInternal
                 LEAP_TRACKING_EVENT tracking_evt;
                 StructMarshal<LEAP_TRACKING_EVENT>.PtrToStruct(trackingBuffer, out tracking_evt);
                 toFill.CopyFrom(ref tracking_evt);
+
+                if (device != null)
+                {
+                    toFill.DeviceID = device.DeviceID;
+                }
             }
             Marshal.FreeHGlobal(trackingBuffer);
         }
