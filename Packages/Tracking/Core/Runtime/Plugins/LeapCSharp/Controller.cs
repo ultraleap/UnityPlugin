@@ -987,5 +987,26 @@ namespace Leap
         {
             _hasInitialized = false;
         }
+
+        public UnityEngine.Matrix4x4 LeapExtrinsicCameraMatrix(Image.CameraType camera, Device device)
+        {
+            float[] data = new float[16];
+            return _connection.LeapExtrinsicCameraMatrix(camera, device);
+        }
+
+        public UnityEngine.Vector3 RectilinearToPixel(Image.CameraType camera, UnityEngine.Vector3 ray)
+        {
+            return _connection.RectilinearToPixel(camera, ray);
+        }
+
+        public UnityEngine.Vector3 RectilinearToPixelEx(Image.CameraType camera, UnityEngine.Vector3 ray, Device device)
+        {
+            return _connection.RectilinearToPixelEx(device.Handle, camera, ray);
+        }
+
+        public UnityEngine.Vector3 PixelToRectilinearEx(Image.CameraType camera, UnityEngine.Vector3 pixel, Device device)
+        {
+            return _connection.PixelToRectilinearEx(device.Handle, camera, Image.CalibrationType.INFRARED, pixel);
+        }
     }
 }

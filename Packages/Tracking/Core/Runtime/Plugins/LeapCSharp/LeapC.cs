@@ -1103,7 +1103,7 @@ namespace LeapInternal
 
         [DllImport("LeapC", EntryPoint = "LeapPixelToRectilinearEx")]
         public static extern LEAP_VECTOR LeapPixelToRectilinearEx(IntPtr hConnection,
-          IntPtr hDevice, eLeapPerspectiveType camera, eLeapCameraCalibrationType calibrationType, LEAP_VECTOR pixel);
+          IntPtr hDevice, eLeapPerspectiveType camera, LEAP_VECTOR pixel);
 
         [DllImport("LeapC", EntryPoint = "LeapRectilinearToPixel")]
         public static extern LEAP_VECTOR LeapRectilinearToPixel(IntPtr hConnection,
@@ -1240,5 +1240,11 @@ namespace LeapInternal
 
         [DllImport("LeapC", EntryPoint = "LeapGetVersion")]
         public static extern eLeapRS GetVersion(IntPtr hConnection, eLeapVersionPart versionPart, ref LEAP_VERSION pVersion);
+
+        [DllImport("LeapC", EntryPoint = "LeapExtrinsicCameraMatrix")]
+        public static extern eLeapRS LeapExtrinsicCameraMatrix(IntPtr hConnection, eLeapPerspectiveType camera, [MarshalAs(UnmanagedType.LPArray, SizeConst = 16)] float[] extrinsicMatrix);
+
+        [DllImport("LeapC", EntryPoint = "LeapExtrinsicCameraMatrixEx")]
+        public static extern eLeapRS LeapExtrinsicCameraMatrixEx(IntPtr hConnection, IntPtr hDevice, eLeapPerspectiveType camera, [MarshalAs(UnmanagedType.LPArray, SizeConst = 16)] float[] extrinsicMatrix);
     }
 }
