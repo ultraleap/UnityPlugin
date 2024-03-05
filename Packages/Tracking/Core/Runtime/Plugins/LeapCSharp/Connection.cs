@@ -123,6 +123,7 @@ namespace LeapInternal
         public EventHandler<DeviceFailureEventArgs> LeapDeviceFailure;
         public EventHandler<PolicyEventArgs> LeapPolicyChange;
         public EventHandler<FrameEventArgs> LeapFrame;
+        public EventHandler<RawFrameEventArgs> LeapRawFrameData;
         public EventHandler<InternalFrameEventArgs> LeapInternalFrame;
         public EventHandler<LogEventArgs> LeapLogEvent;
         [Obsolete("Config is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
@@ -407,6 +408,11 @@ namespace LeapInternal
         private void handleTrackingMessage(ref LEAP_TRACKING_EVENT trackingMsg, UInt32 deviceID)
         {
             Frames.Put(ref trackingMsg);
+
+            if (LeapRawFrameData != null)
+            {
+                LeapRawFrameData.DispatchOnContext(this, EventContext, new RawFrameEventArgs(trackingMsg));
+            }
 
             if (LeapFrame != null)
             {
