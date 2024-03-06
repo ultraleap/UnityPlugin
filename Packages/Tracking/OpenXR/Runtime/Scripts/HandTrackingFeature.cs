@@ -24,7 +24,7 @@ namespace Ultraleap.Tracking.OpenXR
         Desc = "Articulated hands using XR_EXT_hand_tracking",
         Category = FeatureCategory.Feature,
         Required = false,
-        OpenxrExtensionStrings = "XR_EXT_hand_tracking XR_ULTRALEAP_hand_tracking_forearm",
+        OpenxrExtensionStrings = "XR_EXT_hand_tracking XR_ULTRALEAP_hand_tracking_forearm XR_ULTRALEAP_hand_tracking_hints",
         BuildTargetGroups = new[] { BuildTargetGroup.Standalone, BuildTargetGroup.Android }
     )]
 #endif
@@ -85,6 +85,9 @@ namespace Ultraleap.Tracking.OpenXR
                 HandJointLocation[] joints,
                 uint jointCount);
 
+            [DllImport(NativeDLL, EntryPoint = NativePrefix + "SetHandTrackingHints", ExactSpelling = true)]
+            internal static extern void SetHandTrackingHints(string[] hints, uint hintCount);
+
             [DllImport(NativeDLL, EntryPoint = NativePrefix + "XrResultToString", ExactSpelling = true)]
             private static extern IntPtr XrResultToString(int result);
 
@@ -93,8 +96,12 @@ namespace Ultraleap.Tracking.OpenXR
 
         private bool _supportsHandTracking;
         private bool _isUltraleapTracking;
+        private bool _supportsHandTrackingHints;
         [PublicAPI] public bool SupportsHandTracking => enabled && _supportsHandTracking;
         [PublicAPI] public bool IsUltraleapHandTracking => enabled && _isUltraleapTracking;
+        [PublicAPI] public bool SupportsHandTrackingHints => enabled && _supportsHandTrackingHints;
+
+        public void SetHandTrackingHints(string[] hints) => Native.SetHandTrackingHints(hints, (uint)hints.Length);
 
         protected override IntPtr HookGetInstanceProcAddr(IntPtr func) => Native.HookGetInstanceProcAddr(func);
         protected override void OnInstanceDestroy(ulong xrInstance) => Native.OnInstanceDestroy(xrInstance);
@@ -124,6 +131,11 @@ namespace Ultraleap.Tracking.OpenXR
             {
                 Debug.LogWarning("XR_EXT_hand_tracking is not at least version 4, disabling Hand Tracking");
                 return false;
+            }
+
+            if (OpenXRRuntime.IsExtensionEnabled("XR_ULTRALEAP_hand_tracking_hints"))
+            {
+                _supportsHandTrackingHints = true;
             }
 
             bool succeeded = Native.OnInstanceCreate(xrInstance);
