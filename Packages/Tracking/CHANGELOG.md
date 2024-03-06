@@ -31,6 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (Hand Rays) Exposed dot product used to test if the hand is facing camera
 - (Hinting) Added support for startup setting of Hand Tracking Hints via the Ultraleap Settings window
 - (Hinting) Added support for runtime changing of Hand Tracking Hints via static HandTrackingHintManager
+- (Hinting) Added support for setting OpenXR Hand Tracking Hints via the OpenXR HandTrackingFeature
 - Access of Physical Hands extensions
 - Added public accessors to various Physical Hands utilities
 
