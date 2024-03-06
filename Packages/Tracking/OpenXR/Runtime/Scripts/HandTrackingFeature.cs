@@ -101,7 +101,13 @@ namespace Ultraleap.Tracking.OpenXR
         [PublicAPI] public bool IsUltraleapHandTracking => enabled && _isUltraleapTracking;
         [PublicAPI] public bool SupportsHandTrackingHints => enabled && _supportsHandTrackingHints;
 
-        public void SetHandTrackingHints(string[] hints) => Native.SetHandTrackingHints(hints, (uint)hints.Length);
+        public void SetHandTrackingHints(string[] hints)
+        {
+            if (SupportsHandTrackingHints)
+            {
+                Native.SetHandTrackingHints(hints, (uint)hints.Length);
+            }
+        }
 
         protected override IntPtr HookGetInstanceProcAddr(IntPtr func) => Native.HookGetInstanceProcAddr(func);
         protected override void OnInstanceDestroy(ulong xrInstance) => Native.OnInstanceDestroy(xrInstance);
