@@ -109,6 +109,8 @@ namespace Ultraleap.Tracking.OpenXR
             }
         }
 
+        public void ClearHandTrackingHints() => SetHandTrackingHints(new string[] { });
+
         protected override IntPtr HookGetInstanceProcAddr(IntPtr func) => Native.HookGetInstanceProcAddr(func);
         protected override void OnInstanceDestroy(ulong xrInstance) => Native.OnInstanceDestroy(xrInstance);
         protected override void OnSessionCreate(ulong xrSession) => Native.OnSessionCreate(xrSession);
