@@ -35,6 +35,7 @@ variables:
   OUTPUT_NAME: "$CI_PROJECT_TITLE"
 
 stages:
+  - gather
   - test
   - build
 
@@ -136,7 +137,7 @@ generate-api-docs:
     - if: $CI_COMMIT_BRANCH == "develop"
       when: always
     - when: manual
-  stage: build
+  stage: gather
   needs: []
   variables:
 
@@ -170,7 +171,7 @@ dependencies-libtrack:
     - if: $CI_COMMIT_BRANCH == "develop"
       when: always
     - when: manual
-  stage: build
+  stage: gather
   needs: []
   variables:
     # XR group variables:
