@@ -137,7 +137,6 @@ generate-api-docs:
     - when: manual
   stage: build
   needs: []
-  allow_failure: true
   variables:
 
     XML_ARTIFACTS_PATH: "$ARTIFACTS_PATH/unity_xml"
@@ -165,14 +164,8 @@ generate-api-docs:
 #
 dependencies-libtrack:
   extends: .base
-  rules:
-    - if: $CI_COMMIT_BRANCH == "main"
-    - if: $CI_COMMIT_BRANCH == "develop"
-      when: always
-    - when: manual
   stage: build
   needs: []
-  allow_failure: true
   variables:
     # XR group variables:
     #  - LIBTRACK_ACCESS_TOKEN
@@ -245,7 +238,6 @@ export-unitypackages:
   needs:
    - job: dependencies-libtrack
      artifacts: true
-  allow_failure: true
   variables:
   
     # Path to UnityPlugin within a unity project
