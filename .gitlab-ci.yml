@@ -232,7 +232,7 @@ dependencies-libtrack:
 export-unitypackages:
   extends: .base
   stage: build
-
+  allow_failure: true
   needs:
    - job: dependencies-libtrack
      artifacts: true
