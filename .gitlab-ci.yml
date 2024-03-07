@@ -137,8 +137,9 @@ generate-api-docs:
     - when: manual
   stage: build
   needs: []
-  variables:
   allow_failure: true
+  variables:
+
     XML_ARTIFACTS_PATH: "$ARTIFACTS_PATH/unity_xml"
     HTML_ARTIFACTS_PATH: "$ARTIFACTS_PATH/unity_html"
 
