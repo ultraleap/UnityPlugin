@@ -649,7 +649,7 @@ namespace Leap.Unity
             }
 
             // Use the mainCamera parent to transfrom the warped positions so the player can move around
-            if (mainCamera.transform.parent != null && _positionDeviceRelativeToMainCamera)
+            if (_positionDeviceRelativeToMainCamera && mainCamera.transform.parent != null && _deviceOffsetMode != DeviceOffsetMode.Transform)
             {
                 leapTransform = new LeapTransform(
                   mainCamera.transform.parent.TransformPoint(warpedPosition),
