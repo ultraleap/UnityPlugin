@@ -42,12 +42,6 @@ stages:
   tags:
     - unity
     - win10
-  rules:
-    - if: $CI_COMMIT_BRANCH == "main"
-    - if: $CI_COMMIT_BRANCH == "develop"
-      when: always
-    - when: manual
-  interruptible: true
   before_script:
     - New-Item -Path "$ARTIFACTS_PATH" -ItemType Directory -Force
 
@@ -259,17 +253,7 @@ export-unitypackages:
     PACKAGE_IMPORT_PATH_Tracking_Preview:       "$UNITYPLUGIN_ASSETS_PATH/Tracking Preview"
     UNITYPACKAGE_OUTPUT_PATH_Tracking_Preview:  "$UNITYPACKAGES_OUTPUT_PATH/Ultraleap Tracking Preview.unitypackage"
 
-    LEAPC_SOURCE_PATH: "$ARTIFACTS_PATH/Windows/LeapC.dll"
-    LEAPC_DESTINATION_PATH: "$PLUGIN_LIBS_PATH/x86_64/LeapC.dll"
-
   script:
-
-    # We only replace libtrack dependencies if there is an upstream branch ref or we are explicitly using the latest stable artifacts.
-    # Upstream branch ref takes precedence, see the libtrack dependencies job.
-    - $REPLACE_LIBTRACK_DEPENDENCIES = "$UPSTREAM_UPSTREAM_BRANCH_REF" -or "$USE_LIBTRACK_STABLE"
-
-    #  Copy libs from libtrack dependencies, overwritting anything already there
-    - if ($REPLACE_LIBTRACK_DEPENDENCIES) { Copy-Item "$LEAPC_SOURCE_PATH" -Destination "$LEAPC_DESTINATION_PATH" -Force }
 
     - New-Item -Path "$UNITYPACKAGES_OUTPUT_PATH" -ItemType Directory -Force
 
@@ -304,36 +288,3 @@ export-unitypackages:
       - "$ARTIFACTS_PATH/"
 
     when: on_success
-
-# -----------------------------------------------------------------------------
-# Consolidate artifacts
-# -----------------------------------------------------------------------------
-#
-# Bundles other artifacts into a single download
-#
-consolidate:
-  extends: .base
-  stage: build
-
-  needs:
-    - job: check-formatting
-      artifacts: true
-      optional: true
-    - job: generate-api-docs
-      artifacts: true
-      optional: true
-    - job: dependencies-libtrack
-      artifacts: true
-    - job: export-unitypackages
-      artifacts: true
-
-  script:
-    - echo "Consolidating artifacts"
-
-  artifacts:
-    name: "$ARTIFACTS_NAME-consolidated"
-    paths:
-      - "$ARTIFACTS_PATH/"
-
-    when: on_success
-    expire_in: 2 weeks
