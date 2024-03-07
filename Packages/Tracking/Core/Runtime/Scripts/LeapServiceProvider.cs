@@ -919,6 +919,7 @@ namespace Leap.Unity
                else if (_multipleDeviceMode == MultipleDeviceMode.Disabled)
                {
                    _currentDevice = d;
+                   _onDeviceChanged(d);
                }
                else
                {
