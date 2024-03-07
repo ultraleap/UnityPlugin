@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (Physical Hands) Ability to ignore collisions on single object or all children
 - (Physical Hands) Added toggle to GrabHelper to allow kinematic object movement
 - (Physical Hands) Ignore Physical hands component can now choose which hand(s) it should be applied to
+- (Physical Hands) Edit time representation of hands via Physical Hands Manager
 
 ### Changed
 - (Config) Additional uses of Config marked as Obsolete
