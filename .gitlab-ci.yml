@@ -39,15 +39,14 @@ stages:
   - build
 
 .base:
-   rules:
+  tags:
+    - unity
+    - win10
+  rules:
     - if: $CI_COMMIT_BRANCH == "main"
     - if: $CI_COMMIT_BRANCH == "develop"
       when: always
     - when: manual
-      allow_failure: true
-  tags:
-    - unity
-    - win10
   interruptible: true
   before_script:
     - New-Item -Path "$ARTIFACTS_PATH" -ItemType Directory -Force
@@ -154,7 +153,6 @@ generate-api-docs:
     name: "$ARTIFACTS_NAME-api-docs"
     paths:
       - "$ARTIFACTS_PATH/"
-
     when: always
     expire_in: never
 
