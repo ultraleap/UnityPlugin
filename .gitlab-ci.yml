@@ -231,8 +231,12 @@ dependencies-libtrack:
 #
 export-unitypackages:
   extends: .base
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "develop"
+      when: always
+    - when: manual
   stage: build
-  allow_failure: true
   needs:
    - job: dependencies-libtrack
      artifacts: true
@@ -299,7 +303,7 @@ export-unitypackages:
     paths:
       - "$ARTIFACTS_PATH/"
 
-    when: always
+    when: on_success
 
 # -----------------------------------------------------------------------------
 # Consolidate artifacts
@@ -331,5 +335,5 @@ consolidate:
     paths:
       - "$ARTIFACTS_PATH/"
 
-    when: always
+    when: on_success
     expire_in: 2 weeks
