@@ -67,58 +67,115 @@ namespace Leap
             MenuItem("Ultraleap/Hands/Capsule Hands", false, 20)]
         public static void CreateCapsuleHands()
         {
-            CreatePrefab("CapsuleHands");
+            bool created = false;
+
+#if UNITY_URP_AVAILABLE
+            var urpHands = CreatePrefab("Capsule Hands (URP) Variant");
+            created = urpHands == null ? false : true;
+#endif
+
+            if (!created)
+                CreatePrefab("CapsuleHands");
         }
 
         [MenuItem("GameObject/Ultraleap/Hands/Low Poly Hands", false, 21),
             MenuItem("Ultraleap/Hands/Low Poly Hands", false, 21)]
         public static void CreateLowPolyHands()
         {
-            CreatePrefab("LowPolyHandsWithArms");
+            bool created = false;
+
+#if UNITY_URP_AVAILABLE
+            var urpHands = CreatePrefab("LowPolyHandsWithArms (URP) Variant");
+            created = urpHands == null ? false : true;
+#endif
+
+            if (!created)
+                CreatePrefab("LowPolyHandsWithArms");
         }
 
         [MenuItem("GameObject/Ultraleap/Hands/Ghost Hands (with arms)", false, 22),
             MenuItem("Ultraleap/Hands/Ghost Hands (with arms)", false, 22)]
         public static void CreateGenericHand_Arm()
         {
-            CreatePrefab("GenericHand_Arm");
+            bool created = false;
+
+#if UNITY_URP_AVAILABLE
+            var urpHands = CreatePrefab("Ghost Hands (URP) Variant");
+            created = urpHands == null ? false : true;
+#endif
+
+            if (!created)
+                CreatePrefab("GenericHand_Arm");
         }
 
         [MenuItem("GameObject/Ultraleap/Hands/Ghost Hands", false, 23),
             MenuItem("Ultraleap/Hands/Ghost Hands", false, 23)]
         public static void CreateGhostHands()
         {
-            CreatePrefab("GhostHands");
+            bool created = false;
+
+#if UNITY_URP_AVAILABLE
+            var urpHands = CreatePrefab("Ghost Hands (URP) Variant");
+            created = urpHands == null ? false : true;
+#endif
+
+            if (!created)
+                CreatePrefab("GhostHands");
         }
 
         [MenuItem("GameObject/Ultraleap/Hands/Outline Hands", false, 24),
             MenuItem("Ultraleap/Hands/Outline Hands", false, 24)]
         public static void CreateOutlineHands()
         {
-            CreatePrefab("OutlineHands");
+            bool created = false;
+
+#if UNITY_URP_AVAILABLE
+            var urpHands = CreatePrefab("Outline Hands (URP) Variant");
+            created = urpHands == null ? false : true;
+#endif
+
+            if (!created)
+                CreatePrefab("OutlineHands");
         }
 
         [MenuItem("GameObject/Ultraleap/Hands/Skeleton Hands", false, 25),
             MenuItem("Ultraleap/Hands/Skeleton Hands", false, 25)]
         public static void CreateSkeletonHands()
         {
-            CreatePrefab("SkeletonHands");
+            bool created = false;
+
+#if UNITY_URP_AVAILABLE
+            var urpHands = CreatePrefab("Skeleton Hands (URP) Variant");
+            created = urpHands == null ? false : true;
+#endif
+
+            if (!created)
+                CreatePrefab("SkeletonHands");
         }
 
-        [MenuItem("GameObject/Ultraleap/Hands/Attachment Hands", false, 26),
-            MenuItem("Ultraleap/Hands/Attachment Hands", false, 26)]
+        [MenuItem("GameObject/Ultraleap/Hands/Ghost Capsule Hands", false, 26),
+            MenuItem("Ultraleap/Hands/Ghost Capsule Hands", false, 26)]
+        public static void CreateGhostCapsuleHands()
+        {
+            bool created = false;
+
+#if UNITY_URP_AVAILABLE
+            var urpHands = CreatePrefab("Ghost Hands (URP) Variant");
+            created = urpHands == null ? false : true;
+#endif
+
+            if (!created)
+                CreatePrefab("Ghost Capsule Hands");
+        }
+
+        [MenuItem("GameObject/Ultraleap/Hands/Attachment Hands", false, 27),
+            MenuItem("Ultraleap/Hands/Attachment Hands", false, 27)]
         public static void CreateAttachmentHands()
         {
             CreatePrefab("Attachment Hands");
         }
-        [MenuItem("GameObject/Ultraleap/Hands/Ghost Capsule Hands", false, 27),
-    MenuItem("Ultraleap/Hands/Ghost Capsule Hands", false, 27)]
-        public static void CreateGhostCapsuleHands()
-        {
-            CreatePrefab("Ghost Capsule Hands");
-        }
 
-        #endregion
+#endregion
 
         #region Pose Detection
 
