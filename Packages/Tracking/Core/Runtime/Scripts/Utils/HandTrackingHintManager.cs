@@ -24,7 +24,7 @@ namespace Leap.Unity
                     }
                     else // No leapserviceprovider, we should make a new controller ourselves
                     {
-                        _leapController = new Controller();
+                        _leapController = new Controller(0, "Leap Service", false);
                     }
                 }
                 return _leapController;
@@ -43,8 +43,11 @@ namespace Leap.Unity
         {
             currentHints = UltraleapSettings.Instance.startupHints.ToList();
 
-            LeapController.Device -= NewLeapDevice;
-            LeapController.Device += NewLeapDevice;
+            if (currentHints.Count != 0)
+            {
+                LeapController.Device -= NewLeapDevice;
+                LeapController.Device += NewLeapDevice;
+            }
         }
 
         /// <summary>
