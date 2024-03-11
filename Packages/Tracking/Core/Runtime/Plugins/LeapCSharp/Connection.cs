@@ -72,6 +72,7 @@ namespace LeapInternal
 
         private IntPtr _leapConnection;
         private volatile bool _isRunning = false;
+        public bool IsRunning { get { return _isRunning; } }
         private Thread _polster;
 
         /// <summary>

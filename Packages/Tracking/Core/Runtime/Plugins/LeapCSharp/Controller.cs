@@ -463,6 +463,9 @@ namespace Leap
             _connection = Connection.GetConnection(new Connection.Key(connectionKey, serverNamespace));
             _connection.EventContext = SynchronizationContext.Current;
 
+            if (_connection.IsRunning)
+                _hasInitialized = true;
+
             _connection.LeapInit += OnInit;
             _connection.LeapConnection += OnConnect;
             _connection.LeapConnectionLost += OnDisconnect;

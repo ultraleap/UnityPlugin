@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (Physical Hands) Ability to ignore collisions on single object or all children
 - (Physical Hands) Added toggle to GrabHelper to allow kinematic object movement
 - (Physical Hands) Ignore Physical hands component can now choose which hand(s) it should be applied to
+- (Attachment Hands) Do not show warning again this session when deleting attachment points
 
 ### Changed
 - (Config) Additional uses of Config marked as Obsolete
@@ -46,7 +47,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (UI Input Preview) Null UIInput events cause unnecessary error logs
 - Memory increase when repeatedly opening scenes with LeapServiceProviders
 - ThreadAbort when changing scenes in editor that use multidevice or display the tracking device gizmo
-
+- (Physical Hands) Soft Contact NAN collider error when using OpenXR tracking on Android devices
 
 
 ## [6.14.0] - 24/01/24
