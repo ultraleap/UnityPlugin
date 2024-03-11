@@ -32,8 +32,6 @@ namespace Leap.Unity.HandsModule
             }
 
             handBinder.ResetHand();
-            BoneNameDefinitions boneDefinitions = new BoneNameDefinitions();
-
             //Get all children of the hand
             var children = new List<Transform>();
 
@@ -47,13 +45,13 @@ namespace Leap.Unity.HandsModule
             children.Add(root);
             children.AddRange(GetAllChildren(root));
 
-            var thumbBones = SortBones(SelectBones(children, boneDefinitions.DefinitionThumb), false, true);
-            var indexBones = SortBones(SelectBones(children, boneDefinitions.DefinitionIndex));
-            var middleBones = SortBones(SelectBones(children, boneDefinitions.DefinitionMiddle));
-            var ringBones = SortBones(SelectBones(children, boneDefinitions.DefinitionRing));
-            var pinkyBones = SortBones(SelectBones(children, boneDefinitions.DefinitionPinky));
-            var wrist = SelectBones(children, boneDefinitions.DefinitionWrist).FirstOrDefault();
-            var elbow = SelectBones(children, boneDefinitions.DefinitionElbow).FirstOrDefault();
+            var thumbBones = SortBones(SelectBones(children, BoneNameDefinitions.DefinitionThumb), false, true);
+            var indexBones = SortBones(SelectBones(children, BoneNameDefinitions.DefinitionIndex));
+            var middleBones = SortBones(SelectBones(children, BoneNameDefinitions.DefinitionMiddle));
+            var ringBones = SortBones(SelectBones(children, BoneNameDefinitions.DefinitionRing));
+            var pinkyBones = SortBones(SelectBones(children, BoneNameDefinitions.DefinitionPinky));
+            var wrist = SelectBones(children, BoneNameDefinitions.DefinitionWrist).FirstOrDefault();
+            var elbow = SelectBones(children, BoneNameDefinitions.DefinitionElbow).FirstOrDefault();
 
             handBinder.BoundHand.fingers[0].boundBones = AssignTransformToBoundBone(thumbBones);
             handBinder.BoundHand.fingers[1].boundBones = AssignTransformToBoundBone(indexBones);
