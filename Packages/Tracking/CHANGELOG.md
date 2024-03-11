@@ -46,7 +46,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (UI Input Preview) Null UIInput events cause unnecessary error logs
 - Memory increase when repeatedly opening scenes with LeapServiceProviders
 - ThreadAbort when changing scenes in editor that use multidevice or display the tracking device gizmo
-
+- (Physical Hands) Soft Contact NAN collider error when using OpenXR tracking on Android devices
 
 
 ## [6.14.0] - 24/01/24
