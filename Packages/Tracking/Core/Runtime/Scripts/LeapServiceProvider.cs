@@ -789,13 +789,25 @@ namespace Leap.Unity
         public void ChangeTrackingMode(TrackingOptimizationMode trackingMode)
         {
             _trackingOptimization = trackingMode;
-            StartCoroutine(ChangeTrackingMode_Coroutine(trackingMode));
+
+            if (_leapController != null && _leapController.IsConnected)
+            {
+                SetTrackingMode(trackingMode);
+            }
+            else
+            {
+                StartCoroutine(ChangeTrackingMode_Coroutine(trackingMode));
+            }
         }
 
         private IEnumerator ChangeTrackingMode_Coroutine(TrackingOptimizationMode trackingMode)
         {
             yield return new WaitWhile(() => _leapController == null || !_leapController.IsConnected);
+            SetTrackingMode(trackingMode);
+        }
 
+        private void SetTrackingMode(TrackingOptimizationMode trackingMode)
+        {
             Device deviceToChange = _multipleDeviceMode == MultipleDeviceMode.Disabled ? null : _currentDevice;
 
             switch (trackingMode)
@@ -887,9 +899,14 @@ namespace Leap.Unity
                 return;
             }
 
-            string serialNumber = _multipleDeviceMode != MultipleDeviceMode.Disabled ? SpecificSerialNumber : "";
-
-            _leapController = new Controller(serialNumber.GetHashCode(), _serverNameSpace, _multipleDeviceMode != MultipleDeviceMode.Disabled);
+            if(_multipleDeviceMode == MultipleDeviceMode.Disabled)
+            {
+                _leapController = new Controller(0, _serverNameSpace, false);
+            }
+            else
+            {
+                _leapController = new Controller(SpecificSerialNumber.GetHashCode(), _serverNameSpace, true);
+            }
 
             _leapController.Device += (s, e) =>
             {
@@ -908,7 +925,7 @@ namespace Leap.Unity
             };
 
             _onDeviceSafe += (d) =>
-           {
+            {
                if (_multipleDeviceMode == MultipleDeviceMode.Specific)
                {
                    if (SpecificSerialNumber != null && SpecificSerialNumber != "" && d.SerialNumber.Contains(SpecificSerialNumber) && _leapController != null)

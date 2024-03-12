@@ -1263,8 +1263,20 @@ namespace LeapInternal
             public string serial;
             public string type;
         }
+        
+        public static eLeapRS SetDeviceHints(IntPtr hConnection, IntPtr hDevice, string[] hints)
+        {
+            // Ensure the final element of the array is null terminated.
+            if (hints.Length == 0 || hints[^1] != null)
+            {
+                Array.Resize(ref hints, hints.Length + 1);
+                hints[^1] = null;
+            }
 
+            return SetDeviceHintsInternal(hConnection, hDevice, hints);
+        }
+        
         [DllImport("LeapC", EntryPoint = "LeapSetDeviceHints")]
-        public static extern eLeapRS SetDeviceHints(IntPtr hConnection, IntPtr hDevice, string[] hints);
+        private static extern eLeapRS SetDeviceHintsInternal(IntPtr hConnection, IntPtr hDevice, string[] hints);
     }
 }
