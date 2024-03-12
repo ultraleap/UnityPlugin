@@ -28,6 +28,7 @@ namespace Leap.Unity.PhysicalHands
             set
             {
                 _disableAllGrabbing = value;
+                SetAllHandGrabbing();
             }
         }
 
@@ -73,8 +74,6 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
-        private PhysicalHandsManager _physicalHandsManager = null;
-
         private List<ContactHand> contactHands = new List<ContactHand>();
 
 #if UNITY_EDITOR
@@ -86,6 +85,31 @@ namespace Leap.Unity.PhysicalHands
         }
 #endif
 
+        private void Start()
+        {
+            if(GrabHelper.Instance != null)
+            {
+                Rigidbody rbody = GetComponent<Rigidbody>();
+
+                if(rbody != null)
+                {
+                    if(GrabHelper.Instance.TryGetGrabHelperObjectFromRigid(rbody, out _grabHelperObject))
+                    {
+                        _grabHelperObject._ignorePhysicalHands = this;
+                    }
+                }
+            }
+        }
+
+        private void OnEnable()
+        {
+            PhysicalHandsManager.OnHandsInitialized -= HandsInitialized;
+            PhysicalHandsManager.OnHandsInitialized += HandsInitialized;
+
+            SetAllHandCollisions();
+            SetAllHandGrabbing();
+        }
+
         /// <summary>
         /// Clean up code, re-enables all collision and grabbing on this object and all children
         /// </summary>
@@ -94,29 +118,35 @@ namespace Leap.Unity.PhysicalHands
             SetAllHandCollisions(forceEnable : true);
         }
 
-        private void OnEnable()
+        private void OnDestroy()
         {
-#if UNITY_2021_3_18_OR_NEWER
-            _physicalHandsManager = (PhysicalHandsManager)FindAnyObjectByType(typeof(PhysicalHandsManager));
-#else
-            _physicalHandsManager = (PhysicalHandsManager)FindObjectOfType<PhysicalHandsManager>();
-#endif
-
-            if (_physicalHandsManager != null)
-            {
-                PhysicalHandsManager.OnHandsInitialized -= HandsInitialized;
-                PhysicalHandsManager.OnHandsInitialized += HandsInitialized;
-            }
-            else
-            {
-                Debug.Log("No Physical Hands Manager found. Ignore Physical Hands can not initialize");
-            }
+            PhysicalHandsManager.OnHandsInitialized -= HandsInitialized;
         }
 
         internal void AddToHands(ContactHand contactHand)
         {
             contactHands.Add(contactHand);
             SetHandCollision(contactHand);
+        }
+
+        private void SetAllHandGrabbing(bool forceEnable = false, bool forceDisable = false)
+        {
+            if (DisableAllGrabbing)
+            {
+                switch (HandToIgnore)
+                {
+                    case ChiralitySelection.LEFT:
+                        _grabHelperObject?.UnregisterGrabbingHand(Chirality.Left);
+                        break;
+                    case ChiralitySelection.RIGHT:
+                        _grabHelperObject?.UnregisterGrabbingHand(Chirality.Right);
+                        break;
+                    case ChiralitySelection.BOTH:
+                        _grabHelperObject?.UnregisterGrabbingHand(Chirality.Left);
+                        _grabHelperObject?.UnregisterGrabbingHand(Chirality.Right);
+                        break;
+                }
+            }
         }
 
         private void SetAllHandCollisions(bool forceEnable = false, bool forceDisable = false)
@@ -187,10 +217,10 @@ namespace Leap.Unity.PhysicalHands
             Physics.IgnoreCollision(contactHand.palmBone.Collider, colliderToIgnore, collisionDisabled);
         }
 
-        private void HandsInitialized()
+        private void HandsInitialized(ContactParent contactParent)
         {
-            AddToHands(_physicalHandsManager.ContactParent.LeftHand);
-            AddToHands(_physicalHandsManager.ContactParent.RightHand);
+            AddToHands(contactParent.LeftHand);
+            AddToHands(contactParent.RightHand);
 
             SetAllHandCollisions();
         }

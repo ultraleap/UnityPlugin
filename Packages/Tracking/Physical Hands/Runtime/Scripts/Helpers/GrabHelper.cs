@@ -14,6 +14,8 @@ namespace Leap.Unity.PhysicalHands
     [RequireComponent(typeof(PhysicalHandsManager))]
     public class GrabHelper : MonoBehaviour
     {
+        public static GrabHelper Instance;
+
         [SerializeField]
         private PhysicalHandsManager physicalHandsManager;
 
@@ -42,6 +44,8 @@ namespace Leap.Unity.PhysicalHands
 
         private void OnEnable()
         {
+            Instance = this;
+
             if (physicalHandsManager != null)
             {
                 physicalHandsManager.OnPrePhysicsUpdate -= OnPrePhysicsUpdate;
@@ -340,6 +344,12 @@ namespace Leap.Unity.PhysicalHands
             }
             return false;
         }
+
+        public bool TryGetGrabHelperObjectFromRigid(Rigidbody rigid, out GrabHelperObject helperObject)
+        {
+            return _grabHelperObjects.TryGetValue(rigid, out helperObject);
+        }
+
         #endregion
 
         private void OnValidate()

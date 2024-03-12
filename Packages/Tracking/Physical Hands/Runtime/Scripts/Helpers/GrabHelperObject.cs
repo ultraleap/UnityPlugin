@@ -98,7 +98,7 @@ namespace Leap.Unity.PhysicalHands
         private Vector3 oldCenterOfMass;
         private bool oldKinematic;
 
-        private IgnorePhysicalHands _ignorePhysicalHands;
+        internal IgnorePhysicalHands _ignorePhysicalHands;
 
         private float ignoreGrabTime = 0f;
 
@@ -191,14 +191,16 @@ namespace Leap.Unity.PhysicalHands
             oldKinematic = rigid.isKinematic;
         }
 
-
         /// <summary>
         /// Find if the object we are attached to has an IgnoreContactHelper script on it.
         /// If it does, save a reference to it and give it a reference to us so that it can update our ignore values.
         /// </summary>
         private void HandleIgnoreContactHelper()
         {
-            _ignorePhysicalHands = _rigid.GetComponentInChildren<IgnorePhysicalHands>();
+            if (_ignorePhysicalHands == null)
+            {
+                _ignorePhysicalHands = _rigid.GetComponent<IgnorePhysicalHands>();
+            }
 
             if (_ignorePhysicalHands != null)
             {
@@ -680,22 +682,6 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
-        private void ClearGrabbingHands()
-        {
-            foreach (var grabHand in _grabbingHands)
-            {
-                if (_rigid.TryGetComponent<IPhysicalHandGrab>(out var physicalHandGrab))
-                {
-                    physicalHandGrab.OnHandGrabExit(grabHand);
-                }
-
-                grabHand.physicalHandsManager.OnHandGrabExit(grabHand, _rigid);
-            }
-
-            _grabbingHands.Clear();
-            _grabbingHandsPrevious.Clear();
-        }
-
         private void RegisterGrabbingHand(ContactHand hand)
         {
             if (ignoreGrabTime > Time.time)
@@ -719,6 +705,43 @@ namespace Leap.Unity.PhysicalHands
             _grabbableHandsValues[grabHandIndex].offset = _rigid.position - hand.palmBone.transform.position;
             _grabbableHandsValues[grabHandIndex].rotationOffset = Quaternion.Inverse(hand.palmBone.transform.rotation) * _rigid.rotation;
             _grabbableHandsValues[grabHandIndex].originalHandRotationInverse = Quaternion.Inverse(hand.palmBone.transform.rotation);
+        }
+
+        private void ClearGrabbingHands()
+        {
+            foreach (var grabHand in _grabbingHands)
+            {
+                UnregisterGrabbingHand(grabHand);
+            }
+
+            _grabbingHands.Clear();
+            _grabbingHandsPrevious.Clear();
+        }
+
+        internal void UnregisterGrabbingHand(Chirality handChirality)
+        {
+            foreach (var grabHand in _grabbingHands)
+            {
+                if(grabHand.Handedness == handChirality)
+                {
+                    UnregisterGrabbingHand(grabHand);
+                }
+            }
+        }
+
+        internal void UnregisterGrabbingHand(ContactHand hand)
+        {
+            if (GrabbingHands.Contains(hand))
+            {
+                if (_rigid.TryGetComponent<IPhysicalHandGrab>(out var physicalHandGrab))
+                {
+                    physicalHandGrab.OnHandGrabExit(hand);
+                }
+
+                hand.physicalHandsManager.OnHandGrabExit(hand, _rigid);
+
+                _grabbingHands.Remove(hand);
+            }
         }
 
         private void UpdateGrabbingValues()
