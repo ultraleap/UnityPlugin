@@ -101,6 +101,10 @@ namespace Ultraleap.Tracking.OpenXR
         [PublicAPI] public bool IsUltraleapHandTracking => enabled && _isUltraleapTracking;
         [PublicAPI] public bool SupportsHandTrackingHints => enabled && _supportsHandTrackingHints;
 
+        /// <summary>
+        /// Sets a specific set of hints, if this does not include previously set ones, they will be cleared.
+        /// </summary>
+        /// <param name="hints">The hints you wish to set</param>
         public void SetHandTrackingHints(string[] hints)
         {
             if (SupportsHandTrackingHints)
@@ -109,6 +113,9 @@ namespace Ultraleap.Tracking.OpenXR
             }
         }
 
+        /// <summary>
+        /// Clears all hand-tracking hints that have been previously set.
+        /// </summary>
         public void ClearHandTrackingHints() => SetHandTrackingHints(new string[] { });
 
         protected override IntPtr HookGetInstanceProcAddr(IntPtr func) => Native.HookGetInstanceProcAddr(func);
