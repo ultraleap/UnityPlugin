@@ -99,7 +99,8 @@ namespace Ultraleap.Tracking.OpenXR
         private bool _supportsHandTrackingHints;
         
         /// <summary>
-        /// True if the XR_EXT_hand_tracking OpenXR extension is supported (and is a supported revision).
+        /// True if the XR_EXT_hand_tracking OpenXR extension is supported (and is a supported revision) and the
+        /// system indicates it supports hand-tracking.
         /// </summary>
         [PublicAPI] public bool SupportsHandTracking => enabled && _supportsHandTracking;
         
