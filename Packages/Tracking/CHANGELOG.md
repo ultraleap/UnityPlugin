@@ -49,6 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ThreadAbort when changing scenes in editor that use multidevice or display the tracking device gizmo
 - (Hand Binder) incorrect upperArm name definition for elbow joint
 - (Physical Hands) Soft Contact NAN collider error when using OpenXR tracking on Android devices
+- (Physical Hands) Hand stuck in pose, unable to grab if object is disabled while grabbing
 
 
 ## [6.14.0] - 24/01/24

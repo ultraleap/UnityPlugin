@@ -278,6 +278,15 @@ namespace Leap.Unity.PhysicalHands
                     {
                         // Ensure we release the object first
                         _grabHelperObjects[rigid].ReleaseObject();
+
+                        foreach (var bone in _leftContactHand.bones)
+                        {
+                            bone.RemoveGrabbing(rigid);
+                        }
+                        foreach (var bone in _rightContactHand.bones)
+                        {
+                            bone.RemoveGrabbing(rigid);
+                        }
                     }
                     _grabHelperObjects[rigid].ReleaseHelper();
                     _grabHelperObjects.Remove(rigid);
