@@ -632,10 +632,7 @@ namespace LeapInternal
             if (LeapFiducialPose != null)
             {
                 LeapFiducialPose.DispatchOnContext(this, EventContext,
-                    new FiducialPoseEventArgs(fiducialPoseEvent.id,
-                    fiducialPoseEvent.estimated_error,
-                    fiducialPoseEvent.translation,
-                    fiducialPoseEvent.rotation));
+                    new FiducialPoseEventArgs(fiducialPoseEvent));
             }
         }
 

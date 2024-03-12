@@ -983,13 +983,16 @@ namespace LeapInternal
         public string zoneName;
     }
 
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
     public struct LEAP_FIDUCIAL_POSE_EVENT
     {
         public int id;
+        public IntPtr family; // char*
+        public float size;
+        public Int64 timestamp;
         public float estimated_error;
         public LEAP_VECTOR translation;
-        public LEAP_MATRIX_3x3 rotation;
+        public LEAP_QUATERNION rotation;
     }
 
     public class LeapC
