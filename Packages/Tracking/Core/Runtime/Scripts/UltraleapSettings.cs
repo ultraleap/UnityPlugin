@@ -127,11 +127,18 @@ namespace Leap.Unity
 
             using (new EditorGUI.IndentLevelScope())
             {
+                // Android Build Warnings
                 SerializedProperty showAndroidBuildArchitectureWarning = settings.FindProperty("showAndroidBuildArchitectureWarning");
                 showAndroidBuildArchitectureWarning.boolValue = EditorGUILayout.ToggleLeft("Show Android Architecture build warning", showAndroidBuildArchitectureWarning.boolValue);
 
+                // Physical Hands Settings Warnings
                 SerializedProperty showPhysicalHandsPhysicsSettingsWarning = settings.FindProperty("showPhysicalHandsPhysicsSettingsWarning");
                 showPhysicalHandsPhysicsSettingsWarning.boolValue = EditorGUILayout.ToggleLeft("Show Physical Hands settings warning", showPhysicalHandsPhysicsSettingsWarning.boolValue);
+
+                // Attachment Hands delete content warnings
+                bool curValue = !EditorUtility.GetDialogOptOutDecision(DialogOptOutDecisionType.ForThisMachine, "UL attachment hands popup");
+                curValue = EditorGUILayout.ToggleLeft("Show clear Attachment Hands deletes content warning", curValue);
+                EditorUtility.SetDialogOptOutDecision(DialogOptOutDecisionType.ForThisMachine, "UL attachment hands popup", !curValue);
             }
 
             EditorGUILayout.Space(30);
