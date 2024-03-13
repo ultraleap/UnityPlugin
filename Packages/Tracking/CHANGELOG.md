@@ -46,7 +46,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (UI Input Preview) Null UIInput events cause unnecessary error logs
 - Memory increase when repeatedly opening scenes with LeapServiceProviders
 - ThreadAbort when changing scenes in editor that use multidevice or display the tracking device gizmo
-- (LeapXRServiceProvider) LeapXRServiceProvider wringly uses transform relative to camera when offset mode set to transform
+- (LeapXRServiceProvider) LeapXRServiceProvider wrongly uses transform relative to camera when offset mode set to transform
 
 
 
