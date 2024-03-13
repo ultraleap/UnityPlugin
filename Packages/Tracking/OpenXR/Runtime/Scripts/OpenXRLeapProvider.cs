@@ -69,7 +69,9 @@ namespace Ultraleap.Tracking.OpenXR
             }
         }
 
-        private TrackedPoseDriver _trackedPoseDriver;
+        [Tooltip("Automatically adds a TrackedPoseDriver to the MainCamera if there is not one already")]
+        public bool _autoCreateTrackedPoseDriver = true;
+
         private HandJointLocation[] _joints;
 
         public override TrackingSource TrackingDataSource { get { return CheckOpenXRAvailable(); } }
@@ -105,9 +107,12 @@ namespace Ultraleap.Tracking.OpenXR
             return _trackingSource;
         }
 
-        private void Start()
+        private void OnEnable()
         {
-            _trackedPoseDriver = mainCamera.GetComponent<TrackedPoseDriver>();
+            if (_autoCreateTrackedPoseDriver)
+            {
+                mainCamera.AddTrackedPoseDriverToCamera();
+            }
         }
 
         private void Update()
@@ -117,13 +122,6 @@ namespace Ultraleap.Tracking.OpenXR
             trackerTransform.translation = Vector3.zero;
             trackerTransform.rotation = Quaternion.identity;
             trackerTransform.scale = mainCamera.transform.lossyScale;
-
-            // Adjust for relative transform if it's in use.
-            if (_trackedPoseDriver != null && _trackedPoseDriver.UseRelativeTransform)
-            {
-                trackerTransform.translation += _trackedPoseDriver.originPose.position;
-                trackerTransform.rotation *= _trackedPoseDriver.originPose.rotation;
-            }
 
             // Adjust for the camera parent transform if this camera is part of a rig.
             var parentTransform = mainCamera.transform.parent;
@@ -227,7 +225,7 @@ namespace Ultraleap.Tracking.OpenXR
                             metacarpalPosition,
                             _joints[(int)HandJoint.ThumbMetacarpal].Pose.forward,
                             0f,
-                            _joints[(int)HandJoint.ThumbMetacarpal].Radius * 2f,
+                            _joints[(int)HandJoint.ThumbMetacarpal].Radius * 1.5f, // 1.5 to convert from joint radius to bone width (joints bigger than bones)
                             (Bone.BoneType)boneIndex,
                             (_joints[(int)HandJoint.Palm].Pose.rotation * PalmOffset[hand.IsLeft ? 0 : 1].rotation) * ThumbMetacarpalRotationOffset[hand.IsLeft ? 0 : 1]);
                         continue;
@@ -241,7 +239,7 @@ namespace Ultraleap.Tracking.OpenXR
                         ((prevJoint.Pose.position + nextJoint.Pose.position) / 2f),
                         prevJoint.Pose.forward,
                         (prevJoint.Pose.position - nextJoint.Pose.position).magnitude,
-                        prevJoint.Radius * 2f,
+                        prevJoint.Radius * 1.5f, // 1.5 to convert from joint radius to bone width (joints bigger than bones)
                         (Bone.BoneType)boneIndex,
                         prevJoint.Pose.rotation);
                     fingerWidth = Mathf.Max(fingerWidth, bone.Width);

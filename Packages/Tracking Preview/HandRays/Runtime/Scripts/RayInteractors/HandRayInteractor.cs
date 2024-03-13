@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -47,7 +47,11 @@ namespace Leap.Unity.Preview.HandRays
         {
             if (farFieldLayerManager == null)
             {
+#if UNITY_2021_3_18_OR_NEWER
                 farFieldLayerManager = FindAnyObjectByType<FarFieldLayerManager>();
+#else
+                farFieldLayerManager = FindObjectOfType<FarFieldLayerManager>();
+#endif
             }
 
             layerMask |= farFieldLayerManager.FarFieldObjectLayer.layerMask;
@@ -61,7 +65,11 @@ namespace Leap.Unity.Preview.HandRays
         {
             if (farFieldLayerManager == null)
             {
+#if UNITY_2021_3_18_OR_NEWER
                 farFieldLayerManager = FindAnyObjectByType<FarFieldLayerManager>();
+#else
+                farFieldLayerManager = FindObjectOfType<FarFieldLayerManager>();
+#endif
             }
         }
 
@@ -69,7 +77,12 @@ namespace Leap.Unity.Preview.HandRays
         {
             if (_handRay == null)
             {
+#if UNITY_2021_3_18_OR_NEWER
                 _handRay = FindAnyObjectByType<WristShoulderHandRay>();
+#else
+                _handRay = FindObjectOfType<WristShoulderHandRay>();
+#endif
+
                 if (_handRay == null)
                 {
                     Debug.LogWarning("HandRayInteractor needs a HandRay");

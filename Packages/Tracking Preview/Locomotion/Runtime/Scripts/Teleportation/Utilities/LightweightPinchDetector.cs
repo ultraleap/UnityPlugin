@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -55,7 +55,7 @@ namespace Leap.Unity.Preview.Locomotion
             _chiralityLastFrame = chirality;
             if (leapProvider == null)
             {
-                leapProvider = FindAnyObjectByType<LeapProvider>();
+                leapProvider = Hands.Provider;
             }
         }
 
@@ -86,10 +86,6 @@ namespace Leap.Unity.Preview.Locomotion
                 {
                     OnPinch?.Invoke(hand);
                 }
-                else
-                {
-                    OnPinching?.Invoke(hand);
-                }
 
                 IsPinching = true;
             }
@@ -104,6 +100,7 @@ namespace Leap.Unity.Preview.Locomotion
 
             if (IsPinching)
             {
+                OnPinching?.Invoke(hand);
                 SquishPercent = Mathf.InverseLerp(activateDistance, 0, pinchDistance);
             }
             else

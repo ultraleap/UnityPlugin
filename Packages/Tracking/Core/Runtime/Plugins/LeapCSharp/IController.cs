@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -37,6 +37,7 @@ namespace Leap
 
         //new
         event EventHandler<PolicyEventArgs> PolicyChange;
+        [Obsolete("Config is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
         event EventHandler<ConfigChangeEventArgs> ConfigChange;
         event EventHandler<DistortionEventArgs> DistortionChange;
         event EventHandler<ImageEventArgs> ImageReady;

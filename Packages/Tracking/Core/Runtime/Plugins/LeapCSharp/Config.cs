@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -30,7 +30,7 @@ namespace Leap
         /// Note that the Controller.Config provides a properly initialized Config object already.
         /// @since 3.0
         /// </summary>
-        [Obsolete("Config.cs is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
+        [Obsolete("Config is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
         public Config(Connection.Key connectionKey)
         {
             _connection = Connection.GetConnection(connectionKey);
@@ -38,9 +38,10 @@ namespace Leap
             _connection.LeapConfigResponse += handleConfigResponse;
         }
 
-        [Obsolete("Config.cs is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
+        [Obsolete("Config is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
         public Config(int connectionId) : this(new Connection.Key(connectionId)) { }
 
+        [Obsolete("Config is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
         private void handleConfigChange(object sender, ConfigChangeEventArgs eventArgs)
         {
             object actionDelegate;
@@ -52,6 +53,7 @@ namespace Leap
             }
         }
 
+        [Obsolete("Config is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
         private void handleConfigResponse(object sender, SetConfigResponseEventArgs eventArgs)
         {
             object actionDelegate = new object();

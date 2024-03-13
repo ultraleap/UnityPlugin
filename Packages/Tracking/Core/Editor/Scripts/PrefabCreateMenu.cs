@@ -1,11 +1,12 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
+using Leap.Unity.PhysicalHands;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -110,6 +111,12 @@ namespace Leap
         {
             CreatePrefab("Attachment Hands");
         }
+        [MenuItem("GameObject/Ultraleap/Hands/Ghost Capsule Hands", false, 27),
+    MenuItem("Ultraleap/Hands/Ghost Capsule Hands", false, 27)]
+        public static void CreateGhostCapsuleHands()
+        {
+            CreatePrefab("Ghost Capsule Hands");
+        }
 
         #endregion
 
@@ -175,9 +182,32 @@ namespace Leap
             CreatePrefab("Anchor");
         }
 
+        [MenuItem("GameObject/Ultraleap/Physical Hands/Physical Hands Manager", false, 20),
+            MenuItem("Ultraleap/Physical Hands/Physical Hands Manager", false, 20)]
+        public static void CreatePhysicalHandsManagerMenu()
+        {
+            GameObject physicalHandsManager = CreatePrefab("Physical Hands Manager");
+            if (physicalHandsManager != null)
+            {
+                var physHandsManager = physicalHandsManager.GetComponent<Leap.Unity.PhysicalHands.PhysicalHandsManager>();
+                // Ensure that there is a contact parent at runtime
+                if (physHandsManager != null)
+                {
+                    physHandsManager.SetContactMode(physHandsManager.contactMode);
+                }
+            }
+        }
+
+        [MenuItem("GameObject/Ultraleap/Physical Hands/Physical Hands Button", false, 21),
+            MenuItem("Ultraleap/Physical Hands/Physical Hands Button", false, 21)]
+        public static void CreatePhysicalHandsButton()
+        {
+            CreatePrefab("Physical Hands Button");
+        }
+
         #endregion
 
-        public static void CreatePrefab(string prefabName)
+        public static GameObject CreatePrefab(string prefabName)
         {
             var guids = AssetDatabase.FindAssets(prefabName);
 
@@ -199,8 +229,7 @@ namespace Leap
 
                     if (newObject != null)
                     {
-                        HandleObjectCreation(newObject);
-                        return;
+                        return HandleObjectCreation(newObject);
                     }
                 }
             }
@@ -213,13 +242,14 @@ namespace Leap
 
                 if (newObject != null)
                 {
-                    HandleObjectCreation(newObject);
-                    break;
+                    return HandleObjectCreation(newObject);
                 }
             }
+
+            return null;
         }
 
-        static void HandleObjectCreation(GameObject gameObject)
+        static GameObject HandleObjectCreation(GameObject gameObject)
         {
             gameObject = PrefabUtility.InstantiatePrefab(gameObject) as GameObject;
 
@@ -243,6 +273,8 @@ namespace Leap
 
             // For prefabs, let's mark the scene as dirty for saving
             EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
+
+            return gameObject;
         }
     }
 }

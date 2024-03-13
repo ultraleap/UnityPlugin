@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -1135,12 +1135,15 @@ namespace LeapInternal
         [DllImport("LeapC", EntryPoint = "LeapDestroyConnection")]
         public static extern void DestroyConnection(IntPtr connection);
 
+        [Obsolete("Config is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
         [DllImport("LeapC", EntryPoint = "LeapSaveConfigValue")]
         private static extern eLeapRS SaveConfigValue(IntPtr hConnection, string key, IntPtr value, out UInt32 requestId);
 
+        [Obsolete("Config is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
         [DllImport("LeapC", EntryPoint = "LeapRequestConfigValue")]
         public static extern eLeapRS RequestConfigValue(IntPtr hConnection, string name, out UInt32 request_id);
 
+        [Obsolete("Config is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
         public static eLeapRS SaveConfigValue(IntPtr hConnection, string key, bool value, out UInt32 requestId)
         {
             LEAP_VARIANT_VALUE_TYPE valueStruct = new LEAP_VARIANT_VALUE_TYPE(); //This is a C# approximation of a C union
@@ -1148,6 +1151,7 @@ namespace LeapInternal
             valueStruct.boolValue = value ? 1 : 0;
             return SaveConfigWithValueType(hConnection, key, valueStruct, out requestId);
         }
+        [Obsolete("Config is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
         public static eLeapRS SaveConfigValue(IntPtr hConnection, string key, Int32 value, out UInt32 requestId)
         {
             LEAP_VARIANT_VALUE_TYPE valueStruct = new LEAP_VARIANT_VALUE_TYPE();
@@ -1155,6 +1159,7 @@ namespace LeapInternal
             valueStruct.intValue = value;
             return SaveConfigWithValueType(hConnection, key, valueStruct, out requestId);
         }
+        [Obsolete("Config is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
         public static eLeapRS SaveConfigValue(IntPtr hConnection, string key, float value, out UInt32 requestId)
         {
             LEAP_VARIANT_VALUE_TYPE valueStruct = new LEAP_VARIANT_VALUE_TYPE();
@@ -1162,6 +1167,7 @@ namespace LeapInternal
             valueStruct.floatValue = value;
             return SaveConfigWithValueType(hConnection, key, valueStruct, out requestId);
         }
+        [Obsolete("Config is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
         public static eLeapRS SaveConfigValue(IntPtr hConnection, string key, string value, out UInt32 requestId)
         {
             LEAP_VARIANT_REF_TYPE valueStruct;
@@ -1169,6 +1175,8 @@ namespace LeapInternal
             valueStruct.stringValue = value;
             return SaveConfigWithRefType(hConnection, key, valueStruct, out requestId);
         }
+
+        [Obsolete("Config is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
         private static eLeapRS SaveConfigWithValueType(IntPtr hConnection, string key, LEAP_VARIANT_VALUE_TYPE valueStruct, out UInt32 requestId)
         {
             IntPtr configValue = Marshal.AllocHGlobal(Marshal.SizeOf(valueStruct));
@@ -1184,6 +1192,8 @@ namespace LeapInternal
             }
             return callResult;
         }
+
+        [Obsolete("Config is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
         private static eLeapRS SaveConfigWithRefType(IntPtr hConnection, string key, LEAP_VARIANT_REF_TYPE valueStruct, out UInt32 requestId)
         {
             IntPtr configValue = Marshal.AllocHGlobal(Marshal.SizeOf(valueStruct));
@@ -1243,5 +1253,43 @@ namespace LeapInternal
 
         [DllImport("LeapC", EntryPoint = "LeapGetVersion")]
         public static extern eLeapRS GetVersion(IntPtr hConnection, eLeapVersionPart versionPart, ref LEAP_VERSION pVersion);
+
+
+        [DllImport("LeapC", EntryPoint = "LeapGetServerStatus")]
+        public static extern eLeapRS GetServerStatus(UInt32 timeout, ref IntPtr status);
+
+        [DllImport("LeapC", EntryPoint = "LeapReleaseServerStatus")]
+        public static extern eLeapRS ReleaseServerStatus(ref LEAP_SERVER_STATUS status);
+
+
+        [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
+        public struct LEAP_SERVER_STATUS
+        {
+            public string version;
+            public UInt32 device_count;
+            public IntPtr devices;
+        }
+
+        [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
+        public struct LEAP_SERVER_STATUS_DEVICE
+        {
+            public string serial;
+            public string type;
+        }
+        
+        public static eLeapRS SetDeviceHints(IntPtr hConnection, IntPtr hDevice, string[] hints)
+        {
+            // Ensure the final element of the array is null terminated.
+            if (hints.Length == 0 || hints[^1] != null)
+            {
+                Array.Resize(ref hints, hints.Length + 1);
+                hints[^1] = null;
+            }
+
+            return SetDeviceHintsInternal(hConnection, hDevice, hints);
+        }
+        
+        [DllImport("LeapC", EntryPoint = "LeapSetDeviceHints")]
+        private static extern eLeapRS SetDeviceHintsInternal(IntPtr hConnection, IntPtr hDevice, string[] hints);
     }
 }

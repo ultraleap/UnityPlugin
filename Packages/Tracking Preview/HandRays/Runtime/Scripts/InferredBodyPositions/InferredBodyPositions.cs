@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -165,7 +165,11 @@ namespace Leap.Unity.Preview.HandRays
 
         private void Start()
         {
+#if UNITY_2021_3_18_OR_NEWER
             LeapXRServiceProvider leapXRServiceProvider = FindAnyObjectByType<LeapXRServiceProvider>();
+#else
+            LeapXRServiceProvider leapXRServiceProvider = FindObjectOfType<LeapXRServiceProvider>();
+#endif
             if (leapXRServiceProvider != null)
             {
                 Head = leapXRServiceProvider.mainCamera.transform;
