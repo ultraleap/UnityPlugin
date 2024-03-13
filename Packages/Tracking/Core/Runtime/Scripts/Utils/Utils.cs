@@ -2835,7 +2835,7 @@ namespace Leap.Unity
 
         /// <summary>
         /// Adds a tracked pose driver to the given camera if suitable packages are installed.
-        /// Does nothing id a tracked pose driver already exists on the camera
+        /// Does nothing if a tracked pose driver already exists on the camera
         /// </summary>
         public static void AddTrackedPoseDriverToCamera(this Camera mainCamera)
         {
