@@ -35,6 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (Hinting) Added support for runtime changing of Hand Tracking Hints via static HandTrackingHintManager
 - Access of Physical Hands extensions
 - Added public accessors to various Physical Hands utilities
+- Unified use of TrackedPoseDrivers across XR LeapProviders
 
 ### Fixed
 - Errors in Editor when using pre-2023.3.18 LTS due to FindObjectByType issue

@@ -2831,6 +2831,43 @@ namespace Leap.Unity
 
         #endregion
 
+        #region Tracked Pose Driver Utils
+
+        /// <summary>
+        /// Adds a tracked pose driver to the given camera if suitable packages are installed.
+        /// Does nothing if a tracked pose driver already exists on the camera
+        /// </summary>
+        public static void AddTrackedPoseDriverToCamera(this Camera mainCamera)
+        {
+#if !XR_MANAGEMENT_AVAILABLE && !INPUT_SYSTEM_AVAILABLE
+            return;
+#endif
+            bool trackedPoseDriverExists = false;
+
+#if XR_MANAGEMENT_AVAILABLE
+            if (mainCamera.GetComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>())
+            {
+                trackedPoseDriverExists = true;
+            }
+#endif
+#if INPUT_SYSTEM_AVAILABLE
+            if (mainCamera.GetComponent<UnityEngine.InputSystem.XR.TrackedPoseDriver>())
+            {
+                trackedPoseDriverExists = true;
+            }
+#endif
+            if (!trackedPoseDriverExists)
+            {
+#if XR_MANAGEMENT_AVAILABLE
+                mainCamera.gameObject.AddComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>().UseRelativeTransform = true;
+#elif INPUT_SYSTEM_AVAILABLE
+                mainCamera.gameObject.AddComponent<UnityEngine.InputSystem.XR.TrackedPoseDriver>();
+#endif
+            }
+        }
+
+        #endregion
+
         #endregion
 
         #region Value Mapping Utils ("Map")
