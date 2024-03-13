@@ -311,6 +311,11 @@ namespace Leap
         public LEAP_QUATERNION headOrientation { get; set; }
     }
 
+    /// <summary>
+    /// Dispatched when a Fiducial Marker is tracked
+    /// 
+    /// Note: Family and Size are not currently implemented
+    /// </summary>
     public class FiducialPoseEventArgs : LeapEventArgs
     {
         public FiducialPoseEventArgs(LEAP_FIDUCIAL_POSE_EVENT poseEvent) : base(LeapEvent.EVENT_FIDUCIAL_POSE)
