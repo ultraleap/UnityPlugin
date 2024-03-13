@@ -861,9 +861,10 @@ namespace LeapInternal
         private void handleNewDeviceTransform(ref LEAP_NEW_DEVICE_TRANSFORM deviceTransformMsg, UInt32 deviceID)
         {
             Device device = _devices.FindDeviceByID(deviceID);
+
             if (device != null)
             {
-                device.
+                device.FindDeviceTransform();
             }
         }
 
