@@ -135,7 +135,6 @@ namespace LeapInternal
         public EventHandler<ImageEventArgs> LeapImage;
         public EventHandler<PointMappingChangeEventArgs> LeapPointMappingChange;
         public EventHandler<HeadPoseEventArgs> LeapHeadPoseChange;
-        public EventHandler<PolicyEventArgs> LeapNewDeviceTransform;
 
         public Action<BeginProfilingForThreadArgs> LeapBeginProfilingForThread;
         public Action<EndProfilingForThreadArgs> LeapEndProfilingForThread;
