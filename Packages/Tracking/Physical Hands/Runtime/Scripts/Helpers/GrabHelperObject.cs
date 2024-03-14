@@ -285,7 +285,7 @@ namespace Leap.Unity.PhysicalHands
                 _grabbableHands.RemoveAt(index);
                 _grabbableHandsValues.RemoveAt(index);
 
-                if (_rigid.TryGetComponent<IPhysicalHandHover>(out var physicalHandHover))
+                if (_rigid != null && _rigid.TryGetComponent<IPhysicalHandHover>(out var physicalHandHover))
                 {
                     physicalHandHover.OnHandHoverExit(hand);
                 }
@@ -709,9 +709,9 @@ namespace Leap.Unity.PhysicalHands
 
         private void ClearGrabbingHands()
         {
-            foreach (var grabHand in _grabbingHands)
+            for (int i = _grabbingHands.Count-1; i >= 0; i--)
             {
-                UnregisterGrabbingHand(grabHand);
+                UnregisterGrabbingHand(_grabbingHands[i]);
             }
 
             _grabbingHands.Clear();
@@ -722,26 +722,29 @@ namespace Leap.Unity.PhysicalHands
         {
             foreach (var grabHand in _grabbingHands)
             {
-                if(grabHand.Handedness == handChirality)
+                if (grabHand?.Handedness == handChirality)
                 {
                     UnregisterGrabbingHand(grabHand);
+                    return;
                 }
             }
         }
 
-        internal void UnregisterGrabbingHand(ContactHand hand)
+        private void UnregisterGrabbingHand(ContactHand hand)
         {
-            if (GrabbingHands.Contains(hand))
+            if(hand == null)
             {
-                if (_rigid.TryGetComponent<IPhysicalHandGrab>(out var physicalHandGrab))
-                {
-                    physicalHandGrab.OnHandGrabExit(hand);
-                }
-
-                hand.physicalHandsManager.OnHandGrabExit(hand, _rigid);
-
-                _grabbingHands.Remove(hand);
+                return;
             }
+
+            if (_rigid != null && _rigid.TryGetComponent<IPhysicalHandGrab>(out var physicalHandGrab))
+            {
+                physicalHandGrab.OnHandGrabExit(hand);
+            }
+
+            hand.physicalHandsManager.OnHandGrabExit(hand, _rigid);
+
+            _grabbingHands.Remove(hand);
         }
 
         private void UpdateGrabbingValues()
@@ -1045,6 +1048,13 @@ namespace Leap.Unity.PhysicalHands
 
         private void ThrowingOnRelease()
         {
+            // You can't throw kinematic objects
+            if(_rigid != null && _rigid.isKinematic)
+            {
+                _velocityQueue.Clear();
+                return;
+            }
+
             Vector3 averageVelocity = Vector3.zero;
 
             int velocityCount = 0;

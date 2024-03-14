@@ -16,11 +16,11 @@ namespace Leap.Unity.PhysicalHands
     {
         public ChiralitySelection HandToIgnore = ChiralitySelection.BOTH;
 
-        [SerializeField, Tooltip("Prevents the object from being grabbed by all Contact Hands.")]
+        [SerializeField, Tooltip("Prevents the object from being grabbed by chosen Contact Hands.")]
         private bool _disableAllGrabbing = true;
 
         /// <summary>
-        /// Prevents the object from being grabbed by all Contact Hands
+        /// Prevents the object from being grabbed by chosen Contact Hands
         /// </summary>
         public bool DisableAllGrabbing
         {
@@ -87,7 +87,9 @@ namespace Leap.Unity.PhysicalHands
 
         private void Start()
         {
-            if(GrabHelper.Instance != null)
+            // Find if we have a GrabHelperObject already, and pass it a reference to us
+            //  Note: this will only happen when this IgnorePhysicalHands is created at runtime
+            if (GrabHelper.Instance != null)
             {
                 Rigidbody rbody = GetComponent<Rigidbody>();
 
@@ -96,6 +98,14 @@ namespace Leap.Unity.PhysicalHands
                     if(GrabHelper.Instance.TryGetGrabHelperObjectFromRigid(rbody, out _grabHelperObject))
                     {
                         _grabHelperObject._ignorePhysicalHands = this;
+
+                        foreach (var hand in _grabHelperObject.GrabbableHands)
+                        {
+                            AddToHands(hand);
+                        }
+
+                        SetAllHandCollisions();
+                        SetAllHandGrabbing();
                     }
                 }
             }
@@ -123,15 +133,30 @@ namespace Leap.Unity.PhysicalHands
             PhysicalHandsManager.OnHandsInitialized -= HandsInitialized;
         }
 
+        /// <summary>
+        /// Initialize this component with alternative values to the defaults
+        /// 
+        /// Call Init on this component immediately after adding it to a gameobject if you wish to override the default values
+        /// 
+        /// Note: Consider adding this component to the GameObject before runtime begins and simply toggle the variables at runtime instead
+        /// </summary>
+        public void Init(bool ignoreGrabbing = true, bool ignoreCollisions = true, bool ignoreChildCollisions = true, ChiralitySelection handToIgnore = ChiralitySelection.BOTH)
+        {
+            this.HandToIgnore = handToIgnore;
+            this.DisableAllGrabbing = ignoreGrabbing;
+            this.DisableAllHandCollisions = ignoreCollisions;
+            this.DisableCollisionOnChildObjects = ignoreChildCollisions;
+        }
+
         internal void AddToHands(ContactHand contactHand)
         {
             contactHands.Add(contactHand);
             SetHandCollision(contactHand);
         }
 
-        private void SetAllHandGrabbing(bool forceEnable = false, bool forceDisable = false)
+        private void SetAllHandGrabbing(bool forceDisable = false)
         {
-            if (DisableAllGrabbing)
+            if (DisableAllGrabbing || forceDisable)
             {
                 switch (HandToIgnore)
                 {
