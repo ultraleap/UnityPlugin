@@ -104,9 +104,33 @@ namespace Leap.Unity.PhysicalHands
 
         private Frame _modifiedFrame = new Frame();
 
-        public override Frame CurrentFrame => _modifiedFrame;
+        public override Frame CurrentFrame
+        {
+            get
+            {
+#if UNITY_EDITOR
+                if (!Application.isPlaying && _inputProvider != null)
+                {
+                    return _inputProvider.CurrentFrame;
+                }
+#endif
+                return _modifiedFrame;
+            }
+        }
 
-        public override Frame CurrentFixedFrame => _modifiedFrame;
+        public override Frame CurrentFixedFrame
+        {
+            get
+            {
+#if UNITY_EDITOR
+                if (!Application.isPlaying && _inputProvider != null)
+                {
+                    return _inputProvider.CurrentFrame;
+                }
+#endif
+                return _modifiedFrame;
+            }
+        }
 
         /// <summary>
         /// Happens in the execution order just before any hands are changed or updated
