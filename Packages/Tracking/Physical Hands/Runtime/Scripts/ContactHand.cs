@@ -213,7 +213,7 @@ namespace Leap.Unity.PhysicalHands
 
                     boneArrayIndex = fingerIndex * FINGER_BONES + jointIndex;
 
-                    bones[boneArrayIndex] = new GameObject($"{HandUtils.FingerIndexToName(fingerIndex)} {HandUtils.JointIndexToName(jointIndex + 1)}", boneType, typeof(CapsuleCollider)).GetComponent<ContactBone>();
+                    bones[boneArrayIndex] = new GameObject($"{HandUtils.FingerIndexToName(fingerIndex)} {HandUtils.JointIndexToName(jointIndex + 1)}", boneType).GetComponent<ContactBone>();
                     bone = bones[boneArrayIndex];
                     bone.gameObject.layer = contactParent.physicalHandsManager.HandsResetLayer;
                     bone.transform.SetParent(lastTransform);
@@ -221,7 +221,7 @@ namespace Leap.Unity.PhysicalHands
                     bone.finger = fingerIndex;
                     bone.joint = jointIndex;
 
-                    bone.boneCollider = bone.GetComponent<CapsuleCollider>();
+                    bone.boneCollider = bone.gameObject.AddComponent<CapsuleCollider>();
                     ContactUtils.SetupBoneCollider(bone.boneCollider, leapHand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex + 1)));
                     bone.contactHand = this;
 
