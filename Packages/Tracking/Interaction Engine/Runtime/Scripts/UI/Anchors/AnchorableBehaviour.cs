@@ -7,9 +7,10 @@
  ******************************************************************************/
 
 using Leap.Unity.Attributes;
-
+using Leap.Unity.PhysicalHands;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Leap.Unity.Interaction
@@ -19,7 +20,7 @@ namespace Leap.Unity.Interaction
     /// pick up and place in specific locations, specified by other GameObjects with an
     /// Anchor component.
     /// </summary>
-    public class AnchorableBehaviour : MonoBehaviour
+    public class AnchorableBehaviour : MonoBehaviour, IPhysicalHandGrab, IPhysicalHandHover
     {
 
         [Disable]
@@ -67,6 +68,10 @@ namespace Leap.Unity.Interaction
                             if (interactionBehaviour != null)
                             {
                                 interactionBehaviour.rigidbody.useGravity = true;
+                            }
+                            else if(_rigidbody)
+                            {
+                                _rigidbody.useGravity = true;
                             }
                             _reactivateGravityOnDetach = false;
                         }
@@ -322,8 +327,18 @@ namespace Leap.Unity.Interaction
         private Quaternion _targetRotationLastUpdate = Quaternion.identity;
         private bool _hasTargetRotationLastUpdate = false;
 
+        private Rigidbody _rigidbody;
+        private bool _isHovered;
+        private List<Leap.Hand> _hoveringHands = new List<Hand>();
+
+        private IgnorePhysicalHands _ignorePhysicalHands = null;
+
         void OnValidate()
         {
+            if (_rigidbody == null)
+            {
+                _rigidbody = GetComponent<Rigidbody>();
+            }
             refreshInteractionBehaviour();
             refreshInspectorConveniences();
         }
@@ -352,12 +367,28 @@ namespace Leap.Unity.Interaction
                     interactionBehaviour.OnGraspEnd += tryToAnchorOnGraspEnd;
                 }
             }
-
+            if (_rigidbody == null)
+            {
+                _rigidbody = GetComponent<Rigidbody>();
+            }
             initUnityEvents();
         }
 
         void Start()
         {
+            if (anchor.GetChiralityOfAttachedHand() != ChiralitySelection.NONE)
+            {
+                if (!TryGetComponent<IgnorePhysicalHands>(out _ignorePhysicalHands))
+                {
+                    _ignorePhysicalHands = this.gameObject.AddComponent<IgnorePhysicalHands>();
+                }
+
+                if (anchor != null && anchor.AttahedHandChirality != ChiralitySelection.NONE)
+                {
+
+                    _ignorePhysicalHands.HandToIgnore = anchor.AttahedHandChirality;
+                }
+            }
             if (anchor != null && _isAttached)
             {
                 anchor.NotifyAttached(this);
@@ -379,6 +410,11 @@ namespace Leap.Unity.Interaction
                     // The proper solution involves switching the behaviour to FixedUpdate and more
                     // intelligently communicating with the attached InteractionBehaviour.
                     interactionBehaviour.rigidbody.useGravity = false;
+                    _reactivateGravityOnDetach = true;
+                }
+                else if (_rigidbody != null && _rigidbody.useGravity)
+                {
+                    _rigidbody.useGravity = false;
                     _reactivateGravityOnDetach = true;
                 }
 
@@ -420,6 +456,29 @@ namespace Leap.Unity.Interaction
 
             // Make sure we don't leave dangling anchor-preference state.
             endAnchorPreference();
+        }
+
+        void IPhysicalHandGrab.OnHandGrab(ContactHand hand)
+        {
+            detachAnchorOnGraspBegin();
+        }
+
+        void IPhysicalHandGrab.OnHandGrabExit(ContactHand hand)
+        {
+            tryToAnchorOnGraspEnd();
+        }
+
+
+        void IPhysicalHandHover.OnHandHover(ContactHand hand)
+        {
+            _isHovered = true;
+            _hoveringHands.Add(hand.GetDataHand());
+        }
+
+        void IPhysicalHandHover.OnHandHoverExit(ContactHand hand)
+        {
+            _isHovered = false;
+            _hoveringHands.Remove(hand.GetDataHand());
         }
 
         private void refreshInspectorConveniences()
@@ -684,6 +743,15 @@ namespace Leap.Unity.Interaction
                 _preferredAnchor = preferredAnchor;
                 anchor = preferredAnchor;
                 isAttached = true;
+                if (anchor != null && anchor.AttahedHandChirality != ChiralitySelection.NONE)
+                {
+                    _ignorePhysicalHands.HandToIgnore = anchor.AttahedHandChirality;
+                }
+                else if (anchor.AttahedHandChirality != ChiralitySelection.NONE)
+                {
+                    _ignorePhysicalHands.HandToIgnore = ChiralitySelection.NONE;
+
+                }
             }
         }
 
@@ -747,7 +815,7 @@ namespace Leap.Unity.Interaction
 
         private void updateAttractionToHand()
         {
-            if (interactionBehaviour == null || anchor == null || !isAttractedByHand)
+            if (anchor == null || !isAttractedByHand)
             {
                 if (_offsetTowardsHand != Vector3.zero)
                 {
@@ -759,7 +827,7 @@ namespace Leap.Unity.Interaction
 
             float reachTargetAmount = 0F;
             Vector3 towardsHand = Vector3.zero;
-            if (interactionBehaviour.isHovered)
+            if (interactionBehaviour != null && interactionBehaviour.isHovered)
             {
                 Vector3 hoverTarget = Vector3.zero;
 
@@ -773,6 +841,17 @@ namespace Leap.Unity.Interaction
                 {
                     hoverTarget = hoveringController.hoverPoint;
                 }
+
+                reachTargetAmount = Mathf.Clamp01(attractionReachByDistance.Evaluate(
+                   Vector3.Distance(hoverTarget, anchor.transform.position)));
+                towardsHand = hoverTarget - anchor.transform.position;
+            }
+            else if(_isHovered)
+            {
+                Vector3 hoverTarget = Vector3.zero;
+
+                Hand hoveringHand = _hoveringHands.Last();
+                hoverTarget = hoveringHand.PalmPosition;
 
                 reachTargetAmount = Mathf.Clamp01(attractionReachByDistance.Evaluate(
                    Vector3.Distance(hoverTarget, anchor.transform.position)));
@@ -851,6 +930,11 @@ namespace Leap.Unity.Interaction
                 interactionBehaviour.rigidbody.position = finalPosition;
                 this.transform.position = finalPosition;
             }
+            else if (_rigidbody != null)
+            {
+                _rigidbody.position = finalPosition;
+                this.transform.position = finalPosition;
+            }
             else
             {
                 this.transform.position = finalPosition;
@@ -864,6 +948,10 @@ namespace Leap.Unity.Interaction
             if (interactionBehaviour != null)
             {
                 finalRotation = interactionBehaviour.rigidbody.rotation;
+            }
+            else if (_rigidbody != null)
+            {
+                finalRotation = _rigidbody.rotation;
             }
             else
             {
@@ -918,6 +1006,11 @@ namespace Leap.Unity.Interaction
             if (interactionBehaviour != null)
             {
                 interactionBehaviour.rigidbody.rotation = finalRotation;
+                this.transform.rotation = finalRotation;
+            }
+            else if (_rigidbody != null)
+            {
+                _rigidbody.rotation = finalRotation;
                 this.transform.rotation = finalRotation;
             }
             else

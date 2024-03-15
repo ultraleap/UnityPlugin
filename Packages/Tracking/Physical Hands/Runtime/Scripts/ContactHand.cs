@@ -249,6 +249,11 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
+        public Hand GetDataHand()
+        {
+            return dataHand;
+        }
+
         /// <summary>
         /// Helper function to obtain a specific bone of the hand.
         /// </summary>
