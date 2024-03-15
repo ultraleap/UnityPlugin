@@ -9,7 +9,7 @@ using UnityEngine.Events;
 namespace Leap.Unity.PhysicalHands
 {
     [RequireComponent(typeof(Rigidbody))]
-    public class PhysicalHandsUISlider : MonoBehaviour
+    public class PhysicalHandsUISlider : MonoBehaviour, IPhysicalHandGrab
     {
         
         public enum SliderType
@@ -40,6 +40,11 @@ namespace Leap.Unity.PhysicalHands
 
         [SerializeField]
         private PhysicalHandsButton _connectedButton;
+
+        private Rigidbody _connectedRigidbody;
+
+        [SerializeField]
+        private bool _freezeIfNotActive = false;
 
         /// <summary>
         /// The travel distance of the slider (from the central point).
@@ -100,7 +105,7 @@ namespace Leap.Unity.PhysicalHands
 
         private void OnEnable()
         {
-            if (_connectedButton != null)
+            if (_connectedButton == null)
             {
                 if (TryGetComponent<PhysicalHandsButton>(out _connectedButton))
                 {
@@ -108,6 +113,7 @@ namespace Leap.Unity.PhysicalHands
                     _connectedButton.OnButtonUnPressed.AddListener(ButtonUnPressed);
                 }
             }
+            TryGetComponent<Rigidbody>(out _connectedRigidbody);
         }
 
         private void OnDisable()
@@ -181,12 +187,45 @@ namespace Leap.Unity.PhysicalHands
 
         private void ButtonPressed()
         {
+            UnFreezeSliderPosition();
+
             SendSliderEvent(SliderButtonPressedEvent, TwoDimensionalSliderButtonPressedEvent);
         }
         private void ButtonUnPressed()
         {
+            if (_freezeIfNotActive)
+            {
+                FreezeSliderPosition();
+            }
+
             SendSliderEvent(SliderButtonUnPressedEvent, TwoDimensionalSliderButtonUnPressedEvent);
         }
+
+        public void OnHandGrab(ContactHand hand)
+        {
+            UnFreezeSliderPosition();
+        }
+
+        public void OnHandGrabExit(ContactHand hand)
+        {
+            if (_freezeIfNotActive)
+            {
+                FreezeSliderPosition();
+            }
+        }
+
+
+        private void UnFreezeSliderPosition()
+        {
+            _connectedRigidbody.constraints = RigidbodyConstraints.None;
+            _connectedRigidbody.isKinematic = false;
+        }
+        private void FreezeSliderPosition()
+        {
+            _connectedRigidbody.constraints = RigidbodyConstraints.FreezeAll;
+            _connectedRigidbody.isKinematic = true;
+        }
+
 
         private void SetUpConfigurableJoint(ConfigurableJoint joint)
         {

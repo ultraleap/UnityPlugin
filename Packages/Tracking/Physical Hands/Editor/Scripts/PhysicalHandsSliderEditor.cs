@@ -24,6 +24,9 @@ namespace Leap.Unity.PhysicalHands
             }
 
             EditorGUILayout.PropertyField(serializedObject.FindProperty("_sliderTravelDistance"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("_freezeIfNotActive"));
+
+
             EditorGUILayout.Space(20);
 
             EditorGUILayout.PropertyField(serializedObject.FindProperty("_connectedButton"));
