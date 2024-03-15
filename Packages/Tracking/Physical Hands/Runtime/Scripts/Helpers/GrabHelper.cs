@@ -42,10 +42,18 @@ namespace Leap.Unity.PhysicalHands
 
         #endregion
 
+        private void Awake()
+        {
+            if(Instance != null)
+            {
+                Debug.LogWarning("Having multiple GrabHelpers at once is not supported");
+            }
+
+            Instance = this;
+        }
+
         private void OnEnable()
         {
-            Instance = this;
-
             if (physicalHandsManager != null)
             {
                 physicalHandsManager.OnPrePhysicsUpdate -= OnPrePhysicsUpdate;
@@ -355,6 +363,12 @@ namespace Leap.Unity.PhysicalHands
             return false;
         }
 
+        /// <summary>
+        /// Populate helperObject with the GrabHelperObject associated with the provided Rigidbody if there is one.
+        /// </summary>
+        /// <param name="rigid">The Rigidbody to find the associated GrabHelperObject</param>
+        /// <param name="helperObject">A GrabHelperObject to be populated if one is available</param>
+        /// <returns>True if there is a GrabHelperObject associated with the provided Rigidbody</returns>
         public bool TryGetGrabHelperObjectFromRigid(Rigidbody rigid, out GrabHelperObject helperObject)
         {
             return _grabHelperObjects.TryGetValue(rigid, out helperObject);

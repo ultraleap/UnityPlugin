@@ -16,11 +16,14 @@ namespace Leap.Unity.PhysicalHands
     {
         public ChiralitySelection HandToIgnore = ChiralitySelection.BOTH;
 
-        [SerializeField, Tooltip("Prevents the object from being grabbed by chosen Contact Hands.")]
+        [SerializeField, Tooltip("Prevents the object from being grabbed by chosen Contact Hands." +
+            "\n\nNote: This only applies if IgnorePhysicalHands is applied to a GameObject with a Rigidbody component.")]
         private bool _disableAllGrabbing = true;
 
         /// <summary>
-        /// Prevents the object from being grabbed by chosen Contact Hands
+        /// Prevents the object from being grabbed by chosen Contact Hands.
+        /// 
+        /// Note: This only applies if IgnorePhysicalHands is applied to a GameObject with a Rigidbody component.
         /// </summary>
         public bool DisableAllGrabbing
         {
