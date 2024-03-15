@@ -86,10 +86,6 @@ namespace Leap.Unity.Preview.Locomotion
                 {
                     OnPinch?.Invoke(hand);
                 }
-                else
-                {
-                    OnPinching?.Invoke(hand);
-                }
 
                 IsPinching = true;
             }
@@ -104,6 +100,7 @@ namespace Leap.Unity.Preview.Locomotion
 
             if (IsPinching)
             {
+                OnPinching?.Invoke(hand);
                 SquishPercent = Mathf.InverseLerp(activateDistance, 0, pinchDistance);
             }
             else

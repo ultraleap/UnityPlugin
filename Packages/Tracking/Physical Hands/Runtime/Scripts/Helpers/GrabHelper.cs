@@ -17,6 +17,12 @@ namespace Leap.Unity.PhysicalHands
         [SerializeField]
         private PhysicalHandsManager physicalHandsManager;
 
+        [Tooltip("Should kinematic objects be changed to non-kinematic for movement?" +
+                "\n\nIf true, rigidbodies will be changed to non-kinematic when grabbed, and returned to kinematic when released" +
+                "\n\nIf false, kinematic objects will be positioned through kinematic methods" +
+                "\n\nWarning: Hard Contact hands can jitter when moving a kinematic object")]
+        public bool useNonKinematicMovementOnly = true;
+
         private ContactHand _leftContactHand { get { return physicalHandsManager.ContactParent.LeftHand; } }
         private ContactHand _rightContactHand { get { return physicalHandsManager.ContactParent.RightHand; } }
 
@@ -272,6 +278,15 @@ namespace Leap.Unity.PhysicalHands
                     {
                         // Ensure we release the object first
                         _grabHelperObjects[rigid].ReleaseObject();
+
+                        foreach (var bone in _leftContactHand.bones)
+                        {
+                            bone.RemoveGrabbing(rigid);
+                        }
+                        foreach (var bone in _rightContactHand.bones)
+                        {
+                            bone.RemoveGrabbing(rigid);
+                        }
                     }
                     _grabHelperObjects[rigid].ReleaseHelper();
                     _grabHelperObjects.Remove(rigid);
@@ -311,6 +326,28 @@ namespace Leap.Unity.PhysicalHands
             {
                 hand.isGrabbing = found;
             }
+        }
+        #endregion
+
+        #region Object Information
+        /// <summary>
+        /// Find out if the given rigidbody is being grabbed and by which hand
+        /// </summary>
+        /// <param name="rigid">Rigidbody to check</param>
+        /// <param name="hand">Contact Hand that is grabbing, null if no hand is grabbing</param>
+        /// <returns>True if this object is being grabbed</returns>
+        public bool IsObjectGrabbed(Rigidbody rigid, out ContactHand hand)
+        {
+            hand = null;
+            if (_grabHelperObjects.TryGetValue(rigid, out GrabHelperObject helper))
+            {
+                if(helper.currentGrabbingHand != null)
+                {
+                    hand = helper.currentGrabbingHand;
+                    return true;
+                }
+            }
+            return false;
         }
         #endregion
 

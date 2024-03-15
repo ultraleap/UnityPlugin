@@ -1240,5 +1240,43 @@ namespace LeapInternal
 
         [DllImport("LeapC", EntryPoint = "LeapGetVersion")]
         public static extern eLeapRS GetVersion(IntPtr hConnection, eLeapVersionPart versionPart, ref LEAP_VERSION pVersion);
+
+
+        [DllImport("LeapC", EntryPoint = "LeapGetServerStatus")]
+        public static extern eLeapRS GetServerStatus(UInt32 timeout, ref IntPtr status);
+
+        [DllImport("LeapC", EntryPoint = "LeapReleaseServerStatus")]
+        public static extern eLeapRS ReleaseServerStatus(ref LEAP_SERVER_STATUS status);
+
+
+        [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
+        public struct LEAP_SERVER_STATUS
+        {
+            public string version;
+            public UInt32 device_count;
+            public IntPtr devices;
+        }
+
+        [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
+        public struct LEAP_SERVER_STATUS_DEVICE
+        {
+            public string serial;
+            public string type;
+        }
+        
+        public static eLeapRS SetDeviceHints(IntPtr hConnection, IntPtr hDevice, string[] hints)
+        {
+            // Ensure the final element of the array is null terminated.
+            if (hints.Length == 0 || hints[^1] != null)
+            {
+                Array.Resize(ref hints, hints.Length + 1);
+                hints[^1] = null;
+            }
+
+            return SetDeviceHintsInternal(hConnection, hDevice, hints);
+        }
+        
+        [DllImport("LeapC", EntryPoint = "LeapSetDeviceHints")]
+        private static extern eLeapRS SetDeviceHintsInternal(IntPtr hConnection, IntPtr hDevice, string[] hints);
     }
 }
