@@ -125,8 +125,9 @@ namespace Leap.Unity.Examples
                 _wasHovered = false;
                 if (OnStateChanged != null) OnStateChanged.Invoke(PullCordState.Default);
             }
-
-            transform.position = SpringPosition(transform.position, _handlePositionTarget);
+            
+            if(!_isPinching)
+                transform.position = SpringPosition(transform.position, _handlePositionTarget);
         }
 
         private Vector3 SpringPosition(Vector3 current, Vector3 target)

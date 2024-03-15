@@ -123,70 +123,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &41336157
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 41336160}
-  - component: {fileID: 41336159}
-  - component: {fileID: 41336158}
-  m_Layer: 0
-  m_Name: Thumb Proximal
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!136 &41336158
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 41336157}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 0.5
-  m_Height: 1
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &41336159
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 41336157}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1ec5e8176c80ad94d9c5d76a0a6326b2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  <IsBoneHovering>k__BackingField: 0
-  <IsBoneContacting>k__BackingField: 0
-  <IsBoneReadyToGrab>k__BackingField: 0
-  <IsBoneGrabbing>k__BackingField: 0
-  _nearestObjectDistance: 3.4028235e+38
---- !u!4 &41336160
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 41336157}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 6
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &93176843
 GameObject:
   m_ObjectHideFlags: 0
@@ -282,70 +218,6 @@ Transform:
   - {fileID: 3888267153745313842}
   m_Father: {fileID: 0}
   m_RootOrder: 5
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &295066526
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 295066529}
-  - component: {fileID: 295066528}
-  - component: {fileID: 295066527}
-  m_Layer: 0
-  m_Name: Thumb Proximal
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!136 &295066527
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 295066526}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 0.5
-  m_Height: 1
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &295066528
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 295066526}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1ec5e8176c80ad94d9c5d76a0a6326b2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  <IsBoneHovering>k__BackingField: 0
-  <IsBoneContacting>k__BackingField: 0
-  <IsBoneReadyToGrab>k__BackingField: 0
-  <IsBoneGrabbing>k__BackingField: 0
-  _nearestObjectDistance: 3.4028235e+38
---- !u!4 &295066529
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 295066526}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &339624731 stripped
 MonoBehaviour:
@@ -6105,8 +5977,16 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8771092330523101341, guid: 80d0756f4c667cf4092d709be4ca876d, type: 3}
+      propertyPath: maxAnchorRange
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8771092330523101341, guid: 80d0756f4c667cf4092d709be4ca876d, type: 3}
       propertyPath: detachWhenGrasped
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8771092330523101341, guid: 80d0756f4c667cf4092d709be4ca876d, type: 3}
+      propertyPath: _maxMotionlessRange
+      value: 0.040000003
       objectReference: {fileID: 0}
     - target: {fileID: 8771092330523101341, guid: 80d0756f4c667cf4092d709be4ca876d, type: 3}
       propertyPath: interactionBehaviour
