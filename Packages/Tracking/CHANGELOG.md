@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (Physical Hands) Ignore Physical hands component can now choose which hand(s) it should be applied to
 - (Physical Hands) Edit time representation of hands via Physical Hands Manager
 - (Attachment Hands) Do not show warning again this session when deleting attachment points
+- (Physical Hands) Ability to create IgnorePhysicalHands at runtime
 
 ### Changed
 - (Config) Additional uses of Config marked as Obsolete
@@ -54,6 +55,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (Hand Binder) incorrect upperArm name definition for elbow joint
 - (Physical Hands) Soft Contact NAN collider error when using OpenXR tracking on Android devices
 - (Physical Hands) Hand stuck in pose, unable to grab if object is disabled while grabbing
+- (Physical Hands) Errors when destroying objects that are grabbed
 
 
 ## [6.14.0] - 24/01/24
