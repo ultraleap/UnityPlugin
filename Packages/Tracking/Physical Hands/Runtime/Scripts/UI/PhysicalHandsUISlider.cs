@@ -46,9 +46,10 @@ namespace Leap.Unity.PhysicalHands
         [SerializeField]
         private bool _freezeIfNotActive = false;
 
+
         /// <summary>
         /// The travel distance of the slider (from the central point).
-        /// i.e. slider center point +/- sliderTravel distance or half the full travle of the slider.
+        /// i.e. slider center point +/- slider travel distance (or half the full travel of the slider).
         /// </summary>
         [SerializeField]
         private float _sliderTravelDistance = 0.22f;
@@ -79,6 +80,11 @@ namespace Leap.Unity.PhysicalHands
         [SerializeField]
         private Vector3 _sliderPercentage = Vector3.zero;
 
+        [SerializeField]
+        private int _startPercentage = 0;
+        [SerializeField]
+        private Vector2Int _twoDimStartPercentage = Vector2Int.zero;
+
         public UnityEvent<int> SliderChangeEvent = new UnityEvent<int>();
         public UnityEvent<int, int> TwoDimensionalSliderChangeEvent = new UnityEvent<int, int>();
         public UnityEvent<int> SliderButtonPressedEvent = new UnityEvent<int>();
@@ -100,7 +106,53 @@ namespace Leap.Unity.PhysicalHands
             }
 
             UpdateSliderZeroPos();
+            UpdateSliderStartPos();
 
+        }
+
+        private void UpdateSliderStartPos()
+        {
+            Vector3 slideZeroPos = new Vector3(
+                _sliderXZeroPos,
+                _sliderYZeroPos,
+                _sliderZZeroPos);
+
+            Utils.Map(_startPercentage, 0, 100, -SliderTravelDistance, SliderTravelDistance);
+
+            _twoDimStartPercentage.x = (int)Utils.Map(_startPercentage, 0, 100, -SliderTravelDistance, SliderTravelDistance);
+            Utils.Map(_startPercentage, 0, 100, -SliderTravelDistance, SliderTravelDistance);
+
+            switch (_sliderType)
+            {
+                case SliderType.ONE_DIMENSIONAL:
+                    switch (_sliderDirection)
+                    {
+                        case SliderDirection.X:
+                            this.transform.position = new Vector3(0.0f, 0.0f, 0.0f);
+                            break;
+                        case SliderDirection.Y:
+                            this.transform.position = new Vector3(0.0f, 0.0f, 0.0f);
+                            break;
+                        case SliderDirection.Z:
+                            this.transform.position = new Vector3(0.0f, 0.0f, 0.0f);
+                            break;
+                    }
+                    break;
+                case SliderType.TWO_DIMENSIONAL:
+                    switch (_twoDimSliderDirection)
+                    {
+                        case TwoDimSliderDirection.XY:
+                            this.transform.position = new Vector3(0.0f, 0.0f, 0.0f);
+                            break;
+                        case TwoDimSliderDirection.XZ:
+                            this.transform.position = new Vector3(0.0f, 0.0f, 0.0f);
+                            break;
+                        case TwoDimSliderDirection.YZ:
+                            this.transform.position = new Vector3(0.0f, 0.0f, 0.0f);
+                            break;
+                    }
+                    break;
+            }
         }
 
         private void OnEnable()
@@ -114,6 +166,14 @@ namespace Leap.Unity.PhysicalHands
                 }
             }
             TryGetComponent<Rigidbody>(out _connectedRigidbody);
+            if(_freezeIfNotActive == false)
+            {
+                UnFreezeSliderPosition();
+            }
+            else
+            {
+                FreezeSliderPosition();
+            }
         }
 
         private void OnDisable()

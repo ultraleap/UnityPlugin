@@ -17,10 +17,12 @@ namespace Leap.Unity.PhysicalHands
             if (sliderType.enumValueIndex == (int)PhysicalHandsUISlider.SliderType.ONE_DIMENSIONAL)
             {
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("_sliderDirection"));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("_startPercentage"));
             }
             else if (sliderType.enumValueIndex == (int)PhysicalHandsUISlider.SliderType.TWO_DIMENSIONAL)
             {
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("_twoDimSliderDirection"));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("_twoDimStartPercentage"));
             }
 
             EditorGUILayout.PropertyField(serializedObject.FindProperty("_sliderTravelDistance"));
