@@ -91,7 +91,10 @@ namespace Leap.Unity.PhysicalHands
         private Vector3 _newPosition;
         private Quaternion _newRotation;
 
-        private bool oldKinematic;
+        private bool wasKinematic;
+        private bool usedGravity;
+        private float oldDrag;
+        private float oldAngularDrag;
 
         internal IgnorePhysicalHands _ignorePhysicalHands;
 
@@ -182,7 +185,36 @@ namespace Leap.Unity.PhysicalHands
 
             _grabHelperManager = manager;
 
-            oldKinematic = rigid.isKinematic;
+            wasKinematic = _rigid.isKinematic;
+            usedGravity = _rigid.useGravity;
+            oldDrag = _rigid.drag;
+            oldAngularDrag = _rigid.angularDrag;
+        }
+
+        private void HandleGrabbedRigidbody()
+        {
+            if (_rigid != null)
+            {
+                if (_grabHelperManager.useNonKinematicMovementOnly)
+                {
+                    _rigid.isKinematic = false;
+                }
+
+                _rigid.useGravity = false;
+                _rigid.drag = 0f;
+                _rigid.angularDrag = 0f;
+            }
+        }
+
+        private void HandleReleasedRigidbody()
+        {
+            if (_rigid != null)
+            {
+                _rigid.isKinematic = wasKinematic;
+                _rigid.useGravity = usedGravity;
+                _rigid.drag = oldDrag;
+                _rigid.angularDrag = oldAngularDrag;
+            }
         }
 
         /// <summary>
@@ -208,6 +240,7 @@ namespace Leap.Unity.PhysicalHands
             {
                 SetBoneGrabbing(item, false);
             }
+
             GrabState = State.Idle;
 
             ClearGrabbingHands();
@@ -249,6 +282,8 @@ namespace Leap.Unity.PhysicalHands
 
             _grabbingHands.Clear();
             _grabbingHandsPrevious.Clear();
+
+            HandleReleasedRigidbody();
         }
 
         internal void AddHand(ContactHand hand)
@@ -291,15 +326,9 @@ namespace Leap.Unity.PhysicalHands
         internal void ReleaseObject()
         {
             GrabState = State.Hover;
-            // Make sure the object hasn't been destroyed
-            if (_rigid != null)
-            {
-                // Only ever unset the rigidbody values here otherwise outside logic will get confused
-                if (_grabHelperManager.useNonKinematicMovementOnly)
-                    _rigid.isKinematic = oldKinematic;
 
-                ThrowingOnRelease();
-            }
+            HandleReleasedRigidbody();
+            ThrowingOnRelease();
         }
 
         internal State UpdateHelper()
@@ -696,6 +725,8 @@ namespace Leap.Unity.PhysicalHands
             _grabbableHandsValues[grabHandIndex].offset = _rigid.position - hand.palmBone.transform.position;
             _grabbableHandsValues[grabHandIndex].rotationOffset = Quaternion.Inverse(hand.palmBone.transform.rotation) * _rigid.rotation;
             _grabbableHandsValues[grabHandIndex].originalHandRotationInverse = Quaternion.Inverse(hand.palmBone.transform.rotation);
+
+            HandleGrabbedRigidbody();
         }
 
         private void ClearGrabbingHands()
@@ -945,11 +976,6 @@ namespace Leap.Unity.PhysicalHands
 
         private void MoveObject()
         {
-            if (_grabHelperManager.useNonKinematicMovementOnly)
-            {
-                _rigid.isKinematic = false;
-            }
-
             if (_rigid.isKinematic)
             {
                 KinematicMovement(_newPosition, _newRotation);
@@ -1033,8 +1059,13 @@ namespace Leap.Unity.PhysicalHands
 
         private void ThrowingOnRelease()
         {
+            if(_rigid == null)
+            {
+                return;
+            }
+
             // You can't throw kinematic objects
-            if(_rigid != null && _rigid.isKinematic)
+            if(_rigid.isKinematic)
             {
                 _velocityQueue.Clear();
                 return;
