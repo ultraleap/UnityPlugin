@@ -80,10 +80,6 @@ namespace Leap.Unity.PhysicalHands
             /// The hand is grabbing the object
             /// </summary>
             public bool handGrabbing = false;
-            /// <summary>
-            /// the bones in this hand are facing other grabbing applicable bones in a different hand 
-            /// </summary>
-            public bool facingOppositeHand = false;
         }
 
         private GrabHelper _grabHelperManager;
@@ -493,7 +489,6 @@ namespace Leap.Unity.PhysicalHands
             foreach (var grabValue in _grabbableHandsValues)
             {
                 grabValue.handGrabbing = false;
-                grabValue.facingOppositeHand = false;
             }
 
             for (int handIndex = 0; handIndex < _grabbableHands.Count; handIndex++)
@@ -527,7 +522,7 @@ namespace Leap.Unity.PhysicalHands
                     }
                 }
 
-                if (!IsGrabbingIgnored(hand) && IsHandGrabbable(hand))
+                if (IsHandGrabbable(hand))
                 {
                     // Check for how many fingers are pinching
                     int pinchingFingers = 0;
@@ -750,7 +745,6 @@ namespace Leap.Unity.PhysicalHands
                 // Check if this hand was grabbing and is now not grabbing
                 if (_grabbingHands.Count > 0
                     && !_grabbableHandsValues[grabHandIndex].handGrabbing
-                    && !_grabbableHandsValues[grabHandIndex].facingOppositeHand
                     // Hand has moved significantly far away from the object
                     && (_rigid.position - _grabbableHands[grabHandIndex].palmBone.transform.position).sqrMagnitude > _grabbableHandsValues[grabHandIndex].offset.sqrMagnitude * 1.5f)
                 {
@@ -791,7 +785,7 @@ namespace Leap.Unity.PhysicalHands
                 }
 
                 // If we've got two fingers curled, the hand was grabbing in the grab contact checks, or the hand is facing the other, then we grab
-                if (curledFingerCount >= 2 || _grabbableHandsValues[grabHandIndex].handGrabbing || _grabbableHandsValues[grabHandIndex].facingOppositeHand)
+                if (curledFingerCount >= 2 || _grabbableHandsValues[grabHandIndex].handGrabbing)
                 {
                     SetBoneGrabbing(_grabbableHands[grabHandIndex], true);
                     continue;
