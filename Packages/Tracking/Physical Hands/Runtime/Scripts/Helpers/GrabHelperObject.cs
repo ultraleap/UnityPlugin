@@ -95,7 +95,6 @@ namespace Leap.Unity.PhysicalHands
         private Vector3 _newPosition;
         private Quaternion _newRotation;
 
-        private Vector3 oldCenterOfMass;
         private bool oldKinematic;
 
         internal IgnorePhysicalHands _ignorePhysicalHands;
@@ -187,7 +186,6 @@ namespace Leap.Unity.PhysicalHands
 
             _grabHelperManager = manager;
 
-            oldCenterOfMass = rigid.centerOfMass;
             oldKinematic = rigid.isKinematic;
         }
 
@@ -303,8 +301,6 @@ namespace Leap.Unity.PhysicalHands
                 // Only ever unset the rigidbody values here otherwise outside logic will get confused
                 if (_grabHelperManager.useNonKinematicMovementOnly)
                     _rigid.isKinematic = oldKinematic;
-
-                _rigid.centerOfMass = oldCenterOfMass;
 
                 ThrowingOnRelease();
             }
@@ -943,11 +939,6 @@ namespace Leap.Unity.PhysicalHands
 
                 if (hand != null)
                 {
-                    if (hand != currentGrabbingHand)
-                    {
-                        _rigid.centerOfMass = _grabbableHandsValues[grabHandndex].offset;
-                    }
-
                     _newRotation = hand.palmBone.transform.rotation * Quaternion.Euler(hand.AngularVelocity * Time.fixedDeltaTime); // for use in positioning
 
                     _newPosition = hand.palmBone.transform.position + (hand.Velocity * Time.fixedDeltaTime) + (_newRotation * _grabbableHandsValues[grabHandndex].originalHandRotationInverse * _grabbableHandsValues[grabHandndex].offset);
