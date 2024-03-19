@@ -14,12 +14,30 @@ namespace LeapInternal
     {
         public static readonly float MM_TO_M = 1e-3f;
 
+        public static bool leapToUnityTransformSet = false;
+        private static LeapTransform leapToUnityTransform;
+
+        /**
+         * Provides a static LeapTransform that converts from Leap units and coordinates to Unity
+         */
+        public static LeapTransform LeapToUnityTransform
+        {
+            get
+            {
+                if(!leapToUnityTransformSet)
+                {
+                    leapToUnityTransform = new LeapTransform(Vector3.zero, Quaternion.identity, new Vector3(MM_TO_M, MM_TO_M, MM_TO_M));
+                    leapToUnityTransform.MirrorZ();
+                    leapToUnityTransformSet = true;
+                }
+
+                return leapToUnityTransform;
+            }
+        }
+
         public static void TransformToUnityUnits(this Hand hand)
         {
-            LeapTransform leapTransform = new LeapTransform(Vector3.zero, Quaternion.identity, new Vector3(MM_TO_M, MM_TO_M, MM_TO_M));
-            leapTransform.MirrorZ();
-
-            hand.Transform(leapTransform);
+            hand.Transform(LeapToUnityTransform);
         }
 
 

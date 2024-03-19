@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (Physical Hands) Edit time representation of hands via Physical Hands Manager
 - (Attachment Hands) Do not show warning again this session when deleting attachment points
 - (Physical Hands) Ability to create IgnorePhysicalHands at runtime
+- (Fiducial Marker Tracking) Fiducial Marker Tracking support using AprilTag
 
 ### Changed
 - (Config) Additional uses of Config marked as Obsolete
@@ -34,6 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (Hand Rays) Exposed dot product used to test if the hand is facing camera
 - (Hinting) Added support for startup setting of Hand Tracking Hints via the Ultraleap Settings window
 - (Hinting) Added support for runtime changing of Hand Tracking Hints via static HandTrackingHintManager
+- (Hinting) Added support for setting OpenXR Hand Tracking Hints via the OpenXR HandTrackingFeature
 - Access of Physical Hands extensions
 - Added public accessors to various Physical Hands utilities
 - Unified use of TrackedPoseDrivers across XR LeapProviders

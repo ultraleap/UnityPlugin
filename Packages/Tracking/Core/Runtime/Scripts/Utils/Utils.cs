@@ -17,7 +17,6 @@ namespace Leap.Unity
 {
     public static class Utils
     {
-
         #region C# Utilities
 
         #region Generic Utils
@@ -2831,6 +2830,25 @@ namespace Leap.Unity
 
         #endregion
 
+        #region Leap Matrix 3x3
+
+        /// <summary>
+        /// Converts a LEAP_MATRIX_3x3 rotation matrix to a Unity Matrix4x4
+        /// </summary>
+        /// <param name="m">A Leap rotation matrix</param>
+        /// <returns>A Unity Rotation Matrix</returns>
+        public static Matrix4x4 ToUnityRotationMatrix(this LeapInternal.LEAP_MATRIX_3x3 m)
+        {
+            Matrix4x4 rotationMatrix =
+                new Matrix4x4(new Vector4(m.m1.x, m.m2.x, m.m3.x, 0),
+                                new Vector4(m.m1.y, m.m2.y, m.m3.y, 0),
+                                new Vector4(m.m1.z, m.m2.z, m.m3.z, 0),
+                                new Vector4(0, 0, 0, 1));
+            return rotationMatrix;
+        }
+
+        #endregion
+
         #region Tracked Pose Driver Utils
 
         /// <summary>
@@ -2865,8 +2883,6 @@ namespace Leap.Unity
 #endif
             }
         }
-
-        #endregion
 
         #endregion
 
@@ -3232,6 +3248,8 @@ namespace Leap.Unity
 
         #endregion
 
+        #endregion
+
         #region From/Then Utilities
 
         #region Float
@@ -3419,7 +3437,5 @@ namespace Leap.Unity
         #endregion
 
         #endregion
-
     }
-
 }
