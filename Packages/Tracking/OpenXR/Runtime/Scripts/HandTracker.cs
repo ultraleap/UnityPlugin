@@ -1,6 +1,7 @@
 using JetBrains.Annotations;
 using System;
 using System.Runtime.InteropServices;
+using Ultraleap.Tracking.OpenXR.Interop;
 using UnityEngine;
 using UnityEngine.XR.OpenXR;
 
@@ -27,7 +28,9 @@ namespace Ultraleap.Tracking.OpenXR
         /// The current <see cref="HandJointSet"/> that this tracker is tracking.
         /// </summary>
         [PublicAPI]
-        public HandJointSet JointSet => _handTracking.JointSet;
+        public HandJointSet JointSet => _handTracking.JointSet == XrHandJointSetExt.HandWithForearm
+            ? HandJointSet.HandWithForearm
+            : HandJointSet.Default;
 
         /// <summary>
         /// The number of joints in the <see cref="JointSet"/> that this tracker is tracking.
