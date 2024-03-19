@@ -52,7 +52,7 @@ namespace Leap.Unity.PhysicalHands
 
         private void SetupPalmArticulation()
         {
-            articulation.immovable = true;
+            articulation.immovable = false;
             articulation.matchAnchors = false;
 
             articulation.mass = hardContactParent.boneMass * 3f;
