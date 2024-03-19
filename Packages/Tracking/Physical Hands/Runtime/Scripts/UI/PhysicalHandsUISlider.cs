@@ -111,7 +111,6 @@ namespace Leap.Unity.PhysicalHands
         public UnityEvent<int> SliderButtonUnPressedEvent = new UnityEvent<int>();
         public UnityEvent<int, int> TwoDimensionalSliderButtonUnPressedEvent = new UnityEvent<int, int>();
 
-        private Vector3 _localPositionIgnoringRotations = Vector3.zero;
 
         /// <summary>
         /// Use this to get the slider percentage on all axis.
@@ -126,16 +125,12 @@ namespace Leap.Unity.PhysicalHands
         private void Awake()
         {
 
-
-
         }
 
         private void OnEnable()
         {
-
             TryGetComponent<Rigidbody>(out _connectedRigidbody);
-            _localPositionIgnoringRotations = this.transform.InverseTransformPoint(this.transform.parent.InverseTransformPoint(transform.position));
-
+            
             switch (_sliderType)
             {
                 case SliderType.ONE_DIMENSIONAL:
@@ -146,10 +141,7 @@ namespace Leap.Unity.PhysicalHands
                     break;
             }
 
-
             UpdateSliderZeroPos();
-
-
 
             if (_connectedButton == null)
             {
@@ -159,7 +151,6 @@ namespace Leap.Unity.PhysicalHands
                     _connectedButton.OnButtonUnPressed.AddListener(ButtonUnPressed);
                 }
             }
-            TryGetComponent<Rigidbody>(out _connectedRigidbody);
             if(_freezeIfNotActive == false)
             {
                 UnFreezeSliderPosition();
@@ -186,8 +177,6 @@ namespace Leap.Unity.PhysicalHands
 
         private void Update()
         {
-            _localPositionIgnoringRotations = this.transform.InverseTransformPoint(this.transform.parent.InverseTransformPoint(transform.position));
-
             _axisChangeFromZero.x = this.transform.localPosition.x - _sliderXZeroPos;
             _axisChangeFromZero.y = this.transform.localPosition.y - _sliderYZeroPos;
             _axisChangeFromZero.z = this.transform.localPosition.z - _sliderZZeroPos;
@@ -429,7 +418,8 @@ namespace Leap.Unity.PhysicalHands
             }
 
             _connectedRigidbody.velocity = Vector3.zero;
-            this.transform.localPosition = slidePos;
+            _connectedRigidbody.transform.localPosition = slidePos;
+            //this.transform.localPosition = slidePos;
             
         }
 
@@ -439,18 +429,12 @@ namespace Leap.Unity.PhysicalHands
         /// <param name="joint">The configurable joint to set up.</
         private void SetUpConfigurableJoint(ConfigurableJoint joint)
         {
-            //_connectedRigidbody.transform.position = _localPositionIgnoringRotations;
-            //_connectedRigidbody.rotation = this.transform.localRotation;
             joint.xMotion = ConfigurableJointMotion.Locked;
             joint.yMotion = ConfigurableJointMotion.Locked;
             joint.zMotion = ConfigurableJointMotion.Locked;
             joint.angularXMotion = ConfigurableJointMotion.Locked;
             joint.angularYMotion = ConfigurableJointMotion.Locked;
             joint.angularZMotion = ConfigurableJointMotion.Locked;
-
-
-            //joint.autoConfigureConnectedAnchor = false;
-            //joint.connectedAnchor = Vector3.zero;
 
             SoftJointLimit linerJointLimit = new SoftJointLimit();
             linerJointLimit.limit = _sliderTravelDistance +0.01f;
