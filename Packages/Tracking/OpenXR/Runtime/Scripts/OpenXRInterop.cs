@@ -1,15 +1,31 @@
-﻿using System;
+﻿using JetBrains.Annotations;
+using System;
+using System.Buffers;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Runtime.InteropServices;
+using UnityEngine;
 using UnityEngine.XR.OpenXR.NativeTypes;
 
 namespace Ultraleap.Tracking.OpenXR.Interop
 {
     delegate XrResult GetInstanceProcAddrDelegate(XrInstance instance, in string name, out IntPtr function);
-    delegate XrResult WaitFrameDelegate(XrSession session, in XrFrameWaitInfo frameWaitInfo, out XrFrameState frameState);
-    delegate XrResult GetSystemPropertiesDelegate(XrInstance instance, in XrSystemId systemId, XrSystemProperties systemProperties);
-    delegate XrResult CreateHandTrackerExtDelegate(XrSession session, in XrHandTrackerCreateInfoExt createInfo, out XrHandTrackerExt handTracker);
+
+    delegate XrResult WaitFrameDelegate(XrSession session, in XrFrameWaitInfo frameWaitInfo, XrFrameState frameState);
+
+    delegate XrResult GetSystemPropertiesDelegate(XrInstance instance, in XrSystemId systemId,
+        XrSystemProperties systemProperties);
+
+    delegate XrResult CreateHandTrackerExtDelegate(XrSession session, in XrHandTrackerCreateInfoExt createInfo,
+        out XrHandTrackerExt handTracker);
+
     delegate XrResult DestroyHandTrackerExtDelegate(in XrHandTrackerExt handTracker);
+
+    delegate XrResult LocateHandJointsExtDelegate(XrHandTrackerExt handTracker, in XrHandJointsLocateInfoExt locateInfo,
+        XrHandJointLocationsExt jointLocations);
+
+    delegate XrResult SetHandTrackingHintsUltraleapDelegate(in string[] hints, uint hintsLength);
     
 
     public static class XrResultExtensions
@@ -129,7 +145,7 @@ namespace Ultraleap.Tracking.OpenXR.Interop
         public static XrTime operator +(XrTime a, XrDuration b) => a._raw + b._raw;
         public static XrDuration operator -(XrTime a, XrTime b) => a._raw - b._raw;
         public static XrTime operator *(XrTime a, float b) => (XrTime)(a._raw * b);
-        public static float operator /(XrTime a, XrDuration b) => (float)a._raw / (float)b._raw;
+        public static float operator /(XrTime a, XrDuration b) => (float)a._raw / b._raw;
     }
 
     public struct XrDuration : IEquatable<long>
@@ -169,6 +185,12 @@ namespace Ultraleap.Tracking.OpenXR.Interop
         HandJointVelocitiesExt = 1000051004,
     }
     
+    public interface IXrExtendable
+    {
+        public XrStructureType Type { get; }
+        public IntPtr Next { get; set; }
+    }
+    
     public struct XrSystemGraphicsProperties
     {
         public uint MaxSwapchainImageHeight;
@@ -182,32 +204,46 @@ namespace Ultraleap.Tracking.OpenXR.Interop
         public bool OrientationTracking;
         public bool PositionTracking;
     }
-    
-    public struct XrSystemProperties
+
+    public struct XrSystemProperties : IXrExtendable
     {
-        public XrStructureType Type;
-        public IntPtr Next;
-        public XrSystemId SystemId;
-        public uint VendorId;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)]
+        [UsedImplicitly] public XrStructureType Type { get; set; }
+        [UsedImplicitly] public IntPtr Next { get; set; }
+        [UsedImplicitly] public XrSystemId SystemId;
+        [UsedImplicitly] public uint VendorId;
+
+        [UsedImplicitly, MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)]
         public string SystemName;
-        public XrSystemGraphicsProperties GraphicsProperties;
-        public XrSystemTrackingProperties TrackingProperties;
+
+        [UsedImplicitly] public XrSystemGraphicsProperties GraphicsProperties;
+        [UsedImplicitly] public XrSystemTrackingProperties TrackingProperties;
+        
+        public XrSystemProperties(IntPtr next) : this()
+        {
+            Type = XrStructureType.SystemProperties;
+            Next = next;
+        }
+    }
+
+    public struct XrSystemHandTrackingPropertiesExt : IXrExtendable
+    {
+        [UsedImplicitly] public XrStructureType Type { get; set; }
+        [UsedImplicitly] public IntPtr Next { get; set; }
+        [UsedImplicitly] public bool SupportsHandTracking;
+
+        public XrSystemHandTrackingPropertiesExt(IntPtr next) : this()
+        {
+            Type = XrStructureType.SystemHandTrackingProperties;
+            Next = next;
+        }
     }
     
-    public struct XrSystemHandTrackingPropertiesExt
+    public struct XrHandTrackerCreateInfoExt : IXrExtendable
     {
-        public XrStructureType Type;
-        public IntPtr Next;
-        public bool SupportsHandTracking;
-    }
-    
-    public struct XrHandTrackerCreateInfoExt
-    {
-        public readonly XrStructureType Type;
-        public IntPtr Next;
-        public XrHandExt Hand;
-        public XrHandJointSetExt HandJointSet;
+        [UsedImplicitly] public XrStructureType Type { get; set; }
+        [UsedImplicitly] public IntPtr Next { get; set; }
+        [UsedImplicitly] public XrHandExt Hand;
+        [UsedImplicitly]public XrHandJointSetExt HandJointSet;
 
         public XrHandTrackerCreateInfoExt(XrHandExt hand, XrHandJointSetExt handJointSet) : this()
         {
@@ -218,19 +254,19 @@ namespace Ultraleap.Tracking.OpenXR.Interop
         }
     }
     
-    public struct XrFrameWaitInfo
+    public struct XrFrameWaitInfo : IXrExtendable
     {
-        public XrStructureType Type;
-        public IntPtr Next;
+        [UsedImplicitly] public XrStructureType Type { get; set; }
+        [UsedImplicitly] public IntPtr Next { get; set; }
     }
 
-    public struct XrFrameState
+    public struct XrFrameState : IXrExtendable
     {
-        public XrStructureType Type;
-        public IntPtr Next;
-        public XrTime PredictedDisplayTime;
-        public XrDuration PredictedDisplayPeriod;
-        public bool ShouldRender;
+        [UsedImplicitly] public XrStructureType Type { get; set; }
+        [UsedImplicitly] public IntPtr Next { get; set; }
+        [UsedImplicitly] public XrTime PredictedDisplayTime;
+        [UsedImplicitly] public XrDuration PredictedDisplayPeriod;
+        [UsedImplicitly] public bool ShouldRender;
     }
     
     public enum XrHandExt
@@ -243,5 +279,161 @@ namespace Ultraleap.Tracking.OpenXR.Interop
     {
         Default = 0,
         HandWithForearm = 1000149000,
+    }
+
+    public struct XrHandJointsLocateInfoExt : IXrExtendable
+    {
+        [UsedImplicitly] public XrStructureType Type { get; set; }
+        [UsedImplicitly] public IntPtr Next { get; set; }
+        [UsedImplicitly] public XrSpace BaseSpace;
+        [UsedImplicitly] public XrTime Time;
+        
+        public XrHandJointsLocateInfoExt(IntPtr next) : this()
+        {
+            Type = XrStructureType.HandTrackerCreateInfoExt;
+            Next = next;
+        }
+    }
+
+    public struct XrHandJointLocationsExt : IXrExtendable
+    {
+        [UsedImplicitly] public XrStructureType Type { get; set; }
+        [UsedImplicitly] public IntPtr Next { get; set; }
+
+        [UsedImplicitly, MarshalAs(UnmanagedType.U8)]
+        public bool IsActive;
+
+        [UsedImplicitly] public uint JointCount;
+        [UsedImplicitly] public IntPtr JointLocationsPtr;
+
+        public XrHandJointLocationsExt(IntPtr next) : this()
+        {
+            Type = XrStructureType.HandJointLocationsExt;
+            Next = next;
+        }
+    }
+
+    public struct XrHandJointLocationExt
+    {
+        [UsedImplicitly] public XrSpaceLocationFlags LocationFlags;
+        [UsedImplicitly] public XrPosef Pose;
+        [UsedImplicitly] public float Radius;
+        
+        [UsedImplicitly] public bool IsValid => PositionValid && OrientationValid;
+        [UsedImplicitly] public bool IsTracked => OrientationTracked && PositionTracked;
+
+        private bool PositionValid => LocationFlags.HasFlag(XrSpaceLocationFlags.PositionValid);
+        private bool OrientationValid => LocationFlags.HasFlag(XrSpaceLocationFlags.OrientationValid);
+        private bool PositionTracked => LocationFlags.HasFlag(XrSpaceLocationFlags.PositionTracked);
+        private bool OrientationTracked => LocationFlags.HasFlag(XrSpaceLocationFlags.OrientationTracked);
+    }
+    
+    public struct XrHandJointVelocitiesExt : IXrExtendable
+    {
+        [UsedImplicitly] public XrStructureType Type { get; set; }
+        [UsedImplicitly] public IntPtr Next { get; set; }
+        [UsedImplicitly] public uint JointCount;
+        [UsedImplicitly] public IntPtr JointVelocitiesPtr;
+        
+        public XrHandJointVelocitiesExt(IntPtr next) : this()
+        {
+            Type = XrStructureType.HandJointVelocitiesExt;
+            Next = next;
+        }
+    }
+
+    public struct XrHandJointVelocityExt
+    {
+        [UsedImplicitly] public XrSpaceVelocityFlags VelocityFlags;
+        [UsedImplicitly] public XrVector3f LinearVelocity;
+        [UsedImplicitly] public XrVector3f AngularVelocity;
+        
+        [UsedImplicitly] public bool IsLinearValid => VelocityFlags.HasFlag(XrSpaceVelocityFlags.LinearValid);
+        [UsedImplicitly] public bool IsAngularValid => VelocityFlags.HasFlag(XrSpaceVelocityFlags.AngularValid);
+    }
+    
+    public enum XrSpaceLocationFlags : ulong
+    {
+        OrientationValid = 0x1,
+        PositionValid = 0x2,
+        OrientationTracked = 0x4,
+        PositionTracked = 0x8,
+    }
+    
+    public enum XrSpaceVelocityFlags : ulong
+    {
+        LinearValid = 0x1,
+        AngularValid = 0x2,
+    }
+
+    
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    public struct XrVector3f
+    {
+        [UsedImplicitly] public float X;
+        [UsedImplicitly] public float Y;
+        [UsedImplicitly] public float Z;
+
+        public XrVector3f(float x, float y, float z)
+        {
+            X = x;
+            Y = y;
+            Z = -z;
+        }
+        
+        public static implicit operator Vector3(XrVector3f value)
+        {
+            return new Vector3(value.X, value.Y, value.Z);
+        }
+
+        public XrVector3f(Vector3 value)
+        {
+            X = value.x;
+            Y = value.y;
+            Z = -value.z;
+        }
+    }
+
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    public struct XrQuaternionf
+    {
+        [UsedImplicitly] public float X;
+        [UsedImplicitly] public float Y;
+        [UsedImplicitly] public float Z;
+        [UsedImplicitly] public float W;
+
+        public XrQuaternionf(float x, float y, float z, float w)
+        {
+            X = -x;
+            Y = -y;
+            Z = z;
+            W = w;
+        }
+        
+        public static implicit operator Quaternion(XrQuaternionf value)
+        {
+            return new Quaternion(value.X, value.Y, value.Z, value.W);
+        }
+
+        public XrQuaternionf(Quaternion quaternion)
+        {
+            X = -quaternion.x;
+            Y = -quaternion.y;
+            Z = quaternion.z;
+            W = quaternion.w;
+        }
+    }
+
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    public struct XrPosef
+    {
+        [UsedImplicitly] public XrQuaternionf Orientation;
+        [UsedImplicitly] public XrVector3f Position;
+
+        public XrPosef(Vector3 vec3, Quaternion quaternion)
+        {
+            Position = new XrVector3f(vec3);
+            Orientation = new XrQuaternionf(quaternion);
+        }
     }
 }
