@@ -540,7 +540,16 @@ namespace LeapInternal
         /// <summary>
         /// A new head pose is available.
         /// </summary>
-        eLeapEventType_IMU
+        eLeapEventType_IMU,
+        /// <summary>
+        /// Notification that the service received a new device transformation matrix
+        /// Use LeapGetDeviceTransform to update your cached information.
+        /// </summary>
+        eLeapEventType_NewDeviceTransform,
+        /// <summary>
+        /// An event provided when a fiducial marker has been tracked
+        /// </summary>
+        eLeapEventType_Fiducial
     };
 
     public enum eLeapDeviceFlag : uint
@@ -972,6 +981,18 @@ namespace LeapInternal
         public string fileName;
         public UInt32 lineNumber;
         public string zoneName;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
+    public struct LEAP_FIDUCIAL_POSE_EVENT
+    {
+        public int id;
+        public IntPtr family; // char*
+        public float size;
+        public Int64 timestamp;
+        public float estimated_error;
+        public LEAP_VECTOR translation;
+        public LEAP_QUATERNION rotation;
     }
 
     public class LeapC

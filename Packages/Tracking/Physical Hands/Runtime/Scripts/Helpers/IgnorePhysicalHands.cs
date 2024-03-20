@@ -8,7 +8,6 @@
 
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Leap.Unity.PhysicalHands
 {
@@ -16,11 +15,15 @@ namespace Leap.Unity.PhysicalHands
     {
         public ChiralitySelection HandToIgnore = ChiralitySelection.BOTH;
 
-        [SerializeField, Tooltip("Prevents the object from being grabbed by all Contact Hands.")]
+        [SerializeField, Tooltip("Prevents the object from being grabbed by chosen Contact Hands." +
+            "\n\nNote: This only applies if IgnorePhysicalHands is applied to a GameObject with a Rigidbody component."),
+            Attributes.InspectorName("Ignore Grabbing")]
         private bool _disableAllGrabbing = true;
 
         /// <summary>
-        /// Prevents the object from being grabbed by all Contact Hands
+        /// Prevents the object from being grabbed by chosen Contact Hands.
+        /// 
+        /// Note: This only applies if IgnorePhysicalHands is applied to a GameObject with a Rigidbody component.
         /// </summary>
         public bool DisableAllGrabbing
         {
@@ -28,26 +31,29 @@ namespace Leap.Unity.PhysicalHands
             set
             {
                 _disableAllGrabbing = value;
+                SetAllHandGrabbing();
             }
         }
 
-        [SerializeField, Tooltip("Prevents colliders on this gameobject from colliding with Contact Hands."), FormerlySerializedAs("_disableAllHandCollisions")]
-        private bool _disableHandCollisions = true;
+        [SerializeField, Tooltip("Prevents colliders on this gameobject from colliding with Contact Hands."),
+            Attributes.InspectorName("Ignore Hand Collisions")]
+        private bool _disableAllHandCollisions = true;
 
         /// <summary>
         /// Prevents the object from being collided with Contact Hands
         /// </summary>
         public bool DisableAllHandCollisions
         {
-            get { return _disableHandCollisions; }
+            get { return _disableAllHandCollisions; }
             set
             {
-                _disableHandCollisions = value;
+                _disableAllHandCollisions = value;
                 SetAllHandCollisions();
             }
         }
 
-        [SerializeField, Tooltip("Prevents colliders on all child gameobjects of this gameobject from colliding with Contact Hands.")]
+        [SerializeField, Tooltip("Prevents colliders on all child gameobjects of this gameobject from colliding with Contact Hands."),
+            Attributes.InspectorName("Ignore Hand Collisions On Children")]
         private bool _disableCollisionOnChildren = true;
 
         /// <summary>
@@ -73,18 +79,51 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
-        private PhysicalHandsManager _physicalHandsManager = null;
-
         private List<ContactHand> contactHands = new List<ContactHand>();
 
 #if UNITY_EDITOR
         private void OnValidate()
         {
             DisableAllGrabbing = _disableAllGrabbing;
-            DisableAllHandCollisions = _disableHandCollisions;
+            DisableAllHandCollisions = _disableAllHandCollisions;
             DisableCollisionOnChildObjects = _disableCollisionOnChildren;
         }
 #endif
+
+        private void Start()
+        {
+            // Find if we have a GrabHelperObject already, and pass it a reference to us
+            //  Note: this will only happen when this IgnorePhysicalHands is created at runtime
+            if (GrabHelper.Instance != null)
+            {
+                Rigidbody rbody = GetComponent<Rigidbody>();
+
+                if(rbody != null)
+                {
+                    if(GrabHelper.Instance.TryGetGrabHelperObjectFromRigid(rbody, out _grabHelperObject))
+                    {
+                        _grabHelperObject._ignorePhysicalHands = this;
+
+                        foreach (var hand in _grabHelperObject.GrabbableHands)
+                        {
+                            AddToHands(hand);
+                        }
+
+                        SetAllHandCollisions();
+                        SetAllHandGrabbing();
+                    }
+                }
+            }
+        }
+
+        private void OnEnable()
+        {
+            PhysicalHandsManager.OnHandsInitialized -= HandsInitialized;
+            PhysicalHandsManager.OnHandsInitialized += HandsInitialized;
+
+            SetAllHandCollisions();
+            SetAllHandGrabbing();
+        }
 
         /// <summary>
         /// Clean up code, re-enables all collision and grabbing on this object and all children
@@ -94,29 +133,50 @@ namespace Leap.Unity.PhysicalHands
             SetAllHandCollisions(forceEnable : true);
         }
 
-        private void OnEnable()
+        private void OnDestroy()
         {
-#if UNITY_2021_3_18_OR_NEWER
-            _physicalHandsManager = (PhysicalHandsManager)FindAnyObjectByType(typeof(PhysicalHandsManager));
-#else
-            _physicalHandsManager = (PhysicalHandsManager)FindObjectOfType<PhysicalHandsManager>();
-#endif
+            PhysicalHandsManager.OnHandsInitialized -= HandsInitialized;
+        }
 
-            if (_physicalHandsManager != null)
-            {
-                PhysicalHandsManager.OnHandsInitialized -= HandsInitialized;
-                PhysicalHandsManager.OnHandsInitialized += HandsInitialized;
-            }
-            else
-            {
-                Debug.Log("No Physical Hands Manager found. Ignore Physical Hands can not initialize");
-            }
+        /// <summary>
+        /// Initialize this component with alternative values to the defaults
+        /// 
+        /// Call Init on this component immediately after adding it to a gameobject if you wish to override the default values
+        /// 
+        /// Note: Consider adding this component to the GameObject before runtime begins and simply toggle the variables at runtime instead
+        /// </summary>
+        public void Init(bool ignoreGrabbing = true, bool ignoreCollisions = true, bool ignoreChildCollisions = true, ChiralitySelection handToIgnore = ChiralitySelection.BOTH)
+        {
+            this.HandToIgnore = handToIgnore;
+            this.DisableAllGrabbing = ignoreGrabbing;
+            this.DisableAllHandCollisions = ignoreCollisions;
+            this.DisableCollisionOnChildObjects = ignoreChildCollisions;
         }
 
         internal void AddToHands(ContactHand contactHand)
         {
             contactHands.Add(contactHand);
             SetHandCollision(contactHand);
+        }
+
+        private void SetAllHandGrabbing(bool forceDisable = false)
+        {
+            if (DisableAllGrabbing || forceDisable)
+            {
+                switch (HandToIgnore)
+                {
+                    case ChiralitySelection.LEFT:
+                        _grabHelperObject?.UnregisterGrabbingHand(Chirality.Left);
+                        break;
+                    case ChiralitySelection.RIGHT:
+                        _grabHelperObject?.UnregisterGrabbingHand(Chirality.Right);
+                        break;
+                    case ChiralitySelection.BOTH:
+                        _grabHelperObject?.UnregisterGrabbingHand(Chirality.Left);
+                        _grabHelperObject?.UnregisterGrabbingHand(Chirality.Right);
+                        break;
+                }
+            }
         }
 
         private void SetAllHandCollisions(bool forceEnable = false, bool forceDisable = false)
@@ -154,7 +214,7 @@ namespace Leap.Unity.PhysicalHands
 
             if (this != null)
             {
-                bool disableOnParent = shouldDisableCollisionWithHand && _disableHandCollisions;
+                bool disableOnParent = shouldDisableCollisionWithHand && _disableAllHandCollisions;
                 bool disableOnChild = shouldDisableCollisionWithHand && _disableCollisionOnChildren;
 
                 foreach (var objectCollider in GetComponentsInChildren<Collider>(true))
@@ -187,10 +247,10 @@ namespace Leap.Unity.PhysicalHands
             Physics.IgnoreCollision(contactHand.palmBone.Collider, colliderToIgnore, collisionDisabled);
         }
 
-        private void HandsInitialized()
+        private void HandsInitialized(ContactParent contactParent)
         {
-            AddToHands(_physicalHandsManager.ContactParent.LeftHand);
-            AddToHands(_physicalHandsManager.ContactParent.RightHand);
+            AddToHands(contactParent.LeftHand);
+            AddToHands(contactParent.RightHand);
 
             SetAllHandCollisions();
         }
@@ -231,7 +291,7 @@ namespace Leap.Unity.PhysicalHands
         /// <returns>true if ignore collisions is true and chirality is correct or Hand to ignore is set to BOTH</returns>
         public bool IsCollisionIgnoredForHand(ContactHand hand)
         {
-            if (this.enabled && hand != null && _disableHandCollisions && IsHandIgnored(hand))
+            if (this.enabled && hand != null && _disableAllHandCollisions && IsHandIgnored(hand))
             {
                 return true;
             }
