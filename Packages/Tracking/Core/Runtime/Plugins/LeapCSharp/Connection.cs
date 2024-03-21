@@ -1008,15 +1008,6 @@ namespace LeapInternal
             LEAP_CONNECTION_MESSAGE _msg = new LEAP_CONNECTION_MESSAGE();
             uint timeout = 150;
             result = LeapC.PollConnection(tempConnection, timeout, ref _msg);
-            result = LeapC.PollConnection(tempConnection, timeout, ref _msg);
-            result = LeapC.PollConnection(tempConnection, timeout, ref _msg);
-            result = LeapC.PollConnection(tempConnection, timeout, ref _msg);
-            result = LeapC.PollConnection(tempConnection, timeout, ref _msg);
-            result = LeapC.PollConnection(tempConnection, timeout, ref _msg);
-            result = LeapC.PollConnection(tempConnection, timeout, ref _msg);
-            result = LeapC.PollConnection(tempConnection, timeout, ref _msg);
-            result = LeapC.PollConnection(tempConnection, timeout, ref _msg);
-            result = LeapC.PollConnection(tempConnection, timeout, ref _msg);
 
             LEAP_CONNECTION_INFO pInfo = new LEAP_CONNECTION_INFO();
             pInfo.size = (uint)Marshal.SizeOf(pInfo);
