@@ -7,7 +7,21 @@ namespace Leap.Unity
 {
     public static class HandTrackingHintManager
     {
-        static List<string> currentHints = new List<string>();
+        static Dictionary<Device, List<string>> currentDeviceHints = new Dictionary<Device, List<string>>();
+
+        static Device defaultDevice = null;
+        static Device DefaultDevice
+        { 
+            get 
+            {
+                if (defaultDevice == null)
+                {
+                    defaultDevice = new Device();
+                }
+
+                return defaultDevice; 
+            } 
+        }
 
         static Controller _leapController;
         static Controller LeapController
@@ -41,13 +55,8 @@ namespace Leap.Unity
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void StartupHints()
         {
-            currentHints = UltraleapSettings.Instance.startupHints.ToList();
-
-            if (currentHints.Count != 0)
-            {
-                LeapController.Device -= NewLeapDevice;
-                LeapController.Device += NewLeapDevice;
-            }
+            LeapController.Device -= NewLeapDevice;
+            LeapController.Device += NewLeapDevice;
         }
 
         /// <summary>
@@ -55,39 +64,76 @@ namespace Leap.Unity
         /// </summary>
         private static void NewLeapDevice(object sender, DeviceEventArgs e)
         {
-            if (currentHints.Count != 0)
+            if (!currentDeviceHints.ContainsKey(DefaultDevice))
             {
-                LeapController.Device -= NewLeapDevice;
-                RequestHandTrackingHints(currentHints.ToArray());
+                currentDeviceHints.Add(DefaultDevice, UltraleapSettings.Instance.startupHints.ToList());
+
+                if (currentDeviceHints[DefaultDevice].Count != 0)
+                {
+                    RequestHandTrackingHints(currentDeviceHints[DefaultDevice].ToArray());
+                }
             }
+
+            LeapController.Device -= NewLeapDevice;
         }
 
         /// <summary>
         /// Remove a hint from the existing hints and then send them all to the Service for the current device of the current controller
         /// </summary>
-        public static void RemoveHint(string hint)
+        public static void RemoveHint(string hint, Device device)
         {
-            if (currentHints.Remove(hint))
+            // We use a default device to keep a cache of non-specific device settings
+            if (device == null)
             {
-                RequestHandTrackingHints(currentHints.ToArray());
+                device = DefaultDevice;
             }
-            else
+
+            if (currentDeviceHints.ContainsKey(device))
             {
-                Debug.Log("Hand Tracking Hint: " + hint + " was not previously set. No hints were changed.");
+                if(currentDeviceHints[device].Remove(hint))
+                {
+                    RequestHandTrackingHints(currentDeviceHints[device].ToArray(), device);
+                }
+                else
+                {
+                    Debug.Log("Hand Tracking Hint: " + hint + " was not previously set. No hints were changed.");
+                }
             }
         }
 
         /// <summary>
         /// Add a hint to the existing hints and then send them all to the Service for the current device of the current controller
         /// </summary>
-        public static void AddHint(string hint)
+        public static void AddHint(string hint, Device device = null)
         {
-            if (!currentHints.Contains(hint))
+            // We use a default device to keep a cache of non-specific device settings
+            if (device == null)
             {
-                currentHints.Add(hint);
+                device = DefaultDevice;
             }
 
-            RequestHandTrackingHints(currentHints.ToArray());
+            if (currentDeviceHints.ContainsKey(device))
+            {
+                currentDeviceHints[device].Add(hint);
+            }
+            else
+            {
+                currentDeviceHints.Add(device, new List<string> { hint });
+            }
+
+            RequestHandTrackingHints(currentDeviceHints[device].ToArray(), device);
+        }
+
+        /// <summary>
+        /// Used to re-send the existing hints for each device that has had hints sent.
+        /// Consider calling this when a connection is lost and re-established
+        /// </summary>
+        public static void SendAllExistingHints()
+        {
+            foreach (var device in currentDeviceHints.Keys)
+            {
+                RequestHandTrackingHints(currentDeviceHints[device].ToArray(), device);
+            }
         }
 
         /// <summary>
@@ -97,9 +143,41 @@ namespace Leap.Unity
         /// <param name="device">An optional specific Device, otherwise the first found Device of the first Controller will be used</param>
         public static void RequestHandTrackingHints(string[] hints, Device device = null)
         {
-            LeapController.RequestHandTrackingHints(hints, device);
-            currentHints = hints.ToList();
+            if(hints == null)
+            {
+                hints = new string[0];
+            }
 
+            // We need to send null device to the connection if it's not been specified
+            if (device == DefaultDevice)
+            {
+                device = null;
+            }
+
+            LeapController.RequestHandTrackingHints(hints, device);
+
+            // Cache the requested hints
+            if (device == null)
+            {
+                // We use a default device to keep a cache of non-specific device settings
+                device = DefaultDevice;
+            }
+
+            if (currentDeviceHints.ContainsKey(device))
+            {
+                currentDeviceHints[device] = hints.ToList();
+            }
+            else
+            {
+                currentDeviceHints.Add(device, hints.ToList());
+            }
+
+            // Log the results
+            LogRequestedHints(hints);
+        }
+
+        static void LogRequestedHints(string[] hints)
+        {
             // Log the requeste hints
             string logString = "Hand Tracking Hints have been requested:";
 
