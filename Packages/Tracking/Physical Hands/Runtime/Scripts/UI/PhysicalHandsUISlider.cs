@@ -45,12 +45,9 @@ namespace Leap.Unity.PhysicalHands
 
         #endregion
 
-        public UnityEvent<int> SliderChangeEvent = new UnityEvent<int>();
-        public UnityEvent<int, int> TwoDimensionalSliderChangeEvent = new UnityEvent<int, int>();
-        public UnityEvent<int> SliderButtonPressedEvent = new UnityEvent<int>();
-        public UnityEvent<int, int> TwoDimensionalSliderButtonPressedEvent = new UnityEvent<int, int>();
-        public UnityEvent<int> SliderButtonUnPressedEvent = new UnityEvent<int>();
-        public UnityEvent<int, int> TwoDimensionalSliderButtonUnPressedEvent = new UnityEvent<int, int>();
+        public UnityEvent<Dictionary<char,float>> SliderChangeEvent = new UnityEvent<Dictionary<char, float>>();
+        public UnityEvent<Dictionary<char, float>> SliderButtonPressedEvent = new UnityEvent<Dictionary<char, float>>();
+        public UnityEvent<Dictionary<char, float>> SliderButtonUnPressedEvent = new UnityEvent<Dictionary<char, float>>();
 
         /// <summary>
         /// The travel distance of the slider (from the central point).
@@ -233,7 +230,7 @@ namespace Leap.Unity.PhysicalHands
 
             if (prevSliderValue != _sliderValue)
             {
-                SendSliderEvent(SliderChangeEvent, TwoDimensionalSliderChangeEvent);
+                SendSliderEvent(SliderChangeEvent);
                 if (_sliderReleasedLastFrame)
                 {
                     switch (_sliderType)
@@ -438,7 +435,7 @@ namespace Leap.Unity.PhysicalHands
         {
             UnFreezeSliderPosition();
 
-            SendSliderEvent(SliderButtonPressedEvent, TwoDimensionalSliderButtonPressedEvent);
+            SendSliderEvent(SliderButtonPressedEvent);
         }
         private void ButtonUnPressed()
         {
@@ -449,7 +446,7 @@ namespace Leap.Unity.PhysicalHands
 
             _sliderReleasedLastFrame = true;
 
-            SendSliderEvent(SliderButtonUnPressedEvent, TwoDimensionalSliderButtonUnPressedEvent);
+            SendSliderEvent(SliderButtonUnPressedEvent);
         }
 
         public void OnHandGrab(ContactHand hand)
@@ -502,7 +499,7 @@ namespace Leap.Unity.PhysicalHands
         /// </summary>
         /// <param name="unityEvent"></param>
         /// <param name="twoDimUnityEvent"></param>
-        void SendSliderEvent(UnityEvent<int> unityEvent, UnityEvent<int, int> twoDimUnityEvent)
+        void SendSliderEvent(UnityEvent<Dictionary<char, float>> unityEvent)
         {
             switch (_sliderType)
             {
@@ -511,13 +508,13 @@ namespace Leap.Unity.PhysicalHands
                         switch (_sliderDirection)
                         {
                             case SliderDirection.X:
-                                unityEvent.Invoke((int)_sliderValue.x);
+                                unityEvent.Invoke(new Dictionary<char, float> { { 'x', _sliderValue.x } });
                                 break;
                             case SliderDirection.Y:
-                                unityEvent.Invoke((int)_sliderValue.y);
+                                unityEvent.Invoke(new Dictionary<char, float> { { 'y', _sliderValue.y } });
                                 break;
                             case SliderDirection.Z:
-                                unityEvent.Invoke((int)_sliderValue.z);
+                                unityEvent.Invoke(new Dictionary<char, float> { { 'z', _sliderValue.z } });
                                 break;
                         }
                         break;
@@ -527,13 +524,13 @@ namespace Leap.Unity.PhysicalHands
                         switch (_twoDimSliderDirection)
                         {
                             case TwoDimSliderDirection.XY:
-                                twoDimUnityEvent.Invoke((int)_sliderValue.x, (int)_sliderValue.y);
+                                unityEvent.Invoke(new Dictionary<char, float> { { 'x', _sliderValue.x }, { 'y', _sliderValue.y } });
                                 break;
                             case TwoDimSliderDirection.XZ:
-                                twoDimUnityEvent.Invoke((int)_sliderValue.x, (int)_sliderValue.z);
+                                unityEvent.Invoke(new Dictionary<char, float> { { 'x', _sliderValue.x }, { 'z', _sliderValue.z } });
                                 break;
                             case TwoDimSliderDirection.YZ:
-                                twoDimUnityEvent.Invoke((int)_sliderValue.y, (int)_sliderValue.z);
+                                unityEvent.Invoke(new Dictionary<char, float> { { 'y', _sliderValue.y }, { 'z', _sliderValue.z } });
                                 break;
                         }
                         break;
@@ -545,13 +542,21 @@ namespace Leap.Unity.PhysicalHands
 
         #region Update
 
+        /// <summary>
+        /// Updates the position of a slider object based on the provided value or two-dimensional value.
+        /// </summary>
+        /// <param name="value">The value representing the position along the slider.</param>
+        /// <param name="twoDimValue">The two-dimensional value representing the position along the slider in two dimensions.</param>
         private void UpdateSliderPos(float value, Vector2 twoDimValue)
         {
+            // Get the current position of the slider object
             Vector3 slidePos = _slideableObject.transform.localPosition;
 
+            // Determine the type of slider and update its position accordingly
             switch (_sliderType)
             {
                 case SliderType.ONE_DIMENSIONAL:
+                    // Update position for one-dimensional slider based on slider direction
                     switch (_sliderDirection)
                     {
                         case SliderDirection.X:
@@ -566,6 +571,7 @@ namespace Leap.Unity.PhysicalHands
                     }
                     break;
                 case SliderType.TWO_DIMENSIONAL:
+                    // Update position for two-dimensional slider based on slider direction
                     switch (_twoDimSliderDirection)
                     {
                         case TwoDimSliderDirection.XY:
@@ -584,9 +590,9 @@ namespace Leap.Unity.PhysicalHands
                     break;
             }
 
+            // Reset velocity to zero and update the position of the slider object
             _slideableObjectRigidbody.velocity = Vector3.zero;
             _slideableObjectRigidbody.transform.localPosition = slidePos;
-            
         }
 
 
