@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -278,6 +278,11 @@ namespace Leap.Unity.Interaction
 
         private void OnDrawGizmos()
         {
+            if(grabBallInteractionBehaviour == null)
+            {
+                return;
+            }
+
             if (_head == null)
             {
                 _head = Camera.main.transform;

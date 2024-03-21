@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -10,6 +10,7 @@ namespace Leap
 {
     using LeapInternal;
     using System;
+    using System.Linq;
     using System.Threading;
     using UnityEngine;
 
@@ -43,7 +44,6 @@ namespace Leap
         bool _disposed = false;
         bool _supportsMultipleDevices = true;
         string _serverNamespace = "Leap Service";
-        Config _config;
 
         /// <summary>
         /// The SynchronizationContext used for dispatching events.
@@ -233,6 +233,7 @@ namespace Leap
         /// Dispatched when a configuration setting changes.
         /// @since 3.0
         /// </summary>
+        [Obsolete("Config is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
         public event EventHandler<ConfigChangeEventArgs> ConfigChange
         {
             add
@@ -404,6 +405,21 @@ namespace Leap
             }
         }
 
+        /// <summary>
+        /// Dispatched when a Fiducial Marker has been tracked.
+        /// </summary>
+        public event EventHandler<FiducialPoseEventArgs> FiducialPose
+        {
+            add
+            {
+                _connection.LeapFiducialPose += value;
+            }
+            remove
+            {
+                _connection.LeapFiducialPose -= value;
+            }
+        }
+
         public void Dispose()
         {
             Dispose(true);
@@ -446,6 +462,9 @@ namespace Leap
         {
             _connection = Connection.GetConnection(new Connection.Key(connectionKey, serverNamespace));
             _connection.EventContext = SynchronizationContext.Current;
+
+            if (_connection.IsRunning)
+                _hasInitialized = true;
 
             _connection.LeapInit += OnInit;
             _connection.LeapConnection += OnConnect;
@@ -620,6 +639,21 @@ namespace Leap
         public bool IsDeviceAvailable(Device device = null)
         {
             return _connection.IsDeviceAvailable(device);
+        }
+
+        /// <summary>
+        /// Send a specific set of hints, if this does not include previously set ones, they will be cleared.
+        /// </summary>
+        /// <param name="hints">The hints you wish to send</param>
+        /// <param name="device">An optional specific Device, otherwise the first found will be used</param>
+        public void RequestHandTrackingHints(string[] hints, Device device = null)
+        {
+            if(device == null)
+            {
+                device = Devices.ActiveDevices.FirstOrDefault();
+            }
+
+            _connection.RequestHandTrackingHintsOnDevice(device.Handle, hints);
         }
 
         /// <summary>
@@ -871,13 +905,12 @@ namespace Leap
         /// 
         /// @since 1.0
         /// </summary>
+        [Obsolete("Config is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
         public Config Config
         {
             get
             {
-                if (_config == null)
-                    _config = new Config(this._connection.ConnectionKey);
-                return _config;
+                return null;
             }
         }
 

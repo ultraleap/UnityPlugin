@@ -168,6 +168,8 @@ This workflow takes a few steps to setup and enables you to:
 - Manage changes using git.
 - Contribute changes back to the remote repository.
 
+(Note) [Git LFS](https://git-lfs.com/) is required when importing via this method.
+
 #### Local UPM Package Setup
 
 1. Clone or submodule the [repository][repository-url].

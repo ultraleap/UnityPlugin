@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -46,7 +46,7 @@ namespace Leap.Unity.Preview.Locomotion
             base.Start();
             if (leapProvider == null)
             {
-                leapProvider = FindAnyObjectByType<LeapXRServiceProvider>(FindObjectsInactive.Include);
+                leapProvider = Hands.Provider;
             }
 
             _pinchTransformHelper = new GameObject("PinchToTeleport_PinchTransformHelper").transform;
@@ -184,7 +184,7 @@ namespace Leap.Unity.Preview.Locomotion
         {
             if (leapProvider == null)
             {
-                leapProvider = FindAnyObjectByType<LeapXRServiceProvider>(FindObjectsInactive.Include);
+                leapProvider = Hands.Provider;
             }
 
             if (_isFacingObject == null)

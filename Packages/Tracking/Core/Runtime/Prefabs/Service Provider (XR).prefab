@@ -28,6 +28,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -46,21 +47,31 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   editTimePose: 1
   _interactionVolumeVisualization: 4
+  FOV_Visualization: 0
+  OptimalFOV_Visualization: 1
+  MaxFOV_Visualization: 1
   _frameOptimization: 0
   _physicsExtrapolation: 1
   _physicsExtrapolationTime: 0.011111111
+  _multipleDeviceMode: 0
+  _specificSerialNumber: 
   _trackingOptimization: 0
-  _workerThreadProfiling: 0
+  _preventInitializingTrackingMode: 0
   _serverNameSpace: Leap Service
+  _useInterpolation: 1
+  _reconnectionAttempts: 10
+  _reconnectionInterval: 360
   _deviceOffsetMode: 0
   _deviceOffsetYAxis: 0
-  _deviceOffsetZAxis: 0.12
-  _deviceTiltXAxis: 5
+  _deviceOffsetZAxis: 0.08
+  _deviceTiltXAxis: 0
   _deviceOrigin: {fileID: 0}
   _mainCamera: {fileID: 0}
   _temporalWarpingMode: 0
   _customWarpAdjustment: 17
+  _positionDeviceRelativeToMainCamera: 1
   _updateHandInPrecull: 0
+  _autoCreateTrackedPoseDriver: 1
 --- !u!114 &3197135840066374280
 MonoBehaviour:
   m_ObjectHideFlags: 0

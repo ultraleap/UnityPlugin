@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -82,6 +82,8 @@ namespace Leap.Unity.HandsModule
         public SerializedTransform[] DefaultHandPose;
 
 
+        private float lastHandFoundTime = 0;
+        private float instantScaleAfterHandFoundTime = 1f; // seconds
         #endregion
 
         #region Hand Model Base
@@ -97,6 +99,7 @@ namespace Leap.Unity.HandsModule
         /// To set, change the public Chirality.
         /// </summary>
         public override Chirality Handedness { get { return Chirality; } set { } }
+
         /// <summary>
         /// The type of the Hand model (set to Graphics).
         /// </summary>
@@ -156,6 +159,8 @@ namespace Leap.Unity.HandsModule
             {
                 SetModelScale = false;
             }
+
+            lastHandFoundTime = Time.time;
         }
 
         /// <summary>
@@ -213,7 +218,17 @@ namespace Leap.Unity.HandsModule
             else // Lerp the scale during playmode
             {
                 var targetScale = BoundHand.startScale * scaleRatio;
-                transform.localScale = Vector3.Lerp(transform.localScale, targetScale, Time.deltaTime * ScalingSpeedMultiplier);
+
+                if (Time.time - lastHandFoundTime < instantScaleAfterHandFoundTime)
+                {
+                    // Instantly scale if it's not been long since the hand started tracking
+                    transform.localScale = targetScale;
+                }
+                else
+                {
+                    // Smoothly scale
+                    transform.localScale = Vector3.Lerp(transform.localScale, targetScale, Time.deltaTime * ScalingSpeedMultiplier);
+                }
             }
         }
 

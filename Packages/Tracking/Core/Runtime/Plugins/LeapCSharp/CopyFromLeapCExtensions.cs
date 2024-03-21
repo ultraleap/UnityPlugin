@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -14,12 +14,30 @@ namespace LeapInternal
     {
         public static readonly float MM_TO_M = 1e-3f;
 
+        public static bool leapToUnityTransformSet = false;
+        private static LeapTransform leapToUnityTransform;
+
+        /**
+         * Provides a static LeapTransform that converts from Leap units and coordinates to Unity
+         */
+        public static LeapTransform LeapToUnityTransform
+        {
+            get
+            {
+                if(!leapToUnityTransformSet)
+                {
+                    leapToUnityTransform = new LeapTransform(Vector3.zero, Quaternion.identity, new Vector3(MM_TO_M, MM_TO_M, MM_TO_M));
+                    leapToUnityTransform.MirrorZ();
+                    leapToUnityTransformSet = true;
+                }
+
+                return leapToUnityTransform;
+            }
+        }
+
         public static void TransformToUnityUnits(this Hand hand)
         {
-            LeapTransform leapTransform = new LeapTransform(Vector3.zero, Quaternion.identity, new Vector3(MM_TO_M, MM_TO_M, MM_TO_M));
-            leapTransform.MirrorZ();
-
-            hand.Transform(leapTransform);
+            hand.Transform(LeapToUnityTransform);
         }
 
 

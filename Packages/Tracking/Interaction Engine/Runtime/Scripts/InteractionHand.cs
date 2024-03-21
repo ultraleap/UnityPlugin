@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -171,7 +171,7 @@ namespace Leap.Unity.Interaction
             { // Otherwise, configure automatically.
                 if (leapProvider == null)
                 {
-                    leapProvider = FindAnyObjectByType<LeapProvider>();
+                    leapProvider = Hands.Provider;
 
                     if (leapProvider == null)
                     {
@@ -237,7 +237,7 @@ namespace Leap.Unity.Interaction
 
         }
 
-        #endregion
+#endregion
 
         #region General InteractionController Implementation
 
@@ -889,7 +889,8 @@ namespace Leap.Unity.Interaction
                 var provider = leapProvider;
                 if (provider == null)
                 {
-                    provider = FindAnyObjectByType<LeapProvider>();
+                    provider = Hands.Provider;
+
                 }
 
                 if (_testHand == null && provider != null)

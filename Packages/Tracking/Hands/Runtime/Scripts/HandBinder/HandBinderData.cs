@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -258,5 +258,20 @@ namespace Leap.Unity.HandsModule
             leapHand.Arm.NextJoint = leapHand.WristPosition;
             return leapHand;
         }
+    }
+
+    /// <summary>
+    /// Used to define what bones names are valid for each finger
+    /// </summary>
+    [System.Serializable]
+    public static class BoneNameDefinitions
+    {
+        public static string[] DefinitionThumb = { "thumb" };
+        public static string[] DefinitionIndex = { "index" };
+        public static string[] DefinitionMiddle = { "middle" };
+        public static string[] DefinitionRing = { "ring" };
+        public static string[] DefinitionPinky = { "pinky", "little" };
+        public static string[] DefinitionWrist = { "wrist", "hand", "palm" };
+        public static string[] DefinitionElbow = { "elbow", "lowerArm", "forearm" };
     }
 }

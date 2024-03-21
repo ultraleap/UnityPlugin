@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -72,6 +72,7 @@ namespace LeapInternal
 
         private IntPtr _leapConnection;
         private volatile bool _isRunning = false;
+        public bool IsRunning { get { return _isRunning; } }
         private Thread _polster;
 
         /// <summary>
@@ -88,6 +89,7 @@ namespace LeapInternal
         private Dictionary<uint, UInt64> _activePolicies = new Dictionary<uint, ulong>();
 
         //Config change status
+        [Obsolete("Config is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
         private Dictionary<uint, string> _configRequests = new Dictionary<uint, string>();
 
         //Connection events
@@ -124,13 +126,16 @@ namespace LeapInternal
         public EventHandler<FrameEventArgs> LeapFrame;
         public EventHandler<InternalFrameEventArgs> LeapInternalFrame;
         public EventHandler<LogEventArgs> LeapLogEvent;
+        [Obsolete("Config is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
         public EventHandler<SetConfigResponseEventArgs> LeapConfigResponse;
+        [Obsolete("Config is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
         public EventHandler<ConfigChangeEventArgs> LeapConfigChange;
         public EventHandler<DistortionEventArgs> LeapDistortionChange;
         public EventHandler<DroppedFrameEventArgs> LeapDroppedFrame;
         public EventHandler<ImageEventArgs> LeapImage;
         public EventHandler<PointMappingChangeEventArgs> LeapPointMappingChange;
         public EventHandler<HeadPoseEventArgs> LeapHeadPoseChange;
+        public EventHandler<FiducialPoseEventArgs> LeapFiducialPose;
 
         public Action<BeginProfilingForThreadArgs> LeapBeginProfilingForThread;
         public Action<EndProfilingForThreadArgs> LeapEndProfilingForThread;
@@ -354,14 +359,6 @@ namespace LeapInternal
                             StructMarshal<LEAP_DEVICE_EVENT>.PtrToStruct(_msg.eventStructPtr, out device_lost_evt);
                             handleLostDevice(ref device_lost_evt);
                             break;
-                        case eLeapEventType.eLeapEventType_ConfigChange:
-                            LEAP_CONFIG_CHANGE_EVENT config_change_evt;
-                            StructMarshal<LEAP_CONFIG_CHANGE_EVENT>.PtrToStruct(_msg.eventStructPtr, out config_change_evt);
-                            handleConfigChange(ref config_change_evt);
-                            break;
-                        case eLeapEventType.eLeapEventType_ConfigResponse:
-                            handleConfigResponse(ref _msg);
-                            break;
                         case eLeapEventType.eLeapEventType_DroppedFrame:
                             LEAP_DROPPED_FRAME_EVENT dropped_frame_evt;
                             StructMarshal<LEAP_DROPPED_FRAME_EVENT>.PtrToStruct(_msg.eventStructPtr, out dropped_frame_evt);
@@ -386,6 +383,11 @@ namespace LeapInternal
                             LEAP_DEVICE_STATUS_CHANGE_EVENT status_evt;
                             StructMarshal<LEAP_DEVICE_STATUS_CHANGE_EVENT>.PtrToStruct(_msg.eventStructPtr, out status_evt);
                             handleDeviceStatusEvent(ref status_evt);
+                            break;
+                        case eLeapEventType.eLeapEventType_Fiducial:
+                            LEAP_FIDUCIAL_POSE_EVENT fiducial_event;
+                            StructMarshal<LEAP_FIDUCIAL_POSE_EVENT>.PtrToStruct(_msg.eventStructPtr, out fiducial_event);
+                            handleFiducialPoseEvent(ref fiducial_event);
                             break;
                     } //switch on _msg.type
 
@@ -625,6 +627,15 @@ namespace LeapInternal
             device.UpdateStatus(statusEvent.status);
         }
 
+        private void handleFiducialPoseEvent(ref LEAP_FIDUCIAL_POSE_EVENT fiducialPoseEvent)
+        {
+            if (LeapFiducialPose != null)
+            {
+                LeapFiducialPose.DispatchOnContext(this, EventContext,
+                    new FiducialPoseEventArgs(fiducialPoseEvent));
+            }
+        }
+
         private void handleDevice(ref LEAP_DEVICE_EVENT deviceMsg)
         {
             IntPtr deviceHandle = deviceMsg.device.handle;
@@ -733,68 +744,6 @@ namespace LeapInternal
             {
                 LeapDeviceFailure.DispatchOnContext(this, EventContext,
                   new DeviceFailureEventArgs((uint)deviceMsg.status, failureMessage, failedSerialNumber));
-            }
-        }
-
-        private void handleConfigChange(ref LEAP_CONFIG_CHANGE_EVENT configEvent)
-        {
-            string config_key = "";
-            _configRequests.TryGetValue(configEvent.requestId, out config_key);
-            if (config_key != null)
-                _configRequests.Remove(configEvent.requestId);
-            if (LeapConfigChange != null)
-            {
-                LeapConfigChange.DispatchOnContext(this, EventContext,
-                  new ConfigChangeEventArgs(config_key, configEvent.status != false, configEvent.requestId));
-            }
-        }
-
-        private void handleConfigResponse(ref LEAP_CONNECTION_MESSAGE configMsg)
-        {
-            LEAP_CONFIG_RESPONSE_EVENT config_response_evt;
-            StructMarshal<LEAP_CONFIG_RESPONSE_EVENT>.PtrToStruct(configMsg.eventStructPtr, out config_response_evt);
-            string config_key = "";
-            _configRequests.TryGetValue(config_response_evt.requestId, out config_key);
-            if (config_key != null)
-                _configRequests.Remove(config_response_evt.requestId);
-
-            Config.ValueType dataType;
-            object value;
-            uint requestId = config_response_evt.requestId;
-            if (config_response_evt.value.type != eLeapValueType.eLeapValueType_String)
-            {
-                switch (config_response_evt.value.type)
-                {
-                    case eLeapValueType.eLeapValueType_Boolean:
-                        dataType = Config.ValueType.TYPE_BOOLEAN;
-                        value = config_response_evt.value.boolValue;
-                        break;
-                    case eLeapValueType.eLeapValueType_Int32:
-                        dataType = Config.ValueType.TYPE_INT32;
-                        value = config_response_evt.value.intValue;
-                        break;
-                    case eLeapValueType.eLeapValueType_Float:
-                        dataType = Config.ValueType.TYPE_FLOAT;
-                        value = config_response_evt.value.floatValue;
-                        break;
-                    default:
-                        dataType = Config.ValueType.TYPE_UNKNOWN;
-                        value = new object();
-                        break;
-                }
-            }
-            else
-            {
-                LEAP_CONFIG_RESPONSE_EVENT_WITH_REF_TYPE config_ref_value;
-                StructMarshal<LEAP_CONFIG_RESPONSE_EVENT_WITH_REF_TYPE>.PtrToStruct(configMsg.eventStructPtr, out config_ref_value);
-                dataType = Config.ValueType.TYPE_STRING;
-                value = config_ref_value.value.stringValue;
-            }
-            SetConfigResponseEventArgs args = new SetConfigResponseEventArgs(config_key, dataType, value, requestId);
-
-            if (LeapConfigResponse != null)
-            {
-                LeapConfigResponse.DispatchOnContext(this, EventContext, args);
             }
         }
 
@@ -1132,6 +1081,7 @@ namespace LeapInternal
             return _activePolicies.ContainsKey(deviceID);
         }
 
+        [Obsolete("Config is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
         public uint GetConfigValue(string config_key)
         {
             uint requestId = 0;
@@ -1141,6 +1091,7 @@ namespace LeapInternal
             return requestId;
         }
 
+        [Obsolete("Config is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
         public uint SetConfigValue<T>(string config_key, T value) where T : IConvertible
         {
             uint requestId = 0;
@@ -1381,6 +1332,19 @@ namespace LeapInternal
                 pm.ids[i] = unchecked((UInt32)ids[i]);
             }
             Marshal.FreeHGlobal(buffer);
+        }
+
+        /// <summary>
+        /// Send a specific set of hints to hDevice, if this does not include previously set ones, they will be cleared.
+        /// </summary>
+        /// <param name="hDevice">The Device pointer for the trcking device to set the hints for</param>
+        /// <param name="hints">The array of hints</param>
+        public void RequestHandTrackingHintsOnDevice(IntPtr hDevice, string[] hints)
+        {
+            eLeapRS result;
+            result = LeapC.SetDeviceHints(_leapConnection, hDevice, hints);
+
+            reportAbnormalResults("LeapC SetDeviceHints call was ", result);
         }
 
         private eLeapRS _lastResult; //Used to avoid repeating the same log message, ie. for events like time out

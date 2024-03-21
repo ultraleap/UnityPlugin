@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -48,7 +48,11 @@ namespace Leap.Unity.Preview.Locomotion
 
         private void Awake()
         {
+#if UNITY_2021_3_18_OR_NEWER
             _jumpGems = FindObjectsByType<JumpGem>(FindObjectsInactive.Include, FindObjectsSortMode.None).ToList();
+#else
+            _jumpGems = FindObjectsOfType<JumpGem>(true).ToList();
+#endif
             for (int i = 0; i < _jumpGems.Count; i++)
             {
                 int j = i;

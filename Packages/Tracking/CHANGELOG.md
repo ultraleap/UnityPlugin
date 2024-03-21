@@ -9,30 +9,105 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [NEXT] - xx/xx/xx
 
 ### Tracking Client versions
-- Windows 	v5.16.0
-- MacOS 	v5.16.0
-- Android 	v5.16.0
+- Windows 	v5.17.1
+- MacOS 	v5.17.1
+- Android 	v5.17.1
 
 ### Added
+- LeapServiceProvider accessor for world space psoition of the Tracking Camera
+- LeapXRServiceProvider accessor for world space psoition of the Tracking Camera
+- LeapServiceProvider accessor for world space position of the Tracking Camera
+- LeapXRServiceProvider accessor for world space position of the Tracking Camera
+- (Physical Hands) Ability to ignore collisions on single object or all children
+- (Physical Hands) Added toggle to GrabHelper to allow kinematic object movement
+- (Physical Hands) Ignore Physical hands component can now choose which hand(s) it should be applied to
+- (Physical Hands) Edit time representation of hands via Physical Hands Manager
+- (Attachment Hands) Do not show warning again this session when deleting attachment points
+- (Physical Hands) Ability to create IgnorePhysicalHands at runtime
+- (Fiducial Marker Tracking) Fiducial Marker Tracking support using AprilTag
+
+### Changed
+- (Config) Additional uses of Config marked as Obsolete
+- Any LeapServiceProvider can be used with MRTK subsystem
+- Example content to be split by XR, Tabletop and URP Examples
+- Combined example content to be part of the main Ultraleap Tracking .unitypackage when importing via .unitypackage
+- Added fog and gradient sky for all XR example scenes
+- (Hand Rays) Exposed dot product used to test if the hand is facing camera
+- (Hinting) Added support for startup setting of Hand Tracking Hints via the Ultraleap Settings window
+- (Hinting) Added support for runtime changing of Hand Tracking Hints via static HandTrackingHintManager
+- (Hinting) Added support for setting OpenXR Hand Tracking Hints via the OpenXR HandTrackingFeature
+- Access of Physical Hands extensions
+- Added public accessors to various Physical Hands utilities
+- Unified use of TrackedPoseDrivers across XR LeapProviders
+
+### Fixed
+- Errors in Editor when using pre-2023.3.18 LTS due to FindObjectByType issue
+- (Physical Hands) Objects are sticky when they ignore collision with hard contact hands
+- (Physical Hands) Ability to toggle ignore Physical hands options from the inspector at runtime.
+- (Locomotion) IsPinching wouldn't fire when between Activate and Deactivate values in LightweightPinchDetector
+- (Physical Hands) Soft contact button difficult to press in physical hands playground scene when not using UI layer
+- (Physical Hands) Disabled Ignore Physical hands components still affecting grab and collision at runtime
+- (Physical Hands) Button Prefab uses mesh from example assets
+- (Physical Hands) Button gets stuck down if disabled after pressing
+- (UI Input Preview) Null UIInput events cause unnecessary error logs
+- Memory increase when repeatedly opening scenes with LeapServiceProviders
+- ThreadAbort when changing scenes in editor that use multidevice or display the tracking device gizmo
+- (LeapServiceProvider) OnDeviceChanged event is not raised when multidevice mode is disabled
+- (LeapXRServiceProvider) LeapXRServiceProvider wrongly uses transform relative to camera when offset mode set to transform
+- (Hand Binder) incorrect upperArm name definition for elbow joint
+- (Physical Hands) Soft Contact NAN collider error when using OpenXR tracking on Android devices
+- (Physical Hands) Hand stuck in pose, unable to grab if object is disabled while grabbing
+- (Physical Hands) Errors when destroying objects that are grabbed
+
+
+## [6.14.0] - 24/01/24
+
+### Tracking Client versions
+- Windows 	v5.17.1
+- MacOS 	v5.17.1
+- Android 	v5.17.1
+
+### Added
+- Physical Hands. This introduces a new way of interacting with object in the virtual world using your hands and unitys physics engine.
+
+### Changed
+- Removed Physics Hands from the preview package as Physical Hands has replaced it.
+
+### Known issues
+- Repeatedly opening scenes can cause memory use increase
+- The OpenXR Leap Provider does not currently support the `Confidence` hand property (and will return fixed values)
+- After using Ultraleap OpenXR in Unity Editor, the tracking mode of device 0 will be set to HMD until the Unity Editor session ends. This can stop the testing of non-XR scenes until the Unity Editor is re-opened
+
+## [6.13.0] - 24/11/23
+
+### Tracking Client versions
+- Windows 	v5.17.1
+- MacOS 	v5.17.1
+- Android 	v5.17.1
+
+### Added
+- (Hands Recorder Preview) A new Hand Recorder to record animation clips of hands and additional objects to produce re-playable actions (e.g for tutorials)
 - (Pose Detector) Add a new rule type to match rotation of a joint to a target
+- (XR Hands) Added XRHandsLeapProvider to convert the current XRHandsSubsystem data to a LeapProvider for use with the Ultraleap Unity Plugin features
+- Added the ability to suppress the Android build warnings
 - Help Menu that links out to docs, a place to report bugs & places to get support
 
 ### Changed
-- Changed from using obsolete FindObjectOfType to using newer implementations
 - (Preview Teleportation) Lightweight Pinch Detector's finger detection can be configured
-- Ultraleap settings are now in the project settings window, under "Ultraleap" 
+- (Obsolete) Some old unused LeapC APIs have been marked as Obsolete (config, IsSmudged, IsLightingBad)
+- Changed from using obsolete FindObjectOfType to using newer implementations
+- Ultraleap settings are now in the project settings window, under "Ultraleap"
 
 ### Fixed
+- (Hand Binder) Hands begin at large/small scale and slowly scale to normal size
+- (Pinch to Paint Example) Painting sound does not play if pinch began out of tracking range
 - LeapXRServiceProvider ensures default device offset mode is set to new defaults when enabled
+- Attachment Hand Menu is incorrectly rotated
 
-### Known issues 
-- Use of the LeapCSharp Config class is unavailable with v5.X tracking service
+### Known issues
 - Repeatedly opening scenes can cause memory use increase
-- Currently the Ultraleap Hand Tracking feature for OpenXR requires the New and Legacy input systems to be enabled, to simultaneously use OpenXR and the Ultraleap Unity Plugin's features.
 - The OpenXR Leap Provider does not currently support the `Confidence` hand property (and will return fixed values)
 - After using Ultraleap OpenXR in Unity Editor, the tracking mode of device 0 will be set to HMD until the Unity Editor session ends. This can stop the testing of non-XR scenes until the Unity Editor is re-opened
-- The OpenXR Leap Provider palm can be in unexpected position when using pre-1.4.3 OpenXR Layer. A workaround is to ensure you use 1.4.3 or newer - installed by the 5.12.0 or newer Tracking Service Installer
-- Running both the Ultraleap XRHands Subsystem and another XRHands Subsystem at the same time causes unstable results. Only enable one at a time.
 
 ## [6.12.1] - 28/09/23
 

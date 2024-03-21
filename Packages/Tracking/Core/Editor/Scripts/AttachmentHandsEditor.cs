@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2023.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -109,7 +109,7 @@ namespace Leap.Unity.Attachments
             {
                 if (EditorUtility.DisplayDialog("Delete all attachments?",
                                                    "Doing so will destroy all child GameObjects of " + target.gameObject.name + ".",
-                                                   "Delete", "Cancel"))
+                                                   "Delete", "Cancel", DialogOptOutDecisionType.ForThisMachine, "UL attachment hands popup"))
                 {
                     target.attachmentPoints = AttachmentPointFlags.None;
                     GUIUtility.ExitGUI();
@@ -142,7 +142,7 @@ namespace Leap.Unity.Attachments
                                                    "Deleting the " + flag + " attachment point will destroy "
                                                  + "its GameObject and any of its non-Attachment-Point children, "
                                                  + "and will remove any components attached to it.",
-                                                   "Delete " + flag + " Attachment Point", "Cancel"))
+                                                   "Delete " + flag + " Attachment Point", "Cancel", DialogOptOutDecisionType.ForThisMachine, "UL attachment hands popup"))
                 {
                     target.attachmentPoints = attachmentPoints & (~flag); // Set flag bit to 0.
                     GUIUtility.ExitGUI();
