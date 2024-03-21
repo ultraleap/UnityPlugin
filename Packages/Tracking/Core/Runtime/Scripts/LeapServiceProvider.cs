@@ -901,11 +901,11 @@ namespace Leap.Unity
 
             if(_multipleDeviceMode == MultipleDeviceMode.Disabled)
             {
-                _leapController = new Controller(0, _serverNameSpace, false);
+                _leapController = new Controller(0, _serverNameSpace);
             }
             else
             {
-                _leapController = new Controller(SpecificSerialNumber.GetHashCode(), _serverNameSpace, true);
+                _leapController = new Controller(SpecificSerialNumber.GetHashCode(), _serverNameSpace);
             }
 
             _leapController.Device += (s, e) =>

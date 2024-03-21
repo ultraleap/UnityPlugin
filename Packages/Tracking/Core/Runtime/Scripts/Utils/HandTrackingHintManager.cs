@@ -24,7 +24,7 @@ namespace Leap.Unity
                     }
                     else // No leapserviceprovider, we should make a new controller ourselves
                     {
-                        _leapController = new Controller(0, "Leap Service", false);
+                        _leapController = new Controller(0, "Leap Service");
                     }
                 }
                 return _leapController;
