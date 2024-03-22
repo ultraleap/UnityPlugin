@@ -1,78 +1,131 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 
 namespace Leap.Unity.PhysicalHands
 {
-    public class PhysicalHandsButtonBase: MonoBehaviour, IPhysicalHandContact
+    [RequireComponent(typeof(Rigidbody))]
+    public class PhysicalHandsButtonBase : MonoBehaviour
     {
-        internal const float BUTTON_PRESS_EXIT_THRESHOLD = 0.09F;
-
-        [Space(10)]
         [Header("Base Button")]
-        [Space(5)]
-        //[SerializeField, Tooltip("The pressable part of the button.")]
-        //internal GameObject pressableObject;
-        [SerializeField, Tooltip("Travel of the button (How far does the button need to move before it is activated).")]
-        internal float buttonTravelDistance = 0.017f;
+        [SerializeField] 
+        private GameObject _pressableObject;
+        [SerializeField] 
+        private float _buttonTravelDistance = 0.017f;
+        [SerializeField] 
+        private bool _shouldOnlyBePressedByHand = false;
+        [SerializeField] 
+        private ChiralitySelection _whichHandCanPressButton = ChiralitySelection.BOTH;
+        [SerializeField] 
+        private Vector3 _initialButtonPosition = Vector3.zero;
 
-        [SerializeField, Tooltip("Can this button only be activated by pressing it with a hand?")]
-        internal bool _shouldOnlyBePressedByHand = false;
-        [SerializeField, Tooltip("Which hand should be able to press this button?")]
-        ChiralitySelection _whichHandCanPressButton = ChiralitySelection.BOTH;
+        private const float BUTTON_PRESS_EXIT_THRESHOLD = 0.09f;
+        private bool _isButtonPressed = false;
+        private bool _contactHandPressing = false;
+        private bool _leftHandContacting = false;
+        private bool _rightHandContacting = false;
+        private ConfigurableJoint _configurableJoint;
 
-        internal bool _isButtonPressed = true;
-
-        internal bool _contactHandPressing = false;
-        internal List<Collider> _colliders;
-        internal Transform _parent;
-        internal Joint _joint;
-
-        [SerializeField, Tooltip("This should be the starting position i.e. the position the button sits when fully un-pressed. \n" +
-            "If left at (0,0,0), this will default to getting the current button position on awake. \n" +
-            "This is the position where distance checks for button travel distance are performed from. \n")]
-        internal Vector3 _initialButtonPosition = Vector3.zero;
-
-        [Space(10)]
         public UnityEvent OnButtonPressed;
         public UnityEvent OnButtonUnPressed;
+        public UnityEvent<ContactHand> OnHandContact;
+        public UnityEvent<ContactHand> OnHandContactExit;
+        public UnityEvent<ContactHand> OnHandHover;
+        public UnityEvent<ContactHand> OnHandHoverExit;
 
-
-        internal bool _leftHandContacting = false;
-        internal bool _rightHandContacting = false;
-
-
-
-        private void Awake()
+        private void OnEnable()
         {
-            _colliders = this.transform.GetComponentsInChildren<Collider>().ToList();
-            _parent = this.transform.parent;
-            _joint = this.transform.GetComponent<Joint>();
-            if (_initialButtonPosition == Vector3.zero)
-            {
-                _initialButtonPosition = this.transform.localPosition;
-            }
-            Debug.Log(_initialButtonPosition);
+            Initialize();
         }
 
-        void FixedUpdate()
+        private void Initialize()
         {
-
-            if ((!_isButtonPressed
-                && Vector3.Distance(this.transform.localPosition, _initialButtonPosition) > buttonTravelDistance)
-                && (_contactHandPressing || !_shouldOnlyBePressedByHand))
+            if (_pressableObject == null)
             {
-                //Debug.Log("ButtonPressed"+ Vector3.Distance(this.transform.localPosition, _initialButtonPosition));
+                Debug.LogError("Pressable object not assigned. Please assign one to use the button.");
+                enabled = false;
+                return;
+            }
+
+            SetUpPressableObject();
+            SetUpSpringJoint();
+            _initialButtonPosition = _pressableObject.transform.localPosition;
+        }
+
+        private void SetUpPressableObject()
+        {
+            if (!_pressableObject.TryGetComponent<Rigidbody>(out Rigidbody rigidbody))
+            {
+                rigidbody = _pressableObject.AddComponent<Rigidbody>();
+                rigidbody.isKinematic = true;
+                rigidbody.useGravity = false;
+            }
+
+            if (!_pressableObject.TryGetComponent<IgnorePhysicalHands>(out IgnorePhysicalHands ignorePhysHands))
+            {
+                ignorePhysHands = _pressableObject.AddComponent<IgnorePhysicalHands>();
+                ignorePhysHands.DisableAllGrabbing = true;
+                ignorePhysHands.DisableAllHandCollisions = false;
+                ignorePhysHands.DisableCollisionOnChildObjects = false;
+            }
+
+            if (!_pressableObject.TryGetComponent<PhysicalHandsButtonHelper>(out PhysicalHandsButtonHelper buttonHelper))
+            {
+                buttonHelper = _pressableObject.AddComponent<PhysicalHandsButtonHelper>();
+            }
+
+            buttonHelper._onHandContact += OnHandContactPO;
+            buttonHelper._onHandContactExit += OnHandContactExitPO;
+            buttonHelper._onHandHover += OnHandHoverPO;
+            buttonHelper._onHandHoverExit += OnHandHoverExitPO;
+        }
+
+        private void SetUpSpringJoint()
+        {
+            if (!_pressableObject.TryGetComponent<ConfigurableJoint>(out _configurableJoint))
+            {
+                _configurableJoint = _pressableObject.AddComponent<ConfigurableJoint>();
+            }
+
+            _configurableJoint.connectedBody = GetComponent<Rigidbody>();
+
+            _configurableJoint.yDrive = new JointDrive
+            {
+                positionSpring = 100,
+                positionDamper = 10,
+                maximumForce = 1
+            };
+
+            _configurableJoint.xMotion = ConfigurableJointMotion.Locked;
+            _configurableJoint.yMotion = ConfigurableJointMotion.Limited;
+            _configurableJoint.zMotion = ConfigurableJointMotion.Locked;
+            _configurableJoint.angularXMotion = ConfigurableJointMotion.Locked;
+            _configurableJoint.angularYMotion = ConfigurableJointMotion.Locked;
+            _configurableJoint.angularZMotion = ConfigurableJointMotion.Locked;
+
+
+            _configurableJoint.anchor = new Vector3(
+                _configurableJoint.anchor.x,
+                _configurableJoint.anchor.y + (_buttonTravelDistance / 2),
+                _configurableJoint.anchor.z);
+
+            _configurableJoint.linearLimit = new SoftJointLimit
+            {
+                limit = _buttonTravelDistance / 2
+            };
+        }
+
+        private void FixedUpdate()
+        {
+            float distance = Mathf.Abs(transform.position.y - _initialButtonPosition.y);
+
+            if (!_isButtonPressed && distance >= _buttonTravelDistance && (_contactHandPressing || !_shouldOnlyBePressedByHand))
+            {
                 _isButtonPressed = true;
                 ButtonPressed();
             }
 
-            if (_isButtonPressed 
-                && Vector3.Distance(this.transform.localPosition, _initialButtonPosition) < buttonTravelDistance * BUTTON_PRESS_EXIT_THRESHOLD)
+            if (_isButtonPressed && distance < _buttonTravelDistance * BUTTON_PRESS_EXIT_THRESHOLD)
             {
-                //Debug.Log("ButtonUnPressed" + Vector3.Distance(this.transform.localPosition, _initialButtonPosition));
                 _isButtonPressed = false;
                 ButtonUnpressed();
             }
@@ -88,20 +141,17 @@ namespace Leap.Unity.PhysicalHands
             OnButtonUnPressed?.Invoke();
         }
 
-        public void OnHandContact(ContactHand hand)
+        public void OnHandContactPO(ContactHand hand)
         {
-            ContactHandNearbyEnter(hand);
-        }
+            OnHandContact?.Invoke(hand);
 
-        public void ContactHandNearbyEnter(ContactHand contactHand)
-        {
-            if (contactHand != null)
+            if (hand != null)
             {
-                if (contactHand.Handedness == Chirality.Left)
+                if (hand.Handedness == Chirality.Left)
                 {
                     _leftHandContacting = true;
                 }
-                else if (contactHand.Handedness == Chirality.Right)
+                else if (hand.Handedness == Chirality.Right)
                 {
                     _rightHandContacting = true;
                 }
@@ -110,21 +160,17 @@ namespace Leap.Unity.PhysicalHands
             _contactHandPressing = GetChosenHandInContact();
         }
 
-
-        public void OnHandContactExit(ContactHand hand)
+        public void OnHandContactExitPO(ContactHand hand)
         {
-            ContactHandNearbyExit(hand);
-        }
+            OnHandContactExit?.Invoke(hand);
 
-        public void ContactHandNearbyExit(ContactHand contactHand)
-        {
-            if (contactHand != null)
+            if (hand != null)
             {
-                if (contactHand.Handedness == Chirality.Left)
+                if (hand.Handedness == Chirality.Left)
                 {
                     _leftHandContacting = false;
                 }
-                else if (contactHand.Handedness == Chirality.Right)
+                else if (hand.Handedness == Chirality.Right)
                 {
                     _rightHandContacting = false;
                 }
@@ -138,31 +184,29 @@ namespace Leap.Unity.PhysicalHands
             _contactHandPressing = GetChosenHandInContact();
         }
 
+        private void OnHandHoverExitPO(ContactHand hand)
+        {
+            OnHandHoverExit?.Invoke(hand);
+        }
+
+        private void OnHandHoverPO(ContactHand hand)
+        {
+            OnHandHover?.Invoke(hand);
+        }
+
         private bool GetChosenHandInContact()
         {
             switch (_whichHandCanPressButton)
             {
                 case ChiralitySelection.LEFT:
-                    if (_leftHandContacting)
-                    {
-                        return true;
-                    }
-                    break;
+                    return _leftHandContacting;
                 case ChiralitySelection.RIGHT:
-                    if (_rightHandContacting)
-                    {
-                        return true;
-                    }
-                    break;
+                    return _rightHandContacting;
                 case ChiralitySelection.BOTH:
-                    if (_rightHandContacting || _leftHandContacting)
-                    {
-                        return true;
-                    }
-                    break;
+                    return _rightHandContacting || _leftHandContacting;
+                default:
+                    return false;
             }
-
-            return false;
         }
     }
 }

@@ -36,19 +36,19 @@ namespace Leap.Unity.PhysicalHands
 
             this.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
 
-            foreach (var collider in _colliders)
-            {
-                collider.enabled = false;
-            }
+            //foreach (var collider in _colliders)
+            //{
+            //    collider.enabled = false;
+            //}
 
             yield return new WaitForSecondsRealtime(_buttonStaydownTimer);
 
             this.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
 
-            foreach (var collider in _colliders)
-            {
-                collider.enabled = true;
-            }
+            //foreach (var collider in _colliders)
+            //{
+            //    collider.enabled = true;
+            //}
         }
     }
 }
