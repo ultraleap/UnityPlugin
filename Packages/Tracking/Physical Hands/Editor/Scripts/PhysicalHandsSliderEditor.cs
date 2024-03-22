@@ -33,7 +33,7 @@ namespace Leap.Unity.PhysicalHands
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("_twoDimSliderDirection"), new GUIContent("Two-Dimensional Slider Direction", "The direction of movement for the two-dimensional slider."));
 
                 target._twoDimStartPosition = CreateVector2AxisAttribute("Start Position: ", "_twoDimStartPosition", "Starting position of the two-dimensional slider.");
-                target._twoDimNumberOfSegments = CreateVector2AxisAttribute("Number Of Segments: ", "_twoDimNumberOfSegments", "Number of segments for the two-dimensional slider to use (0 = unlimited).");
+                target._twoDimNumberOfSegments = CreateVector2IntAxisAttribute("Number Of Segments: ", "_twoDimNumberOfSegments", "Number of segments for the two-dimensional slider to use (0 = unlimited).");
                 target.TwoDimSliderTravelDistance = CreateVector2AxisAttribute("Slider Travel Distance: ", "TwoDimSliderTravelDistance", "The travel distance of the two-dimensional slider.");
             }
 
@@ -129,6 +129,44 @@ namespace Leap.Unity.PhysicalHands
                 GUILayout.ExpandWidth(true),
                 GUILayout.MinWidth(100)
             );
+            EditorGUIUtility.labelWidth = 0;
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUI.indentLevel = 0;
+
+            return result;
+        }
+
+        private Vector2 CreateVector2IntAxisAttribute(string label, string property, string tooltip)
+        {
+            Vector2 result = Vector2.zero;
+            var enumName = serializedObject.FindProperty("_twoDimSliderDirection").enumDisplayNames[serializedObject.FindProperty("_twoDimSliderDirection").enumValueIndex];
+
+            EditorGUILayout.LabelField(label, EditorStyles.boldLabel);
+            GUILayout.FlexibleSpace();
+            EditorGUIUtility.labelWidth = 50;
+            EditorGUI.indentLevel = 1;
+
+            // Slider Precentage X (first element)
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("" + enumName.ElementAt(0) + " Axis:");
+            result.x = Mathf.RoundToInt(EditorGUILayout.FloatField(
+                new GUIContent("", tooltip),
+                serializedObject.FindProperty(property).vector2Value.x,
+                GUILayout.ExpandWidth(true),
+                GUILayout.MinWidth(100)
+            ));
+            EditorGUILayout.EndHorizontal();
+
+            // Slider Precentage Y (second element)
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("" + enumName.ElementAt(1) + " Axis:");
+            result.y = Mathf.RoundToInt(EditorGUILayout.FloatField(
+                new GUIContent("", tooltip),
+                serializedObject.FindProperty(property).vector2Value.y,
+                GUILayout.ExpandWidth(true),
+                GUILayout.MinWidth(100)
+            ));
             EditorGUIUtility.labelWidth = 0;
             EditorGUILayout.EndHorizontal();
 

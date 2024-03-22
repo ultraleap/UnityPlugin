@@ -442,19 +442,15 @@ namespace Leap.Unity.PhysicalHands
         /// </summary>
         private void SetUpTwoDimSlider()
         {
-            _configurableJoints = GetComponents<ConfigurableJoint>().ToList<ConfigurableJoint>();
+            _configurableJoints = _slideableObject.GetComponents<ConfigurableJoint>().ToList<ConfigurableJoint>();
 
-            
-            for (int i = 0; i < 2; i++)
+            while (_configurableJoints.Count < 2)
             {
-                ConfigurableJoint joint = _configurableJoints[i];
+                _configurableJoints.Add(_slideableObject.AddComponent<ConfigurableJoint>());
+            }
 
-                if (_configurableJoints.Count != 2)
-                {
-                    joint = gameObject.AddComponent<ConfigurableJoint>();
-                    _configurableJoints.Add(joint);
-                }
-
+            foreach (var joint in _configurableJoints)
+            {
                 SetUpConfigurableJoint(joint);
             }
 
@@ -549,6 +545,7 @@ namespace Leap.Unity.PhysicalHands
         private void UnFreezeSliderPosition()
         {
             _slideableObjectRigidbody.constraints = RigidbodyConstraints.None;
+            _slideableObjectRigidbody.freezeRotation = true;
             _slideableObjectRigidbody.isKinematic = false;
         }
         /// <summary>
