@@ -255,65 +255,75 @@ namespace Leap
                     return devicePose;
                 }
 
-                bool deviceTransformAvailable = LeapC.GetDeviceTransformAvailable(Handle);
-
-                if (!deviceTransformAvailable)
-                {
-                    devicePose = Pose.identity;
-                    poseSet = true;
-                    return Pose.identity;
-                }
-
-                float[] data = new float[16];
-                eLeapRS result = LeapC.GetDeviceTransform(Handle, data);
-
-                if (result != eLeapRS.eLeapRS_Success || data == null)
-                {
-                    devicePose = Pose.identity;
-                    poseSet = true;
-                    return Pose.identity;
-                }
-
-                // Using the LEAP->OPENXR device transform matrix
-                // Unitys matrices are generated as 4 columns:
-                Matrix4x4 deviceTransform = new Matrix4x4(
-                                                    new Vector4(data[0], data[1], data[2], data[3]),
-                                                    new Vector4(data[4], data[5], data[6], data[7]),
-                                                    new Vector4(data[8], data[9], data[10], data[11]),
-                                                    new Vector4(data[12], data[13], data[14], data[15]));
-
-
-                // An example of the expected matrix if it were 8cm forward from the head origin
-                // Unitys matrices are generated as 4 columns:
-                //Matrix4x4 deviceTransform = new Matrix4x4(
-                //                                    new Vector4(-0.001f, 0, 0, 0),
-                //                                    new Vector4(0, 0, -0.001f, 0),
-                //                                    new Vector4(0, -0.001f, 0, 0),
-                //                                    new Vector4(0, 0, -0.08f, 1));
-
-                if (deviceTransform == Matrix4x4.identity)
-                {
-                    devicePose = Pose.identity;
-                    poseSet = true;
-                    return Pose.identity;
-                }
-
-                Matrix4x4 openXRToUnity = new Matrix4x4(
-                                                    new Vector4(1f, 0, 0, 0),
-                                                    new Vector4(0, 1f, 0, 0),
-                                                    new Vector4(0, 0, -1f, 0),
-                                                    new Vector4(0, 0, 0, 1));
-
-                deviceTransform = openXRToUnity * deviceTransform;
-
-                Vector3 outputPos = deviceTransform.GetPosition();
-                //Quaternion outputRot = deviceTransform.rotation; // Note: the matrices we receive are not rotatrion matrices. This produces unexpected results
-
-                devicePose = new Pose(outputPos, Quaternion.identity);
-
-                poseSet = true;
-                return devicePose;
+                return FindDeviceTransform();
             }
+        }
+
+        internal Pose FindDeviceTransform()
+        {
+            bool deviceTransformAvailable = LeapC.GetDeviceTransformAvailable(Handle);
+
+            if (!deviceTransformAvailable)
+            {
+                devicePose = Pose.identity;
+                poseSet = true;
+                return Pose.identity;
+            }
+
+            float[] data = new float[16];
+            eLeapRS result = LeapC.GetDeviceTransform(Handle, data);
+
+            if (result != eLeapRS.eLeapRS_Success || data == null)
+            {
+                devicePose = Pose.identity;
+                poseSet = true;
+                return Pose.identity;
+            }
+
+            // Using the LEAP->OPENXR device transform matrix
+            // Unitys matrices are generated as 4 columns:
+            Matrix4x4 deviceTransform = new Matrix4x4(
+                                                new Vector4(data[0], data[1], data[2], data[3]),
+                                                new Vector4(data[4], data[5], data[6], data[7]),
+                                                new Vector4(data[8], data[9], data[10], data[11]),
+                                                new Vector4(data[12], data[13], data[14], data[15]));
+
+
+            ////An example of the expected matrix if it were 8cm forward from the head origin
+            //// Unitys matrices are generated as 4 columns:
+            //Matrix4x4 deviceTransform = new Matrix4x4(
+            //                                    new Vector4(-0.001f, 0, 0, 0),
+            //                                    new Vector4(0, 0, -0.001f, 0),
+            //                                    new Vector4(0, -0.001f, 0, 0),
+            //                                    new Vector4(0, 0, -0.08f, 1));
+
+            //// An example of applying a rotation to the existing device transform
+            //Matrix4x4 rotationMatrix = Matrix4x4.Rotate(Quaternion.Euler(0, 90, 0));
+            //deviceTransform = deviceTransform * rotationMatrix;
+
+            if (deviceTransform == Matrix4x4.identity)
+            {
+                devicePose = Pose.identity;
+                poseSet = true;
+                return Pose.identity;
+            }
+
+            Matrix4x4 openXRToUnitySwizzle = new Matrix4x4(
+                                                new Vector4(1.0f, 0, 0, 0),
+                                                new Vector4(0, 1.0f, 0, 0),
+                                                new Vector4(0, 0, -1f, 0),
+                                                new Vector4(0, 0, 0, 1f));
+
+            // Converts device transform from openxr space to unity space
+            deviceTransform = openXRToUnitySwizzle.inverse * deviceTransform * openXRToUnitySwizzle;
+
+            Vector3 outputPos = deviceTransform.GetPosition();
+            Quaternion outputRot = deviceTransform.rotation;
+
+            devicePose = new Pose(outputPos, outputRot);
+
+            poseSet = true;
+            return devicePose;
         }
 
         /// <summary>
