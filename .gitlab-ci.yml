@@ -155,7 +155,6 @@ generate-api-docs:
     paths:
       - "$ARTIFACTS_PATH/"
     when: always
-    expire_in: never
 
 # -----------------------------------------------------------------------------
 # Libtrack Dependency

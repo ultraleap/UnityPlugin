@@ -135,6 +135,7 @@ namespace LeapInternal
         public EventHandler<ImageEventArgs> LeapImage;
         public EventHandler<PointMappingChangeEventArgs> LeapPointMappingChange;
         public EventHandler<HeadPoseEventArgs> LeapHeadPoseChange;
+        public EventHandler<FiducialPoseEventArgs> LeapFiducialPose;
 
         public Action<BeginProfilingForThreadArgs> LeapBeginProfilingForThread;
         public Action<EndProfilingForThreadArgs> LeapEndProfilingForThread;
@@ -312,7 +313,6 @@ namespace LeapInternal
                     {
                         case eLeapEventType.eLeapEventType_None:
                             break;
-
                         case eLeapEventType.eLeapEventType_Connection:
                             LEAP_CONNECTION_EVENT connection_evt;
                             StructMarshal<LEAP_CONNECTION_EVENT>.PtrToStruct(_msg.eventStructPtr, out connection_evt);
@@ -323,13 +323,11 @@ namespace LeapInternal
                             StructMarshal<LEAP_CONNECTION_LOST_EVENT>.PtrToStruct(_msg.eventStructPtr, out connection_lost_evt);
                             handleConnectionLost(ref connection_lost_evt);
                             break;
-
                         case eLeapEventType.eLeapEventType_Device:
                             LEAP_DEVICE_EVENT device_evt;
                             StructMarshal<LEAP_DEVICE_EVENT>.PtrToStruct(_msg.eventStructPtr, out device_evt);
                             handleDevice(ref device_evt);
                             break;
-
                         // Note that unplugging a device generates an eLeapEventType_DeviceLost event
                         // message, not a failure message. DeviceLost is further down.
                         case eLeapEventType.eLeapEventType_DeviceFailure:
@@ -337,7 +335,6 @@ namespace LeapInternal
                             StructMarshal<LEAP_DEVICE_FAILURE_EVENT>.PtrToStruct(_msg.eventStructPtr, out device_failure_evt);
                             handleFailedDevice(ref device_failure_evt);
                             break;
-
                         case eLeapEventType.eLeapEventType_Policy:
                             LEAP_POLICY_EVENT policy_evt;
                             StructMarshal<LEAP_POLICY_EVENT>.PtrToStruct(_msg.eventStructPtr, out policy_evt);
@@ -373,11 +370,6 @@ namespace LeapInternal
                             StructMarshal<LEAP_POINT_MAPPING_CHANGE_EVENT>.PtrToStruct(_msg.eventStructPtr, out point_mapping_change_evt);
                             handlePointMappingChange(ref point_mapping_change_evt);
                             break;
-                        case eLeapEventType.eLeapEventType_HeadPose:
-                            LEAP_HEAD_POSE_EVENT head_pose_event;
-                            StructMarshal<LEAP_HEAD_POSE_EVENT>.PtrToStruct(_msg.eventStructPtr, out head_pose_event);
-                            handleHeadPoseChange(ref head_pose_event);
-                            break;
                         case eLeapEventType.eLeapEventType_DeviceStatusChange:
                             LEAP_DEVICE_STATUS_CHANGE_EVENT status_evt;
                             StructMarshal<LEAP_DEVICE_STATUS_CHANGE_EVENT>.PtrToStruct(_msg.eventStructPtr, out status_evt);
@@ -387,6 +379,11 @@ namespace LeapInternal
                             LEAP_NEW_DEVICE_TRANSFORM new_transform_evt;
                             StructMarshal<LEAP_NEW_DEVICE_TRANSFORM>.PtrToStruct(_msg.eventStructPtr, out new_transform_evt);
                             handleNewDeviceTransform(ref new_transform_evt, _msg.deviceID);
+                            break;
+                        case eLeapEventType.eLeapEventType_Fiducial:
+                            LEAP_FIDUCIAL_POSE_EVENT fiducial_event;
+                            StructMarshal<LEAP_FIDUCIAL_POSE_EVENT>.PtrToStruct(_msg.eventStructPtr, out fiducial_event);
+                            handleFiducialPoseEvent(ref fiducial_event);
                             break;
                     } //switch on _msg.type
 
@@ -624,6 +621,15 @@ namespace LeapInternal
             }
 
             device.UpdateStatus(statusEvent.status);
+        }
+
+        private void handleFiducialPoseEvent(ref LEAP_FIDUCIAL_POSE_EVENT fiducialPoseEvent)
+        {
+            if (LeapFiducialPose != null)
+            {
+                LeapFiducialPose.DispatchOnContext(this, EventContext,
+                    new FiducialPoseEventArgs(fiducialPoseEvent));
+            }
         }
 
         private void handleDevice(ref LEAP_DEVICE_EVENT deviceMsg)
@@ -866,6 +872,7 @@ namespace LeapInternal
                 device.FindDeviceTransform();
             }
         }
+
 
         public void SetAndClearPolicy(Controller.PolicyFlag set, Controller.PolicyFlag clear, Device device = null)
         {
