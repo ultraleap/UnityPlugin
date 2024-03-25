@@ -24,9 +24,15 @@ namespace Leap.Unity.PhysicalHands
 
         PositionConstraint positionConstraint;
 
+        bool pressingObjectExited = false;
+
         private void Start()
         {
             _initialPressableObjectLocalPosition = this.transform.localPosition;
+            base._buttonHelper._onCollisionEnter += OnCollisionPO;
+            base._buttonHelper._onCollisionExit += OnCollisionExitPO;
+            base._buttonHelper._onHandContact += OnCollisionPO;
+            base._buttonHelper._onHandContactExit += OnCollisionExitPO;
         }
 
         public void UnPressButton()
@@ -37,14 +43,55 @@ namespace Leap.Unity.PhysicalHands
         protected override void ButtonPressed()
         {
             base.ButtonPressed();
-            this.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
+            _pressableObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
+            pressingObjectExited = false;
         }
 
         protected override void ButtonUnpressed()
         {
             base.ButtonUnpressed();
 
-            this.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
+            _pressableObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
+        }
+
+        private void OnCollisionPO(Collision collision)
+        {
+            if (!_shouldOnlyBePressedByHand && pressingObjectExited)
+            {
+                _pressableObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
+            }
+        }
+
+        private void OnCollisionPO(ContactHand contactHand)
+        {
+            if (GetChosenHandInContact() && pressingObjectExited)
+            {
+                _pressableObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
+            }
+        }
+
+        private void OnCollisionExitPO(Collision collision)
+        {
+            if (!_shouldOnlyBePressedByHand)
+            {
+                StartCoroutine(DelayedCollisionExit());
+            }
+        }
+
+        private void OnCollisionExitPO(ContactHand contactHand)
+        {
+            if (GetChosenHandInContact())
+            {
+                StartCoroutine(DelayedCollisionExit());
+            }
+        }
+
+        private IEnumerator DelayedCollisionExit()
+        {
+            // Wait for a short delay before removing constraints
+            yield return new WaitForSeconds(1f); // Adjust the delay time as needed
+
+            pressingObjectExited = true;
         }
     }
 }
