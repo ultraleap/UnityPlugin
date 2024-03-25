@@ -242,7 +242,7 @@ namespace Leap.Unity.MRTK
                     GameObject leapProviderGO = new GameObject("LeapXRServiceProvider");
                     LeapXRServiceProvider leapXRServiceProvider = leapProviderGO.AddComponent<LeapXRServiceProvider>();
                     leapXRServiceProvider.PositionDeviceRelativeToMainCamera = true;
-                    leapProvider = (LeapProvider)leapXRServiceProvider;
+                    leapProvider = (LeapServiceProvider)leapXRServiceProvider;
                     GameObject.DontDestroyOnLoad(leapProviderGO);
                 }
                 else
