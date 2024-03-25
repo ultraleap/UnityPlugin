@@ -7,16 +7,15 @@ namespace Leap.Unity.PhysicalHands
     public class PhysicalHandsButtonBase : MonoBehaviour
     {
         [Header("Base Button")]
-        [SerializeField] 
+        [SerializeField, Tooltip("The GameObject representing the button that can be pressed.")] 
         protected GameObject _pressableObject;
-        [SerializeField] 
-        private float _buttonTravelDistance = 0.017f;
-        [SerializeField] 
+        [SerializeField, Tooltip("The distance the button can travel when pressed. " +
+            "\n If left a 0, the travel distance will be the y distance from the parent object.")] 
+        private float _buttonTravelDistance = 0f;
+        [SerializeField, Tooltip("Determines whether the button should only be pressed by a hand.")] 
         protected bool _shouldOnlyBePressedByHand = false;
-        [SerializeField] 
+        [SerializeField, Tooltip("Specifies which hand(s) can press the button.")] 
         private ChiralitySelection _whichHandCanPressButton = ChiralitySelection.BOTH;
-        [SerializeField] 
-        private Vector3 _initialButtonPosition = Vector3.zero;
 
         [Space(50)]
 
@@ -26,6 +25,8 @@ namespace Leap.Unity.PhysicalHands
         private bool _leftHandContacting = false;
         private bool _rightHandContacting = false;
         private ConfigurableJoint _configurableJoint;
+        private Vector3 _initialButtonPosition = Vector3.zero;
+
         protected PhysicalHandsButtonHelper _buttonHelper;
 
         public UnityEvent OnButtonPressed;
@@ -50,6 +51,11 @@ namespace Leap.Unity.PhysicalHands
                 Debug.LogError("Pressable object not assigned. Please assign one to use the button.");
                 enabled = false;
                 return;
+            }
+
+            if(_buttonTravelDistance == 0)
+            {
+                _buttonTravelDistance = Mathf.Abs(_pressableObject.transform.localPosition.y) - 0.001f;
             }
 
             SetUpPressableObject();
