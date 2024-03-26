@@ -177,8 +177,9 @@ namespace LeapInternal
         {
             LEAP_CONNECTION_CONFIG config = new LEAP_CONNECTION_CONFIG();
             config.server_namespace = Marshal.StringToHGlobalAnsi(serverNamespace);
-            config.flags = (uint)eLeapConnectionFlag.eLeapConnectionFlag_MultipleDevicesAware;
+            config.flags = multiDeviceAware ? (uint)eLeapConnectionFlag.eLeapConnectionFlag_MultipleDevicesAware : 0;
             config.size = (uint)Marshal.SizeOf(config);
+            _multiDeviceAwareConnection = multiDeviceAware;
             Start(config);
         }
 
@@ -247,6 +248,7 @@ namespace LeapInternal
             //unblock in these cases, so just make sure to close the connection
             //before trying to join the worker thread.
             LeapC.CloseConnection(_leapConnection);
+
             _polster.Join();
         }
 
@@ -862,7 +864,7 @@ namespace LeapInternal
             UInt64 clearFlags = (ulong)FlagForPolicy(clear);
             eLeapRS result;
 
-            if (device == null)
+            if (device == null || !_multiDeviceAwareConnection)
             {
                 result = LeapC.SetPolicyFlags(_leapConnection, setFlags, clearFlags);
             }
@@ -890,7 +892,7 @@ namespace LeapInternal
 
             eLeapRS result;
 
-            if (device == null)
+            if (device == null || !_multiDeviceAwareConnection)
             {
                 result = LeapC.SetPolicyFlags(_leapConnection, setFlags, 0);
             }
@@ -918,7 +920,7 @@ namespace LeapInternal
 
             eLeapRS result;
 
-            if (device == null)
+            if (device == null || !_multiDeviceAwareConnection)
             {
                 result = LeapC.SetPolicyFlags(_leapConnection, 0, clearFlags);
             }
