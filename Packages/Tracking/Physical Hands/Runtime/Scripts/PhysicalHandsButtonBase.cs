@@ -15,7 +15,7 @@ namespace Leap.Unity.PhysicalHands
         [SerializeField, Tooltip("Determines whether the button should only be pressed by a hand.")] 
         protected bool _shouldOnlyBePressedByHand = false;
         [SerializeField, Tooltip("Specifies which hand(s) can press the button.")] 
-        private ChiralitySelection _whichHandCanPressButton = ChiralitySelection.BOTH;
+        protected ChiralitySelection _whichHandCanPressButton = ChiralitySelection.BOTH;
 
         [Space(50)]
 
@@ -53,9 +53,11 @@ namespace Leap.Unity.PhysicalHands
                 return;
             }
 
+            // Set default travel distance if one is not set
             if(_buttonTravelDistance == 0)
             {
-                _buttonTravelDistance = Mathf.Abs(_pressableObject.transform.localPosition.y) - 0.001f;
+                // leave 1mm so the button does not clip into the base obect (assuming same thickness)
+                _buttonTravelDistance = Mathf.Abs(_pressableObject.transform.localPosition.y) - 0.001f; 
             }
 
             SetUpPressableObject();
@@ -155,7 +157,6 @@ namespace Leap.Unity.PhysicalHands
             {
                 _isButtonPressed = true;
                 ButtonPressed();
-                Debug.Log("Button Pressed");
             }
 
             // Check if the button should be released
@@ -163,7 +164,6 @@ namespace Leap.Unity.PhysicalHands
             {
                 _isButtonPressed = false;
                 ButtonUnpressed();
-                Debug.Log("Button UnPressed");
             }
         }
 

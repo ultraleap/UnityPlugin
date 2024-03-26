@@ -15,48 +15,49 @@ using UnityEngine.Events;
 
 namespace Leap.Unity.PhysicalHands
 {
+    /// <summary>
+    /// Class for toggling a button using physical hands.
+    /// </summary>
     public class PhysicalHandsButtonToggle : PhysicalHandsButtonBase
     {
-        [Space(10)]
-        [Header("Delay Rebound")]
-        [Space(5)]
-        Vector3 _initialPressableObjectLocalPosition;
-
-        PositionConstraint positionConstraint;
-
-        bool pressingObjectExited = false;
+        private bool _pressingObjectExited = false;
 
         private void Start()
         {
-            _initialPressableObjectLocalPosition = this.transform.localPosition;
+            // Subscribe to events
             base._buttonHelper._onCollisionEnter += OnCollisionPO;
             base._buttonHelper._onCollisionExit += OnCollisionExitPO;
             base._buttonHelper._onHandContact += OnCollisionPO;
             base._buttonHelper._onHandContactExit += OnCollisionExitPO;
         }
 
-        public void UnPressButton()
-        {
-            ButtonUnpressed();
-        }
-
+        /// <summary>
+        /// Action to perform when the button is pressed.
+        /// </summary>
         protected override void ButtonPressed()
         {
             base.ButtonPressed();
+            // Freeze object's position and rotation when pressed
             _pressableObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
-            pressingObjectExited = false;
+            _pressingObjectExited = false;
         }
 
+        /// <summary>
+        /// Action to perform when the button is unpressed.
+        /// </summary>
         protected override void ButtonUnpressed()
         {
             base.ButtonUnpressed();
-
+            // Remove constraints when unpressed
             _pressableObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
         }
 
+        #region Collision handling methods
+
         private void OnCollisionPO(Collision collision)
         {
-            if (!_shouldOnlyBePressedByHand && pressingObjectExited)
+            // If not exclusively pressed by hand and object has exited
+            if (!_shouldOnlyBePressedByHand && _pressingObjectExited)
             {
                 _pressableObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
             }
@@ -64,7 +65,8 @@ namespace Leap.Unity.PhysicalHands
 
         private void OnCollisionPO(ContactHand contactHand)
         {
-            if (GetChosenHandInContact() && pressingObjectExited)
+            // If the chosen hand is in contact and object has exited
+            if (GetChosenHandInContact() && _pressingObjectExited)
             {
                 _pressableObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
             }
@@ -72,6 +74,7 @@ namespace Leap.Unity.PhysicalHands
 
         private void OnCollisionExitPO(Collision collision)
         {
+            // If not exclusively pressed by hand, start delayed exit
             if (!_shouldOnlyBePressedByHand)
             {
                 StartCoroutine(DelayedCollisionExit());
@@ -80,18 +83,30 @@ namespace Leap.Unity.PhysicalHands
 
         private void OnCollisionExitPO(ContactHand contactHand)
         {
-            if (GetChosenHandInContact())
+            // Check which hand can press the button and start delayed exit if correct hand is found
+            if (contactHand.Handedness == (Chirality)_whichHandCanPressButton)
             {
                 StartCoroutine(DelayedCollisionExit());
             }
+            else if(_whichHandCanPressButton == ChiralitySelection.BOTH)
+            {
+                if (!GetChosenHandInContact())
+                {
+                    StartCoroutine(DelayedCollisionExit());
+                }
+            }
         }
 
+        /// <summary>
+        /// Coroutine for delayed collision exit.
+        /// </summary>
         private IEnumerator DelayedCollisionExit()
         {
             // Wait for a short delay before removing constraints
             yield return new WaitForSeconds(1f); // Adjust the delay time as needed
 
-            pressingObjectExited = true;
+            _pressingObjectExited = true;
         }
+        #endregion
     }
 }
