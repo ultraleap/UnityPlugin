@@ -76,6 +76,11 @@ namespace LeapInternal
         private Thread _polster;
 
         /// <summary>
+        /// Has the connection been set up in multi device aware mode
+        /// </summary>
+        private bool _multiDeviceAwareConnection = false;
+
+        /// <summary>
         /// Minimum service version that support setting the tracking mode on a per dervice basis
         /// </summary>
         private static LEAP_VERSION MinServiceVersionForMultiModeSupport = new LEAP_VERSION() { major = 5, minor = 4, patch = 4 };
@@ -150,6 +155,10 @@ namespace LeapInternal
         {
             if (_disposed)
                 return;
+
+            if (disposing)
+            {
+            }
 
             Stop();
             LeapC.DestroyConnection(_leapConnection);
