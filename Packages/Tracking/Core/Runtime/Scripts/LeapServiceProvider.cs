@@ -951,12 +951,9 @@ namespace Leap.Unity
                }
                else if (_multipleDeviceMode == MultipleDeviceMode.Disabled)
                {
-                    if(_leapController?.Devices.Count == 1)
-                    {
-                        connectToNewDevice(d);
-                    }
-               }
-               else
+                    connectToNewDevice(d);
+                }
+                else
                {
                    throw new NotImplementedException($"{nameof(MultipleDeviceMode)} case not implemented");
                }

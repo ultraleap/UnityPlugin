@@ -7,7 +7,7 @@ namespace Leap.Unity
 {
     public static class HandTrackingHintManager
     {
-        static Dictionary<Device, List<string>> currentDeviceHints = new Dictionary<Device, List<string>>();
+        static List<string> currentHints = new List<string>();
 
         static Controller _leapController;
         static Controller LeapController
@@ -45,75 +45,46 @@ namespace Leap.Unity
             LeapController.Device -= NewLeapDevice;
             LeapController.Device += NewLeapDevice;
 
-            LeapController.Connect -= OnLeapCConnect;
-            LeapController.Connect += OnLeapCConnect;
+            currentHints = UltraleapSettings.Instance.startupHints.ToList();
         }
 
         /// <summary>
-        /// Only used for initial device detection, then will send Startup Hints for the first device
-        /// </summary>
+        /// Re-request all hints when new devices connect
         private static void NewLeapDevice(object sender, DeviceEventArgs e)
         {
-            if (!currentDeviceHints.ContainsKey(e.Device))
-            {
-                currentDeviceHints.Add(e.Device, UltraleapSettings.Instance.startupHints.ToList());
-
-                if (currentDeviceHints[e.Device].Count != 0)
-                {
-                    RequestHandTrackingHints(currentDeviceHints[e.Device].ToArray());
-                }
-            }
-
-            LeapController.Device -= NewLeapDevice;
+            RequestAllExistingHints();
         }
 
         /// <summary>
-        /// Remove a hint from the existing hints and then send them all to the Service for the current device of the current controller
+        /// Remove a hint from the existing hints and then send them all to the Service
         /// </summary>
-        public static void RemoveHint(string hint, Device device = null)
+        public static void RemoveHint(string hint)
         {
-            // Find the first available on the Controller, or we cannot set a hint
-            if (device == null && !TryGetFirstDevice(out device))
+            if (currentHints.Contains(hint))
             {
-                Debug.Log("Unable to remove Hand Tracking Hints. No device was provided and no devices are currently connected.");
-                return;
-            }
-
-            if (currentDeviceHints.ContainsKey(device))
-            {
-                if(currentDeviceHints[device].Remove(hint))
-                {
-                    RequestHandTrackingHints(currentDeviceHints[device].ToArray(), device);
-                }
-                else
-                {
-                    Debug.Log("Hand Tracking Hint: " + hint + " was not previously set. No hints were changed.");
-                }
-            }
-        }
-
-        /// <summary>
-        /// Add a hint to the existing hints and then send them all to the Service for the current device of the current controller
-        /// </summary>
-        public static void AddHint(string hint, Device device = null)
-        {
-            // Find the first available on the Controller, or we cannot set a hint
-            if (device == null && !TryGetFirstDevice(out device))
-            {
-                Debug.Log("Unable to add Hand Tracking Hints. No device was provided and no devices are currently connected.");
-                return;
-            }
-
-            if (currentDeviceHints.ContainsKey(device))
-            {
-                currentDeviceHints[device].Add(hint);
+                currentHints.Remove(hint);
+                RequestHandTrackingHints(currentHints.ToArray());
             }
             else
             {
-                currentDeviceHints.Add(device, new List<string> { hint });
+                Debug.Log("Hand Tracking Hint: " + hint + " was not previously requested. No hints were changed.");
             }
+        }
 
-            RequestHandTrackingHints(currentDeviceHints[device].ToArray(), device);
+        /// <summary>
+        /// Add a hint to the existing hints and then send them all to the Service
+        /// </summary>
+        public static void AddHint(string hint)
+        {
+            if(!currentHints.Contains(hint))
+            {
+                currentHints.Add(hint);
+                RequestHandTrackingHints(currentHints.ToArray());
+            }
+            else
+            {
+                Debug.Log("Hand Tracking Hint: " + hint + " was already requested. No hints were changed.");
+            }
         }
 
         /// <summary>
@@ -122,41 +93,27 @@ namespace Leap.Unity
         /// </summary>
         public static void RequestAllExistingHints()
         {
-            foreach (var device in currentDeviceHints.Keys)
-            {
-                RequestHandTrackingHints(currentDeviceHints[device].ToArray(), device);
-            }
+            RequestHandTrackingHints(currentHints.ToArray());
         }
 
         /// <summary>
         /// Send a specific set of hints, if this does not include previously set ones, they will be cleared.
         /// </summary>
         /// <param name="hints">The hints you wish to send</param>
-        /// <param name="device">An optional specific Device, otherwise the first found Device of the first Controller will be used</param>
-        public static void RequestHandTrackingHints(string[] hints, Device device = null)
+        public static void RequestHandTrackingHints(string[] hints)
         {
             if(hints == null)
             {
                 hints = new string[0];
             }
 
-            // Find the first available on the Controller, or we cannot set a hint
-            if (device == null && !TryGetFirstDevice(out device))
+            // Send the hint to all devices
+            foreach (var device in LeapController.Devices.ActiveDevices)
             {
-                Debug.Log("Unable to request Hand Tracking Hints. No device was provided and no devices are currently connected.");
-                return;
+                LeapController.RequestHandTrackingHints(hints, device);
             }
 
-            LeapController.RequestHandTrackingHints(hints, device);
-
-            if (currentDeviceHints.ContainsKey(device))
-            {
-                currentDeviceHints[device] = hints.ToList();
-            }
-            else
-            {
-                currentDeviceHints.Add(device, hints.ToList());
-            }
+            currentHints = hints.ToList();
 
             // Log the results
             LogRequestedHints(hints);
@@ -182,27 +139,6 @@ namespace Leap.Unity
             }
 
             Debug.Log(logString);
-        }
-
-        private static bool TryGetFirstDevice(out Device device)
-        {
-            device = LeapController.Devices.ActiveDevices.FirstOrDefault();
-
-            if(device == null)
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        /// <summary>
-        /// Re-request all existing hints when the connection is established.
-        /// This may be on a re-connection, or the initial connection.
-        /// </summary>
-        private static void OnLeapCConnect(object sender, ConnectionEventArgs eventArgs)
-        {
-            RequestAllExistingHints();
         }
     }
 }
