@@ -212,7 +212,7 @@ namespace Leap.Unity.PhysicalHands
 
         internal void HandsInitiated()
         {
-            OnHandsInitialized?.Invoke();
+            OnHandsInitialized?.Invoke(ContactParent);
         }
 
         private void ProcessFrame(Frame inputFrame)
@@ -411,7 +411,7 @@ namespace Leap.Unity.PhysicalHands
         public UnityEvent<ContactHand, Rigidbody> onGrab;
         public UnityEvent<ContactHand, Rigidbody> onGrabExit;
 
-        internal static Action OnHandsInitialized;
+        internal static Action<ContactParent> OnHandsInitialized;
 
         internal void OnHandHover(ContactHand contacthand, Rigidbody rbody)
         {

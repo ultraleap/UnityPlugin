@@ -23,7 +23,7 @@
     {
       "displayName": "Shared Example Assets [Required]",
       "description": "Shared core example assets for all other Ultraleap Sample content.",
-      "path": "Examples~/Shared Example Assets"
+      "path": "Examples~/Shared Example Assets [Required]"
     },
     {
       "displayName": "XR Examples",

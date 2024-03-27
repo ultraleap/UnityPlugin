@@ -135,6 +135,7 @@ namespace LeapInternal
         public EventHandler<ImageEventArgs> LeapImage;
         public EventHandler<PointMappingChangeEventArgs> LeapPointMappingChange;
         public EventHandler<HeadPoseEventArgs> LeapHeadPoseChange;
+        public EventHandler<FiducialPoseEventArgs> LeapFiducialPose;
 
         public Action<BeginProfilingForThreadArgs> LeapBeginProfilingForThread;
         public Action<EndProfilingForThreadArgs> LeapEndProfilingForThread;
@@ -383,6 +384,11 @@ namespace LeapInternal
                             StructMarshal<LEAP_DEVICE_STATUS_CHANGE_EVENT>.PtrToStruct(_msg.eventStructPtr, out status_evt);
                             handleDeviceStatusEvent(ref status_evt);
                             break;
+                        case eLeapEventType.eLeapEventType_Fiducial:
+                            LEAP_FIDUCIAL_POSE_EVENT fiducial_event;
+                            StructMarshal<LEAP_FIDUCIAL_POSE_EVENT>.PtrToStruct(_msg.eventStructPtr, out fiducial_event);
+                            handleFiducialPoseEvent(ref fiducial_event);
+                            break;
                     } //switch on _msg.type
 
                     if (LeapEndProfilingBlock != null && hasBegunProfilingForThread)
@@ -619,6 +625,15 @@ namespace LeapInternal
             }
 
             device.UpdateStatus(statusEvent.status);
+        }
+
+        private void handleFiducialPoseEvent(ref LEAP_FIDUCIAL_POSE_EVENT fiducialPoseEvent)
+        {
+            if (LeapFiducialPose != null)
+            {
+                LeapFiducialPose.DispatchOnContext(this, EventContext,
+                    new FiducialPoseEventArgs(fiducialPoseEvent));
+            }
         }
 
         private void handleDevice(ref LEAP_DEVICE_EVENT deviceMsg)
