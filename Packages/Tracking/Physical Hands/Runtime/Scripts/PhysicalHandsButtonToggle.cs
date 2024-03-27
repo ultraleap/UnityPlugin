@@ -38,7 +38,7 @@ namespace Leap.Unity.PhysicalHands
         {
             base.ButtonPressed();
             // Freeze object's position and rotation when pressed
-            _pressableObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
+            FreezePressableMovement();
             _pressingObjectExited = false;
         }
 
@@ -49,7 +49,7 @@ namespace Leap.Unity.PhysicalHands
         {
             base.ButtonUnpressed();
             // Remove constraints when unpressed
-            _pressableObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
+            UnFreezePressableMovement();
         }
 
         #region Collision handling methods
@@ -60,7 +60,7 @@ namespace Leap.Unity.PhysicalHands
             // If not exclusively pressed by hand and object has exited
             if (!_shouldOnlyBePressedByHand && _pressingObjectExited)
             {
-                _pressableObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
+                UnFreezePressableMovement();
             }
         }
 
@@ -69,7 +69,7 @@ namespace Leap.Unity.PhysicalHands
             // If the chosen hand is in contact and object has exited
             if (GetChosenHandInContact() && _pressingObjectExited)
             {
-                _pressableObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
+                UnFreezePressableMovement();
             }
         }
 
