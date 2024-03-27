@@ -23,33 +23,14 @@ function global:Export-VersionTxt
 # Exports a unitypackage at the package root path with the given ImportPath when importing into unity.
 # Optionally provide extra subpaths with trailing '~' - these will be exported as extra unitypackages.
 # Example:
-#  Export-UnityPackage "Packages/MyPackage" "Assets/ThirdParty" "MyPackage.unitypackage" "Examples~"
 #  This will create bundle the content of "Packages/MyPackage" into the output package file "MyPackage.unitypackage".
 #  The generated package that unpacks to "Assets/ThirdParty".
-#  The hidden folder "Packages/MyPackages/Examples~" will be exported as a second unitypackage "MyPackage Examples.unitypackage" and will unpack to "Assets/ThirdParty/Examples".
 function global:Export-UnityPackage
 {
     Param(
         [Parameter(Mandatory)][string] $PackageRootPath,
         [Parameter(Mandatory)][string] $PackageImportPath,
-        [Parameter(Mandatory)][string] $PackageOutputPath,
-        [ValidateScript(
-            {
-                foreach($item in $_)
-                {
-                    if([string]::IsNullOrEmpty($item) -or $($(Test-Path $(Join-Path $PackageRootPath $item) -PathType Container) -and $item.EndsWith('~')))
-                    {
-                        $true
-                    }
-                    else
-                    {
-                        throw "Could not find hidden subpath '$item'."
-                    }
-                }
-            },
-            ErrorMessage = "If provided, hidden folder paths must be an existing subdirectory with a trailing '~'")]
-        [string[]]
-        $ExtraHiddenSubPaths = $null
+        [Parameter(Mandatory)][string] $PackageOutputPath
     )
     function Export-UnityPackage-Impl
     {
@@ -90,7 +71,7 @@ function global:Export-UnityPackage
         Function RecursivelyFilterSubDirectories($directoryPath) {
             $SubDirectories = Get-ChildItem $directoryPath -Directory |
                             # Filter hidden assets as described here https://docs.unity3d.com/Manual/SpecialFolders.html
-                            Where-Object { -not ($_.Name.EndsWith('~') -or $_.Name.StartsWith('.') -or $_.Name -eq "cvs") }
+                            Where-Object { -not ($_.Name.StartsWith('.') -or $_.Name -eq "cvs" -or $_.Extension -eq ".tmp") }
             # Return these directories as well as all further subdirectories filtered
             # @() is used to force the result to be treated as an array
             @($SubDirectories) + @($SubDirectories | ForEach-Object { RecursivelyFilterSubDirectories($_.FullName) })
@@ -103,7 +84,7 @@ function global:Export-UnityPackage
                 Where-Object { 
                     $Name = [IO.Path]::GetFileNameWithoutExtension($_.Name)
                     # Filter hidden assets as described here https://docs.unity3d.com/Manual/SpecialFolders.html
-                    -not ($Name.EndsWith('~') -or $_.Name.StartsWith('.') -or $Name -eq "cvs" -or $_.Extension -eq ".tmp")
+                    -not ($_.Name.StartsWith('.') -or $Name -eq "cvs" -or $_.Extension -eq ".tmp")
                 }
 
         
@@ -116,6 +97,10 @@ function global:Export-UnityPackage
 
                 # replace relative ExportPath with ImportPath
                 $FixedImportPath = $FilePath.Replace($ExportPath, $ImportPath)
+				
+				# include example content in the package export
+				$FixedImportPath = $FixedImportPath.Replace('~', '')
+				
                 if (-not $FixedImportPath.StartsWith($ImportPath)) {
                     Write-Error "$FixedImportPath does not start with $ImportPath"
                     $AnyErrors = $true
@@ -148,24 +133,4 @@ function global:Export-UnityPackage
     }
 
     Export-UnityPackage-Impl -ExportPath $PackageRootPath -ImportPath $PackageImportPath -Output $PackageOutputPath
-
-    if ($ExtraHiddenSubPaths)
-    {
-		foreach ($SubPath in $ExtraHiddenSubPaths)
-		{
-			$UnhiddenSubPath = $SubPath.TrimEnd('~')
-
-			$OriginalPath = Join-Path $PackageRootPath $SubPath
-			$NewPath = Join-Path $PackageRootPath $UnhiddenSubPath
-
-			Move-Item $OriginalPath $NewPath
-
-			$ExtraUnitypackageImportPath = Join-Path $PackageImportPath $UnhiddenSubPath
-            # Appends the subpath within the package to the name of the generated unitypackage so it's unique
-            $ExtraUnitypackageOutputPath = $PackageOutputPath.Replace(".unitypackage", " $UnhiddenSubPath.unitypackage")
-
-			Export-UnityPackage-Impl -ExportPath $NewPath -ImportPath $ExtraUnitypackageImportPath -Output $ExtraUnitypackageOutputPath
-		}
-    }
-	# loop through list of samples and generate example packages
 }

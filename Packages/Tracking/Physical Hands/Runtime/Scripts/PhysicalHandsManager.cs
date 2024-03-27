@@ -104,9 +104,33 @@ namespace Leap.Unity.PhysicalHands
 
         private Frame _modifiedFrame = new Frame();
 
-        public override Frame CurrentFrame => _modifiedFrame;
+        public override Frame CurrentFrame
+        {
+            get
+            {
+#if UNITY_EDITOR
+                if (!Application.isPlaying && _inputProvider != null)
+                {
+                    return _inputProvider.CurrentFrame;
+                }
+#endif
+                return _modifiedFrame;
+            }
+        }
 
-        public override Frame CurrentFixedFrame => _modifiedFrame;
+        public override Frame CurrentFixedFrame
+        {
+            get
+            {
+#if UNITY_EDITOR
+                if (!Application.isPlaying && _inputProvider != null)
+                {
+                    return _inputProvider.CurrentFrame;
+                }
+#endif
+                return _modifiedFrame;
+            }
+        }
 
         /// <summary>
         /// Happens in the execution order just before any hands are changed or updated
@@ -117,6 +141,11 @@ namespace Leap.Unity.PhysicalHands
         /// Called when the contact mode has been changed, but before the mode change has completed
         /// </summary>
         public Action OnContactModeChanged;
+
+        #region Quick Accessors
+        public ContactHand LeftHand { get { return ContactParent?.LeftHand; } }
+        public ContactHand RightHand { get { return ContactParent?.RightHand; } }
+        #endregion
 
         private void Awake()
         {
@@ -183,7 +212,7 @@ namespace Leap.Unity.PhysicalHands
 
         internal void HandsInitiated()
         {
-            OnHandsInitialized?.Invoke();
+            OnHandsInitialized?.Invoke(ContactParent);
         }
 
         private void ProcessFrame(Frame inputFrame)
@@ -271,11 +300,13 @@ namespace Leap.Unity.PhysicalHands
                     break;
             }
 
+
             if (transform != null) // catches some edit-time issues
             {
                 newContactParent.transform.parent = transform;
             }
 
+            _contactParent.Initialize();
             OnContactModeChanged?.Invoke();
         }
 
@@ -380,7 +411,7 @@ namespace Leap.Unity.PhysicalHands
         public UnityEvent<ContactHand, Rigidbody> onGrab;
         public UnityEvent<ContactHand, Rigidbody> onGrabExit;
 
-        internal static Action OnHandsInitialized;
+        internal static Action<ContactParent> OnHandsInitialized;
 
         internal void OnHandHover(ContactHand contacthand, Rigidbody rbody)
         {

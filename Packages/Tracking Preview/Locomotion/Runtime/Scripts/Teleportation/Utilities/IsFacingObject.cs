@@ -56,8 +56,12 @@ namespace Leap.Unity.Preview.Locomotion
         private void SetLayerMask()
         {
             _layerMask = -1;
-            InteractionManager interactionManager = FindAnyObjectByType<InteractionManager>();
 
+#if UNITY_2021_3_18_OR_NEWER
+            InteractionManager interactionManager = FindAnyObjectByType<InteractionManager>();
+#else
+            InteractionManager interactionManager = FindObjectOfType<InteractionManager>();
+#endif
             // Ignore any interaction objects 
             if (interactionManager != null)
             {
@@ -67,14 +71,22 @@ namespace Leap.Unity.Preview.Locomotion
                 _layerMask ^= interactionManager.interactionNoContactLayer.layerMask;
             }
 
+#if UNITY_2021_3_18_OR_NEWER
             PhysicalHandsManager physicalHandsManager = FindAnyObjectByType<PhysicalHandsManager>();
+#else
+            PhysicalHandsManager physicalHandsManager = FindObjectOfType<PhysicalHandsManager>();
+#endif
             if (physicalHandsManager != null)
             {
                 _layerMask ^= physicalHandsManager.HandsLayer.layerMask;
                 _layerMask ^= physicalHandsManager.HandsResetLayer.layerMask;
             }
 
+#if UNITY_2021_3_18_OR_NEWER
             FarFieldLayerManager farFieldLayerManager = FindAnyObjectByType<FarFieldLayerManager>();
+#else
+            FarFieldLayerManager farFieldLayerManager = FindObjectOfType<FarFieldLayerManager>();
+#endif
             if (farFieldLayerManager != null)
             {
                 _layerMask ^= farFieldLayerManager.FarFieldObjectLayer.layerMask;

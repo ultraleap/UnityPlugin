@@ -22,6 +22,11 @@ namespace Leap.Unity.PhysicalHands
 
         private void Start()
         {
+            Initialize();
+        }
+
+        internal void Initialize()
+        {
             physicalHandsManager = GetComponentInParent<PhysicalHandsManager>();
 
             if (physicalHandsManager != null)

@@ -17,7 +17,6 @@ namespace Leap.Unity
 {
     public static class Utils
     {
-
         #region C# Utilities
 
         #region Generic Utils
@@ -2831,6 +2830,60 @@ namespace Leap.Unity
 
         #endregion
 
+        #region Leap Matrix 3x3
+
+        /// <summary>
+        /// Converts a LEAP_MATRIX_3x3 rotation matrix to a Unity Matrix4x4
+        /// </summary>
+        /// <param name="m">A Leap rotation matrix</param>
+        /// <returns>A Unity Rotation Matrix</returns>
+        public static Matrix4x4 ToUnityRotationMatrix(this LeapInternal.LEAP_MATRIX_3x3 m)
+        {
+            Matrix4x4 rotationMatrix =
+                new Matrix4x4(new Vector4(m.m1.x, m.m2.x, m.m3.x, 0),
+                                new Vector4(m.m1.y, m.m2.y, m.m3.y, 0),
+                                new Vector4(m.m1.z, m.m2.z, m.m3.z, 0),
+                                new Vector4(0, 0, 0, 1));
+            return rotationMatrix;
+        }
+
+        #endregion
+
+        #region Tracked Pose Driver Utils
+
+        /// <summary>
+        /// Adds a tracked pose driver to the given camera if suitable packages are installed.
+        /// Does nothing if a tracked pose driver already exists on the camera
+        /// </summary>
+        public static void AddTrackedPoseDriverToCamera(this Camera mainCamera)
+        {
+#if !XR_MANAGEMENT_AVAILABLE && !INPUT_SYSTEM_AVAILABLE
+            return;
+#endif
+            bool trackedPoseDriverExists = false;
+
+#if XR_MANAGEMENT_AVAILABLE
+            if (mainCamera.GetComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>())
+            {
+                trackedPoseDriverExists = true;
+            }
+#endif
+#if INPUT_SYSTEM_AVAILABLE
+            if (mainCamera.GetComponent<UnityEngine.InputSystem.XR.TrackedPoseDriver>())
+            {
+                trackedPoseDriverExists = true;
+            }
+#endif
+            if (!trackedPoseDriverExists)
+            {
+#if XR_MANAGEMENT_AVAILABLE
+                mainCamera.gameObject.AddComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>().UseRelativeTransform = true;
+#elif INPUT_SYSTEM_AVAILABLE
+                mainCamera.gameObject.AddComponent<UnityEngine.InputSystem.XR.TrackedPoseDriver>();
+#endif
+            }
+        }
+
         #endregion
 
         #region Value Mapping Utils ("Map")
@@ -3195,6 +3248,8 @@ namespace Leap.Unity
 
         #endregion
 
+        #endregion
+
         #region From/Then Utilities
 
         #region Float
@@ -3382,7 +3437,5 @@ namespace Leap.Unity
         #endregion
 
         #endregion
-
     }
-
 }

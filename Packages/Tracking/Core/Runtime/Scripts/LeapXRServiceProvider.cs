@@ -324,12 +324,10 @@ namespace Leap.Unity
         {
             resetShaderTransforms();
 
-#if XR_MANAGEMENT_AVAILABLE
-            if (mainCamera.GetComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>() == null && _autoCreateTrackedPoseDriver)
+            if (_autoCreateTrackedPoseDriver)
             {
-                mainCamera.gameObject.AddComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>().UseRelativeTransform = true;
+                mainCamera.AddTrackedPoseDriverToCamera();
             }
-#endif
 
             if (GraphicsSettings.renderPipelineAsset != null)
             {
@@ -561,6 +559,9 @@ namespace Leap.Unity
             }
 
             dest.CopyFrom(source).Transform(leapTransform);
+
+            // Take the transform that we apply to the frame that moves it to world space, and allow it to be available externally
+            DeviceOriginWorldSpace = leapTransform;
         }
 
         #endregion
@@ -646,7 +647,7 @@ namespace Leap.Unity
             }
 
             // Use the mainCamera parent to transfrom the warped positions so the player can move around
-            if (mainCamera.transform.parent != null && _positionDeviceRelativeToMainCamera)
+            if (_positionDeviceRelativeToMainCamera && mainCamera.transform.parent != null && _deviceOffsetMode != DeviceOffsetMode.Transform)
             {
                 leapTransform = new LeapTransform(
                   mainCamera.transform.parent.TransformPoint(warpedPosition),

@@ -4,7 +4,8 @@
     "references": [
         "GUID:2ee0542102ac1084e8d9a910885c1e81",
         "GUID:ba171b3dd2a51234ab864770f99741a5",
-        "GUID:e40ba710768534012815d3193fa296cb"
+        "GUID:e40ba710768534012815d3193fa296cb",
+        "GUID:75469ad4d38634e559750d17036d5f7c"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -18,6 +19,16 @@
             "name": "com.unity.xr.management",
             "expression": "1.0",
             "define": "XR_MANAGEMENT_AVAILABLE"
+        },
+        {
+            "name": "Unity",
+            "expression": "2021.3.18f1",
+            "define": "UNITY_2021_3_18_OR_NEWER"
+        },
+        {
+            "name": "com.unity.inputsystem",
+            "expression": "1.0",
+            "define": "INPUT_SYSTEM_AVAILABLE"
         }
     ],
     "noEngineReferences": false

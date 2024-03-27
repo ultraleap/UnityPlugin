@@ -29,6 +29,11 @@
             "name": "com.unity.inputsystem",
             "expression": "1.5.0",
             "define": "INPUT_SYSTEM"
+        },
+        {
+            "name": "Unity",
+            "expression": "2021.3.18f1",
+            "define": "UNITY_2021_3_18_OR_NEWER"
         }
     ],
     "noEngineReferences": false

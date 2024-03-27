@@ -75,8 +75,11 @@ namespace Leap.Unity.Interaction
         {
             if (property.boolValue && _runtimeGizmoManager == null)
             {
+#if UNITY_2021_3_18_OR_NEWER
                 _runtimeGizmoManager = FindAnyObjectByType<RuntimeGizmoManager>();
-
+#else
+                _runtimeGizmoManager = FindObjectOfType<RuntimeGizmoManager>();
+#endif
                 if (_runtimeGizmoManager == null)
                 {
                     EditorGUILayout.Space();
@@ -306,7 +309,7 @@ namespace Leap.Unity.Interaction
                     // Check for a LeapProvider in the scene somewhere.
                     if (_provider == null)
                     {
-                        _provider = FindAnyObjectByType<LeapProvider>();
+                        _provider = Hands.Provider;
                     }
                     if (_provider == null)
                     {

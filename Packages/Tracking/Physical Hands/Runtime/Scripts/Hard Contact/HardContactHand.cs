@@ -204,9 +204,9 @@ namespace Leap.Unity.PhysicalHands
                     contactingFingers++;
                 }
 
-                if (!hasFingerGrasped)
+                if (!contacting || hasFingerGrasped)
                 {
-                    fingerStiffness[fingerIndex] = hardContactParent.boneStiffness;
+                    fingerStiffness[fingerIndex] = Mathf.Lerp(fingerStiffness[fingerIndex], hardContactParent.boneStiffness, Time.fixedDeltaTime * 5);
                 }
             }
 
@@ -219,7 +219,7 @@ namespace Leap.Unity.PhysicalHands
             {
                 _contactFingerDisplacement = _overallFingerDisplacement * contactingFingers;
 
-                if (_displacementGrabCooldown > 0)
+                if (_displacementGrabCooldownCurrent > 0)
                 {
                     _displacementGrabCooldownCurrent -= Time.fixedDeltaTime;
 
