@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -6,7 +7,7 @@ namespace Leap.Unity.PhysicalHands
     [RequireComponent(typeof(Rigidbody))]
     public class PhysicalHandsButtonBase : MonoBehaviour
     {
-        [Header("Base Button")]
+        
         [SerializeField, Tooltip("The GameObject representing the button that can be pressed.")] 
         protected GameObject _pressableObject;
         [SerializeField, Tooltip("The distance the button can travel when pressed. " +
@@ -17,7 +18,6 @@ namespace Leap.Unity.PhysicalHands
         [SerializeField, Tooltip("Specifies which hand(s) can press the button.")] 
         protected ChiralitySelection _whichHandCanPressButton = ChiralitySelection.BOTH;
 
-        [Space(50)]
 
         private const float BUTTON_PRESS_EXIT_THRESHOLD = 0.5f;
         private bool _isButtonPressed = false;
@@ -26,13 +26,23 @@ namespace Leap.Unity.PhysicalHands
         private bool _rightHandContacting = false;
         private ConfigurableJoint _configurableJoint;
         private Vector3 _initialButtonPosition = Vector3.zero;
+        private List<GameObject> _objectsContactingButton = new List<GameObject>();
 
         protected PhysicalHandsButtonHelper _buttonHelper;
 
+        [Space(20)]
+        [Header("Button Events")]
+        [Space(3)]
+        [Header("Button Press")]
+        [Space(3)]
         public UnityEvent OnButtonPressed;
         public UnityEvent OnButtonUnPressed;
+        [Header("Button Contact")]
+        [Space(3)]
         public UnityEvent<ContactHand> OnHandContact;
         public UnityEvent<ContactHand> OnHandContactExit;
+        [Header("Button Hover")]
+        [Space(3)]
         public UnityEvent<ContactHand> OnHandHover;
         public UnityEvent<ContactHand> OnHandHoverExit;
 
@@ -97,6 +107,8 @@ namespace Leap.Unity.PhysicalHands
             _buttonHelper._onHandContactExit += OnHandContactExitPO;
             _buttonHelper._onHandHover += OnHandHoverPO;
             _buttonHelper._onHandHoverExit += OnHandHoverExitPO;
+            _buttonHelper._onCollisionEnter += OnCollisionPO;
+            _buttonHelper._onCollisionExit += OnCollisionExitPO;
         }
 
         /// <summary>
@@ -153,7 +165,8 @@ namespace Leap.Unity.PhysicalHands
             float distance = Mathf.Abs(_pressableObject.transform.localPosition.y - _initialButtonPosition.y);
 
             // Check if the button should be pressed
-            if (!_isButtonPressed && distance >= _buttonTravelDistance && (_contactHandPressing || !_shouldOnlyBePressedByHand))
+            if (!_isButtonPressed && distance >= _buttonTravelDistance &&
+                (_contactHandPressing || (!_shouldOnlyBePressedByHand && _objectsContactingButton.Count > 0)))
             {
                 _isButtonPressed = true;
                 ButtonPressed();
@@ -255,6 +268,19 @@ namespace Leap.Unity.PhysicalHands
         {
             // Invoke event for hand hover
             OnHandHover?.Invoke(hand);
+        }
+
+        protected void OnCollisionPO(Collision collision)
+        {
+            if (!collision.transform.root.GetComponent<PhysicalHandsManager>())
+            {
+                _objectsContactingButton.Add(collision.gameObject);
+            }
+        }
+
+        protected void OnCollisionExitPO(Collision collision)
+        {
+            _objectsContactingButton.Remove(collision.gameObject);
         }
 
         /// <summary>

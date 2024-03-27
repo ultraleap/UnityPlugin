@@ -54,8 +54,9 @@ namespace Leap.Unity.PhysicalHands
 
         #region Collision handling methods
 
-        private void OnCollisionPO(Collision collision)
+        private new void OnCollisionPO(Collision collision)
         {
+            base.OnCollisionPO(collision);
             // If not exclusively pressed by hand and object has exited
             if (!_shouldOnlyBePressedByHand && _pressingObjectExited)
             {
@@ -72,8 +73,9 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
-        private void OnCollisionExitPO(Collision collision)
+        private new void OnCollisionExitPO(Collision collision)
         {
+            base.OnCollisionExitPO(collision);
             // If not exclusively pressed by hand, start delayed exit
             if (!_shouldOnlyBePressedByHand)
             {
