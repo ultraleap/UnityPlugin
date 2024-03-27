@@ -87,7 +87,7 @@ namespace Leap.Unity.PhysicalHands
         private Vector3 _axisChangeFromZero = Vector3.zero;
 
         [SerializeField]
-        private PhysicalHandsButton _connectedButton;
+        private PhysicalHandsButtonBase _connectedButton;
 
         [SerializeField]
         private bool _freezeIfNotActive = false;
@@ -196,7 +196,7 @@ namespace Leap.Unity.PhysicalHands
             // Check if a connected button is assigned
             if (_connectedButton == null)
             {
-                if (_slideableObject.TryGetComponent<PhysicalHandsButton>(out _connectedButton))
+                if (_slideableObject.TryGetComponent<PhysicalHandsButtonBase>(out _connectedButton))
                 {
                     // Assign event listeners for button events
                     _connectedButton.OnButtonPressed.AddListener(ButtonPressed);
