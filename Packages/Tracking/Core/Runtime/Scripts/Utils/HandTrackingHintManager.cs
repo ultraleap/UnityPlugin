@@ -9,20 +9,6 @@ namespace Leap.Unity
     {
         static Dictionary<Device, List<string>> currentDeviceHints = new Dictionary<Device, List<string>>();
 
-        static Device defaultDevice = null;
-        static Device DefaultDevice
-        { 
-            get 
-            {
-                if (defaultDevice == null)
-                {
-                    defaultDevice = new Device();
-                }
-
-                return defaultDevice; 
-            } 
-        }
-
         static Controller _leapController;
         static Controller LeapController
         {
@@ -41,6 +27,7 @@ namespace Leap.Unity
                         _leapController = new Controller(0, "Leap Service");
                     }
                 }
+
                 return _leapController;
             }
             set
@@ -57,6 +44,9 @@ namespace Leap.Unity
         {
             LeapController.Device -= NewLeapDevice;
             LeapController.Device += NewLeapDevice;
+
+            LeapController.Connect -= OnLeapCConnect;
+            LeapController.Connect += OnLeapCConnect;
         }
 
         /// <summary>
@@ -64,13 +54,13 @@ namespace Leap.Unity
         /// </summary>
         private static void NewLeapDevice(object sender, DeviceEventArgs e)
         {
-            if (!currentDeviceHints.ContainsKey(DefaultDevice))
+            if (!currentDeviceHints.ContainsKey(e.Device))
             {
-                currentDeviceHints.Add(DefaultDevice, UltraleapSettings.Instance.startupHints.ToList());
+                currentDeviceHints.Add(e.Device, UltraleapSettings.Instance.startupHints.ToList());
 
-                if (currentDeviceHints[DefaultDevice].Count != 0)
+                if (currentDeviceHints[e.Device].Count != 0)
                 {
-                    RequestHandTrackingHints(currentDeviceHints[DefaultDevice].ToArray());
+                    RequestHandTrackingHints(currentDeviceHints[e.Device].ToArray());
                 }
             }
 
@@ -80,12 +70,13 @@ namespace Leap.Unity
         /// <summary>
         /// Remove a hint from the existing hints and then send them all to the Service for the current device of the current controller
         /// </summary>
-        public static void RemoveHint(string hint, Device device)
+        public static void RemoveHint(string hint, Device device = null)
         {
-            // We use a default device to keep a cache of non-specific device settings
-            if (device == null)
+            // Find the first available on the Controller, or we cannot set a hint
+            if (device == null && !TryGetFirstDevice(out device))
             {
-                device = DefaultDevice;
+                Debug.Log("Unable to remove Hand Tracking Hints. No device was provided and no devices are currently connected.");
+                return;
             }
 
             if (currentDeviceHints.ContainsKey(device))
@@ -106,10 +97,11 @@ namespace Leap.Unity
         /// </summary>
         public static void AddHint(string hint, Device device = null)
         {
-            // We use a default device to keep a cache of non-specific device settings
-            if (device == null)
+            // Find the first available on the Controller, or we cannot set a hint
+            if (device == null && !TryGetFirstDevice(out device))
             {
-                device = DefaultDevice;
+                Debug.Log("Unable to add Hand Tracking Hints. No device was provided and no devices are currently connected.");
+                return;
             }
 
             if (currentDeviceHints.ContainsKey(device))
@@ -148,20 +140,14 @@ namespace Leap.Unity
                 hints = new string[0];
             }
 
-            // We need to send null device to the connection if it's not been specified
-            if (device == DefaultDevice)
+            // Find the first available on the Controller, or we cannot set a hint
+            if (device == null && !TryGetFirstDevice(out device))
             {
-                device = null;
+                Debug.Log("Unable to request Hand Tracking Hints. No device was provided and no devices are currently connected.");
+                return;
             }
 
             LeapController.RequestHandTrackingHints(hints, device);
-
-            // Cache the requested hints
-            if (device == null)
-            {
-                // We use a default device to keep a cache of non-specific device settings
-                device = DefaultDevice;
-            }
 
             if (currentDeviceHints.ContainsKey(device))
             {
@@ -196,6 +182,27 @@ namespace Leap.Unity
             }
 
             Debug.Log(logString);
+        }
+
+        private static bool TryGetFirstDevice(out Device device)
+        {
+            device = LeapController.Devices.ActiveDevices.FirstOrDefault();
+
+            if(device == null)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Re-request all existing hints when the connection is established.
+        /// This may be on a re-connection, or the initial connection.
+        /// </summary>
+        private static void OnLeapCConnect(object sender, ConnectionEventArgs eventArgs)
+        {
+            RequestAllExistingHints();
         }
     }
 }
