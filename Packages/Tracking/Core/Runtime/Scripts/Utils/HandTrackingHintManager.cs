@@ -38,7 +38,7 @@ namespace Leap.Unity
                     }
                     else // No leapserviceprovider, we should make a new controller ourselves
                     {
-                        _leapController = new Controller(0, "Leap Service", false);
+                        _leapController = new Controller(0, "Leap Service");
                     }
                 }
                 return _leapController;
@@ -128,7 +128,7 @@ namespace Leap.Unity
         /// Used to re-send the existing hints for each device that has had hints sent.
         /// Consider calling this when a connection is lost and re-established
         /// </summary>
-        public static void SendAllExistingHints()
+        public static void RequestAllExistingHints()
         {
             foreach (var device in currentDeviceHints.Keys)
             {

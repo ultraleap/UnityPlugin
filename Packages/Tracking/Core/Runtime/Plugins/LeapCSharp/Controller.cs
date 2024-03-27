@@ -42,7 +42,6 @@ namespace Leap
     {
         Connection _connection;
         bool _disposed = false;
-        bool _supportsMultipleDevices = true;
         string _serverNamespace = "Leap Service";
 
         /// <summary>
@@ -470,7 +469,6 @@ namespace Leap
             _connection.LeapConnection += OnConnect;
             _connection.LeapConnectionLost += OnDisconnect;
 
-            _supportsMultipleDevices = supportsMultipleDevices;
             _serverNamespace = serverNamespace;
 
             _connection.Start(serverNamespace, supportsMultipleDevices);
@@ -487,7 +485,7 @@ namespace Leap
         /// </summary>
         public void StartConnection()
         {
-            _connection.Start(_serverNamespace, _supportsMultipleDevices);
+            _connection.Start(_serverNamespace, true);
         }
 
         /// <summary>
