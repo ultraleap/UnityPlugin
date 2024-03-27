@@ -17,6 +17,11 @@ namespace Leap.Unity.PhysicalHands
         protected bool _shouldOnlyBePressedByHand = false;
         [SerializeField, Tooltip("Specifies which hand(s) can press the button.")] 
         protected ChiralitySelection _whichHandCanPressButton = ChiralitySelection.BOTH;
+        [SerializeField, Tooltip("Freeze button travel when base object is moving.")]
+        private bool _freezeButtonTravelOnMovement = true;
+        [SerializeField, Tooltip("How fast can the button move before we consider it moving for the sake of freezing button travel on movement")]
+        private Vector3 _buttonVelocityThreshold = new Vector3(0.1f, 0.1f, 0.1f);
+
 
 
         private const float BUTTON_PRESS_EXIT_THRESHOLD = 0.5f;
@@ -24,6 +29,8 @@ namespace Leap.Unity.PhysicalHands
         private bool _contactHandPressing = false;
         private bool _leftHandContacting = false;
         private bool _rightHandContacting = false;
+        private Rigidbody _pressableObjectRB = null;
+        private Rigidbody _rigidbody = null;
         private ConfigurableJoint _configurableJoint;
         private Vector3 _initialButtonPosition = Vector3.zero;
         private List<GameObject> _objectsContactingButton = new List<GameObject>();
@@ -81,11 +88,13 @@ namespace Leap.Unity.PhysicalHands
         private void SetUpPressableObject()
         {
             // Ensure the pressable object has a Rigidbody component
-            if (!_pressableObject.TryGetComponent<Rigidbody>(out Rigidbody rigidbody))
+            if (!_pressableObject.TryGetComponent<Rigidbody>(out _pressableObjectRB))
             {
-                rigidbody = _pressableObject.AddComponent<Rigidbody>();
-                rigidbody.useGravity = false;
+                _pressableObjectRB = _pressableObject.AddComponent<Rigidbody>();
+                _pressableObjectRB.useGravity = false;
             }
+
+
 
             // Ensure the pressable object has an IgnorePhysicalHands component
             if (!_pressableObject.TryGetComponent<IgnorePhysicalHands>(out IgnorePhysicalHands ignorePhysHands))
@@ -122,7 +131,8 @@ namespace Leap.Unity.PhysicalHands
             }
 
             // Connect the button to the parent object with a spring joint
-            _configurableJoint.connectedBody = GetComponent<Rigidbody>();
+            _rigidbody = GetComponent<Rigidbody>();
+            _configurableJoint.connectedBody = _rigidbody;
 
             // Configure spring parameters
             _configurableJoint.yDrive = new JointDrive
@@ -162,6 +172,15 @@ namespace Leap.Unity.PhysicalHands
 
         private void FixedUpdate()
         {
+            if(_rigidbody.velocity.sqrMagnitude > _buttonVelocityThreshold.sqrMagnitude)
+            {
+                FreezePressableMovement();
+            }
+            else
+            {
+                UnFreezePressableMovement();
+            }
+
             float distance = Mathf.Abs(_pressableObject.transform.localPosition.y - _initialButtonPosition.y);
 
             // Check if the button should be pressed
@@ -299,6 +318,22 @@ namespace Leap.Unity.PhysicalHands
                     return _rightHandContacting || _leftHandContacting;
                 default:
                     return false;
+            }
+        }
+
+        public void FreezePressableMovement()
+        {
+            if (_pressableObjectRB.constraints != RigidbodyConstraints.FreezeAll)
+            {
+                _pressableObjectRB.constraints = RigidbodyConstraints.FreezeAll;
+            }
+        }
+
+        public void UnFreezePressableMovement()
+        {
+            if (_pressableObjectRB.constraints != RigidbodyConstraints.None)
+            {
+                _pressableObjectRB.constraints = RigidbodyConstraints.None;
             }
         }
     }
