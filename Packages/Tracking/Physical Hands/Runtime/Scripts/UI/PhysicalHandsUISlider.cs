@@ -379,6 +379,10 @@ namespace Leap.Unity.PhysicalHands
         /// <param name="joint">The configurable joint to set up.</
         private void SetUpConfigurableJoint(ConfigurableJoint joint)
         {
+            if(joint == null)
+            {
+                return;
+            }
             joint.connectedBody = this.GetComponent<Rigidbody>();
             joint.xMotion = ConfigurableJointMotion.Locked;
             joint.yMotion = ConfigurableJointMotion.Locked;
@@ -403,6 +407,7 @@ namespace Leap.Unity.PhysicalHands
         private void SetUpSlider()
         {
             ConfigurableJoint configurableJoint;
+            _configurableJoints = _slideableObject.GetComponents<ConfigurableJoint>().ToList<ConfigurableJoint>();
             _slideableObject.TryGetComponent<ConfigurableJoint>(out configurableJoint);
 
             if (_configurableJoints.Count < 1 && configurableJoint == null)
@@ -513,6 +518,10 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
+        /// <summary>
+        /// Draws gizmos representing the range of motion for the joint based on its type and direction.
+        /// </summary>
+        /// <param name="jointPosition">Position of the joint.</param>
         private void DrawJointRangeGizmo(Vector3 jointPosition)
         {
             switch (_sliderType)
