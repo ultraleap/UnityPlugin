@@ -26,15 +26,15 @@ namespace Leap.Unity.PhysicalHands
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("_sliderDirection"), new GUIContent("Slider Direction", "The direction in which the slider moves."));
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("_startPosition"), new GUIContent("Start Position", "The starting position of the slider."));
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("_numberOfSegments"), new GUIContent("Number of Segments", "Number of segments for the slider to use (0 = unlimited)."));
-                target.SliderTravelDistance = CreateAxisAttribute("Slider Travel Distance: ", "SliderTravelDistance", "The travel distance of the slider (from the central point).");
+                serializedObject.FindProperty("SliderTravelDistance").floatValue = CreateAxisAttribute("Slider Travel Distance: ", "SliderTravelDistance", "The travel distance of the slider (from the central point).");
             }
             else if (sliderType.enumValueIndex == (int)PhysicalHandsUISlider.SliderType.TWO_DIMENSIONAL)
             {
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("_twoDimSliderDirection"), new GUIContent("Two-Dimensional Slider Direction", "The direction of movement for the two-dimensional slider."));
 
-                target._twoDimStartPosition = CreateVector2AxisAttribute("Start Position: ", "_twoDimStartPosition", "Starting position of the two-dimensional slider.");
-                target._twoDimNumberOfSegments = CreateVector2IntAxisAttribute("Number Of Segments: ", "_twoDimNumberOfSegments", "Number of segments for the two-dimensional slider to use (0 = unlimited).");
-                target.TwoDimSliderTravelDistance = CreateVector2AxisAttribute("Slider Travel Distance: ", "TwoDimSliderTravelDistance", "The travel distance of the two-dimensional slider.");
+                serializedObject.FindProperty("_twoDimStartPosition").vector2Value = CreateVector2AxisAttribute("Start Position: ", "_twoDimStartPosition", "Starting position of the two-dimensional slider.");
+                serializedObject.FindProperty("_twoDimNumberOfSegments").vector2Value = CreateVector2IntAxisAttribute("Number Of Segments: ", "_twoDimNumberOfSegments", "Number of segments for the two-dimensional slider to use (0 = unlimited).");
+                serializedObject.FindProperty("TwoDimSliderTravelDistance").vector2Value = CreateVector2AxisAttribute("Slider Travel Distance: ", "TwoDimSliderTravelDistance", "The travel distance of the two-dimensional slider.");
             }
 
             EditorGUILayout.PropertyField(serializedObject.FindProperty("_freezeIfNotActive"), new GUIContent("Freeze If Not Active", "Flag to freeze the slider position if not active."));

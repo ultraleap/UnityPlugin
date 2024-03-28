@@ -22,8 +22,21 @@ namespace Leap.Unity.PhysicalHands
             ONE_DIMENSIONAL,
             TWO_DIMENSIONAL,
         }
-        [SerializeField]
+        [SerializeField, Leap.Unity.Attributes.OnEditorChange("SliderTypeChanged")]
         internal SliderType _sliderType = SliderType.ONE_DIMENSIONAL;
+
+        private void SliderTypeChanged()
+        {
+            Debug.Log("SliderTypeChanged");
+            if(_slideableObject)
+            {
+                foreach (var joint in _slideableObject.GetComponents<ConfigurableJoint>())
+                {
+                    DestroyImmediate(joint);
+                }
+                
+            }
+        }
 
         public enum SliderDirection
         {
@@ -323,13 +336,13 @@ namespace Leap.Unity.PhysicalHands
             switch (_sliderDirection)
             {
                 case SliderDirection.X:
-                    xOffset = _configurableJoints.First().anchor.x + -SliderTravelDistance;
+                    xOffset = _configurableJoints.First().anchor.x -SliderTravelDistance;
                     break;
                 case SliderDirection.Y:
-                    yOffset = _configurableJoints.First().anchor.y + -SliderTravelDistance;
+                    yOffset = _configurableJoints.First().anchor.y -SliderTravelDistance;
                     break;
                 case SliderDirection.Z:
-                    zOffset = _configurableJoints.First().anchor.z + -SliderTravelDistance;
+                    zOffset = _configurableJoints.First().anchor.z -SliderTravelDistance;
                     break;
             }
 
@@ -353,16 +366,16 @@ namespace Leap.Unity.PhysicalHands
             switch (_twoDimSliderDirection)
             {
                 case TwoDimSliderDirection.XY:
-                    xOffset = _configurableJoints.ElementAt(0).anchor.x + -TwoDimSliderTravelDistance.x;
-                    yOffset = _configurableJoints.ElementAt(1).anchor.y + -TwoDimSliderTravelDistance.y;
+                    xOffset = _configurableJoints.ElementAt(0).anchor.x -TwoDimSliderTravelDistance.x;
+                    yOffset = _configurableJoints.ElementAt(1).anchor.y -TwoDimSliderTravelDistance.y;
                     break;
                 case TwoDimSliderDirection.XZ:
-                    xOffset = _configurableJoints.ElementAt(0).anchor.x + -TwoDimSliderTravelDistance.x;
-                    zOffset = _configurableJoints.ElementAt(1).anchor.z + -TwoDimSliderTravelDistance.y;
+                    xOffset = _configurableJoints.ElementAt(0).anchor.x -TwoDimSliderTravelDistance.x;
+                    zOffset = _configurableJoints.ElementAt(1).anchor.z -TwoDimSliderTravelDistance.y;
                     break;
                 case TwoDimSliderDirection.YZ:
-                    yOffset = _configurableJoints.ElementAt(0).anchor.y + -TwoDimSliderTravelDistance.x;
-                    zOffset = _configurableJoints.ElementAt(1).anchor.z + -TwoDimSliderTravelDistance.y;
+                    yOffset = _configurableJoints.ElementAt(0).anchor.y -TwoDimSliderTravelDistance.x;
+                    zOffset = _configurableJoints.ElementAt(1).anchor.z -TwoDimSliderTravelDistance.y;
                     break;
             }
 
@@ -423,9 +436,9 @@ namespace Leap.Unity.PhysicalHands
             {
                 SetUpConfigurableJoint(joint);
 
-                SoftJointLimit linerJointLimit = new SoftJointLimit();
-                linerJointLimit.limit = SliderTravelDistance + 0.01f;
-                joint.linearLimit = linerJointLimit;
+                SoftJointLimit linearJointLimit = new SoftJointLimit();
+                linearJointLimit.limit = SliderTravelDistance + 0.01f;
+                joint.linearLimit = linearJointLimit;
 
                 switch (_sliderDirection)
                 {
