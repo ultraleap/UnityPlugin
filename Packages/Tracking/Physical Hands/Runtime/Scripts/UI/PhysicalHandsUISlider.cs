@@ -492,6 +492,78 @@ namespace Leap.Unity.PhysicalHands
         }
         #endregion
 
+        private void OnDrawGizmosSelected()
+        {            
+            // Set up the slider based on its type
+            switch (_sliderType)
+            {
+                case SliderType.ONE_DIMENSIONAL:
+                    SetUpSlider();
+                    break;
+                case SliderType.TWO_DIMENSIONAL:
+                    SetUpTwoDimSlider();
+                    break;
+            }
+            if (_configurableJoints != null)
+            {
+                foreach (ConfigurableJoint joint in _configurableJoints)
+                {
+                    DrawJointRangeGizmo(joint.transform.position);
+                }
+            }
+        }
+
+        private void DrawJointRangeGizmo(Vector3 jointPosition)
+        {
+            switch (_sliderType)
+            {
+                case SliderType.ONE_DIMENSIONAL:
+                    {
+                        switch (_sliderDirection)
+                        {
+                            case SliderDirection.X:
+                                Gizmos.color = Color.red; // X axis
+                                Gizmos.DrawLine(jointPosition + transform.right * SliderTravelDistance, jointPosition - transform.right * SliderTravelDistance);
+                                break;
+                            case SliderDirection.Y:
+                                Gizmos.color = Color.green; // Y axis
+                                Gizmos.DrawLine(jointPosition + transform.up * SliderTravelDistance, jointPosition - transform.up * SliderTravelDistance);
+                                break;
+                            case SliderDirection.Z:
+                                Gizmos.color = Color.blue; // Z axis
+                                Gizmos.DrawLine(jointPosition + transform.forward * SliderTravelDistance, jointPosition - transform.forward * SliderTravelDistance);
+                                break;
+                        }
+                        break;
+                    }
+                case SliderType.TWO_DIMENSIONAL:
+                    {
+                        switch (_twoDimSliderDirection)
+                        {
+                            case TwoDimSliderDirection.XY:
+                                Gizmos.color = Color.red; // X axis
+                                Gizmos.DrawLine(jointPosition + transform.right * TwoDimSliderTravelDistance.x, jointPosition - transform.right * TwoDimSliderTravelDistance.x);
+                                Gizmos.color = Color.green; // Y axis
+                                Gizmos.DrawLine(jointPosition + transform.up * TwoDimSliderTravelDistance.y, jointPosition - transform.up * TwoDimSliderTravelDistance.y);
+                                break;
+                            case TwoDimSliderDirection.XZ:
+                                Gizmos.color = Color.red; // X axis
+                                Gizmos.DrawLine(jointPosition + transform.right * TwoDimSliderTravelDistance.x, jointPosition - transform.right * TwoDimSliderTravelDistance.x);
+                                Gizmos.color = Color.blue; // Z axis
+                                Gizmos.DrawLine(jointPosition + transform.forward * TwoDimSliderTravelDistance.y, jointPosition - transform.forward * TwoDimSliderTravelDistance.y);
+                                break;
+                            case TwoDimSliderDirection.YZ:
+                                Gizmos.color = Color.green; // Y axis
+                                Gizmos.DrawLine(jointPosition + transform.up * TwoDimSliderTravelDistance.x, jointPosition - transform.up * TwoDimSliderTravelDistance.x);
+                                Gizmos.color = Color.blue; // Z axis
+                                Gizmos.DrawLine(jointPosition + transform.forward * TwoDimSliderTravelDistance.y, jointPosition - transform.forward * TwoDimSliderTravelDistance.y);
+                                break;
+                        }
+                        break;
+                    }
+            }
+        }
+
         #endregion
 
         #region Events
