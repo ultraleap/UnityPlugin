@@ -79,7 +79,10 @@ namespace Leap.Unity
         /// </summary>
         public static void RequestAllExistingHints()
         {
-            RequestHandTrackingHints(currentHints.ToArray());
+            if (currentHints.Count != 0)
+            {
+                RequestHandTrackingHints(currentHints.ToArray());
+            }
         }
 
         /// <summary>
