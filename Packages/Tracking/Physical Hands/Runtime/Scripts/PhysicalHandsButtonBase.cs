@@ -70,8 +70,12 @@ namespace Leap.Unity.PhysicalHands
                 return;
             }
 
+            _rigidbody = GetComponent<Rigidbody>();
+            _rigidbody.isKinematic = true;
+            _rigidbody.constraints = RigidbodyConstraints.FreezeAll;
+
             // Set default travel distance if one is not set
-            if(_buttonTravelDistance == 0)
+            if (_buttonTravelDistance == 0)
             {
                 // leave 1mm so the button does not clip into the base obect (assuming same thickness)
                 _buttonTravelDistance = Mathf.Abs(_pressableObject.transform.localPosition.y) - 0.001f; 
@@ -131,7 +135,7 @@ namespace Leap.Unity.PhysicalHands
             }
 
             // Connect the button to the parent object with a spring joint
-            _rigidbody = GetComponent<Rigidbody>();
+            
             _configurableJoint.connectedBody = _rigidbody;
 
             // Configure spring parameters
