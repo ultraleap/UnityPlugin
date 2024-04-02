@@ -22,7 +22,7 @@ namespace Leap.Unity.PhysicalHands
 
         [SerializeField, Tooltip("The pressable part of the button.")]
         internal GameObject buttonObject;
-        [Tooltip("The local position which the button will be limited to and will try to return to.")]
+        [Tooltip("Travel of the button (How far does the button need to move before it is activated).")]
         internal float buttonHeightLimit = 0.02f;
 
 
