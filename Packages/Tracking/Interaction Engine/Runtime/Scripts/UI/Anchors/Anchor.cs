@@ -10,6 +10,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Leap.Unity.Attachments;
 
 namespace Leap.Unity.Interaction
 {
@@ -46,6 +47,22 @@ namespace Leap.Unity.Interaction
         private HashSet<AnchorableBehaviour> _preferringAnchorables = new HashSet<AnchorableBehaviour>();
 
         private HashSet<AnchorableBehaviour> _anchoredObjects = new HashSet<AnchorableBehaviour>();
+
+        /// <summary>
+        /// returns ChiralitySelection.NONE if no attachemt hand found in parents
+        /// </summary>
+        internal ChiralitySelection AttahedHandChirality
+        {
+            get
+            {
+                return GetChiralityOfAttachedHand();
+            }
+            private set
+            {
+                _attachedHandChirality = value;
+            }
+        }
+        private ChiralitySelection _attachedHandChirality = ChiralitySelection.NONE;
         /// <summary>
         /// Gets the set of AnchorableBehaviours currently attached to this anchor.
         /// </summary>
@@ -109,11 +126,31 @@ namespace Leap.Unity.Interaction
         void Start()
         {
             initUnityEvents();
+            _attachedHandChirality = GetChiralityOfAttachedHand();
         }
 
         void Update()
         {
             updateAnchorCallbacks();
+        }
+
+        /// <summary>
+        /// Gets the chirality of the hand which this object is attached to if any
+        /// </summary>
+        /// <returns>Chirality of the attached hand</returns>
+        internal ChiralitySelection GetChiralityOfAttachedHand()
+        {
+            AttachmentHand handObject = transform.root.GetComponentInChildren<AttachmentHand>();
+
+            if (handObject != null)
+            {
+                return (ChiralitySelection)((int)handObject.chirality);
+            }
+            else
+            {
+                return ChiralitySelection.NONE;
+            }
+
         }
 
         void OnDisable()
