@@ -168,7 +168,7 @@ namespace Leap.Unity.PhysicalHands
             if (_slideableObject == null)
             {
                 // Display a message if the slideable object is not assigned and disable the script
-                Debug.Log("There is no slideable object. Please add one to use the slider. \n This script has been disabled");
+                Debug.LogWarning("There is no slideable object. Please add one to use the slider. \n This script has been disabled", this.gameObject);
                 this.enabled = false;
                 return;
             }
@@ -420,6 +420,11 @@ namespace Leap.Unity.PhysicalHands
         private void SetUpSlider()
         {
             ConfigurableJoint configurableJoint;
+            if(_slideableObject == null)
+            {
+                Debug.LogWarning("There is no slideable object. Please add one to use the slider.", this.gameObject);
+                return;
+            }
             _configurableJoints = _slideableObject.GetComponents<ConfigurableJoint>().ToList<ConfigurableJoint>();
             _slideableObject.TryGetComponent<ConfigurableJoint>(out configurableJoint);
 
@@ -460,6 +465,12 @@ namespace Leap.Unity.PhysicalHands
         /// </summary>
         private void SetUpTwoDimSlider()
         {
+            if (_slideableObject == null)
+            {
+                Debug.LogWarning("There is no slideable object. Please add one to use the slider.", this.gameObject);
+                return;
+            }
+
             _configurableJoints = _slideableObject.GetComponents<ConfigurableJoint>().ToList<ConfigurableJoint>();
 
             while (_configurableJoints.Count < 2)
