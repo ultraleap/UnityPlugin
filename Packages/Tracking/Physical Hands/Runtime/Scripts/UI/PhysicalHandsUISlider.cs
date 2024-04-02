@@ -192,6 +192,9 @@ namespace Leap.Unity.PhysicalHands
                 _slideableObjectRigidbody = _slideableObject.AddComponent<Rigidbody>();
             }
 
+            _slideableObjectRigidbody.useGravity = false;
+            this.GetComponent<Rigidbody>().isKinematic = true;
+
             // Set up the slider based on its type
             switch (_sliderType)
             {
