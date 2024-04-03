@@ -321,6 +321,8 @@ namespace Leap.Unity.PhysicalHands
         /// </summary>
         protected override void ProcessOutputHand(ref Hand modifiedHand)
         {
+            modifiedHand.CopyFrom(dataHand);
+
             modifiedHand.SetTransform(palmBone.transform.position, palmBone.transform.rotation);
 
             int boneInd = 0;
@@ -334,7 +336,6 @@ namespace Leap.Unity.PhysicalHands
                     Bone b = modifiedHand.Fingers[i].bones[0];
                     PhysExts.ToWorldSpaceCapsule(bones[boneInd].boneCollider, out posA, out posB, out r);
                     b.NextJoint = posB;
-                    b.PrevJoint = dataHand.Fingers[i].bones[0].PrevJoint;
 
                     for (int j = 1; j < modifiedHand.Fingers[i].bones.Length; j++)
                     {
@@ -357,27 +358,19 @@ namespace Leap.Unity.PhysicalHands
 
             modifiedHand.WristPosition = palmBone.transform.position - (palmBone.transform.rotation * Quaternion.Inverse(dataHand.Rotation) * (dataHand.PalmPosition - dataHand.WristPosition));
 
-            Vector3 direction = dataHand.Arm.Direction;
-
-            modifiedHand.Arm.PrevJoint = modifiedHand.WristPosition + (-dataHand.Arm.Length * direction);
+            modifiedHand.Arm.PrevJoint = modifiedHand.WristPosition + (-dataHand.Arm.Length * dataHand.Arm.Direction);
             modifiedHand.Arm.NextJoint = modifiedHand.WristPosition;
             modifiedHand.Arm.Center = (modifiedHand.Arm.PrevJoint + modifiedHand.Arm.NextJoint) / 2f;
             modifiedHand.Arm.Length = Vector3.Distance(modifiedHand.Arm.PrevJoint, modifiedHand.Arm.NextJoint);
             modifiedHand.Arm.Direction = (modifiedHand.WristPosition - modifiedHand.Arm.PrevJoint).normalized;
             modifiedHand.Arm.Rotation = Quaternion.LookRotation(modifiedHand.Arm.Direction, -dataHand.PalmNormal);
-            modifiedHand.Arm.Width = dataHand.Arm.Width;
 
             // Add the radius of one of the palm edges to the box collider to get the correct width
             modifiedHand.PalmWidth = palmBone.palmCollider.size.y + palmBone.palmEdgeColliders[1].radius;
-            modifiedHand.Confidence = dataHand.Confidence;
-            modifiedHand.Direction = dataHand.Direction;
-            modifiedHand.FrameId = dataHand.FrameId;
-            modifiedHand.Id = dataHand.Id;
             modifiedHand.GrabStrength = Hands.CalculateGrabStrength(ref modifiedHand);
             modifiedHand.PinchStrength = Hands.CalculatePinchStrength(ref modifiedHand);
             modifiedHand.PinchDistance = Hands.CalculatePinchDistance(ref modifiedHand);
             modifiedHand.PalmVelocity = (palmBone.transform.position - _oldContactPosition) / Time.fixedDeltaTime;
-            modifiedHand.TimeVisible = dataHand.TimeVisible;
         }
 
         private Vector3 GetTipPosition(int index)
