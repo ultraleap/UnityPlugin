@@ -102,8 +102,8 @@ namespace Leap.Unity.PhysicalHands
         [SerializeField]
         private PhysicalHandsButtonBase _connectedButton;
 
-        [SerializeField]
-        private bool _freezeIfNotActive = false;
+        
+        private bool _freezeIfNotActive = true;
 
         [SerializeField]
         private Vector3 _sliderValue = Vector3.zero;
@@ -116,7 +116,9 @@ namespace Leap.Unity.PhysicalHands
         private float _sliderZZeroPos = 0;
 
         private bool _sliderReleasedLastFrame = false;
-        private Vector3 prevSliderValue = Vector3.zero;
+        private Vector3 _prevSliderValue = Vector3.zero;
+
+        private Quaternion _initialRotation;
 
 
         /// <summary>
@@ -162,7 +164,7 @@ namespace Leap.Unity.PhysicalHands
         /// <summary>
         /// Initializes the slider when the GameObject is enabled.
         /// </summary>
-        private void OnEnable()
+        private void Start()
         {
             // Check if the slideable object is assigned
             if (_slideableObject == null)
@@ -194,6 +196,8 @@ namespace Leap.Unity.PhysicalHands
 
             _slideableObjectRigidbody.useGravity = false;
             this.GetComponent<Rigidbody>().isKinematic = true;
+            _initialRotation = _slideableObject.transform.localRotation;
+
 
             // Set up the slider based on its type
             switch (_sliderType)
@@ -268,7 +272,7 @@ namespace Leap.Unity.PhysicalHands
             _sliderValue = CalculateSliderValue(_axisChangeFromZero);
 
             // Check if the slider value has changed
-            if (prevSliderValue != _sliderValue)
+            if (_prevSliderValue != _sliderValue)
             {
                 // Send slider change event
                 SendSliderEvent(SliderChangeEvent);
@@ -299,9 +303,22 @@ namespace Leap.Unity.PhysicalHands
 
                     // Reset flag and update previous slider value
                     _sliderReleasedLastFrame = false;
-                    prevSliderValue = _sliderValue;
+                    _prevSliderValue = _sliderValue;
                 }
             }
+        }
+
+        private void FixedUpdate()
+        {
+            // Account for joints beimng a little weird when rotating parent rigidbodies.
+            // Set the rotation to the initial rotation of the sliding object when it gets too far away. 
+            // Note. This will stop the slideable object from being rotated at all at runtime
+            if(Quaternion.Angle(_slideableObject.transform.localRotation, _initialRotation) > 0.5f)
+            {
+                Debug.Log("Rotation reset");
+                _slideableObject.transform.localRotation = _initialRotation;
+            }
+
         }
 
         #endregion
@@ -413,6 +430,8 @@ namespace Leap.Unity.PhysicalHands
             joint.xDrive = jointDrive;
             joint.yDrive = jointDrive;
             joint.zDrive = jointDrive;
+
+            joint.projectionMode = JointProjectionMode.PositionAndRotation;
 
             joint.anchor = Vector3.zero;
         }
@@ -638,11 +657,15 @@ namespace Leap.Unity.PhysicalHands
 
         public void OnHandContact(ContactHand hand)
         {
-            
+            UnFreezeSliderPosition();
         }
 
         public void OnHandContactExit(ContactHand hand)
         {
+            if (_freezeIfNotActive)
+            {
+                FreezeSliderPosition();
+            }
             _sliderReleasedLastFrame = true;
         }
 
