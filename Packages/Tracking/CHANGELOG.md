@@ -58,6 +58,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (Physical Hands) Soft Contact NAN collider error when using OpenXR tracking on Android devices
 - (Physical Hands) Hand stuck in pose, unable to grab if object is disabled while grabbing
 - (Physical Hands) Errors when destroying objects that are grabbed
+- (Physical Hands) Errors when adding Physical Hands Manager prefab for the first time
 
 
 ## [6.14.0] - 24/01/24
