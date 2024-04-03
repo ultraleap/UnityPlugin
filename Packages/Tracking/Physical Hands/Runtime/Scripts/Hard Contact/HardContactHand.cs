@@ -334,6 +334,7 @@ namespace Leap.Unity.PhysicalHands
                     Bone b = modifiedHand.Fingers[i].bones[0];
                     PhysExts.ToWorldSpaceCapsule(bones[boneInd].boneCollider, out posA, out posB, out r);
                     b.NextJoint = posB;
+                    b.PrevJoint = dataHand.Fingers[i].bones[0].PrevJoint;
 
                     for (int j = 1; j < modifiedHand.Fingers[i].bones.Length; j++)
                     {
