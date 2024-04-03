@@ -37,8 +37,6 @@ namespace Leap.Unity.PhysicalHands
                 serializedObject.FindProperty("TwoDimSliderTravelDistance").vector2Value = CreateVector2AxisAttribute("Slider Travel Distance: ", "TwoDimSliderTravelDistance", "The travel distance of the two-dimensional slider.");
             }
 
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("_freezeIfNotActive"), new GUIContent("Freeze If Not Active", "Flag to freeze the slider position if not active."));
-
             EditorGUILayout.Space(20);
 
             // Connected Button
@@ -46,8 +44,6 @@ namespace Leap.Unity.PhysicalHands
 
             EditorGUILayout.Space(20);
 
-            // Axis Change From Zero
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("_axisChangeFromZero"), new GUIContent("Axis Change From Zero", "Change in axis from zero position."));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("_sliderValue"), new GUIContent("Slider Value", "Current value of the slider."));
 
             // Slider Events
