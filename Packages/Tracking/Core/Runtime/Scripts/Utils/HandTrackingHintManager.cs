@@ -98,10 +98,13 @@ namespace Leap.Unity
 
             currentHints = hints.ToList();
 
+            string sourceName = "LeapC";
+
             if (HandTrackingSourceUtility.LeapOpenXRHintingAvailable)
             {
                 // Use OpenXR for Hints
                 OnOpenXRHintRequest?.Invoke(hints);
+                sourceName = "OpenXR";
             }
             else
             {
@@ -110,13 +113,13 @@ namespace Leap.Unity
             }
 
             // Log the results
-            LogRequestedHints(hints);
+            LogRequestedHints(hints, sourceName);
         }
 
-        static void LogRequestedHints(string[] hints)
+        static void LogRequestedHints(string[] hints, string sourceName)
         {
             // Log the requeste hints
-            string logString = "Hand Tracking Hints have been requested:";
+            string logString = sourceName + " Hand Tracking Hints have been requested:";
 
             if (hints.Length > 0)
             {
@@ -129,7 +132,7 @@ namespace Leap.Unity
             }
             else
             {
-                logString = "Hand Tracking Hints have been cleared";
+                logString = sourceName + " Hand Tracking Hints have been cleared";
             }
 
             Debug.Log(logString);
