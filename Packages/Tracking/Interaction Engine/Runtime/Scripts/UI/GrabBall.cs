@@ -66,12 +66,31 @@ namespace Leap.Unity.Interaction
 
         public bool continuouslyRestrictGrabBallDistanceFromHead = true;
 
+        public bool IsGrabbed;
+
+        public float ClosestHandDistance
+        {
+            get
+            {
+                float shortestDistance = float.PositiveInfinity;
+                foreach (var hand in _grabbedHands)
+                {
+                    float handDistance = Vector3.Distance(hand.palmBone.transform.position, this.transform.position);
+                    if (handDistance < shortestDistance)
+                    {
+                        shortestDistance = handDistance;
+                    }
+                }
+                return shortestDistance;
+            }
+        }
+
         private Pose _attachedObjectTargetPose = Pose.identity;
         private Transform _head;
         private Vector3 _attachedObjectOffset;
         private Transform _transformHelper;
         private bool _moveGrabBallToPositionOnUngrasp = false;
-        private bool _grabbed;
+        
         private List<ContactHand> _grabbedHands = new List<ContactHand>();
         private const float LERP_POSITION_LIMIT = 0.001f;
         private const float LERP_ROTATION_LIMIT = 1;
@@ -115,7 +134,7 @@ namespace Leap.Unity.Interaction
 
         private void Update()
         {
-            if (grabBallInteractionBehaviour.isGrasped || _grabbed)
+            if ((grabBallInteractionBehaviour != null && grabBallInteractionBehaviour.isGrasped) || IsGrabbed)
             {
                 UpdateAttachedObjectTargetPose();
                 _moveGrabBallToPositionOnUngrasp = true;
@@ -387,7 +406,7 @@ namespace Leap.Unity.Interaction
 
         public void OnHandGrab(ContactHand hand)
         {
-            _grabbed = true;
+            IsGrabbed = true;
             _grabbedHands.Add(hand);
         }
 
@@ -396,7 +415,7 @@ namespace Leap.Unity.Interaction
             _grabbedHands.Remove(hand);
             if(_grabbedHands.Count == 0)
             {
-                _grabbed = false;
+                IsGrabbed = false;
             }
         }
     }
