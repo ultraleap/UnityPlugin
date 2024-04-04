@@ -56,10 +56,20 @@ namespace Leap.InteractionEngine.Examples
 
             defaultMesh.transform.rotation = LookAtRotationParallelToHorizon(defaultMesh.transform.position, Camera.main.transform.position);
 
-            bool expanded = grabBall.grabBallInteractionBehaviour.closestHoveringControllerDistance < distanceToScaleGrabBall;
+            bool expanded = false;
+            if (grabBall.grabBallInteractionBehaviour != null)
+            {
+                expanded = grabBall.grabBallInteractionBehaviour.closestHoveringControllerDistance < distanceToScaleGrabBall;
+            }
+            else
+            {
+                expanded = grabBall.ClosestHandDistance < distanceToScaleGrabBall;
+
+            }
             defaultMesh.transform.localScale = Vector3.Lerp(defaultMesh.transform.localScale, (expanded) ? expandedScale : minimisedScale, Time.deltaTime * lerpTime);
 
-            if (grabBall.grabBallRestrictionStatus.IsRestricted && grabBall.grabBallInteractionBehaviour.isGrasped)
+            if (grabBall.grabBallRestrictionStatus.IsRestricted && 
+                ((grabBall.grabBallInteractionBehaviour != null && grabBall.grabBallInteractionBehaviour.isGrasped) || grabBall.IsGrabbed))
             {
                 ghostedMesh.gameObject.SetActive(true);
                 ghostedMesh.transform.position = grabBall.grabBallPose.position;
