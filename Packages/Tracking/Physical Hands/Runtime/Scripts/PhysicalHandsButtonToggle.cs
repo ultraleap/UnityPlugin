@@ -22,15 +22,6 @@ namespace Leap.Unity.PhysicalHands
     {
         private bool _pressingObjectExited = false;
 
-        private void Start()
-        {
-            // Subscribe to events
-            base._buttonHelper._onCollisionEnter += OnCollisionPO;
-            base._buttonHelper._onCollisionExit += OnCollisionExitPO;
-            base._buttonHelper._onHandContact += OnCollisionPO;
-            base._buttonHelper._onHandContactExit += OnCollisionExitPO;
-        }
-
         /// <summary>
         /// Action to perform when the button is pressed.
         /// </summary>
@@ -54,18 +45,19 @@ namespace Leap.Unity.PhysicalHands
 
         #region Collision handling methods
 
-        private new void OnCollisionPO(Collision collision)
+        protected override void OnCollisionPO(Collision collision)
         {
             base.OnCollisionPO(collision);
             // If not exclusively pressed by hand and object has exited
-            if (!_shouldOnlyBePressedByHand && _pressingObjectExited)
+            if (!_canBePressedByObjects && _pressingObjectExited)
             {
                 UnFreezePressableMovement();
             }
         }
 
-        private void OnCollisionPO(ContactHand contactHand)
+        protected override void OnCollisionPO(ContactHand contactHand)
         {
+            base.OnCollisionPO(contactHand);
             // If the chosen hand is in contact and object has exited
             if (GetChosenHandInContact() && _pressingObjectExited)
             {
@@ -73,18 +65,19 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
-        private new void OnCollisionExitPO(Collision collision)
+        protected override void OnCollisionExitPO(Collision collision)
         {
             base.OnCollisionExitPO(collision);
             // If not exclusively pressed by hand, start delayed exit
-            if (!_shouldOnlyBePressedByHand)
+            if (!_canBePressedByObjects)
             {
                 StartCoroutine(DelayedCollisionExit());
             }
         }
 
-        private void OnCollisionExitPO(ContactHand contactHand)
+        protected override void OnCollisionExitPO(ContactHand contactHand)
         {
+            base.OnCollisionExitPO(contactHand);
             // Check which hand can press the button and start delayed exit if correct hand is found
             if (contactHand.Handedness == (Chirality)_whichHandCanPressButton)
             {
