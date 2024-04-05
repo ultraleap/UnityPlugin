@@ -42,7 +42,6 @@ namespace Leap
     {
         Connection _connection;
         bool _disposed = false;
-        bool _supportsMultipleDevices = true;
         string _serverNamespace = "Leap Service";
 
         /// <summary>
@@ -405,6 +404,21 @@ namespace Leap
             }
         }
 
+        /// <summary>
+        /// Dispatched when a Fiducial Marker has been tracked.
+        /// </summary>
+        public event EventHandler<FiducialPoseEventArgs> FiducialPose
+        {
+            add
+            {
+                _connection.LeapFiducialPose += value;
+            }
+            remove
+            {
+                _connection.LeapFiducialPose -= value;
+            }
+        }
+
         public void Dispose()
         {
             Dispose(true);
@@ -448,14 +462,16 @@ namespace Leap
             _connection = Connection.GetConnection(new Connection.Key(connectionKey, serverNamespace));
             _connection.EventContext = SynchronizationContext.Current;
 
+            if (_connection.IsRunning)
+                _hasInitialized = true;
+
             _connection.LeapInit += OnInit;
             _connection.LeapConnection += OnConnect;
             _connection.LeapConnectionLost += OnDisconnect;
 
-            _supportsMultipleDevices = supportsMultipleDevices;
             _serverNamespace = serverNamespace;
 
-            _connection.Start(serverNamespace, supportsMultipleDevices);
+            StartConnection();
         }
 
 
@@ -469,7 +485,7 @@ namespace Leap
         /// </summary>
         public void StartConnection()
         {
-            _connection.Start(_serverNamespace, _supportsMultipleDevices);
+            _connection.Start(_serverNamespace);
         }
 
         /// <summary>
