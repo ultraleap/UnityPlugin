@@ -249,7 +249,7 @@ namespace Leap.Unity
 
         static string GetPluginVersion()
         {
-            if (IsPackageAvailable("com.ultraleap.tracking", out var packageInfo)) // Check the package exists so we can use package manage wizardry
+            if (Utils.IsPackageAvailable("com.ultraleap.tracking", out var packageInfo)) // Check the package exists so we can use package manage wizardry
             {
                 return packageInfo.version;
             }
@@ -261,7 +261,7 @@ namespace Leap.Unity
 
         static string GetPluginSource()
         {
-            if (IsPackageAvailable("com.ultraleap.tracking", out var packageInfo)) // Check the package exists so we can use package manage wizardry
+            if (Utils.IsPackageAvailable("com.ultraleap.tracking", out var packageInfo)) // Check the package exists so we can use package manage wizardry
             {
                 if (packageInfo.source == UnityEditor.PackageManager.PackageSource.Registry &&
                     packageInfo.registry != null &&
@@ -352,31 +352,6 @@ namespace Leap.Unity
         public static SerializedObject GetSerializedSettings()
         {
             return new SerializedObject(Instance);
-        }
-
-        static bool IsPackageAvailable(string packageName, out UnityEditor.PackageManager.PackageInfo packageInfo)
-        {
-            packageInfo = GetPackageInfo(packageName);
-
-            if (packageInfo != null)
-            {
-                return true;
-            }
-
-            return false;
-        }
-
-        static UnityEditor.PackageManager.PackageInfo GetPackageInfo(string packageName)
-        {
-            var allPackages = UnityEditor.PackageManager.PackageInfo.GetAllRegisteredPackages();
-            foreach (var package in allPackages)
-            {
-                if (package.name == packageName)
-                {
-                    return package;
-                }
-            }
-            return null;
         }
 
         static string FindPluginVersionInAssets()
