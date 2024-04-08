@@ -2754,6 +2754,37 @@ namespace Leap.Unity
 
         #endregion
 
+        #region Editor Utils
+#if UNITY_EDITOR
+
+        public static bool IsPackageAvailable(string packageName, out UnityEditor.PackageManager.PackageInfo packageInfo)
+        {
+            packageInfo = GetPackageInfo(packageName);
+
+            if (packageInfo != null)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        static UnityEditor.PackageManager.PackageInfo GetPackageInfo(string packageName)
+        {
+            var allPackages = UnityEditor.PackageManager.PackageInfo.GetAllRegisteredPackages();
+            foreach (var package in allPackages)
+            {
+                if (package.name == packageName)
+                {
+                    return package;
+                }
+            }
+            return null;
+        }
+
+#endif
+        #endregion
+
         #endregion
 
         #region Leap Utilities
