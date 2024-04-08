@@ -207,7 +207,8 @@ namespace Leap.Unity
         [HideInInspector, SerializeField]
         public bool showPhysicalHandsPhysicsSettingsWarning = true;
 
-        private string pluginVersion = "Unknown";
+        [HideInInspector, SerializeField]
+        public string pluginVersion = "Unknown";
         public string PluginVersion
         { 
             get
@@ -219,7 +220,8 @@ namespace Leap.Unity
             }
         }
 
-        private string pluginSource = "Unknown";
+        [HideInInspector, SerializeField]
+        public string pluginSource = "Unknown";
         public string PluginSource
         {
             get
