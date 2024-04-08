@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (Physical Hands) Ignore Physical hands component can now choose which hand(s) it should be applied to
 - (Physical Hands) Edit time representation of hands via Physical Hands Manager
 - (Attachment Hands) Do not show warning again this session when deleting attachment points
+- (Optional) Metadata capture to help improve the Plugin
 - (Physical Hands) Ability to create IgnorePhysicalHands at runtime
 - (Fiducial Marker Tracking) Fiducial Marker Tracking support using AprilTag
 
