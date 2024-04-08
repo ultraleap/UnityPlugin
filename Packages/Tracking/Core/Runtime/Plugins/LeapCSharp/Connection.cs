@@ -206,13 +206,13 @@ namespace LeapInternal
                 }
             }
 
-            //
-            var str = MetadataUtil.GetMetaData();
-            UIntPtr uIntPtr = new UIntPtr((uint)str.Length);
+            // Produce metadata to send before connection is opened
+            string metadata = MetadataUtil.GetMetaData();
+            UIntPtr uIntPtr = new UIntPtr((uint)metadata.Length);
 
-            if (str != null && str != "")
+            if (metadata != null && metadata != "")
             {
-                LeapC.SetConnectionMetadata(_leapConnection, str, uIntPtr);
+                LeapC.SetConnectionMetadata(_leapConnection, metadata, uIntPtr);
             }
 
             result = LeapC.OpenConnection(_leapConnection);

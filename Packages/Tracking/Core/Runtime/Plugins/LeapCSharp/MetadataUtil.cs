@@ -12,9 +12,16 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Rendering;
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 namespace Leap
 {
-    public static class MetadataUtil
+#if UNITY_EDITOR
+    [InitializeOnLoad]
+#endif
+    public class MetadataUtil
     {
         [System.Serializable]
         private struct Analytics
@@ -34,6 +41,24 @@ namespace Leap
             public string interaction_system;
             public string render_pipeline;
         }
+
+#if UNITY_EDITOR
+
+        // Fire a one-off call to capture metadata at edit time on the first editor update
+        static MetadataUtil() 
+        {
+            EditorApplication.update += FirstEditorUpdate;
+        }
+
+        static void FirstEditorUpdate()
+        {
+            EditorApplication.update -= FirstEditorUpdate;
+
+            // This will capture some values within the editor that may not be accessible in builds
+            //  e.g. Plugin Source and Plugin Versions
+            GetMetaData();
+        }
+#endif
 
         public static string GetMetaData()
         {
