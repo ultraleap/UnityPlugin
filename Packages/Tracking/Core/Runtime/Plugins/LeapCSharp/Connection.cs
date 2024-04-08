@@ -205,7 +205,18 @@ namespace LeapInternal
                     return;
                 }
             }
+
+            // Produce metadata to send before connection is opened
+            string metadata = MetadataUtil.GetMetaData();
+            UIntPtr uIntPtr = new UIntPtr((uint)metadata.Length);
+
+            if (metadata != null && metadata != "")
+            {
+                LeapC.SetConnectionMetadata(_leapConnection, metadata, uIntPtr);
+            }
+
             result = LeapC.OpenConnection(_leapConnection);
+
             if (result != eLeapRS.eLeapRS_Success)
             {
                 reportAbnormalResults("LeapC OpenConnection call was ", result);
