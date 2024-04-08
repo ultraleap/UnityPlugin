@@ -12,14 +12,16 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
-
 namespace Leap
 {
+    /// <summary>
+    /// This class captures information regarding use of the Ultraleap Unity Plugin
+    /// This data is anonymized and only sent to Ultraleap when you choose to allow it.
+    /// You can change your analytics preferences in the Ultraleap Tracking Control Panel.
+    ///     "Settings > Help Improve Tracking"
+    /// </summary>
 #if UNITY_EDITOR
-    [InitializeOnLoad]
+    [UnityEditor.InitializeOnLoad]
 #endif
     public class MetadataUtil
     {
@@ -43,16 +45,16 @@ namespace Leap
         }
 
 #if UNITY_EDITOR
-
         // Fire a one-off call to capture metadata at edit time on the first editor update
         static MetadataUtil() 
         {
-            EditorApplication.update += FirstEditorUpdate;
+            UnityEditor.EditorApplication.update -= FirstEditorUpdate;
+            UnityEditor.EditorApplication.update += FirstEditorUpdate;
         }
 
         static void FirstEditorUpdate()
         {
-            EditorApplication.update -= FirstEditorUpdate;
+            UnityEditor.EditorApplication.update -= FirstEditorUpdate;
 
             // This will capture some values within the editor that may not be accessible in builds
             //  e.g. Plugin Source and Plugin Versions
