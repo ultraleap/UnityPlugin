@@ -149,7 +149,7 @@ namespace Leap.Unity
                 {
                     LeapServiceProvider provider = UnityEngine.Object.FindObjectOfType<LeapServiceProvider>(true);
 
-                    if (provider != null)
+                    if (provider != null && provider.GetLeapController() != null)
                     {
                         _leapController = provider.GetLeapController();
                     }
