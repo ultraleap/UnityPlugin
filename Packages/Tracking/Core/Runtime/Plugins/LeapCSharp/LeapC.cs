@@ -1044,6 +1044,9 @@ namespace LeapInternal
         [DllImport("LeapC", EntryPoint = "LeapOpenConnection")]
         public static extern eLeapRS OpenConnection(IntPtr hConnection);
 
+        [DllImport("LeapC", EntryPoint = "LeapSetConnectionMetadata")]
+        public static extern eLeapRS SetConnectionMetadata(IntPtr hConnection, string metadata, UIntPtr len);
+
         [DllImport("LeapC", EntryPoint = "LeapSetAllocator")]
         public static extern eLeapRS SetAllocator(IntPtr hConnection, ref LEAP_ALLOCATOR pAllocator);
 
