@@ -76,11 +76,6 @@ namespace LeapInternal
         private Thread _polster;
 
         /// <summary>
-        /// Has the connection been set up in multi device aware mode
-        /// </summary>
-        private bool _multiDeviceAwareConnection = false;
-
-        /// <summary>
         /// Minimum service version that support setting the tracking mode on a per dervice basis
         /// </summary>
         private static LEAP_VERSION MinServiceVersionForMultiModeSupport = new LEAP_VERSION() { major = 5, minor = 4, patch = 4 };
@@ -156,10 +151,6 @@ namespace LeapInternal
             if (_disposed)
                 return;
 
-            if (disposing)
-            {
-            }
-
             Stop();
             LeapC.DestroyConnection(_leapConnection);
             _leapConnection = IntPtr.Zero;
@@ -186,9 +177,8 @@ namespace LeapInternal
         {
             LEAP_CONNECTION_CONFIG config = new LEAP_CONNECTION_CONFIG();
             config.server_namespace = Marshal.StringToHGlobalAnsi(serverNamespace);
-            config.flags = multiDeviceAware ? (uint)eLeapConnectionFlag.eLeapConnectionFlag_MultipleDevicesAware : 0;
+            config.flags = (uint)eLeapConnectionFlag.eLeapConnectionFlag_MultipleDevicesAware;
             config.size = (uint)Marshal.SizeOf(config);
-            _multiDeviceAwareConnection = multiDeviceAware;
             Start(config);
         }
 
@@ -215,7 +205,18 @@ namespace LeapInternal
                     return;
                 }
             }
+
+            // Produce metadata to send before connection is opened
+            string metadata = MetadataUtil.GetMetaData();
+            UIntPtr uIntPtr = new UIntPtr((uint)metadata.Length);
+
+            if (metadata != null && metadata != "")
+            {
+                LeapC.SetConnectionMetadata(_leapConnection, metadata, uIntPtr);
+            }
+
             result = LeapC.OpenConnection(_leapConnection);
+
             if (result != eLeapRS.eLeapRS_Success)
             {
                 reportAbnormalResults("LeapC OpenConnection call was ", result);
@@ -583,7 +584,6 @@ namespace LeapInternal
             }
 
             Marshal.FreeHGlobal(trackingBuffer);
-
         }
 
         public void GetInterpolatedLeftRightTransform(Int64 time,
@@ -880,23 +880,13 @@ namespace LeapInternal
             UInt64 clearFlags = (ulong)FlagForPolicy(clear);
             eLeapRS result;
 
-            if (device == null || !_multiDeviceAwareConnection)
+            if(device != null && Controller.CheckRequiredServiceVersion(MinServiceVersionForMultiModeSupport, this))
             {
-                result = LeapC.SetPolicyFlags(_leapConnection, setFlags, clearFlags);
+                result = LeapC.SetPolicyFlagsEx(_leapConnection, device.Handle, setFlags, clearFlags);
             }
             else
             {
-                if (!Controller.CheckRequiredServiceVersion(MinServiceVersionForMultiModeSupport, this))
-                {
-                    UnityEngine.Debug.LogWarning(String.Format("Your current tracking service does not support setting policy flags on a per device basis (min version is {0}.{1}.{2}). Please update your service: https://developer.leapmotion.com/tracking-software-download",
-                        MinServiceVersionForMultiModeSupport.major,
-                        MinServiceVersionForMultiModeSupport.minor,
-                        MinServiceVersionForMultiModeSupport.patch));
-
-                    return;
-                }
-
-                result = LeapC.SetPolicyFlagsEx(_leapConnection, device.Handle, setFlags, clearFlags);
+                result = LeapC.SetPolicyFlags(_leapConnection, setFlags, clearFlags);
             }
 
             reportAbnormalResults("LeapC SetAndClearPolicy call was ", result);
@@ -908,23 +898,13 @@ namespace LeapInternal
 
             eLeapRS result;
 
-            if (device == null || !_multiDeviceAwareConnection)
+            if (device != null && Controller.CheckRequiredServiceVersion(MinServiceVersionForMultiModeSupport, this))
             {
-                result = LeapC.SetPolicyFlags(_leapConnection, setFlags, 0);
+                result = LeapC.SetPolicyFlagsEx(_leapConnection, device.Handle, setFlags, 0);
             }
             else
             {
-                if (!Controller.CheckRequiredServiceVersion(MinServiceVersionForMultiModeSupport, this))
-                {
-                    UnityEngine.Debug.LogWarning(String.Format("Your current tracking service does not support setting policy flags on a per device basis (min version is {0}.{1}.{2}). Please update your service: https://developer.leapmotion.com/tracking-software-download",
-                        MinServiceVersionForMultiModeSupport.major,
-                        MinServiceVersionForMultiModeSupport.minor,
-                        MinServiceVersionForMultiModeSupport.patch));
-
-                    return;
-                }
-
-                result = LeapC.SetPolicyFlagsEx(_leapConnection, device.Handle, setFlags, 0);
+                result = LeapC.SetPolicyFlags(_leapConnection, setFlags, 0);
             }
 
             reportAbnormalResults("LeapC SetPolicyFlags call was ", result);
@@ -936,23 +916,13 @@ namespace LeapInternal
 
             eLeapRS result;
 
-            if (device == null || !_multiDeviceAwareConnection)
+            if (device != null && Controller.CheckRequiredServiceVersion(MinServiceVersionForMultiModeSupport, this))
             {
-                result = LeapC.SetPolicyFlags(_leapConnection, 0, clearFlags);
+                result = LeapC.SetPolicyFlagsEx(_leapConnection, device.Handle, 0, clearFlags);
             }
             else
             {
-                if (!Controller.CheckRequiredServiceVersion(MinServiceVersionForMultiModeSupport, this))
-                {
-                    UnityEngine.Debug.LogWarning(String.Format("Your current tracking service does not support clearing policy flags on a per device basis (min version is {0}.{1}.{2}). Please update your service: https://developer.leapmotion.com/tracking-software-download",
-                        MinServiceVersionForMultiModeSupport.major,
-                        MinServiceVersionForMultiModeSupport.minor,
-                        MinServiceVersionForMultiModeSupport.patch));
-
-                    return;
-                }
-
-                result = LeapC.SetPolicyFlagsEx(_leapConnection, device.Handle, 0, clearFlags);
+                result = LeapC.SetPolicyFlags(_leapConnection, 0, clearFlags);
             }
 
             reportAbnormalResults("LeapC SetPolicyFlags call was ", result);
