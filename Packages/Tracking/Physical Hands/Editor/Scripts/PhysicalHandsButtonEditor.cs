@@ -6,6 +6,7 @@ using UnityEditor;
 namespace Leap.Unity.PhysicalHands
 {
     [CustomEditor(typeof(PhysicalHandsButtonBase), true)]
+    [CanEditMultipleObjects]
     public class PhysicalHandsButtonEditor : CustomEditorBase<PhysicalHandsButtonBase>
     {
         private bool eventsFoldedOut = false;
