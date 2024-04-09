@@ -259,4 +259,19 @@ namespace Leap.Unity.HandsModule
             return leapHand;
         }
     }
+
+    /// <summary>
+    /// Used to define what bones names are valid for each finger
+    /// </summary>
+    [System.Serializable]
+    public static class BoneNameDefinitions
+    {
+        public static string[] DefinitionThumb = { "thumb" };
+        public static string[] DefinitionIndex = { "index" };
+        public static string[] DefinitionMiddle = { "middle" };
+        public static string[] DefinitionRing = { "ring" };
+        public static string[] DefinitionPinky = { "pinky", "little" };
+        public static string[] DefinitionWrist = { "wrist", "hand", "palm" };
+        public static string[] DefinitionElbow = { "elbow", "lowerArm", "forearm" };
+    }
 }

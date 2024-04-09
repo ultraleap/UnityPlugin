@@ -21,6 +21,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (Physical Hands) Ability to ignore collisions on single object or all children
 - (Physical Hands) Added toggle to GrabHelper to allow kinematic object movement
 - (Physical Hands) Ignore Physical hands component can now choose which hand(s) it should be applied to
+- (Physical Hands) Edit time representation of hands via Physical Hands Manager
+- (Attachment Hands) Do not show warning again this session when deleting attachment points
+- (Optional) Metadata capture to help improve the Plugin
+- (Physical Hands) Ability to create IgnorePhysicalHands at runtime
+- (Fiducial Marker Tracking) Fiducial Marker Tracking support using AprilTag
 
 ### Changed
 - (Config) Additional uses of Config marked as Obsolete
@@ -31,8 +36,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (Hand Rays) Exposed dot product used to test if the hand is facing camera
 - (Hinting) Added support for startup setting of Hand Tracking Hints via the Ultraleap Settings window
 - (Hinting) Added support for runtime changing of Hand Tracking Hints via static HandTrackingHintManager
+- (Hinting) Added support for setting OpenXR Hand Tracking Hints via the OpenXR HandTrackingFeature
 - Access of Physical Hands extensions
 - Added public accessors to various Physical Hands utilities
+- Unified use of TrackedPoseDrivers across XR LeapProviders
 
 ### Fixed
 - Errors in Editor when using pre-2023.3.18 LTS due to FindObjectByType issue
@@ -46,7 +53,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (UI Input Preview) Null UIInput events cause unnecessary error logs
 - Memory increase when repeatedly opening scenes with LeapServiceProviders
 - ThreadAbort when changing scenes in editor that use multidevice or display the tracking device gizmo
-
+- (LeapServiceProvider) OnDeviceChanged event is not raised when multidevice mode is disabled
+- (LeapXRServiceProvider) LeapXRServiceProvider wrongly uses transform relative to camera when offset mode set to transform
+- (Hand Binder) incorrect upperArm name definition for elbow joint
+- (Physical Hands) Soft Contact NAN collider error when using OpenXR tracking on Android devices
+- (Physical Hands) Hand stuck in pose, unable to grab if object is disabled while grabbing
+- (Physical Hands) Errors when destroying objects that are grabbed
+- (Physical Hands) Errors when adding Physical Hands Manager prefab for the first time
 
 
 ## [6.14.0] - 24/01/24

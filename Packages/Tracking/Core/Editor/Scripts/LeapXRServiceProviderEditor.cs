@@ -64,6 +64,14 @@ namespace Leap.Unity
             },
                                       "_deviceOrigin");
 
+            specifyConditionalDrawing(() =>
+            {
+                return serializedObject
+                         .FindProperty("_deviceOffsetMode")
+                           .enumValueIndex != 2;
+            },
+                          "_positionDeviceRelativeToMainCamera");
+
             addPropertyToFoldout("_deviceOffsetMode", "Advanced Options");
             addPropertyToFoldout("_temporalWarpingMode", "Advanced Options");
             addPropertyToFoldout("_customWarpAdjustment", "Advanced Options");
