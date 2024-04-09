@@ -1,3 +1,12 @@
+/******************************************************************************
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
+ *                                                                            *
+ * Use subject to the terms of the Apache License 2.0 available at            *
+ * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
+ * between Ultraleap and you, your company or other organization.             *
+ ******************************************************************************/
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -7,34 +16,9 @@ namespace Leap.Unity
 {
     public static class HandTrackingHintManager
     {
-        static List<string> currentHints = new List<string>();
+        private static List<string> currentHints = new List<string>();
 
-        static Controller _leapController;
-        static Controller LeapController
-        {
-            get
-            {
-                if (_leapController == null) // Find any existing controller
-                {
-                    LeapServiceProvider provider = Object.FindObjectOfType<LeapServiceProvider>(true);
-
-                    if (provider != null)
-                    {
-                        _leapController = provider.GetLeapController();
-                    }
-                    else // No leapserviceprovider, we should make a new controller ourselves
-                    {
-                        _leapController = new Controller(0, "Leap Service");
-                    }
-                }
-
-                return _leapController;
-            }
-            set
-            {
-                _leapController = value;
-            }
-        }
+        public static Action<string[]> OnOpenXRHintRequest;
 
         /// <summary>
         /// Capture the values in UltraleapSettings and set up the setting of those hints when the first device is discovered
@@ -42,16 +26,18 @@ namespace Leap.Unity
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void StartupHints()
         {
-            LeapController.Device -= NewLeapDevice;
-            LeapController.Device += NewLeapDevice;
-
             currentHints = UltraleapSettings.Instance.startupHints.ToList();
-        }
 
-        /// <summary>
-        /// Re-request all hints when new devices connect
-        private static void NewLeapDevice(object sender, DeviceEventArgs e)
-        {
+            if (HandTrackingSourceUtility.LeapOpenXRHintingAvailable)
+            { 
+                // Use OpenXR for Hints
+            }
+            else
+            {
+                // Use a LeapC connection for Hints
+                SetupDeviceCallbacks();
+            }
+
             RequestAllExistingHints();
         }
 
@@ -93,7 +79,10 @@ namespace Leap.Unity
         /// </summary>
         public static void RequestAllExistingHints()
         {
-            RequestHandTrackingHints(currentHints.ToArray());
+            if (currentHints.Count != 0)
+            {
+                RequestHandTrackingHints(currentHints.ToArray());
+            }
         }
 
         /// <summary>
@@ -107,22 +96,30 @@ namespace Leap.Unity
                 hints = new string[0];
             }
 
-            // Send the hint to all devices
-            foreach (var device in LeapController.Devices.ActiveDevices)
-            {
-                LeapController.RequestHandTrackingHints(hints, device);
-            }
-
             currentHints = hints.ToList();
 
+            string sourceName = "LeapC";
+
+            if (HandTrackingSourceUtility.LeapOpenXRHintingAvailable)
+            {
+                // Use OpenXR for Hints
+                OnOpenXRHintRequest?.Invoke(hints);
+                sourceName = "OpenXR";
+            }
+            else
+            {
+                // Use a LeapC connection for Hints
+                RequestHintsOnAllDevices(hints);
+            }
+
             // Log the results
-            LogRequestedHints(hints);
+            LogRequestedHints(hints, sourceName);
         }
 
-        static void LogRequestedHints(string[] hints)
+        static void LogRequestedHints(string[] hints, string sourceName)
         {
             // Log the requeste hints
-            string logString = "Hand Tracking Hints have been requested:";
+            string logString = sourceName + " Hand Tracking Hints have been requested:";
 
             if (hints.Length > 0)
             {
@@ -135,10 +132,63 @@ namespace Leap.Unity
             }
             else
             {
-                logString = "Hand Tracking Hints have been cleared";
+                logString = sourceName + " Hand Tracking Hints have been cleared";
             }
 
             Debug.Log(logString);
         }
+
+        #region LeapC Implementation
+
+        static Controller _leapController;
+        static Controller LeapController
+        {
+            get
+            {
+                if (_leapController == null) // Find any existing controller
+                {
+                    LeapServiceProvider provider = UnityEngine.Object.FindObjectOfType<LeapServiceProvider>(true);
+
+                    if (provider != null && provider.GetLeapController() != null)
+                    {
+                        _leapController = provider.GetLeapController();
+                    }
+                    else // No leapserviceprovider, we should make a new controller ourselves
+                    {
+                        _leapController = new Controller(0);
+                    }
+                }
+
+                return _leapController;
+            }
+            set
+            {
+                _leapController = value;
+            }
+        }
+
+        private static void SetupDeviceCallbacks()
+        {
+            LeapController.Device -= NewLeapDevice;
+            LeapController.Device += NewLeapDevice;
+        }
+
+        /// <summary>
+        /// Re-request all hints when new devices connect
+        private static void NewLeapDevice(object sender, DeviceEventArgs e)
+        {
+            RequestAllExistingHints();
+        }
+
+        private static void RequestHintsOnAllDevices(string[] hints)
+        {
+            // Send the hint to all devices
+            foreach (var device in LeapController.Devices.ActiveDevices)
+            {
+                LeapController.RequestHandTrackingHints(hints, device);
+            }
+        }
+
+        #endregion
     }
 }
