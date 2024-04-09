@@ -261,15 +261,20 @@ namespace Leap
 
         internal Pose FindDeviceTransform()
         {
+            // Check the service has valid support for device transforms
+            LEAP_VERSION minimumServiceVersion = new LEAP_VERSION { major = 5, minor = 19, patch = 0 };
+            // Check the device transform is available before asking for one
             bool deviceTransformAvailable = LeapC.GetDeviceTransformAvailable(Handle);
 
-            if (!deviceTransformAvailable)
+            if (!deviceTransformAvailable ||
+                !ServerStatus.IsServiceVersionValid(minimumServiceVersion))
             {
                 devicePose = Pose.identity;
                 poseSet = true;
                 return Pose.identity;
             }
 
+            // Get the device transform data and check it is valid as data
             float[] data = new float[16];
             eLeapRS result = LeapC.GetDeviceTransform(Handle, data);
 
@@ -300,13 +305,6 @@ namespace Leap
             //// An example of applying a rotation to the existing device transform
             //Matrix4x4 rotationMatrix = Matrix4x4.Rotate(Quaternion.Euler(0, 90, 0));
             //deviceTransform = deviceTransform * rotationMatrix;
-
-            if (deviceTransform == Matrix4x4.identity)
-            {
-                devicePose = Pose.identity;
-                poseSet = true;
-                return Pose.identity;
-            }
 
             Matrix4x4 openXRToUnitySwizzle = new Matrix4x4(
                                                 new Vector4(1.0f, 0, 0, 0),
