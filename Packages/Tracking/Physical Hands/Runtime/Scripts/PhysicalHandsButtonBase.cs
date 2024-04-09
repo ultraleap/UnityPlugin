@@ -64,6 +64,20 @@ namespace Leap.Unity.PhysicalHands
         [SerializeField]
         public UnityEvent<ContactHand> OnHandHoverExit;
 
+
+        #region public getters
+        public bool IsPressed
+        {
+            get
+            {
+                return _isButtonPressed;
+            }
+        }
+
+        #endregion
+
+
+
 #if UNITY_EDITOR
         public void UpdateDistanceValues()
         {
@@ -105,16 +119,6 @@ namespace Leap.Unity.PhysicalHands
         private void Start()
         {
             Initialize();
-        }
-
-        private void OnDestroy()
-        {
-            _buttonHelper._onHandContact -= OnHandContactPO;
-            _buttonHelper._onHandContactExit -= OnHandContactExitPO;
-            _buttonHelper._onHandHover -= OnHandHoverPO;
-            _buttonHelper._onHandHoverExit -= OnHandHoverExitPO;
-            _buttonHelper._onCollisionEnter -= OnCollisionPO;
-            _buttonHelper._onCollisionExit -= OnCollisionExitPO;
         }
 
         /// <summary>

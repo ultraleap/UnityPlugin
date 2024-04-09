@@ -81,8 +81,6 @@ namespace Leap.Unity.PhysicalHands
     [CustomEditor(typeof(PhysicalHandsButtonToggle), true)]
     public class PhysicalHandsButtonToggleEditor : PhysicalHandsButtonEditor
     {
-        private bool eventsFoldedOut = false;
-
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
