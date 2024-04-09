@@ -14,6 +14,8 @@ namespace Leap.Unity.PhysicalHands
     [RequireComponent(typeof(PhysicalHandsManager))]
     public class GrabHelper : MonoBehaviour
     {
+        public static GrabHelper Instance;
+
         [SerializeField]
         private PhysicalHandsManager physicalHandsManager;
 
@@ -39,6 +41,16 @@ namespace Leap.Unity.PhysicalHands
         private HashSet<Rigidbody> _previousHoveredRigids = new HashSet<Rigidbody>();
 
         #endregion
+
+        private void Awake()
+        {
+            if(Instance != null)
+            {
+                Debug.LogWarning("Having multiple GrabHelpers at once is not supported");
+            }
+
+            Instance = this;
+        }
 
         private void OnEnable()
         {
@@ -278,19 +290,20 @@ namespace Leap.Unity.PhysicalHands
                     {
                         // Ensure we release the object first
                         _grabHelperObjects[rigid].ReleaseObject();
-
-                        foreach (var bone in _leftContactHand.bones)
-                        {
-                            bone.RemoveGrabbing(rigid);
-                        }
-                        foreach (var bone in _rightContactHand.bones)
-                        {
-                            bone.RemoveGrabbing(rigid);
-                        }
                     }
                     _grabHelperObjects[rigid].ReleaseHelper();
                     _grabHelperObjects.Remove(rigid);
                 }
+
+                foreach (var bone in _leftContactHand.bones)
+                {
+                    bone.RemoveGrabbing(rigid);
+                }
+                foreach (var bone in _rightContactHand.bones)
+                {
+                    bone.RemoveGrabbing(rigid);
+                }
+
                 return true;
             }
             return false;
@@ -349,6 +362,18 @@ namespace Leap.Unity.PhysicalHands
             }
             return false;
         }
+
+        /// <summary>
+        /// Populate helperObject with the GrabHelperObject associated with the provided Rigidbody if there is one.
+        /// </summary>
+        /// <param name="rigid">The Rigidbody to find the associated GrabHelperObject</param>
+        /// <param name="helperObject">A GrabHelperObject to be populated if one is available</param>
+        /// <returns>True if there is a GrabHelperObject associated with the provided Rigidbody</returns>
+        public bool TryGetGrabHelperObjectFromRigid(Rigidbody rigid, out GrabHelperObject helperObject)
+        {
+            return _grabHelperObjects.TryGetValue(rigid, out helperObject);
+        }
+
         #endregion
 
         private void OnValidate()

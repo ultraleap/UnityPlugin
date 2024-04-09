@@ -540,7 +540,16 @@ namespace LeapInternal
         /// <summary>
         /// A new head pose is available.
         /// </summary>
-        eLeapEventType_IMU
+        eLeapEventType_IMU,
+        /// <summary>
+        /// Notification that the service received a new device transformation matrix
+        /// Use LeapGetDeviceTransform to update your cached information.
+        /// </summary>
+        eLeapEventType_NewDeviceTransform,
+        /// <summary>
+        /// An event provided when a fiducial marker has been tracked
+        /// </summary>
+        eLeapEventType_Fiducial
     };
 
     public enum eLeapDeviceFlag : uint
@@ -974,6 +983,18 @@ namespace LeapInternal
         public string zoneName;
     }
 
+    [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
+    public struct LEAP_FIDUCIAL_POSE_EVENT
+    {
+        public int id;
+        public IntPtr family; // char*
+        public float size;
+        public Int64 timestamp;
+        public float estimated_error;
+        public LEAP_VECTOR translation;
+        public LEAP_QUATERNION rotation;
+    }
+
     public class LeapC
     {
         private LeapC() { }
@@ -1022,6 +1043,9 @@ namespace LeapInternal
 
         [DllImport("LeapC", EntryPoint = "LeapOpenConnection")]
         public static extern eLeapRS OpenConnection(IntPtr hConnection);
+
+        [DllImport("LeapC", EntryPoint = "LeapSetConnectionMetadata")]
+        public static extern eLeapRS SetConnectionMetadata(IntPtr hConnection, string metadata, UIntPtr len);
 
         [DllImport("LeapC", EntryPoint = "LeapSetAllocator")]
         public static extern eLeapRS SetAllocator(IntPtr hConnection, ref LEAP_ALLOCATOR pAllocator);
