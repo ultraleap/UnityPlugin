@@ -3,11 +3,9 @@ using Leap.Unity;
 using Leap.Unity.Encoding;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+
 using UnityEngine;
-using UnityEngine.SpatialTracking;
-using UnityEngine.XR.Management;
-using UnityEngine.XR.OpenXR;
+
 using Bone = Leap.Bone;
 using Hand = Leap.Hand;
 
@@ -83,21 +81,13 @@ namespace Ultraleap.Tracking.OpenXR
                 return _trackingSource;
             }
 
-            if (XRGeneralSettings.Instance != null &&
-                XRGeneralSettings.Instance.Manager != null &&
-                XRGeneralSettings.Instance.Manager.ActiveLoaderAs<OpenXRLoaderBase>() != null &&
-                OpenXRSettings.Instance != null &&
-                OpenXRSettings.Instance.GetFeature<HandTrackingFeature>() != null &&
-                OpenXRSettings.Instance.GetFeature<HandTrackingFeature>().SupportsHandTracking)
+            if(HandTrackingSourceUtility.LeapOpenXRTrackingAvailable)
             {
-                if (OpenXRSettings.Instance.GetFeature<HandTrackingFeature>().IsUltraleapHandTracking)
-                {
-                    _trackingSource = TrackingSource.OPENXR_LEAP;
-                }
-                else
-                {
-                    _trackingSource = TrackingSource.OPENXR;
-                }
+                _trackingSource = TrackingSource.OPENXR_LEAP;
+            }
+            else if(HandTrackingSourceUtility.NonLeapOpenXRTrackingAvailable)
+            {
+                _trackingSource = TrackingSource.OPENXR;
             }
             else
             {

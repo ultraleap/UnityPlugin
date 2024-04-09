@@ -754,13 +754,11 @@ namespace Leap.Unity
         /// </summary>
         public Controller GetLeapController()
         {
-#if UNITY_EDITOR
             // Null check to deal with hot reloading.
             if (!_isDestroyed && _leapController == null)
             {
                 createController();
             }
-#endif
 
             return _leapController;
         }
@@ -1100,21 +1098,9 @@ namespace Leap.Unity
                 return _trackingSource;
             }
 
-#if UNITY_ANDROID && !UNITY_EDITOR
-            if(AndroidServiceBinder.Bind())
+            if(HandTrackingSourceUtility.LeapCTrackingAvailable)
             {
                 _trackingSource = TrackingSource.LEAPC;
-                return _trackingSource;
-            }
-#endif
-
-            if (LeapInternal.Connection.IsConnectionAvailable(_serverNameSpace))
-            {
-                _trackingSource = TrackingSource.LEAPC;
-            }
-            else
-            {
-                _trackingSource = TrackingSource.NONE;
             }
 
             return _trackingSource;
