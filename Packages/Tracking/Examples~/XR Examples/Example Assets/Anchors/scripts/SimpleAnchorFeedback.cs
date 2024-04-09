@@ -9,7 +9,7 @@
 using Leap.Unity.Interaction;
 using UnityEngine;
 
-namespace Leap.InteractionEngine.Examples
+namespace Leap.Unity.Examples
 {
 
     [RequireComponent(typeof(Leap.Unity.Interaction.Anchor))]

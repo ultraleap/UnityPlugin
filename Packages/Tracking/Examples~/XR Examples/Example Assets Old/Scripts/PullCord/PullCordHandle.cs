@@ -71,8 +71,6 @@ namespace Leap.Unity.Examples
 
         private List<Hand> _relevanthands = new List<Hand>();
         private Hand _mostRelevantHand = null;
-        private bool _isHovered = false;
-        private bool _isGrabbed = false;
 
 
         private void OnEnable()
@@ -98,7 +96,7 @@ namespace Leap.Unity.Examples
                 {
                     hand = _mostRelevantHand;
                 }
-                
+
 
                 if (!_wasHovered)
                 {
@@ -125,8 +123,8 @@ namespace Leap.Unity.Examples
                 _wasHovered = false;
                 if (OnStateChanged != null) OnStateChanged.Invoke(PullCordState.Default);
             }
-            
-            if(!_isPinching)
+
+            if (!_isPinching)
                 transform.position = SpringPosition(transform.position, _handlePositionTarget);
         }
 
@@ -195,7 +193,7 @@ namespace Leap.Unity.Examples
 
         void IPhysicalHandHover.OnHandHover(ContactHand hand)
         {
-            if(!_relevanthands.Contains(hand.GetDataHand()))
+            if (!_relevanthands.Contains(hand.GetDataHand()))
             {
                 _relevanthands.Add(hand.GetDataHand());
             }
@@ -220,25 +218,7 @@ namespace Leap.Unity.Examples
 
         Hand GetClosestHand()
         {
-            Hand closestHand = null;
-            float closestDist = float.PositiveInfinity;
-            if (_relevanthands.Count > 0)
-            {
-                foreach (var hand in _relevanthands)
-                {
-                    float distanceFromHand = Vector3.Distance(hand.PalmPosition, this.transform.position);
-                    if (closestHand == null || distanceFromHand < closestDist)
-                    {
-                        closestHand = hand;
-                        closestDist = distanceFromHand;
-                    }
-                }
-                return closestHand;
-            }
-            else
-            {
-                return null;
-            }
+            return PhysicalHandUtils.ClosestHand(_relevanthands, this.gameObject);
         }
     }
 }

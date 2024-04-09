@@ -136,7 +136,6 @@ MonoBehaviour:
   _twoDimStartPosition: {x: 0, y: 0}
   _axisChangeFromZero: {x: 0, y: 0, z: 0}
   _connectedButton: {fileID: 3123228626530530032}
-  _freezeIfNotActive: 1
   _sliderValue: {x: 0, y: 0, z: 0}
 --- !u!1 &3123228626684123901
 GameObject:
@@ -293,7 +292,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4922757518265915803, guid: c82cc7fb77a584f46ac8f02c38c084da, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 0.0058
       objectReference: {fileID: 0}
     - target: {fileID: 4922757518265915803, guid: c82cc7fb77a584f46ac8f02c38c084da, type: 3}
       propertyPath: m_LocalPosition.z

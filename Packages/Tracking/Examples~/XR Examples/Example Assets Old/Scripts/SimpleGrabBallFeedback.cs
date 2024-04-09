@@ -9,7 +9,7 @@
 using Leap.Unity.Interaction;
 using UnityEngine;
 
-namespace Leap.InteractionEngine.Examples
+namespace Leap.Unity.Examples
 {
     /// <summary>
     /// Displays a GrabBalls current state by representing restricted areas with a ghostedMesh and scaling the defaultMesh when close to interaction.
@@ -68,7 +68,7 @@ namespace Leap.InteractionEngine.Examples
             }
             defaultMesh.transform.localScale = Vector3.Lerp(defaultMesh.transform.localScale, (expanded) ? expandedScale : minimisedScale, Time.deltaTime * lerpTime);
 
-            if (grabBall.grabBallRestrictionStatus.IsRestricted && 
+            if (grabBall.grabBallRestrictionStatus.IsRestricted &&
                 ((grabBall.grabBallInteractionBehaviour != null && grabBall.grabBallInteractionBehaviour.isGrasped) || grabBall.IsGrabbed))
             {
                 ghostedMesh.gameObject.SetActive(true);

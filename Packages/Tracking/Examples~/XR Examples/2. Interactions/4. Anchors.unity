@@ -2961,9 +2961,21 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 545972869}
     m_Modifications:
+    - target: {fileID: 186018206, guid: 73dde5b40fafb9f439cae744996d7913, type: 3}
+      propertyPath: m_ProjectionMode
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1694853242601310, guid: 73dde5b40fafb9f439cae744996d7913, type: 3}
       propertyPath: m_Name
       value: Dynamic UI Object (Red)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1901877815069510, guid: 73dde5b40fafb9f439cae744996d7913, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1949620407777668, guid: 73dde5b40fafb9f439cae744996d7913, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4915746110913560, guid: 73dde5b40fafb9f439cae744996d7913, type: 3}
       propertyPath: m_RootOrder
