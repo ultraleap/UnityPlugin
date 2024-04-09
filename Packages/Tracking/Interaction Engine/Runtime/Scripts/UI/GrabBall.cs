@@ -72,16 +72,7 @@ namespace Leap.Unity.Interaction
         {
             get
             {
-                float shortestDistance = float.PositiveInfinity;
-                foreach (var hand in _grabbedHands)
-                {
-                    float handDistance = Vector3.Distance(hand.palmBone.transform.position, this.transform.position);
-                    if (handDistance < shortestDistance)
-                    {
-                        shortestDistance = handDistance;
-                    }
-                }
-                return shortestDistance;
+                return PhysicalHandUtils.ClosestHandDistance(_grabbedHands, this.gameObject);
             }
         }
 
