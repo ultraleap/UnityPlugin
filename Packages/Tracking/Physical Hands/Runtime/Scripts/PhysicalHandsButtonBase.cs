@@ -78,41 +78,39 @@ namespace Leap.Unity.PhysicalHands
 
 
 
-#if UNITY_EDITOR
+
         public void UpdateDistanceValues()
         {
-            if (!Application.isPlaying)
+            if (_automaticOffsetDistance)
             {
-                if (_automaticOffsetDistance)
+                if (GetComponent<MeshFilter>())
                 {
-                    if (GetComponent<MeshFilter>())
-                    {
-                        _buttonTravelOffset = GetComponent<MeshFilter>().sharedMesh.bounds.extents.y;
-                    }
-                    else if (UltraleapSettings.Instance.showPhysicalHandsButtonOffsetWarning == true)
-                    {
-                        if (EditorUtility.DisplayDialog("Could not automatically set offset distance.",
-                            "Could not automatically set offset distance. \n \n Please either add mesh filters to both pressable object and physical hands button or manually set the offset.",
-                            "Do Not Show Again", "Okay"))
-                        {
-                            UltraleapSettings.Instance.showPhysicalHandsButtonOffsetWarning = false;
-                        }
-                        _automaticOffsetDistance = false;
-                    }
-                    else
-                    {
-                        _automaticOffsetDistance = false;
-                    }
+                    _buttonTravelOffset = GetComponent<MeshFilter>().sharedMesh.bounds.extents.y;
                 }
-                if (_automaticTravelDistance)
+#if UNITY_EDITOR
+                else if (UltraleapSettings.Instance.showPhysicalHandsButtonOffsetWarning == true)
                 {
-                    // leave 1mm so the button does not clip into the base obect (assuming same thickness)
-                    _buttonTravelDistance = Mathf.Abs(_pressableObject.transform.localPosition.y) - (_buttonTravelOffset);
+                    if (EditorUtility.DisplayDialog("Could not automatically set offset distance.",
+                        "Could not automatically set offset distance. \n \n Please either add mesh filters to both pressable object and physical hands button or manually set the offset.",
+                        "Do Not Show Again", "Okay"))
+                    {
+                        UltraleapSettings.Instance.showPhysicalHandsButtonOffsetWarning = false;
+                    }
+                    _automaticOffsetDistance = false;
                 }
-
+                else
+                {
+                    _automaticOffsetDistance = false;
+                }
+#endif
+            }
+            if (_automaticTravelDistance)
+            {
+                // leave 1mm so the button does not clip into the base obect (assuming same thickness)
+                _buttonTravelDistance = Mathf.Abs(_pressableObject.transform.localPosition.y) - (_buttonTravelOffset);
             }
         }
-#endif
+
 
         private void Start()
         {
@@ -124,13 +122,15 @@ namespace Leap.Unity.PhysicalHands
         /// </summary>
         private void Initialize()
         {
-            _initialButtonPosition = _pressableObject.transform.localPosition;
+
             if (_pressableObject == null)
             {
                 Debug.LogError("Pressable object not assigned. Please assign one to use the button.");
                 enabled = false;
                 return;
             }
+
+            _initialButtonPosition = _pressableObject.transform.localPosition;
 
             _rigidbody = GetComponent<Rigidbody>();
             _rigidbody.isKinematic = true;
