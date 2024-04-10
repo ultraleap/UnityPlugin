@@ -85,9 +85,7 @@ namespace Leap.Unity.PhysicalHands
             {
                 if (_automaticOffsetDistance)
                 {
-                    if (_pressableObject != null &&
-                        _pressableObject.GetComponent<MeshFilter>() &&
-                        GetComponent<MeshFilter>())
+                    if (GetComponent<MeshFilter>())
                     {
                         _buttonTravelOffset = GetComponent<MeshFilter>().sharedMesh.bounds.extents.y;
                     }
@@ -229,7 +227,7 @@ namespace Leap.Unity.PhysicalHands
             // Set linear limit for button travel
             _configurableJoint.linearLimit = new SoftJointLimit
             {
-                limit = (float)((_buttonTravelDistance - _buttonTravelOffset)* transform.localScale.y)
+                limit = (float)((_buttonTravelDistance )* transform.localScale.y) - (_buttonTravelOffset * transform.localScale.y)
             };
         }
 
@@ -247,7 +245,7 @@ namespace Leap.Unity.PhysicalHands
             float distance = Mathf.Abs(_pressableObject.transform.localPosition.y - _initialButtonPosition.y);
 
             // Check if the button should be pressed
-            if (!_isButtonPressed && distance >= (_buttonTravelDistance - 0.001f) &&
+            if (!_isButtonPressed && distance >= (_buttonTravelDistance - (_buttonTravelOffset) - 0.001f) &&
                 (_contactHandPressing || (_canBePressedByObjects && _objectsContactingButton.Count > 0)))
             {
                 _isButtonPressed = true;
