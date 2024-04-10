@@ -83,7 +83,7 @@ namespace Leap.Unity.PhysicalHands
         {
             if (_automaticOffsetDistance)
             {
-                if (GetComponent<MeshFilter>())
+                if (GetComponent<MeshFilter>() && GetComponent<MeshFilter>().sharedMesh != null)
                 {
                     _buttonTravelOffset = GetComponent<MeshFilter>().sharedMesh.bounds.extents.y;
                 }
@@ -133,8 +133,6 @@ namespace Leap.Unity.PhysicalHands
             _initialButtonPosition = _pressableObject.transform.localPosition;
 
             _rigidbody = GetComponent<Rigidbody>();
-            _rigidbody.isKinematic = true;
-            _rigidbody.constraints = RigidbodyConstraints.FreezeAll;
 
             UpdateDistanceValues();
 
@@ -265,6 +263,7 @@ namespace Leap.Unity.PhysicalHands
         /// </summary>
         protected virtual void ButtonPressed()
         {
+            Debug.Log("ButtonPressed");
             OnButtonPressed?.Invoke();
         }
 

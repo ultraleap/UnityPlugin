@@ -219,15 +219,15 @@ namespace Leap.Unity.PhysicalHands
                 if (_slideableObject.TryGetComponent<PhysicalHandsButtonBase>(out _connectedButton))
                 {
                     // Assign event listeners for button events
-                    _connectedButton.OnButtonPressed.AddListener(ButtonPressed);
-                    _connectedButton.OnButtonUnPressed.AddListener(ButtonUnPressed);
+                    _connectedButton.OnButtonPressed?.AddListener(ButtonPressed);
+                    _connectedButton.OnButtonUnPressed?.AddListener(ButtonUnPressed);
                 }
             }
             else
             {
                 // Assign event listeners for button events
-                _connectedButton.OnButtonPressed.AddListener(ButtonPressed);
-                _connectedButton.OnButtonUnPressed.AddListener(ButtonUnPressed);
+                _connectedButton.OnButtonPressed?.AddListener(ButtonPressed);
+                _connectedButton.OnButtonUnPressed?.AddListener(ButtonUnPressed);
             }
 
             // Freeze or unfreeze slider position based on the flag
@@ -253,7 +253,15 @@ namespace Leap.Unity.PhysicalHands
                 _connectedButton.OnButtonPressed.RemoveListener(ButtonPressed);
                 _connectedButton.OnButtonUnPressed.RemoveListener(ButtonUnPressed);
             }
-            
+        }
+
+        private void OnEnable()
+        {
+            if (_connectedButton != null)
+            {
+                _connectedButton.OnButtonPressed.AddListener(ButtonPressed);
+                _connectedButton.OnButtonUnPressed.AddListener(ButtonUnPressed);
+            }
         }
 
 
