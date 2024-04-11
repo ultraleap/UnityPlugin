@@ -286,9 +286,7 @@ namespace Leap.Unity
 
         public override void OnInspectorGUI()
         {
-            EditorGUI.BeginDisabledGroup(true);
-            EditorGUILayout.ObjectField("Script", MonoScript.FromMonoBehaviour((MonoBehaviour)target), GetType(), false);
-            EditorGUI.EndDisabledGroup();
+            EditorUtils.DrawScriptField((MonoBehaviour)target);
 
             HandPoseDetector poseDetectionScript = (HandPoseDetector)target;
 
