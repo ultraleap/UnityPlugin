@@ -263,15 +263,19 @@ namespace Leap
         {
             // Check the service has valid support for device transforms
             LEAP_VERSION minimumServiceVersion = new LEAP_VERSION { major = 5, minor = 19, patch = 0 };
+            if (!ServerStatus.IsServiceVersionValid(minimumServiceVersion))
+            {
+                devicePose = Pose.identity;
+                poseSet = true;
+                return Pose.identity;
+            }
+
             // Check the device transform is available before asking for one
             bool deviceTransformAvailable = LeapC.GetDeviceTransformAvailable(Handle);
 
-            if (!deviceTransformAvailable ||
-                !ServerStatus.IsServiceVersionValid(minimumServiceVersion))
+            if (!deviceTransformAvailable)
             {
-                Debug.Log("Device Transform not available or Service Version too old");
                 devicePose = Pose.identity;
-                poseSet = true;
                 return Pose.identity;
             }
 
@@ -281,10 +285,7 @@ namespace Leap
 
             if (result != eLeapRS.eLeapRS_Success || data == null)
             {
-                Debug.Log("Device Transform not successful or invalid");
-
                 devicePose = Pose.identity;
-                poseSet = true;
                 return Pose.identity;
             }
 
@@ -295,10 +296,6 @@ namespace Leap
                                                 new Vector4(data[4], data[5], data[6], data[7]),
                                                 new Vector4(data[8], data[9], data[10], data[11]),
                                                 new Vector4(data[12], data[13], data[14], data[15]));
-
-
-            Debug.Log("Device Transform: \n" + deviceTransform);
-
 
             ////An example of the expected matrix if it were 8cm forward from the head origin
             //// Unitys matrices are generated as 4 columns:
