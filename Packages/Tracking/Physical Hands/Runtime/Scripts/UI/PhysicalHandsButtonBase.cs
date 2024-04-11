@@ -45,10 +45,10 @@ namespace Leap.Unity.PhysicalHands
         private bool _rightHandContacting = false;
         private Rigidbody _pressableObjectRB = null;
         private Rigidbody _rigidbody = null;
-        private ConfigurableJoint _configurableJoint;
         private Vector3 _initialButtonPosition = Vector3.zero;
         private List<GameObject> _objectsContactingButton = new List<GameObject>();
 
+        protected ConfigurableJoint _configurableJoint;
         protected PhysicalHandsButtonHelper _buttonHelper;
 
         [SerializeField]
@@ -87,24 +87,17 @@ namespace Leap.Unity.PhysicalHands
                 {
                     _buttonTravelOffset = GetComponent<MeshFilter>().sharedMesh.bounds.extents.y;
                 }
-#if UNITY_EDITOR
-                else if (UltraleapSettings.Instance.showPhysicalHandsButtonOffsetWarning == true)
-                {
-                    if (EditorUtility.DisplayDialog("Could not automatically set offset distance.",
-                        "Could not automatically set offset distance. \n \n Please either add mesh filters to both pressable object and physical hands button or manually set the offset.",
-                        "Do Not Show Again", "Okay"))
-                    {
-                        UltraleapSettings.Instance.showPhysicalHandsButtonOffsetWarning = false;
-                    }
-                    _automaticOffsetDistance = false;
-                }
                 else
                 {
-                    _automaticOffsetDistance = false;
+                    Debug.Log(
+                        "Offset distance is based on the button's mesh filter. Please either add a mesh to physical hands button or manually set the offset." +
+                        " Offset defaulted to 0");
+
+                    _buttonTravelOffset = 0;
                 }
-#endif
             }
-            if (_automaticTravelDistance)
+
+            if (_automaticTravelDistance && _pressableObject != null)
             {
                 // leave 1mm so the button does not clip into the base obect (assuming same thickness)
                 _buttonTravelDistance = Mathf.Abs(_pressableObject.transform.localPosition.y) - (_buttonTravelOffset);
@@ -112,7 +105,7 @@ namespace Leap.Unity.PhysicalHands
         }
 
 
-        private void Start()
+        protected virtual void Start()
         {
             Initialize();
         }
@@ -122,7 +115,6 @@ namespace Leap.Unity.PhysicalHands
         /// </summary>
         private void Initialize()
         {
-
             if (_pressableObject == null)
             {
                 Debug.LogError("Pressable object not assigned. Please assign one to use the button.");
@@ -152,8 +144,6 @@ namespace Leap.Unity.PhysicalHands
                 _pressableObjectRB = _pressableObject.AddComponent<Rigidbody>();
                 _pressableObjectRB.useGravity = false;
             }
-
-
 
             // Ensure the pressable object has an IgnorePhysicalHands component
             if (!_pressableObject.TryGetComponent<IgnorePhysicalHands>(out IgnorePhysicalHands ignorePhysHands))
@@ -231,19 +221,22 @@ namespace Leap.Unity.PhysicalHands
 
         private void FixedUpdate()
         {
-            if(_rigidbody.velocity.sqrMagnitude > _buttonVelocityThreshold.sqrMagnitude)
+            if (_freezeButtonTravelOnMovement)
             {
-                FreezePressableMovement();
-            }
-            else
-            {
-                UnFreezePressableMovement();
+                if (_rigidbody?.velocity.sqrMagnitude > _buttonVelocityThreshold.sqrMagnitude)
+                {
+                    FreezePressableMovement();
+                }
+                else
+                {
+                    UnFreezePressableMovement();
+                }
             }
 
             float distance = Mathf.Abs(_pressableObject.transform.localPosition.y - _initialButtonPosition.y);
 
             // Check if the button should be pressed
-            if (!_isButtonPressed && distance >= (_buttonTravelDistance - (_buttonTravelOffset) - 0.001f) &&
+            if (!_isButtonPressed && distance >= (_buttonTravelDistance - _buttonTravelOffset - 0.001f) &&
                 (_contactHandPressing || (_canBePressedByObjects && _objectsContactingButton.Count > 0)))
             {
                 _isButtonPressed = true;
@@ -251,7 +244,7 @@ namespace Leap.Unity.PhysicalHands
             }
 
             // Check if the button should be released
-            if (_isButtonPressed && distance < _buttonTravelDistance * BUTTON_PRESS_EXIT_THRESHOLD)
+            if (_isButtonPressed && distance < (_buttonTravelDistance - _buttonTravelOffset - 0.001f) * BUTTON_PRESS_EXIT_THRESHOLD)
             {
                 _isButtonPressed = false;
                 ButtonUnpressed();
@@ -263,7 +256,6 @@ namespace Leap.Unity.PhysicalHands
         /// </summary>
         protected virtual void ButtonPressed()
         {
-            Debug.Log("ButtonPressed");
             OnButtonPressed?.Invoke();
         }
 
@@ -278,7 +270,7 @@ namespace Leap.Unity.PhysicalHands
         /// <summary>
         /// Handle hand contact with the pressable object.
         /// </summary>
-        public virtual void OnHandContactPO(ContactHand hand)
+        protected virtual void OnHandContactPO(ContactHand hand)
         {
             OnHandContact?.Invoke(hand);
 
@@ -301,7 +293,7 @@ namespace Leap.Unity.PhysicalHands
         /// Handles actions when a hand exits contact with the pressable object.
         /// </summary>
         /// <param name="hand">The hand exiting contact.</param>
-        public virtual void OnHandContactExitPO(ContactHand hand)
+        protected virtual void OnHandContactExitPO(ContactHand hand)
         {
             // Invoke event for hand contact exit
             OnHandContactExit?.Invoke(hand);
@@ -362,14 +354,6 @@ namespace Leap.Unity.PhysicalHands
             _objectsContactingButton.Remove(collision.gameObject);
         }
 
-        protected virtual void OnCollisionPO(ContactHand contactHand)
-        {
-        }
-
-        protected virtual void OnCollisionExitPO(ContactHand contactHand)
-        {
-        }
-
         /// <summary>
         /// Determines whether any chosen hand is in contact with the pressable object.
         /// </summary>
@@ -391,17 +375,23 @@ namespace Leap.Unity.PhysicalHands
 
         public void FreezePressableMovement()
         {
-            if (_pressableObjectRB.constraints != RigidbodyConstraints.FreezeAll)
+            if (_pressableObjectRB != null)
             {
-                _pressableObjectRB.constraints = RigidbodyConstraints.FreezeAll;
+                if (_pressableObjectRB.constraints != RigidbodyConstraints.FreezeAll)
+                {
+                    _pressableObjectRB.constraints = RigidbodyConstraints.FreezeAll;
+                }
             }
         }
 
         public void UnFreezePressableMovement()
         {
-            if (_pressableObjectRB.constraints != RigidbodyConstraints.None)
+            if (_pressableObjectRB != null)
             {
-                _pressableObjectRB.constraints = RigidbodyConstraints.None;
+                if (_pressableObjectRB.constraints != RigidbodyConstraints.None)
+                {
+                    _pressableObjectRB.constraints = RigidbodyConstraints.None;
+                }
             }
         }
     }

@@ -20,7 +20,14 @@ namespace Leap.Unity.PhysicalHands
     /// </summary>
     public class PhysicalHandsButtonToggle : PhysicalHandsButtonBase
     {
-        private bool _pressingObjectExited = false;
+        private bool _canUnpress = false;
+
+
+        protected override void Start()
+        {
+            base.Start();
+            
+        }
 
         /// <summary>
         /// Action to perform when the button is pressed.
@@ -28,19 +35,17 @@ namespace Leap.Unity.PhysicalHands
         protected override void ButtonPressed()
         {
             base.ButtonPressed();
+
             // Freeze object's position and rotation when pressed
-            FreezePressableMovement();
-            _pressingObjectExited = false;
+            _configurableJoint.yMotion = ConfigurableJointMotion.Locked;
+            _canUnpress = false;
+
+            StartCoroutine(DelayUnpress());
         }
 
-        /// <summary>
-        /// Action to perform when the button is unpressed.
-        /// </summary>
         protected override void ButtonUnpressed()
         {
             base.ButtonUnpressed();
-            // Remove constraints when unpressed
-            UnFreezePressableMovement();
         }
 
         #region Collision handling methods
@@ -48,60 +53,37 @@ namespace Leap.Unity.PhysicalHands
         protected override void OnCollisionPO(Collision collision)
         {
             base.OnCollisionPO(collision);
-            // If not exclusively pressed by hand and object has exited
-            if (!_canBePressedByObjects && _pressingObjectExited)
+            if (_canUnpress)
             {
-                UnFreezePressableMovement();
-            }
-        }
-
-        protected override void OnCollisionPO(ContactHand contactHand)
-        {
-            base.OnCollisionPO(contactHand);
-            // If the chosen hand is in contact and object has exited
-            if (GetChosenHandInContact() && _pressingObjectExited)
-            {
-                UnFreezePressableMovement();
-            }
-        }
-
-        protected override void OnCollisionExitPO(Collision collision)
-        {
-            base.OnCollisionExitPO(collision);
-            // If not exclusively pressed by hand, start delayed exit
-            if (!_canBePressedByObjects)
-            {
-                StartCoroutine(DelayedCollisionExit());
-            }
-        }
-
-        protected override void OnCollisionExitPO(ContactHand contactHand)
-        {
-            base.OnCollisionExitPO(contactHand);
-            // Check which hand can press the button and start delayed exit if correct hand is found
-            if (contactHand.Handedness == (Chirality)_whichHandCanPressButton)
-            {
-                StartCoroutine(DelayedCollisionExit());
-            }
-            else if(_whichHandCanPressButton == ChiralitySelection.BOTH)
-            {
-                if (!GetChosenHandInContact())
+                // If not exclusively pressed by hand and object has exited
+                if (_canBePressedByObjects)
                 {
-                    StartCoroutine(DelayedCollisionExit());
+                    _configurableJoint.yMotion = ConfigurableJointMotion.Limited;
                 }
             }
         }
 
-        /// <summary>
-        /// Coroutine for delayed collision exit.
-        /// </summary>
-        private IEnumerator DelayedCollisionExit()
-        {
-            // Wait for a short delay before removing constraints
-            yield return new WaitForSeconds(1f); // Adjust the delay time as needed
 
-            _pressingObjectExited = true;
+        protected override void OnHandContactPO(ContactHand contactHand)
+        {
+            base.OnHandContactPO(contactHand);
+            if (_canUnpress)
+            {
+                // If the chosen hand is in contact and object has exited
+                if (GetChosenHandInContact())
+                {
+                    _configurableJoint.yMotion = ConfigurableJointMotion.Limited;
+
+                }
+            }
         }
+
+        private IEnumerator DelayUnpress()
+        { 
+            yield return new WaitForSecondsRealtime(1f);
+            _canUnpress = true;
+        }
+
         #endregion
     }
 }

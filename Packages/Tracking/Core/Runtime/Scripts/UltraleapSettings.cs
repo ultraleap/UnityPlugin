@@ -143,10 +143,6 @@ namespace Leap.Unity
                 SerializedProperty showPhysicalHandsPhysicsSettingsWarning = settings.FindProperty("showPhysicalHandsPhysicsSettingsWarning");
                 showPhysicalHandsPhysicsSettingsWarning.boolValue = EditorGUILayout.ToggleLeft("Show Physical Hands settings warning", showPhysicalHandsPhysicsSettingsWarning.boolValue);
 
-                // Physical Hands Button Auto Offset
-                SerializedProperty showPhysicalHandsButtonOffsetWarning = settings.FindProperty("showPhysicalHandsButtonOffsetWarning");
-                showPhysicalHandsButtonOffsetWarning.boolValue = EditorGUILayout.ToggleLeft("Show Physical Hands button offset warning", showPhysicalHandsButtonOffsetWarning.boolValue);
-
                 // Attachment Hands delete content warnings
                 bool curValue = !EditorUtility.GetDialogOptOutDecision(DialogOptOutDecisionType.ForThisMachine, "UL attachment hands popup");
                 curValue = EditorGUILayout.ToggleLeft("Show clear Attachment Hands deletes content warning", curValue);
@@ -210,9 +206,6 @@ namespace Leap.Unity
 
         [HideInInspector, SerializeField]
         public bool showPhysicalHandsPhysicsSettingsWarning = true;
-
-        [HideInInspector, SerializeField]
-        public bool showPhysicalHandsButtonOffsetWarning = true;
 
         [HideInInspector, SerializeField]
         public string pluginVersion = "Unknown";
