@@ -13,6 +13,8 @@ namespace Leap.Unity.PhysicalHands
 
         public override void OnInspectorGUI()
         {
+            EditorUtils.DrawScriptField((MonoBehaviour)target);
+
             target.UpdateDistanceValues();
             EditorGUILayout.PropertyField(serializedObject.FindProperty("_pressableObject"), new GUIContent("Pressable Object", "The GameObject representing the button that can be pressed."));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("_automaticTravelDistance"), new GUIContent("Use Automatic Travel Distance", "Travel distance should be calculated based on how far the pressable object is from this object"));
