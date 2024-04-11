@@ -100,7 +100,7 @@ namespace Leap.Unity.PhysicalHands
             if (_automaticTravelDistance && _pressableObject != null)
             {
                 // leave 1mm so the button does not clip into the base obect (assuming same thickness)
-                _buttonTravelDistance = Mathf.Abs(_pressableObject.transform.localPosition.y) - (_buttonTravelOffset);
+                _buttonTravelDistance = Mathf.Abs(_pressableObject.transform.localPosition.y);
             }
         }
 
@@ -215,7 +215,7 @@ namespace Leap.Unity.PhysicalHands
             // Set linear limit for button travel
             _configurableJoint.linearLimit = new SoftJointLimit
             {
-                limit = (float)((_buttonTravelDistance )* transform.localScale.y) - (_buttonTravelOffset * transform.localScale.y)
+                limit = (float)(_buttonTravelDistance * transform.localScale.y) - (_buttonTravelOffset * transform.localScale.y)
             };
         }
 
