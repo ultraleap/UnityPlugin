@@ -8,6 +8,7 @@
 
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -23,12 +24,10 @@ namespace Leap.Unity.PhysicalHands
         protected GameObject _pressableObject;
         [SerializeField]
         bool _automaticTravelDistance = true;
+        [SerializeField, Attributes.OnEditorChange("SetUpSpringJoint")]
+        private float _buttonTravelDistance = 0f; // TODO, make this work in worldspace units
         [SerializeField]
-        private float _buttonTravelDistance = 0f;
-        [SerializeField]
-        bool _automaticOffsetDistance = true;
-        [SerializeField]
-        private float _buttonTravelOffset = 0.001f;
+        private float _buttonTravelOffset = 0;
         [SerializeField] 
         protected bool _canBePressedByObjects = false;
         [SerializeField] 
@@ -76,31 +75,30 @@ namespace Leap.Unity.PhysicalHands
 
         #endregion
 
-
-
-
         public void UpdateDistanceValues()
         {
-            if (_automaticOffsetDistance)
+            if (_automaticTravelDistance && _pressableObject != null)
             {
-                if (GetComponent<MeshFilter>() && GetComponent<MeshFilter>().sharedMesh != null)
+                if (TryGetComponent<MeshFilter>(out MeshFilter meshFilter) && meshFilter.sharedMesh != null)
                 {
-                    _buttonTravelOffset = GetComponent<MeshFilter>().sharedMesh.bounds.extents.y;
+                    _buttonTravelOffset = meshFilter.sharedMesh.bounds.extents.y;
                 }
                 else
                 {
-                    Debug.Log(
-                        "Offset distance is based on the button's mesh filter. Please either add a mesh to physical hands button or manually set the offset." +
-                        " Offset defaulted to 0");
-
                     _buttonTravelOffset = 0;
                 }
-            }
 
-            if (_automaticTravelDistance && _pressableObject != null)
+
+                _buttonTravelDistance = _pressableObject.transform.localPosition.y - _buttonTravelOffset;
+
+                if(_buttonTravelDistance < 0 )
+                {
+                    Debug.Log("Button Travel distance is negative, please ensure the button moves on the positive y axis");
+                }
+            }
+            else
             {
-                // leave 1mm so the button does not clip into the base obect (assuming same thickness)
-                _buttonTravelDistance = Mathf.Abs(_pressableObject.transform.localPosition.y);
+                _buttonTravelOffset = _initialButtonPosition.y - _buttonTravelDistance;
             }
         }
 
@@ -132,6 +130,7 @@ namespace Leap.Unity.PhysicalHands
             SetUpSpringJoint();
             
         }
+
 
         /// <summary>
         /// Set up the pressable object.
@@ -186,7 +185,7 @@ namespace Leap.Unity.PhysicalHands
                 _configurableJoint = _pressableObject.AddComponent<ConfigurableJoint>();
             }
 
-            _configurableJoint.targetPosition = -_initialButtonPosition;
+            _configurableJoint.targetPosition = new Vector3(0, -_buttonTravelDistance, 0);
 
             // Connect the button to the parent object with a spring joint
             _configurableJoint.connectedBody = _rigidbody;
@@ -210,15 +209,16 @@ namespace Leap.Unity.PhysicalHands
             // Adjust anchor position for button travel distance
             _configurableJoint.anchor = Vector3.zero;
             _configurableJoint.autoConfigureConnectedAnchor = false;
-            _configurableJoint.connectedAnchor = new Vector3(0,_initialButtonPosition.y - _buttonTravelOffset,0);
+            _configurableJoint.connectedAnchor = new Vector3(0, _buttonTravelOffset + (_buttonTravelDistance / 2) ,0);
 
             // Set linear limit for button travel
             _configurableJoint.linearLimit = new SoftJointLimit
             {
-                limit = (float)(_buttonTravelDistance * transform.localScale.y) - (_buttonTravelOffset * transform.localScale.y)
+                limit = (float)((_buttonTravelDistance /2 ) * transform.lossyScale.y)
             };
         }
 
+        
         private void FixedUpdate()
         {
             if (_freezeButtonTravelOnMovement)
@@ -236,16 +236,18 @@ namespace Leap.Unity.PhysicalHands
             float distance = Mathf.Abs(_pressableObject.transform.localPosition.y - _initialButtonPosition.y);
 
             // Check if the button should be pressed
-            if (!_isButtonPressed && distance >= (_buttonTravelDistance - _buttonTravelOffset - 0.001f) &&
+            if (!_isButtonPressed && distance >= (_buttonTravelDistance) &&
                 (_contactHandPressing || (_canBePressedByObjects && _objectsContactingButton.Count > 0)))
             {
+                Debug.Log("button Pressed");
                 _isButtonPressed = true;
                 ButtonPressed();
             }
 
             // Check if the button should be released
-            if (_isButtonPressed && distance < (_buttonTravelDistance - _buttonTravelOffset - 0.001f) * BUTTON_PRESS_EXIT_THRESHOLD)
+            if (_isButtonPressed && distance < (_buttonTravelDistance) * BUTTON_PRESS_EXIT_THRESHOLD)
             {
+                Debug.Log("buttonUnpressed");
                 _isButtonPressed = false;
                 ButtonUnpressed();
             }
