@@ -27,18 +27,6 @@ namespace Leap.Unity.PhysicalHands
                 target.UpdateDistanceValues();
             }
             EditorGUI.indentLevel = 0;
-
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("_automaticOffsetDistance"), new GUIContent("Use Automatic Distance Offset", "Offset distance should be calculated based on the size of the pressable object and this objects mesh filters."));
-
-            EditorGUI.indentLevel = 1;
-            if (!serializedObject.FindProperty("_automaticOffsetDistance").boolValue)
-            {
-                target.UpdateDistanceValues();
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("_buttonTravelOffset"), new GUIContent("Button Travel Offset", "Calculated offset based on the bounds of the pressable object and this object"));
-                target.UpdateDistanceValues();
-            }
-
-            EditorGUI.indentLevel = 0;
   
             EditorGUILayout.Space(5);
 
