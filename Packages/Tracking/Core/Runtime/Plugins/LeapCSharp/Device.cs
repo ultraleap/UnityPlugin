@@ -269,6 +269,7 @@ namespace Leap
             if (!deviceTransformAvailable ||
                 !ServerStatus.IsServiceVersionValid(minimumServiceVersion))
             {
+                Debug.Log("Device Transform not available or Service Version too old");
                 devicePose = Pose.identity;
                 poseSet = true;
                 return Pose.identity;
@@ -280,6 +281,8 @@ namespace Leap
 
             if (result != eLeapRS.eLeapRS_Success || data == null)
             {
+                Debug.Log("Device Transform not successful or invalid");
+
                 devicePose = Pose.identity;
                 poseSet = true;
                 return Pose.identity;
@@ -292,6 +295,9 @@ namespace Leap
                                                 new Vector4(data[4], data[5], data[6], data[7]),
                                                 new Vector4(data[8], data[9], data[10], data[11]),
                                                 new Vector4(data[12], data[13], data[14], data[15]));
+
+
+            Debug.Log("Device Transform: \n" + deviceTransform);
 
 
             ////An example of the expected matrix if it were 8cm forward from the head origin
