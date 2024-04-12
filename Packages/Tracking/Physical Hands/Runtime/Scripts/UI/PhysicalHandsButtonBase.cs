@@ -6,11 +6,9 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -19,12 +17,11 @@ namespace Leap.Unity.PhysicalHands
     [RequireComponent(typeof(Rigidbody))]
     public class PhysicalHandsButtonBase : MonoBehaviour
     {
-        
         [SerializeField] 
         protected GameObject _pressableObject;
         [SerializeField]
         bool _automaticTravelDistance = true;
-        [SerializeField, Attributes.OnEditorChange("SetUpSpringJoint")]
+        [SerializeField]
         private float _buttonTravelDistance = 0f; // TODO, make this work in worldspace units
         [SerializeField]
         private float _buttonTravelOffset = 0;
@@ -63,7 +60,6 @@ namespace Leap.Unity.PhysicalHands
         [SerializeField]
         public UnityEvent<ContactHand> OnHandHoverExit;
 
-
         #region public getters
         public bool IsPressed
         {
@@ -72,26 +68,27 @@ namespace Leap.Unity.PhysicalHands
                 return _isButtonPressed;
             }
         }
-
         #endregion
 
         public void UpdateDistanceValues()
         {
             if (_automaticTravelDistance && _pressableObject != null)
             {
+                _buttonTravelOffset = 0;
+
                 if (TryGetComponent<MeshFilter>(out MeshFilter meshFilter) && meshFilter.sharedMesh != null)
                 {
-                    _buttonTravelOffset = meshFilter.sharedMesh.bounds.extents.y;
-                }
-                else
-                {
-                    _buttonTravelOffset = 0;
+                    _buttonTravelOffset += meshFilter.sharedMesh.bounds.extents.y;
                 }
 
+                if (_pressableObject.TryGetComponent<MeshFilter>(out meshFilter) && meshFilter.sharedMesh != null)
+                {
+                    _buttonTravelOffset += (meshFilter.sharedMesh.bounds.extents.y * _pressableObject.transform.localScale.y);
+                }
 
                 _buttonTravelDistance = _pressableObject.transform.localPosition.y - _buttonTravelOffset;
 
-                if(_buttonTravelDistance < 0 )
+                if(_buttonTravelDistance < 0)
                 {
                     Debug.Log("Button Travel distance is negative, please ensure the button moves on the positive y axis");
                 }
