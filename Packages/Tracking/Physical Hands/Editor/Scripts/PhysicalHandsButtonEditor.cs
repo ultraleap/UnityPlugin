@@ -61,7 +61,7 @@ namespace Leap.Unity.PhysicalHands
             }
 
             EditorGUILayout.EndFoldoutHeaderGroup();
-            target.UpdateEditorValues();
+            target.UpdateInspectorValues();
 
             serializedObject.ApplyModifiedProperties();
 
