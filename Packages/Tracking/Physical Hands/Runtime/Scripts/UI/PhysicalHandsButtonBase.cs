@@ -46,6 +46,22 @@ namespace Leap.Unity.PhysicalHands
 
         protected ConfigurableJoint _configurableJoint;
         protected PhysicalHandsButtonHelper _buttonHelper;
+        protected float springValue = 0;
+        protected float damperValue = 0;
+        protected float maxForceValue = Mathf.Infinity;
+        protected float bouncinessValue = 0;
+        protected enum ButtonPreset
+        {
+            Standard = 0,
+            Soft = 1,
+            Bouncy = 2,
+            Firm = 3,
+        }
+        [SerializeField]
+        protected ButtonPreset _buttonPreset = ButtonPreset.Standard;
+
+        
+
 
         [SerializeField]
         public UnityEvent OnButtonPressed;
@@ -70,8 +86,15 @@ namespace Leap.Unity.PhysicalHands
         }
         #endregion
 
-        public void UpdateDistanceValues()
+        /// <summary>
+        /// Updates the editor values including button travel distance and button presets.
+        /// </summary>
+        public void UpdateEditorValues()
         {
+            // Update the button preset values
+            UpdateButtonPreset();
+
+            // Check if automatic travel distance calculation is enabled and a pressable object is assigned
             if (_automaticTravelDistance && _pressableObject != null)
             {
                 _buttonTravelOffset = 0;
@@ -90,12 +113,68 @@ namespace Leap.Unity.PhysicalHands
 
                 if(_buttonTravelDistance < 0)
                 {
+                    // Log a warning if the button travel distance is negative
                     Debug.Log("Button Travel distance is negative, please ensure the button moves on the positive y axis");
                 }
             }
             else
             {
+                // If automatic travel distance calculation is disabled,
+                // calculate the button travel offset based on the initial button position and the previously calculated travel distance
                 _buttonTravelOffset = _initialButtonPosition.y - _buttonTravelDistance;
+            }
+        }
+
+        /// <summary>
+        /// Updates the button preset values based on the selected button preset type.
+        /// </summary>
+        private void UpdateButtonPreset()
+        {
+            switch (_buttonPreset)
+            {
+                // Standard button preset with no spring, damper, or force limits
+                case ButtonPreset.Standard:
+                    springValue = 10;
+                    damperValue = 0;
+                    maxForceValue = Mathf.Infinity;
+                    break;
+                // Soft button preset with low spring, damper, and force limits
+                case ButtonPreset.Soft:
+                    springValue = 1;
+                    damperValue = 10;
+                    maxForceValue = 1;
+                    break;
+                // Bouncy button preset with high spring limit and no damper or force limits
+                case ButtonPreset.Bouncy:
+                    springValue = 1;
+                    damperValue = 0;
+                    maxForceValue = Mathf.Infinity;
+                    bouncinessValue = 0.6f;
+                    break;
+                // Firm button preset with high spring and damper limits and no force limits
+                case ButtonPreset.Firm:
+                    springValue = 25;
+                    damperValue = 100;
+                    maxForceValue = 10000;
+                    break;
+            }
+
+            // To allow runtime changing of button mode
+            if (_configurableJoint != null)
+            {
+                // Configure spring parameters
+                _configurableJoint.yDrive = new JointDrive
+                {
+                    positionSpring = springValue,
+                    positionDamper = damperValue,
+                    maximumForce = maxForceValue
+                };
+
+                _configurableJoint.linearLimit = new SoftJointLimit
+                {
+                    limit = (float)((_buttonTravelDistance / 2) * transform.lossyScale.y),
+                    bounciness = bouncinessValue
+                };
             }
         }
 
@@ -121,7 +200,7 @@ namespace Leap.Unity.PhysicalHands
 
             _rigidbody = GetComponent<Rigidbody>();
 
-            UpdateDistanceValues();
+            UpdateEditorValues();
 
             SetUpPressableObject();
             SetUpSpringJoint();
@@ -190,9 +269,9 @@ namespace Leap.Unity.PhysicalHands
             // Configure spring parameters
             _configurableJoint.yDrive = new JointDrive
             {
-                positionSpring = 100,
-                positionDamper = 10,
-                maximumForce = 1
+                positionSpring = springValue,
+                positionDamper = damperValue,
+                maximumForce = maxForceValue
             };
 
             // Lock and limit motion axes
@@ -211,7 +290,8 @@ namespace Leap.Unity.PhysicalHands
             // Set linear limit for button travel
             _configurableJoint.linearLimit = new SoftJointLimit
             {
-                limit = (float)((_buttonTravelDistance /2 ) * transform.lossyScale.y)
+                limit = (float)((_buttonTravelDistance / 2) * transform.lossyScale.y),
+                bounciness = bouncinessValue
             };
         }
 
@@ -236,7 +316,6 @@ namespace Leap.Unity.PhysicalHands
             if (!_isButtonPressed && distance >= (_buttonTravelDistance) &&
                 (_contactHandPressing || (_canBePressedByObjects && _objectsContactingButton.Count > 0)))
             {
-                Debug.Log("button Pressed");
                 _isButtonPressed = true;
                 ButtonPressed();
             }
@@ -244,7 +323,6 @@ namespace Leap.Unity.PhysicalHands
             // Check if the button should be released
             if (_isButtonPressed && distance < (_buttonTravelDistance) * BUTTON_PRESS_EXIT_THRESHOLD)
             {
-                Debug.Log("buttonUnpressed");
                 _isButtonPressed = false;
                 ButtonUnpressed();
             }
