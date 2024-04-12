@@ -14,17 +14,15 @@ namespace Leap.Unity.PhysicalHands
         public override void OnInspectorGUI()
         {
             EditorUtils.DrawScriptField((MonoBehaviour)target);
-
-            target.UpdateDistanceValues();
             EditorGUILayout.PropertyField(serializedObject.FindProperty("_pressableObject"), new GUIContent("Pressable Object", "The GameObject representing the button that can be pressed."));
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("_automaticTravelDistance"), new GUIContent("Use Automatic Travel Distance", "Travel distance should be calculated based on how far the pressable object is from this object"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("_buttonPreset"), new GUIContent("Button Type", "The preset type of button. each one changes the buttons responsiveness and how it reacts to being pressed or springing back. \n \n Test out the presets to find the right one for you"));
 
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("_automaticTravelDistance"), new GUIContent("Use Automatic Travel Distance", "Travel distance should be calculated based on how far the pressable object is from this object"));
+            
             EditorGUI.indentLevel = 1;
             if (!serializedObject.FindProperty("_automaticTravelDistance").boolValue)
             {
-                target.UpdateDistanceValues();
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("_buttonTravelDistance"), new GUIContent("Button Travel Distance", "The distance the button can travel when pressed."));
-                target.UpdateDistanceValues();
             }
             EditorGUI.indentLevel = 0;
   
@@ -63,6 +61,7 @@ namespace Leap.Unity.PhysicalHands
             }
 
             EditorGUILayout.EndFoldoutHeaderGroup();
+            target.UpdateInspectorValues();
 
             serializedObject.ApplyModifiedProperties();
 
