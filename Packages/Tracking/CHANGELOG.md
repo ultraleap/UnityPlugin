@@ -63,6 +63,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Use of Device Transforms does not apply rotations
 - OpenXR API Layer Service query intent was missing sometimes, preventing API layers functioning correctly
 - OpenXR checks minSdkVersion rather than targetSdkVersion for query intents
+- (Physical Hands) PhysHands Settings are not localized when using decimals
 
 
 ## [6.14.0] - 24/01/24
