@@ -113,12 +113,14 @@ namespace Leap.Unity.PhysicalHands
                     springValue = 10;
                     damperValue = 0;
                     maxForceValue = 5;
+                    bouncinessValue = 0f;
                     break;
                 // Soft button preset with low spring, damper, and force limits
                 case ButtonPreset.Soft:
                     springValue = 1;
                     damperValue = 10;
                     maxForceValue = 1;
+                    bouncinessValue = 0f;
                     break;
                 // Bouncy button preset with high spring limit and no damper or force limits
                 case ButtonPreset.Bouncy:
@@ -137,6 +139,8 @@ namespace Leap.Unity.PhysicalHands
         {
             // Update the button preset values
             UpdateButtonPreset();
+
+            UpdateInspectorValues();
 
             // Check if automatic travel distance calculation is enabled and a pressable object is assigned
             if (_automaticTravelDistance && _pressableObject != null)
