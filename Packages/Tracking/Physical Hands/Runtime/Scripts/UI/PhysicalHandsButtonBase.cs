@@ -9,6 +9,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -17,33 +18,11 @@ namespace Leap.Unity.PhysicalHands
     [RequireComponent(typeof(Rigidbody))]
     public class PhysicalHandsButtonBase : MonoBehaviour
     {
-        [SerializeField] 
-        private GameObject _pressableObject;
-        [SerializeField]
-        bool _automaticTravelDistance = true;
 
-        private float _buttonTravelDistanceLocal;
-        [SerializeField, Min(0.001f)]
-        private float _buttonTravelDistance = 0.01f;
         [SerializeField]
-        private float _buttonTravelOffset = 0;
-        [SerializeField] 
-        protected bool _canBePressedByObjects = false;
-        [SerializeField] 
+        private bool _automaticTravelDistance = true;
+        [SerializeField]
         private ChiralitySelection _whichHandCanPressButton = ChiralitySelection.BOTH;
-
-        private const float BUTTON_PRESS_EXIT_THRESHOLD = 0.5f;
-        private bool _isButtonPressed = false;
-        private bool _contactHandPressing = false;
-        private bool _leftHandContacting = false;
-        private bool _rightHandContacting = false;
-        private Rigidbody _pressableObjectRB = null;
-        private Rigidbody _rigidbody = null;
-        private Vector3 _initialButtonPosition = Vector3.zero;
-        private List<GameObject> _objectsContactingButton = new List<GameObject>();
-
-        protected ConfigurableJoint _configurableJoint;
-        private PhysicalHandsButtonHelper _buttonHelper;
         [SerializeField]
         private float springValue = 0;
         [SerializeField]
@@ -52,6 +31,30 @@ namespace Leap.Unity.PhysicalHands
         private float maxForceValue = Mathf.Infinity;
         [SerializeField]
         private float bouncinessValue = 0;
+        [SerializeField, Min(0.001f)]
+        private float _buttonTravelDistance = 0.01f;
+        [SerializeField]
+        protected float _buttonTravelOffset = 0;
+        [SerializeField] 
+        protected bool _canBePressedByObjects = false;
+        [SerializeField]
+        protected GameObject _pressableObject;
+
+        private const float BUTTON_PRESS_EXIT_THRESHOLD = 0.5f;
+        private bool _contactHandPressing = false;
+        private bool _leftHandContacting = false;
+        private bool _rightHandContacting = false;
+        private Rigidbody _rigidbody = null;
+        private Vector3 _initialButtonPosition = Vector3.zero;
+        private List<GameObject> _objectsContactingButton = new List<GameObject>();
+        private PhysicalHandsButtonHelper _buttonHelper;
+
+        protected float _buttonTravelDistanceLocal;
+        protected bool _isButtonPressed = false;
+        protected Rigidbody _pressableObjectRB = null;
+        protected ConfigurableJoint _configurableJoint;
+        
+
         private enum ButtonPreset
         {
             Standard = 0,
@@ -113,12 +116,14 @@ namespace Leap.Unity.PhysicalHands
                     springValue = 10;
                     damperValue = 0;
                     maxForceValue = 5;
+                    bouncinessValue = 0f;
                     break;
                 // Soft button preset with low spring, damper, and force limits
                 case ButtonPreset.Soft:
                     springValue = 1;
                     damperValue = 10;
                     maxForceValue = 1;
+                    bouncinessValue = 0f;
                     break;
                 // Bouncy button preset with high spring limit and no damper or force limits
                 case ButtonPreset.Bouncy:
@@ -137,6 +142,8 @@ namespace Leap.Unity.PhysicalHands
         {
             // Update the button preset values
             UpdateButtonPreset();
+
+            UpdateInspectorValues();
 
             // Check if automatic travel distance calculation is enabled and a pressable object is assigned
             if (_automaticTravelDistance && _pressableObject != null)
@@ -449,6 +456,24 @@ namespace Leap.Unity.PhysicalHands
                 default:
                     return false;
             }
+        }
+
+        private void OnDrawGizmosSelected()
+        {
+            if (_pressableObject == null)
+                return;
+
+            Gizmos.color = Color.green;
+
+            Vector3 startPosition = transform.TransformPoint(transform.localPosition + new Vector3(0, _buttonTravelOffset, 0));
+            Vector3 endPosition = transform.TransformPoint((transform.localPosition + new Vector3(0, _buttonTravelOffset, 0)))
+                + transform.up * _buttonTravelDistance;
+
+            Gizmos.color = Color.green; // Y axis
+            Gizmos.DrawLine(startPosition, endPosition);
+            Gizmos.DrawSphere(endPosition, 0.004f); // ButtonStartpoint
+            Gizmos.color = Color.red; 
+            Gizmos.DrawSphere(startPosition, 0.004f); // ButtonEndpoint
         }
     }
 }
