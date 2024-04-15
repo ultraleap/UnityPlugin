@@ -94,19 +94,19 @@ namespace Leap.Unity.PhysicalHands
         {
             if (_automaticTravelDistance && _pressableObject != null)
             {
-                float buttonTravelOffset = 0;
+                _buttonTravelOffset = 0;
 
                 if (TryGetComponent<MeshFilter>(out MeshFilter meshFilter) && meshFilter.sharedMesh != null)
                 {
-                    buttonTravelOffset += meshFilter.sharedMesh.bounds.extents.y;
+                    _buttonTravelOffset += meshFilter.sharedMesh.bounds.extents.y;
                 }
 
                 if (_pressableObject.TryGetComponent<MeshFilter>(out meshFilter) && meshFilter.sharedMesh != null)
                 {
-                    buttonTravelOffset += (meshFilter.sharedMesh.bounds.extents.y * _pressableObject.transform.localScale.y);
+                    _buttonTravelOffset += (meshFilter.sharedMesh.bounds.extents.y * _pressableObject.transform.localScale.y);
                 }
 
-                _buttonTravelDistance = (_pressableObject.transform.localPosition.y - buttonTravelOffset) * transform.lossyScale.y;
+                _buttonTravelDistance = (_pressableObject.transform.localPosition.y - _buttonTravelOffset) * transform.lossyScale.y;
             }
 
             switch (_buttonPreset)
@@ -282,7 +282,7 @@ namespace Leap.Unity.PhysicalHands
                 _configurableJoint = _pressableObject.AddComponent<ConfigurableJoint>();
             }
 
-            _configurableJoint.targetPosition = new Vector3(0, -_buttonTravelDistanceLocal, 0);
+            _configurableJoint.targetPosition = new Vector3(0, -(float)(_buttonTravelDistance / 2), 0);
 
             // Connect the button to the parent object with a spring joint
             _configurableJoint.connectedBody = _rigidbody;
