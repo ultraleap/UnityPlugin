@@ -28,7 +28,7 @@ namespace Ultraleap.Tracking.OpenXR
             var manifest = new AndroidManifest(GetAndroidManifestPath(path));
             var feature = OpenXRSettings.ActiveBuildTargetInstance.GetFeature<HandTrackingFeature>();
 
-            if (PlayerSettings.Android.minSdkVersion >= AndroidSdkVersions.AndroidApiLevel30)
+            if (PlayerSettings.Android.targetSdkVersion >= AndroidSdkVersions.AndroidApiLevel30)
             {
                 // These intent queries are required for OpenXR runtimes and API layers to operate correctly, not all
                 // loaders correctly include them so add them if they are missing to ensure applications work correctly.
