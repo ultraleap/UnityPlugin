@@ -18,7 +18,7 @@ namespace Leap.Unity.PhysicalHands
     public class PhysicalHandsButtonBase : MonoBehaviour
     {
         [SerializeField] 
-        protected GameObject _pressableObject;
+        private GameObject _pressableObject;
         [SerializeField]
         bool _automaticTravelDistance = true;
 
@@ -30,11 +30,7 @@ namespace Leap.Unity.PhysicalHands
         [SerializeField] 
         protected bool _canBePressedByObjects = false;
         [SerializeField] 
-        protected ChiralitySelection _whichHandCanPressButton = ChiralitySelection.BOTH;
-        [SerializeField]
-        private bool _freezeButtonTravelOnMovement = false;
-        [SerializeField]
-        private Vector3 _buttonVelocityThreshold = new Vector3(0.1f, 0.1f, 0.1f);
+        private ChiralitySelection _whichHandCanPressButton = ChiralitySelection.BOTH;
 
         private const float BUTTON_PRESS_EXIT_THRESHOLD = 0.5f;
         private bool _isButtonPressed = false;
@@ -47,20 +43,24 @@ namespace Leap.Unity.PhysicalHands
         private List<GameObject> _objectsContactingButton = new List<GameObject>();
 
         protected ConfigurableJoint _configurableJoint;
-        protected PhysicalHandsButtonHelper _buttonHelper;
-        protected float springValue = 0;
-        protected float damperValue = 0;
-        protected float maxForceValue = Mathf.Infinity;
-        protected float bouncinessValue = 0;
-        protected enum ButtonPreset
+        private PhysicalHandsButtonHelper _buttonHelper;
+        [SerializeField]
+        private float springValue = 0;
+        [SerializeField]
+        private float damperValue = 0;
+        [SerializeField]
+        private float maxForceValue = Mathf.Infinity;
+        [SerializeField]
+        private float bouncinessValue = 0;
+        private enum ButtonPreset
         {
             Standard = 0,
             Soft = 1,
             Bouncy = 2,
-            Firm = 3,
+            Custom = 3,
         }
         [SerializeField]
-        protected ButtonPreset _buttonPreset = ButtonPreset.Standard;
+        private ButtonPreset _buttonPreset = ButtonPreset.Standard;
 
         #region Events
         [SerializeField]
@@ -104,6 +104,29 @@ namespace Leap.Unity.PhysicalHands
                 }
 
                 _buttonTravelDistance = (_pressableObject.transform.localPosition.y - buttonTravelOffset) * transform.lossyScale.y;
+            }
+
+            switch (_buttonPreset)
+            {
+                // Standard button preset with no spring, damper, or force limits
+                case ButtonPreset.Standard:
+                    springValue = 10;
+                    damperValue = 0;
+                    maxForceValue = 5;
+                    break;
+                // Soft button preset with low spring, damper, and force limits
+                case ButtonPreset.Soft:
+                    springValue = 1;
+                    damperValue = 10;
+                    maxForceValue = 1;
+                    break;
+                // Bouncy button preset with high spring limit and no damper or force limits
+                case ButtonPreset.Bouncy:
+                    springValue = 1;
+                    damperValue = 0;
+                    maxForceValue = 5;
+                    bouncinessValue = 0.6f;
+                    break;
             }
         }
 
@@ -153,35 +176,6 @@ namespace Leap.Unity.PhysicalHands
         /// </summary>
         private void UpdateButtonPreset()
         {
-            switch (_buttonPreset)
-            {
-                // Standard button preset with no spring, damper, or force limits
-                case ButtonPreset.Standard:
-                    springValue = 10;
-                    damperValue = 0;
-                    maxForceValue = 5;
-                    break;
-                // Soft button preset with low spring, damper, and force limits
-                case ButtonPreset.Soft:
-                    springValue = 1;
-                    damperValue = 10;
-                    maxForceValue = 1;
-                    break;
-                // Bouncy button preset with high spring limit and no damper or force limits
-                case ButtonPreset.Bouncy:
-                    springValue = 1;
-                    damperValue = 0;
-                    maxForceValue = 5;
-                    bouncinessValue = 0.6f;
-                    break;
-                // Firm button preset with high spring and damper limits and no force limits
-                case ButtonPreset.Firm:
-                    springValue = 25;
-                    damperValue = 100;
-                    maxForceValue = 10;
-                    break;
-            }
-
             //To allow runtime changing of button mode
             if (_configurableJoint != null)
             {
@@ -317,18 +311,6 @@ namespace Leap.Unity.PhysicalHands
 
         private void FixedUpdate()
         {
-            if (_freezeButtonTravelOnMovement)
-            {
-                if (_rigidbody?.velocity.sqrMagnitude > _buttonVelocityThreshold.sqrMagnitude)
-                {
-                    FreezePressableMovement();
-                }
-                else
-                {
-                    UnFreezePressableMovement();
-                }
-            }
-
             float distance = Mathf.Abs(_pressableObject.transform.localPosition.y - _initialButtonPosition.y);
 
             // Check if the button should be pressed
@@ -466,28 +448,6 @@ namespace Leap.Unity.PhysicalHands
                     return _rightHandContacting || _leftHandContacting;
                 default:
                     return false;
-            }
-        }
-
-        public void FreezePressableMovement()
-        {
-            if (_pressableObjectRB != null)
-            {
-                if (_pressableObjectRB.constraints != RigidbodyConstraints.FreezeAll)
-                {
-                    _pressableObjectRB.constraints = RigidbodyConstraints.FreezeAll;
-                }
-            }
-        }
-
-        public void UnFreezePressableMovement()
-        {
-            if (_pressableObjectRB != null)
-            {
-                if (_pressableObjectRB.constraints != RigidbodyConstraints.None)
-                {
-                    _pressableObjectRB.constraints = RigidbodyConstraints.None;
-                }
             }
         }
     }
