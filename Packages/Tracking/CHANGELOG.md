@@ -62,6 +62,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (Physical Hands) Errors when adding Physical Hands Manager prefab for the first time
 - Use of Device Transforms does not apply rotations
 - OpenXR API Layer Service query intent was missing sometimes, preventing API layers functioning correctly
+- OpenXR checks minSdkVersion rather than targetSdkVersion for query intents
 
 
 ## [6.14.0] - 24/01/24
