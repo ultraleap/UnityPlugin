@@ -33,6 +33,11 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
+        private void OnEnable()
+        {
+            _canUnpress = true;
+        }
+
         public void ToggleButtonState(bool shouldFirePressEvents = false)
         {
             if (_isButtonPressed == false)
@@ -48,7 +53,9 @@ namespace Leap.Unity.PhysicalHands
         public void SetTogglePressed(bool shouldFirePressEvents = false)
         {
             _isButtonPressed = true;
-            _canUnpress = true;
+            _canUnpress = false;
+            StartCoroutine(DelayUnpress());
+
             _pressableObject.transform.localPosition = new Vector3(_pressableObject.transform.localPosition.x,
                 _buttonTravelOffset,
                 _pressableObject.transform.localPosition.z);
@@ -56,14 +63,15 @@ namespace Leap.Unity.PhysicalHands
 
             if (shouldFirePressEvents == true)
             {
-                OnButtonPressed.Invoke();
+                OnButtonPressed?.Invoke();
             }
         }
 
         public void SetToggleUnPressed(bool shouldFirePressEvents = false)
         {
             _isButtonPressed = false;
-            _canUnpress = false;
+            _canUnpress = true;
+            
             _pressableObject.transform.localPosition = new Vector3(_pressableObject.transform.localPosition.x,
                 _buttonTravelOffset + _buttonTravelDistanceLocal,
                 _pressableObject.transform.localPosition.z);
@@ -71,7 +79,7 @@ namespace Leap.Unity.PhysicalHands
 
             if (shouldFirePressEvents == true)
             {
-                OnButtonUnPressed.Invoke();
+                OnButtonUnPressed?.Invoke();
             }
         }
 
@@ -83,15 +91,13 @@ namespace Leap.Unity.PhysicalHands
             base.ButtonPressed();
 
             // Freeze object's position and rotation when pressed
-            FreezeButtonPosition();
-            _canUnpress = false;
-
-            StartCoroutine(DelayUnpress());
+            SetTogglePressed(false);
         }
 
         protected override void ButtonUnpressed()
         {
             base.ButtonUnpressed();
+            SetToggleUnPressed(false);
         }
 
         #region Collision handling methods

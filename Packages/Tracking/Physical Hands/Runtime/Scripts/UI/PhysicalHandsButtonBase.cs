@@ -62,6 +62,7 @@ namespace Leap.Unity.PhysicalHands
             Bouncy = 2,
             Custom = 3,
         }
+
         [SerializeField]
         private ButtonPreset _buttonPreset = ButtonPreset.Standard;
 
@@ -141,9 +142,8 @@ namespace Leap.Unity.PhysicalHands
         private void UpdateAutomaticValues()
         {
             // Update the button preset values
-            UpdateButtonPreset();
-
             UpdateInspectorValues();
+            UpdateButtonPreset();
 
             // Check if automatic travel distance calculation is enabled and a pressable object is assigned
             if (_automaticTravelDistance && _pressableObject != null)
@@ -282,7 +282,7 @@ namespace Leap.Unity.PhysicalHands
                 _configurableJoint = _pressableObject.AddComponent<ConfigurableJoint>();
             }
 
-            _configurableJoint.targetPosition = new Vector3(0, -(float)(_buttonTravelDistance / 2), 0);
+            _configurableJoint.targetPosition = new Vector3(0, -(_buttonTravelDistanceLocal / 2f), 0);
 
             // Connect the button to the parent object with a spring joint
             _configurableJoint.connectedBody = _rigidbody;
