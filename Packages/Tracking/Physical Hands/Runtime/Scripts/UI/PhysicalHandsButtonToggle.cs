@@ -14,7 +14,7 @@ namespace Leap.Unity.PhysicalHands
     /// <summary>
     /// Class for toggling a button using physical hands.
     /// </summary>
-    public class PhysicalHandsButtonToggle : PhysicalHandsButtonBase
+    public class PhysicalHandsButtonToggle : PhysicalHandsButton
     {
         private bool _canUnpress = false;
         private RigidbodyConstraints _constraintsBeforeFreeze = RigidbodyConstraints.None;
@@ -152,17 +152,6 @@ namespace Leap.Unity.PhysicalHands
                     UnFreezeButtonPosition();
                 }
             }
-        }
-
-        /// <summary>
-        /// Handles hand contact exit events with the button.
-        /// </summary>
-        /// <param name="hand">The hand that exited contact with the button.</param>
-        protected override void OnHandContactExitPO(ContactHand hand)
-        {
-            base.OnHandContactExitPO(hand);
-
-            EnableUnpress();
         }
 
         /// <summary>

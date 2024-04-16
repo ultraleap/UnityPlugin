@@ -49,6 +49,7 @@ namespace Leap.Unity.PhysicalHands.Examples
         private void Start()
         {
             SceneActiveContactModeChanged((int)SceneContactMode.HardContact);
+            HardContactButton.GetComponent<PhysicalHandsButtonToggle>().SetTogglePressed();
         }
 
         /// <summary>

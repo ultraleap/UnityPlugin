@@ -13,7 +13,7 @@ using UnityEngine.Events;
 namespace Leap.Unity.PhysicalHands
 {
     [RequireComponent(typeof(Rigidbody))]
-    public class PhysicalHandsButtonBase : MonoBehaviour
+    public class PhysicalHandsButton: MonoBehaviour
     {
 
         [SerializeField]
@@ -218,6 +218,7 @@ namespace Leap.Unity.PhysicalHands
             Initialize();
         }
 
+
         /// <summary>
         /// Initialize the button.
         /// </summary>
@@ -225,7 +226,7 @@ namespace Leap.Unity.PhysicalHands
         {
             if (_pressableObject == null)
             {
-                Debug.LogError("Pressable object not assigned. Please assign one to use the button.");
+                Debug.LogError("Pressable object not assigned. Please assign one to use the button.", this.gameObject);
                 enabled = false;
                 return;
             }

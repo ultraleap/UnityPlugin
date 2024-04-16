@@ -5,9 +5,9 @@ using UnityEditor;
 
 namespace Leap.Unity.PhysicalHands
 {
-    [CustomEditor(typeof(PhysicalHandsButtonBase), true)]
+    [CustomEditor(typeof(PhysicalHandsButton), true)]
     [CanEditMultipleObjects]
-    public class PhysicalHandsButtonEditor : CustomEditorBase<PhysicalHandsButtonBase>
+    public class PhysicalHandsButtonEditor : CustomEditorBase<PhysicalHandsButton>
     {
         private bool eventsFoldedOut = false;
 
@@ -41,7 +41,12 @@ namespace Leap.Unity.PhysicalHands
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("_buttonTravelDistance"), new GUIContent("Button Travel Distance", "The distance the button can travel when pressed."));
                 EditorGUI.indentLevel = 0;
             }
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("_buttonPressExitThreshold"), new GUIContent("Button Unpress Threshold", "How far the button should travel up the travel distance once pressed before it is considered unpressed 0-1 value, equivalent to percentage of travel distance."));
+
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Button Unpress Threshold");
+            serializedObject.FindProperty("_buttonPressExitThreshold").floatValue = 
+                EditorGUILayout.Slider(serializedObject.FindProperty("_buttonPressExitThreshold").floatValue, 0, 1);
+            EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.Space(5);
 
