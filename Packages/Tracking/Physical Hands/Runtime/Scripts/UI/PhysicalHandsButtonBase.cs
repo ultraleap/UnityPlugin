@@ -487,17 +487,23 @@ namespace Leap.Unity.PhysicalHands
             if (_pressableObject == null)
                 return;
 
-            Gizmos.color = Color.green;
+            Vector3 startPosition = Vector3.zero;
+            Vector3 endPosition = -(Vector3.up * _buttonTravelDistance / _pressableObject.transform.lossyScale.y);
 
-            Vector3 startPosition = transform.TransformPoint(transform.localPosition + new Vector3(0, _buttonTravelOffset, 0));
-            Vector3 endPosition = transform.TransformPoint((transform.localPosition + new Vector3(0, _buttonTravelOffset, 0)))
-                + transform.up * _buttonTravelDistance;
+            Vector3 gizmoSize = (Vector3.one * 0.01f).CompDiv(_pressableObject.transform.lossyScale); // 1cm worldspace
 
+            if (_pressableObject.TryGetComponent<MeshFilter>(out MeshFilter meshFilter) && meshFilter.sharedMesh != null)
+            {
+                // If available, use the pressable extents to show where the bounds of the button will be
+                gizmoSize = meshFilter.sharedMesh.bounds.extents * 2;
+            }
+
+            Gizmos.matrix = _pressableObject.transform.localToWorldMatrix;
             Gizmos.color = Color.green; // Y axis
             Gizmos.DrawLine(startPosition, endPosition);
-            Gizmos.DrawSphere(endPosition, 0.004f); // ButtonStartpoint
-            Gizmos.color = Color.red; 
-            Gizmos.DrawSphere(startPosition, 0.004f); // ButtonEndpoint
+            Gizmos.DrawWireCube(endPosition, gizmoSize); // ButtonStartpoint
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireCube(startPosition, gizmoSize); // ButtonEndpoint
         }
     }
 }
