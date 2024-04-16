@@ -1360,8 +1360,6 @@ GameObject:
   - component: {fileID: 385804515}
   - component: {fileID: 385804514}
   - component: {fileID: 385804513}
-  - component: {fileID: 385804512}
-  - component: {fileID: 385804511}
   m_Layer: 0
   m_Name: Pressable Object
   m_TagString: Untagged
@@ -1385,118 +1383,6 @@ Transform:
   m_Father: {fileID: 328504667}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!153 &385804511
-ConfigurableJoint:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 385804509}
-  m_ConnectedBody: {fileID: 0}
-  m_ConnectedArticulationBody: {fileID: 0}
-  m_Anchor: {x: 0, y: 0, z: 0}
-  m_Axis: {x: 1, y: 0, z: 0}
-  m_AutoConfigureConnectedAnchor: 0
-  m_ConnectedAnchor: {x: 0, y: 0.01, z: 0}
-  serializedVersion: 2
-  m_SecondaryAxis: {x: 0, y: 1, z: 0}
-  m_XMotion: 0
-  m_YMotion: 1
-  m_ZMotion: 0
-  m_AngularXMotion: 0
-  m_AngularYMotion: 0
-  m_AngularZMotion: 0
-  m_LinearLimitSpring:
-    spring: 0
-    damper: 0
-  m_LinearLimit:
-    limit: 0.01
-    bounciness: 0
-    contactDistance: 0
-  m_AngularXLimitSpring:
-    spring: 0
-    damper: 0
-  m_LowAngularXLimit:
-    limit: 0
-    bounciness: 0
-    contactDistance: 0
-  m_HighAngularXLimit:
-    limit: 0
-    bounciness: 0
-    contactDistance: 0
-  m_AngularYZLimitSpring:
-    spring: 0
-    damper: 0
-  m_AngularYLimit:
-    limit: 0
-    bounciness: 0
-    contactDistance: 0
-  m_AngularZLimit:
-    limit: 0
-    bounciness: 0
-    contactDistance: 0
-  m_TargetPosition: {x: 0, y: -0.02, z: 0}
-  m_TargetVelocity: {x: 0, y: 0, z: 0}
-  m_XDrive:
-    serializedVersion: 3
-    positionSpring: 0
-    positionDamper: 0
-    maximumForce: 0
-  m_YDrive:
-    serializedVersion: 3
-    positionSpring: 100
-    positionDamper: 5
-    maximumForce: 3.4028233e+38
-  m_ZDrive:
-    serializedVersion: 3
-    positionSpring: 0
-    positionDamper: 0
-    maximumForce: 0
-  m_TargetRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_TargetAngularVelocity: {x: 0, y: 0, z: 0}
-  m_RotationDriveMode: 0
-  m_AngularXDrive:
-    serializedVersion: 3
-    positionSpring: 0
-    positionDamper: 0
-    maximumForce: 3.4028233e+38
-  m_AngularYZDrive:
-    serializedVersion: 3
-    positionSpring: 0
-    positionDamper: 0
-    maximumForce: 3.4028233e+38
-  m_SlerpDrive:
-    serializedVersion: 3
-    positionSpring: 0
-    positionDamper: 0
-    maximumForce: 3.4028233e+38
-  m_ProjectionMode: 0
-  m_ProjectionDistance: 0.1
-  m_ProjectionAngle: 180
-  m_ConfiguredInWorldSpace: 0
-  m_SwapBodies: 0
-  m_BreakForce: Infinity
-  m_BreakTorque: Infinity
-  m_EnableCollision: 1
-  m_EnablePreprocessing: 1
-  m_MassScale: 1
-  m_ConnectedMassScale: 1
---- !u!54 &385804512
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 385804509}
-  serializedVersion: 2
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_UseGravity: 0
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 3
 --- !u!65 &385804513
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1647,7 +1533,29 @@ PrefabInstance:
       propertyPath: m_LocalPosition.z
       value: -0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    - target: {fileID: 2495802599556206966, guid: b19d51e6a7ac86045884866247967cc6, type: 3}
+      propertyPath: springValue
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 2495802599556206966, guid: b19d51e6a7ac86045884866247967cc6, type: 3}
+      propertyPath: _buttonPreset
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2495802599556206966, guid: b19d51e6a7ac86045884866247967cc6, type: 3}
+      propertyPath: maxForceValue
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 2495802599556206966, guid: b19d51e6a7ac86045884866247967cc6, type: 3}
+      propertyPath: _buttonTravelOffset
+      value: 0.0048818
+      objectReference: {fileID: 0}
+    - target: {fileID: 2495802599556206966, guid: b19d51e6a7ac86045884866247967cc6, type: 3}
+      propertyPath: _buttonTravelDistance
+      value: 0.018478207
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 21357153186210319, guid: b19d51e6a7ac86045884866247967cc6, type: 3}
+    - {fileID: 1425814784214716995, guid: b19d51e6a7ac86045884866247967cc6, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: b19d51e6a7ac86045884866247967cc6, type: 3}
 --- !u!4 &386809004 stripped
 Transform:
@@ -2061,7 +1969,6 @@ GameObject:
   - component: {fileID: 419655444}
   - component: {fileID: 419655443}
   - component: {fileID: 419655442}
-  - component: {fileID: 419655441}
   m_Layer: 0
   m_Name: Pressable Object
   m_TagString: Untagged
@@ -2085,22 +1992,6 @@ Transform:
   m_Father: {fileID: 1821599386}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!54 &419655441
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 419655438}
-  serializedVersion: 2
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_UseGravity: 0
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 3
 --- !u!65 &419655442
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2228,8 +2119,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 017c5e3933235514c9520e1dace2a4b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_ActionAssets:
-  - {fileID: -944628639613478452, guid: c348712bda248c246b8c49b3db54643f, type: 3}
 --- !u!114 &480831412
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2998,7 +2887,6 @@ GameObject:
   - component: {fileID: 686586956}
   - component: {fileID: 686586955}
   - component: {fileID: 686586954}
-  - component: {fileID: 686586953}
   m_Layer: 0
   m_Name: Pressable Object
   m_TagString: Untagged
@@ -3022,22 +2910,6 @@ Transform:
   m_Father: {fileID: 1877823561}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!54 &686586953
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 686586950}
-  serializedVersion: 2
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_UseGravity: 0
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 3
 --- !u!65 &686586954
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4676,53 +4548,6 @@ MonoBehaviour:
   _disableAllGrabbing: 1
   _disableAllHandCollisions: 0
   _disableCollisionOnChildren: 0
---- !u!1 &1076971495 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1425814782421875397, guid: b19d51e6a7ac86045884866247967cc6, type: 3}
-  m_PrefabInstance: {fileID: 386809003}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1076971500
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1076971495}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ee6ba0f8f2ad7aa4d9e4c7ed108f8b46, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _automaticTravelDistance: 1
-  _whichHandCanPressButton: 2
-  springValue: 10
-  damperValue: 0
-  maxForceValue: 5
-  bouncinessValue: 0
-  _buttonTravelDistance: 0
-  _buttonTravelOffset: 0.02
-  _canBePressedByObjects: 0
-  _pressableObject: {fileID: 1646951633}
-  _buttonPressExitThreshold: 0.5
-  _buttonPreset: 0
-  OnButtonPressed:
-    m_PersistentCalls:
-      m_Calls: []
-  OnButtonUnPressed:
-    m_PersistentCalls:
-      m_Calls: []
-  OnHandContact:
-    m_PersistentCalls:
-      m_Calls: []
-  OnHandContactExit:
-    m_PersistentCalls:
-      m_Calls: []
-  OnHandHover:
-    m_PersistentCalls:
-      m_Calls: []
-  OnHandHoverExit:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!1 &1086534614
 GameObject:
   m_ObjectHideFlags: 0
@@ -7714,11 +7539,6 @@ Transform:
   m_Father: {fileID: 1520545033}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1646951633 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1425814784214717005, guid: b19d51e6a7ac86045884866247967cc6, type: 3}
-  m_PrefabInstance: {fileID: 386809003}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1670799058
 GameObject:
   m_ObjectHideFlags: 0
@@ -11123,7 +10943,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6805224202288225953, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
       propertyPath: OnButtonPressed.m_PersistentCalls.m_Calls.Array.size
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 6805224202288225953, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
       propertyPath: OnButtonPressed.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
@@ -11134,6 +10954,10 @@ PrefabInstance:
       value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 6805224202288225953, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+      propertyPath: OnButtonPressed.m_PersistentCalls.m_Calls.Array.data[2].m_Mode
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6805224202288225953, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
       propertyPath: OnButtonPressed.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 1605294539}
@@ -11142,11 +10966,19 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1505926185}
     - target: {fileID: 6805224202288225953, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+      propertyPath: OnButtonPressed.m_PersistentCalls.m_Calls.Array.data[2].m_Target
+      value: 
+      objectReference: {fileID: 1234652847789266410}
+    - target: {fileID: 6805224202288225953, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
       propertyPath: OnButtonPressed.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6805224202288225953, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
       propertyPath: OnButtonPressed.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6805224202288225953, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+      propertyPath: OnButtonPressed.m_PersistentCalls.m_Calls.Array.data[2].m_CallState
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6805224202288225953, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
@@ -11158,12 +10990,20 @@ PrefabInstance:
       value: SetToggleUnPressed
       objectReference: {fileID: 0}
     - target: {fileID: 6805224202288225953, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+      propertyPath: OnButtonPressed.m_PersistentCalls.m_Calls.Array.data[2].m_MethodName
+      value: SetContactModeEnum
+      objectReference: {fileID: 0}
+    - target: {fileID: 6805224202288225953, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
       propertyPath: OnButtonPressed.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
       value: Leap.Unity.PhysicalHands.Examples.SceneReset, Ultraleap.Tracking.PhysicalHandsExamples
       objectReference: {fileID: 0}
     - target: {fileID: 6805224202288225953, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
       propertyPath: OnButtonPressed.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
       value: Leap.Unity.PhysicalHands.PhysicalHandsButtonToggle, Ultraleap.Tracking.PhysicalHands
+      objectReference: {fileID: 0}
+    - target: {fileID: 6805224202288225953, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+      propertyPath: OnButtonPressed.m_PersistentCalls.m_Calls.Array.data[2].m_TargetAssemblyTypeName
+      value: Leap.Unity.PhysicalHands.PhysicalHandsManager, Ultraleap.Tracking.PhysicalHands
       objectReference: {fileID: 0}
     - target: {fileID: 6805224202288225953, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
       propertyPath: OnButtonPressed.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_IntArgument
@@ -11175,6 +11015,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6805224202288225953, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
       propertyPath: OnButtonPressed.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 6805224202288225953, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+      propertyPath: OnButtonPressed.m_PersistentCalls.m_Calls.Array.data[2].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 7288715151897497823, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
@@ -11191,7 +11035,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7557292157203605965, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
       propertyPath: OnButtonPressed.m_PersistentCalls.m_Calls.Array.size
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 7557292157203605965, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
       propertyPath: OnButtonPressed.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
@@ -11202,6 +11046,10 @@ PrefabInstance:
       value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 7557292157203605965, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+      propertyPath: OnButtonPressed.m_PersistentCalls.m_Calls.Array.data[2].m_Mode
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7557292157203605965, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
       propertyPath: OnButtonPressed.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 1605294539}
@@ -11210,11 +11058,19 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1923735300}
     - target: {fileID: 7557292157203605965, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+      propertyPath: OnButtonPressed.m_PersistentCalls.m_Calls.Array.data[2].m_Target
+      value: 
+      objectReference: {fileID: 1234652847789266410}
+    - target: {fileID: 7557292157203605965, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
       propertyPath: OnButtonPressed.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 7557292157203605965, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
       propertyPath: OnButtonPressed.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7557292157203605965, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+      propertyPath: OnButtonPressed.m_PersistentCalls.m_Calls.Array.data[2].m_CallState
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 7557292157203605965, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
@@ -11226,6 +11082,10 @@ PrefabInstance:
       value: SetToggleUnPressed
       objectReference: {fileID: 0}
     - target: {fileID: 7557292157203605965, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+      propertyPath: OnButtonPressed.m_PersistentCalls.m_Calls.Array.data[2].m_MethodName
+      value: SetContactModeEnum
+      objectReference: {fileID: 0}
+    - target: {fileID: 7557292157203605965, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
       propertyPath: OnButtonPressed.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
       value: Leap.Unity.PhysicalHands.Examples.SceneReset, Ultraleap.Tracking.PhysicalHandsExamples
       objectReference: {fileID: 0}
@@ -11234,7 +11094,15 @@ PrefabInstance:
       value: Leap.Unity.PhysicalHands.PhysicalHandsButtonToggle, Ultraleap.Tracking.PhysicalHands
       objectReference: {fileID: 0}
     - target: {fileID: 7557292157203605965, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+      propertyPath: OnButtonPressed.m_PersistentCalls.m_Calls.Array.data[2].m_TargetAssemblyTypeName
+      value: Leap.Unity.PhysicalHands.PhysicalHandsManager, Ultraleap.Tracking.PhysicalHands
+      objectReference: {fileID: 0}
+    - target: {fileID: 7557292157203605965, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
       propertyPath: OnButtonPressed.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_IntArgument
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7557292157203605965, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+      propertyPath: OnButtonPressed.m_PersistentCalls.m_Calls.Array.data[2].m_Arguments.m_IntArgument
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7557292157203605965, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
@@ -11243,6 +11111,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7557292157203605965, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
       propertyPath: OnButtonPressed.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 7557292157203605965, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+      propertyPath: OnButtonPressed.m_PersistentCalls.m_Calls.Array.data[2].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 7777257742192292787, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
@@ -11360,6 +11232,8 @@ PrefabInstance:
     - {fileID: 7348451228333257400, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
     - {fileID: 8134623800349183909, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
     - {fileID: 5076149731805165769, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+    - {fileID: 4677399194488223128, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+    - {fileID: 8536735542557770484, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
 --- !u!4 &8134623799061944077 stripped
 Transform:
