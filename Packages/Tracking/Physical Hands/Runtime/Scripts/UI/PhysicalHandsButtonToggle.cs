@@ -10,9 +10,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Animations;
-using UnityEngine.Assertions.Must;
-using UnityEngine.Events;
 
 namespace Leap.Unity.PhysicalHands
 {
@@ -36,41 +33,24 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
-        protected override void Start()
-        {
-            base.Start();
-        }
-
-        public void ToggleButton(bool shouldFirePressEvents = false)
+        public void ToggleButtonState(bool shouldFirePressEvents = false)
         {
             if (_isButtonPressed == false)
             {
-                MakePressed(shouldFirePressEvents);
+                SetTogglePressed(shouldFirePressEvents);
             }
             else if(_isButtonPressed == true)
             {
-                MakeUnpressed(shouldFirePressEvents);
+                SetToggleUnPressed(shouldFirePressEvents);
             }
         }
 
-        public void SetButtonPressed(bool isPressed, bool shouldFirePressEvents = false)
-        {
-            if (isPressed == true)
-            {
-                MakePressed(shouldFirePressEvents);
-            }
-            else if (isPressed == false)
-            {
-                MakeUnpressed(shouldFirePressEvents);
-            }
-        }
-
-        private void MakePressed(bool shouldFirePressEvents)
+        public void SetTogglePressed(bool shouldFirePressEvents = false)
         {
             _isButtonPressed = true;
             _canUnpress = true;
             _pressableObject.transform.localPosition = new Vector3(_pressableObject.transform.localPosition.x,
-                0 + _buttonTravelOffset,
+                _buttonTravelOffset,
                 _pressableObject.transform.localPosition.z);
             FreezeButtonPosition();
 
@@ -80,7 +60,7 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
-        private void MakeUnpressed(bool shouldFirePressEvents)
+        public void SetToggleUnPressed(bool shouldFirePressEvents = false)
         {
             _isButtonPressed = false;
             _canUnpress = false;
@@ -94,8 +74,6 @@ namespace Leap.Unity.PhysicalHands
                 OnButtonUnPressed.Invoke();
             }
         }
-
-
 
         /// <summary>
         /// Action to perform when the button is pressed.
@@ -157,7 +135,7 @@ namespace Leap.Unity.PhysicalHands
 
         private IEnumerator DelayUnpress()
         { 
-            yield return new WaitForSecondsRealtime(1f);
+            yield return new WaitForSecondsRealtime(0.5f);
             _canUnpress = true;
         }
 
