@@ -567,7 +567,7 @@ namespace Leap.Unity.PhysicalHands
             {
                 foreach (ConfigurableJoint joint in _configurableJoints)
                 {
-                    DrawJointRangeGizmo(joint.transform.position);
+                    DrawJointRangeGizmo(joint.transform.localPosition);
                 }
             }
         }
@@ -578,6 +578,7 @@ namespace Leap.Unity.PhysicalHands
         /// <param name="jointPosition">Position of the joint.</param>
         private void DrawJointRangeGizmo(Vector3 jointPosition)
         {
+            Gizmos.matrix = transform.localToWorldMatrix;
             switch (_sliderType)
             {
                 case SliderType.ONE_DIMENSIONAL:
@@ -586,45 +587,56 @@ namespace Leap.Unity.PhysicalHands
                         {
                             case SliderDirection.X:
                                 Gizmos.color = Color.red; // X axis
-                                Gizmos.DrawLine(jointPosition + transform.right * SliderTravelDistance, jointPosition - transform.right * SliderTravelDistance);
+                                Gizmos.DrawLine(jointPosition + Vector3.right * SliderTravelDistance, jointPosition - Vector3.right * SliderTravelDistance);
                                 break;
                             case SliderDirection.Y:
                                 Gizmos.color = Color.green; // Y axis
-                                Gizmos.DrawLine(jointPosition + transform.up * SliderTravelDistance, jointPosition - transform.up * SliderTravelDistance);
+                                Gizmos.DrawLine(jointPosition + Vector3.up * SliderTravelDistance, jointPosition - Vector3.up * SliderTravelDistance);
                                 break;
                             case SliderDirection.Z:
                                 Gizmos.color = Color.blue; // Z axis
-                                Gizmos.DrawLine(jointPosition + transform.forward * SliderTravelDistance, jointPosition - transform.forward * SliderTravelDistance);
+                                Gizmos.DrawLine(jointPosition + Vector3.forward * SliderTravelDistance, jointPosition - Vector3.forward * SliderTravelDistance);
                                 break;
                         }
                         break;
                     }
                 case SliderType.TWO_DIMENSIONAL:
                     {
+                        Vector3 extents = Vector3.zero;
                         switch (_twoDimSliderDirection)
                         {
                             case TwoDimSliderDirection.XY:
                                 Gizmos.color = Color.red; // X axis
-                                Gizmos.DrawLine(jointPosition + transform.right * TwoDimSliderTravelDistance.x, jointPosition - transform.right * TwoDimSliderTravelDistance.x);
+                                Gizmos.DrawLine(jointPosition + Vector3.right * TwoDimSliderTravelDistance.x, jointPosition - Vector3.right * TwoDimSliderTravelDistance.x);
                                 Gizmos.color = Color.green; // Y axis
-                                Gizmos.DrawLine(jointPosition + transform.up * TwoDimSliderTravelDistance.y, jointPosition - transform.up * TwoDimSliderTravelDistance.y);
+                                Gizmos.DrawLine(jointPosition + Vector3.up * TwoDimSliderTravelDistance.y, jointPosition - Vector3.up * TwoDimSliderTravelDistance.y);
+                                extents = new Vector3(TwoDimSliderTravelDistance.x, TwoDimSliderTravelDistance.y, 0) * 2;
                                 break;
                             case TwoDimSliderDirection.XZ:
                                 Gizmos.color = Color.red; // X axis
-                                Gizmos.DrawLine(jointPosition + transform.right * TwoDimSliderTravelDistance.x, jointPosition - transform.right * TwoDimSliderTravelDistance.x);
+                                Gizmos.DrawLine(jointPosition + Vector3.right * TwoDimSliderTravelDistance.x, jointPosition - Vector3.right * TwoDimSliderTravelDistance.x);
                                 Gizmos.color = Color.blue; // Z axis
-                                Gizmos.DrawLine(jointPosition + transform.forward * TwoDimSliderTravelDistance.y, jointPosition - transform.forward * TwoDimSliderTravelDistance.y);
+                                Gizmos.DrawLine(jointPosition + Vector3.forward * TwoDimSliderTravelDistance.y, jointPosition - Vector3.forward * TwoDimSliderTravelDistance.y);
+                                extents = new Vector3(TwoDimSliderTravelDistance.x, 0, TwoDimSliderTravelDistance.y) * 2;
                                 break;
                             case TwoDimSliderDirection.YZ:
                                 Gizmos.color = Color.green; // Y axis
-                                Gizmos.DrawLine(jointPosition + transform.up * TwoDimSliderTravelDistance.x, jointPosition - transform.up * TwoDimSliderTravelDistance.x);
+                                Gizmos.DrawLine(jointPosition + Vector3.up * TwoDimSliderTravelDistance.x, jointPosition - Vector3.up * TwoDimSliderTravelDistance.x);
                                 Gizmos.color = Color.blue; // Z axis
-                                Gizmos.DrawLine(jointPosition + transform.forward * TwoDimSliderTravelDistance.y, jointPosition - transform.forward * TwoDimSliderTravelDistance.y);
+                                Gizmos.DrawLine(jointPosition + Vector3.forward * TwoDimSliderTravelDistance.y, jointPosition - Vector3.forward * TwoDimSliderTravelDistance.y);
+                                extents = new Vector3(0, TwoDimSliderTravelDistance.x, TwoDimSliderTravelDistance.y) * 2;
                                 break;
                         }
+                        DrawBoxGizmo(jointPosition, extents, Color.cyan);
                         break;
                     }
             }
+        }
+
+        private void DrawBoxGizmo(Vector3 position, Vector3 size, Color color)
+        {
+            Gizmos.color = color;
+            Gizmos.DrawWireCube(position, size);
         }
 
         #endregion
