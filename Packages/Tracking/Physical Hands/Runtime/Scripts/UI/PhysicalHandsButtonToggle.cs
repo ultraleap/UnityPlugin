@@ -33,9 +33,11 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
+        Coroutine delayedUnpressCoroutine;
+
         private void OnEnable()
         {
-            _canUnpress = true;
+            EnableUnpress();
         }
 
         public void ToggleButtonState(bool shouldFirePressEvents = false)
@@ -54,7 +56,13 @@ namespace Leap.Unity.PhysicalHands
         {
             _isButtonPressed = true;
             _canUnpress = false;
-            StartCoroutine(DelayUnpress());
+
+            if (delayedUnpressCoroutine != null)
+            {
+                StopCoroutine(delayedUnpressCoroutine);
+            }
+
+            delayedUnpressCoroutine = StartCoroutine(DelayUnpress());
 
             _pressableObject.transform.localPosition = new Vector3(_pressableObject.transform.localPosition.x,
                 _buttonTravelOffset,
@@ -89,8 +97,6 @@ namespace Leap.Unity.PhysicalHands
         protected override void ButtonPressed()
         {
             base.ButtonPressed();
-
-            // Freeze object's position and rotation when pressed
             SetTogglePressed(false);
         }
 
@@ -128,6 +134,24 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
+        protected override void OnHandContactExitPO(ContactHand hand)
+        {
+            base.OnHandContactExitPO(hand);
+
+            EnableUnpress();
+        }
+
+        private void EnableUnpress()
+        {
+            if (delayedUnpressCoroutine != null)
+            {
+                StopCoroutine(delayedUnpressCoroutine);
+                delayedUnpressCoroutine = null;
+            }
+
+            _canUnpress = true;
+        }
+
         private void FreezeButtonPosition()
         {
             _constaintsBeforeFreeze = _pressableObjectRB.constraints;
@@ -140,9 +164,10 @@ namespace Leap.Unity.PhysicalHands
         }
 
         private IEnumerator DelayUnpress()
-        { 
+        {
             yield return new WaitForSecondsRealtime(0.5f);
             _canUnpress = true;
+            delayedUnpressCoroutine = null;
         }
 
         #endregion
