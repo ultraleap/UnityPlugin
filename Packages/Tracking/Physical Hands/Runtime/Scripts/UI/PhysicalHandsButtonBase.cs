@@ -444,7 +444,7 @@ namespace Leap.Unity.PhysicalHands
         protected virtual void OnCollisionPO(Collision collision)
         {
             // If the colliding object is not part of PhysicalHandsManager, add it to the list of objects contacting the button
-            if (!collision.transform.root.GetComponent<PhysicalHandsManager>())
+            if (!collision.gameObject.TryGetComponent<ContactBone>(out ContactBone contactingBone))
             {
                 _objectsContactingButton.Add(collision.gameObject);
             }

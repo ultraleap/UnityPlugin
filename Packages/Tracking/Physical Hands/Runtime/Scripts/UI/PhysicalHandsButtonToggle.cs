@@ -28,10 +28,6 @@ namespace Leap.Unity.PhysicalHands
             {
                 return _isButtonPressed;
             }
-            set
-            {
-                _isButtonPressed = value;
-            }
         }
 
         Coroutine delayedUnpressCoroutine;
