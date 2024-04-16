@@ -20,10 +20,15 @@
     "url": "https://www.ultraleap.com"
   },
   "samples": [
-    {
-      "displayName": "Shared Example Assets [Required]",
+	{
+      "displayName": "All Examples",
+      "description": "Automatically Import All Examples",
+      "path": "Examples~/All Examples"
+    },
+	{
+      "displayName": "Shared Example Assets REQUIRED",
       "description": "Shared core example assets for all other Ultraleap Sample content.",
-      "path": "Examples~/Shared Example Assets [Required]"
+      "path": "Examples~/Shared Example Assets REQUIRED"
     },
     {
       "displayName": "XR Examples",
