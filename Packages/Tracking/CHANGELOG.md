@@ -6,12 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
 
-## [NEXT] - xx/xx/xx
+## [6.15.0] - 19/04/24
 
 ### Tracking Client versions
-- Windows 	v5.17.1
-- MacOS 	v5.17.1
-- Android 	v5.17.1
+- Windows 	v5.30.0
+- MacOS 	v5.30.0
+- Android 	v5.30.0
 
 ### Added
 - LeapServiceProvider accessor for world space psoition of the Tracking Camera
