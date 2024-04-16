@@ -41,7 +41,8 @@ namespace Leap.Unity.PhysicalHands
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("_buttonTravelDistance"), new GUIContent("Button Travel Distance", "The distance the button can travel when pressed."));
                 EditorGUI.indentLevel = 0;
             }
-  
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("_buttonPressExitThreshold"), new GUIContent("Button Unpress Threshold", "How far the button should travel up the travel distance once pressed before it is considered unpressed 0-1 value, equivalent to percentage of travel distance."));
+
             EditorGUILayout.Space(5);
 
             EditorGUILayout.PropertyField(serializedObject.FindProperty("_canBePressedByObjects"), new GUIContent("Can Be Pressed By Objects", "Determines whether the button can be pressed by objects which are not the hand."));

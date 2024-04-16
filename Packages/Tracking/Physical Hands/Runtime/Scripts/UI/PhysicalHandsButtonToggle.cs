@@ -7,8 +7,6 @@
  ******************************************************************************/
 
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace Leap.Unity.PhysicalHands
@@ -19,8 +17,11 @@ namespace Leap.Unity.PhysicalHands
     public class PhysicalHandsButtonToggle : PhysicalHandsButtonBase
     {
         private bool _canUnpress = false;
-        private RigidbodyConstraints _constaintsBeforeFreeze = RigidbodyConstraints.None;
+        private RigidbodyConstraints _constraintsBeforeFreeze = RigidbodyConstraints.None;
 
+        /// <summary>
+        /// Indicates whether the button is currently toggled.
+        /// </summary>
         public bool IsToggled
         {
             get
@@ -40,18 +41,26 @@ namespace Leap.Unity.PhysicalHands
             EnableUnpress();
         }
 
+        /// <summary>
+        /// Toggles the button state.
+        /// </summary>
+        /// <param name="shouldFirePressEvents">Indicates if press events should be fired.</param>
         public void ToggleButtonState(bool shouldFirePressEvents = false)
         {
             if (_isButtonPressed == false)
             {
                 SetTogglePressed(shouldFirePressEvents);
             }
-            else if(_isButtonPressed == true)
+            else if (_isButtonPressed == true)
             {
                 SetToggleUnPressed(shouldFirePressEvents);
             }
         }
 
+        /// <summary>
+        /// Sets the button to the pressed state.
+        /// </summary>
+        /// <param name="shouldFirePressEvents">Indicates if press events should be fired.</param>
         public void SetTogglePressed(bool shouldFirePressEvents = false)
         {
             _isButtonPressed = true;
@@ -75,11 +84,15 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
+        /// <summary>
+        /// Sets the button to the unpressed state.
+        /// </summary>
+        /// <param name="shouldFirePressEvents">Indicates if press events should be fired.</param>
         public void SetToggleUnPressed(bool shouldFirePressEvents = false)
         {
             _isButtonPressed = false;
             _canUnpress = true;
-            
+
             _pressableObject.transform.localPosition = new Vector3(_pressableObject.transform.localPosition.x,
                 _buttonTravelOffset + _buttonTravelDistanceLocal,
                 _pressableObject.transform.localPosition.z);
@@ -100,6 +113,9 @@ namespace Leap.Unity.PhysicalHands
             SetTogglePressed(false);
         }
 
+        /// <summary>
+        /// Action to perform when the button is unpressed.
+        /// </summary>
         protected override void ButtonUnpressed()
         {
             base.ButtonUnpressed();
@@ -108,6 +124,10 @@ namespace Leap.Unity.PhysicalHands
 
         #region Collision handling methods
 
+        /// <summary>
+        /// Handles collision events with physics objects.
+        /// </summary>
+        /// <param name="collision">The collision data.</param>
         protected override void OnCollisionPO(Collision collision)
         {
             base.OnCollisionPO(collision);
@@ -121,6 +141,10 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
+        /// <summary>
+        /// Handles hand contact events with the button.
+        /// </summary>
+        /// <param name="contactHand">The hand in contact with the button.</param>
         protected override void OnHandContactPO(ContactHand contactHand)
         {
             base.OnHandContactPO(contactHand);
@@ -134,6 +158,10 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
+        /// <summary>
+        /// Handles hand contact exit events with the button.
+        /// </summary>
+        /// <param name="hand">The hand that exited contact with the button.</param>
         protected override void OnHandContactExitPO(ContactHand hand)
         {
             base.OnHandContactExitPO(hand);
@@ -141,6 +169,9 @@ namespace Leap.Unity.PhysicalHands
             EnableUnpress();
         }
 
+        /// <summary>
+        /// Enables the unpressing of the button.
+        /// </summary>
         private void EnableUnpress()
         {
             if (delayedUnpressCoroutine != null)
@@ -152,24 +183,33 @@ namespace Leap.Unity.PhysicalHands
             _canUnpress = true;
         }
 
+        /// <summary>
+        /// Freezes the position of the button.
+        /// </summary>
         private void FreezeButtonPosition()
         {
-            _constaintsBeforeFreeze = _pressableObjectRB.constraints;
+            _constraintsBeforeFreeze = _pressableObjectRB.constraints;
             _pressableObjectRB.constraints = RigidbodyConstraints.FreezeAll;
         }
 
+        /// <summary>
+        /// Unfreezes the position of the button.
+        /// </summary>
         private void UnFreezeButtonPosition()
         {
-            _pressableObjectRB.constraints = _constaintsBeforeFreeze;
+            _pressableObjectRB.constraints = _constraintsBeforeFreeze;
         }
 
+        /// <summary>
+        /// Delays the unpressing of the button.
+        /// </summary>
         private IEnumerator DelayUnpress()
         {
             yield return new WaitForSecondsRealtime(0.5f);
             _canUnpress = true;
             delayedUnpressCoroutine = null;
         }
-
         #endregion
+
     }
 }

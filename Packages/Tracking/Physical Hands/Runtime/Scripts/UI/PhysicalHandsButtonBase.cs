@@ -6,10 +6,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -39,8 +36,9 @@ namespace Leap.Unity.PhysicalHands
         protected bool _canBePressedByObjects = false;
         [SerializeField]
         protected GameObject _pressableObject;
+        [SerializeField]
+        protected float _buttonPressExitThreshold = 0.5f;
 
-        private const float BUTTON_PRESS_EXIT_THRESHOLD = 0.5f;
         private bool _contactHandPressing = false;
         private bool _leftHandContacting = false;
         private bool _rightHandContacting = false;
@@ -54,7 +52,11 @@ namespace Leap.Unity.PhysicalHands
         protected Rigidbody _pressableObjectRB = null;
         protected ConfigurableJoint _configurableJoint;
         
-
+        /// <summary>
+        /// Some presets for how the button should act. 
+        /// Try them out and work out what feels best for your specific button. 
+        /// Custom allows you to create your own feeling buttons
+        /// </summary>
         private enum ButtonPreset
         {
             Standard = 0,
@@ -82,6 +84,9 @@ namespace Leap.Unity.PhysicalHands
         #endregion
 
         #region public getters
+        /// <summary>
+        /// Indicates whether the button is currently pressed.
+        /// </summary>
         public bool IsPressed
         {
             get
@@ -91,12 +96,17 @@ namespace Leap.Unity.PhysicalHands
         }
         #endregion
 
+        /// <summary>
+        /// Updates inspector values such as button travel distance and preset values.
+        /// </summary>
         public void UpdateInspectorValues()
         {
+            // Calculate button travel distance and offset automatically if enabled
             if (_automaticTravelDistance && _pressableObject != null)
             {
                 _buttonTravelOffset = 0;
 
+                // Calculate offset based on mesh filter bounds
                 if (TryGetComponent<MeshFilter>(out MeshFilter meshFilter) && meshFilter.sharedMesh != null)
                 {
                     _buttonTravelOffset += meshFilter.sharedMesh.bounds.extents.y;
@@ -110,6 +120,7 @@ namespace Leap.Unity.PhysicalHands
                 _buttonTravelDistance = (_pressableObject.transform.localPosition.y - _buttonTravelOffset) * transform.lossyScale.y;
             }
 
+            // Update button preset values based on selected preset
             switch (_buttonPreset)
             {
                 // Standard button preset with no spring, damper, or force limits
@@ -329,7 +340,7 @@ namespace Leap.Unity.PhysicalHands
             }
 
             // Check if the button should be released
-            if (_isButtonPressed && distance < _buttonTravelDistanceLocal * BUTTON_PRESS_EXIT_THRESHOLD)
+            if (_isButtonPressed && distance < _buttonTravelDistanceLocal * _buttonPressExitThreshold)
             {
                 _isButtonPressed = false;
                 ButtonUnpressed();
@@ -426,16 +437,26 @@ namespace Leap.Unity.PhysicalHands
             OnHandHover?.Invoke(hand);
         }
 
+        /// <summary>
+        /// Handles collision events with physics objects.
+        /// </summary>
+        /// <param name="collision">The collision data.</param>
         protected virtual void OnCollisionPO(Collision collision)
         {
+            // If the colliding object is not part of PhysicalHandsManager, add it to the list of objects contacting the button
             if (!collision.transform.root.GetComponent<PhysicalHandsManager>())
             {
                 _objectsContactingButton.Add(collision.gameObject);
             }
         }
 
+        /// <summary>
+        /// Handles collision exit events with physics objects.
+        /// </summary>
+        /// <param name="collision">The collision data.</param>
         protected virtual void OnCollisionExitPO(Collision collision)
         {
+            // Remove the colliding object from the list of objects contacting the button
             _objectsContactingButton.Remove(collision.gameObject);
         }
 
@@ -458,6 +479,9 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
+        /// <summary>
+        /// Draws Gizmos to visualize the button's travel path when selected in the Unity editor.
+        /// </summary>
         private void OnDrawGizmosSelected()
         {
             if (_pressableObject == null)
