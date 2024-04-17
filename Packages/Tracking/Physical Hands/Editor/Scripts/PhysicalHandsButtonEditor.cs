@@ -51,6 +51,7 @@ namespace Leap.Unity.PhysicalHands
             EditorGUILayout.Space(5);
 
             EditorGUILayout.PropertyField(serializedObject.FindProperty("_canBePressedByObjects"), new GUIContent("Can Be Pressed By Objects", "Determines whether the button can be pressed by objects which are not the hand."));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("_buttonIgnoreGrabs"), new GUIContent("Ignore Grabbing Button", "Specifies whether grabs should be ignored on the Pressable Object."));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("_whichHandCanPressButton"), new GUIContent("Which Hand Can Activate Button Presses", "Specifies which hand(s) can press the button."));
 
             EditorGUILayout.Space(10);

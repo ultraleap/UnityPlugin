@@ -15,7 +15,6 @@ namespace Leap.Unity.PhysicalHands
     [RequireComponent(typeof(Rigidbody))]
     public class PhysicalHandsButton: MonoBehaviour
     {
-
         [SerializeField]
         private bool _automaticTravelDistance = true;
         [SerializeField]
@@ -38,6 +37,8 @@ namespace Leap.Unity.PhysicalHands
         protected GameObject _pressableObject;
         [SerializeField]
         protected float _buttonPressExitThreshold = 0.5f;
+        [SerializeField]
+        private bool _buttonIgnoreGrabs = true;
 
         private bool _contactHandPressing = false;
         private bool _leftHandContacting = false;
@@ -254,7 +255,7 @@ namespace Leap.Unity.PhysicalHands
             }
 
             // Ensure the pressable object has an IgnorePhysicalHands component
-            if (!_pressableObject.TryGetComponent<IgnorePhysicalHands>(out IgnorePhysicalHands ignorePhysHands))
+            if (_buttonIgnoreGrabs && !_pressableObject.TryGetComponent<IgnorePhysicalHands>(out IgnorePhysicalHands ignorePhysHands))
             {
                 ignorePhysHands = _pressableObject.AddComponent<IgnorePhysicalHands>();
                 ignorePhysHands.DisableAllGrabbing = true;

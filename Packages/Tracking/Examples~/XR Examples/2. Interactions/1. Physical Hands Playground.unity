@@ -1021,6 +1021,7 @@ MonoBehaviour:
   _canBePressedByObjects: 0
   _pressableObject: {fileID: 385804509}
   _buttonPressExitThreshold: 0.5
+  _buttonIgnoreGrabs: 1
   _buttonPreset: 0
   OnButtonPressed:
     m_PersistentCalls:
@@ -1523,15 +1524,31 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1425814784214716994, guid: b19d51e6a7ac86045884866247967cc6, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 1425814784214716994, guid: b19d51e6a7ac86045884866247967cc6, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.02336
+      value: 0.0128
       objectReference: {fileID: 0}
     - target: {fileID: 1425814784214716994, guid: b19d51e6a7ac86045884866247967cc6, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1425814784214716995, guid: b19d51e6a7ac86045884866247967cc6, type: 3}
+      propertyPath: m_Mass
+      value: 0.01
+      objectReference: {fileID: 0}
+    - target: {fileID: 1425814784214716995, guid: b19d51e6a7ac86045884866247967cc6, type: 3}
+      propertyPath: m_AngularDrag
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1425814784214716995, guid: b19d51e6a7ac86045884866247967cc6, type: 3}
+      propertyPath: m_CollisionDetection
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2495802599556206966, guid: b19d51e6a7ac86045884866247967cc6, type: 3}
+      propertyPath: damperValue
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 2495802599556206966, guid: b19d51e6a7ac86045884866247967cc6, type: 3}
       propertyPath: springValue
@@ -1546,22 +1563,60 @@ PrefabInstance:
       value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 2495802599556206966, guid: b19d51e6a7ac86045884866247967cc6, type: 3}
+      propertyPath: _buttonIgnoreGrabs
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2495802599556206966, guid: b19d51e6a7ac86045884866247967cc6, type: 3}
       propertyPath: _buttonTravelOffset
       value: 0.0048818
       objectReference: {fileID: 0}
     - target: {fileID: 2495802599556206966, guid: b19d51e6a7ac86045884866247967cc6, type: 3}
       propertyPath: _buttonTravelDistance
-      value: 0.018478207
+      value: 0.007918202
+      objectReference: {fileID: 0}
+    - target: {fileID: 2495802599556206966, guid: b19d51e6a7ac86045884866247967cc6, type: 3}
+      propertyPath: _canBePressedByObjects
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2495802599556206966, guid: b19d51e6a7ac86045884866247967cc6, type: 3}
+      propertyPath: _automaticTravelDistance
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8844366506104652733, guid: b19d51e6a7ac86045884866247967cc6, type: 3}
+      propertyPath: m_AngularDrag
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8844366506104652733, guid: b19d51e6a7ac86045884866247967cc6, type: 3}
+      propertyPath: m_CollisionDetection
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 21357153186210319, guid: b19d51e6a7ac86045884866247967cc6, type: 3}
-    - {fileID: 1425814784214716995, guid: b19d51e6a7ac86045884866247967cc6, type: 3}
+    - {fileID: 2302522945959691447, guid: b19d51e6a7ac86045884866247967cc6, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: b19d51e6a7ac86045884866247967cc6, type: 3}
 --- !u!4 &386809004 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1425814782421875418, guid: b19d51e6a7ac86045884866247967cc6, type: 3}
   m_PrefabInstance: {fileID: 386809003}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &386809005 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1425814784214717005, guid: b19d51e6a7ac86045884866247967cc6, type: 3}
+  m_PrefabInstance: {fileID: 386809003}
+  m_PrefabAsset: {fileID: 0}
+--- !u!65 &386809006
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 386809005}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1.0000004, y: 2.0000012, z: 1.0000001}
+  m_Center: {x: -0.000011384487, y: -0.00018310547, z: 0.000057131052}
 --- !u!1001 &393039382
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8299,6 +8354,7 @@ MonoBehaviour:
   _canBePressedByObjects: 0
   _pressableObject: {fileID: 419655438}
   _buttonPressExitThreshold: 0.5
+  _buttonIgnoreGrabs: 1
   _buttonPreset: 0
   OnButtonPressed:
     m_PersistentCalls:
@@ -9471,6 +9527,7 @@ MonoBehaviour:
   _canBePressedByObjects: 0
   _pressableObject: {fileID: 686586950}
   _buttonPressExitThreshold: 0.5
+  _buttonIgnoreGrabs: 1
   _buttonPreset: 0
   OnButtonPressed:
     m_PersistentCalls:
