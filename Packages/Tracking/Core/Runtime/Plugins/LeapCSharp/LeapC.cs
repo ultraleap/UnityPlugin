@@ -1295,7 +1295,7 @@ namespace LeapInternal
             public string serial;
             public string type;
         }
-        
+
         public static eLeapRS SetDeviceHints(IntPtr hConnection, IntPtr hDevice, string[] hints)
         {
             // Ensure the final element of the array is null terminated.
@@ -1307,7 +1307,7 @@ namespace LeapInternal
 
             return SetDeviceHintsInternal(hConnection, hDevice, hints);
         }
-        
+
         [DllImport("LeapC", EntryPoint = "LeapSetDeviceHints")]
         private static extern eLeapRS SetDeviceHintsInternal(IntPtr hConnection, IntPtr hDevice, string[] hints);
     }

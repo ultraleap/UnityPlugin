@@ -16,12 +16,12 @@ namespace Leap.Unity
         public static bool NonLeapOpenXRTrackingAvailable;
 
         private static bool leapCTrackingAvailable;
-        public static bool LeapCTrackingAvailable 
-        { 
-            get 
-            {                  
-                return leapCTrackingAvailable = IsLeapCConnectionAvailable(); 
-            } 
+        public static bool LeapCTrackingAvailable
+        {
+            get
+            {
+                return leapCTrackingAvailable = IsLeapCConnectionAvailable();
+            }
         }
 
         private static bool leapCConnectionChecked = false;

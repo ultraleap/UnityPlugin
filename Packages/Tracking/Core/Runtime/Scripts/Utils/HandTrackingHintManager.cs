@@ -29,7 +29,7 @@ namespace Leap.Unity
             currentHints = UltraleapSettings.Instance.startupHints.ToList();
 
             if (HandTrackingSourceUtility.LeapOpenXRHintingAvailable)
-            { 
+            {
                 // Use OpenXR for Hints
             }
             else
@@ -62,7 +62,7 @@ namespace Leap.Unity
         /// </summary>
         public static void AddHint(string hint)
         {
-            if(!currentHints.Contains(hint))
+            if (!currentHints.Contains(hint))
             {
                 currentHints.Add(hint);
                 RequestHandTrackingHints(currentHints.ToArray());
@@ -91,7 +91,7 @@ namespace Leap.Unity
         /// <param name="hints">The hints you wish to send</param>
         public static void RequestHandTrackingHints(string[] hints)
         {
-            if(hints == null)
+            if (hints == null)
             {
                 hints = new string[0];
             }

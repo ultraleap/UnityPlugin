@@ -880,7 +880,7 @@ namespace LeapInternal
             UInt64 clearFlags = (ulong)FlagForPolicy(clear);
             eLeapRS result;
 
-            if(device != null && Controller.CheckRequiredServiceVersion(MinServiceVersionForMultiModeSupport, this))
+            if (device != null && Controller.CheckRequiredServiceVersion(MinServiceVersionForMultiModeSupport, this))
             {
                 result = LeapC.SetPolicyFlagsEx(_leapConnection, device.Handle, setFlags, clearFlags);
             }
