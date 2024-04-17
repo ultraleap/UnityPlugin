@@ -34,13 +34,25 @@ namespace LeapInternal
             return Native.LeapExtrapolatorSetDeviceTransform(_handle, deviceTransform);
         }
 
-        public eLeapRS AddTrackingFrame(LEAP_TRACKING_EVENT trackingEvent) =>
-            Native.LeapExtrapolatorAddTrackingFrame(_handle, trackingEvent);
-        
-        public eLeapRS AddHeadPose(LEAP_HEAD_POSE_EVENT headPoseEvent) =>
-            Native.LeapExtrapolatorAddHeadPose(_handle, headPoseEvent);
+        public void AddTrackingFrame(LEAP_TRACKING_EVENT trackingEvent)
+        {
+            if (Native.LeapExtrapolatorAddTrackingFrame(_handle, trackingEvent) is not eLeapRS.eLeapRS_Success)
+            {
+                throw new Exception("Failed to add tracking frame");
+            }
+        }
 
-        public ulong GetFrameSize(long timestamp)
+
+        public void AddHeadPose(LEAP_HEAD_POSE_EVENT headPoseEvent)
+        {
+            if (Native.LeapExtrapolatorAddHeadPose(_handle, headPoseEvent) is not eLeapRS.eLeapRS_Success)
+            {
+                throw new Exception("Failed to add head pose");
+            }
+        }
+
+
+        private ulong GetFrameSize(long timestamp)
         {
             eLeapRS result = Native.LeapExtrapolatorGetFrameSize(_handle, timestamp, out ulong numBytes);
 
