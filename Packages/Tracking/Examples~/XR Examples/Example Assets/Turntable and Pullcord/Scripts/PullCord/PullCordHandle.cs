@@ -176,9 +176,9 @@ namespace Leap.Unity.Examples
 
         void IPhysicalHandHover.OnHandHover(ContactHand hand)
         {
-            if(!_relevanthands.Contains(hand.GetDataHand()))
+            if(!_relevanthands.Contains(hand.DataHand))
             {
-                _relevanthands.Add(hand.GetDataHand());
+                _relevanthands.Add(hand.DataHand);
             }
 
             _mostRelevantHand = GetClosestHand();
@@ -186,13 +186,13 @@ namespace Leap.Unity.Examples
 
         void IPhysicalHandHover.OnHandHoverExit(ContactHand hand)
         {
-            _relevanthands.Remove(hand.GetDataHand());
+            _relevanthands.Remove(hand.DataHand);
             _mostRelevantHand = GetClosestHand();
         }
 
         void IPhysicalHandGrab.OnHandGrab(ContactHand hand)
         {
-            _mostRelevantHand = hand.GetDataHand();
+            _mostRelevantHand = hand.DataHand;
         }
 
         void IPhysicalHandGrab.OnHandGrabExit(ContactHand hand)

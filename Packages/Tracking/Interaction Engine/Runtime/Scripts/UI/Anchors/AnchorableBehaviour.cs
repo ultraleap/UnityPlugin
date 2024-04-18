@@ -472,13 +472,13 @@ namespace Leap.Unity.Interaction
         void IPhysicalHandHover.OnHandHover(ContactHand hand)
         {
             _isHovered = true;
-            _hoveringHands.Add(hand.GetDataHand());
+            _hoveringHands.Add(hand.DataHand);
         }
 
         void IPhysicalHandHover.OnHandHoverExit(ContactHand hand)
         {
             _isHovered = false;
-            _hoveringHands.Remove(hand.GetDataHand());
+            _hoveringHands.Remove(hand.DataHand);
         }
 
         private void refreshInspectorConveniences()
