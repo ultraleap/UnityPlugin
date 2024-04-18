@@ -6,6 +6,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
 
+## [PHYSHANDSPARITY] - xx/xx/xx
+
+### Added
+- PhysicalHandsButton with automatic setup
+- PhysicalHandsButtonToggle
+
+### Changed
+- Removed old PhysicalHandsButton
+
+### Fixed
+- 
+
 ## [NEXT] - xx/xx/xx
 
 ### Tracking Client versions
@@ -60,6 +72,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (Physical Hands) Hand stuck in pose, unable to grab if object is disabled while grabbing
 - (Physical Hands) Errors when destroying objects that are grabbed
 - (Physical Hands) Errors when adding Physical Hands Manager prefab for the first time
+- Use of Device Transforms does not apply rotations
+- OpenXR API Layer Service query intent was missing sometimes, preventing API layers functioning correctly
+- OpenXR checks minSdkVersion rather than targetSdkVersion for query intents
+- (Physical Hands) PhysHands Settings are not localized when using decimals
 
 
 ## [6.14.0] - 24/01/24
