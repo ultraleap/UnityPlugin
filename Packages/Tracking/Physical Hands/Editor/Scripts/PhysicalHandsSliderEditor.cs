@@ -2,8 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
-using UnityEngine.Animations;
-using UnityEngine.UIElements;
 using System.Linq;
 
 namespace Leap.Unity.PhysicalHands
@@ -11,11 +9,12 @@ namespace Leap.Unity.PhysicalHands
     [CustomEditor(typeof(PhysicalHandsUISlider))]
     public class PhysicalHandsSliderEditor : CustomEditorBase<PhysicalHandsUISlider>
     {
-
         private bool eventsFoldedOut = false;
 
         public override void OnInspectorGUI()
         {
+            EditorUtils.DrawScriptField((MonoBehaviour)target);
+
             EditorGUILayout.PropertyField(serializedObject.FindProperty("_slideableObject"), new GUIContent("Slideable Object", "The GameObject that acts as the slider."));
 
             var sliderType = serializedObject.FindProperty("_sliderType");

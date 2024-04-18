@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
@@ -100,7 +99,7 @@ namespace Leap.Unity.PhysicalHands
         private Vector3 _axisChangeFromZero = Vector3.zero;
 
         [SerializeField]
-        private PhysicalHandsButtonBase _connectedButton;
+        private PhysicalHandsButton _connectedButton;
 
         
         private bool _freezeIfNotActive = true;
@@ -216,7 +215,7 @@ namespace Leap.Unity.PhysicalHands
             // Check if a connected button is assigned
             if (_connectedButton == null)
             {
-                if (_slideableObject.TryGetComponent<PhysicalHandsButtonBase>(out _connectedButton))
+                if (_slideableObject.TryGetComponent<PhysicalHandsButton>(out _connectedButton))
                 {
                     // Assign event listeners for button events
                     _connectedButton.OnButtonPressed?.AddListener(ButtonPressed);
@@ -318,7 +317,7 @@ namespace Leap.Unity.PhysicalHands
 
         private void FixedUpdate()
         {
-            // Account for joints beimng a little weird when rotating parent rigidbodies.
+            // Account for joints being a little weird when rotating parent rigidbodies.
             // Set the rotation to the initial rotation of the sliding object when it gets too far away. 
             // Note. This will stop the slideable object from being rotated at all at runtime
             if(Quaternion.Angle(_slideableObject.transform.localRotation, _initialRotation) > 0.5f)
