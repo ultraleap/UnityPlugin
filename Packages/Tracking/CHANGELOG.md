@@ -6,6 +6,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
 
+## [PHYSHANDSPARITY] - xx/xx/xx
+
+### Added
+- PhysicalHandsButton with automatic setup
+- PhysicalHandsButtonToggle
+
+### Changed
+- Removed old PhysicalHandsButton
+
+### Fixed
+- 
+
 ## [NEXT] - xx/xx/xx
 
 ### Tracking Client versions

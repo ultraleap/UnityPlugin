@@ -13,22 +13,12 @@ namespace Leap.Unity.PhysicalHands.Examples
 {
     public class PhysicalHandsRocket : MonoBehaviour
     {
-        [SerializeField, Tooltip("The pressable part of the rocket, which is used as a form of button")]
-        private GameObject buttonObject;
         [SerializeField, Tooltip("Should be at the front of the rocket, used to calculate which direction the rocket should travel in.")]
         private GameObject noseCone;
-        [Tooltip("The local position which the button will be limited to and will try to return to.")]
-        [SerializeField]
-        private float buttonHeightLimit = 0.02f;
         [SerializeField, Tooltip("Force to add to the rocket when launching.")]
         private float rocketPower = 30;
         [SerializeField, Tooltip("How long should the rocket add force for? (In seconds)")]
         private float burnTime = 3;
-
-        private const float BUTTON_PRESS_THRESHOLD = 0.01F;
-        private const float BUTTON_PRESS_EXIT_THRESHOLD = 0.09F;
-
-        private bool _isButtonPressed = false;
 
         private Rigidbody _rigidbody;
 
@@ -45,22 +35,8 @@ namespace Leap.Unity.PhysicalHands.Examples
             _ignoreHands = this.GetComponent<IgnorePhysicalHands>();
         }
 
-        void FixedUpdate()
-        {
-            if (buttonObject.transform.localPosition.y <= buttonHeightLimit * BUTTON_PRESS_THRESHOLD
-                && !_isButtonPressed)
-            {
-                _isButtonPressed = true;
-                ButtonPressed();
-            }
 
-            if (_isButtonPressed && buttonObject.transform.localPosition.y >= buttonHeightLimit * BUTTON_PRESS_EXIT_THRESHOLD)
-            {
-                _isButtonPressed = false;
-            }
-        }
-
-        void ButtonPressed()
+        public void ButtonPressed()
         {
             if (launching)
                 return;
