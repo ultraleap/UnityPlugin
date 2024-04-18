@@ -16,6 +16,9 @@ namespace Leap.Unity.PhysicalHands
     /// </summary>
     public class PhysicalHandsButtonToggle : PhysicalHandsButton
     {
+        [SerializeField]
+        private bool _untoggleWhenPressed = true;
+
         private bool _canUnpress = false;
         private RigidbodyConstraints _constraintsBeforeFreeze = RigidbodyConstraints.None;
 
@@ -127,7 +130,7 @@ namespace Leap.Unity.PhysicalHands
         protected override void OnCollisionPO(Collision collision)
         {
             base.OnCollisionPO(collision);
-            if (_canUnpress)
+            if (_canUnpress && _untoggleWhenPressed)
             {
                 // If not exclusively pressed by hand and object has exited
                 if (_canBePressedByObjects)
@@ -144,7 +147,7 @@ namespace Leap.Unity.PhysicalHands
         protected override void OnHandContactPO(ContactHand contactHand)
         {
             base.OnHandContactPO(contactHand);
-            if (_canUnpress)
+            if (_canUnpress && _untoggleWhenPressed)
             {
                 // If the chosen hand is in contact and object has exited
                 if (GetChosenHandInContact())

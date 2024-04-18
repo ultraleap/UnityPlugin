@@ -1067,6 +1067,7 @@ MonoBehaviour:
   OnHandHoverExit:
     m_PersistentCalls:
       m_Calls: []
+  _untoggleWhenPressed: 1
 --- !u!1 &345004528
 GameObject:
   m_ObjectHideFlags: 0
@@ -10991,6 +10992,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6805224202288225953, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+      propertyPath: _untoggleWhenPressed
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6805224202288225953, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
       propertyPath: _buttonTravelDistance
       value: 0.009500004
       objectReference: {fileID: 0}
@@ -11080,6 +11085,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7288715151897497823, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
       propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7557292157203605965, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
+      propertyPath: _untoggleWhenPressed
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7557292157203605965, guid: 573970f98ffc25c4f8aaaf0125cb9f30, type: 3}
