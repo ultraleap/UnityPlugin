@@ -74,7 +74,6 @@ namespace Leap.Unity.Examples
             _pullCordHandle.OnPinchEnd.RemoveListener(OnPinchEnd);
         }
 
-
         private void Update()
         {
             UpdateProjection();
@@ -98,13 +97,13 @@ namespace Leap.Unity.Examples
                 // update resting pos of handle, if the pulled status has changed since last frame:
                 if (!_pulled && _progress > _pulledPoint)
                 {
-                    if (OnPulled != null) OnPulled.Invoke();
+                    OnPulled?.Invoke();
                     _pulled = true;
                     _pullCordHandle.RestingPos = _pullCordEnd.position;
                 }
                 else if (_pulled && _progress < _pulledPoint)
                 {
-                    if (OnUnpulled != null) OnUnpulled.Invoke();
+                    OnUnpulled?.Invoke();
                     _pulled = false;
                     _pullCordHandle.RestingPos = _defaultRestingPos;
                 }
@@ -126,7 +125,7 @@ namespace Leap.Unity.Examples
             // if the velocity of the progress is bigger than some threshold, set the resting position to the pulled position
             if (_currentProgressVelocity > _progressVelocityThreshold)
             {
-                if (OnPulled != null) OnPulled.Invoke();
+                OnPulled?.Invoke();
                 _pulled = true;
                 _pullCordHandle.RestingPos = _pullCordEnd.position;
             }

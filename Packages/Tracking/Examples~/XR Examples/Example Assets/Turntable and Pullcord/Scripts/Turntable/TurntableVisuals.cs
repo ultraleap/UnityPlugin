@@ -53,8 +53,6 @@ namespace Leap.Unity.Examples
 
         private Turntable _turntable;
 
-        private Camera _editTimeSceneCamera;
-
 #if UNITY_EDITOR
         private Matrix4x4[] _rotationMatrices;
 #endif
@@ -90,7 +88,10 @@ namespace Leap.Unity.Examples
         /// </summary>
         public void UpdateVisuals()
         {
-            if (_turntable == null) return;
+            if (_turntable == null)
+            {
+                return;
+            }
 
             float height = _turntable.TableHeight;
             float lowerHeight = _turntable.LowerLevelHeight;

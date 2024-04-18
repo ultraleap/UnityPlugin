@@ -16,7 +16,6 @@ namespace Leap.Unity.Examples
     [RequireComponent(typeof(LineRenderer))]
     public class LineBetweenTransforms : MonoBehaviour
     {
-
         [SerializeField] private Transform _pointA, _pointB;
         private LineRenderer _line;
 

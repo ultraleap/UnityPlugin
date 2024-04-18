@@ -7,19 +7,19 @@
  ******************************************************************************/
 
 using Leap.Unity;
-using Leap.Unity.Interaction;
+using Leap.Unity.PhysicalHands;
+
+using System.Linq;
 using System.Collections.Generic;
+
 using UnityEngine;
 using UnityEngine.Events;
-using Leap.Unity.PhysicalHands;
-using System.Linq;
 
 namespace Leap.Unity.Examples
 {
     /// <summary>
     /// PullCordHandle keeps track of the handle's position and moves it according to hand attraction and pinching.
     /// </summary>
-
     public class PullCordHandle : MonoBehaviour, IPhysicalHandHover, IPhysicalHandGrab
     {
         public enum PullCordState
@@ -50,14 +50,12 @@ namespace Leap.Unity.Examples
         [SerializeField, Tooltip("Distance that the handle can be pulled away from its resting position")]
         private float _stretchThreshold = 0.6f;
 
-
         private Vector3 _restingPos;
         /// <summary>
         /// The position that the handle is going to jump to if released
         /// </summary>
         [HideInInspector] public Vector3 RestingPos { get { return _restingPos; } set { _restingPos = value; } }
 
-        private InteractionBehaviour _intBeh;
         private Vector3 _handlePositionTarget;
 
         private float _springSpeed = 100f;
@@ -71,13 +69,9 @@ namespace Leap.Unity.Examples
 
         private List<Hand> _relevanthands = new List<Hand>();
         private Hand _mostRelevantHand = null;
-        private bool _isHovered = false;
-        private bool _isGrabbed = false;
-
 
         private void OnEnable()
         {
-            _intBeh = GetComponent<InteractionBehaviour>();
             StopPinching();
 
             OnStateChanged.AddListener((x) => _state = x);
@@ -87,27 +81,17 @@ namespace Leap.Unity.Examples
         {
             _handlePositionTarget = RestingPos;
 
-            if ((_intBeh && _intBeh.isPrimaryHovered) || _relevanthands.Count() != 0)
+            if (_relevanthands.Count() != 0)
             {
-                Hand hand;
-                if (_intBeh)
-                {
-                    hand = _intBeh.primaryHoveringHand;
-                }
-                else
-                {
-                    hand = _mostRelevantHand;
-                }
-                
+                Hand hand = _mostRelevantHand;
 
                 if (!_wasHovered)
                 {
                     _wasHovered = true;
-                    if (OnStateChanged != null) OnStateChanged.Invoke(PullCordState.Hovered);
+                    OnStateChanged?.Invoke(PullCordState.Hovered);
                 }
-                Vector3 midpoint = Vector3.zero;
 
-                midpoint = Midpoint(hand);
+                Vector3 midpoint = Midpoint(hand);
                 float distance = Vector3.Distance(midpoint, RestingPos);
                 UpdatePinching(hand, distance);
 
@@ -123,11 +107,14 @@ namespace Leap.Unity.Examples
             else if (_wasHovered)
             {
                 _wasHovered = false;
-                if (OnStateChanged != null) OnStateChanged.Invoke(PullCordState.Default);
+
+                OnStateChanged?.Invoke(PullCordState.Default);
             }
-            
-            if(!_isPinching)
+
+            if (!_isPinching)
+            {
                 transform.position = SpringPosition(transform.position, _handlePositionTarget);
+            }
         }
 
         private Vector3 SpringPosition(Vector3 current, Vector3 target)
@@ -155,9 +142,7 @@ namespace Leap.Unity.Examples
             if (_isPinching && (distance > _pinchDeactivateDistance || distanceToRestingPos > _stretchThreshold))
             {
                 StopPinching();
-            }
-
-            // only start pinching if the midpoint is close enough to the resting position
+            }// only start pinching if the midpoint is close enough to the resting position
             else if (distanceToRestingPos < _distanceToHandThreshold)
             {
                 if (!_isPinching && distance < _pinchActivateDistance)
@@ -165,30 +150,26 @@ namespace Leap.Unity.Examples
                     StartPinching();
                 }
             }
-
         }
 
         private void StartPinching()
         {
-            if (OnStateChanged != null) OnStateChanged.Invoke(PullCordState.Pinched);
-
+            OnStateChanged?.Invoke(PullCordState.Pinched);
             _isPinching = true;
         }
 
         private void StopPinching()
         {
-            bool hovered;
-            if (_intBeh)
+            if (_mostRelevantHand != null)
             {
-                hovered = _intBeh.isPrimaryHovered;
+                OnStateChanged?.Invoke(PullCordState.Hovered);
             }
             else
             {
-                hovered = _mostRelevantHand != null;
+                OnStateChanged?.Invoke( PullCordState.Default);
             }
-            if (OnStateChanged != null) OnStateChanged.Invoke(hovered ? PullCordState.Hovered : PullCordState.Default);
 
-            if (OnPinchEnd != null) OnPinchEnd.Invoke();
+            OnPinchEnd?.Invoke();
 
             _isPinching = false;
         }
@@ -199,6 +180,7 @@ namespace Leap.Unity.Examples
             {
                 _relevanthands.Add(hand.GetDataHand());
             }
+
             _mostRelevantHand = GetClosestHand();
         }
 
@@ -222,6 +204,7 @@ namespace Leap.Unity.Examples
         {
             Hand closestHand = null;
             float closestDist = float.PositiveInfinity;
+
             if (_relevanthands.Count > 0)
             {
                 foreach (var hand in _relevanthands)
@@ -233,12 +216,9 @@ namespace Leap.Unity.Examples
                         closestDist = distanceFromHand;
                     }
                 }
-                return closestHand;
             }
-            else
-            {
-                return null;
-            }
+
+            return closestHand;
         }
     }
 }
