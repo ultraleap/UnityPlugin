@@ -6,18 +6,15 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Leap.Unity.Attachments;
 
-namespace Leap.Unity.Interaction
+namespace Leap.Unity
 {
-
     public class Anchor : MonoBehaviour
     {
-
         private static HashSet<Anchor> _allAnchors;
         public static HashSet<Anchor> allAnchors
         {
@@ -57,12 +54,8 @@ namespace Leap.Unity.Interaction
             {
                 return GetChiralityOfAttachedHand();
             }
-            private set
-            {
-                _attachedHandChirality = value;
-            }
         }
-        private ChiralitySelection _attachedHandChirality = ChiralitySelection.NONE;
+
         /// <summary>
         /// Gets the set of AnchorableBehaviours currently attached to this anchor.
         /// </summary>
@@ -126,7 +119,6 @@ namespace Leap.Unity.Interaction
         void Start()
         {
             initUnityEvents();
-            _attachedHandChirality = GetChiralityOfAttachedHand();
         }
 
         void Update()
@@ -138,7 +130,7 @@ namespace Leap.Unity.Interaction
         /// Gets the chirality of the hand which this object is attached to if any
         /// </summary>
         /// <returns>Chirality of the attached hand</returns>
-        internal ChiralitySelection GetChiralityOfAttachedHand()
+        private ChiralitySelection GetChiralityOfAttachedHand()
         {
             AttachmentHand handObject = transform.root.GetComponentInChildren<AttachmentHand>();
 
@@ -150,7 +142,6 @@ namespace Leap.Unity.Interaction
             {
                 return ChiralitySelection.NONE;
             }
-
         }
 
         void OnDisable()
@@ -303,7 +294,5 @@ namespace Leap.Unity.Interaction
         }
 
         #endregion
-
     }
-
 }

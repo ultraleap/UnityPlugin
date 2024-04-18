@@ -7,22 +7,20 @@
  ******************************************************************************/
 
 using Leap.Unity.Attributes;
-using Leap.Unity.PhysicalHands;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Leap.Unity.Interaction
+namespace Leap.Unity
 {
     /// <summary>
     /// AnchorableBehaviours mix well with InteractionBehaviours you'd like to be able to
     /// pick up and place in specific locations, specified by other GameObjects with an
     /// Anchor component.
     /// </summary>
-    public class AnchorableBehaviour : MonoBehaviour, IPhysicalHandGrab, IPhysicalHandHover
+    public class AnchorableBehaviour : MonoBehaviour
     {
-
         [Disable]
         [SerializeField]
         [Tooltip("Whether or not this AnchorableBehaviour is actively attached to its anchor.")]
@@ -65,11 +63,7 @@ namespace Leap.Unity.Interaction
                         // TODO: A more robust gravity fix.
                         if (_reactivateGravityOnDetach)
                         {
-                            if (interactionBehaviour != null)
-                            {
-                                interactionBehaviour.rigidbody.useGravity = true;
-                            }
-                            else if(_rigidbody)
+                            if(_rigidbody)
                             {
                                 _rigidbody.useGravity = true;
                             }
@@ -80,10 +74,10 @@ namespace Leap.Unity.Interaction
             }
         }
 
-        [Tooltip("The current anchor of this AnchorableBehaviour.")]
+        [Tooltip("The current Anchor of this AnchorableBehaviour.")]
         [OnEditorChange("anchor"), SerializeField]
         private Anchor _anchor;
-        public Anchor anchor
+        public Anchor Anchor
         {
             get
             {
@@ -140,9 +134,9 @@ namespace Leap.Unity.Interaction
 
                 _anchorGroup = value;
 
-                if (anchor != null && !_anchorGroup.Contains(anchor))
+                if (Anchor != null && !_anchorGroup.Contains(Anchor))
                 {
-                    anchor = null;
+                    Anchor = null;
                     Debug.LogWarning(this.name + "'s anchor is not within its anchorGroup (setting it to null).", this.gameObject);
                 }
 
@@ -161,7 +155,6 @@ namespace Leap.Unity.Interaction
         [Tooltip("Only allowed when an InteractionBehaviour is attached to this object. If enabled, this "
                + "object's Attach() method or its variants will weigh its velocity towards an anchor along "
                + "with its proximity when seeking an anchor to attach to.")]
-        [DisableIf("_interactionBehaviourIsNull", true)]
         public bool useTrajectory = true;
 
         [Tooltip("The fraction of the maximum anchor range to use as the effective max range when "
@@ -217,12 +210,6 @@ namespace Leap.Unity.Interaction
 
         [Header("Interaction")]
 
-        [Tooltip("Additional features are enabled when this GameObject also has an InteractionBehaviour component.")]
-        [Disable]
-        public InteractionBehaviour interactionBehaviour;
-        [SerializeField, HideInInspector]
-        private bool _interactionBehaviourIsNull = true;
-
         [Tooltip("If the InteractionBehaviour is set, objects will automatically detach from their anchor when grasped.")]
         [Disable]
         public bool detachWhenGrasped = true;
@@ -233,7 +220,7 @@ namespace Leap.Unity.Interaction
         [SerializeField]
         [OnEditorChange("tryAnchorNearestOnGraspEnd")]
         private bool _tryAnchorNearestOnGraspEnd = true;
-        public bool tryAnchorNearestOnGraspEnd
+        public bool TryAnchorNearestOnGraspEnd
         {
             get
             {
@@ -241,17 +228,7 @@ namespace Leap.Unity.Interaction
             }
             set
             {
-                if (interactionBehaviour != null)
-                {
-                    // Prevent duplicate subscription.
-                    interactionBehaviour.OnGraspEnd -= tryToAnchorOnGraspEnd;
-                }
-
                 _tryAnchorNearestOnGraspEnd = value;
-                if (interactionBehaviour != null && _tryAnchorNearestOnGraspEnd)
-                {
-                    interactionBehaviour.OnGraspEnd += tryToAnchorOnGraspEnd;
-                }
             }
         }
 
@@ -328,10 +305,8 @@ namespace Leap.Unity.Interaction
         private bool _hasTargetRotationLastUpdate = false;
 
         private Rigidbody _rigidbody;
-        private bool _isHovered;
-        private List<Leap.Hand> _hoveringHands = new List<Hand>();
 
-        private IgnorePhysicalHands _ignorePhysicalHands = null;
+        protected List<Hand> _hoveringHands = new List<Hand>();
 
         void OnValidate()
         {
@@ -339,18 +314,11 @@ namespace Leap.Unity.Interaction
             {
                 _rigidbody = GetComponent<Rigidbody>();
             }
-            refreshInteractionBehaviour();
             refreshInspectorConveniences();
-        }
-
-        void Reset()
-        {
-            refreshInteractionBehaviour();
         }
 
         void Awake()
         {
-            refreshInteractionBehaviour();
             refreshInspectorConveniences();
 
             if (anchorGroup != null)
@@ -358,15 +326,6 @@ namespace Leap.Unity.Interaction
                 anchorGroup.NotifyAnchorableObjectAdded(this);
             }
 
-            if (interactionBehaviour != null)
-            {
-                interactionBehaviour.OnGraspBegin += detachAnchorOnGraspBegin;
-
-                if (_tryAnchorNearestOnGraspEnd)
-                {
-                    interactionBehaviour.OnGraspEnd += tryToAnchorOnGraspEnd;
-                }
-            }
             if (_rigidbody == null)
             {
                 _rigidbody = GetComponent<Rigidbody>();
@@ -374,25 +333,15 @@ namespace Leap.Unity.Interaction
             initUnityEvents();
         }
 
-        void Start()
+        protected virtual void Start()
         {
-            if (anchor.GetChiralityOfAttachedHand() != ChiralitySelection.NONE)
+            if (Anchor != null)
             {
-                if (!TryGetComponent<IgnorePhysicalHands>(out _ignorePhysicalHands))
+                if (_isAttached)
                 {
-                    _ignorePhysicalHands = this.gameObject.AddComponent<IgnorePhysicalHands>();
+                    Anchor.NotifyAttached(this);
+                    OnAttachedToAnchor();
                 }
-
-                if (anchor != null && anchor.AttahedHandChirality != ChiralitySelection.NONE)
-                {
-
-                    _ignorePhysicalHands.HandToIgnore = anchor.AttahedHandChirality;
-                }
-            }
-            if (anchor != null && _isAttached)
-            {
-                anchor.NotifyAttached(this);
-                OnAttachedToAnchor();
             }
         }
 
@@ -402,17 +351,9 @@ namespace Leap.Unity.Interaction
         {
             updateAttractionToHand();
 
-            if (anchor != null && isAttached)
+            if (Anchor != null && isAttached)
             {
-                if (interactionBehaviour != null && interactionBehaviour.rigidbody.useGravity)
-                {
-                    // TODO: This is a temporary fix for gravity to be fixed in a future IE PR.
-                    // The proper solution involves switching the behaviour to FixedUpdate and more
-                    // intelligently communicating with the attached InteractionBehaviour.
-                    interactionBehaviour.rigidbody.useGravity = false;
-                    _reactivateGravityOnDetach = true;
-                }
-                else if (_rigidbody != null && _rigidbody.useGravity)
+                if (_rigidbody != null && _rigidbody.useGravity)
                 {
                     _rigidbody.useGravity = false;
                     _reactivateGravityOnDetach = true;
@@ -448,55 +389,14 @@ namespace Leap.Unity.Interaction
 
         void OnDestroy()
         {
-            if (interactionBehaviour != null)
-            {
-                interactionBehaviour.OnGraspBegin -= detachAnchorOnGraspBegin;
-                interactionBehaviour.OnGraspEnd -= tryToAnchorOnGraspEnd;
-            }
-
             // Make sure we don't leave dangling anchor-preference state.
             endAnchorPreference();
-        }
-
-        void IPhysicalHandGrab.OnHandGrab(ContactHand hand)
-        {
-            detachAnchorOnGraspBegin();
-        }
-
-        void IPhysicalHandGrab.OnHandGrabExit(ContactHand hand)
-        {
-            tryToAnchorOnGraspEnd();
-        }
-
-
-        void IPhysicalHandHover.OnHandHover(ContactHand hand)
-        {
-            _isHovered = true;
-            _hoveringHands.Add(hand.DataHand);
-        }
-
-        void IPhysicalHandHover.OnHandHoverExit(ContactHand hand)
-        {
-            _isHovered = false;
-            _hoveringHands.Remove(hand.DataHand);
         }
 
         private void refreshInspectorConveniences()
         {
             _minAttachmentDotProduct = Mathf.Cos(_maxAttachmentAngle * Mathf.Deg2Rad);
             _maxMotionlessRange = maxAnchorRange * _motionlessRangeFraction;
-        }
-
-        private void refreshInteractionBehaviour()
-        {
-            interactionBehaviour = GetComponent<InteractionBehaviour>();
-            _interactionBehaviourIsNull = interactionBehaviour == null;
-
-            detachWhenGrasped = !_interactionBehaviourIsNull;
-            if (_interactionBehaviourIsNull)
-            {
-                useTrajectory = false;
-            }
         }
 
         /// <summary>
@@ -697,7 +597,7 @@ namespace Leap.Unity.Interaction
         /// </summary>
         public bool TryAttach(bool ignoreRange = false)
         {
-            if (anchor != null && (ignoreRange || IsWithinRange(anchor)))
+            if (Anchor != null && (ignoreRange || IsWithinRange(Anchor)))
             {
                 isAttached = true;
                 return true;
@@ -726,11 +626,6 @@ namespace Leap.Unity.Interaction
             return false;
         }
 
-        public void AttachToNearestAnchor()
-        {
-            AttachToNearestAnchor(null);
-        }
-
         private void AttachToNearestAnchor(Anchor preferredAnchor)
         {
             if (preferredAnchor == null)
@@ -741,25 +636,19 @@ namespace Leap.Unity.Interaction
             if (preferredAnchor != null)
             {
                 _preferredAnchor = preferredAnchor;
-                anchor = preferredAnchor;
+                Anchor = preferredAnchor;
                 isAttached = true;
-                if (anchor != null && anchor.AttahedHandChirality != ChiralitySelection.NONE)
-                {
-                    _ignorePhysicalHands.HandToIgnore = anchor.AttahedHandChirality;
-                }
-                else if (anchor.AttahedHandChirality != ChiralitySelection.NONE)
-                {
-                    _ignorePhysicalHands.HandToIgnore = ChiralitySelection.NONE;
-
-                }
             }
         }
 
         /// <summary> Score an anchor based on its proximity and this object's trajectory relative to it. </summary>
         private float getAnchorScore(Anchor anchor)
         {
-            return GetAnchorScore(this.interactionBehaviour.rigidbody.position,
-                                  this.interactionBehaviour.rigidbody.velocity,
+            Vector3 pos = _rigidbody == null ? transform.position : _rigidbody.position;
+            Vector3 velocity = _rigidbody == null ? Vector3.zero : _rigidbody.velocity;
+
+            return GetAnchorScore(pos,
+                                  velocity,
                                   anchor.transform.position,
                                   maxAnchorRange,
                                   _maxMotionlessRange,
@@ -815,7 +704,7 @@ namespace Leap.Unity.Interaction
 
         private void updateAttractionToHand()
         {
-            if (anchor == null || !isAttractedByHand)
+            if (Anchor == null || !isAttractedByHand)
             {
                 if (_offsetTowardsHand != Vector3.zero)
                 {
@@ -827,35 +716,15 @@ namespace Leap.Unity.Interaction
 
             float reachTargetAmount = 0F;
             Vector3 towardsHand = Vector3.zero;
-            if (interactionBehaviour != null && interactionBehaviour.isHovered)
+
+            if(_hoveringHands.Count > 0)
             {
-                Vector3 hoverTarget = Vector3.zero;
-
-                InteractionController hoveringController = interactionBehaviour.closestHoveringController;
-                if (hoveringController is InteractionHand)
-                {
-                    Hand hoveringHand = interactionBehaviour.closestHoveringHand;
-                    hoverTarget = hoveringHand.PalmPosition;
-                }
-                else
-                {
-                    hoverTarget = hoveringController.hoverPoint;
-                }
-
-                reachTargetAmount = Mathf.Clamp01(attractionReachByDistance.Evaluate(
-                   Vector3.Distance(hoverTarget, anchor.transform.position)));
-                towardsHand = hoverTarget - anchor.transform.position;
-            }
-            else if(_isHovered)
-            {
-                Vector3 hoverTarget = Vector3.zero;
-
                 Hand hoveringHand = _hoveringHands.Last();
-                hoverTarget = hoveringHand.PalmPosition;
+                Vector3 hoverTarget = hoveringHand.PalmPosition;
 
                 reachTargetAmount = Mathf.Clamp01(attractionReachByDistance.Evaluate(
-                   Vector3.Distance(hoverTarget, anchor.transform.position)));
-                towardsHand = hoverTarget - anchor.transform.position;
+                   Vector3.Distance(hoverTarget, Anchor.transform.position)));
+                towardsHand = hoverTarget - Anchor.transform.position;
             }
 
             Vector3 targetOffsetTowardsHand = towardsHand * maxAttractionReach * reachTargetAmount;
@@ -866,17 +735,11 @@ namespace Leap.Unity.Interaction
         {
             // Initialize position.
             Vector3 finalPosition;
-            if (interactionBehaviour != null)
-            {
-                finalPosition = interactionBehaviour.rigidbody.position;
-            }
-            else
-            {
-                finalPosition = this.transform.position;
-            }
+
+            finalPosition = _rigidbody == null ? transform.position : _rigidbody.position;
 
             // Update position based on anchor state.
-            Vector3 targetPosition = anchor.transform.position;
+            Vector3 targetPosition = Anchor.transform.position;
             if (lockToAnchor)
             {
                 // In this state, we are simply locked directly to the anchor.
@@ -901,7 +764,7 @@ namespace Leap.Unity.Interaction
                     finalPosition -= _offsetTowardsHand;
 
                     // If desired, automatically correct for the anchor itself moving while attempting to return to it.
-                    if (matchAnchorMotionWhileAttaching && this.transform.parent != anchor.transform)
+                    if (matchAnchorMotionWhileAttaching && this.transform.parent != Anchor.transform)
                     {
                         if (_hasTargetPositionLastUpdate)
                         {
@@ -925,12 +788,7 @@ namespace Leap.Unity.Interaction
             }
 
             // Set final position.
-            if (interactionBehaviour != null)
-            {
-                interactionBehaviour.rigidbody.position = finalPosition;
-                this.transform.position = finalPosition;
-            }
-            else if (_rigidbody != null)
+            if (_rigidbody != null)
             {
                 _rigidbody.position = finalPosition;
                 this.transform.position = finalPosition;
@@ -945,11 +803,7 @@ namespace Leap.Unity.Interaction
         {
             // Initialize rotation.
             Quaternion finalRotation;
-            if (interactionBehaviour != null)
-            {
-                finalRotation = interactionBehaviour.rigidbody.rotation;
-            }
-            else if (_rigidbody != null)
+            if (_rigidbody != null)
             {
                 finalRotation = _rigidbody.rotation;
             }
@@ -959,7 +813,7 @@ namespace Leap.Unity.Interaction
             }
 
             // Update rotation based on anchor state.
-            Quaternion targetRotation = anchor.transform.rotation;
+            Quaternion targetRotation = Anchor.transform.rotation;
             if (lockToAnchor)
             {
                 // In this state, we are simply locked directly to the anchor.
@@ -981,7 +835,7 @@ namespace Leap.Unity.Interaction
                 else
                 {
                     // If desired, automatically correct for the anchor itself moving while attempting to return to it.
-                    if (matchAnchorMotionWhileAttaching && this.transform.parent != anchor.transform)
+                    if (matchAnchorMotionWhileAttaching && this.transform.parent != Anchor.transform)
                     {
                         if (_hasTargetRotationLastUpdate)
                         {
@@ -1003,12 +857,7 @@ namespace Leap.Unity.Interaction
             }
 
             // Set final rotation.
-            if (interactionBehaviour != null)
-            {
-                interactionBehaviour.rigidbody.rotation = finalRotation;
-                this.transform.rotation = finalRotation;
-            }
-            else if (_rigidbody != null)
+            if (_rigidbody != null)
             {
                 _rigidbody.rotation = finalRotation;
                 this.transform.rotation = finalRotation;
@@ -1054,18 +903,6 @@ namespace Leap.Unity.Interaction
                 _preferredAnchor.NotifyEndAnchorPreference(this);
                 _preferredAnchor = null;
             }
-        }
-
-        private void detachAnchorOnGraspBegin()
-        {
-            Detach();
-        }
-
-        private void tryToAnchorOnGraspEnd()
-        {
-            TryAttachToNearestAnchor();
-
-            OnPostTryAnchorOnGraspEnd();
         }
 
         #region Unity Events (Internal)

@@ -6,19 +6,16 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Leap.Unity.Interaction
+namespace Leap.Unity
 {
-
     [System.Serializable]
     public class AnchorSet : SerializableHashSet<Anchor> { }
 
     public class AnchorGroup : MonoBehaviour
     {
-
         [SerializeField]
         [Tooltip("The anchors that are within this AnchorGroup. Anchorable objects associated "
                + "this AnchorGroup can only be placed in anchors within this group.")]
@@ -73,7 +70,5 @@ namespace Leap.Unity.Interaction
         {
             anchorableObjects.Remove(anchObj);
         }
-
     }
-
 }

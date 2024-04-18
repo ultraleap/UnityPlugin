@@ -33,13 +33,6 @@ namespace Leap.Unity.Interaction
                                       "_maxMotionlessRange",
                                       "_maxAttachmentAngle");
 
-            specifyConditionalDrawing(() => { return target.interactionBehaviour != null; },
-                                      "detachWhenGrasped",
-                                      "_tryAnchorNearestOnGraspEnd",
-                                      "isAttractedByHand",
-                                      "maxAttractionReach",
-                                      "attractionReachByDistance");
-
             specifyConditionalDrawing("isAttractedByHand",
                                       "maxAttractionReach",
                                       "attractionReachByDistance",
@@ -73,7 +66,7 @@ namespace Leap.Unity.Interaction
             // While in edit-mode, we only expect there to be the empty lambda that initializes the Action.
             int expectedMinimumActionListeners = EditorApplication.isPlaying ? 2 : 1;
 
-            bool hasInvalidPostGraspEndCallback = !target.tryAnchorNearestOnGraspEnd
+            bool hasInvalidPostGraspEndCallback = !target.TryAnchorNearestOnGraspEnd
                                                && (target.OnPostTryAnchorOnGraspEnd.GetInvocationList().Length > expectedMinimumActionListeners
                                                    || (_tableEditor != null &&
                                                        _tableEditor.HasAnyCallbacks((int)AnchorableBehaviour.EventType.OnPostTryAnchorOnGraspEnd)));
@@ -92,7 +85,7 @@ namespace Leap.Unity.Interaction
                 // Attach / Detach Object
                 EditorGUILayout.BeginHorizontal();
 
-                var anyTargetsCanAnchor = targets.Any(t => t.anchor != null && !target.isAttached);
+                var anyTargetsCanAnchor = targets.Any(t => t.Anchor != null && !target.isAttached);
 
                 EditorGUI.BeginDisabledGroup(!anyTargetsCanAnchor);
                 if (GUILayout.Button(new GUIContent("Attach Object" + (targets.Length > 1 ? "s" : ""),
@@ -133,9 +126,9 @@ namespace Leap.Unity.Interaction
 
                 foreach (var singleTarget in targets)
                 {
-                    anyTranslatedFromAnchor |= singleTarget.anchor != null && Vector3.Distance(singleTarget.transform.position, singleTarget.anchor.transform.position) > 0.0001F;
-                    anyRotatedFromAnchor |= singleTarget.anchor != null && singleTarget.anchorRotation
-                                                                            && Quaternion.Angle(singleTarget.transform.rotation, singleTarget.anchor.transform.rotation) > 0.1F;
+                    anyTranslatedFromAnchor |= singleTarget.Anchor != null && Vector3.Distance(singleTarget.transform.position, singleTarget.Anchor.transform.position) > 0.0001F;
+                    anyRotatedFromAnchor |= singleTarget.Anchor != null && singleTarget.anchorRotation
+                                                                            && Quaternion.Angle(singleTarget.transform.rotation, singleTarget.Anchor.transform.rotation) > 0.1F;
                 }
 
                 if (anyTranslatedFromAnchor || anyRotatedFromAnchor)
@@ -149,8 +142,8 @@ namespace Leap.Unity.Interaction
                         foreach (var singleTarget in targets)
                         {
                             Undo.RecordObject(singleTarget.transform, "Move Target Transform to Anchor");
-                            singleTarget.transform.position = singleTarget.anchor.transform.position;
-                            if (singleTarget.anchorRotation) singleTarget.transform.rotation = singleTarget.anchor.transform.rotation;
+                            singleTarget.transform.position = singleTarget.Anchor.transform.position;
+                            if (singleTarget.anchorRotation) singleTarget.transform.rotation = singleTarget.Anchor.transform.rotation;
                         }
                     }
                 }
