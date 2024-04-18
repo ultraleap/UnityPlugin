@@ -6,19 +6,15 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
 
 namespace Leap.Unity.PhysicalHands
 {
     [RequireComponent(typeof(Rigidbody))]
-    public class PhysicalHandsButtonBase : MonoBehaviour
+    public class PhysicalHandsButton: MonoBehaviour
     {
-
         [SerializeField]
         private bool _automaticTravelDistance = true;
         [SerializeField]
@@ -39,8 +35,11 @@ namespace Leap.Unity.PhysicalHands
         protected bool _canBePressedByObjects = false;
         [SerializeField]
         protected GameObject _pressableObject;
+        [SerializeField]
+        protected float _buttonPressExitThreshold = 0.5f;
+        [SerializeField]
+        private bool _buttonIgnoreGrabs = true;
 
-        private const float BUTTON_PRESS_EXIT_THRESHOLD = 0.5f;
         private bool _contactHandPressing = false;
         private bool _leftHandContacting = false;
         private bool _rightHandContacting = false;
@@ -54,7 +53,11 @@ namespace Leap.Unity.PhysicalHands
         protected Rigidbody _pressableObjectRB = null;
         protected ConfigurableJoint _configurableJoint;
         
-
+        /// <summary>
+        /// Some presets for how the button should act. 
+        /// Try them out and work out what feels best for your specific button. 
+        /// Custom allows you to create your own feeling buttons
+        /// </summary>
         private enum ButtonPreset
         {
             Standard = 0,
@@ -62,6 +65,7 @@ namespace Leap.Unity.PhysicalHands
             Bouncy = 2,
             Custom = 3,
         }
+
         [SerializeField]
         private ButtonPreset _buttonPreset = ButtonPreset.Standard;
 
@@ -81,6 +85,9 @@ namespace Leap.Unity.PhysicalHands
         #endregion
 
         #region public getters
+        /// <summary>
+        /// Indicates whether the button is currently pressed.
+        /// </summary>
         public bool IsPressed
         {
             get
@@ -90,12 +97,17 @@ namespace Leap.Unity.PhysicalHands
         }
         #endregion
 
+        /// <summary>
+        /// Updates inspector values such as button travel distance and preset values.
+        /// </summary>
         public void UpdateInspectorValues()
         {
+            // Calculate button travel distance and offset automatically if enabled
             if (_automaticTravelDistance && _pressableObject != null)
             {
                 _buttonTravelOffset = 0;
 
+                // Calculate offset based on mesh filter bounds
                 if (TryGetComponent<MeshFilter>(out MeshFilter meshFilter) && meshFilter.sharedMesh != null)
                 {
                     _buttonTravelOffset += meshFilter.sharedMesh.bounds.extents.y;
@@ -109,6 +121,7 @@ namespace Leap.Unity.PhysicalHands
                 _buttonTravelDistance = (_pressableObject.transform.localPosition.y - _buttonTravelOffset) * transform.lossyScale.y;
             }
 
+            // Update button preset values based on selected preset
             switch (_buttonPreset)
             {
                 // Standard button preset with no spring, damper, or force limits
@@ -141,9 +154,8 @@ namespace Leap.Unity.PhysicalHands
         private void UpdateAutomaticValues()
         {
             // Update the button preset values
-            UpdateButtonPreset();
-
             UpdateInspectorValues();
+            UpdateButtonPreset();
 
             // Check if automatic travel distance calculation is enabled and a pressable object is assigned
             if (_automaticTravelDistance && _pressableObject != null)
@@ -202,10 +214,11 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
-        protected virtual void Start()
+        protected virtual void Awake()
         {
             Initialize();
         }
+
 
         /// <summary>
         /// Initialize the button.
@@ -214,7 +227,7 @@ namespace Leap.Unity.PhysicalHands
         {
             if (_pressableObject == null)
             {
-                Debug.LogError("Pressable object not assigned. Please assign one to use the button.");
+                Debug.LogError("Pressable object not assigned. Please assign one to use the button.", this.gameObject);
                 enabled = false;
                 return;
             }
@@ -242,7 +255,7 @@ namespace Leap.Unity.PhysicalHands
             }
 
             // Ensure the pressable object has an IgnorePhysicalHands component
-            if (!_pressableObject.TryGetComponent<IgnorePhysicalHands>(out IgnorePhysicalHands ignorePhysHands))
+            if (_buttonIgnoreGrabs && !_pressableObject.TryGetComponent<IgnorePhysicalHands>(out IgnorePhysicalHands ignorePhysHands))
             {
                 ignorePhysHands = _pressableObject.AddComponent<IgnorePhysicalHands>();
                 ignorePhysHands.DisableAllGrabbing = true;
@@ -282,7 +295,7 @@ namespace Leap.Unity.PhysicalHands
                 _configurableJoint = _pressableObject.AddComponent<ConfigurableJoint>();
             }
 
-            _configurableJoint.targetPosition = new Vector3(0, -(float)(_buttonTravelDistance / 2), 0);
+            _configurableJoint.targetPosition = new Vector3(0, -(_buttonTravelDistanceLocal / 2f), 0);
 
             // Connect the button to the parent object with a spring joint
             _configurableJoint.connectedBody = _rigidbody;
@@ -329,7 +342,7 @@ namespace Leap.Unity.PhysicalHands
             }
 
             // Check if the button should be released
-            if (_isButtonPressed && distance < _buttonTravelDistanceLocal * BUTTON_PRESS_EXIT_THRESHOLD)
+            if (_isButtonPressed && distance < _buttonTravelDistanceLocal * _buttonPressExitThreshold)
             {
                 _isButtonPressed = false;
                 ButtonUnpressed();
@@ -426,16 +439,26 @@ namespace Leap.Unity.PhysicalHands
             OnHandHover?.Invoke(hand);
         }
 
+        /// <summary>
+        /// Handles collision events with physics objects.
+        /// </summary>
+        /// <param name="collision">The collision data.</param>
         protected virtual void OnCollisionPO(Collision collision)
         {
-            if (!collision.transform.root.GetComponent<PhysicalHandsManager>())
+            // If the colliding object is not part of PhysicalHandsManager, add it to the list of objects contacting the button
+            if (!collision.gameObject.TryGetComponent<ContactBone>(out ContactBone contactingBone))
             {
                 _objectsContactingButton.Add(collision.gameObject);
             }
         }
 
+        /// <summary>
+        /// Handles collision exit events with physics objects.
+        /// </summary>
+        /// <param name="collision">The collision data.</param>
         protected virtual void OnCollisionExitPO(Collision collision)
         {
+            // Remove the colliding object from the list of objects contacting the button
             _objectsContactingButton.Remove(collision.gameObject);
         }
 
@@ -458,22 +481,31 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
+        /// <summary>
+        /// Draws Gizmos to visualize the button's travel path when selected in the Unity editor.
+        /// </summary>
         private void OnDrawGizmosSelected()
         {
             if (_pressableObject == null)
                 return;
 
-            Gizmos.color = Color.green;
+            Vector3 startPosition = Vector3.zero;
+            Vector3 endPosition = -(Vector3.up * _buttonTravelDistance / _pressableObject.transform.lossyScale.y);
 
-            Vector3 startPosition = transform.TransformPoint(transform.localPosition + new Vector3(0, _buttonTravelOffset, 0));
-            Vector3 endPosition = transform.TransformPoint((transform.localPosition + new Vector3(0, _buttonTravelOffset, 0)))
-                + transform.up * _buttonTravelDistance;
+            Vector3 gizmoSize = (Vector3.one * 0.01f).CompDiv(_pressableObject.transform.lossyScale); // 1cm worldspace
 
+            if (_pressableObject.TryGetComponent<MeshFilter>(out MeshFilter meshFilter) && meshFilter.sharedMesh != null)
+            {
+                // If available, use the pressable extents to show where the bounds of the button will be
+                gizmoSize = meshFilter.sharedMesh.bounds.extents * 2;
+            }
+
+            Gizmos.matrix = _pressableObject.transform.localToWorldMatrix;
             Gizmos.color = Color.green; // Y axis
             Gizmos.DrawLine(startPosition, endPosition);
-            Gizmos.DrawSphere(endPosition, 0.004f); // ButtonStartpoint
-            Gizmos.color = Color.red; 
-            Gizmos.DrawSphere(startPosition, 0.004f); // ButtonEndpoint
+            Gizmos.DrawWireCube(endPosition, gizmoSize); // ButtonStartpoint
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireCube(startPosition, gizmoSize); // ButtonEndpoint
         }
     }
 }

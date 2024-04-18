@@ -5,9 +5,9 @@ using UnityEditor;
 
 namespace Leap.Unity.PhysicalHands
 {
-    [CustomEditor(typeof(PhysicalHandsButtonBase), true)]
+    [CustomEditor(typeof(PhysicalHandsButton), true)]
     [CanEditMultipleObjects]
-    public class PhysicalHandsButtonEditor : CustomEditorBase<PhysicalHandsButtonBase>
+    public class PhysicalHandsButtonEditor : CustomEditorBase<PhysicalHandsButton>
     {
         private bool eventsFoldedOut = false;
 
@@ -41,10 +41,17 @@ namespace Leap.Unity.PhysicalHands
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("_buttonTravelDistance"), new GUIContent("Button Travel Distance", "The distance the button can travel when pressed."));
                 EditorGUI.indentLevel = 0;
             }
-  
+
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Button Unpress Threshold");
+            serializedObject.FindProperty("_buttonPressExitThreshold").floatValue = 
+                EditorGUILayout.Slider(serializedObject.FindProperty("_buttonPressExitThreshold").floatValue, 0, 1);
+            EditorGUILayout.EndHorizontal();
+
             EditorGUILayout.Space(5);
 
             EditorGUILayout.PropertyField(serializedObject.FindProperty("_canBePressedByObjects"), new GUIContent("Can Be Pressed By Objects", "Determines whether the button can be pressed by objects which are not the hand."));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("_buttonIgnoreGrabs"), new GUIContent("Ignore Grabbing Button", "Specifies whether grabs should be ignored on the Pressable Object."));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("_whichHandCanPressButton"), new GUIContent("Which Hand Can Activate Button Presses", "Specifies which hand(s) can press the button."));
 
             EditorGUILayout.Space(10);

@@ -7,83 +7,91 @@
  ******************************************************************************/
 
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using UnityEngine.Animations;
-using UnityEngine.Assertions.Must;
-using UnityEngine.Events;
 
 namespace Leap.Unity.PhysicalHands
 {
     /// <summary>
     /// Class for toggling a button using physical hands.
     /// </summary>
-    public class PhysicalHandsButtonToggle : PhysicalHandsButtonBase
+    public class PhysicalHandsButtonToggle : PhysicalHandsButton
     {
-        private bool _canUnpress = false;
-        private RigidbodyConstraints _constaintsBeforeFreeze = RigidbodyConstraints.None;
+        [SerializeField]
+        private bool _untoggleWhenPressed = true;
 
+        private bool _canUnpress = false;
+        private RigidbodyConstraints _constraintsBeforeFreeze = RigidbodyConstraints.None;
+
+        /// <summary>
+        /// Indicates whether the button is currently toggled.
+        /// </summary>
         public bool IsToggled
         {
             get
             {
                 return _isButtonPressed;
             }
-            set
-            {
-                _isButtonPressed = value;
-            }
         }
 
-        protected override void Start()
+        Coroutine delayedUnpressCoroutine;
+
+        private void OnEnable()
         {
-            base.Start();
+            EnableUnpress();
         }
 
-        public void ToggleButton(bool shouldFirePressEvents = false)
+        /// <summary>
+        /// Toggles the button state.
+        /// </summary>
+        /// <param name="shouldFirePressEvents">Indicates if press events should be fired.</param>
+        public void ToggleButtonState(bool shouldFirePressEvents = false)
         {
             if (_isButtonPressed == false)
             {
-                MakePressed(shouldFirePressEvents);
+                SetTogglePressed(shouldFirePressEvents);
             }
-            else if(_isButtonPressed == true)
+            else if (_isButtonPressed == true)
             {
-                MakeUnpressed(shouldFirePressEvents);
+                SetToggleUnPressed(shouldFirePressEvents);
             }
         }
 
-        public void SetButtonPressed(bool isPressed, bool shouldFirePressEvents = false)
-        {
-            if (isPressed == true)
-            {
-                MakePressed(shouldFirePressEvents);
-            }
-            else if (isPressed == false)
-            {
-                MakeUnpressed(shouldFirePressEvents);
-            }
-        }
-
-        private void MakePressed(bool shouldFirePressEvents)
+        /// <summary>
+        /// Sets the button to the pressed state.
+        /// </summary>
+        /// <param name="shouldFirePressEvents">Indicates if press events should be fired.</param>
+        public void SetTogglePressed(bool shouldFirePressEvents = false)
         {
             _isButtonPressed = true;
-            _canUnpress = true;
+            _canUnpress = false;
+
+            if (delayedUnpressCoroutine != null)
+            {
+                StopCoroutine(delayedUnpressCoroutine);
+            }
+
+            delayedUnpressCoroutine = StartCoroutine(DelayUnpress());
+
             _pressableObject.transform.localPosition = new Vector3(_pressableObject.transform.localPosition.x,
-                0 + _buttonTravelOffset,
+                _buttonTravelOffset,
                 _pressableObject.transform.localPosition.z);
             FreezeButtonPosition();
 
             if (shouldFirePressEvents == true)
             {
-                OnButtonPressed.Invoke();
+                OnButtonPressed?.Invoke();
             }
         }
 
-        private void MakeUnpressed(bool shouldFirePressEvents)
+        /// <summary>
+        /// Sets the button to the unpressed state.
+        /// </summary>
+        /// <param name="shouldFirePressEvents">Indicates if press events should be fired.</param>
+        public void SetToggleUnPressed(bool shouldFirePressEvents = false)
         {
             _isButtonPressed = false;
-            _canUnpress = false;
+            _canUnpress = true;
+
             _pressableObject.transform.localPosition = new Vector3(_pressableObject.transform.localPosition.x,
                 _buttonTravelOffset + _buttonTravelDistanceLocal,
                 _pressableObject.transform.localPosition.z);
@@ -91,11 +99,9 @@ namespace Leap.Unity.PhysicalHands
 
             if (shouldFirePressEvents == true)
             {
-                OnButtonUnPressed.Invoke();
+                OnButtonUnPressed?.Invoke();
             }
         }
-
-
 
         /// <summary>
         /// Action to perform when the button is pressed.
@@ -103,25 +109,28 @@ namespace Leap.Unity.PhysicalHands
         protected override void ButtonPressed()
         {
             base.ButtonPressed();
-
-            // Freeze object's position and rotation when pressed
-            FreezeButtonPosition();
-            _canUnpress = false;
-
-            StartCoroutine(DelayUnpress());
+            SetTogglePressed(false);
         }
 
+        /// <summary>
+        /// Action to perform when the button is unpressed.
+        /// </summary>
         protected override void ButtonUnpressed()
         {
             base.ButtonUnpressed();
+            SetToggleUnPressed(false);
         }
 
         #region Collision handling methods
 
+        /// <summary>
+        /// Handles collision events with physics objects.
+        /// </summary>
+        /// <param name="collision">The collision data.</param>
         protected override void OnCollisionPO(Collision collision)
         {
             base.OnCollisionPO(collision);
-            if (_canUnpress)
+            if (_canUnpress && _untoggleWhenPressed)
             {
                 // If not exclusively pressed by hand and object has exited
                 if (_canBePressedByObjects)
@@ -131,10 +140,14 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
+        /// <summary>
+        /// Handles hand contact events with the button.
+        /// </summary>
+        /// <param name="contactHand">The hand in contact with the button.</param>
         protected override void OnHandContactPO(ContactHand contactHand)
         {
             base.OnHandContactPO(contactHand);
-            if (_canUnpress)
+            if (_canUnpress && _untoggleWhenPressed)
             {
                 // If the chosen hand is in contact and object has exited
                 if (GetChosenHandInContact())
@@ -144,23 +157,47 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
-        private void FreezeButtonPosition()
+        /// <summary>
+        /// Enables the unpressing of the button.
+        /// </summary>
+        private void EnableUnpress()
         {
-            _constaintsBeforeFreeze = _pressableObjectRB.constraints;
-            _pressableObjectRB.constraints = RigidbodyConstraints.FreezeAll;
-        }
+            if (delayedUnpressCoroutine != null)
+            {
+                StopCoroutine(delayedUnpressCoroutine);
+                delayedUnpressCoroutine = null;
+            }
 
-        private void UnFreezeButtonPosition()
-        {
-            _pressableObjectRB.constraints = _constaintsBeforeFreeze;
-        }
-
-        private IEnumerator DelayUnpress()
-        { 
-            yield return new WaitForSecondsRealtime(1f);
             _canUnpress = true;
         }
 
+        /// <summary>
+        /// Freezes the position of the button.
+        /// </summary>
+        private void FreezeButtonPosition()
+        {
+            _constraintsBeforeFreeze = _pressableObjectRB.constraints;
+            _pressableObjectRB.constraints = RigidbodyConstraints.FreezeAll;
+        }
+
+        /// <summary>
+        /// Unfreezes the position of the button.
+        /// </summary>
+        private void UnFreezeButtonPosition()
+        {
+            _pressableObjectRB.constraints = _constraintsBeforeFreeze;
+        }
+
+        /// <summary>
+        /// Delays the unpressing of the button.
+        /// </summary>
+        private IEnumerator DelayUnpress()
+        {
+            yield return new WaitForSecondsRealtime(0.5f);
+            _canUnpress = true;
+            delayedUnpressCoroutine = null;
+        }
         #endregion
+
     }
 }
