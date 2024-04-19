@@ -224,7 +224,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8771092330523101336, guid: 80d0756f4c667cf4092d709be4ca876d, type: 3}
   m_PrefabInstance: {fileID: 8771092330184035203}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 777349566}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5d65614e3dcb2f64eb6983652f2d0537, type: 3}
@@ -629,11 +629,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8801e643e53a19d488f5168057473354, type: 3}
---- !u!1 &777349566 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2823639796257503354, guid: 80d0756f4c667cf4092d709be4ca876d, type: 3}
-  m_PrefabInstance: {fileID: 8771092330184035203}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &910057133
 GameObject:
   m_ObjectHideFlags: 0
@@ -5778,63 +5773,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7039315153258593349, guid: 80d0756f4c667cf4092d709be4ca876d, type: 3}
   m_PrefabInstance: {fileID: 8771092330184035203}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1732062689305655241
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 777349566}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1e0788de50284f742a8e17eea713e48c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _isAttached: 0
-  _anchor: {fileID: 744858217861368212}
-  _anchorGroup: {fileID: 0}
-  maxAnchorRange: 0.1
-  useTrajectory: 0
-  _motionlessRangeFraction: 0.4
-  _maxMotionlessRange: 0.040000003
-  _maxAttachmentAngle: 60
-  _alwaysAttachDistance: 0
-  lockToAnchor: 0
-  lockWhenAttached: 1
-  matchAnchorMotionWhileAttaching: 1
-  anchorLerpCoeffPerSec: 20
-  anchorRotation: 1
-  detachWhenGrasped: 1
-  _tryAnchorNearestOnGraspEnd: 1
-  isAttractedByHand: 0
-  maxAttractionReach: 0.1
-  anchorHandAttractionRate: 5
-  attractionReachByDistance:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  _eventTable:
-    _entries: []
 --- !u!4 &3888267153745313842 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4983487451737576753, guid: 0f3768b220c90bd45a0d80701a3fe3ae, type: 3}
@@ -5929,6 +5867,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 276590359}
     m_Modifications:
+    - target: {fileID: 1732062689305655241, guid: 80d0756f4c667cf4092d709be4ca876d, type: 3}
+      propertyPath: _anchor
+      value: 
+      objectReference: {fileID: 744858217861368212}
     - target: {fileID: 2823639796257503354, guid: 80d0756f4c667cf4092d709be4ca876d, type: 3}
       propertyPath: m_Name
       value: Turntable Object
@@ -5977,14 +5919,5 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 8771092330523101341, guid: 80d0756f4c667cf4092d709be4ca876d, type: 3}
-      propertyPath: _anchor
-      value: 
-      objectReference: {fileID: 744858217861368212}
-    - target: {fileID: 8771092330523101341, guid: 80d0756f4c667cf4092d709be4ca876d, type: 3}
-      propertyPath: _isAttached
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 8771092330523101341, guid: 80d0756f4c667cf4092d709be4ca876d, type: 3}
+    m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 80d0756f4c667cf4092d709be4ca876d, type: 3}

@@ -46,9 +46,9 @@ namespace Leap.Unity
         private HashSet<AnchorableBehaviour> _anchoredObjects = new HashSet<AnchorableBehaviour>();
 
         /// <summary>
-        /// returns ChiralitySelection.NONE if no attachemt hand found in parents
+        /// returns ChiralitySelection.NONE if no attachment hand found in parents
         /// </summary>
-        internal ChiralitySelection AttahedHandChirality
+        public ChiralitySelection AttahedHandChirality
         {
             get
             {

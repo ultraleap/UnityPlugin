@@ -60,7 +60,6 @@ namespace Leap.Unity
                         _hasTargetPositionLastUpdate = false;
                         _hasTargetRotationLastUpdate = false;
 
-                        // TODO: A more robust gravity fix.
                         if (_reactivateGravityOnDetach)
                         {
                             if(_rigidbody)

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7039315153258593349}
   - component: {fileID: 8771092330523101342}
   - component: {fileID: 8771092330523101336}
-  - component: {fileID: 8771092330523101341}
+  - component: {fileID: 1732062689305655241}
   m_Layer: 0
   m_Name: Turntable Object
   m_TagString: Untagged
@@ -90,7 +90,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _explodingItemsRoot: {fileID: 7039315153258593349}
---- !u!114 &8771092330523101341
+--- !u!114 &1732062689305655241
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -99,7 +99,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2823639796257503354}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1aceea2f5c70da64e893474302ff53e6, type: 3}
+  m_Script: {fileID: 11500000, guid: 1e0788de50284f742a8e17eea713e48c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _isAttached: 1
@@ -111,21 +111,37 @@ MonoBehaviour:
   _maxMotionlessRange: 0.040000003
   _maxAttachmentAngle: 60
   _alwaysAttachDistance: 0
-  lockToAnchor: 0
+  lockToAnchor: 1
   lockWhenAttached: 1
   matchAnchorMotionWhileAttaching: 1
   anchorLerpCoeffPerSec: 20
   anchorRotation: 1
-  interactionBehaviour: {fileID: 0}
-  _interactionBehaviourIsNull: 1
-  detachWhenGrasped: 0
+  detachWhenGrasped: 1
   _tryAnchorNearestOnGraspEnd: 1
   isAttractedByHand: 0
   maxAttractionReach: 0.1
   anchorHandAttractionRate: 5
   attractionReachByDistance:
     serializedVersion: 2
-    m_Curve: []
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
