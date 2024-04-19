@@ -9,13 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [6.15.0] - 19/04/24
 
 ### Tracking Client versions
-- Windows 	v5.30.0
-- MacOS 	v5.30.0
-- Android 	v5.30.0
+- Windows 	v6.0.0
+- MacOS 	v6.0.0
+- Android 	v6.0.0
 
 ### Added
-- LeapServiceProvider accessor for world space psoition of the Tracking Camera
-- LeapXRServiceProvider accessor for world space psoition of the Tracking Camera
+- LeapServiceProvider accessor for world space position of the Tracking Camera
+- LeapXRServiceProvider accessor for world space position of the Tracking Camera
 - LeapServiceProvider accessor for world space position of the Tracking Camera
 - LeapXRServiceProvider accessor for world space position of the Tracking Camera
 - (Physical Hands) Ability to ignore collisions on single object or all children
