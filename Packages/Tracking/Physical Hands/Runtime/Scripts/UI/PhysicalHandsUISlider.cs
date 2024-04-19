@@ -230,7 +230,7 @@ namespace Leap.Unity.PhysicalHands
                     _prevSliderValue = _sliderValue;
                 }
                 // Send slider change event
-                SendSliderEvent(SliderChangeEvent, TwoDimSliderButtonPressedEvent);
+                SendSliderEvent(SliderChangeEvent, TwoDimSliderChangeEvent);
             }
         }
 
@@ -805,7 +805,7 @@ namespace Leap.Unity.PhysicalHands
             }
 
             // Update the slider position
-            UpdateSliderPos(closestStep, twoDimValue);
+            UpdateSliderPos(value, twoDimValue);
         }
 
 
