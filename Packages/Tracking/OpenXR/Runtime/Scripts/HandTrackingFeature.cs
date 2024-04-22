@@ -226,32 +226,6 @@ namespace Ultraleap.Tracking.OpenXR
 #if UNITY_EDITOR
         protected override void GetValidationChecks(List<ValidationRule> rules, BuildTargetGroup targetGroup)
         {
-#if UNITY_ANDROID
-            // If building for Android, check that we are targeting Android API 29 for maximum compatibility.
-            rules.Add(new ValidationRule(this)
-            {
-                message = "Android target SDK version is not set to 29, hand-tracking may not work on devices " +
-                          "running Android 11 or higher",
-                helpLink = "https://registry.khronos.org/OpenXR/specs/1.0/loader.html#android-active-runtime-location",
-                helpText = "OpenXR applications should not target API levels higher than 29 for maximum " +
-                           "compatibility, as runtimes may need to query and load classes from their own packages, " +
-                           "which are necessarily not listed in the <queries> tag above.",
-                checkPredicate = () => PlayerSettings.Android.targetSdkVersion == AndroidSdkVersions.AndroidApiLevel29,
-                error = false,
-                fixItAutomatic = true,
-                fixItMessage = "Set the Android target SDK version to 29",
-                fixIt = () =>
-                {
-                    if (PlayerSettings.Android.minSdkVersion > AndroidSdkVersions.AndroidApiLevel29)
-                    {
-                        PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel29;
-                    }
-
-                    PlayerSettings.Android.targetSdkVersion = AndroidSdkVersions.AndroidApiLevel29;
-                },
-            });
-#endif
-
             // Check the active input handling supports New (for OpenXR) and Legacy (for Ultraleap Plugin support).
             rules.Add(new ValidationRule(this)
             {
