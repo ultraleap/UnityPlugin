@@ -6,27 +6,24 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity.Interaction;
 using UnityEngine;
 
 namespace Leap.Unity.Examples
 {
-
-    [RequireComponent(typeof(Leap.Unity.Interaction.Anchor))]
+    [RequireComponent(typeof(Leap.Unity.Anchor))]
     [AddComponentMenu("")]
     public class SimpleAnchorFeedback : MonoBehaviour
     {
-
         public Transform scaleTarget;
 
-        private Leap.Unity.Interaction.Anchor _anchor;
+        private Leap.Unity.Anchor _anchor;
 
         private Vector3 _initScaleVector;
         private float _curScale = 1F;
 
         void Start()
         {
-            _anchor = GetComponent<Leap.Unity.Interaction.Anchor>();
+            _anchor = GetComponent<Leap.Unity.Anchor>();
 
             _initScaleVector = scaleTarget.transform.localScale;
         }
@@ -49,7 +46,5 @@ namespace Leap.Unity.Examples
 
             scaleTarget.transform.localScale = _curScale * _initScaleVector;
         }
-
     }
-
 }

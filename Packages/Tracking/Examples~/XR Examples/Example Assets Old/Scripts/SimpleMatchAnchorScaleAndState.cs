@@ -20,17 +20,17 @@ namespace Leap.Unity.InteractionEngine.Examples
 
         void Update()
         {
-            if (anchObj != null && anchObj.anchor != null && anchObj.isAttached)
+            if (anchObj != null && anchObj.Anchor != null && anchObj.isAttached)
             {
-                anchObj.transform.localScale = anchObj.anchor.transform.localScale;
+                anchObj.transform.localScale = anchObj.Anchor.transform.localScale;
 
-                anchObj.gameObject.SetActive(anchObj.anchor.gameObject.activeInHierarchy);
+                anchObj.gameObject.SetActive(anchObj.Anchor.gameObject.activeInHierarchy);
 
                 if (!anchObj.gameObject.activeInHierarchy)
                 {
-                    anchObj.transform.position = anchObj.anchor.transform.position;
+                    anchObj.transform.position = anchObj.Anchor.transform.position;
                     if (anchObj.anchorRotation)
-                        anchObj.transform.rotation = anchObj.anchor.transform.rotation;
+                        anchObj.transform.rotation = anchObj.Anchor.transform.rotation;
                 }
             }
         }

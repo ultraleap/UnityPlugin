@@ -6,6 +6,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
+using Leap.Unity;
 using Leap.Unity.Interaction;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,7 +14,6 @@ using Leap.Unity.PhysicalHands;
 
 namespace Leap.InteractionEngine.Examples
 {
-
     /// <summary>
     /// This example script constructs behavior for a UI object that can open
     /// a "workstation" panel when placed outside of an anchor.
@@ -61,7 +61,7 @@ namespace Leap.InteractionEngine.Examples
             }
             refreshRequiredComponents();
 
-            if (!_anchObj.tryAnchorNearestOnGraspEnd)
+            if (!_anchObj.TryAnchorNearestOnGraspEnd)
             {
                 Debug.LogWarning("WorkstationBehaviour expects its AnchorableBehaviour's tryAnchorNearestOnGraspEnd property to be enabled.", this.gameObject);
             }
