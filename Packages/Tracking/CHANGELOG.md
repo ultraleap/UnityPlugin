@@ -9,12 +9,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [NEXT] - xx/xx/xx
 
 ### Tracking Client versions
-- Windows 	v5.17.1
-- MacOS 	v5.17.1
-- Android 	v5.17.1
+- Windows 	v6.0.0
+- MacOS 	v6.0.0
+- Android 	v6.0.0
 
 ### Added
 - Support for reading the camera matrix
+
+### Changed
+- 
+
+### Fixed
+- Issue with the method signature for LeapPixelToRectilinearEx
+
+## [6.15.0] - 19/04/24
+
+### Tracking Client versions
+- Windows 	v6.0.0
+- MacOS 	v6.0.0
+- Android 	v6.0.0
+
+### Added
+- LeapServiceProvider accessor for world space position of the Tracking Camera
+- LeapXRServiceProvider accessor for world space position of the Tracking Camera
+- LeapServiceProvider accessor for world space position of the Tracking Camera
+- LeapXRServiceProvider accessor for world space position of the Tracking Camera
+- (Physical Hands) Ability to ignore collisions on single object or all children
+- (Physical Hands) Added toggle to GrabHelper to allow kinematic object movement
+- (Physical Hands) Ignore Physical hands component can now choose which hand(s) it should be applied to
+- (Physical Hands) Edit time representation of hands via Physical Hands Manager
+- (Attachment Hands) Do not show warning again this session when deleting attachment points
+- (Optional) Metadata capture to help improve the Plugin
+- (Physical Hands) Ability to create IgnorePhysicalHands at runtime
+- (Fiducial Marker Tracking) Fiducial Marker Tracking support using AprilTag
 
 ### Changed
 - (Config) Additional uses of Config marked as Obsolete
@@ -22,11 +49,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Example content to be split by XR, Tabletop and URP Examples
 - Combined example content to be part of the main Ultraleap Tracking .unitypackage when importing via .unitypackage
 - Added fog and gradient sky for all XR example scenes
+- (Hand Rays) Exposed dot product used to test if the hand is facing camera
+- (Hinting) Added support for startup setting of Hand Tracking Hints via the Ultraleap Settings window
+- (Hinting) Added support for runtime changing of Hand Tracking Hints via static HandTrackingHintManager
+- (Hinting) Added support for setting OpenXR Hand Tracking Hints via the OpenXR HandTrackingFeature
+- Access of Physical Hands extensions
+- Added public accessors to various Physical Hands utilities
+- Unified use of TrackedPoseDrivers across XR LeapProviders
 
 ### Fixed
 - Errors in Editor when using pre-2023.3.18 LTS due to FindObjectByType issue
 - (Physical Hands) Objects are sticky when they ignore collision with hard contact hands
-- Issue with the method signature for LeapPixelToRectilinearEx
+- (Physical Hands) Ability to toggle ignore Physical hands options from the inspector at runtime.
+- (Locomotion) IsPinching wouldn't fire when between Activate and Deactivate values in LightweightPinchDetector
+- (Physical Hands) Soft contact button difficult to press in physical hands playground scene when not using UI layer
+- (Physical Hands) Disabled Ignore Physical hands components still affecting grab and collision at runtime
+- (Physical Hands) Button Prefab uses mesh from example assets
+- (Physical Hands) Button gets stuck down if disabled after pressing
+- (UI Input Preview) Null UIInput events cause unnecessary error logs
+- Memory increase when repeatedly opening scenes with LeapServiceProviders
+- ThreadAbort when changing scenes in editor that use multidevice or display the tracking device gizmo
+- (LeapServiceProvider) OnDeviceChanged event is not raised when multidevice mode is disabled
+- (LeapXRServiceProvider) LeapXRServiceProvider wrongly uses transform relative to camera when offset mode set to transform
+- (Hand Binder) incorrect upperArm name definition for elbow joint
+- (Physical Hands) Soft Contact NAN collider error when using OpenXR tracking on Android devices
+- (Physical Hands) Hand stuck in pose, unable to grab if object is disabled while grabbing
+- (Physical Hands) Errors when destroying objects that are grabbed
+- (Physical Hands) Errors when adding Physical Hands Manager prefab for the first time
+- Use of Device Transforms does not apply rotations
+- OpenXR API Layer Service query intent was missing sometimes, preventing API layers functioning correctly
+- OpenXR checks minSdkVersion rather than targetSdkVersion for query intents
+- (Physical Hands) PhysHands Settings are not localized when using decimals
 
 ## [6.14.0] - 24/01/24
 

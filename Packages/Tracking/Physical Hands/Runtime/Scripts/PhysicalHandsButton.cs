@@ -47,6 +47,8 @@ namespace Leap.Unity.PhysicalHands
         internal bool _leftHandContacting = false;
         internal bool _rightHandContacting = false;
 
+        Coroutine delayedPressCoroutine;
+
         private void Start()
         {
             _colliders = this.transform.GetComponentsInChildren<Collider>().ToList();
@@ -70,12 +72,23 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
+        private void OnDisable()
+        {
+            if (delayedPressCoroutine != null)
+            {
+                StopAllCoroutines();
+                delayedPressCoroutine = null;
+                EnableButtonMovement();
+            }
+        }
+
         void ButtonPressed()
         {
             OnButtonPressed?.Invoke();
-            if (_buttonShouldDelayRebound)
+
+            if (_buttonShouldDelayRebound && this.enabled && delayedPressCoroutine == null)
             {
-                StartCoroutine(ButtonCollisionReset());
+                delayedPressCoroutine = StartCoroutine(ButtonCollisionReset());
             }
         }
 
@@ -97,6 +110,12 @@ namespace Leap.Unity.PhysicalHands
 
             yield return new WaitForSecondsRealtime(_buttonStaydownTimer);
 
+            EnableButtonMovement();
+            delayedPressCoroutine = null;
+        }
+
+        void EnableButtonMovement()
+        {
             buttonObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
 
             foreach (var collider in _colliders)

@@ -24,7 +24,7 @@ namespace Leap.Unity.PhysicalHands
         [SerializeField, HideInInspector, Range(0.01f, 0.5f), Tooltip("The maximum distance at which the hand will then jump back to the data hand.")]
         internal float teleportDistance = 0.1f;
         [SerializeField, HideInInspector]
-        internal float boneMass = 0.1f, boneStiffness = 100f, boneDamping = 1f;
+        internal float boneMass = 0.1f, boneStiffness = 100f, grabbedBoneStiffness = 10f, boneDamping = 1f;
 
         [SerializeField, HideInInspector]
         internal bool useProjectPhysicsIterations = false;

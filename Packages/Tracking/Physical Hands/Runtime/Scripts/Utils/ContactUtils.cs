@@ -103,6 +103,8 @@ namespace Leap.Unity.PhysicalHands
         internal static void SetupBoneCollider(CapsuleCollider collider, Bone bone, PhysicMaterial material = null)
         {
             collider.direction = 2;
+            if (bone.Width <= 0) { bone.Width = 0.01f; }
+            if (bone.Length <= 0) { bone.Length = 0.01f; }
             collider.radius = bone.Width * 0.5f;
             collider.height = bone.Length + bone.Width;
             collider.center = new Vector3(0f, 0f, bone.Length / 2f);
