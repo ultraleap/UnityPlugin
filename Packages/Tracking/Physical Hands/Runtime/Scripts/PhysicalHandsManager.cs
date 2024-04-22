@@ -76,10 +76,32 @@ namespace Leap.Unity.PhysicalHands
         #region Layers
         // Layers
         // Hand Layers
-        public SingleLayer HandsLayer => _handsLayer;
+        public SingleLayer HandsLayer
+        { 
+            get 
+            {
+                if(_handsLayer == -1)
+                {
+                    _layersGenerated = false;
+                    GenerateLayers();
+                }
+                return _handsLayer;
+            }
+        }
         private SingleLayer _handsLayer = -1;
 
-        public SingleLayer HandsResetLayer => _handsResetLayer;
+        public SingleLayer HandsResetLayer
+        {
+            get
+            {
+                if (_handsResetLayer == -1)
+                {
+                    _layersGenerated = false;
+                    GenerateLayers();
+                }
+                return _handsResetLayer;
+            }
+        }
         private SingleLayer _handsResetLayer = -1;
 
         private bool _layersGenerated = false;

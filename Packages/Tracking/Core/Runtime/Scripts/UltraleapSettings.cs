@@ -1,3 +1,11 @@
+/******************************************************************************
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
+ *                                                                            *
+ * Use subject to the terms of the Apache License 2.0 available at            *
+ * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
+ * between Ultraleap and you, your company or other organization.             *
+ ******************************************************************************/
+
 using System.Collections.Generic;
 using UnityEngine;
 #if UNITY_EDITOR
@@ -199,6 +207,32 @@ namespace Leap.Unity
         [HideInInspector, SerializeField]
         public bool showPhysicalHandsPhysicsSettingsWarning = true;
 
+        [HideInInspector, SerializeField]
+        public string pluginVersion = "Unknown";
+        public string PluginVersion
+        { 
+            get
+            {
+#if UNITY_EDITOR
+                pluginVersion = GetPluginVersion();
+#endif
+                return pluginVersion;
+            }
+        }
+
+        [HideInInspector, SerializeField]
+        public string pluginSource = "Unknown";
+        public string PluginSource
+        {
+            get
+            {
+#if UNITY_EDITOR
+                pluginSource = GetPluginSource();
+#endif
+                return pluginSource;
+            }
+        }
+
         public void ResetToDefaults()
         {
             leapSubsystemEnabled = false;
@@ -212,6 +246,40 @@ namespace Leap.Unity
         }
 
 #if UNITY_EDITOR
+
+        static string GetPluginVersion()
+        {
+            if (Utils.IsPackageAvailable("com.ultraleap.tracking", out var packageInfo)) // Check the package exists so we can use package manage wizardry
+            {
+                return packageInfo.version;
+            }
+            else // We are not using package manager :( we need to look for version number elsewhere
+            {
+                return FindPluginVersionInAssets();
+            }
+        }
+
+        static string GetPluginSource()
+        {
+            if (Utils.IsPackageAvailable("com.ultraleap.tracking", out var packageInfo)) // Check the package exists so we can use package manage wizardry
+            {
+                if (packageInfo.source == UnityEditor.PackageManager.PackageSource.Registry &&
+                    packageInfo.registry != null &&
+                    packageInfo.registry.url.Contains("openupm"))
+                {
+                    return "UPM OpenUPM";
+                }
+                else
+                {
+                    return "UPM " + packageInfo.source;
+                }
+            }
+            else // We are not using package manager :( we need to look for version number elsewhere
+            {
+                return "Unity Package";
+            }
+        }
+
         [MenuItem("Ultraleap/Open Ultraleap Settings", false, 50)]
         private static void SelectULSettingsDropdown()
         {
@@ -284,6 +352,28 @@ namespace Leap.Unity
         public static SerializedObject GetSerializedSettings()
         {
             return new SerializedObject(Instance);
+        }
+
+        static string FindPluginVersionInAssets()
+        {
+            string pluginVersionFromAssets = "";
+
+            string[] fileGUIDs = AssetDatabase.FindAssets("Version");
+
+            foreach (var guid in fileGUIDs)
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+
+                if (path.Contains("/Ultraleap/Tracking/Version.txt"))
+                {
+                    string content = File.ReadAllText(path);
+
+                    pluginVersionFromAssets = content;
+                    break;
+                }
+            }
+
+            return pluginVersionFromAssets;
         }
 #endif
     }

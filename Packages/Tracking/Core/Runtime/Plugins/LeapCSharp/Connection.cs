@@ -205,7 +205,18 @@ namespace LeapInternal
                     return;
                 }
             }
+
+            // Produce metadata to send before connection is opened
+            string metadata = MetadataUtil.GetMetaData();
+            UIntPtr uIntPtr = new UIntPtr((uint)metadata.Length);
+
+            if (metadata != null && metadata != "")
+            {
+                LeapC.SetConnectionMetadata(_leapConnection, metadata, uIntPtr);
+            }
+
             result = LeapC.OpenConnection(_leapConnection);
+
             if (result != eLeapRS.eLeapRS_Success)
             {
                 reportAbnormalResults("LeapC OpenConnection call was ", result);
@@ -360,15 +371,15 @@ namespace LeapInternal
                             StructMarshal<LEAP_POINT_MAPPING_CHANGE_EVENT>.PtrToStruct(_msg.eventStructPtr, out point_mapping_change_evt);
                             handlePointMappingChange(ref point_mapping_change_evt);
                             break;
-                        case eLeapEventType.eLeapEventType_HeadPose:
-                            LEAP_HEAD_POSE_EVENT head_pose_event;
-                            StructMarshal<LEAP_HEAD_POSE_EVENT>.PtrToStruct(_msg.eventStructPtr, out head_pose_event);
-                            handleHeadPoseChange(ref head_pose_event);
-                            break;
                         case eLeapEventType.eLeapEventType_DeviceStatusChange:
                             LEAP_DEVICE_STATUS_CHANGE_EVENT status_evt;
                             StructMarshal<LEAP_DEVICE_STATUS_CHANGE_EVENT>.PtrToStruct(_msg.eventStructPtr, out status_evt);
                             handleDeviceStatusEvent(ref status_evt);
+                            break;
+                        case eLeapEventType.eLeapEventType_NewDeviceTransform:
+                            LEAP_NEW_DEVICE_TRANSFORM new_transform_evt;
+                            StructMarshal<LEAP_NEW_DEVICE_TRANSFORM>.PtrToStruct(_msg.eventStructPtr, out new_transform_evt);
+                            handleNewDeviceTransform(ref new_transform_evt, _msg.deviceID);
                             break;
                         case eLeapEventType.eLeapEventType_Fiducial:
                             LEAP_FIDUCIAL_POSE_EVENT fiducial_event;
@@ -851,6 +862,17 @@ namespace LeapInternal
 
             _activePolicies[deviceID] = policyMsg.current_policy;
         }
+
+        private void handleNewDeviceTransform(ref LEAP_NEW_DEVICE_TRANSFORM deviceTransformMsg, UInt32 deviceID)
+        {
+            Device device = _devices.FindDeviceByID(deviceID);
+
+            if (device != null)
+            {
+                device.FindDeviceTransform();
+            }
+        }
+
 
         public void SetAndClearPolicy(Controller.PolicyFlag set, Controller.PolicyFlag clear, Device device = null)
         {

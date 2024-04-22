@@ -6,6 +6,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
 
+## [PHYSHANDSPARITY] - xx/xx/xx
+
+### Added
+- PhysicalHandsButton with automatic setup
+- PhysicalHandsButtonToggle
+- PhysicalHandsAnchorable, including anchoring and un-anchoring based on grabs
+
+### Changed
+- Removed old PhysicalHandsButton
+- Anchors no longer require Interaction Engine
+- Turntable and Pullcord example scene now uses Physical Hands
+- Physical Hands Playground uses new PhysicalHandsButtons and Toggles
+
+### Fixed
+- 
+
 ## [NEXT] - xx/xx/xx
 
 ### Tracking Client versions
@@ -23,6 +39,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (Physical Hands) Ignore Physical hands component can now choose which hand(s) it should be applied to
 - (Physical Hands) Edit time representation of hands via Physical Hands Manager
 - (Attachment Hands) Do not show warning again this session when deleting attachment points
+- (Optional) Metadata capture to help improve the Plugin
 - (Physical Hands) Ability to create IgnorePhysicalHands at runtime
 - (Fiducial Marker Tracking) Fiducial Marker Tracking support using AprilTag
 
@@ -58,6 +75,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (Physical Hands) Soft Contact NAN collider error when using OpenXR tracking on Android devices
 - (Physical Hands) Hand stuck in pose, unable to grab if object is disabled while grabbing
 - (Physical Hands) Errors when destroying objects that are grabbed
+- (Physical Hands) Errors when adding Physical Hands Manager prefab for the first time
+- Use of Device Transforms does not apply rotations
+- OpenXR API Layer Service query intent was missing sometimes, preventing API layers functioning correctly
+- OpenXR checks minSdkVersion rather than targetSdkVersion for query intents
+- (Physical Hands) PhysHands Settings are not localized when using decimals
 
 
 ## [6.14.0] - 24/01/24
