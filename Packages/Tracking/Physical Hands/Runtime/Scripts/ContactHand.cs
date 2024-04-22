@@ -26,6 +26,12 @@ namespace Leap.Unity.PhysicalHands
 
         private Hand modifiedHand = new Hand();
         internal Hand dataHand = new Hand();
+
+        /// <summary>
+        /// The raw data for this hand before it is modified to account for Physical Hands
+        /// </summary>
+        public Hand DataHand => dataHand;
+
         [SerializeField]
         internal bool tracked = false, resetting = false, ghosted = false;
 
@@ -247,11 +253,6 @@ namespace Leap.Unity.PhysicalHands
                     lastTransform = bone.transform;
                 }
             }
-        }
-
-        public Hand GetDataHand()
-        {
-            return dataHand;
         }
 
         /// <summary>
