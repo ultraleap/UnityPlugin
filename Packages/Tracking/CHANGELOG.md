@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Support for reading the camera matrix
+- Raise RawFrameEvent for the raw tracking frame
 
 ### Changed
 - 

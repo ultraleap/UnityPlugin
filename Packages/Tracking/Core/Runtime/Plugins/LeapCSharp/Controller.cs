@@ -133,6 +133,21 @@ namespace Leap
         }
 
         /// <summary>
+        ///  Dispatched when the raw frame data is ready
+        /// </summary>
+        public event EventHandler<RawFrameEventArgs> RawFrameReady
+        {
+            add
+            {
+                _connection.LeapRawFrameData += value;
+            }
+            remove
+            {
+                _connection.LeapRawFrameData -= value;
+            }
+        }
+
+        /// <summary>
         /// Dispatched when an internal tracking frame is ready.
         /// @since 3.0
         /// </summary>
