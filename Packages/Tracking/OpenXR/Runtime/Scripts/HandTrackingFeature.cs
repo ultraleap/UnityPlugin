@@ -24,7 +24,7 @@ namespace Ultraleap.Tracking.OpenXR
         Desc = "Articulated hands using XR_EXT_hand_tracking",
         Category = FeatureCategory.Feature,
         Required = false,
-        OpenxrExtensionStrings = "XR_EXT_hand_tracking XR_ULTRALEAP_hand_tracking_forearm",
+        OpenxrExtensionStrings = "XR_EXT_hand_tracking XR_ULTRALEAP_hand_tracking_forearm XR_ULTRALEAP_hand_tracking_hints",
         BuildTargetGroups = new[] { BuildTargetGroup.Standalone, BuildTargetGroup.Android }
     )]
 #endif
@@ -85,6 +85,9 @@ namespace Ultraleap.Tracking.OpenXR
                 HandJointLocation[] joints,
                 uint jointCount);
 
+            [DllImport(NativeDLL, EntryPoint = NativePrefix + "SetHandTrackingHints", ExactSpelling = true)]
+            internal static extern void SetHandTrackingHints(string[] hints, uint hintCount);
+
             [DllImport(NativeDLL, EntryPoint = NativePrefix + "XrResultToString", ExactSpelling = true)]
             private static extern IntPtr XrResultToString(int result);
 
@@ -93,8 +96,40 @@ namespace Ultraleap.Tracking.OpenXR
 
         private bool _supportsHandTracking;
         private bool _isUltraleapTracking;
+        private bool _supportsHandTrackingHints;
+
+        /// <summary>
+        /// True if the XR_EXT_hand_tracking OpenXR extension is supported (and is a supported revision) and the
+        /// system indicates it supports hand-tracking.
+        /// </summary>
         [PublicAPI] public bool SupportsHandTracking => enabled && _supportsHandTracking;
+
+        /// <summary>
+        /// Indicates if the tracking is provided by Ultraleap as opposed to another OpenXR implementation.
+        /// </summary>
         [PublicAPI] public bool IsUltraleapHandTracking => enabled && _isUltraleapTracking;
+
+        /// <summary>
+        /// True if the XR_ULTRALEAP_hand_tracking_hints OpenXR extension is supported (and is a supported revision).
+        /// </summary>
+        [PublicAPI] public bool SupportsHandTrackingHints => enabled && _supportsHandTrackingHints;
+
+        /// <summary>
+        /// Sets a specific set of hints, if this does not include previously set ones, they will be cleared.
+        /// </summary>
+        /// <param name="hints">The hints you wish to set</param>
+        public void SetHandTrackingHints(string[] hints)
+        {
+            if (SupportsHandTrackingHints)
+            {
+                Native.SetHandTrackingHints(hints, (uint)hints.Length);
+            }
+        }
+
+        /// <summary>
+        /// Clears all hand-tracking hints that have been previously set.
+        /// </summary>
+        public void ClearHandTrackingHints() => SetHandTrackingHints(new string[] { });
 
         protected override IntPtr HookGetInstanceProcAddr(IntPtr func) => Native.HookGetInstanceProcAddr(func);
         protected override void OnInstanceDestroy(ulong xrInstance) => Native.OnInstanceDestroy(xrInstance);
@@ -124,6 +159,11 @@ namespace Ultraleap.Tracking.OpenXR
             {
                 Debug.LogWarning("XR_EXT_hand_tracking is not at least version 4, disabling Hand Tracking");
                 return false;
+            }
+
+            if (OpenXRRuntime.IsExtensionEnabled("XR_ULTRALEAP_hand_tracking_hints"))
+            {
+                _supportsHandTrackingHints = true;
             }
 
             bool succeeded = Native.OnInstanceCreate(xrInstance);
@@ -186,32 +226,6 @@ namespace Ultraleap.Tracking.OpenXR
 #if UNITY_EDITOR
         protected override void GetValidationChecks(List<ValidationRule> rules, BuildTargetGroup targetGroup)
         {
-#if UNITY_ANDROID
-            // If building for Android, check that we are targeting Android API 29 for maximum compatibility.
-            rules.Add(new ValidationRule(this)
-            {
-                message = "Android target SDK version is not set to 29, hand-tracking may not work on devices " +
-                          "running Android 11 or higher",
-                helpLink = "https://registry.khronos.org/OpenXR/specs/1.0/loader.html#android-active-runtime-location",
-                helpText = "OpenXR applications should not target API levels higher than 29 for maximum " +
-                           "compatibility, as runtimes may need to query and load classes from their own packages, " +
-                           "which are necessarily not listed in the <queries> tag above.",
-                checkPredicate = () => PlayerSettings.Android.targetSdkVersion == AndroidSdkVersions.AndroidApiLevel29,
-                error = false,
-                fixItAutomatic = true,
-                fixItMessage = "Set the Android target SDK version to 29",
-                fixIt = () =>
-                {
-                    if (PlayerSettings.Android.minSdkVersion > AndroidSdkVersions.AndroidApiLevel29)
-                    {
-                        PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel29;
-                    }
-
-                    PlayerSettings.Android.targetSdkVersion = AndroidSdkVersions.AndroidApiLevel29;
-                },
-            });
-#endif
-
             // Check the active input handling supports New (for OpenXR) and Legacy (for Ultraleap Plugin support).
             rules.Add(new ValidationRule(this)
             {

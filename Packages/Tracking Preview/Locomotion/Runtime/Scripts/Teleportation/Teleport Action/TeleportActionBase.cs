@@ -101,7 +101,11 @@ namespace Leap.Unity.Preview.Locomotion
             if (Player == null) Player = Head.parent.gameObject == null ? Head.gameObject : Head.parent.gameObject;
             if (farFieldLayerManager == null)
             {
+#if UNITY_2021_3_18_OR_NEWER
                 farFieldLayerManager = FindAnyObjectByType<FarFieldLayerManager>();
+#else
+                farFieldLayerManager = FindObjectOfType<FarFieldLayerManager>();
+#endif
             }
 
             if (handRayInteractor != null)
@@ -111,7 +115,11 @@ namespace Leap.Unity.Preview.Locomotion
 
             if (findTeleportAnchorsOnStart)
             {
+#if UNITY_2021_3_18_OR_NEWER
                 _teleportAnchors = new List<TeleportAnchor>(FindObjectsByType<TeleportAnchor>(FindObjectsInactive.Include, FindObjectsSortMode.None));
+#else
+                _teleportAnchors = new List<TeleportAnchor>(FindObjectsOfType<TeleportAnchor>(true));
+#endif
             }
 
             if (freeTeleportAnchor.TryGetComponent(out MeshCollider anchorCollider))
@@ -145,7 +153,11 @@ namespace Leap.Unity.Preview.Locomotion
 
             if (farFieldLayerManager == null)
             {
+#if UNITY_2021_3_18_OR_NEWER
                 farFieldLayerManager = FindAnyObjectByType<FarFieldLayerManager>();
+#else
+                farFieldLayerManager = FindObjectOfType<FarFieldLayerManager>();
+#endif
             }
         }
 
@@ -299,16 +311,7 @@ namespace Leap.Unity.Preview.Locomotion
 
         protected void SelectTeleport(bool selected = true)
         {
-            if (selected && !IsSelected)
-            {
-                OnTeleportSelected?.Invoke(true);
-            }
-            else if (!selected && IsSelected)
-            {
-                OnTeleportSelected?.Invoke(false);
-            }
-
-
+            bool wasSelected = IsSelected;
             _isSelected = selected;
             if (handRayRenderer != null)
             {
@@ -338,6 +341,15 @@ namespace Leap.Unity.Preview.Locomotion
             else
             {
                 freeTeleportAnchor.gameObject.SetActive(!(movementType == TeleportActionMovementType.FIXED));
+            }
+
+            if (selected && !wasSelected)
+            {
+                OnTeleportSelected?.Invoke(true);
+            }
+            else if (!selected && wasSelected)
+            {
+                OnTeleportSelected?.Invoke(false);
             }
         }
 

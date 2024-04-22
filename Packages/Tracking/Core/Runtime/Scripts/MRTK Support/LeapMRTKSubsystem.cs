@@ -231,23 +231,23 @@ namespace Leap.Unity.MRTK
                     return;
                 }
 
-                LeapProvider leapProvider = GameObject.FindAnyObjectByType<LeapXRServiceProvider>();
+                LeapServiceProvider leapProvider = GameObject.FindAnyObjectByType<LeapServiceProvider>();
 
                 // If there is no leap provider in the scene
                 if (leapProvider == null)
                 {
-                    Debug.Log("There are no LeapXRServiceProviders in the scene, automatically assigning one for use with Ultraleap Subsystem for MRTK");
+                    Debug.Log("There are no LeapServiceProviders in the scene, automatically assigning a LeapXRServiceProvider for use with Ultraleap Subsystem for MRTK");
 
 
                     GameObject leapProviderGO = new GameObject("LeapXRServiceProvider");
                     LeapXRServiceProvider leapXRServiceProvider = leapProviderGO.AddComponent<LeapXRServiceProvider>();
                     leapXRServiceProvider.PositionDeviceRelativeToMainCamera = true;
-                    leapProvider = (LeapProvider)leapXRServiceProvider;
+                    leapProvider = (LeapServiceProvider)leapXRServiceProvider;
                     GameObject.DontDestroyOnLoad(leapProviderGO);
                 }
                 else
                 {
-                    Debug.Log("Ultraleap Subsystem for MRTK is using the existing LeapXRServiceProvider found in the current scene");
+                    Debug.Log("Ultraleap Subsystem for MRTK is using the existing  LeapServiceProvider found in the current scene");
                 }
 
                 foreach (var hand in hands)

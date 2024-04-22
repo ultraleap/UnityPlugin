@@ -14,8 +14,16 @@ namespace Leap.Unity.PhysicalHands
     [RequireComponent(typeof(PhysicalHandsManager))]
     public class GrabHelper : MonoBehaviour
     {
+        public static GrabHelper Instance;
+
         [SerializeField]
         private PhysicalHandsManager physicalHandsManager;
+
+        [Tooltip("Should kinematic objects be changed to non-kinematic for movement?" +
+                "\n\nIf true, rigidbodies will be changed to non-kinematic when grabbed, and returned to kinematic when released" +
+                "\n\nIf false, kinematic objects will be positioned through kinematic methods" +
+                "\n\nWarning: Hard Contact hands can jitter when moving a kinematic object")]
+        public bool useNonKinematicMovementOnly = true;
 
         private ContactHand _leftContactHand { get { return physicalHandsManager.ContactParent.LeftHand; } }
         private ContactHand _rightContactHand { get { return physicalHandsManager.ContactParent.RightHand; } }
@@ -33,6 +41,16 @@ namespace Leap.Unity.PhysicalHands
         private HashSet<Rigidbody> _previousHoveredRigids = new HashSet<Rigidbody>();
 
         #endregion
+
+        private void Awake()
+        {
+            if (Instance != null)
+            {
+                Debug.LogWarning("Having multiple GrabHelpers at once is not supported");
+            }
+
+            Instance = this;
+        }
 
         private void OnEnable()
         {
@@ -276,6 +294,16 @@ namespace Leap.Unity.PhysicalHands
                     _grabHelperObjects[rigid].ReleaseHelper();
                     _grabHelperObjects.Remove(rigid);
                 }
+
+                foreach (var bone in _leftContactHand.bones)
+                {
+                    bone.RemoveGrabbing(rigid);
+                }
+                foreach (var bone in _rightContactHand.bones)
+                {
+                    bone.RemoveGrabbing(rigid);
+                }
+
                 return true;
             }
             return false;
@@ -312,6 +340,40 @@ namespace Leap.Unity.PhysicalHands
                 hand.isGrabbing = found;
             }
         }
+        #endregion
+
+        #region Object Information
+        /// <summary>
+        /// Find out if the given rigidbody is being grabbed and by which hand
+        /// </summary>
+        /// <param name="rigid">Rigidbody to check</param>
+        /// <param name="hand">Contact Hand that is grabbing, null if no hand is grabbing</param>
+        /// <returns>True if this object is being grabbed</returns>
+        public bool IsObjectGrabbed(Rigidbody rigid, out ContactHand hand)
+        {
+            hand = null;
+            if (_grabHelperObjects.TryGetValue(rigid, out GrabHelperObject helper))
+            {
+                if (helper.currentGrabbingHand != null)
+                {
+                    hand = helper.currentGrabbingHand;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Populate helperObject with the GrabHelperObject associated with the provided Rigidbody if there is one.
+        /// </summary>
+        /// <param name="rigid">The Rigidbody to find the associated GrabHelperObject</param>
+        /// <param name="helperObject">A GrabHelperObject to be populated if one is available</param>
+        /// <returns>True if there is a GrabHelperObject associated with the provided Rigidbody</returns>
+        public bool TryGetGrabHelperObjectFromRigid(Rigidbody rigid, out GrabHelperObject helperObject)
+        {
+            return _grabHelperObjects.TryGetValue(rigid, out helperObject);
+        }
+
         #endregion
 
         private void OnValidate()
