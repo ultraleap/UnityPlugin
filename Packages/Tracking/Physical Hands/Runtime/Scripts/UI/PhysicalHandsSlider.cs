@@ -526,16 +526,19 @@ namespace Leap.Unity.PhysicalHands
         private void OnDrawGizmosSelected()
         {
             MakeLocalSliderScales();
-            DrawJointRangeGizmo(_slideableObject.transform.localPosition);
+            DrawJointRangeGizmo();
         }
 
         /// <summary>
         /// Draws gizmos representing the range of motion for the joint based on its type and direction.
         /// </summary>
-        /// <param name="jointPosition">Position of the joint.</param>
-        private void DrawJointRangeGizmo(Vector3 jointPosition)
+        private void DrawJointRangeGizmo()
         {
-            Gizmos.matrix = _slideableObject.transform.localToWorldMatrix;
+            Vector3 jointPosition = _slideableObject.transform.localPosition;
+            Matrix4x4 m = _slideableObject.transform.localToWorldMatrix;
+            m.SetTRS(this.transform.position, m.rotation, m.lossyScale);
+            Gizmos.matrix = m;
+
             switch (_sliderType)
             {
                 case SliderType.ONE_DIMENSIONAL:
@@ -546,11 +549,11 @@ namespace Leap.Unity.PhysicalHands
                         {
                             case SliderDirection.X:
                                 Gizmos.color = Color.red; // X axis
-                                Gizmos.DrawLine(jointPosition + Vector3.right * (SliderTravelDistanceHalf / _slideableObject.transform.lossyScale.x), jointPosition - Vector3.right * (SliderTravelDistanceHalf / _slideableObject.transform.lossyScale.x));
+                                Gizmos.DrawLine(jointPosition + (Vector3.right * (SliderTravelDistanceHalf / _slideableObject.transform.lossyScale.x)), jointPosition - (Vector3.right * (SliderTravelDistanceHalf / _slideableObject.transform.lossyScale.x)));
                                 break;
                             case SliderDirection.Z:
                                 Gizmos.color = Color.blue; // Z axis
-                                Gizmos.DrawLine(jointPosition + Vector3.forward * (SliderTravelDistanceHalf / _slideableObject.transform.lossyScale.z), jointPosition - Vector3.forward * (SliderTravelDistanceHalf / _slideableObject.transform.lossyScale.z));
+                                Gizmos.DrawLine(jointPosition + (Vector3.forward * (SliderTravelDistanceHalf / _slideableObject.transform.lossyScale.z)), jointPosition - (Vector3.forward * (SliderTravelDistanceHalf / _slideableObject.transform.lossyScale.z)));
                                 break;
                         }
                         break;
