@@ -1133,9 +1133,13 @@ namespace LeapInternal
         public static extern LEAP_VECTOR LeapPixelToRectilinear(IntPtr hConnection,
           eLeapPerspectiveType camera, LEAP_VECTOR pixel);
 
-        [DllImport("LeapC", EntryPoint = "LeapPixelToRectilinearEx")]
+        [Obsolete("Use of calibrationType is not valid. Use alternative LeapPixelToRectilinearEx method."), DllImport("LeapC", EntryPoint = "LeapPixelToRectilinearEx")]
         public static extern LEAP_VECTOR LeapPixelToRectilinearEx(IntPtr hConnection,
           IntPtr hDevice, eLeapPerspectiveType camera, eLeapCameraCalibrationType calibrationType, LEAP_VECTOR pixel);
+
+        [DllImport("LeapC", EntryPoint = "LeapPixelToRectilinearEx")]
+        public static extern LEAP_VECTOR LeapPixelToRectilinearEx(IntPtr hConnection,
+            IntPtr hDevice, eLeapPerspectiveType camera, LEAP_VECTOR pixel);
 
         [DllImport("LeapC", EntryPoint = "LeapRectilinearToPixel")]
         public static extern LEAP_VECTOR LeapRectilinearToPixel(IntPtr hConnection,
@@ -1144,6 +1148,14 @@ namespace LeapInternal
         [DllImport("LeapC", EntryPoint = "LeapRectilinearToPixelEx")]
         public static extern LEAP_VECTOR LeapRectilinearToPixelEx(IntPtr hConnection,
           IntPtr hDevice, eLeapPerspectiveType camera, LEAP_VECTOR rectilinear);
+
+        [DllImport("LeapC", EntryPoint = "LeapExtrinsicCameraMatrix")]
+        public static extern eLeapRS LeapExtrinsicCameraMatrix(IntPtr hConnection, eLeapPerspectiveType camera, 
+            [MarshalAs(UnmanagedType.LPArray, SizeConst = 16)] float[] extrinsicMatrix);
+
+        [DllImport("LeapC", EntryPoint = "LeapExtrinsicCameraMatrixEx")]
+        public static extern eLeapRS LeapExtrinsicCameraMatrixEx(IntPtr hConnection, IntPtr hDevice, eLeapPerspectiveType camera, 
+            [MarshalAs(UnmanagedType.LPArray, SizeConst = 16)] float[] extrinsicMatrix);
 
         [DllImport("LeapC", EntryPoint = "LeapCloseDevice")]
         public static extern void CloseDevice(IntPtr pDevice);
@@ -1272,7 +1284,6 @@ namespace LeapInternal
 
         [DllImport("LeapC", EntryPoint = "LeapGetVersion")]
         public static extern eLeapRS GetVersion(IntPtr hConnection, eLeapVersionPart versionPart, ref LEAP_VERSION pVersion);
-
 
         [DllImport("LeapC", EntryPoint = "LeapGetServerStatus")]
         public static extern eLeapRS GetServerStatus(UInt32 timeout, ref IntPtr status);

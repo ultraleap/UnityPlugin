@@ -14,13 +14,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Android 	v6.0.0
 
 ### Added
-- 
+- Support for reading the camera matrix
 
 ### Changed
 - 
 
 ### Fixed
-- 
+- Issue with the method signature for LeapPixelToRectilinearEx
 
 ## [6.15.0] - 19/04/24
 
