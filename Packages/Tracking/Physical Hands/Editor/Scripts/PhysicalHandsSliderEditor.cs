@@ -6,8 +6,8 @@ using System.Linq;
 
 namespace Leap.Unity.PhysicalHands
 {
-    [CustomEditor(typeof(PhysicalHandsUISlider))]
-    public class PhysicalHandsSliderEditor : CustomEditorBase<PhysicalHandsUISlider>
+    [CustomEditor(typeof(PhysicalHandsSlider))]
+    public class PhysicalHandsSliderEditor : CustomEditorBase<PhysicalHandsSlider>
     {
         private bool eventsFoldedOut = false;
 
@@ -20,14 +20,14 @@ namespace Leap.Unity.PhysicalHands
             var sliderType = serializedObject.FindProperty("_sliderType");
             EditorGUILayout.PropertyField(sliderType, new GUIContent("Slider Type", "The type of slider (one-dimensional or two-dimensional)."));
 
-            if (sliderType.enumValueIndex == (int)PhysicalHandsUISlider.SliderType.ONE_DIMENSIONAL)
+            if (sliderType.enumValueIndex == (int)PhysicalHandsSlider.SliderType.ONE_DIMENSIONAL)
             {
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("_sliderDirection"), new GUIContent("Slider Direction", "The direction in which the slider moves."));
                 serializedObject.FindProperty("SliderTravelDistance").floatValue = CreateAxisAttribute("Slider Travel Distance: ", "SliderTravelDistance", "The travel distance of the slider (from the central point).");
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("_startPosition"), new GUIContent("Start Position", "The starting position of the slider."));
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("_numberOfSegments"), new GUIContent("Number of Segments", "Number of segments for the slider to use (0 = unlimited)."));
             }
-            else if (sliderType.enumValueIndex == (int)PhysicalHandsUISlider.SliderType.TWO_DIMENSIONAL)
+            else if (sliderType.enumValueIndex == (int)PhysicalHandsSlider.SliderType.TWO_DIMENSIONAL)
             {
                 serializedObject.FindProperty("TwoDimSliderTravelDistance").vector2Value = CreateVector2AxisAttribute("Slider Travel Distance: ", "TwoDimSliderTravelDistance", "The travel distance of the two-dimensional slider.");
                 serializedObject.FindProperty("_twoDimStartPosition").vector2Value = CreateVector2AxisAttribute("Start Position: ", "_twoDimStartPosition", "Starting position of the two-dimensional slider.");
@@ -48,13 +48,13 @@ namespace Leap.Unity.PhysicalHands
 
             if (eventsFoldedOut)
             {
-                if (sliderType.enumValueIndex == (int)PhysicalHandsUISlider.SliderType.ONE_DIMENSIONAL)
+                if (sliderType.enumValueIndex == (int)PhysicalHandsSlider.SliderType.ONE_DIMENSIONAL)
                 {
                     EditorGUILayout.PropertyField(serializedObject.FindProperty("SliderChangeEvent"), new GUIContent("Slider Change Event", "Event triggered when the slider value changes."));
                     EditorGUILayout.PropertyField(serializedObject.FindProperty("SliderButtonPressedEvent"), new GUIContent("Slider Button Pressed Event", "Event triggered when the slider button is pressed."));
                     EditorGUILayout.PropertyField(serializedObject.FindProperty("SliderButtonUnPressedEvent"), new GUIContent("Slider Button Unpressed Event", "Event triggered when the slider button is released."));
                 }
-                else if (sliderType.enumValueIndex == (int)PhysicalHandsUISlider.SliderType.TWO_DIMENSIONAL)
+                else if (sliderType.enumValueIndex == (int)PhysicalHandsSlider.SliderType.TWO_DIMENSIONAL)
                 {
                     EditorGUILayout.PropertyField(serializedObject.FindProperty("TwoDimSliderChangeEvent"), new GUIContent("Slider Change Event", "Event triggered when the slider value changes."));
                     EditorGUILayout.PropertyField(serializedObject.FindProperty("TwoDimSliderButtonPressedEvent"), new GUIContent("Slider Button Pressed Event", "Event triggered when the slider button is pressed."));

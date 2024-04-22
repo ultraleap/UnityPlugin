@@ -10,7 +10,7 @@ namespace Leap.Unity.PhysicalHands
     /// This clas is purely to get events from the slideable object.
     /// You do not need to add this class to your object, it will be added automatically by the slider.
     /// </summary>
-    internal class PhysicalHandsUISliderHelper : MonoBehaviour, IPhysicalHandGrab, IPhysicalHandContact
+    internal class PhysicalHandsSlideHelper : MonoBehaviour, IPhysicalHandGrab, IPhysicalHandContact
     {
         internal Action<ContactHand> _onHandGrab;
         internal Action<ContactHand> _onHandGrabExit;

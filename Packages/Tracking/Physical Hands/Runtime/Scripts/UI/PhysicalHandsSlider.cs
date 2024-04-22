@@ -9,7 +9,7 @@ using UnityEngine.Events;
 namespace Leap.Unity.PhysicalHands
 {
     [RequireComponent(typeof(Rigidbody))]
-    public class PhysicalHandsUISlider : MonoBehaviour
+    public class PhysicalHandsSlider : MonoBehaviour
     {
 
         [SerializeField, OnEditorChange("AutoAssignConnectedButton")]
@@ -325,10 +325,10 @@ namespace Leap.Unity.PhysicalHands
         /// </summary>
         private void ConfigureSlideableObject()
         {
-            PhysicalHandsUISliderHelper slideHelper;
-            if (!_slideableObject.TryGetComponent<PhysicalHandsUISliderHelper>(out slideHelper))
+            PhysicalHandsSlideHelper slideHelper;
+            if (!_slideableObject.TryGetComponent<PhysicalHandsSlideHelper>(out slideHelper))
             {
-                slideHelper = _slideableObject.AddComponent<PhysicalHandsUISliderHelper>();
+                slideHelper = _slideableObject.AddComponent<PhysicalHandsSlideHelper>();
             }
 
             slideHelper._onHandGrab += OnHandGrab;
