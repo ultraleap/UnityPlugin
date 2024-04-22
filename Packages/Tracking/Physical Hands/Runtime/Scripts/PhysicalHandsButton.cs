@@ -74,7 +74,7 @@ namespace Leap.Unity.PhysicalHands
 
         private void OnDisable()
         {
-            if(delayedPressCoroutine != null)
+            if (delayedPressCoroutine != null)
             {
                 StopAllCoroutines();
                 delayedPressCoroutine = null;

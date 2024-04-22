@@ -81,11 +81,11 @@ namespace Ultraleap.Tracking.OpenXR
                 return _trackingSource;
             }
 
-            if(HandTrackingSourceUtility.LeapOpenXRTrackingAvailable)
+            if (HandTrackingSourceUtility.LeapOpenXRTrackingAvailable)
             {
                 _trackingSource = TrackingSource.OPENXR_LEAP;
             }
-            else if(HandTrackingSourceUtility.NonLeapOpenXRTrackingAvailable)
+            else if (HandTrackingSourceUtility.NonLeapOpenXRTrackingAvailable)
             {
                 _trackingSource = TrackingSource.OPENXR;
             }

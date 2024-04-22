@@ -9,13 +9,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [NEXT] - xx/xx/xx
 
 ### Tracking Client versions
-- Windows 	v5.17.1
-- MacOS 	v5.17.1
-- Android 	v5.17.1
+- Windows 	v6.0.0
+- MacOS 	v6.0.0
+- Android 	v6.0.0
 
 ### Added
-- LeapServiceProvider accessor for world space psoition of the Tracking Camera
-- LeapXRServiceProvider accessor for world space psoition of the Tracking Camera
+- 
+
+### Changed
+- 
+
+### Fixed
+- 
+
+## [6.15.0] - 19/04/24
+
+### Tracking Client versions
+- Windows 	v6.0.0
+- MacOS 	v6.0.0
+- Android 	v6.0.0
+
+### Added
+- LeapServiceProvider accessor for world space position of the Tracking Camera
+- LeapXRServiceProvider accessor for world space position of the Tracking Camera
 - LeapServiceProvider accessor for world space position of the Tracking Camera
 - LeapXRServiceProvider accessor for world space position of the Tracking Camera
 - (Physical Hands) Ability to ignore collisions on single object or all children
@@ -64,7 +80,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - OpenXR API Layer Service query intent was missing sometimes, preventing API layers functioning correctly
 - OpenXR checks minSdkVersion rather than targetSdkVersion for query intents
 - (Physical Hands) PhysHands Settings are not localized when using decimals
-
 
 ## [6.14.0] - 24/01/24
 

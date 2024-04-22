@@ -237,7 +237,7 @@ namespace Leap.Unity.Interaction
 
         }
 
-#endregion
+        #endregion
 
         #region General InteractionController Implementation
 

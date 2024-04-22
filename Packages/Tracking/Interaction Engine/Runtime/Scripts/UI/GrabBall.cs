@@ -278,7 +278,7 @@ namespace Leap.Unity.Interaction
 
         private void OnDrawGizmos()
         {
-            if(grabBallInteractionBehaviour == null)
+            if (grabBallInteractionBehaviour == null)
             {
                 return;
             }

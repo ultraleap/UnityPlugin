@@ -646,7 +646,7 @@ namespace Leap
         /// <param name="device">An optional specific Device, otherwise the first found will be used</param>
         public void RequestHandTrackingHints(string[] hints, Device device = null)
         {
-            if(device == null)
+            if (device == null)
             {
                 device = Devices.ActiveDevices.FirstOrDefault();
             }
