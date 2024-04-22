@@ -11,9 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - PhysicalHandsButton with automatic setup
 - PhysicalHandsButtonToggle
+- PhysicalHandsAnchorable, including anchoring and un-anchoring based on grabs
 
 ### Changed
 - Removed old PhysicalHandsButton
+- Anchors no longer require Interaction Engine
+- Turntable and Pullcord example scene now uses Physical Hands
+- Physical Hands Playground uses new PhysicalHandsButtons and Toggles
 
 ### Fixed
 - 
