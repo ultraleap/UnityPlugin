@@ -118,7 +118,6 @@ MonoBehaviour:
   _slideableObject: {fileID: 8402712650214517380}
   _sliderType: 0
   _sliderDirection: 0
-  _twoDimSliderDirection: 1
   SliderChangeEvent:
     m_PersistentCalls:
       m_Calls: []
@@ -126,6 +125,15 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   SliderButtonUnPressedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  TwoDimSliderChangeEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  TwoDimSliderButtonPressedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  TwoDimSliderButtonUnPressedEvent:
     m_PersistentCalls:
       m_Calls: []
   SliderTravelDistance: 0.22
@@ -137,6 +145,7 @@ MonoBehaviour:
   _axisChangeFromZero: {x: 0, y: 0, z: 0}
   _connectedButton: {fileID: 8216536195087636660}
   _sliderValue: {x: 0, y: 0, z: 0}
+  localTwoDimSliderTravelDistance: {x: 0.22, y: 0.22}
 --- !u!1 &3123228626684123901
 GameObject:
   m_ObjectHideFlags: 0
@@ -258,6 +267,22 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 3123228626017199009}
     m_Modifications:
+    - target: {fileID: 2504497278577001491, guid: 43eaa06112baf304ba03b0e3634d568d, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2504497278577001491, guid: 43eaa06112baf304ba03b0e3634d568d, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.11
+      objectReference: {fileID: 0}
+    - target: {fileID: 2504497278577001491, guid: 43eaa06112baf304ba03b0e3634d568d, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2504497278577001491, guid: 43eaa06112baf304ba03b0e3634d568d, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.41
+      objectReference: {fileID: 0}
     - target: {fileID: 3690411740684171252, guid: 43eaa06112baf304ba03b0e3634d568d, type: 3}
       propertyPath: m_Constraints
       value: 112
@@ -325,6 +350,10 @@ PrefabInstance:
     - target: {fileID: 6690543558420774076, guid: 43eaa06112baf304ba03b0e3634d568d, type: 3}
       propertyPath: _freezeButtonTravelOnMovement
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8988865282199578529, guid: 43eaa06112baf304ba03b0e3634d568d, type: 3}
+      propertyPath: m_Name
+      value: PressableObject
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 43eaa06112baf304ba03b0e3634d568d, type: 3}
