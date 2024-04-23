@@ -104,7 +104,6 @@ namespace Leap.Unity.PhysicalHands
         private float _sliderXZeroPos = 0;
         private float _sliderZZeroPos = 0;
 
-        private bool _sliderReleasedLastFrame = false;
         private Vector3 _prevSliderValue = Vector3.zero;
 
         private Quaternion _initialRotation;
@@ -165,8 +164,8 @@ namespace Leap.Unity.PhysicalHands
         {
             if(_connectedButton != null)
             {
-                _connectedButton.OnButtonPressed.RemoveListener(ButtonPressed);
-                _connectedButton.OnButtonUnPressed.RemoveListener(ButtonUnPressed);
+                _connectedButton.OnButtonPressed?.RemoveListener(ButtonPressed);
+                _connectedButton.OnButtonUnPressed?.RemoveListener(ButtonUnPressed);
             }
         }
 
@@ -174,8 +173,10 @@ namespace Leap.Unity.PhysicalHands
         {
             if (_connectedButton != null)
             {
-                _connectedButton.OnButtonPressed.AddListener(ButtonPressed);
-                _connectedButton.OnButtonUnPressed.AddListener(ButtonUnPressed);
+                _connectedButton.OnButtonPressed?.RemoveListener(ButtonPressed);
+                _connectedButton.OnButtonUnPressed?.RemoveListener(ButtonUnPressed);
+                _connectedButton.OnButtonPressed?.AddListener(ButtonPressed);
+                _connectedButton.OnButtonUnPressed?.AddListener(ButtonUnPressed);
             }
         }
 
@@ -187,44 +188,17 @@ namespace Leap.Unity.PhysicalHands
             // Calculate the change in position of the slider object from its zero position
             _axisChangeFromZero.x = _slideableObject.transform.localPosition.x - _sliderXZeroPos;
             _axisChangeFromZero.z = _slideableObject.transform.localPosition.z - _sliderZZeroPos;
-
             // Calculate the slider value based on the change in position
             _sliderValue = CalculateSliderValue(_axisChangeFromZero);
 
             // Check if the slider value has changed
             if (_prevSliderValue != _sliderValue)
             {
-                // Check if the slider was released last frame
-                if (_sliderReleasedLastFrame)
-                {
-                    // Snap to segment if applicable
-                    switch (_sliderType)
-                    {
-                        case SliderType.ONE_DIMENSIONAL:
-                            {
-                                if (_numberOfSegments != 0)
-                                {
-                                    SnapToSegment();
-                                }
-                                break;
-                            }
-                        case SliderType.TWO_DIMENSIONAL:
-                            {
-                                if (_twoDimNumberOfSegments.x != 0 || _twoDimNumberOfSegments.y != 0)
-                                {
-                                    SnapToSegment();
-                                }
-                                break;
-                            }
-                    }
-
-                    // Reset flag and update previous slider value
-                    _sliderReleasedLastFrame = false;
-                    _prevSliderValue = _sliderValue;
-                }
                 // Send slider change event
                 SendSliderEvent(SliderChangeEvent, TwoDimSliderChangeEvent);
             }
+
+            _prevSliderValue = _sliderValue;
         }
 
         private void FixedUpdate()
@@ -344,12 +318,16 @@ namespace Leap.Unity.PhysicalHands
             {
                 if (_slideableObject.TryGetComponent<PhysicalHandsButton>(out _connectedButton))
                 {
+                    _connectedButton.OnButtonPressed?.RemoveListener(ButtonPressed);
+                    _connectedButton.OnButtonUnPressed?.RemoveListener(ButtonUnPressed);
                     _connectedButton.OnButtonPressed?.AddListener(ButtonPressed);
                     _connectedButton.OnButtonUnPressed?.AddListener(ButtonUnPressed);
                 }
             }
             else
             {
+                _connectedButton.OnButtonPressed?.RemoveListener(ButtonPressed);
+                _connectedButton.OnButtonUnPressed?.RemoveListener(ButtonUnPressed);
                 _connectedButton.OnButtonPressed?.AddListener(ButtonPressed);
                 _connectedButton.OnButtonUnPressed?.AddListener(ButtonUnPressed);
             }
@@ -597,7 +575,7 @@ namespace Leap.Unity.PhysicalHands
                 FreezeSliderPosition();
             }
 
-            _sliderReleasedLastFrame = true;
+            SnapSliderOnRelease();
 
             SendSliderEvent(SliderButtonUnPressedEvent, TwoDimSliderButtonUnPressedEvent);
         }
@@ -614,7 +592,7 @@ namespace Leap.Unity.PhysicalHands
                 FreezeSliderPosition();
             }
 
-            _sliderReleasedLastFrame = true;
+            SnapSliderOnRelease();
         }
 
         public void OnHandContact(ContactHand hand)
@@ -628,9 +606,48 @@ namespace Leap.Unity.PhysicalHands
             {
                 FreezeSliderPosition();
             }
-            _sliderReleasedLastFrame = true;
+
+            SnapSliderOnRelease();
         }
 
+        void SnapSliderOnRelease()
+        {
+            // Snap to segment if applicable
+            switch (_sliderType)
+            {
+                case SliderType.ONE_DIMENSIONAL:
+                    {
+                        if (_numberOfSegments != 0)
+                        {
+                            SnapToSegment();
+                        }
+                        break;
+                    }
+                case SliderType.TWO_DIMENSIONAL:
+                    {
+                        if (_twoDimNumberOfSegments.x != 0 || _twoDimNumberOfSegments.y != 0)
+                        {
+                            SnapToSegment();
+                        }
+                        break;
+                    }
+            }
+
+            // Calculate the change in position of the slider object from its zero position
+            _axisChangeFromZero.x = _slideableObject.transform.localPosition.x - _sliderXZeroPos;
+            _axisChangeFromZero.z = _slideableObject.transform.localPosition.z - _sliderZZeroPos;
+            // Calculate the slider value based on the change in position
+            _sliderValue = CalculateSliderValue(_axisChangeFromZero);
+
+            // Check if the slider value has changed
+            if (_prevSliderValue != _sliderValue)
+            {
+                // Send slider change event
+                SendSliderEvent(SliderChangeEvent, TwoDimSliderChangeEvent);
+            }
+
+            _prevSliderValue = _sliderValue;
+        }
 
         /// <summary>
         /// Unfreezes the slider position, allowing it to move freely.
