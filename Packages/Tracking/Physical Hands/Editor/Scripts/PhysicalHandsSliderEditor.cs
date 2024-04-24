@@ -20,7 +20,7 @@ namespace Leap.Unity.PhysicalHands
             EditorGUILayout.PropertyField(serializedObject.FindProperty("_sliderDirection"), new GUIContent("Slider Direction", "The direction in which the slider moves."));
 
             EditorGUILayout.Space(5);
-            serializedObject.FindProperty("SliderTravelDistance").floatValue = CreateAxisAttribute("Slider Travel Distance: ", "SliderTravelDistance", "The travel distance of the slider (from the central point).");
+            serializedObject.FindProperty("_sliderTravelDistance").floatValue = CreateAxisAttribute("Slider Travel Distance: ", "_sliderTravelDistance", "The travel distance of the slider (from the central point).");
             EditorGUILayout.PropertyField(serializedObject.FindProperty("_startPosition"), new GUIContent("Start Position", "The starting position of the slider."));
 
             EditorGUILayout.Space(20);
