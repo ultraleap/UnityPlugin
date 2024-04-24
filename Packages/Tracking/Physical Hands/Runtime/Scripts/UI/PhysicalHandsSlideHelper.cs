@@ -7,15 +7,15 @@ using UnityEngine;
 namespace Leap.Unity.PhysicalHands
 {
     /// <summary>
-    /// This clas is purely to get events from the slideable object.
+    /// This class is purely to get events from the slideable object.
     /// You do not need to add this class to your object, it will be added automatically by the slider.
     /// </summary>
-    internal class PhysicalHandsSlideHelper : MonoBehaviour, IPhysicalHandGrab, IPhysicalHandContact
+    public class PhysicalHandsSlideHelper : MonoBehaviour, IPhysicalHandGrab, IPhysicalHandContact
     {
-        internal Action<ContactHand> _onHandGrab;
-        internal Action<ContactHand> _onHandGrabExit;
-        internal Action<ContactHand> _onHandContact;
-        internal Action<ContactHand> _onHandContactExit;
+        public Action<ContactHand> _onHandGrab;
+        public Action<ContactHand> _onHandGrabExit;
+        public Action<ContactHand> _onHandContact;
+        public Action<ContactHand> _onHandContactExit;
 
         public void OnHandContact(ContactHand hand)
         {

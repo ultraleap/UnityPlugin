@@ -7,10 +7,9 @@
  ******************************************************************************/
 
 using UnityEngine;
-using Leap.Unity.PhysicalHands;
 using System.Collections.Generic;
 
-namespace Leap.Unity.Interaction
+namespace Leap.Unity.PhysicalHands
 {
     /// <summary>
     /// A representation of an object with an attached object which can be restricted relative to the users head
@@ -37,9 +36,6 @@ namespace Leap.Unity.Interaction
         /// The pose the grab ball is actually at, including restrictions
         /// </summary>
         [HideInInspector] public Pose grabBallPose;
-
-        [Tooltip("The interaction behaviour attached to the grab ball. If left empty, will attempt to find an Interaction Behaviour on the current gameobject")]
-        public InteractionBehaviour grabBallInteractionBehaviour;
 
         [Tooltip("The object controlled by the grab ball")]
         public Transform attachedObject;
@@ -99,19 +95,7 @@ namespace Leap.Unity.Interaction
 
             _head = Camera.main.transform;
 
-            if (grabBallInteractionBehaviour == null)
-            {
-                grabBallInteractionBehaviour = GetComponent<InteractionBehaviour>();
-            }
-
-            if (grabBallInteractionBehaviour != null)
-            {
-                _attachedObjectOffset = InverseTransformPointUnscaled(grabBallInteractionBehaviour.transform, attachedObject.position);
-            }
-            else
-            {
-                _attachedObjectOffset = InverseTransformPointUnscaled(this.transform, attachedObject.position);
-            }
+            _attachedObjectOffset = InverseTransformPointUnscaled(this.transform, attachedObject.position);
 
             if (useAttachedObjectsXRotation)
             {
@@ -125,32 +109,19 @@ namespace Leap.Unity.Interaction
 
         private void Update()
         {
-            if ((grabBallInteractionBehaviour != null && grabBallInteractionBehaviour.isGrasped) || IsGrabbed)
+            if (IsGrabbed)
             {
                 UpdateAttachedObjectTargetPose();
                 _moveGrabBallToPositionOnUngrasp = true;
             }
             else if (_moveGrabBallToPositionOnUngrasp)
             {
-                if (grabBallInteractionBehaviour != null)
-                {
-                    grabBallInteractionBehaviour.transform.position = Vector3.Lerp(grabBallInteractionBehaviour.transform.position, grabBallPose.position, Time.deltaTime * lerpSpeed);
-                    
-                    if (Vector3.Distance(grabBallInteractionBehaviour.transform.position, grabBallPose.position) < LERP_POSITION_LIMIT)
-                    {
-                        _moveGrabBallToPositionOnUngrasp = false;
-                    }
-                }
-                else
-                {
-                    this.transform.position = Vector3.Lerp(this.transform.position, grabBallPose.position, Time.deltaTime * lerpSpeed);
+                this.transform.position = Vector3.Lerp(this.transform.position, grabBallPose.position, Time.deltaTime * lerpSpeed);
 
-                    if (Vector3.Distance(this.transform.position, grabBallPose.position) < LERP_POSITION_LIMIT)
-                    {
-                        _moveGrabBallToPositionOnUngrasp = false;
-                    }
+                if (Vector3.Distance(this.transform.position, grabBallPose.position) < LERP_POSITION_LIMIT)
+                {
+                    _moveGrabBallToPositionOnUngrasp = false;
                 }
-                
             }
             else if (continuouslyRestrictGrabBallDistanceFromHead)
             {
@@ -171,14 +142,8 @@ namespace Leap.Unity.Interaction
 
         void ConstrainGrabBallToArea()
         {
-            if (grabBallInteractionBehaviour != null)
-            {
-                grabBallInteractionBehaviour.transform.position = Vector3.Lerp(grabBallInteractionBehaviour.transform.position, grabBallPose.position, Time.deltaTime * lerpSpeed);
-            }
-            else
-            {
-                this.transform.position = Vector3.Lerp(this.transform.position, grabBallPose.position, Time.deltaTime * lerpSpeed);
-            }
+            this.transform.position = Vector3.Lerp(this.transform.position, grabBallPose.position, Time.deltaTime * lerpSpeed);
+
             UpdateAttachedObjectTargetPose(false);
         }
 
@@ -192,14 +157,7 @@ namespace Leap.Unity.Interaction
             _transformHelper.rotation = attachedObject.rotation;
             _attachedObjectOffset = InverseTransformPointUnscaled(_transformHelper.transform, attachedObject.position);
 
-            if (grabBallInteractionBehaviour != null)
-            {
-                grabBallInteractionBehaviour.transform.position = _transformHelper.position;
-            }
-            else
-            {
-                this.transform.position = _transformHelper.position;
-            }
+            this.transform.position = _transformHelper.position;
         }
 
         /// <summary>
@@ -220,15 +178,7 @@ namespace Leap.Unity.Interaction
         {
             Vector3 grabBallHorizontalDiff;
             // Horizontal restriction
-            if (grabBallInteractionBehaviour != null)
-            {
-                grabBallHorizontalDiff = grabBallInteractionBehaviour.transform.position - _head.position;
-            }
-            else
-            {
-                grabBallHorizontalDiff = this.transform.position - _head.position;
-            }
-
+            grabBallHorizontalDiff = this.transform.position - _head.position;
 
             grabBallHorizontalDiff.y = 0;
 
@@ -251,29 +201,15 @@ namespace Leap.Unity.Interaction
             else
             {
                 // no restriction necessary
-                if (grabBallInteractionBehaviour != null)
-                {
-                    grabBallPose.position = grabBallInteractionBehaviour.transform.position;
-                }
-                else
-                {
-                    grabBallPose.position = this.transform.position;
-                }
+                grabBallPose.position = this.transform.position;
+
                 grabBallRestrictionStatus.horizontalMax = false;
                 grabBallRestrictionStatus.horizontalMin = false;
             }
 
             float yDiff = 0;
             // Y restriction
-            if (grabBallInteractionBehaviour != null)
-            {
-                yDiff = grabBallInteractionBehaviour.transform.position.y - _head.position.y;
-            }
-            else
-            {
-                yDiff = this.transform.position.y - _head.position.y;
-            }
-
+            yDiff = this.transform.position.y - _head.position.y;
 
             if (yDiff > maxHeightFromHead)
             {
@@ -292,15 +228,8 @@ namespace Leap.Unity.Interaction
             else
             {
                 // no restriction necessary
-                if (grabBallInteractionBehaviour != null)
-                {
-                    grabBallPose.position.y = grabBallInteractionBehaviour.transform.position.y;
-                }
-                else
-                {
-                    grabBallPose.position.y = this.transform.position.y;
+                grabBallPose.position.y = this.transform.position.y;
 
-                }
                 grabBallRestrictionStatus.heightMax = false;
                 grabBallRestrictionStatus.heightMin = false;
             }
@@ -314,14 +243,7 @@ namespace Leap.Unity.Interaction
             }
             else
             {
-                if (grabBallInteractionBehaviour != null)
-                {
-                    grabBallPose.position = grabBallInteractionBehaviour.transform.position;
-                }
-                else
-                {
-                    grabBallPose.position = this.transform.position;
-                }
+                grabBallPose.position = this.transform.position;
             }
 
             _transformHelper.position = grabBallPose.position;
@@ -372,14 +294,8 @@ namespace Leap.Unity.Interaction
 
                 // Draw Horizontal Max Restriction
                 Vector3 centerPosition = _head.position;
-                if (grabBallInteractionBehaviour != null)
-                {
-                    centerPosition.y = Mathf.Clamp(grabBallInteractionBehaviour.transform.position.y, _head.position.y + minHeightFromHead, _head.position.y + maxHeightFromHead);
-                }
-                else
-                {
-                    centerPosition.y = Mathf.Clamp(this.transform.position.y, _head.position.y + minHeightFromHead, _head.position.y + maxHeightFromHead);
-                }
+                centerPosition.y = Mathf.Clamp(this.transform.position.y, _head.position.y + minHeightFromHead, _head.position.y + maxHeightFromHead);
+
                 Leap.Unity.Utils.DrawCircle(centerPosition, normal, maxHorizontalDistanceFromHead, grabBallRestrictionStatus.horizontalMax ? Color.green : Color.gray);
 
                 //Draw Horizontal Min Restriction
@@ -398,7 +314,8 @@ namespace Leap.Unity.Interaction
         public void OnHandGrab(ContactHand hand)
         {
             IsGrabbed = true;
-            _grabbedHands.Add(hand);
+            if(!_grabbedHands.Contains(hand))
+                _grabbedHands.Add(hand);
         }
 
         public void OnHandGrabExit(ContactHand hand)

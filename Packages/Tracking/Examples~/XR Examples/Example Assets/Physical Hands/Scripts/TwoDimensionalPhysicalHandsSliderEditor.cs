@@ -3,28 +3,27 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using System.Linq;
+using Leap.Unity;
 
-namespace Leap.Unity.PhysicalHands
+namespace Leap.Unity.PhysicalHandsExamples
 {
-    [CustomEditor(typeof(PhysicalHandsSlider))]
-    public class PhysicalHandsSliderEditor : CustomEditorBase<PhysicalHandsSlider>
+    [CustomEditor(typeof(TwoDimensionalPhysicalHandsSlider))]
+    public class TwoDimensionalPhysicalHandsSliderEditor : CustomEditorBase<TwoDimensionalPhysicalHandsSlider>
     {
         private bool eventsFoldedOut = false;
 
         public override void OnInspectorGUI()
         {
-            EditorUtils.DrawScriptField((MonoBehaviour)target);
+            //EditorUtils.DrawScriptField((MonoBehaviour)target);
 
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("_slideableObject"), new GUIContent("Slideable Object", "The GameObject that acts as the slider."));
-
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("_sliderDirection"), new GUIContent("Slider Direction", "The direction in which the slider moves."));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("_slideableObject"), new GUIContent("Slideable Object: ", "The GameObject that acts as the slider."));
 
             EditorGUILayout.Space(5);
-            serializedObject.FindProperty("_sliderTravelDistance").floatValue = CreateAxisAttribute("Slider Travel Distance: ", "_sliderTravelDistance", "The travel distance of the slider (from the central point).");
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("_startPosition"), new GUIContent("Start Position", "The starting position of the slider."));
+            serializedObject.FindProperty("SliderTravelDistance").vector2Value = CreateVector2AxisAttribute("Slider Travel Distance: ", "SliderTravelDistance", "The travel distance of the slider (from the central point).");
+            serializedObject.FindProperty("_twoDimStartPosition").vector2Value = CreateVector2AxisAttribute("Start Position: ", "_twoDimStartPosition", "The starting position of the slider.");
 
             EditorGUILayout.Space(20);
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("_numberOfSegments"), new GUIContent("Number of Segments", "Number of segments for the slider to use (0 = unlimited)."));
+            serializedObject.FindProperty("_twoDimNumberOfSegments").vector2Value = CreateVector2AxisAttribute("Number of Segments: ", "_twoDimNumberOfSegments", "Number of segments for the slider to use (0 = unlimited).");
 
             // Connected Button
             EditorGUILayout.PropertyField(serializedObject.FindProperty("_connectedButton"), new GUIContent("Connected Button", "The button that interacts with the slider."));
@@ -37,9 +36,9 @@ namespace Leap.Unity.PhysicalHands
             if (eventsFoldedOut)
             {
 
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("SliderChangeEvent"), new GUIContent("Slider Change Event", "Event triggered when the slider value changes."));
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("SliderButtonPressedEvent"), new GUIContent("Slider Button Pressed Event", "Event triggered when the slider button is pressed."));
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("SliderButtonUnPressedEvent"), new GUIContent("Slider Button Unpressed Event", "Event triggered when the slider button is released."));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("TwoDimSliderChangeEvent"), new GUIContent("Slider Change Event", "Event triggered when the slider value changes."));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("TwoDimSliderButtonPressedEvent"), new GUIContent("Slider Button Pressed Event", "Event triggered when the slider button is pressed."));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("TwoDimSliderButtonUnPressedEvent"), new GUIContent("Slider Button Unpressed Event", "Event triggered when the slider button is released."));
 
             }
 
