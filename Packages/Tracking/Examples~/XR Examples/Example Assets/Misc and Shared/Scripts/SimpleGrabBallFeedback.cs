@@ -6,7 +6,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity.Interaction;
+using Leap.Unity.PhysicalHands;
 using UnityEngine;
 
 namespace Leap.Unity.Examples
@@ -56,20 +56,11 @@ namespace Leap.Unity.Examples
 
             defaultMesh.transform.rotation = LookAtRotationParallelToHorizon(defaultMesh.transform.position, Camera.main.transform.position);
 
-            bool expanded = false;
-            if (grabBall.grabBallInteractionBehaviour != null)
-            {
-                expanded = grabBall.grabBallInteractionBehaviour.closestHoveringControllerDistance < distanceToScaleGrabBall;
-            }
-            else
-            {
-                expanded = grabBall.ClosestHandDistance < distanceToScaleGrabBall;
 
-            }
+            bool expanded = grabBall.ClosestHandDistance < distanceToScaleGrabBall;
             defaultMesh.transform.localScale = Vector3.Lerp(defaultMesh.transform.localScale, (expanded) ? expandedScale : minimisedScale, Time.deltaTime * lerpTime);
 
-            if (grabBall.grabBallRestrictionStatus.IsRestricted &&
-                ((grabBall.grabBallInteractionBehaviour != null && grabBall.grabBallInteractionBehaviour.isGrasped) || grabBall.IsGrabbed))
+            if (grabBall.grabBallRestrictionStatus.IsRestricted && grabBall.IsGrabbed)
             {
                 ghostedMesh.gameObject.SetActive(true);
                 ghostedMesh.transform.position = grabBall.grabBallPose.position;

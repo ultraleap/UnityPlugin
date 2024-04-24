@@ -9,7 +9,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace Leap.Unity.Interaction
+namespace Leap.Unity.PhysicalHands
 {
     [CanEditMultipleObjects]
     [CustomEditor(typeof(GrabBall))]
@@ -24,7 +24,6 @@ namespace Leap.Unity.Interaction
         SerializedProperty _minHeightFromHead;
         SerializedProperty _drawGrabBallRestrictionGizmos;
         SerializedProperty _attachedObject;
-        SerializedProperty _grabBallInteractionBehaviour;
         SerializedProperty _lerpSpeed;
 
         SerializedProperty _continuouslyRestrictGrabBallDistanceFromHead;
@@ -40,7 +39,6 @@ namespace Leap.Unity.Interaction
             EditorGUILayout.LabelField("Setup", EditorStyles.boldLabel);
 
             EditorGUILayout.PropertyField(_attachedObject);
-            EditorGUILayout.PropertyField(_grabBallInteractionBehaviour);
             EditorGUILayout.PropertyField(_lerpSpeed);
 
             EditorGUILayout.Space();
@@ -88,7 +86,6 @@ namespace Leap.Unity.Interaction
         private void GetProperties()
         {
             _attachedObject = serializedObject.FindProperty("attachedObject");
-            _grabBallInteractionBehaviour = serializedObject.FindProperty("grabBallInteractionBehaviour");
             _lerpSpeed = serializedObject.FindProperty("lerpSpeed");
             _useAttachedObjectsXRotation = serializedObject.FindProperty("useAttachedObjectsXRotation");
             _xRotation = serializedObject.FindProperty("xRotation");
