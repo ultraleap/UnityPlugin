@@ -40,8 +40,6 @@ namespace Leap.Unity.PhysicalHands
         public int _numberOfSegments = 0;
         [SerializeField]
         public float _startPosition = 0;
-        [SerializeField]
-        private Vector3 _axisChangeFromZero = Vector3.zero;
 
         [SerializeField]
         private Vector3 _sliderValue = Vector3.zero;
@@ -109,11 +107,8 @@ namespace Leap.Unity.PhysicalHands
         /// </summary>
         private void Update()
         {
-            // Calculate the change in position of the slider object from its zero position
-            _axisChangeFromZero.x = _slideableObject.transform.localPosition.x - _sliderXZeroPos;
-            _axisChangeFromZero.z = _slideableObject.transform.localPosition.z - _sliderZZeroPos;
             // Calculate the slider value based on the change in position
-            _sliderValue = CalculateSliderValue(_axisChangeFromZero);
+            _sliderValue = CalculateSliderValue();
 
             // Check if the slider value has changed
             if (_prevSliderValue != _sliderValue)
@@ -271,6 +266,10 @@ namespace Leap.Unity.PhysicalHands
             _slideableObjectRigidbody.velocity = Vector3.zero;
             _slideableObjectRigidbody.transform.localPosition = slidePos;
 
+            // Calculate the slider value based on the change in position
+            _sliderValue = CalculateSliderValue();
+
+            SnapToSegment();
         }
 
         /// <summary>
@@ -449,20 +448,22 @@ namespace Leap.Unity.PhysicalHands
         /// </summary>
         /// <param name="changeFromZero">Change in position from zero position.</param>
         /// <returns>The calculated slider value.</returns>
-        private Vector3 CalculateSliderValue(in Vector3 changeFromZero)
+        private Vector3 CalculateSliderValue()
         {
             switch (_sliderDirection)
             {
                 case SliderDirection.X:
+                    float changeFromZeroX = _slideableObject.transform.localPosition.x - _sliderXZeroPos;
                     return new Vector3(
-                        Utils.Map(changeFromZero.x, 0, _localSliderTravelDistanceHalf * 2, 0, 1),
+                        Utils.Map(changeFromZeroX, 0, _localSliderTravelDistanceHalf * 2, 0, 1),
                         0,
                         0);
                 case SliderDirection.Z:
+                    float changeFromZeroZ = _slideableObject.transform.localPosition.z - _sliderZZeroPos;
                     return new Vector3(
                         0,
                         0,
-                        Utils.Map(changeFromZero.z, 0, _localSliderTravelDistanceHalf * 2, 0, 1));
+                        Utils.Map(changeFromZeroZ, 0, _localSliderTravelDistanceHalf * 2, 0, 1));
             }
 
             return Vector3.negativeInfinity;
@@ -503,6 +504,12 @@ namespace Leap.Unity.PhysicalHands
             {
                 return (float)inputNumber;
             }
+            else if (numberOfSegments == 1)
+            {
+                return 0.5f;
+            }
+
+            numberOfSegments -= 1;
 
             // Calculate the step size
             float stepSize = 1.0f / numberOfSegments;
@@ -528,11 +535,8 @@ namespace Leap.Unity.PhysicalHands
                 SnapToSegment();
             }
 
-            // Calculate the change in position of the slider object from its zero position
-            _axisChangeFromZero.x = _slideableObject.transform.localPosition.x - _sliderXZeroPos;
-            _axisChangeFromZero.z = _slideableObject.transform.localPosition.z - _sliderZZeroPos;
             // Calculate the slider value based on the change in position
-            _sliderValue = CalculateSliderValue(_axisChangeFromZero);
+            _sliderValue = CalculateSliderValue();
 
             // Check if the slider value has changed
             if (_prevSliderValue != _sliderValue)
