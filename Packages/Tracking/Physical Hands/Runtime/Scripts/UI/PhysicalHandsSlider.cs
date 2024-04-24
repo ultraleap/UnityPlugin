@@ -85,6 +85,9 @@ namespace Leap.Unity.PhysicalHands
             return 0;
         }
 
+        /// <summary>
+        /// Automatically sets the connected button if one is added as the slideable object
+        /// </summary>
         private void AutoAssignConnectedButton()
         {
             if(_slideableObject != null)
@@ -163,6 +166,9 @@ namespace Leap.Unity.PhysicalHands
 
         #region Set Up
 
+        /// <summary>
+        /// Initialize the slider, setting up the configurable joints, setting the start position and working out slider values
+        /// </summary>
         private void Initialize()
         {
             MakeLocalSliderScales();
@@ -187,7 +193,8 @@ namespace Leap.Unity.PhysicalHands
             ConfigureConnectedButton();
 
             // Freeze or unfreeze slider position based on the flag
-            UpdateSliderPosition();
+            ApplySliderStartPosition();
+
         }
 
         /// <summary>
@@ -259,7 +266,7 @@ namespace Leap.Unity.PhysicalHands
         /// <summary>
         /// Updates the slider position based on freezing conditions and starting positions.
         /// </summary>
-        private void UpdateSliderPosition()
+        private void ApplySliderStartPosition()
         {
             if (_freezeIfNotActive == false)
             {
@@ -270,7 +277,26 @@ namespace Leap.Unity.PhysicalHands
                 FreezeSliderPosition();
             }
 
-            UpdateSliderPos(_startPosition);
+            // Get the current position of the slider object
+            Vector3 slidePos = _slideableObject.transform.localPosition;
+
+            // Update position for one-dimensional slider based on slider direction
+            switch (_sliderDirection)
+            {
+                case SliderDirection.X:
+                    slidePos.x = Utils.Map(_startPosition, 0, 1, 0, localSliderTravelDistanceHalf * 2) + _sliderXZeroPos;
+                    break;
+                case SliderDirection.Z:
+                    slidePos.z = Utils.Map(_startPosition, 0, 1, 0, localSliderTravelDistanceHalf * 2) + _sliderZZeroPos;
+                    break;
+            }
+
+            slidePos = _slideableObject.transform.localRotation * slidePos;
+
+            // Reset velocity to zero and update the position of the slider object
+            _slideableObjectRigidbody.velocity = Vector3.zero;
+            _slideableObjectRigidbody.transform.localPosition = slidePos;
+
         }
 
         /// <summary>
@@ -451,7 +477,10 @@ namespace Leap.Unity.PhysicalHands
             SnapSliderOnRelease();
         }
 
-        void SnapSliderOnRelease()
+        /// <summary>
+        /// Snap the slider to the correct location whenb released if there are segments set
+        /// </summary>
+        private void SnapSliderOnRelease()
         {
             // Snap to segment if applicable
 
@@ -500,7 +529,7 @@ namespace Leap.Unity.PhysicalHands
         /// Invoke by passing the correct type of event.
         /// </summary>
         /// <param name="unityEvent"></param>
-        void SendSliderEvent(UnityEvent<float> curEvent)
+        private void SendSliderEvent(UnityEvent<float> curEvent)
         {
             switch (_sliderDirection)
             {
@@ -589,6 +618,12 @@ namespace Leap.Unity.PhysicalHands
             UpdateSliderPos(closestStep);
         }
 
+        /// <summary>
+        /// Wourk out which step is closest to the current slider value
+        /// </summary>
+        /// <param name="inputNumber">The currrent value of the slider.</param>
+        /// <param name="numberOfSteps">How many steps should the slider be divided into.</param>
+        /// <returns></returns>
         private float GetClosestStep(float inputNumber, int numberOfSteps)
         {
             if (numberOfSteps == 0)
