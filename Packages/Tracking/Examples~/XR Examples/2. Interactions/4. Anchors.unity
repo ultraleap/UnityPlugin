@@ -463,6 +463,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 545972869}
     m_Modifications:
+    - target: {fileID: 1234304293458748, guid: 6d3e45125c02bea4c9c28f57a82c3f6a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1284443966656062, guid: 6d3e45125c02bea4c9c28f57a82c3f6a, type: 3}
       propertyPath: m_Name
       value: Dynamic UI Object (Blue)
@@ -1707,6 +1711,10 @@ PrefabInstance:
     - target: {fileID: 1294726134686968, guid: 42e8bd39fe145a8419d212958fac6589, type: 3}
       propertyPath: m_Name
       value: Dynamic UI Object (Magenta)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1724470782025482, guid: 42e8bd39fe145a8419d212958fac6589, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4854436900119490, guid: 42e8bd39fe145a8419d212958fac6589, type: 3}
       propertyPath: m_RootOrder

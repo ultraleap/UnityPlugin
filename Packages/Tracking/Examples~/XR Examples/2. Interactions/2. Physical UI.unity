@@ -718,6 +718,11 @@ PhysicMaterial:
   bounciness: 0
   frictionCombine: 0
   bounceCombine: 1
+--- !u!1 &543510866 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3123228626017199020, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
+  m_PrefabInstance: {fileID: 1703706291}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &548857822 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1036772921153050404, guid: ce9ae74789b26354f81e23aa199da1af, type: 3}
@@ -5766,10 +5771,41 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3123228626017199009, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
   m_PrefabInstance: {fileID: 1703706291}
   m_PrefabAsset: {fileID: 0}
---- !u!54 &1328893640 stripped
-Rigidbody:
-  m_CorrespondingSourceObject: {fileID: 3123228626017199011, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
-  m_PrefabInstance: {fileID: 1703706291}
+--- !u!114 &1328893644
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 543510866}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ac432446300ed5f4f96d5ec9454ce2d3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _slideableObject: {fileID: 1703706292}
+  _sliderType: 0
+  _sliderDirection: 0
+  TwoDimSliderChangeEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  TwoDimSliderButtonPressedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  TwoDimSliderButtonUnPressedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  SliderTravelDistance: {x: 0.19, y: 0.145}
+  _numberOfSegments: 0
+  _twoDimNumberOfSegments: {x: 0, y: 0}
+  _twoDimStartPosition: {x: 0.5, y: 0.5}
+  _axisChangeFromZero: {x: 0, y: 0, z: 0}
+  _connectedButton: {fileID: 1703706297}
+  _sliderValue: {x: 0, y: 0, z: 0}
+--- !u!1 &1417129476 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3891926267328605168, guid: 7de8538a4edc3b54e814543f3ad21849, type: 3}
+  m_PrefabInstance: {fileID: 3891926265803604724}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &1432746478
 GameObject:
@@ -6055,10 +6091,12 @@ MonoBehaviour:
   damperValue: 0
   maxForceValue: 5
   bouncinessValue: 0
-  _buttonTravelDistance: 0.0041168886
+  _buttonTravelDistance: 0.0041167983
   _buttonTravelOffset: 0.54270023
   _canBePressedByObjects: 0
   _pressableObject: {fileID: 875505813}
+  _buttonPressExitThreshold: 0.5
+  _buttonIgnoreGrabs: 1
   _buttonPreset: 0
   OnButtonPressed:
     m_PersistentCalls:
@@ -6078,11 +6116,61 @@ MonoBehaviour:
   OnHandHoverExit:
     m_PersistentCalls:
       m_Calls: []
+  _untoggleWhenPressed: 1
 --- !u!4 &1696508165 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3891926267328605169, guid: 7de8538a4edc3b54e814543f3ad21849, type: 3}
   m_PrefabInstance: {fileID: 3891926265803604724}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1696508168
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1417129476}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b02e2f8ae628ac4f9faca951fe12db4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  useHover: 1
+  usePrimaryHover: 0
+  defaultColor: {r: 0.10980393, g: 0.64705884, b: 0.21176472, a: 1}
+  suspendedColor: {r: 1, g: 0, b: 0, a: 1}
+  hoverColor: {r: 0.06666667, g: 0.25882354, b: 1, a: 1}
+  primaryHoverColor: {r: 0.62624454, g: 0, b: 1, a: 1}
+  pressedColor: {r: 1, g: 1, b: 1, a: 1}
+  rends:
+  - materialID: 0
+    renderer: {fileID: 916686217}
+--- !u!114 &1696508169
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1417129476}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b69fff22deb09004c916f84bf084afee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  grabBallPose:
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+  attachedObject: {fileID: 1057954427}
+  lerpSpeed: 10
+  useAttachedObjectsXRotation: 1
+  xRotation: 25
+  restrictGrabBallDistanceFromHead: 1
+  maxHorizontalDistanceFromHead: 0.5
+  minHorizontalDistanceFromHead: 0.1
+  maxHeightFromHead: 0.3
+  minHeightFromHead: -0.65
+  drawGrabBallRestrictionGizmos: 1
+  continuouslyRestrictGrabBallDistanceFromHead: 1
+  IsGrabbed: 0
 --- !u!1001 &1703706291
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6090,6 +6178,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1432746479}
     m_Modifications:
+    - target: {fileID: 873512272262586395, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.01
+      objectReference: {fileID: 0}
+    - target: {fileID: 873512272262586395, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3123228626017199009, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
       propertyPath: m_RootOrder
       value: 0
@@ -6100,11 +6196,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3123228626017199009, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 3123228626017199009, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: -0.0044
       objectReference: {fileID: 0}
     - target: {fileID: 3123228626017199009, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
       propertyPath: m_LocalRotation.w
@@ -6164,11 +6260,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3123228626017199010, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
       propertyPath: TwoDimSliderTravelDistance.x
-      value: 0.08
+      value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: 3123228626017199010, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
       propertyPath: TwoDimSliderTravelDistance.y
-      value: 0.06
+      value: 0.21
       objectReference: {fileID: 0}
     - target: {fileID: 3123228626017199020, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
       propertyPath: m_Name
@@ -6359,12 +6455,28 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8216536195087636660, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
+      propertyPath: damperValue
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 8216536195087636660, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
+      propertyPath: springValue
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8216536195087636660, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
       propertyPath: _buttonPreset
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8216536195087636660, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
+      propertyPath: maxForceValue
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8216536195087636660, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
       propertyPath: _buttonTravelOffset
-      value: 0.5
+      value: 0.555
+      objectReference: {fileID: 0}
+    - target: {fileID: 8216536195087636660, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
+      propertyPath: _buttonTravelDistance
+      value: 0.008550002
       objectReference: {fileID: 0}
     - target: {fileID: 8216536195087636660, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
       propertyPath: _automaticTravelDistance
@@ -6396,204 +6508,25 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 3123228626530530035, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
+    - {fileID: 3123228626017199010, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
+    - {fileID: 9051524192433599047, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
 --- !u!1 &1703706292 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8402712650214517380, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
   m_PrefabInstance: {fileID: 1703706291}
   m_PrefabAsset: {fileID: 0}
---- !u!153 &1703706293
-ConfigurableJoint:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
+--- !u!114 &1703706297 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8216536195087636660, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
+  m_PrefabInstance: {fileID: 1703706291}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1703706292}
-  m_ConnectedBody: {fileID: 1328893640}
-  m_ConnectedArticulationBody: {fileID: 0}
-  m_Anchor: {x: 0, y: 0, z: 0}
-  m_Axis: {x: 1, y: 0, z: 0}
-  m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 0, y: -0.000000022351742, z: -0.00000003352762}
-  serializedVersion: 2
-  m_SecondaryAxis: {x: 0, y: 1, z: 0}
-  m_XMotion: 2
-  m_YMotion: 0
-  m_ZMotion: 1
-  m_AngularXMotion: 0
-  m_AngularYMotion: 0
-  m_AngularZMotion: 0
-  m_LinearLimitSpring:
-    spring: 0
-    damper: 0
-  m_LinearLimit:
-    limit: 0.07
-    bounciness: 0
-    contactDistance: 0
-  m_AngularXLimitSpring:
-    spring: 0
-    damper: 0
-  m_LowAngularXLimit:
-    limit: 0
-    bounciness: 0
-    contactDistance: 0
-  m_HighAngularXLimit:
-    limit: 0
-    bounciness: 0
-    contactDistance: 0
-  m_AngularYZLimitSpring:
-    spring: 0
-    damper: 0
-  m_AngularYLimit:
-    limit: 0
-    bounciness: 0
-    contactDistance: 0
-  m_AngularZLimit:
-    limit: 0
-    bounciness: 0
-    contactDistance: 0
-  m_TargetPosition: {x: 0, y: 0, z: 0}
-  m_TargetVelocity: {x: 0, y: 0, z: 0}
-  m_XDrive:
-    serializedVersion: 3
-    positionSpring: 0
-    positionDamper: 10
-    maximumForce: 2
-  m_YDrive:
-    serializedVersion: 3
-    positionSpring: 0
-    positionDamper: 10
-    maximumForce: 2
-  m_ZDrive:
-    serializedVersion: 3
-    positionSpring: 0
-    positionDamper: 10
-    maximumForce: 2
-  m_TargetRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_TargetAngularVelocity: {x: 0, y: 0, z: 0}
-  m_RotationDriveMode: 0
-  m_AngularXDrive:
-    serializedVersion: 3
-    positionSpring: 0
-    positionDamper: 0
-    maximumForce: 3.4028233e+38
-  m_AngularYZDrive:
-    serializedVersion: 3
-    positionSpring: 0
-    positionDamper: 0
-    maximumForce: 3.4028233e+38
-  m_SlerpDrive:
-    serializedVersion: 3
-    positionSpring: 0
-    positionDamper: 0
-    maximumForce: 3.4028233e+38
-  m_ProjectionMode: 1
-  m_ProjectionDistance: 0.1
-  m_ProjectionAngle: 180
-  m_ConfiguredInWorldSpace: 0
-  m_SwapBodies: 0
-  m_BreakForce: Infinity
-  m_BreakTorque: Infinity
-  m_EnableCollision: 0
-  m_EnablePreprocessing: 1
-  m_MassScale: 1
-  m_ConnectedMassScale: 1
---- !u!153 &1703706294
-ConfigurableJoint:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1703706292}
-  m_ConnectedBody: {fileID: 1328893640}
-  m_ConnectedArticulationBody: {fileID: 0}
-  m_Anchor: {x: 0, y: 0, z: 0}
-  m_Axis: {x: 1, y: 0, z: 0}
-  m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 0, y: -0.000000022351742, z: -0.00000003352762}
-  serializedVersion: 2
-  m_SecondaryAxis: {x: 0, y: 1, z: 0}
-  m_XMotion: 0
-  m_YMotion: 0
-  m_ZMotion: 0
-  m_AngularXMotion: 0
-  m_AngularYMotion: 0
-  m_AngularZMotion: 0
-  m_LinearLimitSpring:
-    spring: 0
-    damper: 0
-  m_LinearLimit:
-    limit: 0.089999996
-    bounciness: 0
-    contactDistance: 0
-  m_AngularXLimitSpring:
-    spring: 0
-    damper: 0
-  m_LowAngularXLimit:
-    limit: 0
-    bounciness: 0
-    contactDistance: 0
-  m_HighAngularXLimit:
-    limit: 0
-    bounciness: 0
-    contactDistance: 0
-  m_AngularYZLimitSpring:
-    spring: 0
-    damper: 0
-  m_AngularYLimit:
-    limit: 0
-    bounciness: 0
-    contactDistance: 0
-  m_AngularZLimit:
-    limit: 0
-    bounciness: 0
-    contactDistance: 0
-  m_TargetPosition: {x: 0, y: 0, z: 0}
-  m_TargetVelocity: {x: 0, y: 0, z: 0}
-  m_XDrive:
-    serializedVersion: 3
-    positionSpring: 0
-    positionDamper: 10
-    maximumForce: 2
-  m_YDrive:
-    serializedVersion: 3
-    positionSpring: 0
-    positionDamper: 10
-    maximumForce: 2
-  m_ZDrive:
-    serializedVersion: 3
-    positionSpring: 0
-    positionDamper: 10
-    maximumForce: 2
-  m_TargetRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_TargetAngularVelocity: {x: 0, y: 0, z: 0}
-  m_RotationDriveMode: 0
-  m_AngularXDrive:
-    serializedVersion: 3
-    positionSpring: 0
-    positionDamper: 0
-    maximumForce: 3.4028233e+38
-  m_AngularYZDrive:
-    serializedVersion: 3
-    positionSpring: 0
-    positionDamper: 0
-    maximumForce: 3.4028233e+38
-  m_SlerpDrive:
-    serializedVersion: 3
-    positionSpring: 0
-    positionDamper: 0
-    maximumForce: 3.4028233e+38
-  m_ProjectionMode: 1
-  m_ProjectionDistance: 0.1
-  m_ProjectionAngle: 180
-  m_ConfiguredInWorldSpace: 0
-  m_SwapBodies: 0
-  m_BreakForce: Infinity
-  m_BreakTorque: Infinity
-  m_EnableCollision: 0
-  m_EnablePreprocessing: 1
-  m_MassScale: 1
-  m_ConnectedMassScale: 1
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee6ba0f8f2ad7aa4d9e4c7ed108f8b46, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1715524417
 GameObject:
   m_ObjectHideFlags: 0
@@ -6665,27 +6598,27 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3123228626017199009, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 3123228626017199009, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: -0.0053
       objectReference: {fileID: 0}
     - target: {fileID: 3123228626017199009, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.7071067
+      value: 0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: 3123228626017199009, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.70710677
+      value: -0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: 3123228626017199009, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3123228626017199009, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3123228626017199009, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -6704,16 +6637,32 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3123228626017199010, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
+      propertyPath: _startPosition
+      value: 0.75
+      objectReference: {fileID: 0}
+    - target: {fileID: 3123228626017199010, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
       propertyPath: _slideableObject
       value: 
       objectReference: {fileID: 1813946686}
+    - target: {fileID: 3123228626017199010, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
+      propertyPath: _sliderDirection
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3123228626017199010, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
+      propertyPath: _numberOfSegments
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 3123228626017199010, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
       propertyPath: _freezeIfNotActive
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3123228626017199010, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
       propertyPath: SliderTravelDistance
-      value: 0.2
+      value: 0.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3123228626017199010, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
+      propertyPath: _sliderTravelDistance
+      value: 0.4
       objectReference: {fileID: 0}
     - target: {fileID: 3123228626017199010, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
       propertyPath: _twoDimSliderDirection
@@ -6797,6 +6746,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3123228626530530035, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
       propertyPath: OnButtonUnPressed.m_PersistentCalls.m_Calls.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3123228626684123902, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
+      propertyPath: m_LocalPosition.z
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3300154889951872116, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
@@ -6931,6 +6884,42 @@ PrefabInstance:
       propertyPath: m_LocalScale.z
       value: 0.03
       objectReference: {fileID: 0}
+    - target: {fileID: 8402712650214517403, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.004819938
+      objectReference: {fileID: 0}
+    - target: {fileID: 8402712650214517403, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.004604972
+      objectReference: {fileID: 0}
+    - target: {fileID: 8402712650214517403, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.00000013457611
+      objectReference: {fileID: 0}
+    - target: {fileID: 8402712650214517403, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8402712650214517403, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8402712650214517403, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8402712650214517403, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8402712650214517403, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8402712650214517403, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8693133890979388964, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
       propertyPath: m_YMotion
       value: 0
@@ -6946,6 +6935,10 @@ PrefabInstance:
     - target: {fileID: 9051524192433599047, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
       propertyPath: m_LinearLimit.limit
       value: 0.21000001
+      objectReference: {fileID: 0}
+    - target: {fileID: 9051524192433599047, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
+      propertyPath: m_AutoConfigureConnectedAnchor
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 8693133890979388964, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
@@ -6968,7 +6961,7 @@ ConfigurableJoint:
   m_Anchor: {x: 0, y: 0, z: 0}
   m_Axis: {x: 1, y: 0, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 0, y: -0.000000013038514, z: 8.881784e-16}
+  m_ConnectedAnchor: {x: 0.004819938, y: 0.004604972, z: 0.00000013457611}
   serializedVersion: 2
   m_SecondaryAxis: {x: 0, y: 1, z: 0}
   m_XMotion: 1
@@ -7445,4 +7438,6 @@ PrefabInstance:
     m_RemovedComponents:
     - {fileID: 7736706413067419542, guid: 7de8538a4edc3b54e814543f3ad21849, type: 3}
     - {fileID: 3891926267328605171, guid: 7de8538a4edc3b54e814543f3ad21849, type: 3}
+    - {fileID: 3891926267328605170, guid: 7de8538a4edc3b54e814543f3ad21849, type: 3}
+    - {fileID: 3891926265964585191, guid: 7de8538a4edc3b54e814543f3ad21849, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 7de8538a4edc3b54e814543f3ad21849, type: 3}

@@ -46,7 +46,7 @@ namespace Leap.Unity.Examples
 
         private InteractionBehaviour _intObj;
 
-        private PhysicalHandsButtonBase _physHandButton;
+        private PhysicalHandsButton _physHandButton;
 
         [SerializeField]
         private Rend[] rends;
@@ -77,7 +77,7 @@ namespace Leap.Unity.Examples
         void Start()
         {
             _intObj = GetComponent<InteractionBehaviour>();
-            this.TryGetComponent<PhysicalHandsButtonBase>(out _physHandButton);
+            this.TryGetComponent<PhysicalHandsButton>(out _physHandButton);
 
             if(_physHandButton != null )
             {

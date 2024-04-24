@@ -46,27 +46,16 @@ namespace Leap.Unity.PhysicalHandsExamples
 
         #endregion
 
-        public UnityEvent<float> SliderChangeEvent = new UnityEvent<float>();
-        public UnityEvent<float> SliderButtonPressedEvent = new UnityEvent<float>();
-        public UnityEvent<float> SliderButtonUnPressedEvent = new UnityEvent<float>();
-
         public UnityEvent<Vector2> TwoDimSliderChangeEvent = new UnityEvent<Vector2>();
         public UnityEvent<Vector2> TwoDimSliderButtonPressedEvent = new UnityEvent<Vector2>();
         public UnityEvent<Vector2> TwoDimSliderButtonUnPressedEvent = new UnityEvent<Vector2>();
-
-        /// <summary>
-        /// The travel distance of the slider (from the central point).
-        /// i.e. slider center point +/- slider travel distance (or half the full travel of the slider).
-        /// </summary>
-        [SerializeField]
-        public float SliderTravelDistance = 0.22f;
 
         /// <summary>
         /// The travel distance of the two-dimensional slider.
         /// i.e. slider center point +/- slider travel distance (or half the full travel of the slider) in both X and Y axes.
         /// </summary>
         [SerializeField]
-        public Vector2 TwoDimSliderTravelDistance = new Vector2(0.22f, 0.22f);
+        public Vector2 SliderTravelDistance = new Vector2(0.22f, 0.22f);
 
         /// <summary>
         /// Number of segments for the one-dimensional slider to use.
@@ -81,9 +70,6 @@ namespace Leap.Unity.PhysicalHandsExamples
         /// </summary>
         [SerializeField]
         public Vector2 _twoDimNumberOfSegments = Vector2.zero;
-
-        [SerializeField]
-        public float _startPosition = 0;
 
         [SerializeField]
         public Vector2 _twoDimStartPosition = Vector2.zero;
@@ -116,27 +102,9 @@ namespace Leap.Unity.PhysicalHandsExamples
         /// Use this to get the slider value on all axes.
         /// </summary>
         /// <returns>Vector3 ofslider values.</returns>
-        public Dictionary<char, float> GetSliderValue()
+        public Vector2 GetSliderValue()
         {
-            switch (_sliderType)
-            {
-                case SliderType.ONE_DIMENSIONAL:
-                    {
-                        switch (_sliderDirection)
-                        {
-                            case SliderDirection.X:
-                                return new Dictionary<char, float>() { { 'x', _sliderValue.x } };
-                            case SliderDirection.Z:
-                                return new Dictionary<char, float>() { { 'z', _sliderValue.z } };
-                        }
-                        break;
-                    }
-                case SliderType.TWO_DIMENSIONAL:
-                    {
-                        return new Dictionary<char, float>() { { 'x', _sliderValue.x }, { 'z', _sliderValue.y } };
-                    }
-            }
-            return null;
+            return new Vector2(_sliderValue.x, _sliderValue.y);
         }
 
         private void AutoAssignConnectedButton()
@@ -196,7 +164,7 @@ namespace Leap.Unity.PhysicalHandsExamples
             if (_prevSliderValue != _sliderValue)
             {
                 // Send slider change event
-                SendSliderEvent(SliderChangeEvent, TwoDimSliderChangeEvent);
+                SendSliderEvent(TwoDimSliderChangeEvent);
             }
 
             _prevSliderValue = _sliderValue;
@@ -232,26 +200,11 @@ namespace Leap.Unity.PhysicalHandsExamples
             ConfigureSlideableObject();
 
             // Set up the slider based on its type
-            switch (_sliderType)
-            {
-                case SliderType.ONE_DIMENSIONAL:
-                    SetUpSlider();
-                    break;
-                case SliderType.TWO_DIMENSIONAL:
-                    SetUpTwoDimSlider();
-                    break;
-            }
+
+            SetUpTwoDimSlider();
 
             // Update the zero position of the slider
-            switch (_sliderType)
-            {
-                case SliderType.ONE_DIMENSIONAL:
-                    UpdateOneDimensionalSliderZeroPos();
-                    break;
-                case SliderType.TWO_DIMENSIONAL:
-                    UpdateTwoDimensionalSliderZeroPos();
-                    break;
-            }
+            UpdateTwoDimensionalSliderZeroPos();
 
             ConfigureConnectedButton();
 
@@ -264,24 +217,8 @@ namespace Leap.Unity.PhysicalHandsExamples
         /// </summary>
         private void MakeLocalSliderScales()
         {
-            switch (_sliderType)
-            {
-                case SliderType.ONE_DIMENSIONAL:
-                    switch (_sliderDirection)
-                    {
-                        case SliderDirection.X:
-                            localSliderTravelDistanceHalf = SliderTravelDistance / transform.lossyScale.x / 2;
-                            break;
-                        case SliderDirection.Z:
-                            localSliderTravelDistanceHalf = SliderTravelDistance / transform.lossyScale.z / 2;
-                            break;
-                    }
-                    break;
-                case SliderType.TWO_DIMENSIONAL:
-                    localTwoDimSliderTravelDistanceHalf.x = TwoDimSliderTravelDistance.x / transform.lossyScale.x / 2;
-                    localTwoDimSliderTravelDistanceHalf.y = TwoDimSliderTravelDistance.y / transform.lossyScale.z / 2;
-                    break;
-            }
+            localTwoDimSliderTravelDistanceHalf.x = SliderTravelDistance.x / transform.lossyScale.x / 2;
+            localTwoDimSliderTravelDistanceHalf.y = SliderTravelDistance.y / transform.lossyScale.z / 2;
         }
 
         /// <summary>
@@ -348,32 +285,7 @@ namespace Leap.Unity.PhysicalHandsExamples
                 FreezeSliderPosition();
             }
 
-            UpdateSliderPos(_startPosition, _twoDimStartPosition);
-        }
-
-        /// <summary>
-        /// Updates the zero position for a one-dimensional slider based on its direction.
-        /// </summary>
-        private void UpdateOneDimensionalSliderZeroPos()
-        {
-            // Initialize offset variables
-            float xOffset = 0;
-            float zOffset = 0;
-
-            // Determine the slider direction and calculate offsets accordingly
-            switch (_sliderDirection)
-            {
-                case SliderDirection.X:
-                    xOffset = _configurableJoints.First().anchor.x - localSliderTravelDistanceHalf;
-                    break;
-                case SliderDirection.Z:
-                    zOffset = _configurableJoints.First().anchor.z - localSliderTravelDistanceHalf;
-                    break;
-            }
-
-            // Update zero positions based on calculated offsets and current object position
-            _sliderXZeroPos = xOffset + _slideableObject.transform.localPosition.x;
-            _sliderZZeroPos = zOffset + _slideableObject.transform.localPosition.z;
+            UpdateSliderPos(_twoDimStartPosition);
         }
 
         /// <summary>
@@ -423,49 +335,6 @@ namespace Leap.Unity.PhysicalHandsExamples
         }
 
         /// <summary>
-        /// Sets up a one-dimensional slider.
-        /// </summary>
-        private void SetUpSlider()
-        {
-            ConfigurableJoint configurableJoint;
-            if (_slideableObject == null)
-            {
-                Debug.LogWarning("There is no slideable object. Please add one to use the slider.", this.gameObject);
-                return;
-            }
-            _configurableJoints = _slideableObject.GetComponents<ConfigurableJoint>().ToList<ConfigurableJoint>();
-            _slideableObject.TryGetComponent<ConfigurableJoint>(out configurableJoint);
-
-            if (_configurableJoints.Count < 1 && configurableJoint == null)
-            {
-                _configurableJoints.Add(_slideableObject.AddComponent<ConfigurableJoint>());
-            }
-            else
-            {
-                _configurableJoints.Add(configurableJoint);
-            }
-
-            foreach (ConfigurableJoint joint in _configurableJoints)
-            {
-                SetUpConfigurableJoint(joint);
-
-                SoftJointLimit linearJointLimit = new SoftJointLimit();
-                linearJointLimit.limit = SliderTravelDistance / 2;
-                joint.linearLimit = linearJointLimit;
-
-                switch (_sliderDirection)
-                {
-                    case SliderDirection.X:
-                        joint.xMotion = ConfigurableJointMotion.Limited;
-                        break;
-                    case SliderDirection.Z:
-                        joint.zMotion = ConfigurableJointMotion.Limited;
-                        break;
-                }
-            }
-        }
-
-        /// <summary>
         /// Sets up a two-dimensional slider.
         /// </summary>
         private void SetUpTwoDimSlider()
@@ -476,7 +345,11 @@ namespace Leap.Unity.PhysicalHandsExamples
                 return;
             }
 
-            _configurableJoints = _slideableObject.GetComponents<ConfigurableJoint>().ToList<ConfigurableJoint>();
+            foreach (var joint in _slideableObject.GetComponents<ConfigurableJoint>())
+            {
+                Destroy(joint);
+            }
+   
 
             while (_configurableJoints.Count < 2)
             {
@@ -490,9 +363,9 @@ namespace Leap.Unity.PhysicalHandsExamples
 
             //Set up joint limits for separate travel distances on each axis
             SoftJointLimit linerJointLimit = new SoftJointLimit();
-            linerJointLimit.limit = TwoDimSliderTravelDistance.x / 2;
+            linerJointLimit.limit = SliderTravelDistance.x / 2;
             _configurableJoints.ElementAt(0).linearLimit = linerJointLimit;
-            linerJointLimit.limit = TwoDimSliderTravelDistance.y / 2;
+            linerJointLimit.limit = SliderTravelDistance.y / 2;
             _configurableJoints.ElementAt(1).linearLimit = linerJointLimit;
 
             _configurableJoints.ElementAt(0).xMotion = ConfigurableJointMotion.Limited;
@@ -518,39 +391,15 @@ namespace Leap.Unity.PhysicalHandsExamples
             m.SetTRS(this.transform.position, m.rotation, m.lossyScale);
             Gizmos.matrix = m;
 
-            switch (_sliderType)
-            {
-                case SliderType.ONE_DIMENSIONAL:
-                    {
-                        float SliderTravelDistanceHalf = SliderTravelDistance / 2;
+            Vector2 TwoDimSliderTravelDistanceHalf = SliderTravelDistance / 2;
 
-                        switch (_sliderDirection)
-                        {
-                            case SliderDirection.X:
-                                Gizmos.color = Color.red; // X axis
-                                Gizmos.DrawLine(jointPosition + (Vector3.right * (SliderTravelDistanceHalf / _slideableObject.transform.lossyScale.x)), jointPosition - (Vector3.right * (SliderTravelDistanceHalf / _slideableObject.transform.lossyScale.x)));
-                                break;
-                            case SliderDirection.Z:
-                                Gizmos.color = Color.blue; // Z axis
-                                Gizmos.DrawLine(jointPosition + (Vector3.forward * (SliderTravelDistanceHalf / _slideableObject.transform.lossyScale.z)), jointPosition - (Vector3.forward * (SliderTravelDistanceHalf / _slideableObject.transform.lossyScale.z)));
-                                break;
-                        }
-                        break;
-                    }
-                case SliderType.TWO_DIMENSIONAL:
-                    {
-                        Vector2 TwoDimSliderTravelDistanceHalf = TwoDimSliderTravelDistance / 2;
+            Gizmos.color = Color.red; // X axis
+            Gizmos.DrawLine(jointPosition + Vector3.right * (TwoDimSliderTravelDistanceHalf.x / _slideableObject.transform.lossyScale.x), jointPosition - Vector3.right * (TwoDimSliderTravelDistanceHalf.x / _slideableObject.transform.lossyScale.x));
+            Gizmos.color = Color.blue; // Z axis
+            Gizmos.DrawLine(jointPosition + Vector3.forward * (TwoDimSliderTravelDistanceHalf.y / _slideableObject.transform.lossyScale.z), jointPosition - Vector3.forward * (TwoDimSliderTravelDistanceHalf.y / _slideableObject.transform.lossyScale.z));
+            Vector3 extents = new Vector3(SliderTravelDistance.x / _slideableObject.transform.lossyScale.x, 0, SliderTravelDistance.y / _slideableObject.transform.lossyScale.z);
 
-                        Gizmos.color = Color.red; // X axis
-                        Gizmos.DrawLine(jointPosition + Vector3.right * (TwoDimSliderTravelDistanceHalf.x / _slideableObject.transform.lossyScale.x), jointPosition - Vector3.right * (TwoDimSliderTravelDistanceHalf.x / _slideableObject.transform.lossyScale.x));
-                        Gizmos.color = Color.blue; // Z axis
-                        Gizmos.DrawLine(jointPosition + Vector3.forward * (TwoDimSliderTravelDistanceHalf.y / _slideableObject.transform.lossyScale.z), jointPosition - Vector3.forward * (TwoDimSliderTravelDistanceHalf.y / _slideableObject.transform.lossyScale.z));
-                        Vector3 extents = new Vector3(TwoDimSliderTravelDistance.x / _slideableObject.transform.lossyScale.x, 0, TwoDimSliderTravelDistance.y / _slideableObject.transform.lossyScale.z);
-
-                        DrawBoxGizmo(jointPosition, extents, Color.cyan);
-                        break;
-                    }
-            }
+            DrawBoxGizmo(jointPosition, extents, Color.cyan);
         }
 
         private void DrawBoxGizmo(Vector3 position, Vector3 size, Color color)
@@ -566,7 +415,7 @@ namespace Leap.Unity.PhysicalHandsExamples
         {
             UnFreezeSliderPosition();
 
-            SendSliderEvent(SliderButtonPressedEvent, TwoDimSliderButtonPressedEvent);
+            SendSliderEvent(TwoDimSliderButtonPressedEvent);
         }
 
         private void ButtonUnPressed()
@@ -578,7 +427,7 @@ namespace Leap.Unity.PhysicalHandsExamples
 
             SnapSliderOnRelease();
 
-            SendSliderEvent(SliderButtonUnPressedEvent, TwoDimSliderButtonUnPressedEvent);
+            SendSliderEvent(TwoDimSliderButtonUnPressedEvent);
         }
 
         public void OnHandGrab(ContactHand hand)
@@ -613,25 +462,9 @@ namespace Leap.Unity.PhysicalHandsExamples
 
         void SnapSliderOnRelease()
         {
-            // Snap to segment if applicable
-            switch (_sliderType)
+            if (_twoDimNumberOfSegments.x != 0 || _twoDimNumberOfSegments.y != 0)
             {
-                case SliderType.ONE_DIMENSIONAL:
-                    {
-                        if (_numberOfSegments != 0)
-                        {
-                            SnapToSegment();
-                        }
-                        break;
-                    }
-                case SliderType.TWO_DIMENSIONAL:
-                    {
-                        if (_twoDimNumberOfSegments.x != 0 || _twoDimNumberOfSegments.y != 0)
-                        {
-                            SnapToSegment();
-                        }
-                        break;
-                    }
+                SnapToSegment();
             }
 
             // Calculate the change in position of the slider object from its zero position
@@ -644,7 +477,7 @@ namespace Leap.Unity.PhysicalHandsExamples
             if (_prevSliderValue != _sliderValue)
             {
                 // Send slider change event
-                SendSliderEvent(SliderChangeEvent, TwoDimSliderChangeEvent);
+                SendSliderEvent(TwoDimSliderChangeEvent);
             }
 
             _prevSliderValue = _sliderValue;
@@ -675,29 +508,9 @@ namespace Leap.Unity.PhysicalHandsExamples
         /// </summary>
         /// <param name="unityEvent"></param>
         /// <param name="twoDimUnityEvent"></param>
-        void SendSliderEvent(UnityEvent<float> curEvent, UnityEvent<Vector2> twoDimCurEvent)
+        void SendSliderEvent(UnityEvent<Vector2> twoDimCurEvent)
         {
-            switch (_sliderType)
-            {
-                case SliderType.ONE_DIMENSIONAL:
-                    {
-                        switch (_sliderDirection)
-                        {
-                            case SliderDirection.X:
-                                curEvent?.Invoke(_sliderValue.x);
-                                break;
-                            case SliderDirection.Z:
-                                curEvent?.Invoke(_sliderValue.z);
-                                break;
-                        }
-                        break;
-                    }
-                case SliderType.TWO_DIMENSIONAL:
-                    {
-                        twoDimCurEvent?.Invoke(new Vector2(_sliderValue.x, _sliderValue.z));
-                        break;
-                    }
-            }
+            twoDimCurEvent?.Invoke(new Vector2(_sliderValue.x, _sliderValue.z));
         }
 
         #endregion
@@ -709,31 +522,14 @@ namespace Leap.Unity.PhysicalHandsExamples
         /// </summary>
         /// <param name="value">The value representing the position along the slider.</param>
         /// <param name="twoDimValue">The two-dimensional value representing the position along the slider in two dimensions.</param>
-        private void UpdateSliderPos(float value, Vector2 twoDimValue)
+        private void UpdateSliderPos(Vector2 twoDimValue)
         {
             // Get the current position of the slider object
             Vector3 slidePos = _slideableObject.transform.localPosition;
 
             // Determine the type of slider and update its position accordingly
-            switch (_sliderType)
-            {
-                case SliderType.ONE_DIMENSIONAL:
-                    // Update position for one-dimensional slider based on slider direction
-                    switch (_sliderDirection)
-                    {
-                        case SliderDirection.X:
-                            slidePos.x = Utils.Map(value, 0, 1, 0, localSliderTravelDistanceHalf) + _sliderXZeroPos;
-                            break;
-                        case SliderDirection.Z:
-                            slidePos.z = Utils.Map(value, 0, 1, 0, localSliderTravelDistanceHalf) + _sliderZZeroPos;
-                            break;
-                    }
-                    break;
-                case SliderType.TWO_DIMENSIONAL:
-                    slidePos.x += Utils.Map(twoDimValue.x, 0, 1, 0, localTwoDimSliderTravelDistanceHalf.x) + _sliderXZeroPos;
-                    slidePos.z += Utils.Map(twoDimValue.y, 0, 1, 0, localTwoDimSliderTravelDistanceHalf.y) + _sliderZZeroPos;
-                    break;
-            }
+            slidePos.x += Utils.Map(twoDimValue.x, 0, 1, 0, localTwoDimSliderTravelDistanceHalf.x * 2) + _sliderXZeroPos;
+            slidePos.z += Utils.Map(twoDimValue.y, 0, 1, 0, localTwoDimSliderTravelDistanceHalf.y * 2) + _sliderZZeroPos;
 
             // Reset velocity to zero and update the position of the slider object
             _slideableObjectRigidbody.velocity = Vector3.zero;
@@ -747,30 +543,11 @@ namespace Leap.Unity.PhysicalHandsExamples
         /// <returns>The calculated slider value.</returns>
         private Vector3 CalculateSliderValue(in Vector3 changeFromZero)
         {
-            switch (_sliderType)
-            {
-                case SliderType.ONE_DIMENSIONAL:
-                    switch (_sliderDirection)
-                    {
-                        case SliderDirection.X:
-                            return new Vector3(
-                                Utils.Map(changeFromZero.x, 0, localSliderTravelDistanceHalf * 2, 0, 1),
-                                0,
-                                0);
-                        case SliderDirection.Z:
-                            return new Vector3(
-                                0,
-                                0,
-                                Utils.Map(changeFromZero.z, 0, localSliderTravelDistanceHalf * 2, 0, 1));
-                    }
-                    break;
-                case SliderType.TWO_DIMENSIONAL:
-                    return new Vector3(
-                        Utils.Map(changeFromZero.x, 0, localTwoDimSliderTravelDistanceHalf.x * 2, 0, 1),
-                        0,
-                        Utils.Map(changeFromZero.z, 0, localTwoDimSliderTravelDistanceHalf.y * 2, 0, 1));
-            }
-            return Vector3.negativeInfinity;
+
+            return new Vector3(
+                Utils.Map(changeFromZero.x, 0, localTwoDimSliderTravelDistanceHalf.x * 2, 0, 1),
+                0,
+                Utils.Map(changeFromZero.z, 0, localTwoDimSliderTravelDistanceHalf.y * 2, 0, 1));
         }
 
         /// <summary>
@@ -783,40 +560,19 @@ namespace Leap.Unity.PhysicalHandsExamples
             float value = 0;
             Vector2 twoDimValue = Vector2.zero;
 
-            // Determine the slider type and direction
-            switch (_sliderType)
+            // Snap to segments on X and Z axes
+            if (_twoDimNumberOfSegments.x != 0)
             {
-                case SliderType.ONE_DIMENSIONAL:
-                    // For one-dimensional sliders
-                    switch (_sliderDirection)
-                    {
-                        case SliderDirection.X:
-                            closestStep = GetClosestStep(_sliderValue.x, _numberOfSegments);
-                            value = _sliderXZeroPos + (closestStep * (localSliderTravelDistanceHalf * 2));
-                            break;
-                        case SliderDirection.Z:
-                            closestStep = GetClosestStep(_sliderValue.z, _numberOfSegments);
-                            value = _sliderZZeroPos + (closestStep * (localSliderTravelDistanceHalf * 2));
-                            break;
-                    }
-                    break;
-                case SliderType.TWO_DIMENSIONAL:
-                    // Snap to segments on X and Z axes
-                    if (_twoDimNumberOfSegments.x != 0)
-                    {
-                        closestStep = GetClosestStep(_sliderValue.x, (int)_twoDimNumberOfSegments.x);
-                        twoDimValue.x = _sliderXZeroPos + (closestStep * (localSliderTravelDistanceHalf * 2));
-                    }
-                    if (_twoDimNumberOfSegments.y != 0)
-                    {
-                        closestStep = GetClosestStep(_sliderValue.z, (int)_twoDimNumberOfSegments.y);
-                        twoDimValue.y = _sliderZZeroPos + (closestStep * (localSliderTravelDistanceHalf * 2));
-                    }
-                    break;
+                closestStep = GetClosestStep(_sliderValue.x, (int)_twoDimNumberOfSegments.x);
+                twoDimValue.x = closestStep;
             }
-
+            if (_twoDimNumberOfSegments.y != 0)
+            {
+                closestStep = GetClosestStep(_sliderValue.z, (int)_twoDimNumberOfSegments.y);
+                twoDimValue.y = closestStep;
+            }
             // Update the slider position
-            UpdateSliderPos(value, twoDimValue);
+            UpdateSliderPos(twoDimValue);
         }
 
         private float GetClosestStep(float inputNumber, int numberOfSteps)

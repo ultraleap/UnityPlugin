@@ -176,7 +176,7 @@ namespace Leap.Unity.Examples
 
         void IPhysicalHandHover.OnHandHover(ContactHand hand)
         {
-            if (!_relevanthands.Contains(hand.GetDataHand()))
+            if (!_relevanthands.Contains(hand.DataHand))
             {
                 _relevanthands.Add(hand.DataHand);
             }
