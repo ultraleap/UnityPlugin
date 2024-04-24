@@ -22,7 +22,7 @@ public class ServiceCallbacks : AndroidJavaProxy
 #if UNITY_2021_3_18_OR_NEWER
         foreach (var provider in GameObject.FindObjectsByType<Leap.Unity.LeapServiceProvider>(FindObjectsSortMode.None))
         {
-            provider.destroyController();
+            provider.DestroyConnection();
         }
 #else
         foreach (var provider in GameObject.FindObjectsOfType<Leap.Unity.LeapServiceProvider>())

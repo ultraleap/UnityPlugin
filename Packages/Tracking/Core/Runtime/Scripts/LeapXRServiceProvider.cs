@@ -391,9 +391,9 @@ namespace Leap.Unity
         {
             manualUpdateHasBeenCalledSinceUpdate = false;
             base.Update();
-            if (_leapController != null)
+            if (Connection != null)
             {
-                imageTimeStamp = _leapController.FrameTimestamp();
+                imageTimeStamp = _latestTrackingFrame.Timestamp;
             }
         }
 
@@ -460,7 +460,7 @@ namespace Leap.Unity
             }
 #endif
 
-            if (mainCamera == null || _leapController == null)
+            if (mainCamera == null || Connection == null)
             {
                 if (_temporalWarpingMode == TemporalWarpingMode.Auto || _temporalWarpingMode == TemporalWarpingMode.Manual)
                 {
@@ -504,7 +504,7 @@ namespace Leap.Unity
                 return;
             }
 
-            transformHistory.UpdateDelay(trackedPose, _leapController.Now());
+            transformHistory.UpdateDelay(trackedPose, LeapInternal.LeapC.GetNow());
 
             OnPreCullHandTransforms(mainCamera);
         }
@@ -515,16 +515,16 @@ namespace Leap.Unity
 
         protected override long CalculateInterpolationTime(bool endOfFrame = false)
         {
-            if (_leapController == null)
+            if (Connection == null)
             {
                 return 0;
             }
 
 #if UNITY_ANDROID
-            return _leapController.Now() - 16000;
+            return LeapInternal.LeapC.GetNow() - 16000;
 #else
 
-            return _leapController.Now()
+            return LeapInternal.LeapC.GetNow()
                     - (long)_smoothedTrackingLatency.value
                     + ((updateHandInPrecull && !endOfFrame) ?
                         (long)(Time.smoothDeltaTime * S_TO_US / Time.timeScale)
@@ -690,7 +690,7 @@ namespace Leap.Unity
                         return;
                 }
 
-                if (Application.isPlaying && !manualUpdateHasBeenCalledSinceUpdate && _leapController != null)
+                if (Application.isPlaying && !manualUpdateHasBeenCalledSinceUpdate && Connection != null)
                 {
 
                     manualUpdateHasBeenCalledSinceUpdate = true;
@@ -714,7 +714,7 @@ namespace Leap.Unity
 
                     //Determine their new Transforms
                     var interpolationTime = CalculateInterpolationTime();
-                    _leapController.GetInterpolatedLeftRightTransform(
+                    Connection.GetInterpolatedLeftRightTransform(
                                       interpolationTime + (ExtrapolationAmount * 1000),
                                       interpolationTime - (BounceAmount * 1000),
                                       (leftHand != null ? leftHand.Id : 0),

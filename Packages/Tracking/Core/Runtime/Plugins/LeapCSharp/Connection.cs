@@ -62,14 +62,13 @@ namespace LeapInternal
         }
 
         public Key ConnectionKey { get; private set; }
-        public CircularObjectBuffer<LEAP_TRACKING_EVENT> Frames { get; set; }
+        //public LEAP_TRACKING_EVENT LatestFrame { get; set; }
 
         private DeviceList _devices = new DeviceList();
         private FailedDeviceList _failedDevices;
 
         private DistortionData _currentLeftDistortionData = new DistortionData();
         private DistortionData _currentRightDistortionData = new DistortionData();
-        private int _frameBufferLength = 60; //TODO, surface this value in LeapC, currently hardcoded!
 
         private IntPtr _leapConnection;
         private volatile bool _isRunning = false;
@@ -169,7 +168,7 @@ namespace LeapInternal
             ConnectionKey = connectionKey;
             _leapConnection = IntPtr.Zero;
 
-            Frames = new CircularObjectBuffer<LEAP_TRACKING_EVENT>(_frameBufferLength);
+            //LatestFrame = new LEAP_TRACKING_EVENT();
         }
 
         private LEAP_ALLOCATOR _pLeapAllocator = new LEAP_ALLOCATOR();
@@ -273,6 +272,28 @@ namespace LeapInternal
             LEAP_VERSION currentVersion = new LEAP_VERSION { major = 0, minor = 0, patch = 0 };
             LeapC.GetVersion(_leapConnection, eLeapVersionPart.eLeapVersionPart_ServerLibrary, ref currentVersion);
             return currentVersion;
+        }
+
+        /// <summary>
+        /// Checks whether a minimum or required tracking service version is installed.
+        /// Gets the currently installed service version from the connection and checks whether 
+        /// the argument minServiceVersion is smaller or equal to it
+        /// </summary>
+        /// <param name="minServiceVersion">The minimum service version to check against</param>
+        /// <param name="connection">The connection</param>
+        /// <returns>True if the version of the running service is equal to or less than the minimum version specified</returns>
+        public static bool CheckRequiredServiceVersion(LEAP_VERSION minServiceVersion, Connection connection)
+        {
+            LEAP_VERSION currentServiceVersion = connection.GetCurrentServiceVersion();
+
+            // check that minServiceVersion is smaller or equal to the current service version
+            if (minServiceVersion.major < currentServiceVersion.major) return true;
+            else if (minServiceVersion.major == currentServiceVersion.major)
+            {
+                if (minServiceVersion.minor < currentServiceVersion.minor) return true;
+                else if (minServiceVersion.minor == currentServiceVersion.minor && minServiceVersion.patch <= currentServiceVersion.patch) return true;
+            }
+            return false;
         }
 
         //Run in Polster thread, fills in object queues
@@ -411,7 +432,7 @@ namespace LeapInternal
 
         private void handleTrackingMessage(ref LEAP_TRACKING_EVENT trackingMsg, UInt32 deviceID)
         {
-            Frames.Put(ref trackingMsg);
+            //LatestFrame = trackingMsg;
 
             if (LeapFrame != null)
             {
@@ -424,6 +445,15 @@ namespace LeapInternal
             }
         }
 
+        ///// <summary>
+        ///// Identical to Frame(history) but instead of constructing a new frame and returning
+        ///// it, the user provides a frame object to be filled with data instead.
+        ///// </summary>
+        //public void GetLatestFrame(Frame toFill)
+        //{
+        //    LEAP_TRACKING_EVENT trackingEvent = LatestFrame;
+        //    toFill.CopyFrom(ref trackingEvent);
+        //}
 
         public UInt64 GetInterpolatedFrameSize(Int64 time, Device device = null)
         {
@@ -442,8 +472,6 @@ namespace LeapInternal
             reportAbnormalResults("LeapC get interpolated frame call was ", result);
             return size;
         }
-
-
 
         public void GetInterpolatedFrame(Frame toFill, Int64 time, Device device = null)
         {
@@ -511,6 +539,19 @@ namespace LeapInternal
             GetInterpolatedFrame(frame, time, device);
             return frame;
         }
+
+        ///// <summary>
+        ///// Returns the timestamp of a recent tracking frame.  Use the
+        ///// optional history parameter to specify how many frames in the past
+        ///// to retrieve the timestamp.  Leave the history parameter as
+        ///// it's default value to return the timestamp of the most recent
+        ///// tracked frame.
+        ///// </summary>
+        //public long FrameTimestamp()
+        //{
+        //    LEAP_TRACKING_EVENT trackingEvent = LatestFrame;
+        //    return trackingEvent.info.timestamp;
+        //}
 
         public void GetInterpolatedHeadPose(ref LEAP_HEAD_POSE_EVENT toFill, Int64 time)
         {
@@ -875,13 +916,13 @@ namespace LeapInternal
         }
 
 
-        public void SetAndClearPolicy(Controller.PolicyFlag set, Controller.PolicyFlag clear, Device device = null)
+        public void SetAndClearPolicy(PolicyFlag set, PolicyFlag clear, Device device = null)
         {
             UInt64 setFlags = (ulong)FlagForPolicy(set);
             UInt64 clearFlags = (ulong)FlagForPolicy(clear);
             eLeapRS result;
 
-            if (device != null && Controller.CheckRequiredServiceVersion(MinServiceVersionForMultiModeSupport, this))
+            if (device != null && CheckRequiredServiceVersion(MinServiceVersionForMultiModeSupport, this))
             {
                 result = LeapC.SetPolicyFlagsEx(_leapConnection, device.Handle, setFlags, clearFlags);
             }
@@ -893,13 +934,13 @@ namespace LeapInternal
             reportAbnormalResults("LeapC SetAndClearPolicy call was ", result);
         }
 
-        public void SetPolicy(Controller.PolicyFlag policy, Device device = null)
+        public void SetPolicy(PolicyFlag policy, Device device = null)
         {
             UInt64 setFlags = (ulong)FlagForPolicy(policy);
 
             eLeapRS result;
 
-            if (device != null && Controller.CheckRequiredServiceVersion(MinServiceVersionForMultiModeSupport, this))
+            if (device != null && CheckRequiredServiceVersion(MinServiceVersionForMultiModeSupport, this))
             {
                 result = LeapC.SetPolicyFlagsEx(_leapConnection, device.Handle, setFlags, 0);
             }
@@ -911,13 +952,13 @@ namespace LeapInternal
             reportAbnormalResults("LeapC SetPolicyFlags call was ", result);
         }
 
-        public void ClearPolicy(Controller.PolicyFlag policy, Device device = null)
+        public void ClearPolicy(PolicyFlag policy, Device device = null)
         {
             UInt64 clearFlags = (ulong)FlagForPolicy(policy);
 
             eLeapRS result;
 
-            if (device != null && Controller.CheckRequiredServiceVersion(MinServiceVersionForMultiModeSupport, this))
+            if (device != null && CheckRequiredServiceVersion(MinServiceVersionForMultiModeSupport, this))
             {
                 result = LeapC.SetPolicyFlagsEx(_leapConnection, device.Handle, 0, clearFlags);
             }
@@ -929,23 +970,23 @@ namespace LeapInternal
             reportAbnormalResults("LeapC SetPolicyFlags call was ", result);
         }
 
-        static public eLeapPolicyFlag FlagForPolicy(Controller.PolicyFlag singlePolicy)
+        static public eLeapPolicyFlag FlagForPolicy(PolicyFlag singlePolicy)
         {
             switch (singlePolicy)
             {
-                case Controller.PolicyFlag.POLICY_BACKGROUND_FRAMES:
+                case PolicyFlag.POLICY_BACKGROUND_FRAMES:
                     return eLeapPolicyFlag.eLeapPolicyFlag_BackgroundFrames;
-                case Controller.PolicyFlag.POLICY_IMAGES:
+                case PolicyFlag.POLICY_IMAGES:
                     return eLeapPolicyFlag.eLeapPolicyFlag_Images;
-                case Controller.PolicyFlag.POLICY_OPTIMIZE_HMD:
+                case PolicyFlag.POLICY_OPTIMIZE_HMD:
                     return eLeapPolicyFlag.eLeapPolicyFlag_OptimizeHMD;
-                case Controller.PolicyFlag.POLICY_ALLOW_PAUSE_RESUME:
+                case PolicyFlag.POLICY_ALLOW_PAUSE_RESUME:
                     return eLeapPolicyFlag.eLeapPolicyFlag_AllowPauseResume;
-                case Controller.PolicyFlag.POLICY_MAP_POINTS:
+                case PolicyFlag.POLICY_MAP_POINTS:
                     return eLeapPolicyFlag.eLeapPolicyFlag_MapPoints;
-                case Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP:
+                case PolicyFlag.POLICY_OPTIMIZE_SCREENTOP:
                     return eLeapPolicyFlag.eLeapPolicyFlag_ScreenTop;
-                case Controller.PolicyFlag.POLICY_DEFAULT:
+                case PolicyFlag.POLICY_DEFAULT:
                     return 0;
                 default:
                     return 0;
@@ -1017,7 +1058,7 @@ namespace LeapInternal
         ///
         /// @since 2.1.6
         /// </summary>
-        public bool IsPolicySet(Controller.PolicyFlag policy, Device device = null)
+        public bool IsPolicySet(PolicyFlag policy, Device device = null)
         {
             UInt64 policyToCheck = (ulong)FlagForPolicy(policy);
 
@@ -1116,6 +1157,29 @@ namespace LeapInternal
         }
 
         /// <summary>
+        /// Reports whether this Controller is connected to the Leap Motion service and
+        /// the Leap Motion hardware is plugged in.
+        /// 
+        /// When you first create a Controller object, isConnected() returns false.
+        /// After the controller finishes initializing and connects to the Leap Motion
+        /// software and if the Leap Motion hardware is plugged in, isConnected() returns true.
+        /// 
+        /// You can either handle the onConnect event using a Listener instance or
+        /// poll the isConnected() function if you need to wait for your
+        /// application to be connected to the Leap Motion software before performing some other
+        /// operation.
+        /// 
+        /// @since 1.0
+        /// </summary>
+        public bool IsConnectedWithDevice
+        {
+            get
+            {
+                return IsServiceConnected && Devices.Count > 0;
+            }
+        }
+
+        /// <summary>
         /// The list of currently attached and recognized Leap Motion controller devices.
         ///
         /// The Device objects in the list describe information such as the range and
@@ -1180,6 +1244,22 @@ namespace LeapInternal
         {
             eLeapRS result = LeapC.LeapUnsubscribeEvents(_leapConnection, device.Handle);
             reportAbnormalResults("LeapC UnsubscribeEvents call was ", result);
+        }
+
+        public void SubscribeToAllDeviceEvents()
+        {
+            for (int i = 0; i < Devices.Count; i++)
+            {
+                SubscribeToDeviceEvents(Devices[i]);
+            }
+        }
+
+        public void UnsubscribeFromAllDeviceEvents()
+        {
+            for (int i = 0; i < Devices.Count; i++)
+            {
+                UnsubscribeFromDeviceEvents(Devices[i]);
+            }
         }
 
         /// <summary>

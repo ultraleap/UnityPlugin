@@ -40,10 +40,10 @@ namespace Leap.Unity
             }
 
             // Listen to events for the new marker poses
-            if (leapServiceProvider != null)
+            if (leapServiceProvider != null && leapServiceProvider.Connection != null)
             {
-                leapServiceProvider.GetLeapController().FiducialPose -= OnFiducialMarkerPose;
-                leapServiceProvider.GetLeapController().FiducialPose += OnFiducialMarkerPose;
+                leapServiceProvider.Connection.LeapFiducialPose -= OnFiducialMarkerPose;
+                leapServiceProvider.Connection.LeapFiducialPose += OnFiducialMarkerPose;
             }
             else
             {

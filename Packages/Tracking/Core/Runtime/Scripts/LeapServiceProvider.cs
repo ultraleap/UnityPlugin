@@ -13,6 +13,8 @@ using System.ComponentModel;
 using System.Linq;
 using UnityEngine;
 
+using Connection = LeapInternal.Connection;
+
 namespace Leap.Unity
 {
     using Attributes;
@@ -29,12 +31,6 @@ namespace Leap.Unity
     public class LeapServiceProvider : LeapProvider
     {
         #region Constants
-
-        [Obsolete("This const is named incorrectly. Use US_TO_S instead.")]
-        protected const double NS_TO_S = 1e-6;
-
-        [Obsolete("This const is named incorrectly. Use S_TO_US instead.")]
-        protected const double S_TO_NS = 1e6;
 
         /// <summary>
         /// Converts Microseconds to seconds.
@@ -55,21 +51,13 @@ namespace Leap.Unity
         /// The maximum number of times the provider will 
         /// attempt to reconnect to the service before giving up.
         /// </summary>
-#if UNITY_ANDROID
         protected const int MAX_RECONNECTION_ATTEMPTS = 10;
-#else
-        protected const int MAX_RECONNECTION_ATTEMPTS = 5;
-#endif
 
         /// <summary>
         /// The number of frames to wait between each
         /// reconnection attempt.
         /// </summary>
-#if UNITY_ANDROID
         protected const int RECONNECTION_INTERVAL = 360;
-#else
-        protected const int RECONNECTION_INTERVAL = 180;
-#endif
 
         #endregion
 
@@ -168,6 +156,110 @@ namespace Leap.Unity
         [SerializeField]
         protected float _physicsExtrapolationTime = 1.0f / 90.0f;
 
+        #region Connection
+
+        Connection _connection;
+
+        /// <summary>
+        /// Returns the current connection, or null if there is not a current connection
+        /// </summary>
+        public Connection Connection => _connection;
+
+        /// <summary>
+        /// Gets the current connection or makes a new one if there is not a current connection.
+        /// </summary>
+        /// <returns>The current connection or a new one</returns>
+        public Connection GetConnection()
+        {
+            if (Connection == null && !_isDestroyed)
+            {
+                CreateConnection();
+            }
+
+            return Connection;
+        }
+
+        private void CreateConnection()
+        {
+            if (Connection != null)
+            {
+                return;
+            }
+
+            if (_multipleDeviceMode == MultipleDeviceMode.Disabled)
+            {
+                CreateConnection(0, _serverNameSpace);
+            }
+            else
+            {
+                CreateConnection(SpecificSerialNumber.GetHashCode(), _serverNameSpace);
+            }
+
+            Connection.LeapDevice += (s, e) =>
+            {
+                if (_onDeviceSafe != null)
+                {
+                    _onDeviceSafe(e.Device);
+                }
+            };
+
+            Connection.LeapDeviceLost += (s, e) =>
+            {
+                if (e.Device == _currentDevice)
+                {
+                    Connection.UnsubscribeFromDeviceEvents(_currentDevice);
+                    _currentDevice = null;
+                    ClearCurrentFrames();
+                }
+            };
+
+            Connection.LeapFrame += (s, e) =>
+            {
+                if(e.frame.DeviceID == _currentDevice.DeviceID)
+                {
+                    _latestTrackingFrame = e.frame;
+                }
+            };
+
+            _onDeviceSafe += (d) =>
+            {
+                if (_multipleDeviceMode == MultipleDeviceMode.Specific)
+                {
+                    if (SpecificSerialNumber != null && SpecificSerialNumber != "" && d.SerialNumber.Contains(SpecificSerialNumber))
+                    {
+                        connectToNewDevice(d, true);
+                    }
+                }
+                else if (_multipleDeviceMode == MultipleDeviceMode.Disabled)
+                {
+                    connectToNewDevice(d);
+                }
+                else
+                {
+                    throw new NotImplementedException($"{nameof(MultipleDeviceMode)} case not implemented");
+                }
+            };
+
+            if (Connection.IsConnectedWithDevice)
+            {
+                initializeFlags();
+            }
+            else
+            {
+                Connection.LeapDevice += onHandControllerConnect;
+            }
+        }
+
+
+        private void CreateConnection(int connectionKey, string serverNamespace = "Leap Service")
+        {
+            _connection = Connection.GetConnection(new Connection.Key(connectionKey, serverNamespace));
+            _connection.EventContext = System.Threading.SynchronizationContext.Current;
+            _connection.Start(serverNamespace);
+        }
+
+        #endregion
+
         #region Multiple Device
         public enum MultipleDeviceMode
         {
@@ -225,7 +317,7 @@ namespace Leap.Unity
             {
                 if (_currentDevice == null && _multipleDeviceMode == MultipleDeviceMode.Disabled)
                 {
-                    Device firstDevice = GetLeapController().Devices.ActiveDevices.FirstOrDefault();
+                    Device firstDevice = Connection.Devices.ActiveDevices.FirstOrDefault();
 
                     if (firstDevice != null)
                     {
@@ -243,7 +335,7 @@ namespace Leap.Unity
         /// </summary>
         public List<Device> Devices
         {
-            get { return _leapController.Devices; }
+            get { return Connection.Devices; }
         }
 
         #endregion
@@ -306,7 +398,6 @@ namespace Leap.Unity
         protected int BounceAmount = 0;
 #endif
 
-        protected Controller _leapController;
         protected bool _isDestroyed;
 
         private protected SmoothedFloat _fixedOffset = new SmoothedFloat();
@@ -317,6 +408,8 @@ namespace Leap.Unity
         protected Frame _transformedUpdateFrame;
         protected Frame _untransformedFixedFrame;
         protected Frame _transformedFixedFrame;
+
+        protected Frame _latestTrackingFrame;
 
         #endregion
 
@@ -334,15 +427,15 @@ namespace Leap.Unity
         {
             add
             {
-                if (_leapController != null)
+                if (Connection != null)
                 {
-                    _leapController.Device += (a0, a1) =>
+                    Connection.LeapDevice += (a0, a1) =>
                     {
                         value(a1.Device);
                     };
-                    if (_leapController.IsConnected)
+                    if (Connection.IsConnectedWithDevice)
                     {
-                        foreach (var device in _leapController.Devices)
+                        foreach (var device in Connection.Devices)
                         {
                             value(device);
                         }
@@ -585,7 +678,7 @@ namespace Leap.Unity
 
         protected virtual void Start()
         {
-            createController();
+            CreateConnection();
 
             if (_currentDevice == null)
             {
@@ -597,6 +690,7 @@ namespace Leap.Unity
                 _transformedFixedFrame = new Frame(_currentDevice.DeviceID);
                 _untransformedUpdateFrame = new Frame(_currentDevice.DeviceID);
                 _untransformedFixedFrame = new Frame(_currentDevice.DeviceID);
+                _latestTrackingFrame = new Frame(_currentDevice.DeviceID);
             }
         }
 
@@ -653,11 +747,11 @@ namespace Leap.Unity
                           "Unexpected frame optimization mode: " + _frameOptimization);
                 }
 
-                _leapController.GetInterpolatedFrame(_untransformedFixedFrame, timestamp, _currentDevice);
+                Connection.GetInterpolatedFrame(_untransformedFixedFrame, timestamp, _currentDevice);
             }
             else
             {
-                _leapController.Frame(_untransformedFixedFrame);
+                _untransformedFixedFrame.CopyFrom(_latestTrackingFrame);
             }
 
             if (_untransformedFixedFrame != null)
@@ -669,21 +763,21 @@ namespace Leap.Unity
 
         protected virtual void OnDestroy()
         {
-            destroyController();
+            DestroyConnection();
             _isDestroyed = true;
         }
 
         protected virtual void OnApplicationPause(bool isPaused)
         {
-            if (_leapController != null)
+            if (Connection != null)
             {
                 if (isPaused)
                 {
-                    _leapController.StopConnection();
+                    Connection.Stop();
                 }
                 else
                 {
-                    _leapController.StartConnection();
+                    Connection.Start(_serverNameSpace);
                 }
             }
         }
@@ -697,6 +791,7 @@ namespace Leap.Unity
             _transformedFixedFrame = new Frame();
             _untransformedUpdateFrame = new Frame();
             _untransformedFixedFrame = new Frame();
+            _latestTrackingFrame = new Frame();
         }
 
         /// <summary>
@@ -726,16 +821,16 @@ namespace Leap.Unity
             {
 #if !UNITY_ANDROID || UNITY_EDITOR
                 _smoothedTrackingLatency.value = Mathf.Min(_smoothedTrackingLatency.value, 30000f);
-                _smoothedTrackingLatency.Update((float)(_leapController.Now() - _leapController.FrameTimestamp()), Time.deltaTime);
+                _smoothedTrackingLatency.Update((float)(LeapInternal.LeapC.GetNow() - _latestTrackingFrame.Timestamp), Time.deltaTime);
 #endif
                 long timestamp = CalculateInterpolationTime() + (ExtrapolationAmount * 1000);
                 _unityToLeapOffset = timestamp - (long)(Time.time * S_TO_US);
 
-                _leapController.GetInterpolatedFrameFromTime(_untransformedUpdateFrame, timestamp, CalculateInterpolationTime() - (BounceAmount * 1000), _currentDevice);
+                Connection.GetInterpolatedFrameFromTime(_untransformedUpdateFrame, timestamp, CalculateInterpolationTime() - (BounceAmount * 1000), _currentDevice);
             }
             else
             {
-                _leapController.Frame(_untransformedUpdateFrame);
+                _untransformedUpdateFrame.CopyFrom(_latestTrackingFrame);
             }
 
             if (_untransformedUpdateFrame != null)
@@ -749,27 +844,12 @@ namespace Leap.Unity
         #region Public API
 
         /// <summary>
-        /// Returns the Leap Controller instance.
-        /// If not found, it creates a new controller instance.
-        /// </summary>
-        public Controller GetLeapController()
-        {
-            // Null check to deal with hot reloading.
-            if (!_isDestroyed && _leapController == null)
-            {
-                createController();
-            }
-
-            return _leapController;
-        }
-
-        /// <summary>
         /// Returns true if the Leap Motion hardware is plugged in and this application is
         /// connected to the Leap Motion service.
         /// </summary>
         public bool IsConnected()
         {
-            return GetLeapController().IsConnected;
+            return Connection.IsConnectedWithDevice;
         }
 
         /// <summary>
@@ -804,7 +884,7 @@ namespace Leap.Unity
         {
             _trackingOptimization = trackingMode;
 
-            if (_leapController != null && _leapController.IsConnected)
+            if (Connection != null && Connection.IsConnectedWithDevice)
             {
                 SetTrackingMode(trackingMode);
             }
@@ -816,7 +896,7 @@ namespace Leap.Unity
 
         private IEnumerator ChangeTrackingMode_Coroutine(TrackingOptimizationMode trackingMode)
         {
-            yield return new WaitWhile(() => _leapController == null || !_leapController.IsConnected);
+            yield return new WaitWhile(() => Connection == null || !Connection.IsConnectedWithDevice);
             SetTrackingMode(trackingMode);
         }
 
@@ -825,14 +905,14 @@ namespace Leap.Unity
             switch (trackingMode)
             {
                 case TrackingOptimizationMode.Desktop:
-                    _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP, CurrentDevice);
-                    _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD, CurrentDevice);
+                    Connection.ClearPolicy(LeapInternal.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP, CurrentDevice);
+                    Connection.ClearPolicy(LeapInternal.PolicyFlag.POLICY_OPTIMIZE_HMD, CurrentDevice);
                     break;
                 case TrackingOptimizationMode.Screentop:
-                    _leapController.SetAndClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP, Controller.PolicyFlag.POLICY_OPTIMIZE_HMD, CurrentDevice);
+                    Connection.SetAndClearPolicy(LeapInternal.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP, LeapInternal.PolicyFlag.POLICY_OPTIMIZE_HMD, CurrentDevice);
                     break;
                 case TrackingOptimizationMode.HMD:
-                    _leapController.SetAndClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD, Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP, CurrentDevice);
+                    Connection.SetAndClearPolicy(LeapInternal.PolicyFlag.POLICY_OPTIMIZE_HMD, LeapInternal.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP, CurrentDevice);
                     break;
             }
         }
@@ -842,12 +922,12 @@ namespace Leap.Unity
         /// </summary>
         public TrackingOptimizationMode GetTrackingMode()
         {
-            if (_leapController == null) return _trackingOptimization;
+            if (Connection == null) return _trackingOptimization;
 
             Device deviceToGet = _multipleDeviceMode == MultipleDeviceMode.Disabled ? null : _currentDevice;
 
-            var screenTopPolicySet = _leapController.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP, deviceToGet);
-            var headMountedPolicySet = _leapController.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD, deviceToGet);
+            var screenTopPolicySet = Connection.IsPolicySet(LeapInternal.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP, deviceToGet);
+            var headMountedPolicySet = Connection.IsPolicySet(LeapInternal.PolicyFlag.POLICY_OPTIMIZE_HMD, deviceToGet);
 
             var desktopMode = !screenTopPolicySet && !headMountedPolicySet;
             if (desktopMode)
@@ -877,11 +957,11 @@ namespace Leap.Unity
         protected virtual long CalculateInterpolationTime(bool endOfFrame = false)
         {
 #if UNITY_ANDROID && !UNITY_EDITOR
-      return _leapController.Now() - 16000;
+            return LeapInternal.LeapC.GetNow() - 16000;
 #else
-            if (_leapController != null)
+            if (Connection != null)
             {
-                return _leapController.Now() - (long)_smoothedTrackingLatency.value;
+                return LeapInternal.LeapC.GetNow() - (long)_smoothedTrackingLatency.value;
             }
             else
             {
@@ -901,74 +981,6 @@ namespace Leap.Unity
         }
 
         /// <summary>
-        /// Creates an instance of a Controller, initializing its policy flags and
-        /// subscribing to its connection event.
-        /// </summary>
-        protected void createController()
-        {
-            if (_leapController != null)
-            {
-                return;
-            }
-
-            if (_multipleDeviceMode == MultipleDeviceMode.Disabled)
-            {
-                _leapController = new Controller(0, _serverNameSpace);
-            }
-            else
-            {
-                _leapController = new Controller(SpecificSerialNumber.GetHashCode(), _serverNameSpace);
-            }
-
-            _leapController.Device += (s, e) =>
-            {
-                if (_onDeviceSafe != null)
-                {
-                    _onDeviceSafe(e.Device);
-                }
-            };
-
-            _leapController.DeviceLost += (s, e) =>
-            {
-                if (e.Device == _currentDevice)
-                {
-                    _leapController.UnsubscribeFromDeviceEvents(_currentDevice);
-                    _currentDevice = null;
-                    ClearCurrentFrames();
-                }
-            };
-
-            _onDeviceSafe += (d) =>
-            {
-                if (_multipleDeviceMode == MultipleDeviceMode.Specific)
-                {
-                    if (SpecificSerialNumber != null && SpecificSerialNumber != "" && d.SerialNumber.Contains(SpecificSerialNumber))
-                    {
-                        connectToNewDevice(d, true);
-                    }
-                }
-                else if (_multipleDeviceMode == MultipleDeviceMode.Disabled)
-                {
-                    connectToNewDevice(d);
-                }
-                else
-                {
-                    throw new NotImplementedException($"{nameof(MultipleDeviceMode)} case not implemented");
-                }
-            };
-
-
-            if (_leapController.IsConnected)
-            {
-                initializeFlags();
-            }
-            else
-            {
-                _leapController.Device += onHandControllerConnect;
-            }
-        }
-
-        /// <summary>
         /// Only during runtime:
         /// connects to a new device (param d) and subscribes to its device events. 
         /// Also unsubscribes from all device events from the last connected device.
@@ -978,14 +990,14 @@ namespace Leap.Unity
         /// or application is not playing or already connected to Device d</returns>
         private bool connectToNewDevice(Device d, bool notify = false)
         {
-            if (_leapController == null || !Application.isPlaying || _currentDevice == d)
+            if (Connection == null || !Application.isPlaying || _currentDevice == d)
             {
                 return false;
             }
 
             if (_currentDevice != null)
             {
-                _leapController.UnsubscribeFromDeviceEvents(_currentDevice);
+                Connection.UnsubscribeFromDeviceEvents(_currentDevice);
             }
 
             if (notify)
@@ -993,7 +1005,7 @@ namespace Leap.Unity
                 Debug.Log($"Connecting to Device with Serial: {d.SerialNumber} and ID {d.DeviceID}");
             }
 
-            _leapController.SubscribeToDeviceEvents(d);
+            Connection.SubscribeToDeviceEvents(d);
             _currentDevice = d;
 
             if (_onDeviceChanged != null)
@@ -1011,10 +1023,10 @@ namespace Leap.Unity
         /// </summary>
         private void updateDevice()
         {
-            if (_leapController == null) return;
+            if (Connection == null) return;
             if (SpecificSerialNumber == null || SpecificSerialNumber == "") return;
 
-            foreach (Device d in _leapController.Devices)
+            foreach (Device d in Connection.Devices)
             {
                 if (d.SerialNumber.Contains(SpecificSerialNumber))
                 {
@@ -1028,14 +1040,12 @@ namespace Leap.Unity
         /// Stops the connection for the existing instance of a Controller, clearing old
         /// policy flags and resetting the Controller to null.
         /// </summary>
-    	public void destroyController()
+    	public void DestroyConnection()
         {
-            if (_leapController != null)
+            if (Connection != null)
             {
-                _leapController.UnsubscribeFromAllDevices();
-                _leapController.StopConnection();
-                _leapController.Dispose();
-                _leapController = null;
+                Connection.UnsubscribeFromAllDeviceEvents();
+                Connection.Stop();
             }
         }
 
@@ -1048,7 +1058,7 @@ namespace Leap.Unity
         /// </summary>
         protected bool checkConnectionIntegrity()
         {
-            if (_leapController != null && _leapController.IsServiceConnected)
+            if (Connection != null && Connection.IsServiceConnected)
             {
                 _framesSinceServiceConnectionChecked = 0;
                 _numberOfReconnectionAttempts = 0;
@@ -1066,8 +1076,8 @@ namespace Leap.Unity
                     Debug.LogWarning("Leap Service not connected; attempting to reconnect for try " +
                                      _numberOfReconnectionAttempts + "/" + _reconnectionAttempts +
                                      "...", this);
-                    destroyController();
-                    createController();
+                    DestroyConnection();
+                    CreateConnection();
                 }
             }
             return false;
@@ -1077,9 +1087,9 @@ namespace Leap.Unity
         {
             initializeFlags();
 
-            if (_leapController != null)
+            if (Connection != null)
             {
-                _leapController.Device -= onHandControllerConnect;
+                Connection.LeapDevice -= onHandControllerConnect;
             }
         }
 

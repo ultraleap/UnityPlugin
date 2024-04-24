@@ -162,7 +162,7 @@ namespace Leap.Unity
                 Shader.SetGlobalVector(pixelSizeName, new Vector2(1.0f / image.Width, 1.0f / image.Height));
             }
 
-            public void UpdateTexture(Image image, int deviceID, Controller controller = null)
+            public void UpdateTexture(Image image, int deviceID, LeapInternal.Connection connection = null)
             {
                 if (deviceID >= MAX_NUMBER_OF_GLOBAL_TEXTURES)
                 {
@@ -176,9 +176,9 @@ namespace Leap.Unity
                 // the first byte being at the bottom left pixel
                 byte[] data = image.Data(Image.CameraType.LEFT);
 
-                if (_hideLeapDebugInfo && controller != null)
+                if (_hideLeapDebugInfo && connection != null)
                 {
-                    Device[] devices = controller.Devices.ActiveDevices.ToArray();
+                    Device[] devices = connection.Devices.ActiveDevices.ToArray();
                     Device specificDevice = devices.FirstOrDefault(d => d.DeviceID == deviceID);
 
                     if (specificDevice != null)
@@ -386,9 +386,9 @@ namespace Leap.Unity
                 _isStale = false;
             }
 
-            public void UpdateTextures(Image image, int deviceID, Controller controller = null)
+            public void UpdateTextures(Image image, int deviceID, LeapInternal.Connection connection = null)
             {
-                TextureData.UpdateTexture(image, deviceID, controller);
+                TextureData.UpdateTexture(image, deviceID, connection);
             }
         }
 
@@ -479,13 +479,13 @@ namespace Leap.Unity
         {
             StopAllCoroutines();
 
-            Controller controller = _provider.GetLeapController();
-            if (controller != null)
+            LeapInternal.Connection connection = _provider.Connection;
+            if (connection != null)
             {
-                controller.DistortionChange -= onDistortionChange;
-                controller.Disconnect -= onDisconnect;
-                controller.ImageReady -= onImageReady;
-                controller.FrameReady -= onFrameReady;
+                connection.LeapDistortionChange -= onDistortionChange;
+                connection.LeapConnectionLost -= onDisconnect;
+                connection.LeapImage -= onImageReady;
+                connection.LeapFrame -= onFrameReady;
                 _provider.OnDeviceChanged -= OnDeviceChanged;
             }
 
@@ -552,8 +552,8 @@ namespace Leap.Unity
         private void OnCameraPreRender(Camera cam)
         {
             // set image policy if it is not set. This could happen when eg. another image retriever corresponding to the same device is disabled
-            var controller = _provider.GetLeapController();
-            if (controller != null)
+            var connection = _provider.Connection;
+            if (connection != null)
             {
                 var currentDevice = _provider.CurrentDevice;
 
@@ -562,7 +562,7 @@ namespace Leap.Unity
                     currentDevice = null;
                 }
 
-                if (!HasPolicyBeenSet() && controller.IsDeviceAvailable(currentDevice) && !controller.IsPolicySet(Controller.PolicyFlag.POLICY_IMAGES, currentDevice))
+                if (!HasPolicyBeenSet() && connection.IsDeviceAvailable(currentDevice) && !connection.IsPolicySet(LeapInternal.PolicyFlag.POLICY_IMAGES, currentDevice))
                 {
                     SetImagePolicySafely(true);
                 }
@@ -584,7 +584,7 @@ namespace Leap.Unity
                     }
                 }
 
-                _eyeTextureData.UpdateTextures(_currentImage, (int)_provider.CurrentDevice.DeviceID, _provider?.GetLeapController());
+                _eyeTextureData.UpdateTextures(_currentImage, (int)_provider.CurrentDevice.DeviceID, _provider?.Connection);
             }
         }
 
@@ -613,14 +613,14 @@ namespace Leap.Unity
                 _serviceCoroutine = null;
             }
 
-            var controller = _provider.GetLeapController();
-            if (controller != null)
+            var connection = _provider.Connection;
+            if (connection != null)
             {
                 SetImagePolicySafely(false);
-                controller.Disconnect -= onDisconnect;
-                controller.ImageReady -= onImageReady;
-                controller.DistortionChange -= onDistortionChange;
-                controller.FrameReady -= onFrameReady;
+                connection.LeapDistortionChange -= onDistortionChange;
+                connection.LeapConnectionLost -= onDisconnect;
+                connection.LeapImage -= onImageReady;
+                connection.LeapFrame -= onFrameReady;
                 _provider.OnDeviceChanged -= OnDeviceChanged;
             }
             _eyeTextureData.MarkStale();
@@ -629,17 +629,17 @@ namespace Leap.Unity
         private Coroutine _serviceCoroutine = null;
         private IEnumerator serviceCoroutine()
         {
-            Controller controller = null;
+            LeapInternal.Connection connection = null;
             do
             {
-                controller = _provider.GetLeapController();
+                connection = _provider.Connection;
                 yield return null;
-            } while (controller == null);
+            } while (connection == null);
 
-            controller.FrameReady += onFrameReady;
-            controller.Disconnect += onDisconnect;
-            controller.ImageReady += onImageReady;
-            controller.DistortionChange += onDistortionChange;
+            connection.LeapDistortionChange += onDistortionChange;
+            connection.LeapConnectionLost += onDisconnect;
+            connection.LeapImage += onImageReady;
+            connection.LeapFrame += onFrameReady;
             _provider.OnDeviceChanged += OnDeviceChanged;
         }
 
@@ -647,9 +647,8 @@ namespace Leap.Unity
         {
             unsubscribeFromService();
             subscribeToService();
-            Controller controller = _provider.GetLeapController();
-            controller.FrameReady -= onFrameReady;
-            controller.FrameReady += onFrameReady;
+            _provider.Connection.LeapFrame -= onFrameReady;
+            _provider.Connection.LeapFrame += onFrameReady;
         }
 
         private void onImageReady(object sender, ImageEventArgs args)
@@ -676,21 +675,19 @@ namespace Leap.Unity
 
         private void onFrameReady(object sender, FrameEventArgs args)
         {
-            var controller = _provider.GetLeapController();
-            if (controller != null)
+            if (_provider.Connection != null)
             {
-                controller.FrameReady -= onFrameReady;
+                _provider.Connection.LeapFrame -= onFrameReady;
                 SetImagePolicySafely(true);
             }
         }
 
         private void onDisconnect(object sender, ConnectionLostEventArgs args)
         {
-            var controller = _provider.GetLeapController();
-            if (controller != null)
+            if (_provider.Connection != null)
             {
-                controller.FrameReady -= onFrameReady;
-                controller.FrameReady += onFrameReady;
+                _provider.Connection.LeapFrame -= onFrameReady;
+                _provider.Connection.LeapFrame += onFrameReady;
                 SetImagePolicySafely(false);
             }
         }
@@ -750,11 +747,9 @@ namespace Leap.Unity
                 }
             }
 
-            var controller = _provider.GetLeapController();
-
             bool recount = false;
 
-            if (controller != null)
+            if (_provider.Connection != null)
             {
                 foreach (var item in _policiesSet)
                 {
@@ -771,13 +766,13 @@ namespace Leap.Unity
                 {
                     foreach (var device in devicesToClear)
                     {
-                        controller.ClearPolicy(Controller.PolicyFlag.POLICY_IMAGES, device);
+                        _provider.Connection.ClearPolicy(LeapInternal.PolicyFlag.POLICY_IMAGES, device);
                     }
                 }
 
                 if (deviceToSet != null)
                 {
-                    controller.SetPolicy(Controller.PolicyFlag.POLICY_IMAGES, deviceToSet);
+                    _provider.Connection.SetPolicy(LeapInternal.PolicyFlag.POLICY_IMAGES, deviceToSet);
                 }
             }
 

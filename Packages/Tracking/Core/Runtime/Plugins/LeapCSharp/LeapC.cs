@@ -554,6 +554,67 @@ namespace LeapInternal
         eLeapEventType_Fiducial
     };
 
+    /// <summary>
+    /// The supported controller policies.
+    /// 
+    /// The supported policy flags are:
+    /// 
+    /// **POLICY_BACKGROUND_FRAMES** -- requests that your application receives frames
+    ///   when it is not the foreground application for user input.
+    /// 
+    ///   The background frames policy determines whether an application
+    ///   receives frames of tracking data while in the background. By
+    ///   default, the Leap Motion  software only sends tracking data to the foreground application.
+    ///   Only applications that need this ability should request the background
+    ///   frames policy. The "Allow Background Apps" checkbox must be enabled in the
+    ///   Leap Motion Control Panel or this policy will be denied.
+    /// 
+    /// **POLICY_OPTIMIZE_HMD** -- request that the tracking be optimized for head-mounted
+    ///   tracking.
+    /// 
+    ///   The optimize HMD policy improves tracking in situations where the Leap
+    ///   Motion hardware is attached to a head-mounted display. This policy is
+    ///   not granted for devices that cannot be mounted to an HMD, such as
+    ///   Leap Motion controllers embedded in a laptop or keyboard.
+    /// 
+    /// Some policies can be denied if the user has disabled the feature on
+    /// their Leap Motion control panel.
+    /// 
+    /// @since 1.0
+    /// </summary>
+    public enum PolicyFlag
+    {
+        /// <summary>
+        /// The default policy.
+        /// </summary>
+        POLICY_DEFAULT = 0,
+        /// <summary>
+        /// Receive background frames.
+        /// </summary>
+        POLICY_BACKGROUND_FRAMES = (1 << 0),
+        /// <summary>
+        /// Allow streaming images.
+        /// </summary>
+        POLICY_IMAGES = (1 << 1),
+        /// <summary>
+        /// Optimize the tracking for head-mounted device.
+        /// </summary>
+        POLICY_OPTIMIZE_HMD = (1 << 2),
+        /// <summary>
+        /// Allow pausing and unpausing of the Leap Motion service.
+        /// </summary>
+        POLICY_ALLOW_PAUSE_RESUME = (1 << 3),
+        /// <summary>
+        /// Allow streaming map point
+        /// </summary>
+        POLICY_MAP_POINTS = (1 << 7),
+        /// <summary>
+        /// Optimize the tracking for screen-top device.
+        /// @since 5.0.0
+        /// </summary>
+        POLICY_OPTIMIZE_SCREENTOP = (1 << 8),
+    }
+
     public enum eLeapDeviceFlag : uint
     {
         /// <summary>

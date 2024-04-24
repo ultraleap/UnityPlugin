@@ -140,37 +140,46 @@ namespace Leap.Unity
 
         #region LeapC Implementation
 
-        static Controller _leapController;
-        static Controller LeapController
+        static LeapInternal.Connection _leapConnection;
+        static LeapInternal.Connection LeapConnection
         {
             get
             {
-                if (_leapController == null) // Find any existing controller
+                if (_leapConnection == null) // Find any existing controller
                 {
                     LeapServiceProvider provider = UnityEngine.Object.FindObjectOfType<LeapServiceProvider>(true);
 
-                    if (provider != null && provider.GetLeapController() != null)
+                    if (provider != null && provider.Connection != null)
                     {
-                        _leapController = provider.GetLeapController();
+                        _leapConnection = provider.Connection;
                     }
                     else // No leapserviceprovider, we should make a new controller ourselves
                     {
-                        _leapController = new Controller(0);
+                        _leapConnection = CreateConnection(0);
                     }
                 }
 
-                return _leapController;
+                return _leapConnection;
             }
             set
             {
-                _leapController = value;
+                _leapConnection = value;
             }
+        }
+
+        private static LeapInternal.Connection CreateConnection(int connectionKey, string serverNamespace = "Leap Service")
+        {
+            var _connection = LeapInternal.Connection.GetConnection(new LeapInternal.Connection.Key(connectionKey, serverNamespace));
+            _connection.EventContext = System.Threading.SynchronizationContext.Current;
+            _connection.Start(serverNamespace);
+
+            return _connection;
         }
 
         private static void SetupDeviceCallbacks()
         {
-            LeapController.Device -= NewLeapDevice;
-            LeapController.Device += NewLeapDevice;
+            LeapConnection.LeapDevice -= NewLeapDevice;
+            LeapConnection.LeapDevice += NewLeapDevice;
         }
 
         /// <summary>
@@ -183,9 +192,9 @@ namespace Leap.Unity
         private static void RequestHintsOnAllDevices(string[] hints)
         {
             // Send the hint to all devices
-            foreach (var device in LeapController.Devices.ActiveDevices)
+            foreach (var device in LeapConnection.Devices.ActiveDevices)
             {
-                LeapController.RequestHandTrackingHints(hints, device);
+                LeapConnection.RequestHandTrackingHintsOnDevice(device.Handle, hints);
             }
         }
 
