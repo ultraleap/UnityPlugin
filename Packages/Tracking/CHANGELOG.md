@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Anchors no longer require Interaction Engine
 - Turntable and Pullcord example scene now uses Physical Hands
 - Physical Hands Playground uses new PhysicalHandsButtons and Toggles
+- Grab Ball uses Physical Hands rather than Interaction Engine
 
 ### Fixed
 - 
