@@ -646,7 +646,7 @@ namespace Leap
         /// <param name="device">An optional specific Device, otherwise the first found will be used</param>
         public void RequestHandTrackingHints(string[] hints, Device device = null)
         {
-            if(device == null)
+            if (device == null)
             {
                 device = Devices.ActiveDevices.FirstOrDefault();
             }
@@ -861,6 +861,26 @@ namespace Leap
         public void GetInterpolatedFrameFromTime(Frame toFill, Int64 time, Int64 sourceTime, Device device = null)
         {
             _connection.GetInterpolatedFrameFromTime(toFill, time, sourceTime, device);
+        }
+
+        public UnityEngine.Matrix4x4 LeapExtrinsicCameraMatrix(Image.CameraType camera, Device device)
+        {
+            return _connection.LeapExtrinsicCameraMatrix(camera, device);
+        }
+
+        public UnityEngine.Vector3 RectilinearToPixel(Image.CameraType camera, UnityEngine.Vector3 ray)
+        {
+            return _connection.RectilinearToPixel(camera, ray);
+        }
+
+        public UnityEngine.Vector3 RectilinearToPixelEx(Image.CameraType camera, UnityEngine.Vector3 ray, Device device)
+        {
+            return _connection.RectilinearToPixelEx(device.Handle, camera, ray);
+        }
+
+        public UnityEngine.Vector3 PixelToRectilinearEx(Image.CameraType camera, UnityEngine.Vector3 pixel, Device device)
+        {
+            return _connection.PixelToRectilinearEx(device.Handle, camera, pixel);
         }
 
         /// <summary>

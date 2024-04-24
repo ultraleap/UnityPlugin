@@ -98,9 +98,9 @@ namespace Leap.Unity.PhysicalHands
             {
                 Rigidbody rbody = GetComponent<Rigidbody>();
 
-                if(rbody != null)
+                if (rbody != null)
                 {
-                    if(GrabHelper.Instance.TryGetGrabHelperObjectFromRigid(rbody, out _grabHelperObject))
+                    if (GrabHelper.Instance.TryGetGrabHelperObjectFromRigid(rbody, out _grabHelperObject))
                     {
                         _grabHelperObject._ignorePhysicalHands = this;
 
@@ -130,7 +130,7 @@ namespace Leap.Unity.PhysicalHands
         /// </summary>
         void OnDisable()
         {
-            SetAllHandCollisions(forceEnable : true);
+            SetAllHandCollisions(forceEnable: true);
         }
 
         private void OnDestroy()
@@ -199,11 +199,11 @@ namespace Leap.Unity.PhysicalHands
         {
             bool shouldDisableCollisionWithHand = false;
 
-            if(forceEnable) // Force the collision to be enabled
+            if (forceEnable) // Force the collision to be enabled
             {
                 shouldDisableCollisionWithHand = false;
             }
-            else if(forceDisable) // Force the collision to be disabled
+            else if (forceDisable) // Force the collision to be disabled
             {
                 shouldDisableCollisionWithHand = true;
             }
@@ -219,7 +219,7 @@ namespace Leap.Unity.PhysicalHands
 
                 foreach (var objectCollider in GetComponentsInChildren<Collider>(true))
                 {
-                    if ((disableOnParent && objectCollider.gameObject == gameObject) || 
+                    if ((disableOnParent && objectCollider.gameObject == gameObject) ||
                         (disableOnChild && objectCollider.gameObject != gameObject))
                     {
                         IgnoreCollisionOnAllHandBones(contactHand, objectCollider, true);
