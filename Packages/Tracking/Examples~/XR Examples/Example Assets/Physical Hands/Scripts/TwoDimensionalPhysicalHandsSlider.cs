@@ -245,6 +245,7 @@ namespace Leap.Unity.PhysicalHandsExamples
 
             slidePos = _slideableObject.transform.localRotation * slidePos;
 
+
             // Reset velocity to zero and update the position of the slider object
             _slideableObjectRigidbody.velocity = Vector3.zero;
             _slideableObjectRigidbody.transform.localPosition = slidePos;
@@ -381,7 +382,7 @@ namespace Leap.Unity.PhysicalHandsExamples
         {
             Vector3 changeFromZero = Vector3.zero;
             changeFromZero.x = _slideableObject.transform.localPosition.x - _sliderXZeroPos;
-            changeFromZero.z = _slideableObject.transform.localPosition.x - _sliderXZeroPos;
+            changeFromZero.z = _slideableObject.transform.localPosition.z - _sliderZZeroPos;
 
             return new Vector3(
                 Utils.Map(changeFromZero.x, 0, _localTwoDimSliderTravelDistanceHalf.x * 2, 0, 1),
