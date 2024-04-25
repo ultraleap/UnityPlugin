@@ -20,7 +20,13 @@ namespace Leap.Unity.PhysicalHandsExamples
 
         public override void OnInspectorGUI()
         {
-            //EditorUtils.DrawScriptField((MonoBehaviour)target);
+            EditorUtils.DrawScriptField((MonoBehaviour)target);
+
+            if (target._slideableObject.transform.localRotation != Quaternion.identity)
+            {
+                EditorGUILayout.HelpBox("Warning! Slideable object cannot be rotated. This will cause unexpected behaviour. \n " +
+                    "Please rotate the slider instead, leaving slideable object rotation 0,0,0", MessageType.Warning);
+            }
 
             EditorGUILayout.PropertyField(serializedObject.FindProperty("_slideableObject"), new GUIContent("Slideable Object: ", "The GameObject that acts as the slider."));
 

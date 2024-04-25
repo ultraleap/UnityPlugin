@@ -20,7 +20,7 @@ namespace Leap.Unity.PhysicalHandsExamples
     public class TwoDimensionalPhysicalHandsSlider : MonoBehaviour
     {
         [SerializeField, OnEditorChange("AutoAssignConnectedButton")]
-        GameObject _slideableObject;
+        public GameObject _slideableObject;
 
         public UnityEvent<Vector2> TwoDimSliderChangeEvent = new UnityEvent<Vector2>();
         public UnityEvent<Vector2> TwoDimSliderButtonPressedEvent = new UnityEvent<Vector2>();
@@ -147,6 +147,11 @@ namespace Leap.Unity.PhysicalHandsExamples
                 Debug.LogWarning("There is no slideable object. Please add one to use the slider. \n This script has been disabled", this.gameObject);
                 this.enabled = false;
                 return;
+            }
+            if (_slideableObject.transform.localRotation != Quaternion.identity)
+            {
+                Debug.LogWarning("Warning! Slideable object cannot be rotated. This will cause unexpected behaviour. \n " +
+                    "Please rotate the slider instead, leaving slideable object rotation 0,0,0", _slideableObject);
             }
 
             ConfigureSlideableObject();
