@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.SceneManagement;
 
 namespace Leap
 {
@@ -67,7 +68,7 @@ namespace Leap
             Analytics analytics = new Analytics();
             analytics.telemetry = new Telemetry();
 
-            analytics.telemetry.app_name = Application.productName;
+            analytics.telemetry.app_name = GetAppName();
             analytics.telemetry.app_type = GetAppType();
             analytics.telemetry.engine_name = "Unity";
             analytics.telemetry.engine_version = Application.unityVersion;
@@ -89,6 +90,18 @@ namespace Leap
 #endif
 
             return appType;
+        }
+
+        static string GetAppName()
+        {
+            string appName = Application.productName;
+
+            if(appName == "Unity" || appName == "Unity.exe") // If we get a useless "UNITY" name, add some extra info about the scene
+            {
+                appName = "Unity Scene: " + SceneManager.GetActiveScene().name;
+            }
+
+            return appName;
         }
 
         static string GetRenderPipeline()
@@ -124,12 +137,31 @@ namespace Leap
                 return "Interaction Engine";
             }
 
+            // XRI
+            if(GameObject.Find("Complete XR Origin Hands Set Up") ||
+                GameObject.Find("Complete XR Origin Set Up") ||
+                GameObject.Find("Poke Interactor"))
+            {
+                return "XRI";
+            }
+
             // XR Hands
             if (Leap.Unity.UltraleapSettings.Instance.leapSubsystemEnabled ||
                 Leap.Unity.UltraleapSettings.Instance.updateLeapInputSystem ||
                 Leap.Unity.UltraleapSettings.Instance.updateMetaInputSystem)
             {
                 return "UL XR Hands";
+            }
+
+            if(GameObject.Find("Hand Visualizer"))
+            {
+                return "XR Hands";
+            }
+
+            // MRTK
+            if(GameObject.Find("MRTK Interaction Manager"))
+            {
+                return "MRTK";
             }
 
             return "Unknown";
