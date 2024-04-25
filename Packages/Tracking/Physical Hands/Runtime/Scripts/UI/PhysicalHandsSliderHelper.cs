@@ -1,6 +1,12 @@
+/******************************************************************************
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
+ *                                                                            *
+ * Use subject to the terms of the Apache License 2.0 available at            *
+ * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
+ * between Ultraleap and you, your company or other organization.             *
+ ******************************************************************************/
+
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 
@@ -10,7 +16,7 @@ namespace Leap.Unity.PhysicalHands
     /// This class is purely to get events from the slideable object.
     /// You do not need to add this class to your object, it will be added automatically by the slider.
     /// </summary>
-    public class PhysicalHandsSlideHelper : MonoBehaviour, IPhysicalHandGrab, IPhysicalHandContact
+    public class PhysicalHandsSliderHelper : MonoBehaviour, IPhysicalHandGrab, IPhysicalHandContact
     {
         public Action<ContactHand> _onHandGrab;
         public Action<ContactHand> _onHandGrabExit;
