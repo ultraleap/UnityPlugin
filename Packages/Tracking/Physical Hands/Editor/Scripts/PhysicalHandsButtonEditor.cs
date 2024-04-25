@@ -31,28 +31,30 @@ namespace Leap.Unity.PhysicalHands
                 EditorGUI.indentLevel = 0;
             }
 
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("_whichHandCanPressButton"), new GUIContent("Which Hand Can Activate Button Presses", "Specifies which hand(s) can press the button."));
+
+
             EditorGUILayout.Space(5);
 
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("_automaticTravelDistance"), new GUIContent("Use Automatic Travel Distance", "Travel distance should be calculated based on how far the pressable object is from this object"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("_automaticTravelDistance"), new GUIContent("Use Automatic Travel Distance", "Travel distance will be calculated automaticall based on how far the pressable object is from this object"));
             
             if (!serializedObject.FindProperty("_automaticTravelDistance").boolValue)
             {
                 EditorGUI.indentLevel = 1;
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("_buttonTravelDistance"), new GUIContent("Button Travel Distance", "The distance the button can travel when pressed."));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("_buttonTravelDistance"), new GUIContent("Button Travel Distance", "The distance the button can travel before it is pressed."));
                 EditorGUI.indentLevel = 0;
             }
 
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("Button Unpress Threshold");
-            serializedObject.FindProperty("_buttonPressExitThreshold").floatValue = 
-                EditorGUILayout.Slider(serializedObject.FindProperty("_buttonPressExitThreshold").floatValue, 0, 1);
+            //EditorGUILayout.LabelField("Button Unpress Threshold");
+            EditorGUILayout.Slider(serializedObject.FindProperty("_buttonPressExitThreshold"), 0, 1, new GUIContent("Button Exit Threshold", "How far up should the button travel before it is considered unpressed. " +
+                "\n \n The higher the value, the less it needs to be lifted before being considered unpressed. i.e. at 0.8, the button will unpress at 80% of its full travel distance"));
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.Space(5);
 
             EditorGUILayout.PropertyField(serializedObject.FindProperty("_canBePressedByObjects"), new GUIContent("Can Be Pressed By Objects", "Determines whether the button can be pressed by objects which are not the hand."));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("_buttonIgnoreGrabs"), new GUIContent("Ignore Grabbing Button", "Specifies whether grabs should be ignored on the Pressable Object."));
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("_whichHandCanPressButton"), new GUIContent("Which Hand Can Activate Button Presses", "Specifies which hand(s) can press the button."));
 
             EditorGUILayout.Space(10);
 
