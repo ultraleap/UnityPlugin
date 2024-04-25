@@ -7,7 +7,7 @@
  ******************************************************************************/
 
 using LeapInternal;
-
+using System;
 using UnityEngine;
 
 namespace Leap.Unity
@@ -28,8 +28,11 @@ namespace Leap.Unity
 
         LeapTransform trackerPosWorldSpace;
 
-        Vector3 targetPos;
-        Quaternion targetRot;
+        public Vector3 TargetPos { get { return targetPos; } }
+        public Quaternion TargetRot { get { return targetRot; } }
+
+        private Vector3 targetPos;
+        private Quaternion targetRot;
 
         private void Start()
         {
@@ -99,6 +102,7 @@ namespace Leap.Unity
             targetPos = markerPos + posOffset;
             targetRot = markerRot * Quaternion.Inverse(rotOffset);
         }
+
 
         private void Update()
         {
