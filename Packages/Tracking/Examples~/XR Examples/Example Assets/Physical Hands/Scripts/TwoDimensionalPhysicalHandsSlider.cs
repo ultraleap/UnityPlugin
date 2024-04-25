@@ -26,7 +26,6 @@ namespace Leap.Unity.PhysicalHandsExamples
         public UnityEvent<Vector2> TwoDimSliderButtonPressedEvent = new UnityEvent<Vector2>();
         public UnityEvent<Vector2> TwoDimSliderButtonUnPressedEvent = new UnityEvent<Vector2>();
 
-
         /// <summary>
         /// The travel distance of the two-dimensional slider.
         /// i.e. slider center point +/- slider travel distance (or half the full travel of the slider) in both X and Y axes.
@@ -45,7 +44,7 @@ namespace Leap.Unity.PhysicalHandsExamples
         public Vector2 _startPosition = Vector2.zero;
 
         [SerializeField]
-        private PhysicalHandsButton _connectedButton;
+        public PhysicalHandsButton _connectedButton;
 
         private bool _freezeIfNotActive = true;
 
@@ -406,14 +405,8 @@ namespace Leap.Unity.PhysicalHandsExamples
             // Determine the slider type and direction
 
             // Snap to segments on X and Z axes
-            if (_numberOfSegments.x != 0)
-            {
-                twoDimValue.x = GetClosestStep(_sliderValue.x, (int)_numberOfSegments.x);
-            }
-            if (_numberOfSegments.y != 0)
-            {
-                twoDimValue.y = GetClosestStep(_sliderValue.z, (int)_numberOfSegments.y);
-            }
+            twoDimValue.x = GetClosestStep(_sliderValue.x, (int)_numberOfSegments.x);
+            twoDimValue.y = GetClosestStep(_sliderValue.z, (int)_numberOfSegments.y);
 
             // Update the slider position
             UpdateSliderPos(twoDimValue);
@@ -455,11 +448,7 @@ namespace Leap.Unity.PhysicalHandsExamples
         void SnapSliderOnRelease()
         {
             // Snap to segment if applicable
-
-            if (_numberOfSegments.x != 0 || _numberOfSegments.y != 0)
-            {
-                SnapToSegment();
-            }
+            SnapToSegment();
 
             // Calculate the slider value based on the change in position
             _sliderValue = CalculateSliderValue();
@@ -559,6 +548,11 @@ namespace Leap.Unity.PhysicalHandsExamples
 
         private void OnDrawGizmosSelected()
         {
+            if (_slideableObject == null)
+            {
+                return;
+            }
+
             MakeLocalSliderScales();
             DrawJointRangeGizmo();
         }
@@ -583,7 +577,6 @@ namespace Leap.Unity.PhysicalHandsExamples
 
             DrawBoxGizmo(jointPosition, extents, Color.cyan);
         }
-
 
         private void DrawBoxGizmo(Vector3 position, Vector3 size, Color color)
         {

@@ -9,7 +9,6 @@
 using UnityEngine;
 using UnityEditor;
 using System.Linq;
-using Leap.Unity;
 
 namespace Leap.Unity.PhysicalHandsExamples
 {
@@ -22,13 +21,19 @@ namespace Leap.Unity.PhysicalHandsExamples
         {
             EditorUtils.DrawScriptField((MonoBehaviour)target);
 
-            if (target._slideableObject.transform.localRotation != Quaternion.identity)
+            if (target._slideableObject != null && target._slideableObject.transform.localRotation != Quaternion.identity)
             {
                 EditorGUILayout.HelpBox("Warning! Slideable object cannot be rotated. This will cause unexpected behaviour. \n " +
                     "Please rotate the slider instead, leaving slideable object rotation 0,0,0", MessageType.Warning);
             }
 
             EditorGUILayout.PropertyField(serializedObject.FindProperty("_slideableObject"), new GUIContent("Slideable Object: ", "The GameObject that acts as the slider."));
+
+            if (target._slideableObject != null)
+            {
+                // Connected Button
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("_connectedButton"), new GUIContent("Connected Button", "The button that interacts with the slider."));
+            }
 
             EditorGUILayout.Space(5);
             serializedObject.FindProperty("SliderTravelDistance").vector2Value = CreateVector2AxisAttribute("Slider Travel Distance: ", "SliderTravelDistance", "The travel distance of the slider (from the central point).");
@@ -37,21 +42,20 @@ namespace Leap.Unity.PhysicalHandsExamples
             EditorGUILayout.Space(20);
             serializedObject.FindProperty("_numberOfSegments").vector2Value = CreateVector2AxisAttribute("Number of Segments: ", "_numberOfSegments", "Number of segments for the slider to use (0 = unlimited).");
 
-            // Connected Button
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("_connectedButton"), new GUIContent("Connected Button", "The button that interacts with the slider."));
-
-            EditorGUILayout.Space(20);
+            EditorGUILayout.Space(5);
 
             // Slider Events
             eventsFoldedOut = EditorGUILayout.BeginFoldoutHeaderGroup(eventsFoldedOut, "Slider Events");
 
             if (eventsFoldedOut)
             {
-
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("TwoDimSliderChangeEvent"), new GUIContent("Slider Change Event", "Event triggered when the slider value changes."));
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("TwoDimSliderButtonPressedEvent"), new GUIContent("Slider Button Pressed Event", "Event triggered when the slider button is pressed."));
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("TwoDimSliderButtonUnPressedEvent"), new GUIContent("Slider Button Unpressed Event", "Event triggered when the slider button is released."));
 
+                if (target._connectedButton != null)
+                {
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("TwoDimSliderButtonPressedEvent"), new GUIContent("Slider Button Pressed Event", "Event triggered when the slider button is pressed."));
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("TwoDimSliderButtonUnPressedEvent"), new GUIContent("Slider Button Unpressed Event", "Event triggered when the slider button is released."));
+                }
             }
 
             EditorGUILayout.EndFoldoutHeaderGroup();

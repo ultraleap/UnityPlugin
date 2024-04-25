@@ -53,7 +53,7 @@ namespace Leap.Unity.PhysicalHands
         private Quaternion _initialRotation;
 
         [SerializeField]
-        private PhysicalHandsButton _connectedButton;
+        public PhysicalHandsButton _connectedButton;
         private Rigidbody _slideableObjectRigidbody;
         private ConfigurableJoint _configurableJoint;
 
@@ -504,11 +504,7 @@ namespace Leap.Unity.PhysicalHands
         private void SnapSliderOnRelease()
         {
             // Snap to segment if applicable
-
-            if (_numberOfSegments != 0)
-            {
-                SnapToSegment();
-            }
+            SnapToSegment();
 
             // Calculate the slider value based on the change in position
             _sliderValue = CalculateSliderValue();
@@ -616,6 +612,11 @@ namespace Leap.Unity.PhysicalHands
 
         private void OnDrawGizmosSelected()
         {
+            if(_slideableObject == null)
+            {
+                return;
+            }
+
             MakeLocalSliderScales();
             DrawJointRangeGizmo();
         }
