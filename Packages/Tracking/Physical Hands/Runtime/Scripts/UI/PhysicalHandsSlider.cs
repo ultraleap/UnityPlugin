@@ -1,7 +1,13 @@
+/******************************************************************************
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
+ *                                                                            *
+ * Use subject to the terms of the Apache License 2.0 available at            *
+ * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
+ * between Ultraleap and you, your company or other organization.             *
+ ******************************************************************************/
+
 using Leap.Unity.Attributes;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -135,9 +141,6 @@ namespace Leap.Unity.PhysicalHands
 
         #region Set Up
 
-        /// <summary>
-        /// Initialize the slider, setting up the configurable joints, setting the start position and working out slider values
-        /// </summary>
         private void Initialize()
         {
             MakeLocalSliderScales();
@@ -187,10 +190,10 @@ namespace Leap.Unity.PhysicalHands
         /// </summary>
         private void ConfigureSlideableObject()
         {
-            PhysicalHandsSlideHelper slideHelper;
-            if (!_slideableObject.TryGetComponent<PhysicalHandsSlideHelper>(out slideHelper))
+            PhysicalHandsSliderHelper slideHelper;
+            if (!_slideableObject.TryGetComponent<PhysicalHandsSliderHelper>(out slideHelper))
             {
-                slideHelper = _slideableObject.AddComponent<PhysicalHandsSlideHelper>();
+                slideHelper = _slideableObject.AddComponent<PhysicalHandsSliderHelper>();
             }
 
             slideHelper._onHandGrab += OnHandGrab;
@@ -380,40 +383,7 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
-
         #endregion
-
-        private void OnDrawGizmosSelected()
-        {
-            MakeLocalSliderScales();
-            DrawJointRangeGizmo();
-        }
-
-        /// <summary>
-        /// Draws gizmos representing the range of motion for the joint based on its type and direction.
-        /// </summary>
-        private void DrawJointRangeGizmo()
-        {
-            Vector3 jointPosition = _slideableObject.transform.localPosition;
-            Matrix4x4 m = _slideableObject.transform.localToWorldMatrix;
-            m.SetTRS(this.transform.position, m.rotation, m.lossyScale);
-            Gizmos.matrix = m;
-
-            float SliderTravelDistanceHalf = _sliderTravelDistance / 2;
-
-            switch (_sliderDirection)
-            {
-                case SliderDirection.X:
-                    Gizmos.color = Color.red; // X axis
-                    Gizmos.DrawLine(jointPosition + (Vector3.right * (SliderTravelDistanceHalf / _slideableObject.transform.lossyScale.x)), jointPosition - (Vector3.right * (SliderTravelDistanceHalf / _slideableObject.transform.lossyScale.x)));
-                    break;
-                case SliderDirection.Z:
-                    Gizmos.color = Color.blue; // Z axis
-                    Gizmos.DrawLine(jointPosition + (Vector3.forward * (SliderTravelDistanceHalf / _slideableObject.transform.lossyScale.z)), jointPosition - (Vector3.forward * (SliderTravelDistanceHalf / _slideableObject.transform.lossyScale.z)));
-                    break;
-            }
-        }
-
         #endregion
 
         #region Update
@@ -481,10 +451,10 @@ namespace Leap.Unity.PhysicalHands
             switch (_sliderDirection)
             {
                 case SliderDirection.X:
-                    closestStep = GetClosestStep(_sliderValue.x, _numberOfSegments);
+                    closestStep = GetClosestStep(_sliderValue.x, (int)_numberOfSegments);
                     break;
                 case SliderDirection.Z:
-                    closestStep = GetClosestStep(_sliderValue.z, _numberOfSegments);
+                    closestStep = GetClosestStep(_sliderValue.z, (int)_numberOfSegments);
                     break;
             }
 
@@ -636,7 +606,38 @@ namespace Leap.Unity.PhysicalHands
                     break;
             }
         }
-        
+
         #endregion
+
+        private void OnDrawGizmosSelected()
+        {
+            MakeLocalSliderScales();
+            DrawJointRangeGizmo();
+        }
+
+        /// <summary>
+        /// Draws gizmos representing the range of motion for the joint based on its type and direction.
+        /// </summary>
+        private void DrawJointRangeGizmo()
+        {
+            Vector3 jointPosition = _slideableObject.transform.localPosition;
+            Matrix4x4 m = _slideableObject.transform.localToWorldMatrix;
+            m.SetTRS(this.transform.position, m.rotation, m.lossyScale);
+            Gizmos.matrix = m;
+
+            float SliderTravelDistanceHalf = _sliderTravelDistance / 2;
+
+            switch (_sliderDirection)
+            {
+                case SliderDirection.X:
+                    Gizmos.color = Color.red; // X axis
+                    Gizmos.DrawLine(jointPosition + (Vector3.right * (SliderTravelDistanceHalf / _slideableObject.transform.lossyScale.x)), jointPosition - (Vector3.right * (SliderTravelDistanceHalf / _slideableObject.transform.lossyScale.x)));
+                    break;
+                case SliderDirection.Z:
+                    Gizmos.color = Color.blue; // Z axis
+                    Gizmos.DrawLine(jointPosition + (Vector3.forward * (SliderTravelDistanceHalf / _slideableObject.transform.lossyScale.z)), jointPosition - (Vector3.forward * (SliderTravelDistanceHalf / _slideableObject.transform.lossyScale.z)));
+                    break;
+            }
+        }
     }
 }

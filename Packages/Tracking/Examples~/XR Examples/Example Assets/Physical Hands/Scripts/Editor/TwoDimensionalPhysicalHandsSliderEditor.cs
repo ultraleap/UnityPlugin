@@ -1,5 +1,11 @@
-using System.Collections;
-using System.Collections.Generic;
+/******************************************************************************
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
+ *                                                                            *
+ * Use subject to the terms of the Apache License 2.0 available at            *
+ * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
+ * between Ultraleap and you, your company or other organization.             *
+ ******************************************************************************/
+
 using UnityEngine;
 using UnityEditor;
 using System.Linq;
@@ -20,10 +26,10 @@ namespace Leap.Unity.PhysicalHandsExamples
 
             EditorGUILayout.Space(5);
             serializedObject.FindProperty("SliderTravelDistance").vector2Value = CreateVector2AxisAttribute("Slider Travel Distance: ", "SliderTravelDistance", "The travel distance of the slider (from the central point).");
-            serializedObject.FindProperty("_twoDimStartPosition").vector2Value = CreateVector2AxisAttribute("Start Position: ", "_twoDimStartPosition", "The starting position of the slider.");
+            serializedObject.FindProperty("_startPosition").vector2Value = CreateVector2SliderAttribute("Start Position: ", "_startPosition", "The starting position of the slider.");
 
             EditorGUILayout.Space(20);
-            serializedObject.FindProperty("_twoDimNumberOfSegments").vector2Value = CreateVector2AxisAttribute("Number of Segments: ", "_twoDimNumberOfSegments", "Number of segments for the slider to use (0 = unlimited).");
+            serializedObject.FindProperty("_numberOfSegments").vector2Value = CreateVector2AxisAttribute("Number of Segments: ", "_numberOfSegments", "Number of segments for the slider to use (0 = unlimited).");
 
             // Connected Button
             EditorGUILayout.PropertyField(serializedObject.FindProperty("_connectedButton"), new GUIContent("Connected Button", "The button that interacts with the slider."));
@@ -76,6 +82,40 @@ namespace Leap.Unity.PhysicalHandsExamples
                 serializedObject.FindProperty(property).vector2Value.y,
                 GUILayout.ExpandWidth(true),
                 GUILayout.MinWidth(100)
+            );
+            EditorGUIUtility.labelWidth = 0;
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUI.indentLevel = 0;
+
+            return result;
+        }
+
+        private Vector2 CreateVector2SliderAttribute(string label, string property, string tooltip)
+        {
+            Vector2 result = Vector2.zero;
+            var enumName = "XZ";
+
+            EditorGUILayout.LabelField(label, EditorStyles.boldLabel);
+            GUILayout.FlexibleSpace();
+            EditorGUIUtility.labelWidth = 50;
+            EditorGUI.indentLevel = 1;
+
+            // Slider Precentage X (first element)
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("" + enumName.ElementAt(0) + " Axis:");
+            result.x = EditorGUILayout.Slider(
+                serializedObject.FindProperty(property).vector2Value.x,
+                0,1
+            );
+            EditorGUILayout.EndHorizontal();
+
+            // Slider Precentage Y (second element)
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("" + enumName.ElementAt(1) + " Axis:");
+            result.y = EditorGUILayout.Slider(
+                serializedObject.FindProperty(property).vector2Value.y,
+                0,1
             );
             EditorGUIUtility.labelWidth = 0;
             EditorGUILayout.EndHorizontal();
