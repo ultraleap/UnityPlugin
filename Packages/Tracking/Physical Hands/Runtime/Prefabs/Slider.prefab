@@ -116,7 +116,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _slideableObject: {fileID: 8402712650214517380}
-  _sliderType: 0
   _sliderDirection: 0
   SliderChangeEvent:
     m_PersistentCalls:
@@ -127,25 +126,12 @@ MonoBehaviour:
   SliderButtonUnPressedEvent:
     m_PersistentCalls:
       m_Calls: []
-  TwoDimSliderChangeEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  TwoDimSliderButtonPressedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  TwoDimSliderButtonUnPressedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  SliderTravelDistance: 0.22
-  TwoDimSliderTravelDistance: {x: 0.1, y: 0.01}
+  _sliderTravelDistance: 0.4
   _numberOfSegments: 0
-  _twoDimNumberOfSegments: {x: 0, y: 0}
   _startPosition: 0.5
-  _twoDimStartPosition: {x: 0, y: 0}
   _axisChangeFromZero: {x: 0, y: 0, z: 0}
-  _connectedButton: {fileID: 8216536195087636660}
   _sliderValue: {x: 0, y: 0, z: 0}
-  localTwoDimSliderTravelDistance: {x: 0.22, y: 0.22}
+  _connectedButton: {fileID: 8216536195087636660}
 --- !u!1 &3123228626684123901
 GameObject:
   m_ObjectHideFlags: 0
@@ -301,11 +287,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6504037249797295763, guid: 43eaa06112baf304ba03b0e3634d568d, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.04
+      value: 0.03
       objectReference: {fileID: 0}
     - target: {fileID: 6504037249797295763, guid: 43eaa06112baf304ba03b0e3634d568d, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.04
+      value: 0.03
       objectReference: {fileID: 0}
     - target: {fileID: 6504037249797295763, guid: 43eaa06112baf304ba03b0e3634d568d, type: 3}
       propertyPath: m_LocalPosition.x
@@ -373,6 +359,102 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 6504037249797295756, guid: 43eaa06112baf304ba03b0e3634d568d, type: 3}
   m_PrefabInstance: {fileID: 3377301465149481992}
   m_PrefabAsset: {fileID: 0}
+--- !u!153 &1813946687
+ConfigurableJoint:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8402712650214517380}
+  m_ConnectedBody: {fileID: 3123228626017199011}
+  m_ConnectedArticulationBody: {fileID: 0}
+  m_Anchor: {x: 0, y: 0, z: 0}
+  m_Axis: {x: 1, y: 0, z: 0}
+  m_AutoConfigureConnectedAnchor: 1
+  m_ConnectedAnchor: {x: 0, y: -0.000000013038514, z: 8.881784e-16}
+  serializedVersion: 2
+  m_SecondaryAxis: {x: 0, y: 1, z: 0}
+  m_XMotion: 1
+  m_YMotion: 0
+  m_ZMotion: 0
+  m_AngularXMotion: 0
+  m_AngularYMotion: 0
+  m_AngularZMotion: 0
+  m_LinearLimitSpring:
+    spring: 0
+    damper: 0
+  m_LinearLimit:
+    limit: 0.21000001
+    bounciness: 0
+    contactDistance: 0
+  m_AngularXLimitSpring:
+    spring: 0
+    damper: 0
+  m_LowAngularXLimit:
+    limit: 0
+    bounciness: 0
+    contactDistance: 0
+  m_HighAngularXLimit:
+    limit: 0
+    bounciness: 0
+    contactDistance: 0
+  m_AngularYZLimitSpring:
+    spring: 0
+    damper: 0
+  m_AngularYLimit:
+    limit: 0
+    bounciness: 0
+    contactDistance: 0
+  m_AngularZLimit:
+    limit: 0
+    bounciness: 0
+    contactDistance: 0
+  m_TargetPosition: {x: 0, y: 0, z: 0}
+  m_TargetVelocity: {x: 0, y: 0, z: 0}
+  m_XDrive:
+    serializedVersion: 3
+    positionSpring: 0
+    positionDamper: 10
+    maximumForce: 2
+  m_YDrive:
+    serializedVersion: 3
+    positionSpring: 0
+    positionDamper: 10
+    maximumForce: 2
+  m_ZDrive:
+    serializedVersion: 3
+    positionSpring: 0
+    positionDamper: 10
+    maximumForce: 2
+  m_TargetRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_TargetAngularVelocity: {x: 0, y: 0, z: 0}
+  m_RotationDriveMode: 0
+  m_AngularXDrive:
+    serializedVersion: 3
+    positionSpring: 0
+    positionDamper: 0
+    maximumForce: 3.4028233e+38
+  m_AngularYZDrive:
+    serializedVersion: 3
+    positionSpring: 0
+    positionDamper: 0
+    maximumForce: 3.4028233e+38
+  m_SlerpDrive:
+    serializedVersion: 3
+    positionSpring: 0
+    positionDamper: 0
+    maximumForce: 3.4028233e+38
+  m_ProjectionMode: 1
+  m_ProjectionDistance: 0.1
+  m_ProjectionAngle: 180
+  m_ConfiguredInWorldSpace: 0
+  m_SwapBodies: 0
+  m_BreakForce: Infinity
+  m_BreakTorque: Infinity
+  m_EnableCollision: 0
+  m_EnablePreprocessing: 1
+  m_MassScale: 1
+  m_ConnectedMassScale: 1
 --- !u!153 &9051524192433599047
 ConfigurableJoint:
   m_ObjectHideFlags: 0
@@ -398,7 +480,7 @@ ConfigurableJoint:
     spring: 0
     damper: 0
   m_LinearLimit:
-    limit: 0.23
+    limit: 0.21000001
     bounciness: 0
     contactDistance: 0
   m_AngularXLimitSpring:
