@@ -49,7 +49,8 @@ namespace Leap.Unity.PhysicalHandsExamples
         private bool _freezeIfNotActive = true;
 
         [SerializeField]
-        private Vector3 _sliderValue = Vector3.zero;
+        private Vector2 _sliderValue = Vector2.zero;
+        public Vector2 SliderValue => _sliderValue;
 
         private Rigidbody _slideableObjectRigidbody;
         private List<ConfigurableJoint> _configurableJoints = new List<ConfigurableJoint>();
@@ -57,20 +58,11 @@ namespace Leap.Unity.PhysicalHandsExamples
         private float _sliderXZeroPos = 0;
         private float _sliderZZeroPos = 0;
 
-        private Vector3 _prevSliderValue = Vector3.zero;
+        private Vector2 _prevSliderValue = Vector2.zero;
 
         private Quaternion _initialRotation;
 
         private Vector2 _localTwoDimSliderTravelDistanceHalf;
-
-        /// <summary>
-        /// Use this to get the slider value on all axes.
-        /// </summary>
-        /// <returns>Vector3 ofslider values.</returns>
-        public Dictionary<char, float> GetSliderValue()
-        {
-            return new Dictionary<char, float>() { { 'x', _sliderValue.x }, { 'z', _sliderValue.z } };
-        }
 
         #region Unity Methods
 
@@ -112,7 +104,7 @@ namespace Leap.Unity.PhysicalHandsExamples
             if (_prevSliderValue != _sliderValue)
             {
                 // Send slider change event
-                SendSliderEvent(TwoDimSliderChangeEvent);
+                TwoDimSliderChangeEvent?.Invoke(_sliderValue);
             }
 
             _prevSliderValue = _sliderValue;
@@ -385,16 +377,15 @@ namespace Leap.Unity.PhysicalHandsExamples
         /// </summary>
         /// <param name="changeFromZero">Change in position from zero position.</param>
         /// <returns>The calculated slider value.</returns>
-        private Vector3 CalculateSliderValue()
+        private Vector2 CalculateSliderValue()
         {
-            Vector3 changeFromZero = Vector3.zero;
+            Vector2 changeFromZero = Vector2.zero;
             changeFromZero.x = _slideableObject.transform.localPosition.x - _sliderXZeroPos;
-            changeFromZero.z = _slideableObject.transform.localPosition.z - _sliderZZeroPos;
+            changeFromZero.y = _slideableObject.transform.localPosition.z - _sliderZZeroPos;
 
-            return new Vector3(
+            return new Vector2(
                 Utils.Map(changeFromZero.x, 0, _localTwoDimSliderTravelDistanceHalf.x * 2, 0, 1),
-                0,
-                Utils.Map(changeFromZero.z, 0, _localTwoDimSliderTravelDistanceHalf.y * 2, 0, 1));
+                Utils.Map(changeFromZero.y, 0, _localTwoDimSliderTravelDistanceHalf.y * 2, 0, 1));
         }
 
         /// <summary>
@@ -409,7 +400,7 @@ namespace Leap.Unity.PhysicalHandsExamples
 
             // Snap to segments on X and Z axes
             twoDimValue.x = GetClosestStep(_sliderValue.x, (int)_numberOfSegments.x);
-            twoDimValue.y = GetClosestStep(_sliderValue.z, (int)_numberOfSegments.y);
+            twoDimValue.y = GetClosestStep(_sliderValue.y, (int)_numberOfSegments.y);
 
             // Update the slider position
             UpdateSliderPos(twoDimValue);
@@ -460,7 +451,7 @@ namespace Leap.Unity.PhysicalHandsExamples
             if (_prevSliderValue != _sliderValue)
             {
                 // Send slider change event
-                SendSliderEvent(TwoDimSliderChangeEvent);
+                TwoDimSliderChangeEvent?.Invoke(_sliderValue);
             }
 
             _prevSliderValue = _sliderValue;
@@ -491,7 +482,7 @@ namespace Leap.Unity.PhysicalHandsExamples
         {
             UnFreezeSliderPosition();
 
-            SendSliderEvent(TwoDimSliderButtonPressedEvent);
+            TwoDimSliderButtonPressedEvent?.Invoke(_sliderValue);
         }
 
         private void ButtonUnPressed()
@@ -503,7 +494,7 @@ namespace Leap.Unity.PhysicalHandsExamples
 
             SnapSliderOnRelease();
 
-            SendSliderEvent(TwoDimSliderButtonUnPressedEvent);
+            TwoDimSliderButtonUnPressedEvent?.Invoke(_sliderValue);
         }
 
         public void OnHandGrab(ContactHand hand)
@@ -534,17 +525,6 @@ namespace Leap.Unity.PhysicalHandsExamples
             }
 
             SnapSliderOnRelease();
-        }
-
-        /// <summary>
-        /// Standardised event to send any sort of value events. 
-        /// If you know which event will be used then only send the relevant event with the other being null.
-        /// Invoke by passing the correct type of event.
-        /// </summary>
-        /// <param name="twoDimUnityEvent"></param>
-        void SendSliderEvent(UnityEvent<Vector2> twoDimCurEvent)
-        {
-            twoDimCurEvent?.Invoke(new Vector2(_sliderValue.x, _sliderValue.z));
         }
 
         #endregion
