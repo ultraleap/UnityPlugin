@@ -13,6 +13,7 @@ namespace LeapInternal
     using System.Collections.Generic;
     using System.Runtime.InteropServices;
     using System.Threading;
+    using UnityEngine;
 
     public class Connection
     {
@@ -880,7 +881,7 @@ namespace LeapInternal
             UInt64 clearFlags = (ulong)FlagForPolicy(clear);
             eLeapRS result;
 
-            if(device != null && Controller.CheckRequiredServiceVersion(MinServiceVersionForMultiModeSupport, this))
+            if (device != null && Controller.CheckRequiredServiceVersion(MinServiceVersionForMultiModeSupport, this))
             {
                 result = LeapC.SetPolicyFlagsEx(_leapConnection, device.Handle, setFlags, clearFlags);
             }
@@ -1195,11 +1196,7 @@ namespace LeapInternal
             return new UnityEngine.Vector3(ray.x, ray.y, ray.z);
         }
 
-        /// <summary>
-        /// Converts from image-space pixel coordinates to camera-space rectilinear coordinates
-        /// 
-        /// Also allows specifying a specific device handle and calibration type.
-        /// </summary>
+        [Obsolete("calibType is not necessary. Please use the alternative PixelToRectilinearEx method.")]
         public UnityEngine.Vector3 PixelToRectilinearEx(IntPtr deviceHandle,
                                            Image.CameraType camera, Image.CalibrationType calibType, UnityEngine.Vector3 pixel)
         {
@@ -1212,6 +1209,24 @@ namespace LeapInternal
                    (calibType == Image.CalibrationType.INFRARED ?
                    eLeapCameraCalibrationType.eLeapCameraCalibrationType_infrared :
                    eLeapCameraCalibrationType.eLeapCameraCalibrationType_visual),
+                   pixelStruct);
+            return new UnityEngine.Vector3(ray.x, ray.y, ray.z);
+        }
+
+        /// <summary>
+        /// Converts from image-space pixel coordinates to camera-space rectilinear coordinates
+        /// 
+        /// Also allows specifying a specific device handle and calibration type.
+        /// </summary>
+        public UnityEngine.Vector3 PixelToRectilinearEx(IntPtr deviceHandle,
+                                           Image.CameraType camera, UnityEngine.Vector3 pixel)
+        {
+            LEAP_VECTOR pixelStruct = new LEAP_VECTOR(pixel);
+            LEAP_VECTOR ray = LeapC.LeapPixelToRectilinearEx(_leapConnection,
+                   deviceHandle,
+                   (camera == Image.CameraType.LEFT ?
+                   eLeapPerspectiveType.eLeapPerspectiveType_stereo_left :
+                   eLeapPerspectiveType.eLeapPerspectiveType_stereo_right),
                    pixelStruct);
             return new UnityEngine.Vector3(ray.x, ray.y, ray.z);
         }
@@ -1300,6 +1315,48 @@ namespace LeapInternal
                 pm.ids[i] = unchecked((UInt32)ids[i]);
             }
             Marshal.FreeHGlobal(buffer);
+        }
+
+        /// <summary>
+        /// Request the Extrinsic Camera Matrix
+        /// </summary>
+        public Matrix4x4 LeapExtrinsicCameraMatrix(Image.CameraType camera, Device device)
+        {
+            float[] data = new float[16];
+
+            try
+            {
+                eLeapRS result = eLeapRS.eLeapRS_Success;
+
+                if (device != null)
+                {
+                    result = LeapC.LeapExtrinsicCameraMatrixEx(_leapConnection, device.Handle, camera == Image.CameraType.LEFT ?
+                       eLeapPerspectiveType.eLeapPerspectiveType_stereo_left :
+                       eLeapPerspectiveType.eLeapPerspectiveType_stereo_right, data);
+                }
+                else
+                {
+                    result = LeapC.LeapExtrinsicCameraMatrix(_leapConnection, camera == Image.CameraType.LEFT ?
+                       eLeapPerspectiveType.eLeapPerspectiveType_stereo_left :
+                       eLeapPerspectiveType.eLeapPerspectiveType_stereo_right, data);
+                }
+
+                if (result != eLeapRS.eLeapRS_Success)
+                {
+                    return new Matrix4x4(new Vector4(data[0], data[1], data[2], data[3]),
+                        new Vector4(data[4], data[5], data[6], data[7]),
+                        new Vector4(data[8], data[9], data[10], data[11]),
+                        new Vector4(data[12], data[13], data[14], data[15])
+                        );
+                }
+
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+            }
+
+            return Matrix4x4.identity;
         }
 
         /// <summary>

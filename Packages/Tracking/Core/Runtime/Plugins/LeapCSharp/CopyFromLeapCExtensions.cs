@@ -24,7 +24,7 @@ namespace LeapInternal
         {
             get
             {
-                if(!leapToUnityTransformSet)
+                if (!leapToUnityTransformSet)
                 {
                     leapToUnityTransform = new LeapTransform(Vector3.zero, Quaternion.identity, new Vector3(MM_TO_M, MM_TO_M, MM_TO_M));
                     leapToUnityTransform.MirrorZ();

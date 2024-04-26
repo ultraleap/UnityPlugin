@@ -4,7 +4,7 @@ using UnityEditor;
 
 namespace Leap.Examples
 {
-    public static class TabletopSampleDependencyImporter
+    public static class URPSampleDependencyImporter
     {
         [UnityEditor.Callbacks.DidReloadScripts]
         private static void CreateAssetWhenReady()
@@ -14,7 +14,7 @@ namespace Leap.Examples
                 SampleDependencyImporter.FindAndImportSampleDependencies
                 (
                     "com.ultraleap.tracking",
-                    "Tabletop Examples",
+                    "URP Examples",
                     new string[] { "Shared Example Assets REQUIRED" }
                 );
             };

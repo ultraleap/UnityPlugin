@@ -274,7 +274,7 @@ namespace Leap.Unity.Interaction
             set { s_instance = value; }
         }
 
-#endregion
+        #endregion
 
         #region Unity Events
 
