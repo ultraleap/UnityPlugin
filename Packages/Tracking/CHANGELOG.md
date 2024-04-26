@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - PhysicalHandsButton with automatic setup
 - PhysicalHandsButtonToggle
 - PhysicalHandsAnchorable, including anchoring and un-anchoring based on grabs
+- PhysicalHandsSlider
+- TwoDimensionalPhysicalHandsSlider example
 
 ### Changed
 - Removed old PhysicalHandsButton
