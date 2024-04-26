@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -71,7 +71,7 @@ namespace LeapInternal
 
             string[] serials = new string[lastDevices.Length];
 
-            for(int i = 0; i < lastDevices.Length; i++)
+            for (int i = 0; i < lastDevices.Length; i++)
             {
                 serials[i] = lastDevices[i].serial;
             }
@@ -82,12 +82,12 @@ namespace LeapInternal
         public static string GetDeviceType(string _serial)
         {
             GetStatus();
-            
-            if(lastDevices != null)
+
+            if (lastDevices != null)
             {
                 for (int i = 0; i < lastDevices.Length; i++)
                 {
-                    if(_serial == "" || _serial == lastDevices[i].serial)
+                    if (_serial == "" || _serial == lastDevices[i].serial)
                     {
                         return lastDevices[i].type;
                     }

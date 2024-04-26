@@ -227,7 +227,7 @@ namespace Leap.Unity
                 {
                     Device firstDevice = GetLeapController().Devices.ActiveDevices.FirstOrDefault();
 
-                    if(firstDevice != null)
+                    if (firstDevice != null)
                     {
                         connectToNewDevice(firstDevice);
                     }
@@ -911,7 +911,7 @@ namespace Leap.Unity
                 return;
             }
 
-            if(_multipleDeviceMode == MultipleDeviceMode.Disabled)
+            if (_multipleDeviceMode == MultipleDeviceMode.Disabled)
             {
                 _leapController = new Controller(0, _serverNameSpace);
             }
@@ -940,22 +940,22 @@ namespace Leap.Unity
 
             _onDeviceSafe += (d) =>
             {
-               if (_multipleDeviceMode == MultipleDeviceMode.Specific)
-               {
-                   if (SpecificSerialNumber != null && SpecificSerialNumber != "" && d.SerialNumber.Contains(SpecificSerialNumber))
-                   {
-                       connectToNewDevice(d, true);
-                   }
-               }
-               else if (_multipleDeviceMode == MultipleDeviceMode.Disabled)
-               {
+                if (_multipleDeviceMode == MultipleDeviceMode.Specific)
+                {
+                    if (SpecificSerialNumber != null && SpecificSerialNumber != "" && d.SerialNumber.Contains(SpecificSerialNumber))
+                    {
+                        connectToNewDevice(d, true);
+                    }
+                }
+                else if (_multipleDeviceMode == MultipleDeviceMode.Disabled)
+                {
                     connectToNewDevice(d);
                 }
                 else
-               {
-                   throw new NotImplementedException($"{nameof(MultipleDeviceMode)} case not implemented");
-               }
-           };
+                {
+                    throw new NotImplementedException($"{nameof(MultipleDeviceMode)} case not implemented");
+                }
+            };
 
 
             if (_leapController.IsConnected)
@@ -1098,7 +1098,7 @@ namespace Leap.Unity
                 return _trackingSource;
             }
 
-            if(HandTrackingSourceUtility.LeapCTrackingAvailable)
+            if (HandTrackingSourceUtility.LeapCTrackingAvailable)
             {
                 _trackingSource = TrackingSource.LEAPC;
             }

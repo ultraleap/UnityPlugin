@@ -210,7 +210,7 @@ namespace Leap.Unity
         [HideInInspector, SerializeField]
         public string pluginVersion = "Unknown";
         public string PluginVersion
-        { 
+        {
             get
             {
 #if UNITY_EDITOR

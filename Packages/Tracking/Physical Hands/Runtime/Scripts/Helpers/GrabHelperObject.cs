@@ -731,7 +731,7 @@ namespace Leap.Unity.PhysicalHands
 
         private void ClearGrabbingHands()
         {
-            for (int i = _grabbingHands.Count-1; i >= 0; i--)
+            for (int i = _grabbingHands.Count - 1; i >= 0; i--)
             {
                 UnregisterGrabbingHand(_grabbingHands[i]);
             }
@@ -754,7 +754,7 @@ namespace Leap.Unity.PhysicalHands
 
         private void UnregisterGrabbingHand(ContactHand hand)
         {
-            if(hand == null)
+            if (hand == null)
             {
                 return;
             }
@@ -1059,13 +1059,13 @@ namespace Leap.Unity.PhysicalHands
 
         private void ThrowingOnRelease()
         {
-            if(_rigid == null)
+            if (_rigid == null)
             {
                 return;
             }
 
             // You can't throw kinematic objects
-            if(_rigid.isKinematic)
+            if (_rigid.isKinematic)
             {
                 _velocityQueue.Clear();
                 return;
