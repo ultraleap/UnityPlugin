@@ -158,6 +158,7 @@ namespace Leap.Unity.PhysicalHands
                     "Please rotate the slider instead, leaving slideable object rotation 0,0,0", _slideableObject);
             }
 
+
             ConfigureSlideableObject();
 
             // Set up the slider based on its type
@@ -200,6 +201,17 @@ namespace Leap.Unity.PhysicalHands
             {
                 slideHelper = _slideableObject.AddComponent<PhysicalHandsSliderHelper>();
             }
+
+            switch(_sliderDirection)
+            {
+                case SliderDirection.X:
+                    _slideableObject.transform.localPosition = new Vector3(0, _slideableObject.transform.localPosition.y, _slideableObject.transform.localPosition.z);
+                    break;
+                case SliderDirection.Z:
+                    _slideableObject.transform.localPosition = new Vector3(_slideableObject.transform.localPosition.x, _slideableObject.transform.localPosition.y, 0);
+                    break;
+            }
+
 
             slideHelper._onHandGrab += OnHandGrab;
             slideHelper._onHandGrabExit += OnHandGrabExit;

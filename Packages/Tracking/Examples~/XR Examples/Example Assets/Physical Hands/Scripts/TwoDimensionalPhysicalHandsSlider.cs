@@ -69,7 +69,7 @@ namespace Leap.Unity.PhysicalHandsExamples
         /// <returns>Vector3 ofslider values.</returns>
         public Dictionary<char, float> GetSliderValue()
         {
-            return new Dictionary<char, float>() { { 'x', _sliderValue.x }, { 'z', _sliderValue.y } };
+            return new Dictionary<char, float>() { { 'x', _sliderValue.x }, { 'z', _sliderValue.z } };
         }
 
         #region Unity Methods
@@ -152,6 +152,8 @@ namespace Leap.Unity.PhysicalHandsExamples
                 Debug.LogWarning("Warning! Slideable object cannot be rotated. This will cause unexpected behaviour. \n " +
                     "Please rotate the slider instead, leaving slideable object rotation 0,0,0", _slideableObject);
             }
+
+            _slideableObject.transform.localPosition = new Vector3(0, _slideableObject.transform.localPosition.y, 0);
 
             ConfigureSlideableObject();
 
@@ -346,6 +348,7 @@ namespace Leap.Unity.PhysicalHandsExamples
             SoftJointLimit linerJointLimit = new SoftJointLimit();
             linerJointLimit.limit = SliderTravelDistance.x / 2;
             _configurableJoints.ElementAt(0).linearLimit = linerJointLimit;
+
             linerJointLimit.limit = SliderTravelDistance.y / 2;
             _configurableJoints.ElementAt(1).linearLimit = linerJointLimit;
 
@@ -369,8 +372,8 @@ namespace Leap.Unity.PhysicalHandsExamples
             // Get the current position of the slider object
             Vector3 slidePos = _slideableObject.transform.localPosition;
 
-            slidePos.x += Utils.Map(twoDimValue.x, 0, 1, 0, _localTwoDimSliderTravelDistanceHalf.x * 2) + _sliderXZeroPos;
-            slidePos.z += Utils.Map(twoDimValue.y, 0, 1, 0, _localTwoDimSliderTravelDistanceHalf.y * 2) + _sliderZZeroPos;
+            slidePos.x = Utils.Map(twoDimValue.x, 0, 1, 0, _localTwoDimSliderTravelDistanceHalf.x * 2) + _sliderXZeroPos;
+            slidePos.z = Utils.Map(twoDimValue.y, 0, 1, 0, _localTwoDimSliderTravelDistanceHalf.y * 2) + _sliderZZeroPos;
 
             // Reset velocity to zero and update the position of the slider object
             _slideableObjectRigidbody.velocity = Vector3.zero;
