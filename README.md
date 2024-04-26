@@ -73,11 +73,6 @@ This workflow is the easiest way to get up and running and makes updating packag
 
 If you are familiar with OpenUPM, follow the [OpenUPM instructions](https://openupm.com/packages/com.ultraleap.tracking/#modal-manualinstallation).
 
-Detailed instructions are available in the foldout below.
-
-<details>
-<summary> UPM Package via OpenUPM </summary>
-
 #### OpenUPM Setup
 
 Setup only needs to be performed once per Unity project.
@@ -113,8 +108,6 @@ In `Edit -> Project Settings -> Package Manager`, add a new scoped registry with
 
 If you prefer to use a CLI to modify your packages or need to be able to perform actions from a terminal (e.g. CI) then you may find the OpenUPM CLI helpful.
 See [Getting Started with OpenUPM-CLI][openupm-cli].
-
-</details>
 
 ### Unity Package (Legacy)
 

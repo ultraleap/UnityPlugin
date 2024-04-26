@@ -44,7 +44,7 @@ namespace Leap.Unity.PhysicalHands
 
         private void Awake()
         {
-            if(Instance != null)
+            if (Instance != null)
             {
                 Debug.LogWarning("Having multiple GrabHelpers at once is not supported");
             }
@@ -354,7 +354,7 @@ namespace Leap.Unity.PhysicalHands
             hand = null;
             if (_grabHelperObjects.TryGetValue(rigid, out GrabHelperObject helper))
             {
-                if(helper.currentGrabbingHand != null)
+                if (helper.currentGrabbingHand != null)
                 {
                     hand = helper.currentGrabbingHand;
                     return true;

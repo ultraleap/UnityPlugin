@@ -27,7 +27,7 @@ namespace Leap.Unity.PhysicalHands
 
         internal void Initialize()
         {
-            if(!Application.isPlaying)
+            if (!Application.isPlaying)
             {
                 return;
             }

@@ -48,8 +48,10 @@ namespace Leap.Unity.PhysicalHands
         public float _startPosition = 0;
 
         [SerializeField]
-        private Vector3 _sliderValue = Vector3.zero;
-        private Vector3 _prevSliderValue = Vector3.zero;
+        private float _sliderValue = 0;
+        public float SliderValue => _sliderValue;
+
+        private float _prevSliderValue = 0;
         private Quaternion _initialRotation;
 
         [SerializeField]
@@ -62,22 +64,6 @@ namespace Leap.Unity.PhysicalHands
         private float _sliderZZeroPos = 0;
         private bool _freezeIfNotActive = true;
 
-        /// <summary>
-        /// Use this to get the slider value on all axes.
-        /// </summary>
-        /// <returns>Vector3 ofslider values.</returns>
-        public float GetSliderValue()
-        {
-            switch (_sliderDirection)
-            {
-                case SliderDirection.X:
-                    return _sliderValue.x;
-                case SliderDirection.Z:
-                    return _sliderValue.z;
-            }
-            return 0;
-        }
-         
         #region Unity Methods
 
         /// <summary>
@@ -120,7 +106,7 @@ namespace Leap.Unity.PhysicalHands
             if (_prevSliderValue != _sliderValue)
             {
                 // Send slider change event
-                SendSliderEvent(SliderChangeEvent);
+                SliderChangeEvent?.Invoke(_sliderValue);
             }
 
             _prevSliderValue = _sliderValue;
@@ -157,6 +143,7 @@ namespace Leap.Unity.PhysicalHands
                 Debug.LogWarning("Warning! Slideable object cannot be rotated. This will cause unexpected behaviour. \n " +
                     "Please rotate the slider instead, leaving slideable object rotation 0,0,0", _slideableObject);
             }
+
 
             ConfigureSlideableObject();
 
@@ -200,6 +187,17 @@ namespace Leap.Unity.PhysicalHands
             {
                 slideHelper = _slideableObject.AddComponent<PhysicalHandsSliderHelper>();
             }
+
+            switch(_sliderDirection)
+            {
+                case SliderDirection.X:
+                    _slideableObject.transform.localPosition = new Vector3(0, _slideableObject.transform.localPosition.y, _slideableObject.transform.localPosition.z);
+                    break;
+                case SliderDirection.Z:
+                    _slideableObject.transform.localPosition = new Vector3(_slideableObject.transform.localPosition.x, _slideableObject.transform.localPosition.y, 0);
+                    break;
+            }
+
 
             slideHelper._onHandGrab += OnHandGrab;
             slideHelper._onHandGrabExit += OnHandGrabExit;
@@ -423,25 +421,21 @@ namespace Leap.Unity.PhysicalHands
         /// </summary>
         /// <param name="changeFromZero">Change in position from zero position.</param>
         /// <returns>The calculated slider value.</returns>
-        private Vector3 CalculateSliderValue()
+        private float CalculateSliderValue()
         {
+            float changeFromZero = 0;
+
             switch (_sliderDirection)
             {
                 case SliderDirection.X:
-                    float changeFromZeroX = _slideableObject.transform.localPosition.x - _sliderXZeroPos;
-                    return new Vector3(
-                        Utils.Map(changeFromZeroX, 0, _localSliderTravelDistanceHalf * 2, 0, 1),
-                        0,
-                        0);
+                    changeFromZero = _slideableObject.transform.localPosition.x - _sliderXZeroPos;
+                    break;
                 case SliderDirection.Z:
-                    float changeFromZeroZ = _slideableObject.transform.localPosition.z - _sliderZZeroPos;
-                    return new Vector3(
-                        0,
-                        0,
-                        Utils.Map(changeFromZeroZ, 0, _localSliderTravelDistanceHalf * 2, 0, 1));
+                    changeFromZero = _slideableObject.transform.localPosition.z - _sliderZZeroPos;
+                    break;
             }
 
-            return Vector3.negativeInfinity;
+            return Utils.Map(changeFromZero, 0, _localSliderTravelDistanceHalf * 2, 0, 1);
         }
 
         /// <summary>
@@ -450,18 +444,7 @@ namespace Leap.Unity.PhysicalHands
         private void SnapToSegment()
         {
             // Initialize variables
-            float closestStep = 0;
-
-            // For one-dimensional sliders
-            switch (_sliderDirection)
-            {
-                case SliderDirection.X:
-                    closestStep = GetClosestStep(_sliderValue.x, (int)_numberOfSegments);
-                    break;
-                case SliderDirection.Z:
-                    closestStep = GetClosestStep(_sliderValue.z, (int)_numberOfSegments);
-                    break;
-            }
+            float closestStep = GetClosestStep(_sliderValue, (int)_numberOfSegments);
 
             // Update the slider position
             UpdateSliderPos(closestStep);
@@ -513,7 +496,7 @@ namespace Leap.Unity.PhysicalHands
             if (_prevSliderValue != _sliderValue)
             {
                 // Send slider change event
-                SendSliderEvent(SliderChangeEvent);
+                SliderChangeEvent?.Invoke(_sliderValue);
             }
 
             _prevSliderValue = _sliderValue;
@@ -544,7 +527,7 @@ namespace Leap.Unity.PhysicalHands
         {
             UnFreezeSliderPosition();
 
-            SendSliderEvent(SliderButtonPressedEvent);
+            SliderButtonPressedEvent?.Invoke(_sliderValue);
         }
 
         private void ButtonUnPressed()
@@ -556,7 +539,7 @@ namespace Leap.Unity.PhysicalHands
 
             SnapSliderOnRelease();
 
-            SendSliderEvent(SliderButtonUnPressedEvent);
+            SliderButtonPressedEvent?.Invoke(_sliderValue);
         }
 
         public void OnHandGrab(ContactHand hand)
@@ -587,25 +570,6 @@ namespace Leap.Unity.PhysicalHands
             }
 
             SnapSliderOnRelease();
-        }
-
-        /// <summary>
-        /// Standardised event to send any sort of value events. 
-        /// If you know which event will be used then only send the relevant event with the other being null.
-        /// Invoke by passing the correct type of event.
-        /// </summary>
-        /// <param name="unityEvent"></param>
-        private void SendSliderEvent(UnityEvent<float> curEvent)
-        {
-            switch (_sliderDirection)
-            {
-                case SliderDirection.X:
-                    curEvent?.Invoke(_sliderValue.x);
-                    break;
-                case SliderDirection.Z:
-                    curEvent?.Invoke(_sliderValue.z);
-                    break;
-            }
         }
 
         #endregion

@@ -77,10 +77,10 @@ namespace Leap.Unity.PhysicalHands
         // Layers
         // Hand Layers
         public SingleLayer HandsLayer
-        { 
-            get 
+        {
+            get
             {
-                if(_handsLayer == -1)
+                if (_handsLayer == -1)
                 {
                     _layersGenerated = false;
                     GenerateLayers();
