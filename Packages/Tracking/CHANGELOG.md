@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - PhysicalHandsAnchorable, including anchoring and un-anchoring based on grabs
 - PhysicalHandsSlider
 - TwoDimensionalPhysicalHandsSlider example
+- Ability to ignore collisions per hand separately from grabs
 
 ### Changed
 - Removed old PhysicalHandsButton
