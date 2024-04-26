@@ -460,8 +460,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1181966998313410}
   m_LocalRotation: {x: -0.000000016128897, y: 0.0000000389386, z: -0.000000029802315, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -0.5166667}
-  m_LocalScale: {x: 0.9080239, y: 0.90802366, z: 0.24525453}
+  m_LocalPosition: {x: -0, y: 0.48, z: -0}
+  m_LocalScale: {x: 0.9080239, y: 0.2452545, z: 0.9080239}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4844586815743484}
@@ -1000,8 +1000,6 @@ MonoBehaviour:
   matchAnchorMotionWhileAttaching: 1
   anchorLerpCoeffPerSec: 10
   anchorRotation: 1
-  interactionBehaviour: {fileID: 0}
-  _interactionBehaviourIsNull: 1
   detachWhenGrasped: 0
   _tryAnchorNearestOnGraspEnd: 1
   isAttractedByHand: 0
@@ -1225,8 +1223,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1302481672841178}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.02, y: 0.02, z: 0.006}
+  m_LocalPosition: {x: 0, y: 0.0038, z: 0}
+  m_LocalScale: {x: 0.02, y: 0.006, z: 0.02}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4091547367843310}
@@ -1324,7 +1322,7 @@ ConfigurableJoint:
   m_Anchor: {x: 0, y: 0, z: 0}
   m_Axis: {x: 1, y: 0, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 0.000000057951915, y: 0.000000047415206, z: 9.313226e-10}
+  m_ConnectedAnchor: {x: 0.000000057951915, y: 0.0038000077, z: 0.00000006891787}
   serializedVersion: 2
   m_SecondaryAxis: {x: 0, y: 1, z: 0}
   m_XMotion: 2
@@ -1420,7 +1418,7 @@ ConfigurableJoint:
   m_Anchor: {x: 0, y: 0, z: 0}
   m_Axis: {x: 1, y: 0, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 0.000000057951915, y: 0.000000047415206, z: 9.313226e-10}
+  m_ConnectedAnchor: {x: 0.000000057951915, y: 0.0038000077, z: 0.00000006891787}
   serializedVersion: 2
   m_SecondaryAxis: {x: 0, y: 1, z: 0}
   m_XMotion: 1
@@ -2393,8 +2391,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1421062777906842}
   m_LocalRotation: {x: -0.000000016128897, y: 0.0000000389386, z: -0.000000029802315, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -0.5166628}
-  m_LocalScale: {x: 0.9080239, y: 0.90802366, z: 0.24525453}
+  m_LocalPosition: {x: 0.000000042188002, y: 0.48000324, z: 0.00000015133992}
+  m_LocalScale: {x: 0.9080239, y: 0.2452545, z: 0.9080239}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4104799211727496}
@@ -2543,7 +2541,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4754278044759552}
   - component: {fileID: 54757883203877810}
-  - component: {fileID: 1055794755}
+  - component: {fileID: 5419039493250600941}
   m_Layer: 0
   m_Name: 2D Slider
   m_TagString: Untagged
@@ -2558,15 +2556,15 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1479338265924126}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0, z: -0.0073}
+  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: 0, z: -0.0031}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4104799211727496}
   m_Father: {fileID: 4918507338532530}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
 --- !u!54 &54757883203877810
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2583,7 +2581,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
---- !u!114 &1055794755
+--- !u!114 &5419039493250600941
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2592,31 +2590,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 1479338265924126}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 858d8cda8193ec94798795228b029f9f, type: 3}
+  m_Script: {fileID: 11500000, guid: ac432446300ed5f4f96d5ec9454ce2d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _slideableObject: {fileID: 1302481672841178}
-  _sliderType: 1
-  _sliderDirection: 0
-  _twoDimSliderDirection: 0
-  SliderChangeEvent:
+  TwoDimSliderChangeEvent:
     m_PersistentCalls:
       m_Calls: []
-  SliderButtonPressedEvent:
+  TwoDimSliderButtonPressedEvent:
     m_PersistentCalls:
       m_Calls: []
-  SliderButtonUnPressedEvent:
+  TwoDimSliderButtonUnPressedEvent:
     m_PersistentCalls:
       m_Calls: []
-  SliderTravelDistance: 0.22
-  TwoDimSliderTravelDistance: {x: 0.05, y: 0.015}
-  _numberOfSegments: 0
-  _twoDimNumberOfSegments: {x: 0, y: 0}
-  _startPosition: 0
-  _twoDimStartPosition: {x: 0, y: 0}
-  _axisChangeFromZero: {x: 0, y: 0, z: 0}
+  SliderTravelDistance: {x: 0.1, y: 0.025}
+  _numberOfSegments: {x: 0, y: 0}
+  _startPosition: {x: 0, y: 0}
   _connectedButton: {fileID: 0}
-  _sliderValue: {x: 0, y: 0, z: 0}
+  _sliderValue: {x: 0, y: 0}
 --- !u!1 &1480005392514780
 GameObject:
   m_ObjectHideFlags: 0
@@ -2793,7 +2784,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4275089971556662}
   - component: {fileID: 54783115363902762}
-  - component: {fileID: 935487084}
+  - component: {fileID: 8454674276670869718}
   m_Layer: 0
   m_Name: 2D Slider
   m_TagString: Untagged
@@ -2808,15 +2799,15 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1518170993950910}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -0.0073000193}
+  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: -0, y: -0, z: -0.0027}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4844586815743484}
   m_Father: {fileID: 4610518379362466}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
 --- !u!54 &54783115363902762
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2833,7 +2824,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
---- !u!114 &935487084
+--- !u!114 &8454674276670869718
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2842,31 +2833,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 1518170993950910}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 858d8cda8193ec94798795228b029f9f, type: 3}
+  m_Script: {fileID: 11500000, guid: ac432446300ed5f4f96d5ec9454ce2d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _slideableObject: {fileID: 1833395508903704}
-  _sliderType: 1
-  _sliderDirection: 0
-  _twoDimSliderDirection: 0
-  SliderChangeEvent:
+  TwoDimSliderChangeEvent:
     m_PersistentCalls:
       m_Calls: []
-  SliderButtonPressedEvent:
+  TwoDimSliderButtonPressedEvent:
     m_PersistentCalls:
       m_Calls: []
-  SliderButtonUnPressedEvent:
+  TwoDimSliderButtonUnPressedEvent:
     m_PersistentCalls:
       m_Calls: []
-  SliderTravelDistance: 0.22
-  TwoDimSliderTravelDistance: {x: 0.025, y: 0.02}
-  _numberOfSegments: 0
-  _twoDimNumberOfSegments: {x: 0, y: 0}
-  _startPosition: 0
-  _twoDimStartPosition: {x: 0, y: 0}
-  _axisChangeFromZero: {x: 0, y: 0, z: 0}
+  SliderTravelDistance: {x: 0.05, y: 0.03}
+  _numberOfSegments: {x: 0, y: 0}
+  _startPosition: {x: 0, y: 0}
   _connectedButton: {fileID: 0}
-  _sliderValue: {x: 0, y: 0, z: 0}
+  _sliderValue: {x: 0, y: 0}
 --- !u!1 &1541302722189588
 GameObject:
   m_ObjectHideFlags: 0
@@ -4472,8 +4456,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1833395508903704}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.02, y: 0.02, z: 0.006}
+  m_LocalPosition: {x: 0, y: 0.0038, z: 0}
+  m_LocalScale: {x: 0.02, y: 0.006, z: 0.02}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4360874184650288}
@@ -4571,7 +4555,7 @@ ConfigurableJoint:
   m_Anchor: {x: 0, y: 0, z: 0}
   m_Axis: {x: 1, y: 0, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 0.000000015805067, y: 0.000000015805067, z: -0.000000014901161}
+  m_ConnectedAnchor: {x: 0.000000015805067, y: 0.0038000061, z: 0.000000016298145}
   serializedVersion: 2
   m_SecondaryAxis: {x: 0, y: 1, z: 0}
   m_XMotion: 2
@@ -4667,7 +4651,7 @@ ConfigurableJoint:
   m_Anchor: {x: 0, y: 0, z: 0}
   m_Axis: {x: 1, y: 0, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 0.000000015805067, y: 0.000000015805067, z: -0.000000014901161}
+  m_ConnectedAnchor: {x: 0.000000015805067, y: 0.0038000061, z: 0.000000016298145}
   serializedVersion: 2
   m_SecondaryAxis: {x: 0, y: 1, z: 0}
   m_XMotion: 1

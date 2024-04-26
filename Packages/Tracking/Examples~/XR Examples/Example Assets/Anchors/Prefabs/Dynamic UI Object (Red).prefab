@@ -1393,9 +1393,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _slideableObject: {fileID: 1879569288017280}
-  _sliderType: 0
   _sliderDirection: 0
-  _twoDimSliderDirection: 0
   SliderChangeEvent:
     m_PersistentCalls:
       m_Calls: []
@@ -1405,15 +1403,11 @@ MonoBehaviour:
   SliderButtonUnPressedEvent:
     m_PersistentCalls:
       m_Calls: []
-  SliderTravelDistance: 0.03
-  TwoDimSliderTravelDistance: {x: 0.22, y: 0.22}
+  _sliderTravelDistance: 0.07
   _numberOfSegments: 0
-  _twoDimNumberOfSegments: {x: 0, y: 0}
-  _startPosition: 0
-  _twoDimStartPosition: {x: 0, y: 0}
-  _axisChangeFromZero: {x: 0, y: 0, z: 0}
+  _startPosition: 0.5
+  _sliderValue: 0
   _connectedButton: {fileID: 0}
-  _sliderValue: {x: 0, y: 0, z: 0}
 --- !u!1 &1314965672609742
 GameObject:
   m_ObjectHideFlags: 0
@@ -3280,9 +3274,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _slideableObject: {fileID: 1398823726791232}
-  _sliderType: 0
   _sliderDirection: 0
-  _twoDimSliderDirection: 0
   SliderChangeEvent:
     m_PersistentCalls:
       m_Calls: []
@@ -3292,15 +3284,11 @@ MonoBehaviour:
   SliderButtonUnPressedEvent:
     m_PersistentCalls:
       m_Calls: []
-  SliderTravelDistance: 0.03
-  TwoDimSliderTravelDistance: {x: 0.22, y: 0.22}
+  _sliderTravelDistance: 0.07
   _numberOfSegments: 0
-  _twoDimNumberOfSegments: {x: 0, y: 0}
-  _startPosition: 0
-  _twoDimStartPosition: {x: 0, y: 0}
-  _axisChangeFromZero: {x: 0, y: 0, z: 0}
+  _startPosition: 0.5
+  _sliderValue: 0
   _connectedButton: {fileID: 0}
-  _sliderValue: {x: 0, y: 0, z: 0}
 --- !u!1 &1694853242601310
 GameObject:
   m_ObjectHideFlags: 0
@@ -3379,8 +3367,6 @@ MonoBehaviour:
   matchAnchorMotionWhileAttaching: 1
   anchorLerpCoeffPerSec: 10
   anchorRotation: 1
-  interactionBehaviour: {fileID: 0}
-  _interactionBehaviourIsNull: 1
   detachWhenGrasped: 0
   _tryAnchorNearestOnGraspEnd: 1
   isAttractedByHand: 0

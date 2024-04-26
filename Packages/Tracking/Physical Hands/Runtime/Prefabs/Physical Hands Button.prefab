@@ -29,7 +29,7 @@ Transform:
   m_GameObject: {fileID: 6504037249797295756}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.06, y: 0.01, z: 0.06}
+  m_LocalScale: {x: 0.1, y: 0.01, z: 0.1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2504497278577001491}
@@ -120,7 +120,7 @@ MonoBehaviour:
   damperValue: 0
   maxForceValue: 5
   bouncinessValue: 0
-  _buttonTravelDistance: 0.007116776
+  _buttonTravelDistance: 0.0071167764
   _buttonTravelOffset: 0.5683204
   _canBePressedByObjects: 0
   _pressableObject: {fileID: 8988865282199578529}
@@ -173,7 +173,7 @@ Transform:
   m_GameObject: {fileID: 8988865282199578529}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 1.2799981, z: 0}
-  m_LocalScale: {x: 1.3029895, y: 0.13664076, z: 1.1363968}
+  m_LocalScale: {x: 0.9, y: 0.13664076, z: 0.9}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6505167972119725765}

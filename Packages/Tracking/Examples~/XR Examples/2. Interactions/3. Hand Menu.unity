@@ -462,6 +462,22 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 824489014}
     m_Modifications:
+    - target: {fileID: 873512272262586395, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 873512272262586395, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 873512272262586395, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 873512272262586395, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0
+      objectReference: {fileID: 0}
     - target: {fileID: 2155091328399905788, guid: f0859577120b0ab4ca075e25fb2e6ab1, type: 3}
       propertyPath: m_IsKinematic
       value: 0
@@ -643,6 +659,18 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+    - target: {fileID: 2504497278577001491, guid: 43eaa06112baf304ba03b0e3634d568d, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2504497278577001491, guid: 43eaa06112baf304ba03b0e3634d568d, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2504497278577001491, guid: 43eaa06112baf304ba03b0e3634d568d, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6504037249797295756, guid: 43eaa06112baf304ba03b0e3634d568d, type: 3}
       propertyPath: m_Name
       value: Physical Hands Button (1)
@@ -2085,6 +2113,18 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+    - target: {fileID: 2504497278577001491, guid: 43eaa06112baf304ba03b0e3634d568d, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2504497278577001491, guid: 43eaa06112baf304ba03b0e3634d568d, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2504497278577001491, guid: 43eaa06112baf304ba03b0e3634d568d, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 6504037249797295756, guid: 43eaa06112baf304ba03b0e3634d568d, type: 3}
       propertyPath: m_Name
       value: Physical Hands Button
