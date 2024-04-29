@@ -8,6 +8,8 @@
 
 using System.Collections.Generic;
 using UnityEngine;
+using System;
+
 #if UNITY_EDITOR
 using UnityEditor;
 using System.IO;
@@ -249,14 +251,24 @@ namespace Leap.Unity
 
         static string GetPluginVersion()
         {
+            string version = "Unknown";
+
             if (Utils.IsPackageAvailable("com.ultraleap.tracking", out var packageInfo)) // Check the package exists so we can use package manage wizardry
             {
-                return packageInfo.version;
+                version = packageInfo.version;
             }
             else // We are not using package manager :( we need to look for version number elsewhere
             {
-                return FindPluginVersionInAssets();
+                version = FindPluginVersionInAssets();
             }
+
+            // Parse through system.version to improve formatting standardisation
+            if(Version.TryParse(version, out var ver))
+            {
+                version = ver.ToString();
+            }
+
+            return version;
         }
 
         static string GetPluginSource()
@@ -274,10 +286,15 @@ namespace Leap.Unity
                     return "UPM " + packageInfo.source;
                 }
             }
-            else // We are not using package manager :( we need to look for version number elsewhere
+            else
             {
-                return "Unity Package";
+                if(FindPluginVersionInAssets() != "")
+                {
+                    return "Unity Package";
+                }
             }
+
+            return "Unknown";
         }
 
         [MenuItem("Ultraleap/Open Ultraleap Settings", false, 50)]
