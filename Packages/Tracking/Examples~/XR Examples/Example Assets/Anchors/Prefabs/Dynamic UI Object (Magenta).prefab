@@ -1357,8 +1357,8 @@ GameObject:
   m_Component:
   - component: {fileID: 4854436900119490}
   - component: {fileID: 54111658736148914}
-  - component: {fileID: 1917020350}
   - component: {fileID: 1917020347}
+  - component: {fileID: 1917020350}
   m_Layer: 0
   m_Name: Dynamic UI Object (Magenta)
   m_TagString: Untagged
@@ -1399,19 +1399,6 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!65 &1917020350
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1294726134686968}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 0.033, y: 0.033, z: 0.033}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &1917020347
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1469,6 +1456,20 @@ MonoBehaviour:
     m_RotationOrder: 4
   _eventTable:
     _entries: []
+--- !u!114 &1917020350
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1294726134686968}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c3dbca35b70f7b438b1ced7eb3765f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  workstation: {fileID: 1724470782025482}
+  workstationState: 0
 --- !u!1 &1298143058939648
 GameObject:
   m_ObjectHideFlags: 0

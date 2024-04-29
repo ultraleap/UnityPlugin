@@ -933,6 +933,7 @@ GameObject:
   - component: {fileID: 4342971396213660}
   - component: {fileID: 54108310109255444}
   - component: {fileID: 812120092}
+  - component: {fileID: 812120095}
   m_Layer: 0
   m_Name: Dynamic UI Object (Blue)
   m_TagString: Untagged
@@ -1030,6 +1031,20 @@ MonoBehaviour:
     m_RotationOrder: 4
   _eventTable:
     _entries: []
+--- !u!114 &812120095
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1284443966656062}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c3dbca35b70f7b438b1ced7eb3765f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  workstation: {fileID: 1234304293458748}
+  workstationState: 0
 --- !u!1 &1298171294483616
 GameObject:
   m_ObjectHideFlags: 0

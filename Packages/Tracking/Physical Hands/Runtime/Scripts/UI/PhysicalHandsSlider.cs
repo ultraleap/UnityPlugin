@@ -53,6 +53,7 @@ namespace Leap.Unity.PhysicalHands
 
         private float _prevSliderValue = 0;
         private Quaternion _initialRotation;
+        private Vector3 _initialPosition;
 
         [SerializeField]
         public PhysicalHandsButton _connectedButton;
@@ -120,6 +121,43 @@ namespace Leap.Unity.PhysicalHands
             if(Quaternion.Angle(_slideableObject.transform.localRotation, _initialRotation) > 0.5f)
             {
                 _slideableObject.transform.localRotation = _initialRotation;
+            }
+
+
+            //If you position of the sliders on the 2 unused axes is different from the 
+            switch (_sliderDirection)
+            {
+                case SliderDirection.X:
+                    if (Mathf.Abs(_slideableObject.transform.localPosition.y - _initialPosition.y) > 0.01)
+                    {
+                        _slideableObject.transform.localPosition = new Vector3(
+                            _slideableObject.transform.localPosition.x, 
+                            _initialPosition.y, 
+                            _slideableObject.transform.localPosition.z);
+                    }
+                    if (Mathf.Abs(_slideableObject.transform.localPosition.z - _initialPosition.z) > 0.01)
+                    {
+                        _slideableObject.transform.localPosition = new Vector3(_slideableObject.transform.localPosition.x, 
+                            _slideableObject.transform.localPosition.y, 
+                            _initialPosition.z);
+                    }
+                    break;
+                case SliderDirection.Z:
+                    if (Mathf.Abs(_slideableObject.transform.localPosition.y - _initialPosition.y) > 0.01)
+                    {
+                        _slideableObject.transform.localPosition = new Vector3(
+                            _slideableObject.transform.localPosition.x, 
+                            _initialPosition.y, 
+                            _slideableObject.transform.localPosition.z);
+                    }
+                    if (Mathf.Abs(_slideableObject.transform.localPosition.x - _initialPosition.x) > 0.01)
+                    {
+                        _slideableObject.transform.localPosition = new Vector3(
+                            _initialPosition.z, 
+                            _slideableObject.transform.localPosition.y, 
+                            _slideableObject.transform.localPosition.z);
+                    }
+                    break;
             }
         }
 
@@ -212,6 +250,7 @@ namespace Leap.Unity.PhysicalHands
             _slideableObjectRigidbody.useGravity = false;
             this.GetComponent<Rigidbody>().isKinematic = true;
             _initialRotation = _slideableObject.transform.localRotation;
+            _initialPosition = _slideableObject.transform.localPosition;
         }
 
         /// <summary>
