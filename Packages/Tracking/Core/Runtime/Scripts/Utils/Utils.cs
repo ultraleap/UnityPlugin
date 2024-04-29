@@ -1198,6 +1198,111 @@ namespace Leap.Unity
 #endif
         }
 
+        /// <summary>
+        /// Try to get all components of type from the provided Component's GameObject
+        /// </summary>
+        public static bool TryGetComponents<T>(this Component source, out T[] components)
+        {
+            if(source.TryGetComponent<T>(out _))
+            {
+                components = source.GetComponents<T>();
+                return true;
+            }
+
+            components = default;
+            return false;
+        }
+
+        /// <summary>
+        /// Try to get the given component of type from the provided Component's Parent
+        /// </summary>
+        public static bool TryGetComponentInParent<T>(this Component source, out T component)
+        {
+            if(source.transform.parent != null)
+            {
+                return source.transform.parent.TryGetComponent(out component);
+            }
+
+            component = default;
+            return false;
+        }
+
+        /// <summary>
+        /// Try to get the given components of type from the provided Component's Parent
+        /// </summary>
+        public static bool TryGetComponentsInParent<T>(this Component source, out T[] components)
+        {
+            if (source.transform.parent != null)
+            {
+                return source.transform.parent.TryGetComponents(out components);
+            }
+
+            components = default;
+            return false;
+        }
+
+        /// <summary>
+        /// Try to get the given component of type from the provided Component's self or children
+        /// </summary>
+        public static bool TryGetComponentInChildren<T>(this Component source, out T component, bool includeSelf = true, bool includeInactive = false)
+        {
+            if(!source.gameObject.activeInHierarchy && !includeInactive) // No children can be active either
+            {
+                component = default;
+                return false;
+            }
+
+            if(includeSelf && source.TryGetComponent(out component))
+            {
+                return true;
+            }
+            else
+            {
+                foreach(Transform child in source.transform)
+                {
+                    component = child.GetComponentInChildren<T>(includeInactive);
+
+                    if(component != null)
+                    {
+                        return true;
+                    }
+                }
+            }    
+
+            component = default;
+            return false;
+        }
+
+        /// <summary>
+        /// Try to get the given component of type from the provided Component's self or children
+        /// </summary>
+        public static bool TryGetComponentsInChildren<T>(this Component source, out T[] components, bool includeSelf = true, bool includeInactive = false)
+        {
+            if(includeSelf)
+            {
+                components = source.GetComponentsInChildren<T>(includeInactive);
+                return components != null;
+            }
+            else
+            {
+                List<T> componentList = new List<T>();
+
+                foreach (Transform child in source.transform)
+                {
+                    componentList.AddRange(child.GetComponentsInChildren<T>(includeInactive));
+                }
+
+                if(componentList.Count > 0)
+                {
+                    components = componentList.ToArray();
+                    return true;
+                }
+            }
+
+            components = default;
+            return false;
+        }
+
         #endregion
 
         #region Transform Utils

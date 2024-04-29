@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Turntable and Pullcord example scene now uses Physical Hands
 - Physical Hands Playground uses new PhysicalHandsButtons and Toggles
 - Grab Ball uses Physical Hands rather than Interaction Engine
+- Physical Hands events are sent to all event interfaces attached to the interacted rigidbody
 
 ### Fixed
 - 
