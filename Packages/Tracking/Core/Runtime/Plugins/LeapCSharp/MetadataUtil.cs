@@ -69,7 +69,7 @@ namespace Leap
             Analytics analytics = new Analytics();
             analytics.telemetry = new Telemetry();
 
-            analytics.telemetry.app_title = GetAppName();
+            analytics.telemetry.app_title = Application.productName;
             analytics.telemetry.app_scene_name = GetAppSceneName();
             analytics.telemetry.app_type = GetAppType();
             analytics.telemetry.engine_name = "Unity";
@@ -92,18 +92,6 @@ namespace Leap
 #endif
 
             return appType;
-        }
-
-        static string GetAppName()
-        {
-            string appName = Application.productName;
-
-            if(appName == "Unity" || appName == "Unity.exe") // If we get a useless "UNITY" name, add some extra info about the scene
-            {
-                appName = "Unity Scene: " + SceneManager.GetActiveScene().name;
-            }
-
-            return appName;
         }
 
         static string GetAppSceneName()
