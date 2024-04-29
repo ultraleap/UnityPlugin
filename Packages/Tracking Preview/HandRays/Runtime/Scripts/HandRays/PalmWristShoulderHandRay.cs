@@ -35,9 +35,7 @@ namespace Leap.Unity.Preview.HandRays
                 localWristPosition.x = -localWristPosition.x;
             }
 
-            transformHelper.transform.position = hand.WristPosition;
-            transformHelper.transform.rotation = hand.Rotation;
-            return transformHelper.TransformPoint(localWristPosition);
+            return Utils.TransformPoint(localWristPosition, hand.WristPosition, hand.Rotation);
         }
     }
 }

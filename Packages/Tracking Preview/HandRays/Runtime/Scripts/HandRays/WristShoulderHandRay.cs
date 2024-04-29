@@ -62,7 +62,6 @@ namespace Leap.Unity.Preview.HandRays
         /// This local-space offset from the wrist is used to better align the ray to the pinch position
         /// </summary>
         private Vector3 pinchWristOffset = new Vector3(0.0425f, 0.0652f, 0.0f);
-        protected Transform transformHelper;
 
         protected OneEuroFilter<Vector3> aimPositionFilter;
         protected OneEuroFilter<Vector3> rayOriginFilter;
@@ -84,30 +83,17 @@ namespace Leap.Unity.Preview.HandRays
         protected override void Start()
         {
             base.Start();
-            transformHelper = new GameObject("WristShoulderFarFieldRay_TransformHelper").transform;
-            transformHelper.SetParent(transform);
 
-            if (inferredBodyPositions == null)
-            {
-                inferredBodyPositions = gameObject.AddComponent<InferredBodyPositions>();
-            }
+            inferredBodyPositions = new InferredBodyPositions();
 
             ResetFilters();
         }
 
-        /// <summary>
-        /// Calculates whether the hand ray should be enabled
-        /// </summary>
-        protected override bool ShouldEnableRay()
+        protected override void Update()
         {
-            if (!base.ShouldEnableRay())
-            {
-                return false;
-            }
-            transformHelper.position = leapProvider.CurrentFrame.GetHand(chirality).PalmPosition;
-            Quaternion palmForwardRotation = leapProvider.CurrentFrame.GetHand(chirality).Rotation * Quaternion.Euler(90, 0, 0);
-            transformHelper.rotation = palmForwardRotation;
-            return !IsFacingTransform(transformHelper, inferredBodyPositions.Head, facingCamMinDotProd);
+            base.Update();
+
+            inferredBodyPositions.UpdatePositions();
         }
 
         protected virtual Vector3 GetWristOffsetPosition(Hand hand)
@@ -118,14 +104,7 @@ namespace Leap.Unity.Preview.HandRays
                 localWristPosition.x = -localWristPosition.x;
             }
 
-            transformHelper.transform.position = hand.WristPosition;
-            transformHelper.transform.rotation = hand.Rotation;
-            return transformHelper.TransformPoint(localWristPosition);
-        }
-
-        private bool IsFacingTransform(Transform facingTransform, Transform transformToCheck, float minAllowedDotProduct = 0.8F)
-        {
-            return Vector3.Dot((transformToCheck.transform.position - facingTransform.position).normalized, facingTransform.forward) > minAllowedDotProduct;
+            return Utils.TransformPoint(localWristPosition, hand.WristPosition, hand.Rotation);
         }
 
         protected override Vector3 CalculateVisualAimPosition()
@@ -168,7 +147,7 @@ namespace Leap.Unity.Preview.HandRays
 
         private void OnDrawGizmos()
         {
-            if (!drawDebugGizmos || !Application.isPlaying || !HandRayEnabled)
+            if (!drawDebugGizmos || !Application.isPlaying)
             {
                 return;
             }
