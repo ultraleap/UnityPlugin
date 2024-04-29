@@ -35,7 +35,8 @@ namespace Leap
         [System.Serializable]
         private struct Telemetry
         {
-            public string app_name;
+            public string app_title;
+            public string app_scene_name;
             public string app_type;
             public string engine_name;
             public string engine_version;
@@ -68,7 +69,8 @@ namespace Leap
             Analytics analytics = new Analytics();
             analytics.telemetry = new Telemetry();
 
-            analytics.telemetry.app_name = GetAppName();
+            analytics.telemetry.app_title = GetAppName();
+            analytics.telemetry.app_scene_name = GetAppSceneName();
             analytics.telemetry.app_type = GetAppType();
             analytics.telemetry.engine_name = "Unity";
             analytics.telemetry.engine_version = Application.unityVersion;
@@ -102,6 +104,18 @@ namespace Leap
             }
 
             return appName;
+        }
+
+        static string GetAppSceneName()
+        {
+            string sceneMane = "Unknown";
+
+            if(SceneManager.GetActiveScene() != null)
+            {
+                sceneMane = SceneManager.GetActiveScene().name;
+            }
+
+            return sceneMane;
         }
 
         static string GetRenderPipeline()
