@@ -19,7 +19,7 @@ namespace Leap.InteractionEngine.Examples
     /// The panel is closed when the object is moved at or over a given speed.
     /// The anchorable object is set to kinematic when in workstation mode.
     /// </summary>
-    [RequireComponent(typeof(AnchorableBehaviour))]
+    //[RequireComponent(typeof(AnchorableBehaviour))]
     public class WorkstationBehaviourExample : MonoBehaviour, IPhysicalHandGrab
     {
         /// <summary>

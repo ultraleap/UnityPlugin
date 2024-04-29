@@ -3299,8 +3299,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4915746110913560}
   - component: {fileID: 54580840187329922}
-  - component: {fileID: 114185678842112410}
-  - component: {fileID: 4745844787878438023}
+  - component: {fileID: 1640027420}
   m_Layer: 0
   m_Name: Dynamic UI Object (Red)
   m_TagString: Untagged
@@ -3341,7 +3340,7 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &114185678842112410
+--- !u!114 &1640027420
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -3350,7 +3349,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1694853242601310}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1aceea2f5c70da64e893474302ff53e6, type: 3}
+  m_Script: {fileID: 11500000, guid: 1e0788de50284f742a8e17eea713e48c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _isAttached: 1
@@ -3365,35 +3364,39 @@ MonoBehaviour:
   lockToAnchor: 0
   lockWhenAttached: 1
   matchAnchorMotionWhileAttaching: 1
-  anchorLerpCoeffPerSec: 10
+  anchorLerpCoeffPerSec: 20
   anchorRotation: 1
-  detachWhenGrasped: 0
+  detachWhenGrasped: 1
   _tryAnchorNearestOnGraspEnd: 1
   isAttractedByHand: 0
   maxAttractionReach: 0.1
   anchorHandAttractionRate: 5
   attractionReachByDistance:
     serializedVersion: 2
-    m_Curve: []
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
   _eventTable:
     _entries: []
---- !u!114 &4745844787878438023
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1694853242601310}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7c3dbca35b70f7b438b1ced7eb3765f6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  workstation: {fileID: 1949620407777668}
-  workstationState: 0
 --- !u!1 &1701384272860896
 GameObject:
   m_ObjectHideFlags: 0
@@ -4328,7 +4331,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4628648804060578}
-  - component: {fileID: 1640027420}
+  - component: {fileID: 6337498384834270455}
   m_Layer: 0
   m_Name: Workstation Base
   m_TagString: Untagged
@@ -4352,7 +4355,7 @@ Transform:
   m_Father: {fileID: 4915746110913560}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1640027420
+--- !u!114 &6337498384834270455
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
