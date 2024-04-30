@@ -962,16 +962,60 @@ namespace Leap.Unity.PhysicalHands
                     }
                 }
 
-                if (hand != null)
+                if (hand != null && _grabbingHands.Count == 1)
                 {
                     _newRotation = hand.palmBone.transform.rotation * Quaternion.Euler(hand.AngularVelocity * Time.fixedDeltaTime); // for use in positioning
 
                     _newPosition = hand.palmBone.transform.position + (hand.Velocity * Time.fixedDeltaTime) + (_newRotation * _grabbableHandsValues[grabHandndex].originalHandRotationInverse * _grabbableHandsValues[grabHandndex].offset);
                     _newRotation = _newRotation * _grabbableHandsValues[grabHandndex].rotationOffset; // Include the original rotation offset
                 }
+                else if(hand != null && _grabbingHands.Count > 1)
+                {
+                    AggregateGrabbedHands();
+                }
             }
 
             currentGrabbingHand = hand;
+        }
+
+
+
+        private void AggregateGrabbedHands()
+        {
+            List<Vector3> grabbingHandPositions = new List<Vector3>();
+            List<Quaternion> grabbingHandRotations = new List<Quaternion>();
+
+            for (int i = 0; i < _grabbingHands.Count; i++)
+            {
+                ContactHand hand = _grabbingHands[i];
+                int grabHandndex = _grabbableHands.IndexOf(hand);
+                if(grabHandndex < 0)
+                {
+                    return;
+                }
+                _newRotation = hand.palmBone.transform.rotation * Quaternion.Euler(hand.AngularVelocity * Time.fixedDeltaTime); // for use in positioning
+
+
+                grabbingHandPositions.Add(hand.palmBone.transform.position +
+                    (hand.Velocity * Time.fixedDeltaTime) +
+                    (_newRotation * _grabbableHandsValues[grabHandndex].originalHandRotationInverse *
+                    _grabbableHandsValues[grabHandndex].offset));
+
+                grabbingHandRotations.Add(_newRotation * _grabbableHandsValues[grabHandndex].rotationOffset); // Include the original rotation offset
+            }
+
+            if (grabbingHandPositions.Count > 1)
+            {
+                Debug.Log("more than one pos");
+                _newPosition = Vector3.Lerp(grabbingHandPositions.ElementAt(0), grabbingHandPositions.ElementAt(1), 0.5f);
+                _newRotation = Quaternion.Slerp(grabbingHandRotations.ElementAt(0), grabbingHandRotations.ElementAt(1), 0.5f);
+            }
+
+            for (int i = 0; i < _grabbingHands.Count; i++)
+            {
+                ContactHand hand = _grabbingHands[i];
+                hand.palmBone.transform.rotation = Quaternion.FromToRotation(hand.palmBone.transform.position, _newPosition);
+            }
         }
 
         private void MoveObject()
