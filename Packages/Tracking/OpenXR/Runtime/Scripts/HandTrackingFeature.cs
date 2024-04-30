@@ -81,8 +81,6 @@ namespace Ultraleap.Tracking.OpenXR
         /// </summary>
         public void ClearHandTrackingHints() => SetHandTrackingHints(new string[] { });
 
-        //protected override IntPtr HookGetInstanceProcAddr(IntPtr func) => Native.HookGetInstanceProcAddr(func);
-
         private XrInstance _xrInstance;
         private XrSession _xrSession;
         private XrSystemId _xrSystemId;
@@ -91,9 +89,11 @@ namespace Ultraleap.Tracking.OpenXR
         private GetInstanceProcAddrDelegate _xrGetInstanceProcAddr;
         private WaitFrameDelegate _xrWaitFrame;
         private GetSystemPropertiesDelegate _xrGetSystemProperties;
+        
         private CreateHandTrackerExtDelegate _xrCreateHandTrackerExt;
         private DestroyHandTrackerExtDelegate _xrDestroyHandTrackerExt;
         private LocateHandJointsExtDelegate _xrLocateHandJointsExt;
+        
         private SetHandTrackingHintsUltraleapDelegate _xrSetHandTrackingHintsUltraleap;
 
         private GetInstanceProcAddrDelegate _xrGetInstanceProcAddrHook;
@@ -107,14 +107,14 @@ namespace Ultraleap.Tracking.OpenXR
 
         private XrResult GetInstanceProcAddr(XrInstance xrInstance, in string functionName, out IntPtr xrFunction)
         {
+            if (xrInstance == 0)
+            {
+                xrFunction = IntPtr.Zero;
+                return XrResult.HandleInvalid;
+            }
+
             if (functionName == "xrWaitFrame")
             {
-                if (xrInstance.IsNull)
-                {
-                    xrFunction = IntPtr.Zero;
-                    return XrResult.HandleInvalid;
-                }
-
                 _xrWaitFrameHook = OnWaitFrame;
                 xrFunction = Marshal.GetFunctionPointerForDelegate(_xrWaitFrameHook);
                 return XrResult.Success;
@@ -140,7 +140,7 @@ namespace Ultraleap.Tracking.OpenXR
 
         protected override IntPtr HookGetInstanceProcAddr(IntPtr func)
         {
-            // Store the original function and override with out intercepted version.
+            // Store the original function and override with our intercepted version.
             _xrGetInstanceProcAddr = Marshal.GetDelegateForFunctionPointer<GetInstanceProcAddrDelegate>(func);
             _xrGetInstanceProcAddrHook = GetInstanceProcAddr;
             return Marshal.GetFunctionPointerForDelegate(_xrGetInstanceProcAddrHook);
@@ -152,9 +152,10 @@ namespace Ultraleap.Tracking.OpenXR
             _xrInstance = xrInstance;
 
             // Lookup required core OpenXR functions.
-            _xrWaitFrame = GetInstanceDelegate<WaitFrameDelegate>(_xrInstance, "xrWaitFrame");
+            _xrWaitFrame = GetInstanceDelegate<WaitFrameDelegate>("xrWaitFrame");
 
-            if (!OpenXRRuntime.IsExtensionEnabled("XR_EXT_hand_tracking"))
+            if (!OpenXRRuntime.IsExtensionEnabled("XR_EXT_hand_tracking") ||
+                OpenXRRuntime.GetExtensionVersion("XR_EXT_hand_tracking") < 4)
             {
                 Debug.LogWarning("XR_EXT_hand_tracking is not enabled, disabling Hand Tracking");
                 return false;
@@ -163,13 +164,13 @@ namespace Ultraleap.Tracking.OpenXR
             try
             {
                 _xrGetSystemProperties =
-                    GetInstanceDelegate<GetSystemPropertiesDelegate>(_xrInstance, "xrGetSystemProperties");
+                    GetInstanceDelegate<GetSystemPropertiesDelegate>("xrGetSystemProperties");
                 _xrCreateHandTrackerExt =
-                    GetInstanceDelegate<CreateHandTrackerExtDelegate>(_xrInstance, "xrCreateHandTrackerEXT");
+                    GetInstanceDelegate<CreateHandTrackerExtDelegate>("xrCreateHandTrackerEXT");
                 _xrDestroyHandTrackerExt =
-                    GetInstanceDelegate<DestroyHandTrackerExtDelegate>(_xrInstance, "xrDestroyHandTrackerEXT");
+                    GetInstanceDelegate<DestroyHandTrackerExtDelegate>("xrDestroyHandTrackerEXT");
                 _xrLocateHandJointsExt =
-                    GetInstanceDelegate<LocateHandJointsExtDelegate>(_xrInstance, "xrLocateHandJointsExt");
+                    GetInstanceDelegate<LocateHandJointsExtDelegate>("xrLocateHandJointsExt");
             }
             catch
             {
@@ -177,15 +178,10 @@ namespace Ultraleap.Tracking.OpenXR
                 return false;
             }
 
+            // Enable the elbow joint-set if it is available.
             JointSet = OpenXRRuntime.IsExtensionEnabled("XR_ULTRALEAP_hand_tracking_forearm")
-                ? XrHandJointSetExt.HandWithForearm
+                ? XrHandJointSetExt.HandWithForearmUltraleap
                 : XrHandJointSetExt.Default;
-
-            if (OpenXRRuntime.GetExtensionVersion("XR_EXT_hand_tracking") < 4)
-            {
-                Debug.LogWarning("XR_EXT_hand_tracking is not at least version 4, disabling Hand Tracking");
-                return false;
-            }
 
             // Enable the Ultraleap hinting extension if supported.
             if (OpenXRRuntime.IsExtensionEnabled("XR_ULTRALEAP_hand_tracking_hints"))
@@ -193,8 +189,7 @@ namespace Ultraleap.Tracking.OpenXR
                 try
                 {
                     _xrSetHandTrackingHintsUltraleap =
-                        GetInstanceDelegate<SetHandTrackingHintsUltraleapDelegate>(_xrInstance,
-                            "xrSetHandTrackingHintsULTRALEAP");
+                        GetInstanceDelegate<SetHandTrackingHintsUltraleapDelegate>("xrSetHandTrackingHintsULTRALEAP");
                     _supportsHandTrackingHints = true;
                 }
                 catch
@@ -213,8 +208,9 @@ namespace Ultraleap.Tracking.OpenXR
 
         protected override void OnInstanceDestroy(ulong xrInstance)
         {
-            // Clear our instance handle.
+            // Clear our instance handle (and associated system id).
             _xrInstance = 0;
+            _xrSystemId = 0;
 
             // Clear all function pointers
             _xrGetInstanceProcAddr = null;
@@ -234,7 +230,12 @@ namespace Ultraleap.Tracking.OpenXR
 
         protected override void OnSessionCreate(ulong xrSession) => _xrSession = xrSession;
 
-        protected override void OnSessionDestroy(ulong xrSession) => _xrSession = 0;
+        protected override void OnSessionDestroy(ulong xrSession)
+        {
+            // Clear the session handle and the associated space handle.
+            _xrSession = 0;
+            _xrAppSpace = 0;
+        }
 
         protected override void OnAppSpaceChange(ulong xrSpace) => _xrAppSpace = xrSpace;
 
@@ -247,7 +248,7 @@ namespace Ultraleap.Tracking.OpenXR
             var handTrackingProperties = new XrSystemHandTrackingPropertiesExt(IntPtr.Zero);
             var handTrackingPropertiesHandle = GCHandle.Alloc(handTrackingProperties, GCHandleType.Pinned);
             var systemProperties = new XrSystemProperties(handTrackingPropertiesHandle.AddrOfPinnedObject());
-            
+
             if (_xrGetSystemProperties(_xrInstance, _xrSystemId, systemProperties).Failed())
             {
                 Debug.LogError("Failed to retrieve system properties.");
@@ -256,7 +257,7 @@ namespace Ultraleap.Tracking.OpenXR
 
             // Indicate that hand-tracking is supported if the appropriate system property is set.
             _supportsHandTracking = handTrackingProperties.SupportsHandTracking;
-            
+
             // Free the GCHandles.
             handTrackingPropertiesHandle.Free();
         }
@@ -297,10 +298,9 @@ namespace Ultraleap.Tracking.OpenXR
             if (_rightHandTracker != 0) _xrDestroyHandTrackerExt(_rightHandTracker);
         }
 
-        private TDelegate GetInstanceDelegate<TDelegate>(XrInstance xrInstance, in string functionName)
-            where TDelegate : Delegate
+        private TDelegate GetInstanceDelegate<TDelegate>(in string functionName) where TDelegate : Delegate
         {
-            if (_xrGetInstanceProcAddr(xrInstance, functionName, out IntPtr functionPtr).Failed())
+            if (_xrGetInstanceProcAddr(_xrInstance, functionName, out IntPtr functionPtr).Failed())
             {
                 throw new Exception($"Failed to lookup address of {functionName}");
             }
@@ -308,13 +308,21 @@ namespace Ultraleap.Tracking.OpenXR
             return Marshal.GetDelegateForFunctionPointer<TDelegate>(functionPtr);
         }
 
-        internal bool LocateHandJoints(Handedness handedness, HandJointLocation[] handJointLocations)
+        
+        public XrHandJointSetExt JointSet { get; set; }
+        public int JointCount => JointSet == XrHandJointSetExt.HandWithForearmUltraleap ? 27 : 26;
+
+        private XrHandTrackerExt GetHandTrackerForHand(XrHandExt hand) =>
+            hand == XrHandExt.Left ? _leftHandTracker : _rightHandTracker;
+
+        internal bool LocateHandJoints(XrHandExt hand, ref XrHandJointLocationExt[] jointLocations, ref XrHandJointVelocityExt[] jointVelocities)
         {
             if (!SupportsHandTracking)
             {
                 return false;
             }
 
+            // Input structure.
             var locateInfo = new XrHandJointsLocateInfoExt
             {
                 Type = XrStructureType.HandJointsLocateInfoExt,
@@ -322,50 +330,39 @@ namespace Ultraleap.Tracking.OpenXR
                 BaseSpace = _xrAppSpace,
                 Time = _predictedFrameDisplayTime,
             };
-
-            // Let's come back to this...
-
-            var jointCount = JointSet == XrHandJointSetExt.HandWithForearm ? 27 : 26;
-
-            // These should be declared on this class to avoid excessive allocations.
-            var jointLocationsData = new XrHandJointLocationExt[jointCount];
-            var jointVelocityData = new XrHandJointVelocityExt[jointCount];
             
-            var jointVelocitiesDataHandle = GCHandle.Alloc(jointVelocityData, GCHandleType.Pinned);
-            var jointVelocities = new XrHandJointLocationsExt
+            // Output query structures.
+            // TODO: Make velocity optional?
+            var velocitiesDataHandle = GCHandle.Alloc(jointVelocities, GCHandleType.Pinned);
+            var velocities = new XrHandJointVelocitiesExt
             {
                 Type = XrStructureType.HandJointLocationsExt,
                 Next = IntPtr.Zero,
-                JointCount = (uint)jointVelocityData.Length,
-                IsActive = false,
-                JointLocationsPtr = jointVelocitiesDataHandle.AddrOfPinnedObject(),
+                JointCount = (uint)jointVelocities.Length,
+                JointVelocitiesPtr = velocitiesDataHandle.AddrOfPinnedObject(),
             };
-            var jointVelocitiesHandle = GCHandle.Alloc(jointVelocities, GCHandleType.Pinned);
-            var jointLocationsDataHandle = GCHandle.Alloc(jointLocationsData, GCHandleType.Pinned);
-            var jointLocations = new XrHandJointLocationsExt
+            var velocitiesHandle = GCHandle.Alloc(jointVelocities, GCHandleType.Pinned);
+            
+            var locationsDataHandle = GCHandle.Alloc(jointLocations, GCHandleType.Pinned);
+            var locations = new XrHandJointLocationsExt
             {
                 Type = XrStructureType.HandJointLocationsExt,
-                Next = jointVelocitiesHandle.AddrOfPinnedObject(),
-                JointCount = (uint)jointLocationsData.Length,
+                Next = velocitiesHandle.AddrOfPinnedObject(),
+                JointCount = (uint)jointLocations.Length,
                 IsActive = false,
-                JointLocationsPtr = jointLocationsDataHandle.AddrOfPinnedObject(),
+                JointLocationsPtr = locationsDataHandle.AddrOfPinnedObject(),
             };
-
-            _xrLocateHandJointsExt(_leftHandTracker, locateInfo, jointLocations);
-            // TODO: Actually pass the results out...
-
-            // int result = Native.LocateHandJoints(handedness, out uint isActive, handJointLocations,
-            //     (uint)handJointLocations.Length);
-            // if (IsResultFailure(result))
-            // {
-            //     Debug.LogError($"Failed to locate hand-joints: {Native.ResultToString(result)}");
-            //     return false;
-            // }
-            //
-            // return Convert.ToBoolean(isActive);
+            
+            XrResult result = _xrLocateHandJointsExt(GetHandTrackerForHand(hand), locateInfo, locations);
+            if (result.Failed())
+            {
+                throw new Exception($"Failed to locate hand-joints: {result.ToString()}");
+            }
+            
+            return locations.IsActive;
         }
 
-        internal XrHandJointSetExt JointSet { get; private set; }
+        #region Validation Checks
 
 #if UNITY_EDITOR
         protected override void GetValidationChecks(List<ValidationRule> rules, BuildTargetGroup targetGroup)
@@ -431,5 +428,7 @@ namespace Ultraleap.Tracking.OpenXR
             });
         }
 #endif
+
+        #endregion
     }
 }

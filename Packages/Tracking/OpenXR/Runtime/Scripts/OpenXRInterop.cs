@@ -10,6 +10,11 @@ using UnityEngine.XR.OpenXR.NativeTypes;
 
 namespace Ultraleap.Tracking.OpenXR.Interop
 {
+    public static class Constants
+    {
+        public const int MaxResultStringSize = 64;
+    }
+
     delegate XrResult GetInstanceProcAddrDelegate(XrInstance instance, in string name, out IntPtr function);
 
     delegate XrResult WaitFrameDelegate(XrSession session, in XrFrameWaitInfo frameWaitInfo, XrFrameState frameState);
@@ -26,7 +31,7 @@ namespace Ultraleap.Tracking.OpenXR.Interop
         XrHandJointLocationsExt jointLocations);
 
     delegate XrResult SetHandTrackingHintsUltraleapDelegate(in string[] hints, uint hintsLength);
-    
+
 
     public static class XrResultExtensions
     {
@@ -35,11 +40,9 @@ namespace Ultraleap.Tracking.OpenXR.Interop
         public static bool Failed(this XrResult result) => result < 0;
     }
 
-    public struct XrInstance : IEquatable<ulong>
+    public readonly struct XrInstance : IEquatable<ulong>
     {
         private readonly ulong _raw;
-
-        public bool IsNull => _raw == 0;
 
         public XrInstance(ulong value) => _raw = value;
         public static implicit operator ulong(XrInstance equatable) => equatable._raw;
@@ -54,7 +57,7 @@ namespace Ultraleap.Tracking.OpenXR.Interop
         public static bool operator !=(XrInstance a, XrInstance b) => !a.Equals(b);
     }
 
-    public struct XrSession : IEquatable<ulong>
+    public readonly struct XrSession : IEquatable<ulong>
     {
         private readonly ulong _raw;
 
@@ -71,7 +74,7 @@ namespace Ultraleap.Tracking.OpenXR.Interop
         public static bool operator !=(XrSession a, XrSession b) => !a.Equals(b);
     }
 
-    public struct XrSystemId : IEquatable<ulong>
+    public readonly struct XrSystemId : IEquatable<ulong>
     {
         private readonly ulong _raw;
 
@@ -89,7 +92,7 @@ namespace Ultraleap.Tracking.OpenXR.Interop
     }
 
 
-    public struct XrSpace : IEquatable<ulong>
+    public readonly struct XrSpace : IEquatable<ulong>
     {
         private readonly ulong _raw;
 
@@ -105,8 +108,8 @@ namespace Ultraleap.Tracking.OpenXR.Interop
         public static bool operator ==(XrSpace a, XrSpace b) => a.Equals(b);
         public static bool operator !=(XrSpace a, XrSpace b) => !a.Equals(b);
     }
-    
-    public struct XrHandTrackerExt : IEquatable<ulong>
+
+    public readonly struct XrHandTrackerExt : IEquatable<ulong>
     {
         private readonly ulong _raw;
 
@@ -123,7 +126,7 @@ namespace Ultraleap.Tracking.OpenXR.Interop
         public static bool operator !=(XrHandTrackerExt a, XrHandTrackerExt b) => !a.Equals(b);
     }
 
-    public struct XrTime : IEquatable<long>
+    public readonly struct XrTime : IEquatable<long>
     {
         internal readonly long _raw;
 
@@ -148,7 +151,7 @@ namespace Ultraleap.Tracking.OpenXR.Interop
         public static float operator /(XrTime a, XrDuration b) => (float)a._raw / b._raw;
     }
 
-    public struct XrDuration : IEquatable<long>
+    public readonly struct XrDuration : IEquatable<long>
     {
         internal readonly long _raw;
 
@@ -184,21 +187,21 @@ namespace Ultraleap.Tracking.OpenXR.Interop
         HandJointLocationsExt = 1000051003,
         HandJointVelocitiesExt = 1000051004,
     }
-    
+
     public interface IXrExtendable
     {
         public XrStructureType Type { get; }
         public IntPtr Next { get; set; }
     }
-    
+
     public struct XrSystemGraphicsProperties
     {
         public uint MaxSwapchainImageHeight;
         public uint MaxSwapchainImageWidth;
         public uint MaxLayerCount;
     }
-  
-    
+
+
     public struct XrSystemTrackingProperties
     {
         public bool OrientationTracking;
@@ -217,7 +220,7 @@ namespace Ultraleap.Tracking.OpenXR.Interop
 
         [UsedImplicitly] public XrSystemGraphicsProperties GraphicsProperties;
         [UsedImplicitly] public XrSystemTrackingProperties TrackingProperties;
-        
+
         public XrSystemProperties(IntPtr next) : this()
         {
             Type = XrStructureType.SystemProperties;
@@ -237,13 +240,13 @@ namespace Ultraleap.Tracking.OpenXR.Interop
             Next = next;
         }
     }
-    
+
     public struct XrHandTrackerCreateInfoExt : IXrExtendable
     {
         [UsedImplicitly] public XrStructureType Type { get; set; }
         [UsedImplicitly] public IntPtr Next { get; set; }
         [UsedImplicitly] public XrHandExt Hand;
-        [UsedImplicitly]public XrHandJointSetExt HandJointSet;
+        [UsedImplicitly] public XrHandJointSetExt HandJointSet;
 
         public XrHandTrackerCreateInfoExt(XrHandExt hand, XrHandJointSetExt handJointSet) : this()
         {
@@ -253,7 +256,7 @@ namespace Ultraleap.Tracking.OpenXR.Interop
             HandJointSet = handJointSet;
         }
     }
-    
+
     public struct XrFrameWaitInfo : IXrExtendable
     {
         [UsedImplicitly] public XrStructureType Type { get; set; }
@@ -268,17 +271,53 @@ namespace Ultraleap.Tracking.OpenXR.Interop
         [UsedImplicitly] public XrDuration PredictedDisplayPeriod;
         [UsedImplicitly] public bool ShouldRender;
     }
-    
+
     public enum XrHandExt
     {
         Left = 1,
         Right = 2,
     }
-    
+
     public enum XrHandJointSetExt
     {
         Default = 0,
-        HandWithForearm = 1000149000,
+        HandWithForearmUltraleap = 1000149000,
+    }
+    
+    /// <summary>
+    /// The hand joints according to the <see href="https://www.khronos.org/registry/OpenXR/specs/1.0/html/xrspec.html#XrHandJointEXT">OpenXR Specification</see>.
+    /// </summary>
+    public enum XrHandJointExt
+    {
+        Palm = 0,
+        Wrist,
+        ThumbMetacarpal,
+        ThumbProximal,
+        ThumbDistal,
+        ThumbTip,
+        IndexMetacarpal,
+        IndexProximal,
+        IndexIntermediate,
+        IndexDistal,
+        IndexTip,
+        MiddleMetacarpal,
+        MiddleProximal,
+        MiddleIntermediate,
+        MiddleDistal,
+        MiddleTip,
+        RingMetacarpal,
+        RingProximal,
+        RingIntermediate,
+        RingDistal,
+        RingTip,
+        LittleMetacarpal,
+        LittleProximal,
+        LittleIntermediate,
+        LittleDistal,
+        LittleTip,
+
+        // Ultraleap Elbow extension
+        Elbow
     }
 
     public struct XrHandJointsLocateInfoExt : IXrExtendable
@@ -287,7 +326,7 @@ namespace Ultraleap.Tracking.OpenXR.Interop
         [UsedImplicitly] public IntPtr Next { get; set; }
         [UsedImplicitly] public XrSpace BaseSpace;
         [UsedImplicitly] public XrTime Time;
-        
+
         public XrHandJointsLocateInfoExt(IntPtr next) : this()
         {
             Type = XrStructureType.HandTrackerCreateInfoExt;
@@ -315,26 +354,28 @@ namespace Ultraleap.Tracking.OpenXR.Interop
 
     public struct XrHandJointLocationExt
     {
-        [UsedImplicitly] public XrSpaceLocationFlags LocationFlags;
-        [UsedImplicitly] public XrPosef Pose;
-        [UsedImplicitly] public float Radius;
+        [UsedImplicitly] private XrSpaceLocationFlags _locationFlags;
+        [UsedImplicitly] private XrPosef _pose;
+        [UsedImplicitly] public float Radius { get; }
+
+        public Pose Pose => _pose;
         
         [UsedImplicitly] public bool IsValid => PositionValid && OrientationValid;
         [UsedImplicitly] public bool IsTracked => OrientationTracked && PositionTracked;
 
-        private bool PositionValid => LocationFlags.HasFlag(XrSpaceLocationFlags.PositionValid);
-        private bool OrientationValid => LocationFlags.HasFlag(XrSpaceLocationFlags.OrientationValid);
-        private bool PositionTracked => LocationFlags.HasFlag(XrSpaceLocationFlags.PositionTracked);
-        private bool OrientationTracked => LocationFlags.HasFlag(XrSpaceLocationFlags.OrientationTracked);
+        private bool PositionValid => _locationFlags.HasFlag(XrSpaceLocationFlags.PositionValid);
+        private bool OrientationValid => _locationFlags.HasFlag(XrSpaceLocationFlags.OrientationValid);
+        private bool PositionTracked => _locationFlags.HasFlag(XrSpaceLocationFlags.PositionTracked);
+        private bool OrientationTracked => _locationFlags.HasFlag(XrSpaceLocationFlags.OrientationTracked);
     }
-    
+
     public struct XrHandJointVelocitiesExt : IXrExtendable
     {
         [UsedImplicitly] public XrStructureType Type { get; set; }
         [UsedImplicitly] public IntPtr Next { get; set; }
         [UsedImplicitly] public uint JointCount;
         [UsedImplicitly] public IntPtr JointVelocitiesPtr;
-        
+
         public XrHandJointVelocitiesExt(IntPtr next) : this()
         {
             Type = XrStructureType.HandJointVelocitiesExt;
@@ -347,11 +388,11 @@ namespace Ultraleap.Tracking.OpenXR.Interop
         [UsedImplicitly] public XrSpaceVelocityFlags VelocityFlags;
         [UsedImplicitly] public XrVector3f LinearVelocity;
         [UsedImplicitly] public XrVector3f AngularVelocity;
-        
+
         [UsedImplicitly] public bool IsLinearValid => VelocityFlags.HasFlag(XrSpaceVelocityFlags.LinearValid);
         [UsedImplicitly] public bool IsAngularValid => VelocityFlags.HasFlag(XrSpaceVelocityFlags.AngularValid);
     }
-    
+
     public enum XrSpaceLocationFlags : ulong
     {
         OrientationValid = 0x1,
@@ -359,14 +400,14 @@ namespace Ultraleap.Tracking.OpenXR.Interop
         OrientationTracked = 0x4,
         PositionTracked = 0x8,
     }
-    
+
     public enum XrSpaceVelocityFlags : ulong
     {
         LinearValid = 0x1,
         AngularValid = 0x2,
     }
 
-    
+
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public struct XrVector3f
     {
@@ -380,11 +421,8 @@ namespace Ultraleap.Tracking.OpenXR.Interop
             Y = y;
             Z = -z;
         }
-        
-        public static implicit operator Vector3(XrVector3f value)
-        {
-            return new Vector3(value.X, value.Y, value.Z);
-        }
+
+        public static implicit operator Vector3(XrVector3f value) => new(value.X, value.Y, value.Z);
 
         public XrVector3f(Vector3 value)
         {
@@ -409,11 +447,8 @@ namespace Ultraleap.Tracking.OpenXR.Interop
             Z = z;
             W = w;
         }
-        
-        public static implicit operator Quaternion(XrQuaternionf value)
-        {
-            return new Quaternion(value.X, value.Y, value.Z, value.W);
-        }
+
+        public static implicit operator Quaternion(XrQuaternionf value) => new(value.X, value.Y, value.Z, value.W);
 
         public XrQuaternionf(Quaternion quaternion)
         {
@@ -430,10 +465,18 @@ namespace Ultraleap.Tracking.OpenXR.Interop
         [UsedImplicitly] public XrQuaternionf Orientation;
         [UsedImplicitly] public XrVector3f Position;
 
-        public XrPosef(Vector3 vec3, Quaternion quaternion)
+        public XrPosef(Vector3 vector, Quaternion quaternion)
         {
-            Position = new XrVector3f(vec3);
+            Position = new XrVector3f(vector);
             Orientation = new XrQuaternionf(quaternion);
         }
+
+        public XrPosef(Pose pose)
+        {
+            Position = new XrVector3f(pose.position);
+            Orientation = new XrQuaternionf(pose.rotation);
+        }
+
+        public static implicit operator Pose(XrPosef xrPose) => new(xrPose.Position, xrPose.Orientation);
     }
 }

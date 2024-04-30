@@ -4,6 +4,7 @@ using Leap.Unity.Encoding;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Ultraleap.Tracking.OpenXR.Interop;
 using UnityEngine;
 using UnityEngine.SpatialTracking;
 using UnityEngine.XR.Management;
@@ -15,18 +16,19 @@ namespace Ultraleap.Tracking.OpenXR
 {
     public class OpenXRLeapProvider : LeapProvider
     {
-        private LeapTransform trackerTransform = new LeapTransform(Vector3.zero, Quaternion.identity);
+        private HandTrackingFeature _handTracking = OpenXRSettings.Instance.GetFeature<HandTrackingFeature>();
+        
+        private LeapTransform _trackerTransform = new(Vector3.zero, Quaternion.identity);
 
-        private Frame _currentFrame = new Frame();
+        private Frame _currentFrame = new();
+        private Hand _leftHand = new();
+        private Hand _rightHand = new();
 
-        private Hand _leftHand = new Hand();
-        private Hand _rightHand = new Hand();
-
-        private int _handId = 0;
-        private int _leftHandId = 0;
-        private int _rightHandId = 0;
-        private long _leftHandFirstSeen_ticks;
-        private long _rightHandFirstSeen_ticks;
+        private int _handId;
+        private int _leftHandId;
+        private int _rightHandId;
+        private long _leftHandFirstSeenTicks;
+        private long _rightHandFirstSeenTicks;
 
         // Correction for the 0th thumb bone rotation offsets to match LeapC
         private static readonly Quaternion[] ThumbMetacarpalRotationOffset =
@@ -42,7 +44,7 @@ namespace Ultraleap.Tracking.OpenXR
             new Pose(new Vector3(0.001039105f, -0.008749885f, 0.01165112f), Quaternion.Euler(-8f, +0.63f, +8.4f)),
         };
 
-        private const float DEFAULT_HAND_SCALE = 0.08425f;
+        private const float DefaultHandScale = 0.08425f;
 
         private long _frameId = 0;
 
@@ -57,7 +59,7 @@ namespace Ultraleap.Tracking.OpenXR
         {
             get
             {
-                if (_mainCamera == null)
+                if (!_mainCamera)
                 {
                     _mainCamera = Camera.main;
                 }
@@ -70,7 +72,8 @@ namespace Ultraleap.Tracking.OpenXR
         }
 
         private TrackedPoseDriver _trackedPoseDriver;
-        private HandJointLocation[] _joints;
+        private XrHandJointLocationExt[] _jointLocations;
+        private XrHandJointVelocityExt[] _jointVelocities;
 
         public override TrackingSource TrackingDataSource { get { return CheckOpenXRAvailable(); } }
 
@@ -114,26 +117,26 @@ namespace Ultraleap.Tracking.OpenXR
         {
             PopulateLeapFrame(ref _currentFrame);
 
-            trackerTransform.translation = Vector3.zero;
-            trackerTransform.rotation = Quaternion.identity;
-            trackerTransform.scale = mainCamera.transform.lossyScale;
+            _trackerTransform.translation = Vector3.zero;
+            _trackerTransform.rotation = Quaternion.identity;
+            _trackerTransform.scale = mainCamera.transform.lossyScale;
 
             // Adjust for relative transform if it's in use.
             if (_trackedPoseDriver != null && _trackedPoseDriver.UseRelativeTransform)
             {
-                trackerTransform.translation += _trackedPoseDriver.originPose.position;
-                trackerTransform.rotation *= _trackedPoseDriver.originPose.rotation;
+                _trackerTransform.translation += _trackedPoseDriver.originPose.position;
+                _trackerTransform.rotation *= _trackedPoseDriver.originPose.rotation;
             }
 
             // Adjust for the camera parent transform if this camera is part of a rig.
             var parentTransform = mainCamera.transform.parent;
             if (parentTransform != null)
             {
-                trackerTransform.translation += parentTransform.position;
-                trackerTransform.rotation *= parentTransform.rotation;
+                _trackerTransform.translation += parentTransform.position;
+                _trackerTransform.rotation *= parentTransform.rotation;
             }
 
-            _currentFrame.Transform(trackerTransform);
+            _currentFrame.Transform(_trackerTransform);
 
             DispatchUpdateFrameEvent(_currentFrame);
         }
@@ -151,56 +154,59 @@ namespace Ultraleap.Tracking.OpenXR
             leapFrame.Timestamp = (long)(Time.realtimeSinceStartup * 1000000f);
             leapFrame.CurrentFramesPerSecond = 1.0f / Time.smoothDeltaTime;
 
-            if (PopulateLeapHandFromOpenXRJoints(HandTracker.Left, ref _leftHand))
+            if (PopulateLeapHandFromOpenXRJoints(XrHandExt.Left, ref _leftHand))
             {
                 leapFrame.Hands.Add(_leftHand);
             }
 
-            if (PopulateLeapHandFromOpenXRJoints(HandTracker.Right, ref _rightHand))
+            if (PopulateLeapHandFromOpenXRJoints(XrHandExt.Right, ref _rightHand))
             {
                 leapFrame.Hands.Add(_rightHand);
             }
         }
 
-        private bool PopulateLeapHandFromOpenXRJoints(HandTracker handTracker, ref Hand hand)
+        private bool PopulateLeapHandFromOpenXRJoints(XrHandExt hand, ref Hand leapHand)
         {
-            _joints ??= new HandJointLocation[handTracker.JointCount];
+            // TODO: Retrieve this properly from the feature.
+            int jointCount = 27;
+            
+            _jointLocations ??= new XrHandJointLocationExt[jointCount];
+            _jointVelocities ??= new XrHandJointVelocityExt[jointCount];
+            
+            bool isLeftHand = hand == XrHandExt.Left;
 
-            if (!handTracker.TryLocateHandJoints(_joints))
+            if (!_handTracking.LocateHandJoints(hand, ref _jointLocations, ref _jointVelocities))
             {
-                if (handTracker == HandTracker.Left)
+                if (isLeftHand)
                 {
-                    _leftHandFirstSeen_ticks = -1;
+                    _leftHandFirstSeenTicks = -1;
                 }
                 else
                 {
-                    _rightHandFirstSeen_ticks = -1;
+                    _rightHandFirstSeenTicks = -1;
                 }
-
                 return false;
             }
 
+            float timeVisible;
             long currentDateTimeTicks = DateTime.Now.Ticks;
-
-            float timeVisible = 0;
-            if (handTracker == HandTracker.Left)
+            if (isLeftHand)
             {
-                if (_leftHandFirstSeen_ticks == -1)
+                if (_leftHandFirstSeenTicks == -1)
                 {
-                    _leftHandFirstSeen_ticks = currentDateTimeTicks;
+                    _leftHandFirstSeenTicks = currentDateTimeTicks;
                     _leftHandId = _handId++;
                 }
-                timeVisible = ((float)(currentDateTimeTicks - _leftHandFirstSeen_ticks)) / (float)TimeSpan.TicksPerSecond;
+                timeVisible = (float)(currentDateTimeTicks - _leftHandFirstSeenTicks) / TimeSpan.TicksPerSecond;
             }
             else
             {
-                if (_rightHandFirstSeen_ticks == -1)
+                if (_rightHandFirstSeenTicks == -1)
                 {
-                    _rightHandFirstSeen_ticks = currentDateTimeTicks;
+                    _rightHandFirstSeenTicks = currentDateTimeTicks;
                     _rightHandId = _handId++;
                 }
-                timeVisible = ((float)(currentDateTimeTicks - _rightHandFirstSeen_ticks)) /
-                              (float)TimeSpan.TicksPerSecond;
+                timeVisible = (float)(currentDateTimeTicks - _rightHandFirstSeenTicks) / TimeSpan.TicksPerSecond;
             }
 
             for (int fingerIndex = 0; fingerIndex < 5; fingerIndex++)
@@ -214,27 +220,27 @@ namespace Ultraleap.Tracking.OpenXR
                 {
                     var xrPrevIndex = fingerIndex * 5 + boneIndex + 1;
                     var xrNextIndex = xrPrevIndex + 1;
-                    var prevJoint = _joints[xrPrevIndex];
-                    var nextJoint = _joints[xrNextIndex];
+                    var prevJoint = _jointLocations[xrPrevIndex];
+                    var nextJoint = _jointLocations[xrNextIndex];
 
                     // Ignore thumb Metacarpal
                     if (fingerIndex == 0 && boneIndex == 0)
                     {
-                        var metacarpalPosition = _joints[(int)HandJoint.ThumbMetacarpal].Pose.position;
-                        hand.GetBone(boneIndex).Fill(
+                        var metacarpalPosition = _jointLocations[(int)XrHandJointExt.ThumbMetacarpal].Pose.position;
+                        leapHand.GetBone(boneIndex).Fill(
                             metacarpalPosition,
                             metacarpalPosition,
                             metacarpalPosition,
-                            _joints[(int)HandJoint.ThumbMetacarpal].Pose.forward,
+                            _jointLocations[(int)XrHandJointExt.ThumbMetacarpal].Pose.forward,
                             0f,
-                            _joints[(int)HandJoint.ThumbMetacarpal].Radius * 1.5f, // 1.5 to convert from joint radius to bone width (joints bigger than bones)
+                            _jointLocations[(int)XrHandJointExt.ThumbMetacarpal].Radius * 1.5f, // 1.5 to convert from joint radius to bone width (joints bigger than bones)
                             (Bone.BoneType)boneIndex,
-                            (_joints[(int)HandJoint.Palm].Pose.rotation * PalmOffset[hand.IsLeft ? 0 : 1].rotation) * ThumbMetacarpalRotationOffset[hand.IsLeft ? 0 : 1]);
+                            (_jointLocations[(int)XrHandJointExt.Palm].Pose.rotation * PalmOffset[leapHand.IsLeft ? 0 : 1].rotation) * ThumbMetacarpalRotationOffset[leapHand.IsLeft ? 0 : 1]);
                         continue;
                     }
 
                     // Populate the finger bone information
-                    var bone = hand.Fingers[fingerIndex].bones[boneIndex];
+                    var bone = leapHand.Fingers[fingerIndex].bones[boneIndex];
                     bone.Fill(
                         prevJoint.Pose.position,
                         nextJoint.Pose.position,
@@ -264,60 +270,60 @@ namespace Ultraleap.Tracking.OpenXR
                 }
 
                 // Populate the higher - level finger data.
-                hand.Fingers[fingerIndex].Fill(
+                leapHand.Fingers[fingerIndex].Fill(
                     _frameId,
-                    (handTracker == HandTracker.Left ? 0 : 1),
+                    (isLeftHand ? 0 : 1),
                     fingerIndex,
                     timeVisible,
-                    _joints[xrTipIndex].Pose.position,
-                    _joints[xrIntermediateIndex].Pose.forward,
+                    _jointLocations[xrTipIndex].Pose.position,
+                    _jointLocations[xrIntermediateIndex].Pose.forward,
                     fingerWidth,
                     fingerLength,
-                    hand.GetFingerStrength(fingerIndex) < 0.4, // Fixed for now
+                    leapHand.GetFingerStrength(fingerIndex) < 0.4, // Fixed for now
                     (Finger.FingerType)fingerIndex);
             }
 
             // Populate the whole hand information.
             // NOTE: Ordering is important as some of the `Calculate*` functions requires some of this data to be set.
-            float handScale = Hands.CalculateHandScale(ref hand); // Requires fingers to be set.
-            hand.FrameId = _frameId;
-            hand.Id = handTracker == HandTracker.Left ? _leftHandId : _rightHandId;
-            hand.Confidence = 1.0f;
-            hand.PalmWidth = handScale * DEFAULT_HAND_SCALE;
-            hand.IsLeft = handTracker == HandTracker.Left;
-            hand.TimeVisible = timeVisible;
-            hand.PalmVelocity = _joints[(int)HandJoint.Palm].LinearVelocity;
-            hand.WristPosition = _joints[(int)HandJoint.Wrist].Pose.position;
+            float handScale = Hands.CalculateHandScale(ref leapHand); // Requires fingers to be set.
+            leapHand.FrameId = _frameId;
+            leapHand.Id = isLeftHand ? _leftHandId : _rightHandId;
+            leapHand.Confidence = 1.0f;
+            leapHand.PalmWidth = handScale * DefaultHandScale;
+            leapHand.IsLeft = isLeftHand;
+            leapHand.TimeVisible = timeVisible;
+            leapHand.PalmVelocity = _jointVelocities[(int)XrHandJointExt.Palm].LinearVelocity;
+            leapHand.WristPosition = _jointLocations[(int)XrHandJointExt.Wrist].Pose.position;
 
             // Calculate adjusted palm position, rotation and direction.
-            hand.Rotation = _joints[(int)HandJoint.Palm].Pose.rotation * PalmOffset[hand.IsLeft ? 0 : 1].rotation;
-            hand.PalmPosition = _joints[(int)HandJoint.Palm].Pose.position + hand.Rotation * PalmOffset[hand.IsLeft ? 0 : 1].position;
-            hand.StabilizedPalmPosition = hand.PalmPosition;
-            hand.PalmNormal = hand.Rotation * Vector3.down;
-            hand.Direction = hand.Rotation * Vector3.forward;
+            leapHand.Rotation = _jointLocations[(int)XrHandJointExt.Palm].Pose.rotation * PalmOffset[isLeftHand ? 0 : 1].rotation;
+            leapHand.PalmPosition = _jointLocations[(int)XrHandJointExt.Palm].Pose.position + leapHand.Rotation * PalmOffset[isLeftHand ? 0 : 1].position;
+            leapHand.StabilizedPalmPosition = leapHand.PalmPosition;
+            leapHand.PalmNormal = leapHand.Rotation * Vector3.down;
+            leapHand.Direction = leapHand.Rotation * Vector3.forward;
 
             // Calculate now we have the hand data available.
             // Requires `Hand.Rotation` and fingers to be set.
-            hand.GrabStrength = Hands.CalculateGrabStrength(ref hand);
-            hand.PinchStrength = Hands.CalculatePinchStrength(ref hand);
-            hand.PinchDistance = Hands.CalculatePinchDistance(ref hand);
+            leapHand.GrabStrength = Hands.CalculateGrabStrength(ref leapHand);
+            leapHand.PinchStrength = Hands.CalculatePinchStrength(ref leapHand);
+            leapHand.PinchDistance = Hands.CalculatePinchDistance(ref leapHand);
 
             // Other hand-properties are derived.
-            hand.PalmNormal = hand.Rotation * Vector3.down;
+            leapHand.PalmNormal = leapHand.Rotation * Vector3.down;
 
             // Fill arm data.
-            var palmPosition = _joints[(int)HandJoint.Palm].Pose.position;
-            var wristPosition = _joints[(int)HandJoint.Wrist].Pose.position;
-            var wristWidth = _joints[(int)HandJoint.Wrist].Radius * 2f;
+            var palmPosition = _jointLocations[(int)XrHandJointExt.Palm].Pose.position;
+            var wristPosition = _jointLocations[(int)XrHandJointExt.Wrist].Pose.position;
+            var wristWidth = _jointLocations[(int)XrHandJointExt.Wrist].Radius * 2f;
 
-            if (handTracker.JointSet == HandJointSet.HandWithForearm)
+            if (_handTracking.JointSet == XrHandJointSetExt.HandWithForearmUltraleap)
             {
-                var elbowPosition = _joints[(int)HandJoint.Elbow].Pose.position;
-                var elbowRotation = _joints[(int)HandJoint.Elbow].Pose.rotation;
+                var elbowPosition = _jointLocations[(int)XrHandJointExt.Elbow].Pose.position;
+                var elbowRotation = _jointLocations[(int)XrHandJointExt.Elbow].Pose.rotation;
                 var elbowDirection = elbowRotation * Vector3.back;
                 var elbowLength = (elbowPosition - wristPosition).magnitude;
                 var centerPosition = (elbowPosition + wristPosition) / 2f;
-                hand.Arm.Fill(
+                leapHand.Arm.Fill(
                     elbowPosition,
                     wristPosition,
                     centerPosition,
@@ -330,11 +336,11 @@ namespace Ultraleap.Tracking.OpenXR
             else
             {
                 const float elbowLength = 0.3f;
-                var elbowRotation = _joints[(int)HandJoint.Palm].Pose.rotation;
+                var elbowRotation = _jointLocations[(int)XrHandJointExt.Palm].Pose.rotation;
                 var elbowDirection = elbowRotation * Vector3.back;
-                var elbowPosition = _joints[(int)HandJoint.Palm].Pose.position + (elbowDirection * elbowLength);
+                var elbowPosition = _jointLocations[(int)XrHandJointExt.Palm].Pose.position + (elbowDirection * elbowLength);
                 var centerPosition = (elbowPosition + palmPosition) / 2f;
-                hand.Arm.Fill(
+                leapHand.Arm.Fill(
                     elbowPosition,
                     wristPosition,
                     centerPosition,
