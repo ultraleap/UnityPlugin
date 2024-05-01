@@ -1033,7 +1033,6 @@ namespace Leap.Unity.PhysicalHands
 
             if (grabbingHandPositions.Count > 1)
             {
-                Debug.Log("more than one pos");
                 _newPosition = Vector3.Lerp(grabbingHandPositions.ElementAt(0), grabbingHandPositions.ElementAt(1), 0.5f);
                 _newRotation = Quaternion.Slerp(grabbingHandRotations.ElementAt(0), grabbingHandRotations.ElementAt(1), 0.5f);
             }
