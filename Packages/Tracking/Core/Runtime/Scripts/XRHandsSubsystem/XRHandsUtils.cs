@@ -6,10 +6,11 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
+using Leap.Unity;
 using UnityEngine;
 using UnityEngine.XR.Hands;
 
-namespace Leap.Unity
+namespace Leap
 {
     public static class XRHandsUtils
     {
@@ -109,6 +110,22 @@ namespace Leap.Unity
                 float distanceZero = 0.0600f * handScale;
                 float distanceOne = 0.0220f * handScale;
                 return Mathf.Clamp01((distance - distanceZero) / (distanceOne - distanceZero));
+            }
+
+            return 0;
+        }
+
+        public static float CalculatePinchDistance(this XRHand hand, XRHandJointID jointToCompare = XRHandJointID.IndexTip)
+        {
+            // Get the thumb position.
+            Vector3 thumbTip = Vector3.zero;
+            if (hand.GetJoint(XRHandJointID.ThumbTip).TryGetPose(out Pose thumbTipPose)) thumbTip = thumbTipPose.position;
+
+            // Compute the distance midpoints between the thumb and thejointToCompare.
+            if (hand.GetJoint(jointToCompare).TryGetPose(out var fingerTipPose))
+            {
+                float distance = (fingerTipPose.position - thumbTip).magnitude;
+                return distance;
             }
 
             return 0;
