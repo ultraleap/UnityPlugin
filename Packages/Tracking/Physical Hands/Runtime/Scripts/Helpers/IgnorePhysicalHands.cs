@@ -288,7 +288,7 @@ namespace Leap.Unity.PhysicalHands
             if (this.enabled &&
                 hand != null &&
                 _disableAllHandCollisions &&
-                ((int)HandToIgnoreGrabs == (int)hand.Handedness || HandToIgnoreGrabs == ChiralitySelection.BOTH))
+                ((int)HandToIgnoreCollisions == (int)hand.Handedness || HandToIgnoreCollisions == ChiralitySelection.BOTH))
             {
                 return true;
             }
