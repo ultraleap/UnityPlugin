@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support for reading the camera matrix
 
 ### Changed
-- 
+- Improved XRHands support for Meta Aim Input Actions
 
 ### Fixed
 - Issue with the method signature for LeapPixelToRectilinearEx
