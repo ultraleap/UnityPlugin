@@ -26,6 +26,7 @@ namespace Leap.Unity.PhysicalHands
 
         private Hand modifiedHand = new Hand();
         internal Hand dataHand = new Hand();
+        public Hand ModifiedHand => modifiedHand;
         [SerializeField]
         internal bool tracked = false, resetting = false, ghosted = false;
 
@@ -110,7 +111,7 @@ namespace Leap.Unity.PhysicalHands
         /// Update the hand using new tracking data. Updated each bone includin the palm and tidies up any old data that may need to be updated
         /// </summary>
         /// <param name="hand">The tracking data hand to update with</param>
-        internal void UpdateHand(Hand hand)
+        public void UpdateHand(Hand hand)
         {
             dataHand.CopyFrom(hand);
             UpdateHandLogic(hand);
