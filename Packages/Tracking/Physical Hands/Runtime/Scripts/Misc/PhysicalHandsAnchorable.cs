@@ -6,7 +6,8 @@ namespace Leap.Unity
     public class PhysicalHandsAnchorable : AnchorableBehaviour, IPhysicalHandGrab, IPhysicalHandHover
     {
         private IgnorePhysicalHands _ignorePhysicalHands = null;
-        private ChiralitySelection originalIgnoreHands = ChiralitySelection.NONE;
+        private ChiralitySelection originalIgnoreHandsGrab = ChiralitySelection.NONE;
+        private ChiralitySelection originalIgnoreHandsCollisions = ChiralitySelection.NONE;
 
         private bool leftHandGrabbing;
         private bool rightHandGrabbing;
@@ -24,7 +25,8 @@ namespace Leap.Unity
             // Cache the original ignoring hands if they exist so we can revert to them when un-anchored
             if (TryGetComponent<IgnorePhysicalHands>(out _ignorePhysicalHands))
             {
-                originalIgnoreHands = _ignorePhysicalHands.HandToIgnore;
+                originalIgnoreHandsGrab = _ignorePhysicalHands.HandToIgnoreGrabs;
+                originalIgnoreHandsCollisions = _ignorePhysicalHands.HandToIgnoreCollisions;
             }
         }
 
@@ -38,7 +40,8 @@ namespace Leap.Unity
                     _ignorePhysicalHands = this.gameObject.AddComponent<IgnorePhysicalHands>();
                 }
 
-                _ignorePhysicalHands.HandToIgnore = Anchor.AttahedHandChirality;
+                _ignorePhysicalHands.HandToIgnoreGrabs = Anchor.AttahedHandChirality;
+                _ignorePhysicalHands.HandToIgnoreCollisions = Anchor.AttahedHandChirality;
             }
         }
 
@@ -47,7 +50,8 @@ namespace Leap.Unity
         {
             if(_ignorePhysicalHands != null)
             {
-                _ignorePhysicalHands.HandToIgnore = originalIgnoreHands;
+                _ignorePhysicalHands.HandToIgnoreGrabs = originalIgnoreHandsGrab;
+                _ignorePhysicalHands.HandToIgnoreCollisions = originalIgnoreHandsCollisions;
             }
         }
 
