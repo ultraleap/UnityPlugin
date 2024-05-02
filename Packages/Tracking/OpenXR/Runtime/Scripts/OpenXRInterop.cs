@@ -1,9 +1,6 @@
 ﻿using JetBrains.Annotations;
 using System;
-using System.Buffers;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.XR.OpenXR.NativeTypes;
@@ -13,9 +10,12 @@ namespace Ultraleap.Tracking.OpenXR.Interop
     public static class Constants
     {
         public const int MaxResultStringSize = 64;
-    }
 
-    delegate XrResult GetInstanceProcAddrDelegate(XrInstance instance, in string name, out IntPtr function);
+        public const int HandJointCountExt = 26;
+        public const int HandForearmJointCountUltraleap = 27;
+    }
+    
+    delegate XrResult GetInstanceProcAddrDelegate(ulong instance, in string name, out IntPtr function);
 
     delegate XrResult WaitFrameDelegate(XrSession session, in XrFrameWaitInfo frameWaitInfo, XrFrameState frameState);
 

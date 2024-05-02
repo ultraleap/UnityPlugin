@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using Leap;
 using Leap.Unity;
 using Leap.Unity.Encoding;
@@ -6,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Ultraleap.Tracking.OpenXR.Interop;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.SpatialTracking;
 using UnityEngine.XR.Management;
 using UnityEngine.XR.OpenXR;
@@ -16,8 +18,8 @@ namespace Ultraleap.Tracking.OpenXR
 {
     public class OpenXRLeapProvider : LeapProvider
     {
-        private HandTrackingFeature _handTracking = OpenXRSettings.Instance.GetFeature<HandTrackingFeature>();
-        
+        private HandTrackingFeature _handTracking;
+
         private LeapTransform _trackerTransform = new(Vector3.zero, Quaternion.identity);
 
         private Frame _currentFrame = new();
@@ -30,11 +32,10 @@ namespace Ultraleap.Tracking.OpenXR
         private long _leftHandFirstSeenTicks;
         private long _rightHandFirstSeenTicks;
 
-        // Correction for the 0th thumb bone rotation offsets to match LeapC
+        // Correction for the 0th thumb bone rotation offsets to match LeapC.
         private static readonly Quaternion[] ThumbMetacarpalRotationOffset =
         {
-            Quaternion.Euler(0, +25.9f, -63.45f),
-            Quaternion.Euler(0, -25.9f, +63.45f),
+            Quaternion.Euler(0, +25.9f, -63.45f), Quaternion.Euler(0, -25.9f, +63.45f),
         };
 
         // Correction for the Palm position & rotation to match LeapC. Also used for the hand rotation.
@@ -48,69 +49,57 @@ namespace Ultraleap.Tracking.OpenXR
 
         private long _frameId = 0;
 
-        [Tooltip("Specifies the main camera. Falls back to Camera.main if not set")]
-        [SerializeField]
-        private Camera _mainCamera; // Redundant backing field, used to present value in editor at parent level
+        [SerializeField] [FormerlySerializedAs("_mainCamera")]
+        private Camera mainCamera; // Redundant backing field, used to present value in editor at parent level
+
         /// <summary>
         /// Specifies the main camera.
         /// Falls back to Camera.main if not set.
         /// </summary>
-        public Camera mainCamera
+        [Tooltip("Specifies the main camera. Falls back to Camera.main if not set")]
+        public Camera MainCamera
         {
-            get
-            {
-                if (!_mainCamera)
-                {
-                    _mainCamera = Camera.main;
-                }
-                return _mainCamera;
-            }
-            set
-            {
-                _mainCamera = value;
-            }
+            get => mainCamera ??= Camera.main;
+            [UsedImplicitly] set => mainCamera = value;
         }
 
         private TrackedPoseDriver _trackedPoseDriver;
         private XrHandJointLocationExt[] _jointLocations;
         private XrHandJointVelocityExt[] _jointVelocities;
 
-        public override TrackingSource TrackingDataSource { get { return CheckOpenXRAvailable(); } }
-
-        private TrackingSource CheckOpenXRAvailable()
+        public override TrackingSource TrackingDataSource
         {
-            if (_trackingSource != TrackingSource.NONE)
+            get
             {
-                return _trackingSource;
-            }
-
-            if (XRGeneralSettings.Instance != null &&
-                XRGeneralSettings.Instance.Manager != null &&
-                XRGeneralSettings.Instance.Manager.ActiveLoaderAs<OpenXRLoaderBase>() != null &&
-                OpenXRSettings.Instance != null &&
-                OpenXRSettings.Instance.GetFeature<HandTrackingFeature>() != null &&
-                OpenXRSettings.Instance.GetFeature<HandTrackingFeature>().SupportsHandTracking)
-            {
-                if (OpenXRSettings.Instance.GetFeature<HandTrackingFeature>().IsUltraleapHandTracking)
+                if (_trackingSource != TrackingSource.NONE)
                 {
-                    _trackingSource = TrackingSource.OPENXR_LEAP;
+                    return _trackingSource;
+                }
+
+                if (XRGeneralSettings.Instance != null &&
+                    XRGeneralSettings.Instance.Manager != null &&
+                    XRGeneralSettings.Instance.Manager.ActiveLoaderAs<OpenXRLoaderBase>() != null &&
+                    OpenXRSettings.Instance != null &&
+                    OpenXRSettings.Instance.GetFeature<HandTrackingFeature>() != null &&
+                    OpenXRSettings.Instance.GetFeature<HandTrackingFeature>().SupportsHandTracking)
+                {
+                    _trackingSource = OpenXRSettings.Instance.GetFeature<HandTrackingFeature>().IsUltraleapHandTracking
+                        ? TrackingSource.OPENXR_LEAP
+                        : TrackingSource.OPENXR;
                 }
                 else
                 {
-                    _trackingSource = TrackingSource.OPENXR;
+                    _trackingSource = TrackingSource.NONE;
                 }
-            }
-            else
-            {
-                _trackingSource = TrackingSource.NONE;
-            }
 
-            return _trackingSource;
+                return _trackingSource;
+            }
         }
 
         private void Start()
         {
-            _trackedPoseDriver = mainCamera.GetComponent<TrackedPoseDriver>();
+            _handTracking = OpenXRSettings.Instance.GetFeature<HandTrackingFeature>();
+            _trackedPoseDriver = MainCamera.GetComponent<TrackedPoseDriver>();
         }
 
         private void Update()
@@ -119,7 +108,7 @@ namespace Ultraleap.Tracking.OpenXR
 
             _trackerTransform.translation = Vector3.zero;
             _trackerTransform.rotation = Quaternion.identity;
-            _trackerTransform.scale = mainCamera.transform.lossyScale;
+            _trackerTransform.scale = MainCamera.transform.lossyScale;
 
             // Adjust for relative transform if it's in use.
             if (_trackedPoseDriver != null && _trackedPoseDriver.UseRelativeTransform)
@@ -129,7 +118,7 @@ namespace Ultraleap.Tracking.OpenXR
             }
 
             // Adjust for the camera parent transform if this camera is part of a rig.
-            var parentTransform = mainCamera.transform.parent;
+            var parentTransform = MainCamera.transform.parent;
             if (parentTransform != null)
             {
                 _trackerTransform.translation += parentTransform.position;
@@ -169,10 +158,10 @@ namespace Ultraleap.Tracking.OpenXR
         {
             // TODO: Retrieve this properly from the feature.
             int jointCount = 27;
-            
+
             _jointLocations ??= new XrHandJointLocationExt[jointCount];
             _jointVelocities ??= new XrHandJointVelocityExt[jointCount];
-            
+
             bool isLeftHand = hand == XrHandExt.Left;
 
             if (!_handTracking.LocateHandJoints(hand, ref _jointLocations, ref _jointVelocities))
@@ -185,6 +174,7 @@ namespace Ultraleap.Tracking.OpenXR
                 {
                     _rightHandFirstSeenTicks = -1;
                 }
+
                 return false;
             }
 
@@ -197,6 +187,7 @@ namespace Ultraleap.Tracking.OpenXR
                     _leftHandFirstSeenTicks = currentDateTimeTicks;
                     _leftHandId = _handId++;
                 }
+
                 timeVisible = (float)(currentDateTimeTicks - _leftHandFirstSeenTicks) / TimeSpan.TicksPerSecond;
             }
             else
@@ -206,6 +197,7 @@ namespace Ultraleap.Tracking.OpenXR
                     _rightHandFirstSeenTicks = currentDateTimeTicks;
                     _rightHandId = _handId++;
                 }
+
                 timeVisible = (float)(currentDateTimeTicks - _rightHandFirstSeenTicks) / TimeSpan.TicksPerSecond;
             }
 
@@ -233,9 +225,12 @@ namespace Ultraleap.Tracking.OpenXR
                             metacarpalPosition,
                             _jointLocations[(int)XrHandJointExt.ThumbMetacarpal].Pose.forward,
                             0f,
-                            _jointLocations[(int)XrHandJointExt.ThumbMetacarpal].Radius * 1.5f, // 1.5 to convert from joint radius to bone width (joints bigger than bones)
+                            _jointLocations[(int)XrHandJointExt.ThumbMetacarpal].Radius *
+                            1.5f, // 1.5 to convert from joint radius to bone width (joints bigger than bones)
                             (Bone.BoneType)boneIndex,
-                            (_jointLocations[(int)XrHandJointExt.Palm].Pose.rotation * PalmOffset[leapHand.IsLeft ? 0 : 1].rotation) * ThumbMetacarpalRotationOffset[leapHand.IsLeft ? 0 : 1]);
+                            (_jointLocations[(int)XrHandJointExt.Palm].Pose.rotation *
+                             PalmOffset[leapHand.IsLeft ? 0 : 1].rotation) *
+                            ThumbMetacarpalRotationOffset[leapHand.IsLeft ? 0 : 1]);
                         continue;
                     }
 
@@ -247,7 +242,8 @@ namespace Ultraleap.Tracking.OpenXR
                         ((prevJoint.Pose.position + nextJoint.Pose.position) / 2f),
                         prevJoint.Pose.forward,
                         (prevJoint.Pose.position - nextJoint.Pose.position).magnitude,
-                        prevJoint.Radius * 1.5f, // 1.5 to convert from joint radius to bone width (joints bigger than bones)
+                        prevJoint.Radius *
+                        1.5f, // 1.5 to convert from joint radius to bone width (joints bigger than bones)
                         (Bone.BoneType)boneIndex,
                         prevJoint.Pose.rotation);
                     fingerWidth = Mathf.Max(fingerWidth, bone.Width);
@@ -296,8 +292,10 @@ namespace Ultraleap.Tracking.OpenXR
             leapHand.WristPosition = _jointLocations[(int)XrHandJointExt.Wrist].Pose.position;
 
             // Calculate adjusted palm position, rotation and direction.
-            leapHand.Rotation = _jointLocations[(int)XrHandJointExt.Palm].Pose.rotation * PalmOffset[isLeftHand ? 0 : 1].rotation;
-            leapHand.PalmPosition = _jointLocations[(int)XrHandJointExt.Palm].Pose.position + leapHand.Rotation * PalmOffset[isLeftHand ? 0 : 1].position;
+            leapHand.Rotation = _jointLocations[(int)XrHandJointExt.Palm].Pose.rotation *
+                                PalmOffset[isLeftHand ? 0 : 1].rotation;
+            leapHand.PalmPosition = _jointLocations[(int)XrHandJointExt.Palm].Pose.position +
+                                    leapHand.Rotation * PalmOffset[isLeftHand ? 0 : 1].position;
             leapHand.StabilizedPalmPosition = leapHand.PalmPosition;
             leapHand.PalmNormal = leapHand.Rotation * Vector3.down;
             leapHand.Direction = leapHand.Rotation * Vector3.forward;
@@ -338,7 +336,8 @@ namespace Ultraleap.Tracking.OpenXR
                 const float elbowLength = 0.3f;
                 var elbowRotation = _jointLocations[(int)XrHandJointExt.Palm].Pose.rotation;
                 var elbowDirection = elbowRotation * Vector3.back;
-                var elbowPosition = _jointLocations[(int)XrHandJointExt.Palm].Pose.position + (elbowDirection * elbowLength);
+                var elbowPosition = _jointLocations[(int)XrHandJointExt.Palm].Pose.position +
+                                    (elbowDirection * elbowLength);
                 var centerPosition = (elbowPosition + palmPosition) / 2f;
                 leapHand.Arm.Fill(
                     elbowPosition,
@@ -350,12 +349,13 @@ namespace Ultraleap.Tracking.OpenXR
                     elbowRotation
                 );
             }
+
             return true;
         }
 
         #region LeapProvider Implementation
 
-        [JetBrains.Annotations.NotNull]
+        [NotNull]
         public override Frame CurrentFrame
         {
             get
@@ -368,8 +368,7 @@ namespace Ultraleap.Tracking.OpenXR
             }
         }
 
-        [JetBrains.Annotations.NotNull]
-        public override Frame CurrentFixedFrame => CurrentFrame;
+        [NotNull] public override Frame CurrentFixedFrame => CurrentFrame;
 
 #if UNITY_EDITOR
         private Frame _backingUntransformedEditTimeFrame;
@@ -384,17 +383,18 @@ namespace Ultraleap.Tracking.OpenXR
                 _backingUntransformedEditTimeFrame.Hands.Add(EditTimeLeftHand);
                 _backingUntransformedEditTimeFrame.Hands.Add(EditTimeRightHand);
 
-                if (mainCamera != null)
+                if (MainCamera != null)
                 {
-                    _backingEditTimeFrame = _backingUntransformedEditTimeFrame.TransformedCopy(new LeapTransform(mainCamera.transform));
+                    _backingEditTimeFrame =
+                        _backingUntransformedEditTimeFrame.TransformedCopy(new LeapTransform(MainCamera.transform));
                 }
 
                 return _backingEditTimeFrame;
             }
         }
 
-        private readonly Dictionary<TestHandFactory.TestHandPose, Hand> _cachedLeftHands
-            = new Dictionary<TestHandFactory.TestHandPose, Hand>();
+        private readonly Dictionary<TestHandFactory.TestHandPose, Hand> _cachedLeftHands =
+            new Dictionary<TestHandFactory.TestHandPose, Hand>();
 
         private Hand EditTimeLeftHand
         {
@@ -411,8 +411,8 @@ namespace Ultraleap.Tracking.OpenXR
             }
         }
 
-        private readonly Dictionary<TestHandFactory.TestHandPose, Hand> _cachedRightHands
-            = new Dictionary<TestHandFactory.TestHandPose, Hand>();
+        private readonly Dictionary<TestHandFactory.TestHandPose, Hand> _cachedRightHands =
+            new Dictionary<TestHandFactory.TestHandPose, Hand>();
 
         private Hand EditTimeRightHand
         {
