@@ -187,8 +187,8 @@ namespace Leap.Unity.PhysicalHands
 
             wasKinematic = _rigid.isKinematic;
             usedGravity = _rigid.useGravity;
-            oldDrag = _rigid.drag;
-            oldAngularDrag = _rigid.angularDrag;
+            oldDrag = _rigid.linearDamping;
+            oldAngularDrag = _rigid.angularDamping;
         }
 
         private void HandleGrabbedRigidbody()
@@ -201,8 +201,8 @@ namespace Leap.Unity.PhysicalHands
                 }
 
                 _rigid.useGravity = false;
-                _rigid.drag = 0f;
-                _rigid.angularDrag = 0f;
+                _rigid.linearDamping = 0f;
+                _rigid.angularDamping = 0f;
             }
         }
 
@@ -212,8 +212,8 @@ namespace Leap.Unity.PhysicalHands
             {
                 _rigid.isKinematic = wasKinematic;
                 _rigid.useGravity = usedGravity;
-                _rigid.drag = oldDrag;
-                _rigid.angularDrag = oldAngularDrag;
+                _rigid.linearDamping = oldDrag;
+                _rigid.angularDamping = oldAngularDrag;
             }
         }
 
@@ -1004,7 +1004,7 @@ namespace Leap.Unity.PhysicalHands
                 targetVelocity *= targetPercent;
             }
 
-            _rigid.velocity = targetVelocity;
+            _rigid.linearVelocity = targetVelocity;
             if (targetAngularVelocity.IsValid())
             {
                 _rigid.angularVelocity = targetAngularVelocity;
@@ -1038,7 +1038,7 @@ namespace Leap.Unity.PhysicalHands
 
         private void TrackThrowingVelocities()
         {
-            _velocityQueue.Enqueue(new VelocitySample(_rigid.velocity,
+            _velocityQueue.Enqueue(new VelocitySample(_rigid.linearVelocity,
                                                       Time.time + VELOCITY_HISTORY_LENGTH));
 
             while (true)
@@ -1099,11 +1099,11 @@ namespace Leap.Unity.PhysicalHands
                 ignoreGrabTime = Time.time + THOWN_GRAB_COOLDOWNTIME;
 
                 // Set the new velocty. Allow physics to solve for rotational change
-                _rigid.velocity = averageVelocity;
+                _rigid.linearVelocity = averageVelocity;
             }
             else
             {
-                _rigid.velocity = Vector3.zero;
+                _rigid.linearVelocity = Vector3.zero;
                 _rigid.angularVelocity = Vector3.zero;
             }
         }

@@ -29,7 +29,7 @@ namespace Leap.Unity.PhysicalHands
             return new Vector3(hand.PalmWidth, hand.Fingers[2].Bone(0).Width, Vector3.Distance(CalculateAverageKnucklePosition(hand), hand.WristPosition));
         }
 
-        internal static void SetupPalmCollider(BoxCollider collider, CapsuleCollider[] palmEdges, Hand hand, PhysicMaterial material = null)
+        internal static void SetupPalmCollider(BoxCollider collider, CapsuleCollider[] palmEdges, Hand hand, PhysicsMaterial material = null)
         {
             Vector3 palmSize = CalculatePalmSize(hand);
             if (palmEdges != null)
@@ -100,7 +100,7 @@ namespace Leap.Unity.PhysicalHands
             }
         }
 
-        internal static void SetupBoneCollider(CapsuleCollider collider, Bone bone, PhysicMaterial material = null)
+        internal static void SetupBoneCollider(CapsuleCollider collider, Bone bone, PhysicsMaterial material = null)
         {
             collider.direction = 2;
             if (bone.Width <= 0) { bone.Width = 0.01f; }

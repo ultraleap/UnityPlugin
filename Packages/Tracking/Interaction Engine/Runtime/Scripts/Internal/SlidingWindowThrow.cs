@@ -100,7 +100,7 @@ namespace Leap.Unity.Interaction
         {
             if (_velocityQueue.Count < 2)
             {
-                intObj.rigidbody.velocity = Vector3.zero;
+                intObj.rigidbody.linearVelocity = Vector3.zero;
                 intObj.rigidbody.angularVelocity = Vector3.zero;
                 return;
             }
@@ -145,12 +145,12 @@ namespace Leap.Unity.Interaction
                                                                            end.position,
                                                                            _windowLength);
 
-            intObj.rigidbody.velocity = interpolatedVelocity;
+            intObj.rigidbody.linearVelocity = interpolatedVelocity;
             intObj.rigidbody.angularVelocity = PhysicsUtility.ToAngularVelocity(start.rotation,
                                                                                 end.rotation,
                                                                                 _windowLength);
 
-            intObj.rigidbody.velocity *= _velocityMultiplierCurve.Evaluate(intObj.rigidbody.velocity.magnitude);
+            intObj.rigidbody.linearVelocity *= _velocityMultiplierCurve.Evaluate(intObj.rigidbody.linearVelocity.magnitude);
         }
     }
 }

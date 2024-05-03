@@ -691,7 +691,7 @@ namespace Leap.Unity.Interaction
         private float getAnchorScore(Anchor anchor)
         {
             return GetAnchorScore(this.interactionBehaviour.rigidbody.position,
-                                  this.interactionBehaviour.rigidbody.velocity,
+                                  this.interactionBehaviour.rigidbody.linearVelocity,
                                   anchor.transform.position,
                                   maxAnchorRange,
                                   _maxMotionlessRange,

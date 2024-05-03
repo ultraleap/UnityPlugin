@@ -156,7 +156,7 @@ namespace Leap.Interaction.Internal.InteractionEngineUtility
                 if (!originalVelocities.TryGetValue(contact.body, out originalBodyVelocities))
                 {
                     originalBodyVelocities = new Velocities();
-                    originalBodyVelocities.velocity = contact.body.velocity;
+                    originalBodyVelocities.velocity = contact.body.linearVelocity;
                     originalBodyVelocities.angularVelocity = contact.body.angularVelocity;
 
                     Matrix4x4 tensorRotation = Matrix4x4.TRS(Vector3.zero, contact.body.rotation * contact.body.inertiaTensorRotation, Vector3.one);
@@ -170,7 +170,7 @@ namespace Leap.Interaction.Internal.InteractionEngineUtility
                     if (contact.body.useGravity)
                     {
                         contact.body.AddForce(-Physics.gravity, ForceMode.Acceleration);
-                        contact.body.velocity += Physics.gravity * Time.fixedDeltaTime;
+                        contact.body.linearVelocity += Physics.gravity * Time.fixedDeltaTime;
                     }
                 }
 
@@ -270,9 +270,9 @@ namespace Leap.Interaction.Internal.InteractionEngineUtility
                 //Apply these changes in velocity as forces, so the PhysX solver can resolve them (optional)
                 foreach (KeyValuePair<Rigidbody, Velocities> RigidbodyVelocity in originalVelocities)
                 {
-                    RigidbodyVelocity.Key.AddForce(RigidbodyVelocity.Key.velocity - RigidbodyVelocity.Value.velocity, ForceMode.VelocityChange);
+                    RigidbodyVelocity.Key.AddForce(RigidbodyVelocity.Key.linearVelocity - RigidbodyVelocity.Value.velocity, ForceMode.VelocityChange);
                     RigidbodyVelocity.Key.AddTorque(RigidbodyVelocity.Key.angularVelocity - RigidbodyVelocity.Value.angularVelocity, ForceMode.VelocityChange);
-                    RigidbodyVelocity.Key.velocity = RigidbodyVelocity.Value.velocity;
+                    RigidbodyVelocity.Key.linearVelocity = RigidbodyVelocity.Value.velocity;
                     RigidbodyVelocity.Key.angularVelocity = RigidbodyVelocity.Value.angularVelocity;
                 }
 
@@ -294,7 +294,7 @@ namespace Leap.Interaction.Internal.InteractionEngineUtility
             if (thisObject.mass != 0f && 1f / thisObject.mass != 0f && impulse.IsValid() && impulse != Vector3.zero)
             {
                 impulse = impulse.normalized * Mathf.Clamp(impulse.magnitude, 0f, 6f);
-                thisObject.velocity += impulse / thisObject.mass;
+                thisObject.linearVelocity += impulse / thisObject.mass;
                 Vector3 angularImpulse = Vector3.Cross(worldPos - thisObject.worldCenterOfMass, invWorldInertiaTensor * impulse);
                 if (angularImpulse.magnitude < 4f)
                 {
@@ -308,7 +308,7 @@ namespace Leap.Interaction.Internal.InteractionEngineUtility
             if (thisObject.mass != 0f && 1f / thisObject.mass != 0f)
             {
                 LinearAngularRatio = Mathf.Clamp01(LinearAngularRatio);
-                thisObject.velocity = impulse * LinearAngularRatio;
+                thisObject.linearVelocity = impulse * LinearAngularRatio;
                 thisObject.angularVelocity = Vector3.Cross(worldPos - thisObject.worldCenterOfMass, impulse / (worldPos - thisObject.worldCenterOfMass).sqrMagnitude) * (1f - LinearAngularRatio);
             }
         }

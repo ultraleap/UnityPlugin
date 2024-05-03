@@ -54,10 +54,10 @@ namespace Leap.Unity.Interaction
                 followStrength = _strengthByDistance.Evaluate(remainingDistanceLastFrame / intObj.manager.SimulationScale);
             }
 
-            Vector3 lerpedVelocity = Vector3.Lerp(intObj.rigidbody.velocity, targetVelocity, followStrength);
+            Vector3 lerpedVelocity = Vector3.Lerp(intObj.rigidbody.linearVelocity, targetVelocity, followStrength);
             Vector3 lerpedAngularVelocity = Vector3.Lerp(intObj.rigidbody.angularVelocity, targetAngularVelocity, followStrength);
 
-            intObj.rigidbody.velocity = lerpedVelocity;
+            intObj.rigidbody.linearVelocity = lerpedVelocity;
             intObj.rigidbody.angularVelocity = lerpedAngularVelocity;
 
             _lastSolvedCoMPosition = solvedCenterOfMass;

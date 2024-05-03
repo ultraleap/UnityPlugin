@@ -900,8 +900,8 @@ namespace Leap.Unity.Interaction
             set { _softContactDislocationDistance = value; }
         }
 
-        private static PhysicMaterial s_defaultContactBoneMaterial;
-        protected static PhysicMaterial defaultContactBoneMaterial
+        private static PhysicsMaterial s_defaultContactBoneMaterial;
+        protected static PhysicsMaterial defaultContactBoneMaterial
         {
             get
             {
@@ -921,10 +921,10 @@ namespace Leap.Unity.Interaction
         {
             if (s_defaultContactBoneMaterial == null)
             {
-                s_defaultContactBoneMaterial = new PhysicMaterial();
+                s_defaultContactBoneMaterial = new PhysicsMaterial();
             }
             s_defaultContactBoneMaterial.hideFlags = HideFlags.HideAndDontSave;
-            s_defaultContactBoneMaterial.bounceCombine = PhysicMaterialCombine.Minimum;
+            s_defaultContactBoneMaterial.bounceCombine = PhysicsMaterialCombine.Minimum;
             s_defaultContactBoneMaterial.bounciness = 0F;
         }
 
@@ -1125,7 +1125,7 @@ namespace Leap.Unity.Interaction
             float deltaMag = delta.magnitude;
             if (deltaMag <= deadzone)
             {
-                body.velocity = Vector3.zero;
+                body.linearVelocity = Vector3.zero;
                 contactBone.lastTargetPosition = body.position;
             }
             else
@@ -1135,7 +1135,7 @@ namespace Leap.Unity.Interaction
 
                 Vector3 targetVelocity = delta / Time.fixedDeltaTime;
                 float targetVelocityMag = targetVelocity.magnitude;
-                body.velocity = (targetVelocity / targetVelocityMag)
+                body.linearVelocity = (targetVelocity / targetVelocityMag)
                               * Mathf.Clamp(targetVelocityMag, 0F, 100F);
             }
             Quaternion deltaRot = targetRotation * Quaternion.Inverse(body.rotation);
@@ -1736,7 +1736,7 @@ namespace Leap.Unity.Interaction
 
                 contactBone.rigidbody.position = position;
                 contactBone.rigidbody.rotation = rotation;
-                contactBone.rigidbody.velocity = Vector3.zero;
+                contactBone.rigidbody.linearVelocity = Vector3.zero;
                 contactBone.rigidbody.angularVelocity = Vector3.zero;
             }
         }

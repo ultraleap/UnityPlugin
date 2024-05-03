@@ -58,7 +58,7 @@ namespace Leap.Unity.PhysicalHands
                 Collider.attachedRigidbody.rotation = targetRotation;
                 gameObject.layer = contactParent.physicalHandsManager.HandsResetLayer;
 
-                Collider.attachedRigidbody.velocity = Vector3.zero;
+                Collider.attachedRigidbody.linearVelocity = Vector3.zero;
                 Collider.attachedRigidbody.angularVelocity = Vector3.zero;
                 lastTargetPosition = Collider.attachedRigidbody.position;
                 return;
@@ -82,7 +82,7 @@ namespace Leap.Unity.PhysicalHands
 
             if (deltaMag <= DEAD_ZONE)
             {
-                Collider.attachedRigidbody.velocity = Vector3.zero;
+                Collider.attachedRigidbody.linearVelocity = Vector3.zero;
                 lastTargetPosition = Collider.attachedRigidbody.position;
             }
             else
@@ -91,7 +91,7 @@ namespace Leap.Unity.PhysicalHands
                 lastTargetPosition = Collider.attachedRigidbody.position + delta;
 
                 Vector3 targetVelocity = delta / Time.fixedDeltaTime;
-                Collider.attachedRigidbody.velocity = targetVelocity;
+                Collider.attachedRigidbody.linearVelocity = targetVelocity;
             }
 
             Quaternion deltaRot = targetRotation * Quaternion.Inverse(Collider.attachedRigidbody.rotation);

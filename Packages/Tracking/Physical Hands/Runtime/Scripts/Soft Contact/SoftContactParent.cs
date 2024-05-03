@@ -13,8 +13,8 @@ namespace Leap.Unity.PhysicalHands
     public class SoftContactParent : ContactParent
     {
         [SerializeField, HideInInspector]
-        private PhysicMaterial _physicsMaterial;
-        internal PhysicMaterial PhysicsMaterial => _physicsMaterial;
+        private PhysicsMaterial _physicsMaterial;
+        internal PhysicsMaterial PhysicsMaterial => _physicsMaterial;
 
         internal override void GenerateHands()
         {
@@ -22,14 +22,14 @@ namespace Leap.Unity.PhysicalHands
             GenerateHandsObjects(typeof(SoftContactHand));
         }
 
-        private static PhysicMaterial CreateHandPhysicsMaterial()
+        private static PhysicsMaterial CreateHandPhysicsMaterial()
         {
-            PhysicMaterial material = new PhysicMaterial("HandPhysics");
+            PhysicsMaterial material = new PhysicsMaterial("HandPhysics");
 
             material.dynamicFriction = 1f;
             material.staticFriction = 1f;
-            material.frictionCombine = PhysicMaterialCombine.Average;
-            material.bounceCombine = PhysicMaterialCombine.Minimum;
+            material.frictionCombine = PhysicsMaterialCombine.Average;
+            material.bounceCombine = PhysicsMaterialCombine.Minimum;
 
             return material;
         }

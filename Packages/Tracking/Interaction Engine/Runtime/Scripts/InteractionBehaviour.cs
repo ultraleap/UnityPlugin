@@ -1577,8 +1577,8 @@ namespace Leap.Unity.Interaction
             {
 
                 // Remember drag settings pre-grasp, to be restored on release.
-                _dragBeforeGrasp = rigidbody.drag;
-                _angularDragBeforeGrasp = rigidbody.angularDrag;
+                _dragBeforeGrasp = rigidbody.linearDamping;
+                _angularDragBeforeGrasp = rigidbody.angularDamping;
 
                 // Remember kinematic state.
                 _wasKinematicBeforeGrasp = rigidbody.isKinematic;
@@ -1592,8 +1592,8 @@ namespace Leap.Unity.Interaction
                 }
 
                 // Set rigidbody drag/angular drag to zero.
-                rigidbody.drag = 0F;
-                rigidbody.angularDrag = 0F;
+                rigidbody.linearDamping = 0F;
+                rigidbody.angularDamping = 0F;
 
                 OnGraspBegin();
             }
@@ -1641,8 +1641,8 @@ namespace Leap.Unity.Interaction
             if (_graspingControllers.Count == 0)
             {
                 // Restore drag settings from prior to the grasp.
-                rigidbody.drag = _dragBeforeGrasp;
-                rigidbody.angularDrag = _angularDragBeforeGrasp;
+                rigidbody.linearDamping = _dragBeforeGrasp;
+                rigidbody.angularDamping = _angularDragBeforeGrasp;
 
                 // Revert kinematic state.
                 rigidbody.isKinematic = _wasKinematicBeforeGrasp;
@@ -1739,7 +1739,7 @@ namespace Leap.Unity.Interaction
                 //Only apply if non-zero to prevent waking up the body
                 if (_accumulatedLinearAcceleration != Vector3.zero)
                 {
-                    rigidbody.velocity += _accumulatedLinearAcceleration * Time.fixedDeltaTime;
+                    rigidbody.linearVelocity += _accumulatedLinearAcceleration * Time.fixedDeltaTime;
                 }
 
                 if (_accumulatedAngularAcceleration != Vector3.zero)

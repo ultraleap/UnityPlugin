@@ -264,7 +264,7 @@ namespace Leap.Unity.Interaction
                         }
 
                         rigidbody.position = transform.parent.TransformPoint(localPhysicsPositionConstrained);
-                        rigidbody.velocity = _physicsVelocity;
+                        rigidbody.linearVelocity = _physicsVelocity;
                     }
                 }
             }
@@ -314,7 +314,7 @@ namespace Leap.Unity.Interaction
                 }
 
                 // Calculate the physical kinematics of the button in local space
-                Vector3 localPhysicsVelocity = transform.parent.InverseTransformVector(rigidbody.velocity);
+                Vector3 localPhysicsVelocity = transform.parent.InverseTransformVector(rigidbody.linearVelocity);
                 if (isPressed && isPrimaryHovered && _lastDepressor != null)
                 {
                     Vector3 curLocalDepressorPos = transform.parent.InverseTransformPoint(_lastDepressor.position);
