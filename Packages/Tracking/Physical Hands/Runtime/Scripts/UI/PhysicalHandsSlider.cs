@@ -591,6 +591,9 @@ namespace Leap.Unity.PhysicalHands
         private void DrawJointRangeGizmo()
         {
             Vector3 jointPosition = _slideableObject.transform.localPosition;
+            jointPosition.y = 0;
+
+
             Matrix4x4 m = _slideableObject.transform.localToWorldMatrix;
             m.SetTRS(this.transform.position, m.rotation, m.lossyScale);
             Gizmos.matrix = m;
