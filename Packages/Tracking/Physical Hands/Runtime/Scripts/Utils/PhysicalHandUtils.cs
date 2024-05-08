@@ -49,15 +49,17 @@ namespace Leap.Unity.PhysicalHands
             // Loop through each hand in the list
             foreach (var hand in handsToCompare)
             {
-                var bone = hand.GetBone(1, 2);
-
-                if(bone.NearbyObjects.TryGetValue(objectToCheckDistanceFrom, out Dictionary<Collider, ClosestColliderDirection> result))
+                foreach (var bone in hand.bones)
                 {
-                    foreach (var value in result.Values)
+                    // Only check for distal joints
+                    if (bone.Joint == 2 && bone.NearbyObjects.TryGetValue(objectToCheckDistanceFrom, out Dictionary<Collider, ClosestColliderDirection> result))
                     {
-                        if (value.distance < shortestDistance)
+                        foreach (var value in result.Values)
                         {
-                            shortestDistance = value.distance;
+                            if (value.distance < shortestDistance)
+                            {
+                                shortestDistance = value.distance;
+                            }
                         }
                     }
                 }
