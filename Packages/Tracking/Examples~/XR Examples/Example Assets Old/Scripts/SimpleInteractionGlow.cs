@@ -20,7 +20,7 @@ namespace Leap.Unity.Examples
     /// a function of its distance to the palm of the closest hand that is
     /// hovering nearby.
     /// </summary>
-    [AddComponentMenu("")]
+    //[AddComponentMenu("")]
     public class SimpleInteractionGlow : MonoBehaviour, IPhysicalHandHover, IPhysicalHandContact, IPhysicalHandGrab
     {
         [Tooltip("If enabled, the object will lerp to its hoverColor when a hand is nearby.")]
