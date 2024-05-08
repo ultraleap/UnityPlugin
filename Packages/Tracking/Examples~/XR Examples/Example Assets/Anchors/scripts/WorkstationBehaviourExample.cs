@@ -7,11 +7,9 @@
  ******************************************************************************/
 
 using UnityEngine;
-
-using Leap.Unity;
 using Leap.Unity.PhysicalHands;
 
-namespace Leap.InteractionEngine.Examples
+namespace Leap.Unity.Examples
 {
     /// <summary>
     /// This example script constructs behavior for a UI object that can open
@@ -19,7 +17,6 @@ namespace Leap.InteractionEngine.Examples
     /// The panel is closed when the object is moved at or over a given speed.
     /// The anchorable object is set to kinematic when in workstation mode.
     /// </summary>
-    //[RequireComponent(typeof(AnchorableBehaviour))]
     public class WorkstationBehaviourExample : MonoBehaviour, IPhysicalHandGrab
     {
         /// <summary>
@@ -36,7 +33,6 @@ namespace Leap.InteractionEngine.Examples
         private AnchorableBehaviour _anchObj;
 
         private bool _wasKinematicBeforeActivation = false;
-
 
         public enum WorkstationState { Closed, Open }
         public WorkstationState workstationState;

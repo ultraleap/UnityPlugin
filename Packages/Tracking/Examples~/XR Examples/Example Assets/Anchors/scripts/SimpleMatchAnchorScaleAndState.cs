@@ -6,16 +6,12 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity.Interaction;
 using UnityEngine;
 
-namespace Leap.Unity.InteractionEngine.Examples
+namespace Leap.Unity.Examples
 {
-
-    [AddComponentMenu("")]
     public class SimpleMatchAnchorScaleAndState : MonoBehaviour
     {
-
         public AnchorableBehaviour anchObj;
 
         void Update()
@@ -34,7 +30,5 @@ namespace Leap.Unity.InteractionEngine.Examples
                 }
             }
         }
-
     }
-
 }

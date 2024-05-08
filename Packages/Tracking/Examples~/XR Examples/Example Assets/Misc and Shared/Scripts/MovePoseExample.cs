@@ -6,11 +6,10 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-
 using Leap.Unity;
 using UnityEngine;
 
-namespace Leap.InteractionEngine.Examples
+namespace Leap.Examples
 {
     public class MovePoseExample : MonoBehaviour
     {

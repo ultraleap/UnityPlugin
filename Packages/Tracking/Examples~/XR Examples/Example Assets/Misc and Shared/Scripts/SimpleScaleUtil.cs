@@ -6,28 +6,15 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-#if UNITY_EDITOR
+using UnityEngine;
 
-using UnityEditor;
-
-namespace Leap.Examples
+namespace Leap.Unity.Examples
 {
-    public static class XRSampleDependencyImporter
+    public class SimpleScaleUtil : MonoBehaviour
     {
-        [UnityEditor.Callbacks.DidReloadScripts]
-        private static void CreateAssetWhenReady()
+        public void SetLocalScale(float scale)
         {
-            EditorApplication.delayCall += () =>
-            {
-                SampleDependencyImporter.FindAndImportSampleDependencies
-                (
-                    "com.ultraleap.tracking",
-                    "XR Examples",
-                    new string[] { "Shared Example Assets REQUIRED" }
-                );
-            };
+            this.transform.localScale = Vector3.one * scale;
         }
     }
 }
-
-#endif

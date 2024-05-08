@@ -8,18 +8,16 @@
 
 using UnityEngine;
 
-namespace Leap.Unity.InteractionEngine.Examples
+namespace Leap.Unity.Examples
 {
-
-    [AddComponentMenu("")]
-    public class SimpleScaleUtil : MonoBehaviour
+    public class SpawnObjectAtPosition : MonoBehaviour
     {
+        public Transform objectToSpawn;
+        public Transform spawnPoint;
 
-        public void SetLocalScale(float scale)
+        public void SpawnObject()
         {
-            this.transform.localScale = Vector3.one * scale;
+            Instantiate(objectToSpawn, spawnPoint.position, Quaternion.identity);
         }
-
     }
-
 }

@@ -11,7 +11,6 @@ using UnityEngine;
 namespace Leap.Unity.Examples
 {
     [RequireComponent(typeof(Leap.Unity.Anchor))]
-    [AddComponentMenu("")]
     public class SimpleAnchorFeedback : MonoBehaviour
     {
         public Transform scaleTarget;

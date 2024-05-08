@@ -8,13 +8,11 @@
 
 using UnityEngine;
 
-namespace ULeap.Unity.InteractionEngine.Examples
+namespace Leap.Unity.Examples
 {
-
     [RequireComponent(typeof(Renderer))]
     public class SimpleRendererUtil : MonoBehaviour
     {
-
         public Color activationColor = Color.yellow;
 
         private Renderer _renderer;
@@ -48,7 +46,5 @@ namespace ULeap.Unity.InteractionEngine.Examples
         {
             _renderer.enabled = false;
         }
-
     }
-
 }

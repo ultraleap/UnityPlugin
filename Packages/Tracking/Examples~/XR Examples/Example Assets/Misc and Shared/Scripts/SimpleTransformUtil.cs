@@ -8,13 +8,10 @@
 
 using UnityEngine;
 
-namespace Leap.Unity.InteractionEngine.Examples
+namespace Leap.Unity.Examples
 {
-
-    [AddComponentMenu("")]
     public class SimpleTransformUtil : MonoBehaviour
     {
-
         public void SetParentTo(Transform t)
         {
             this.transform.SetParent(t, true);
@@ -24,7 +21,5 @@ namespace Leap.Unity.InteractionEngine.Examples
         {
             this.transform.SetParent(null, true);
         }
-
     }
-
 }

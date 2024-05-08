@@ -39,7 +39,7 @@ namespace Leap.Unity.PhysicalHands
         // The distance from any collider that the bone must be to allow the hand to re-enable collision after a teleportation event
         private static float SAFETY_CLOSE_DISTANCE = 0.005f;
 
-        internal class ClosestColliderDirection
+        public class ClosestColliderDirection
         {
             /// <summary>
             /// Is this bone contacting the collider associated with this ClosestColliderDirection?
@@ -69,13 +69,13 @@ namespace Leap.Unity.PhysicalHands
         /// Dictionary of dictionaries of the directions from this bone to a grabbable object's colliders
         ///</summary>
         private Dictionary<Rigidbody, Dictionary<Collider, ClosestColliderDirection>> _nearbyObjects = new Dictionary<Rigidbody, Dictionary<Collider, ClosestColliderDirection>>(30);
-        internal Dictionary<Rigidbody, Dictionary<Collider, ClosestColliderDirection>> NearbyObjects => _nearbyObjects;
+        public Dictionary<Rigidbody, Dictionary<Collider, ClosestColliderDirection>> NearbyObjects => _nearbyObjects;
 
         ///<summary>
         /// Dictionary of dictionaries of the directions from this bone to a grabbable object's colliders
         ///</summary>
         private Dictionary<Rigidbody, Dictionary<Collider, ClosestColliderDirection>> _grabbableDirections = new Dictionary<Rigidbody, Dictionary<Collider, ClosestColliderDirection>>(10);
-        internal Dictionary<Rigidbody, Dictionary<Collider, ClosestColliderDirection>> GrabbableDirections => _grabbableDirections;
+        public Dictionary<Rigidbody, Dictionary<Collider, ClosestColliderDirection>> GrabbableDirections => _grabbableDirections;
 
 
         [field: SerializeField, Tooltip("Is the bone hovering an object? The hover distances are set in the Physics Provider.")]

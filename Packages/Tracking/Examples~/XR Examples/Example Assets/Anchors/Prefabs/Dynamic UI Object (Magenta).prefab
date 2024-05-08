@@ -1414,10 +1414,10 @@ MonoBehaviour:
   _isAttached: 1
   _anchor: {fileID: 0}
   _anchorGroup: {fileID: 0}
-  maxAnchorRange: 0.3
+  maxAnchorRange: 0.1
   useTrajectory: 0
   _motionlessRangeFraction: 0.4
-  _maxMotionlessRange: 0.120000005
+  _maxMotionlessRange: 0.040000003
   _maxAttachmentAngle: 60
   _alwaysAttachDistance: 0
   lockToAnchor: 0
@@ -2099,10 +2099,10 @@ MonoBehaviour:
   damperValue: 0
   maxForceValue: 5
   bouncinessValue: 0
-  _buttonTravelDistance: -0.0047999993
-  _buttonTravelOffset: 0.505
+  _buttonTravelDistance: 0.0038000003
+  _buttonTravelOffset: 0.6
   _canBePressedByObjects: 0
-  _pressableObject: {fileID: 1375438037617704}
+  _pressableObject: {fileID: 1607714312898442}
   _buttonPressExitThreshold: 0.5
   _buttonIgnoreGrabs: 1
   _buttonPreset: 0
@@ -3999,6 +3999,7 @@ GameObject:
   - component: {fileID: 4438177830887550}
   - component: {fileID: 33886567421087928}
   - component: {fileID: 23604676075754768}
+  - component: {fileID: 1603828668135246715}
   m_Layer: 0
   m_Name: Outer Cube
   m_TagString: Untagged
@@ -4072,6 +4073,19 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &1603828668135246715
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1732126764506280}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.9999999, y: 0.9999999, z: 1}
+  m_Center: {x: -0.00000023841858, y: -0.00000023841858, z: 0}
 --- !u!1 &1761600384332432
 GameObject:
   m_ObjectHideFlags: 0
