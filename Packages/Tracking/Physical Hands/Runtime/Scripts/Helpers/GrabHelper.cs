@@ -214,14 +214,115 @@ namespace Leap.Unity.PhysicalHands
         #endregion
 
         #region Helper Updating
+
+        internal struct PrimaryHoverValues
+        {
+            internal ContactBone _bone;
+            internal ContactHand _hand;
+            internal float _hoverDistance;
+
+            internal PrimaryHoverValues(ContactBone bone, ContactHand hand, float hoverDistance)
+            {
+                _bone = bone;
+                _hand = hand;
+                _hoverDistance = hoverDistance;
+            }
+        }
+
+
+        Dictionary<GrabHelperObject, PrimaryHoverValues> closestHoverForEachGrabHelper = new Dictionary<GrabHelperObject, PrimaryHoverValues>();
+        GrabHelperObject primaryHoverObjectLeft = null;
+        GrabHelperObject primaryHoverObjectRight = null;
+
         private void UpdateHelpers()
         {
-            RemoveUnhoveredGrabHelperObjects();
+            RemoveUnhoveredGrabHelperObjects(); //orig
+
+            closestHoverForEachGrabHelper.Clear();
 
             foreach (var helper in _grabHelperObjects)
             {
-                helper.Value.UpdateHelper();
+                helper.Value.UpdateHelper(); //orig
             }
+
+            if (primaryHoverObjectLeft == null || (primaryHoverObjectLeft.GrabState != GrabHelperObject.State.Contact || primaryHoverObjectLeft.GrabState != GrabHelperObject.State.Grab))
+            {
+                foreach (var helper in _grabHelperObjects)
+                {
+                    KeyValuePair<ContactBone, float>? leftPrimaryHover = helper.Value.GetPrimaryHoverValues(_leftContactHand);
+                    KeyValuePair<ContactBone, float>? rightPrimaryHover = helper.Value.GetPrimaryHoverValues(_rightContactHand);
+
+                    if (leftPrimaryHover != null)
+                    {
+                        closestHoverForEachGrabHelper.Add(
+                            helper.Value,
+                            new PrimaryHoverValues(leftPrimaryHover.Value.Key, leftPrimaryHover.Value.Key.contactHand, leftPrimaryHover.Value.Value));
+                    }
+                    if (rightPrimaryHover != null)
+                    {
+                        closestHoverForEachGrabHelper.Add(
+                            helper.Value,
+                            new PrimaryHoverValues(rightPrimaryHover.Value.Key, rightPrimaryHover.Value.Key.contactHand, rightPrimaryHover.Value.Value));
+                    }
+
+                }
+
+                UpdatePrimaryHover();
+            }
+        }
+
+        private void UpdatePrimaryHover()
+        {
+            
+            float closestHoverDistanceLeft = float.MaxValue;
+            float closestHoverDistanceRight = float.MaxValue;
+
+            foreach (var hoverValues in closestHoverForEachGrabHelper)
+            {
+                if((hoverValues.Value._hoverDistance < closestHoverDistanceLeft) && hoverValues.Value._hand.Handedness == Chirality.Left)
+                {
+                    closestHoverDistanceLeft = hoverValues.Value._hoverDistance;
+                    primaryHoverObjectLeft = hoverValues.Key;
+                }
+
+                if ((hoverValues.Value._hoverDistance < closestHoverDistanceRight) && hoverValues.Value._hand.Handedness == Chirality.Right)
+                {
+                    closestHoverDistanceRight = hoverValues.Value._hoverDistance;
+                    primaryHoverObjectRight = hoverValues.Key;
+                }
+
+            }
+
+            if (primaryHoverObjectLeft != null)
+            {
+                foreach (var hoverValues in closestHoverForEachGrabHelper)
+                {
+                    if (hoverValues.Key == primaryHoverObjectLeft)
+                    {
+                        hoverValues.Key.HandlePrimaryHover(_leftContactHand);
+                    }
+                    else
+                    {
+                        hoverValues.Key.HandlePrimaryHoverExit(_leftContactHand);
+                    }
+                }
+            }
+
+            if (primaryHoverObjectRight != null)
+            {
+                foreach (var hoverValues in closestHoverForEachGrabHelper)
+                {
+                    if (hoverValues.Key == primaryHoverObjectRight)
+                    {
+                        hoverValues.Key.HandlePrimaryHover(_rightContactHand);
+                    }
+                    else
+                    {
+                        hoverValues.Key.HandlePrimaryHoverExit(_rightContactHand);
+                    }
+                }
+            }
+
         }
 
         /// <summary>

@@ -16,7 +16,22 @@ namespace Leap.Unity.PhysicalHands
         #region Bone Parameters
         internal int finger, joint;
         internal bool isPalm = false;
+        /// <summary>
+        /// Finger:
+        /// 0 = thumb
+        /// 1 = index
+        /// 2 = middle
+        /// 3 = ring
+        /// 4 = pinky
+        /// 5 = palm
+        /// </summary>
         public int Finger => finger;
+        /// <summary>
+        /// Joint:
+        /// 0 = proximal
+        /// 1 = intermediate
+        /// 2 = distal
+        /// </summary>
         public int Joint => joint;
         public bool IsPalm => isPalm;
 
@@ -139,6 +154,9 @@ namespace Leap.Unity.PhysicalHands
         public float NearestObjectDistance => _nearestObjectDistance;
         [SerializeField, Tooltip("The distance between the edge of the bone collider and the nearest object. Will report float.MaxValue if IsHovering is false.")]
         private float _nearestObjectDistance = float.MaxValue;
+
+        private GameObject _nearestObject = null;
+        public GameObject NearestObject => _nearestObject;
         #endregion
 
         private Vector3 _debugA, _debugB;
@@ -310,6 +328,7 @@ namespace Leap.Unity.PhysicalHands
                         if (singleObjectDistance < _nearestObjectDistance)
                         {
                             _nearestObjectDistance = singleObjectDistance;
+                            _nearestObject = col.Key.gameObject;
                             _debugA = col.Value.bonePos;
                             _debugB = col.Value.bonePos + (col.Value.direction * (col.Value.distance));
                         }

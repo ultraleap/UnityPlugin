@@ -97,6 +97,7 @@ namespace Leap.Unity.PhysicalHands
         private float oldAngularDrag;
 
         internal IgnorePhysicalHands _ignorePhysicalHands;
+        public bool isPrimaryHovered;
 
         private float ignoreGrabTime = 0f;
 
@@ -387,6 +388,8 @@ namespace Leap.Unity.PhysicalHands
 
         private void UpdateHands()
         {
+
+            
             // Loop through each hand in our bone array, then the finger, then the bones in that finger
             // If we're no longer in a grabbing state with that bone we want to add it to the cooldowns
             foreach (var pair in _grabbableBones) // Loop through the hands
@@ -418,6 +421,86 @@ namespace Leap.Unity.PhysicalHands
 
             UpdateGrabEvents();
         }
+
+        internal KeyValuePair<ContactBone, float>? GetPrimaryHoverValues(ContactHand hand)
+        {
+            KeyValuePair<ContactBone, float>? closestBoneToObject = null;
+            float closestBoneDistance = float.MaxValue;
+
+            //foreach (var pair in _grabbableBones) // Loop through the hands
+            //{
+            //    if (pair.Key == hand)
+            //    {
+            //        for (int i = 0; i < _grabbableBones[pair.Key].Length; i++) // loop through the fingers
+            //        {
+            //            for (int j = 0; j < _grabbableBones[pair.Key][i].Count; j++) // loop through the bones
+            //            {
+            //                if (_grabbableBones[pair.Key][i][j].joint == 2) // if this bone is the distal
+            //                {
+            //                    if (_grabbableBones[pair.Key][i][j].NearestObjectDistance < closestBoneDistance)
+            //                    {
+            //                        closestBoneDistance = _grabbableBones[pair.Key][i][j].NearestObjectDistance;
+            //                        closestBoneToObject = new KeyValuePair<ContactBone, float>(_grabbableBones[pair.Key][i][j], closestBoneDistance);
+            //                    }
+            //                }
+            //            }
+            //        }
+            //    }
+            //}
+
+            foreach (var grabbableHand in _grabbableHands) // Loop through the hands
+            {
+                if (grabbableHand == hand)
+                {
+                    for (int i = 0; i < 3; i++) // loop thumb, index & middle
+                    {
+                        ContactBone bone = grabbableHand.GetBone(i, 2); //get distal
+
+                        if (bone.NearestObject == _rigid.gameObject)
+                        {
+                            if (bone.NearestObjectDistance < closestBoneDistance)
+                            {
+                                closestBoneDistance = bone.NearestObjectDistance;
+                                closestBoneToObject = new KeyValuePair<ContactBone, float>(bone, closestBoneDistance);
+                            }
+                        }
+
+                    }
+
+                }
+            }
+
+            return closestBoneToObject;
+
+        }
+
+        internal void HandlePrimaryHover(ContactHand hand)
+        {
+            isPrimaryHovered = true;
+
+            if (_rigid != null && _rigid.TryGetComponents<IPhysicalHandPrimaryHover>(out var physicalHandPrimaryHovers))
+            {
+                foreach (var primaryHoverEventReceiver in physicalHandPrimaryHovers)
+                {
+                    primaryHoverEventReceiver.OnHandPrimaryHover(hand);
+                }
+            }
+        }
+
+        internal void HandlePrimaryHoverExit(ContactHand hand)
+        {
+            isPrimaryHovered = false;
+
+
+            if (_rigid != null && _rigid.TryGetComponents<IPhysicalHandPrimaryHover>(out var physicalHandPrimaryHovers))
+            {
+                foreach (var primaryHoverEventReceiver in physicalHandPrimaryHovers)
+                {
+                    primaryHoverEventReceiver.OnHandPrimaryHoverExit(hand);
+                }
+            }
+        }
+
 
         private void UpdateGrabbableBones(int handID)
         {
