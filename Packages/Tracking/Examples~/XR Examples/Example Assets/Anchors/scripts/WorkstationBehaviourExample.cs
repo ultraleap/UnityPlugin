@@ -6,12 +6,10 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity;
-using Leap.Unity.Interaction;
-using System.Collections.Generic;
 using UnityEngine;
+using Leap.Unity.PhysicalHands;
 
-namespace Leap.InteractionEngine.Examples
+namespace Leap.Unity.Examples
 {
     /// <summary>
     /// This example script constructs behavior for a UI object that can open
@@ -19,10 +17,8 @@ namespace Leap.InteractionEngine.Examples
     /// The panel is closed when the object is moved at or over a given speed.
     /// The anchorable object is set to kinematic when in workstation mode.
     /// </summary>
-    [RequireComponent(typeof(AnchorableBehaviour))]
-    public class WorkstationBehaviourExample : MonoBehaviour
+    public class WorkstationBehaviourExample : MonoBehaviour, IPhysicalHandGrab
     {
-
         /// <summary>
         /// If the rigidbody of this object moves faster than this speed and the object
         /// is in workstation mode, it will exit workstation mode.
@@ -34,14 +30,15 @@ namespace Leap.InteractionEngine.Examples
         /// </summary>
         public GameObject workstation;
 
-        private InteractionBehaviour _intObj;
         private AnchorableBehaviour _anchObj;
 
         private bool _wasKinematicBeforeActivation = false;
 
-
         public enum WorkstationState { Closed, Open }
         public WorkstationState workstationState;
+
+        private bool _grabbed;
+        private Rigidbody _rigidbody;
 
 
         void OnValidate()
@@ -51,6 +48,8 @@ namespace Leap.InteractionEngine.Examples
 
         void Start()
         {
+            _rigidbody = GetComponent<Rigidbody>();
+
             refreshRequiredComponents();
 
             if (!_anchObj.TryAnchorNearestOnGraspEnd)
@@ -61,8 +60,6 @@ namespace Leap.InteractionEngine.Examples
 
         void OnDestroy()
         {
-            _intObj.OnGraspedMovement -= onGraspedMovement;
-
             _anchObj.OnPostTryAnchorOnGraspEnd -= onPostObjectGraspEnd;
         }
 
@@ -70,8 +67,8 @@ namespace Leap.InteractionEngine.Examples
         {
             if (workstationState != WorkstationState.Open)
             {
-                _wasKinematicBeforeActivation = _intObj.rigidbody.isKinematic;
-                _intObj.rigidbody.isKinematic = true;
+                _wasKinematicBeforeActivation = _rigidbody.isKinematic;
+                _rigidbody.isKinematic = true;
             }
 
             workstation.SetActive(true);
@@ -80,7 +77,7 @@ namespace Leap.InteractionEngine.Examples
 
         public void DeactivateWorkstation()
         {
-            _intObj.rigidbody.isKinematic = _wasKinematicBeforeActivation;
+            _rigidbody.isKinematic = _wasKinematicBeforeActivation;
 
             workstation.SetActive(false);
             workstationState = WorkstationState.Closed;
@@ -88,24 +85,25 @@ namespace Leap.InteractionEngine.Examples
 
         private void refreshRequiredComponents()
         {
-            _intObj = GetComponent<InteractionBehaviour>();
             _anchObj = GetComponent<AnchorableBehaviour>();
-
-            _intObj.OnGraspedMovement -= onGraspedMovement;
-            _intObj.OnGraspedMovement += onGraspedMovement;
 
             _anchObj.OnPostTryAnchorOnGraspEnd -= onPostObjectGraspEnd;
             _anchObj.OnPostTryAnchorOnGraspEnd += onPostObjectGraspEnd;
         }
 
-        private void onGraspedMovement(Vector3 preSolvePos, Quaternion preSolveRot,
-                                       Vector3 curPos, Quaternion curRot,
-                                       List<InteractionController> controllers)
+        private void FixedUpdate()
+        {
+            if (_grabbed)
+            {
+                onGraspedMovement();
+            }
+        }
+
+        private void onGraspedMovement()
         {
             // If the velocity of the object while grasped is too large, exit workstation mode.
             if (workstationState == WorkstationState.Open
-                && (_intObj.rigidbody.velocity.magnitude > MAX_SPEED_AS_WORKSTATION
-                || (_intObj.rigidbody.isKinematic && ((preSolvePos - curPos).magnitude / Time.fixedDeltaTime) > MAX_SPEED_AS_WORKSTATION)))
+                && (_rigidbody.velocity.magnitude > MAX_SPEED_AS_WORKSTATION))
             {
                 DeactivateWorkstation();
             }
@@ -116,9 +114,7 @@ namespace Leap.InteractionEngine.Examples
             if (_anchObj.FindPreferredAnchor() == null && !_anchObj.isAttached)
             {
                 // Choose a good position and rotation for workstation mode
-
-                Vector3 targetPosition = _intObj.rigidbody.position;
-
+                Vector3 targetPosition = _rigidbody.position;
                 Quaternion targetRotation = determineWorkstationRotation(targetPosition);
 
                 workstation.transform.SetPositionAndRotation(targetPosition, targetRotation);
@@ -142,6 +138,15 @@ namespace Leap.InteractionEngine.Examples
             return placementRotation;
         }
 
-    }
+        void IPhysicalHandGrab.OnHandGrab(ContactHand hand)
+        {
+            _grabbed = true;
+        }
 
+        void IPhysicalHandGrab.OnHandGrabExit(ContactHand hand)
+        {
+            _grabbed = false;
+            onPostObjectGraspEnd();
+        }
+    }
 }

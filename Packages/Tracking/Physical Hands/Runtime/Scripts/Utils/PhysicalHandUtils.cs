@@ -2,6 +2,7 @@ using Leap.Unity.PhysicalHands;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static Leap.Unity.PhysicalHands.ContactBone;
 
 namespace Leap.Unity.PhysicalHands
 {
@@ -32,6 +33,40 @@ namespace Leap.Unity.PhysicalHands
             return shortestDistance;
         }
 
+        /// <summary>
+        /// Calculates the shortest distance between a list of hand objects and a specified game object.
+        /// </summary>
+        /// <param name="handsToCompare">The list of hand objects to compare distances from.</param>
+        /// <param name="objectToCheckDistanceFrom">The game object to check distances from.</param>
+        /// <returns>The shortest distance between the hands and the specified game object.</returns>
+        public static float ClosestHandBoneDistance(List<ContactHand> handsToCompare, Rigidbody objectToCheckDistanceFrom)
+        {
+            float shortestDistance = float.PositiveInfinity;
+
+            if (objectToCheckDistanceFrom == null)
+                return shortestDistance;
+
+            // Loop through each hand in the list
+            foreach (var hand in handsToCompare)
+            {
+                foreach (var bone in hand.bones)
+                {
+                    // Only check for distal joints
+                    if (bone.Joint == 2 && bone.NearbyObjects.TryGetValue(objectToCheckDistanceFrom, out Dictionary<Collider, ClosestColliderDirection> result))
+                    {
+                        foreach (var value in result.Values)
+                        {
+                            if (value.distance < shortestDistance)
+                            {
+                                shortestDistance = value.distance;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return shortestDistance;
+        }
 
         /// <summary>
         /// Finds the closest Contact Hand from a list of contact hands to a given object.

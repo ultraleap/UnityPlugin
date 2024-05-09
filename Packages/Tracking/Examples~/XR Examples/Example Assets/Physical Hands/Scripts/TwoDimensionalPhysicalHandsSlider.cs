@@ -61,6 +61,7 @@ namespace Leap.Unity.PhysicalHandsExamples
         private Vector2 _prevSliderValue = Vector2.zero;
 
         private Quaternion _initialRotation;
+        private Vector3 _initialPosition;
 
         private Vector2 _localTwoDimSliderTravelDistanceHalf;
 
@@ -118,6 +119,14 @@ namespace Leap.Unity.PhysicalHandsExamples
             if (Quaternion.Angle(_slideableObject.transform.localRotation, _initialRotation) > 0.5f)
             {
                 _slideableObject.transform.localRotation = _initialRotation;
+            }
+
+            if (Mathf.Abs(_slideableObject.transform.localPosition.y - _initialPosition.y) > 0.01)
+            {
+                _slideableObject.transform.localPosition = new Vector3(
+                    _slideableObject.transform.localPosition.x,
+                    _initialPosition.y,
+                    _slideableObject.transform.localPosition.z);
             }
         }
 
@@ -195,6 +204,7 @@ namespace Leap.Unity.PhysicalHandsExamples
             _slideableObjectRigidbody.useGravity = false;
             this.GetComponent<Rigidbody>().isKinematic = true;
             _initialRotation = _slideableObject.transform.localRotation;
+            _initialPosition = _slideableObject.transform.localPosition;
         }
 
         /// <summary>

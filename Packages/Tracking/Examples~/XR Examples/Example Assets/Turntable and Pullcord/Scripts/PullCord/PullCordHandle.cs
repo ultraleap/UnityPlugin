@@ -176,7 +176,7 @@ namespace Leap.Unity.Examples
 
         void IPhysicalHandHover.OnHandHover(ContactHand hand)
         {
-            if(!_relevanthands.Contains(hand.DataHand))
+            if (!_relevanthands.Contains(hand.DataHand))
             {
                 _relevanthands.Add(hand.DataHand);
             }
@@ -202,23 +202,7 @@ namespace Leap.Unity.Examples
 
         Hand GetClosestHand()
         {
-            Hand closestHand = null;
-            float closestDist = float.PositiveInfinity;
-
-            if (_relevanthands.Count > 0)
-            {
-                foreach (var hand in _relevanthands)
-                {
-                    float distanceFromHand = Vector3.Distance(hand.PalmPosition, this.transform.position);
-                    if (closestHand == null || distanceFromHand < closestDist)
-                    {
-                        closestHand = hand;
-                        closestDist = distanceFromHand;
-                    }
-                }
-            }
-
-            return closestHand;
+            return PhysicalHandUtils.ClosestHand(_relevanthands, this.gameObject);
         }
     }
 }
