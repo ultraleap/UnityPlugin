@@ -231,7 +231,7 @@ namespace Leap.Unity.MRTK
                     return;
                 }
 
-                LeapServiceProvider leapProvider = GameObject.FindAnyObjectByType< LeapServiceProvider>();
+                LeapServiceProvider leapProvider = GameObject.FindAnyObjectByType<LeapServiceProvider>();
 
                 // If there is no leap provider in the scene
                 if (leapProvider == null)
@@ -242,7 +242,7 @@ namespace Leap.Unity.MRTK
                     GameObject leapProviderGO = new GameObject("LeapXRServiceProvider");
                     LeapXRServiceProvider leapXRServiceProvider = leapProviderGO.AddComponent<LeapXRServiceProvider>();
                     leapXRServiceProvider.PositionDeviceRelativeToMainCamera = true;
-                    leapProvider = (LeapProvider)leapXRServiceProvider;
+                    leapProvider = (LeapServiceProvider)leapXRServiceProvider;
                     GameObject.DontDestroyOnLoad(leapProviderGO);
                 }
                 else

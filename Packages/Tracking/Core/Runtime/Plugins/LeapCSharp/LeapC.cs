@@ -532,15 +532,26 @@ namespace LeapInternal
         /// <summary>
         /// A new head pose is available.
         /// </summary>
+        [Obsolete("Head pose events are not supported and will never be raised")]
         eLeapEventType_HeadPose,
         /// <summary>
         /// A new head pose is available.
         /// </summary>
+        [Obsolete("Eye pose events are not supported and will never be raised")]
         eLeapEventType_Eyes,
         /// <summary>
-        /// A new head pose is available.
+        /// A new IMU information frame is available.
         /// </summary>
-        eLeapEventType_IMU
+        eLeapEventType_IMU,
+        /// <summary>
+        /// Notification that the service received a new device transformation matrix
+        /// Use LeapGetDeviceTransform to update your cached information.
+        /// </summary>
+        eLeapEventType_NewDeviceTransform,
+        /// <summary>
+        /// An event provided when a fiducial marker has been tracked
+        /// </summary>
+        eLeapEventType_Fiducial
     };
 
     public enum eLeapDeviceFlag : uint
@@ -716,6 +727,12 @@ namespace LeapInternal
         public LEAP_QUATERNION head_orientation;
         public LEAP_VECTOR head_linear_velocity;
         public LEAP_VECTOR head_angular_velocity;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct LEAP_NEW_DEVICE_TRANSFORM
+    {
+        public UInt32 reserved;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -974,6 +991,18 @@ namespace LeapInternal
         public string zoneName;
     }
 
+    [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
+    public struct LEAP_FIDUCIAL_POSE_EVENT
+    {
+        public int id;
+        public IntPtr family; // char*
+        public float size;
+        public Int64 timestamp;
+        public float estimated_error;
+        public LEAP_VECTOR translation;
+        public LEAP_QUATERNION rotation;
+    }
+
     public class LeapC
     {
         private LeapC() { }
@@ -1022,6 +1051,9 @@ namespace LeapInternal
 
         [DllImport("LeapC", EntryPoint = "LeapOpenConnection")]
         public static extern eLeapRS OpenConnection(IntPtr hConnection);
+
+        [DllImport("LeapC", EntryPoint = "LeapSetConnectionMetadata")]
+        public static extern eLeapRS SetConnectionMetadata(IntPtr hConnection, string metadata, UIntPtr len);
 
         [DllImport("LeapC", EntryPoint = "LeapSetAllocator")]
         public static extern eLeapRS SetAllocator(IntPtr hConnection, ref LEAP_ALLOCATOR pAllocator);
@@ -1101,9 +1133,13 @@ namespace LeapInternal
         public static extern LEAP_VECTOR LeapPixelToRectilinear(IntPtr hConnection,
           eLeapPerspectiveType camera, LEAP_VECTOR pixel);
 
-        [DllImport("LeapC", EntryPoint = "LeapPixelToRectilinearEx")]
+        [Obsolete("Use of calibrationType is not valid. Use alternative LeapPixelToRectilinearEx method."), DllImport("LeapC", EntryPoint = "LeapPixelToRectilinearEx")]
         public static extern LEAP_VECTOR LeapPixelToRectilinearEx(IntPtr hConnection,
           IntPtr hDevice, eLeapPerspectiveType camera, eLeapCameraCalibrationType calibrationType, LEAP_VECTOR pixel);
+
+        [DllImport("LeapC", EntryPoint = "LeapPixelToRectilinearEx")]
+        public static extern LEAP_VECTOR LeapPixelToRectilinearEx(IntPtr hConnection,
+            IntPtr hDevice, eLeapPerspectiveType camera, LEAP_VECTOR pixel);
 
         [DllImport("LeapC", EntryPoint = "LeapRectilinearToPixel")]
         public static extern LEAP_VECTOR LeapRectilinearToPixel(IntPtr hConnection,
@@ -1112,6 +1148,14 @@ namespace LeapInternal
         [DllImport("LeapC", EntryPoint = "LeapRectilinearToPixelEx")]
         public static extern LEAP_VECTOR LeapRectilinearToPixelEx(IntPtr hConnection,
           IntPtr hDevice, eLeapPerspectiveType camera, LEAP_VECTOR rectilinear);
+
+        [DllImport("LeapC", EntryPoint = "LeapExtrinsicCameraMatrix")]
+        public static extern eLeapRS LeapExtrinsicCameraMatrix(IntPtr hConnection, eLeapPerspectiveType camera, 
+            [MarshalAs(UnmanagedType.LPArray, SizeConst = 16)] float[] extrinsicMatrix);
+
+        [DllImport("LeapC", EntryPoint = "LeapExtrinsicCameraMatrixEx")]
+        public static extern eLeapRS LeapExtrinsicCameraMatrixEx(IntPtr hConnection, IntPtr hDevice, eLeapPerspectiveType camera, 
+            [MarshalAs(UnmanagedType.LPArray, SizeConst = 16)] float[] extrinsicMatrix);
 
         [DllImport("LeapC", EntryPoint = "LeapCloseDevice")]
         public static extern void CloseDevice(IntPtr pDevice);
@@ -1241,7 +1285,6 @@ namespace LeapInternal
         [DllImport("LeapC", EntryPoint = "LeapGetVersion")]
         public static extern eLeapRS GetVersion(IntPtr hConnection, eLeapVersionPart versionPart, ref LEAP_VERSION pVersion);
 
-
         [DllImport("LeapC", EntryPoint = "LeapGetServerStatus")]
         public static extern eLeapRS GetServerStatus(UInt32 timeout, ref IntPtr status);
 
@@ -1263,7 +1306,7 @@ namespace LeapInternal
             public string serial;
             public string type;
         }
-        
+
         public static eLeapRS SetDeviceHints(IntPtr hConnection, IntPtr hDevice, string[] hints)
         {
             // Ensure the final element of the array is null terminated.
@@ -1275,7 +1318,7 @@ namespace LeapInternal
 
             return SetDeviceHintsInternal(hConnection, hDevice, hints);
         }
-        
+
         [DllImport("LeapC", EntryPoint = "LeapSetDeviceHints")]
         private static extern eLeapRS SetDeviceHintsInternal(IntPtr hConnection, IntPtr hDevice, string[] hints);
     }

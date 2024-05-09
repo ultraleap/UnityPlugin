@@ -10,6 +10,7 @@ namespace Leap
 {
     using LeapInternal;
     using System;
+    using System.Runtime.InteropServices;
 
     /// <summary>
     /// An enumeration defining the types of Leap Motion events.
@@ -35,7 +36,8 @@ namespace Leap
         EVENT_DROPPED_FRAME,
         EVENT_IMAGE,             //!< An unrequested image is available
         EVENT_POINT_MAPPING_CHANGE,
-        EVENT_HEAD_POSE
+        EVENT_HEAD_POSE,
+        EVENT_FIDUCIAL_POSE
     };
     /// <summary>
     /// A generic object with no arguments beyond the event type.
@@ -307,6 +309,33 @@ namespace Leap
 
         public LEAP_VECTOR headPosition { get; set; }
         public LEAP_QUATERNION headOrientation { get; set; }
+    }
+
+    /// <summary>
+    /// Dispatched when a Fiducial Marker is tracked
+    /// 
+    /// Note: Family and Size are not currently implemented
+    /// </summary>
+    public class FiducialPoseEventArgs : LeapEventArgs
+    {
+        public FiducialPoseEventArgs(LEAP_FIDUCIAL_POSE_EVENT poseEvent) : base(LeapEvent.EVENT_FIDUCIAL_POSE)
+        {
+            this.id = poseEvent.id;
+            this.family = ""; // TODO: Marshal.PtrToStringAnsi(poseEvent.family); - when ptr is implemented in LeapC
+            this.size = poseEvent.size;
+            this.timestamp = poseEvent.timestamp;
+            this.estimated_error = poseEvent.estimated_error;
+            this.translation = poseEvent.translation;
+            this.rotation = poseEvent.rotation;
+        }
+
+        public int id { get; set; }
+        public string family { get; set; }
+        public float size { get; set; }
+        public float timestamp { get; set; }
+        public float estimated_error { get; set; }
+        public LEAP_VECTOR translation { get; set; }
+        public LEAP_QUATERNION rotation { get; set; }
     }
 
     public struct BeginProfilingForThreadArgs

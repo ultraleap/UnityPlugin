@@ -42,7 +42,6 @@ namespace Leap
     {
         Connection _connection;
         bool _disposed = false;
-        bool _supportsMultipleDevices = true;
         string _serverNamespace = "Leap Service";
 
         /// <summary>
@@ -405,6 +404,21 @@ namespace Leap
             }
         }
 
+        /// <summary>
+        /// Dispatched when a Fiducial Marker has been tracked.
+        /// </summary>
+        public event EventHandler<FiducialPoseEventArgs> FiducialPose
+        {
+            add
+            {
+                _connection.LeapFiducialPose += value;
+            }
+            remove
+            {
+                _connection.LeapFiducialPose -= value;
+            }
+        }
+
         public void Dispose()
         {
             Dispose(true);
@@ -448,14 +462,16 @@ namespace Leap
             _connection = Connection.GetConnection(new Connection.Key(connectionKey, serverNamespace));
             _connection.EventContext = SynchronizationContext.Current;
 
+            if (_connection.IsRunning)
+                _hasInitialized = true;
+
             _connection.LeapInit += OnInit;
             _connection.LeapConnection += OnConnect;
             _connection.LeapConnectionLost += OnDisconnect;
 
-            _supportsMultipleDevices = supportsMultipleDevices;
             _serverNamespace = serverNamespace;
 
-            _connection.Start(serverNamespace, supportsMultipleDevices);
+            StartConnection();
         }
 
 
@@ -469,7 +485,7 @@ namespace Leap
         /// </summary>
         public void StartConnection()
         {
-            _connection.Start(_serverNamespace, _supportsMultipleDevices);
+            _connection.Start(_serverNamespace);
         }
 
         /// <summary>
@@ -630,7 +646,7 @@ namespace Leap
         /// <param name="device">An optional specific Device, otherwise the first found will be used</param>
         public void RequestHandTrackingHints(string[] hints, Device device = null)
         {
-            if(device == null)
+            if (device == null)
             {
                 device = Devices.ActiveDevices.FirstOrDefault();
             }
@@ -845,6 +861,26 @@ namespace Leap
         public void GetInterpolatedFrameFromTime(Frame toFill, Int64 time, Int64 sourceTime, Device device = null)
         {
             _connection.GetInterpolatedFrameFromTime(toFill, time, sourceTime, device);
+        }
+
+        public UnityEngine.Matrix4x4 LeapExtrinsicCameraMatrix(Image.CameraType camera, Device device)
+        {
+            return _connection.LeapExtrinsicCameraMatrix(camera, device);
+        }
+
+        public UnityEngine.Vector3 RectilinearToPixel(Image.CameraType camera, UnityEngine.Vector3 ray)
+        {
+            return _connection.RectilinearToPixel(camera, ray);
+        }
+
+        public UnityEngine.Vector3 RectilinearToPixelEx(Image.CameraType camera, UnityEngine.Vector3 ray, Device device)
+        {
+            return _connection.RectilinearToPixelEx(device.Handle, camera, ray);
+        }
+
+        public UnityEngine.Vector3 PixelToRectilinearEx(Image.CameraType camera, UnityEngine.Vector3 pixel, Device device)
+        {
+            return _connection.PixelToRectilinearEx(device.Handle, camera, pixel);
         }
 
         /// <summary>

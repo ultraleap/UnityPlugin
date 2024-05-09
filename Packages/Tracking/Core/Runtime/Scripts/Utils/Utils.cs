@@ -17,7 +17,6 @@ namespace Leap.Unity
 {
     public static class Utils
     {
-
         #region C# Utilities
 
         #region Generic Utils
@@ -1197,6 +1196,111 @@ namespace Leap.Unity
 #else
             return false;
 #endif
+        }
+
+        /// <summary>
+        /// Try to get all components of type from the provided Component's GameObject
+        /// </summary>
+        public static bool TryGetComponents<T>(this Component source, out T[] components)
+        {
+            if(source.TryGetComponent<T>(out _))
+            {
+                components = source.GetComponents<T>();
+                return true;
+            }
+
+            components = default;
+            return false;
+        }
+
+        /// <summary>
+        /// Try to get the given component of type from the provided Component's Parent
+        /// </summary>
+        public static bool TryGetComponentInParent<T>(this Component source, out T component)
+        {
+            if(source.transform.parent != null)
+            {
+                return source.transform.parent.TryGetComponent(out component);
+            }
+
+            component = default;
+            return false;
+        }
+
+        /// <summary>
+        /// Try to get the given components of type from the provided Component's Parent
+        /// </summary>
+        public static bool TryGetComponentsInParent<T>(this Component source, out T[] components)
+        {
+            if (source.transform.parent != null)
+            {
+                return source.transform.parent.TryGetComponents(out components);
+            }
+
+            components = default;
+            return false;
+        }
+
+        /// <summary>
+        /// Try to get the given component of type from the provided Component's self or children
+        /// </summary>
+        public static bool TryGetComponentInChildren<T>(this Component source, out T component, bool includeSelf = true, bool includeInactive = false)
+        {
+            if(!source.gameObject.activeInHierarchy && !includeInactive) // No children can be active either
+            {
+                component = default;
+                return false;
+            }
+
+            if(includeSelf && source.TryGetComponent(out component))
+            {
+                return true;
+            }
+            else
+            {
+                foreach(Transform child in source.transform)
+                {
+                    component = child.GetComponentInChildren<T>(includeInactive);
+
+                    if(component != null)
+                    {
+                        return true;
+                    }
+                }
+            }    
+
+            component = default;
+            return false;
+        }
+
+        /// <summary>
+        /// Try to get the given component of type from the provided Component's self or children
+        /// </summary>
+        public static bool TryGetComponentsInChildren<T>(this Component source, out T[] components, bool includeSelf = true, bool includeInactive = false)
+        {
+            if(includeSelf)
+            {
+                components = source.GetComponentsInChildren<T>(includeInactive);
+                return components != null;
+            }
+            else
+            {
+                List<T> componentList = new List<T>();
+
+                foreach (Transform child in source.transform)
+                {
+                    componentList.AddRange(child.GetComponentsInChildren<T>(includeInactive));
+                }
+
+                if(componentList.Count > 0)
+                {
+                    components = componentList.ToArray();
+                    return true;
+                }
+            }
+
+            components = default;
+            return false;
         }
 
         #endregion
@@ -2755,6 +2859,37 @@ namespace Leap.Unity
 
         #endregion
 
+        #region Editor Utils
+#if UNITY_EDITOR
+
+        public static bool IsPackageAvailable(string packageName, out UnityEditor.PackageManager.PackageInfo packageInfo)
+        {
+            packageInfo = GetPackageInfo(packageName);
+
+            if (packageInfo != null)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        static UnityEditor.PackageManager.PackageInfo GetPackageInfo(string packageName)
+        {
+            var allPackages = UnityEditor.PackageManager.PackageInfo.GetAllRegisteredPackages();
+            foreach (var package in allPackages)
+            {
+                if (package.name == packageName)
+                {
+                    return package;
+                }
+            }
+            return null;
+        }
+
+#endif
+        #endregion
+
         #endregion
 
         #region Leap Utilities
@@ -2830,6 +2965,60 @@ namespace Leap.Unity
         }
 
         #endregion
+
+        #region Leap Matrix 3x3
+
+        /// <summary>
+        /// Converts a LEAP_MATRIX_3x3 rotation matrix to a Unity Matrix4x4
+        /// </summary>
+        /// <param name="m">A Leap rotation matrix</param>
+        /// <returns>A Unity Rotation Matrix</returns>
+        public static Matrix4x4 ToUnityRotationMatrix(this LeapInternal.LEAP_MATRIX_3x3 m)
+        {
+            Matrix4x4 rotationMatrix =
+                new Matrix4x4(new Vector4(m.m1.x, m.m2.x, m.m3.x, 0),
+                                new Vector4(m.m1.y, m.m2.y, m.m3.y, 0),
+                                new Vector4(m.m1.z, m.m2.z, m.m3.z, 0),
+                                new Vector4(0, 0, 0, 1));
+            return rotationMatrix;
+        }
+
+        #endregion
+
+        #region Tracked Pose Driver Utils
+
+        /// <summary>
+        /// Adds a tracked pose driver to the given camera if suitable packages are installed.
+        /// Does nothing if a tracked pose driver already exists on the camera
+        /// </summary>
+        public static void AddTrackedPoseDriverToCamera(this Camera mainCamera)
+        {
+#if !XR_MANAGEMENT_AVAILABLE && !INPUT_SYSTEM_AVAILABLE
+            return;
+#endif
+            bool trackedPoseDriverExists = false;
+
+#if XR_MANAGEMENT_AVAILABLE
+            if (mainCamera.GetComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>())
+            {
+                trackedPoseDriverExists = true;
+            }
+#endif
+#if INPUT_SYSTEM_AVAILABLE
+            if (mainCamera.GetComponent<UnityEngine.InputSystem.XR.TrackedPoseDriver>())
+            {
+                trackedPoseDriverExists = true;
+            }
+#endif
+            if (!trackedPoseDriverExists)
+            {
+#if XR_MANAGEMENT_AVAILABLE
+                mainCamera.gameObject.AddComponent<UnityEngine.SpatialTracking.TrackedPoseDriver>().UseRelativeTransform = true;
+#elif INPUT_SYSTEM_AVAILABLE
+                mainCamera.gameObject.AddComponent<UnityEngine.InputSystem.XR.TrackedPoseDriver>();
+#endif
+            }
+        }
 
         #endregion
 
@@ -3195,6 +3384,8 @@ namespace Leap.Unity
 
         #endregion
 
+        #endregion
+
         #region From/Then Utilities
 
         #region Float
@@ -3382,7 +3573,5 @@ namespace Leap.Unity
         #endregion
 
         #endregion
-
     }
-
 }

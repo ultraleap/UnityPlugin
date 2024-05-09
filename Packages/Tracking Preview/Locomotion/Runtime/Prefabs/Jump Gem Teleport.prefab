@@ -330,7 +330,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   farFieldLayerManager: {fileID: 0}
   handRayRenderer: {fileID: 1135228147649426934}
-  handRayInteractor: {fileID: 0}
+  handRayInteractor: {fileID: 1180466939248385762}
   freeTeleportAnchor: {fileID: 4636800580180853980}
   Head: {fileID: 0}
   Player: {fileID: 0}
