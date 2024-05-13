@@ -1,4 +1,4 @@
-Shader "Unlit/SimpleOutline"
+Shader "Ultraleap/Simple Outline"
 {
     Properties
     {
