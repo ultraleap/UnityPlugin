@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Issue with the method signature for LeapPixelToRectilinearEx
+- Duplicate meta aim hands when using XRHands Input
 
 ## [6.15.0] - 19/04/24
 
