@@ -67,13 +67,6 @@ namespace Leap.Unity.InputActions
             currentSubsystem.updatedHands -= UpdateHands;
             currentSubsystem.updatedHands += UpdateHands;
 
-            // Create meta hands if required
-            if (ultraleapSettings.updateMetaInputSystem)
-            {
-                MetaAimHand.left = MetaAimHand.CreateHand(UnityEngine.XR.InputDeviceCharacteristics.Left);
-                MetaAimHand.right = MetaAimHand.CreateHand(UnityEngine.XR.InputDeviceCharacteristics.Right);
-            }
-
             SetupDefaultStateGetters();
 
             OnDeviceAdded();
@@ -345,8 +338,15 @@ namespace Leap.Unity.InputActions
         {
             if (ultraleapSettings.updateMetaInputSystem)
             {
-                MetaAimHand.CreateHand(UnityEngine.XR.InputDeviceCharacteristics.Left);
-                MetaAimHand.CreateHand(UnityEngine.XR.InputDeviceCharacteristics.Right);
+                if (MetaAimHand.left == null)
+                {
+                    MetaAimHand.CreateHand(UnityEngine.XR.InputDeviceCharacteristics.Left);
+                }
+
+                if (MetaAimHand.right == null)
+                {
+                    MetaAimHand.CreateHand(UnityEngine.XR.InputDeviceCharacteristics.Right);
+                }
             }
 
             if (ultraleapSettings.updateLeapInputSystem)
