@@ -12,9 +12,9 @@ GameObject:
   - component: {fileID: 2167320533068517813}
   - component: {fileID: 2167320533068517812}
   - component: {fileID: 3690411740684171252}
-  - component: {fileID: 6690543558420774076}
+  - component: {fileID: 1859057712282412615}
   m_Layer: 5
-  m_Name: Physical Hands Button
+  m_Name: Physical Hands Button Toggle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -102,7 +102,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 126
   m_CollisionDetection: 3
---- !u!114 &6690543558420774076
+--- !u!114 &1859057712282412615
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -111,7 +111,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 6504037249797295756}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ee6ba0f8f2ad7aa4d9e4c7ed108f8b46, type: 3}
+  m_Script: {fileID: 11500000, guid: f23606059f7ad1c4396d3a607116a4f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _automaticTravelDistance: 1
@@ -145,6 +145,7 @@ MonoBehaviour:
   OnHandHoverExit:
     m_PersistentCalls:
       m_Calls: []
+  _untoggleWhenPressed: 1
 --- !u!1 &8988865282199578529
 GameObject:
   m_ObjectHideFlags: 0

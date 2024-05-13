@@ -10,8 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7760771333842036307}
   - component: {fileID: 7760771333842036306}
-  - component: {fileID: 7760771333842036305}
-  - component: {fileID: 7760771333842036304}
+  - component: {fileID: 1411668327718571878}
   m_Layer: 0
   m_Name: Anchorable Object
   m_TagString: Untagged
@@ -29,6 +28,7 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7760771334010125618}
   m_Father: {fileID: 0}
@@ -47,10 +47,10 @@ Rigidbody:
   m_AngularDrag: 5
   m_UseGravity: 0
   m_IsKinematic: 1
-  m_Interpolate: 1
+  m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &7760771333842036305
+--- !u!114 &1411668327718571878
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -59,64 +59,49 @@ MonoBehaviour:
   m_GameObject: {fileID: 7760771333842036311}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _manager: {fileID: 0}
-  _ignoreHoverMode: 0
-  _isIgnoringAllHoverState: 0
-  _ignorePrimaryHover: 0
-  _ignoreContact: 0
-  _ignoreGraspingMode: 0
-  _ignoreGrasping: 0
-  _contactForceMode: 0
-  _allowMultiGrasp: 0
-  _moveObjectWhenGrasped: 1
-  graspedMovementType: 0
-  _overrideInteractionLayer: 0
-  _interactionLayer:
-    layerIndex: 0
-  _overrideNoContactLayer: 0
-  _noContactLayer:
-    layerIndex: 0
-  _eventTable:
-    _entries: []
---- !u!114 &7760771333842036304
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7760771333842036311}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1aceea2f5c70da64e893474302ff53e6, type: 3}
+  m_Script: {fileID: 11500000, guid: 1e0788de50284f742a8e17eea713e48c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _isAttached: 0
   _anchor: {fileID: 0}
   _anchorGroup: {fileID: 0}
-  maxAnchorRange: 0.3
-  useTrajectory: 1
+  maxAnchorRange: 0.1
+  useTrajectory: 0
   _motionlessRangeFraction: 0.4
-  _maxMotionlessRange: 0.120000005
-  _maxAttachmentAngle: 66
+  _maxMotionlessRange: 0.040000003
+  _maxAttachmentAngle: 60
   _alwaysAttachDistance: 0
   lockToAnchor: 0
   lockWhenAttached: 1
   matchAnchorMotionWhileAttaching: 1
   anchorLerpCoeffPerSec: 20
   anchorRotation: 1
-  interactionBehaviour: {fileID: 7760771333842036305}
-  _interactionBehaviourIsNull: 0
   detachWhenGrasped: 1
   _tryAnchorNearestOnGraspEnd: 1
-  isAttractedByHand: 1
-  maxAttractionReach: 10
+  isAttractedByHand: 0
+  maxAttractionReach: 0.1
   anchorHandAttractionRate: 5
   attractionReachByDistance:
     serializedVersion: 2
-    m_Curve: []
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
@@ -151,6 +136,7 @@ Transform:
   m_LocalRotation: {x: -0.18469808, y: -0.8254062, z: -0.42364976, w: -0.32420996}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.033000004, y: 0.033000004, z: 0.033}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7760771333842036307}
   m_RootOrder: 0
@@ -187,6 +173,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1

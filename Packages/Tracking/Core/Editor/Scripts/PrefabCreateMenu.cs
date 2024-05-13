@@ -6,7 +6,6 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity.PhysicalHands;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -17,43 +16,43 @@ namespace Leap
     {
         #region Providers
 
-        [MenuItem("GameObject/Ultraleap/Tracking/XR Leap Provider Manager", false, 20),
-            MenuItem("Ultraleap/Tracking/XR Leap Provider Manager", false, 20)]
+        [MenuItem("GameObject/Ultraleap/Tracking/XR Leap Provider Manager", false, 1),
+            MenuItem("Ultraleap/Tracking/XR Leap Provider Manager", false, 1)]
         public static void CreateProviderXR()
         {
             CreatePrefab("XR Leap Provider Manager");
         }
 
-        [MenuItem("GameObject/Ultraleap/Tracking/Service Provider (XR)", false, 31),
-            MenuItem("Ultraleap/Tracking/Service Provider (XR)", false, 31)]
+        [MenuItem("GameObject/Ultraleap/Tracking/Service Provider (XR)", false, 2),
+            MenuItem("Ultraleap/Tracking/Service Provider (XR)", false, 2)]
         public static void CreateServiceProviderXR()
         {
             CreatePrefab("Service Provider (XR)");
         }
 
-        [MenuItem("GameObject/Ultraleap/Tracking/Service Provider (OpenXR)", false, 32),
-            MenuItem("Ultraleap/Tracking/Service Provider (OpenXR)", false, 32)]
+        [MenuItem("GameObject/Ultraleap/Tracking/Service Provider (OpenXR)", false, 3),
+            MenuItem("Ultraleap/Tracking/Service Provider (OpenXR)", false, 3)]
         public static void CreateServiceProviderOpenXR()
         {
             CreatePrefab("Service Provider (OpenXR)");
         }
 
-        [MenuItem("GameObject/Ultraleap/Tracking/XRHands Leap Provider", false, 33),
-            MenuItem("Ultraleap/Tracking/XRHands Leap Provider", false, 33)]
+        [MenuItem("GameObject/Ultraleap/Tracking/XRHands Leap Provider", false, 4),
+            MenuItem("Ultraleap/Tracking/XRHands Leap Provider", false, 4)]
         public static void CreateXRHandsLeapProvider()
         {
             CreatePrefab("XRHands Leap Provider");
         }
 
-        [MenuItem("GameObject/Ultraleap/Tracking/Service Provider (Desktop)", false, 45),
-            MenuItem("Ultraleap/Tracking/Service Provider (Desktop)", false, 45)]
+        [MenuItem("GameObject/Ultraleap/Tracking/Service Provider (Desktop)", false, 101),
+            MenuItem("Ultraleap/Tracking/Service Provider (Desktop)", false, 101)]
         public static void CreateServiceProviderDesktop()
         {
             CreatePrefab("Service Provider (Desktop)");
         }
 
-        [MenuItem("GameObject/Ultraleap/Tracking/Service Provider (Screentop)", false, 46),
-            MenuItem("Ultraleap/Tracking/Service Provider (Screentop)", false, 46)]
+        [MenuItem("GameObject/Ultraleap/Tracking/Service Provider (Screentop)", false, 102),
+            MenuItem("Ultraleap/Tracking/Service Provider (Screentop)", false, 102)]
         public static void CreateServiceProviderScreentop()
         {
             CreatePrefab("Service Provider (Screentop)");
@@ -67,58 +66,115 @@ namespace Leap
             MenuItem("Ultraleap/Hands/Capsule Hands", false, 20)]
         public static void CreateCapsuleHands()
         {
-            CreatePrefab("CapsuleHands");
+            bool created = false;
+
+#if UNITY_URP_AVAILABLE
+            var urpHands = CreatePrefab("Capsule Hands (URP) Variant");
+            created = urpHands == null ? false : true;
+#endif
+
+            if (!created)
+                CreatePrefab("CapsuleHands");
         }
 
         [MenuItem("GameObject/Ultraleap/Hands/Low Poly Hands", false, 21),
             MenuItem("Ultraleap/Hands/Low Poly Hands", false, 21)]
         public static void CreateLowPolyHands()
         {
-            CreatePrefab("LowPolyHandsWithArms");
+            bool created = false;
+
+#if UNITY_URP_AVAILABLE
+            var urpHands = CreatePrefab("LowPolyHandsWithArms (URP) Variant");
+            created = urpHands == null ? false : true;
+#endif
+
+            if (!created)
+                CreatePrefab("LowPolyHandsWithArms");
         }
 
         [MenuItem("GameObject/Ultraleap/Hands/Ghost Hands (with arms)", false, 22),
             MenuItem("Ultraleap/Hands/Ghost Hands (with arms)", false, 22)]
         public static void CreateGenericHand_Arm()
         {
-            CreatePrefab("GenericHand_Arm");
+            bool created = false;
+
+#if UNITY_URP_AVAILABLE
+            var urpHands = CreatePrefab("Ghost Hands (URP) Variant");
+            created = urpHands == null ? false : true;
+#endif
+
+            if (!created)
+                CreatePrefab("GenericHand_Arm");
         }
 
         [MenuItem("GameObject/Ultraleap/Hands/Ghost Hands", false, 23),
             MenuItem("Ultraleap/Hands/Ghost Hands", false, 23)]
         public static void CreateGhostHands()
         {
-            CreatePrefab("GhostHands");
+            bool created = false;
+
+#if UNITY_URP_AVAILABLE
+            var urpHands = CreatePrefab("Ghost Hands (URP) Variant");
+            created = urpHands == null ? false : true;
+#endif
+
+            if (!created)
+                CreatePrefab("GhostHands");
         }
 
         [MenuItem("GameObject/Ultraleap/Hands/Outline Hands", false, 24),
             MenuItem("Ultraleap/Hands/Outline Hands", false, 24)]
         public static void CreateOutlineHands()
         {
-            CreatePrefab("OutlineHands");
+            bool created = false;
+
+#if UNITY_URP_AVAILABLE
+            var urpHands = CreatePrefab("Outline Hands (URP) Variant");
+            created = urpHands == null ? false : true;
+#endif
+
+            if (!created)
+                CreatePrefab("OutlineHands");
         }
 
         [MenuItem("GameObject/Ultraleap/Hands/Skeleton Hands", false, 25),
             MenuItem("Ultraleap/Hands/Skeleton Hands", false, 25)]
         public static void CreateSkeletonHands()
         {
-            CreatePrefab("SkeletonHands");
+            bool created = false;
+
+#if UNITY_URP_AVAILABLE
+            var urpHands = CreatePrefab("Skeleton Hands (URP) Variant");
+            created = urpHands == null ? false : true;
+#endif
+
+            if (!created)
+                CreatePrefab("SkeletonHands");
         }
 
-        [MenuItem("GameObject/Ultraleap/Hands/Attachment Hands", false, 26),
-            MenuItem("Ultraleap/Hands/Attachment Hands", false, 26)]
+        [MenuItem("GameObject/Ultraleap/Hands/Ghost Capsule Hands", false, 26),
+            MenuItem("Ultraleap/Hands/Ghost Capsule Hands", false, 26)]
+        public static void CreateGhostCapsuleHands()
+        {
+            bool created = false;
+
+#if UNITY_URP_AVAILABLE
+            var urpHands = CreatePrefab("Ghost Hands (URP) Variant");
+            created = urpHands == null ? false : true;
+#endif
+
+            if (!created)
+                CreatePrefab("Ghost Capsule Hands");
+        }
+
+        [MenuItem("GameObject/Ultraleap/Hands/Attachment Hands", false, 27),
+            MenuItem("Ultraleap/Hands/Attachment Hands", false, 27)]
         public static void CreateAttachmentHands()
         {
             CreatePrefab("Attachment Hands");
         }
-        [MenuItem("GameObject/Ultraleap/Hands/Ghost Capsule Hands", false, 27),
-    MenuItem("Ultraleap/Hands/Ghost Capsule Hands", false, 27)]
-        public static void CreateGhostCapsuleHands()
-        {
-            CreatePrefab("Ghost Capsule Hands");
-        }
 
-        #endregion
+#endregion
 
         #region Pose Detection
 
@@ -133,57 +189,8 @@ namespace Leap
 
         #region Interaction
 
-        [MenuItem("GameObject/Ultraleap/Interaction/Interaction Manager", false, 20),
-            MenuItem("Ultraleap/Interaction/Interaction Manager", false, 20)]
-        public static void CreateInteractionManager()
-        {
-            CreatePrefab("Ultraleap Interaction Manager");
-        }
-
-        [MenuItem("GameObject/Ultraleap/Interaction/Interaction Cube", false, 21),
-            MenuItem("Ultraleap/Interaction/Interaction Cube", false, 21)]
-        public static void CreateInteractionCube()
-        {
-            CreatePrefab("Interaction Cube");
-        }
-
-        [MenuItem("GameObject/Ultraleap/Interaction/3D Button", false, 22),
-            MenuItem("Ultraleap/Interaction/3D Button", false, 22)]
-        public static void CreateSimple3dButton()
-        {
-            CreatePrefab("3D Button");
-        }
-
-        [MenuItem("GameObject/Ultraleap/Interaction/3D UI Panel", false, 24),
-            MenuItem("Ultraleap/Interaction/3D UI Panel", false, 24)]
-        public static void Create3dUI()
-        {
-            CreatePrefab("3D UI Panel");
-        }
-
-        [MenuItem("GameObject/Ultraleap/Interaction/Attachment Hand Menu", false, 25),
-            MenuItem("Ultraleap/Interaction/Attachment Hand Menu", false, 25)]
-        public static void CreateAttachmentHandMenu()
-        {
-            CreatePrefab("Attachment Hand Menu");
-        }
-
-        [MenuItem("GameObject/Ultraleap/Interaction/Anchorable Object", false, 26),
-            MenuItem("Ultraleap/Interaction/Anchorable Object", false, 26)]
-        public static void CreateAnchorableObject()
-        {
-            CreatePrefab("Anchorable Object");
-        }
-
-        [MenuItem("GameObject/Ultraleap/Interaction/Anchor", false, 27),
-            MenuItem("Ultraleap/Interaction/Anchor", false, 27)]
-        public static void CreateAnchor()
-        {
-            CreatePrefab("Anchor");
-        }
-
-        [MenuItem("GameObject/Ultraleap/Physical Hands/Physical Hands Manager", false, 20),
-            MenuItem("Ultraleap/Physical Hands/Physical Hands Manager", false, 20)]
+        [MenuItem("GameObject/Ultraleap/Physical Interaction/Physical Hands Manager", false, 20),
+            MenuItem("Ultraleap/Physical Interaction/Physical Hands Manager", false, 20)]
         public static void CreatePhysicalHandsManagerMenu()
         {
             GameObject physicalHandsManager = CreatePrefab("Physical Hands Manager");
@@ -198,11 +205,46 @@ namespace Leap
             }
         }
 
-        [MenuItem("GameObject/Ultraleap/Physical Hands/Physical Hands Button", false, 21),
-            MenuItem("Ultraleap/Physical Hands/Physical Hands Button", false, 21)]
+        [MenuItem("GameObject/Ultraleap/Physical Interaction/Physical Hands Button", false, 35),
+            MenuItem("Ultraleap/Physical Interaction/Physical Hands Button", false, 35)]
         public static void CreatePhysicalHandsButton()
         {
             CreatePrefab("Physical Hands Button");
+        }
+
+        [MenuItem("GameObject/Ultraleap/Physical Interaction/Physical Hands Button Toggle", false, 36),
+            MenuItem("Ultraleap/Physical Interaction/Physical Hands Button Toggle", false, 36)]
+        public static void CreatePhysicalHandsToggle()
+        {
+            CreatePrefab("Physical Hands Button Toggle");
+        }
+
+        [MenuItem("GameObject/Ultraleap/Physical Interaction/Physical Hands Slider", false, 37),
+            MenuItem("Ultraleap/Physical Interaction/Physical Hands Slider", false, 37)]
+        public static void CreatePhysicalHandsSlider()
+        {
+            CreatePrefab("Physical Hands Slider");
+        }
+
+        [MenuItem("GameObject/Ultraleap/Physical Interaction/Attachment Hand Menu", false, 50),
+            MenuItem("Ultraleap/Physical Interaction/Attachment Hand Menu", false, 50)]
+        public static void CreateAttachmentHandMenu()
+        {
+            CreatePrefab("Attachment Hand Menu");
+        }
+
+        [MenuItem("GameObject/Ultraleap/Physical Interaction/Anchorable Object", false, 51),
+            MenuItem("Ultraleap/Physical Interaction/Anchorable Object", false, 51)]
+        public static void CreateAnchorableObject()
+        {
+            CreatePrefab("Anchorable Object");
+        }
+
+        [MenuItem("GameObject/Ultraleap/Physical Interaction/Anchor", false, 52),
+            MenuItem("Ultraleap/Physical Interaction/Anchor", false, 52)]
+        public static void CreateAnchor()
+        {
+            CreatePrefab("Anchor");
         }
 
         #endregion

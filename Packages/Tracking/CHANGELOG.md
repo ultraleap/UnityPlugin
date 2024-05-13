@@ -24,6 +24,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Grab Ball uses Physical Hands rather than Interaction Engine
 - Physical Hands events are sent to all event interfaces attached to the interacted rigidbody
 - Hard Contact Parent settings access levels to public
+- Prefab Create Menu uses Physical Hands prefabs as opposed to Interaction Engine
+- Prefab Create Menu chooses URP hands where available
 
 ### Fixed
 - 
