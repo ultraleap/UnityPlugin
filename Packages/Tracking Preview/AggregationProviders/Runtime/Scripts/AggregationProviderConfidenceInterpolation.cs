@@ -570,16 +570,16 @@ namespace Leap.Unity
                 confidences = new float[VectorHand.NUM_JOINT_POSITIONS];
             }
 
-            foreach (var finger in hand.Fingers)
+            foreach (var finger in hand.fingers)
             {
                 for (int bone_idx = 0; bone_idx < 4; bone_idx++)
                 {
                     int key = (int)finger.Type * 4 + bone_idx;
 
-                    Vector3 jointPos = finger.Bone((Bone.BoneType)bone_idx).NextJoint;
+                    Vector3 jointPos = finger.GetBone((Bone.BoneType)bone_idx).NextJoint;
                     Vector3 jointNormalVector = new Vector3();
-                    if ((int)finger.Type == 0) jointNormalVector = finger.Bone((Bone.BoneType)bone_idx).Rotation * Vector3.right;
-                    else jointNormalVector = finger.Bone((Bone.BoneType)bone_idx).Rotation * Vector3.up * -1;
+                    if ((int)finger.Type == 0) jointNormalVector = finger.GetBone((Bone.BoneType)bone_idx).Rotation * Vector3.right;
+                    else jointNormalVector = finger.GetBone((Bone.BoneType)bone_idx).Rotation * Vector3.up * -1;
 
                     float angle = Vector3.Angle(jointPos - deviceOrigin.position, jointNormalVector);
 
@@ -604,13 +604,13 @@ namespace Leap.Unity
                 confidences = new float[VectorHand.NUM_JOINT_POSITIONS];
             }
 
-            foreach (var finger in hand.Fingers)
+            foreach (var finger in hand.fingers)
             {
                 for (int bone_idx = 0; bone_idx < 4; bone_idx++)
                 {
                     int key = (int)finger.Type * 4 + bone_idx;
 
-                    Vector3 jointNormalVector = finger.Bone((Bone.BoneType)bone_idx).Rotation * Vector3.up * -1;
+                    Vector3 jointNormalVector = finger.GetBone((Bone.BoneType)bone_idx).Rotation * Vector3.up * -1;
 
                     float angle = Vector3.Angle(hand.PalmNormal, jointNormalVector);
 

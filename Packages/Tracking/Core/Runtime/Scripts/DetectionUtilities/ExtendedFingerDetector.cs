@@ -132,16 +132,16 @@ namespace Leap.Unity
                     hand = HandModel.GetLeapHand();
                     if (hand != null)
                     {
-                        fingerState = matchFingerState(hand.Fingers[0], Thumb)
-                          && matchFingerState(hand.Fingers[1], Index)
-                          && matchFingerState(hand.Fingers[2], Middle)
-                          && matchFingerState(hand.Fingers[3], Ring)
-                          && matchFingerState(hand.Fingers[4], Pinky);
+                        fingerState = matchFingerState(hand.fingers[0], Thumb)
+                          && matchFingerState(hand.fingers[1], Index)
+                          && matchFingerState(hand.fingers[2], Middle)
+                          && matchFingerState(hand.fingers[3], Ring)
+                          && matchFingerState(hand.fingers[4], Pinky);
 
                         int extendedCount = 0;
                         for (int f = 0; f < 5; f++)
                         {
-                            if (hand.Fingers[f].IsExtended)
+                            if (hand.fingers[f].IsExtended)
                             {
                                 extendedCount++;
                             }
@@ -185,7 +185,7 @@ namespace Leap.Unity
                 int notExtendedCount = 0;
                 for (int f = 0; f < 5; f++)
                 {
-                    Finger finger = hand.Fingers[f];
+                    Finger finger = hand.fingers[f];
                     if (finger.IsExtended) extendedCount++;
                     else notExtendedCount++;
                     if (matchFingerState(finger, state[f]) &&

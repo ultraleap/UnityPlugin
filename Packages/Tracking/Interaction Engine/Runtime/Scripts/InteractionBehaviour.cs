@@ -168,7 +168,7 @@ namespace Leap.Unity.Interaction
             {
                 if (!isPrimaryHovered) return null;
                 return _closestPrimaryHoveringHand.leapHand
-                          .Fingers[_closestPrimaryHoveringHand.primaryHoveringPointIndex];
+                          .fingers[_closestPrimaryHoveringHand.primaryHoveringPointIndex];
             }
         }
 

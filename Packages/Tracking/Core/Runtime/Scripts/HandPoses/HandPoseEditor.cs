@@ -107,11 +107,11 @@ namespace Leap.Unity
                 return;
             }
 
-            for (int j = 0; j < hand.Fingers.Count; j++)
+            for (int j = 0; j < hand.fingers.Length; j++)
             {
-                Finger finger = hand.Fingers[j];
-                Bone proximal = finger.Bone(Bone.BoneType.TYPE_PROXIMAL);
-                Bone intermediate = finger.Bone(Bone.BoneType.TYPE_INTERMEDIATE);
+                Finger finger = hand.fingers[j];
+                Bone proximal = finger.GetBone(Bone.BoneType.PROXIMAL);
+                Bone intermediate = finger.GetBone(Bone.BoneType.INTERMEDIATE);
 
                 Plane fingerNormalPlane = new Plane(proximal.PrevJoint, proximal.NextJoint, intermediate.NextJoint);
                 Vector3 normal = fingerNormalPlane.normal;
@@ -128,7 +128,7 @@ namespace Leap.Unity
                         bone.Direction.normalized,
                         bone.PrevJoint, normal, gizmoColors[0], bone.Length);
 
-                        if (finger.bones[i].Type == Bone.BoneType.TYPE_PROXIMAL) 
+                        if (finger.bones[i].Type == Bone.BoneType.PROXIMAL) 
                         {
                             Vector3 proximalNormal = Quaternion.AngleAxis(90, bone.Direction.normalized) * normal;
                             DrawThresholdGizmo(handPoseScriptableObject.GetBoneRotationthreshold(j, i - 1).y, // i-1 to ignore metacarpal

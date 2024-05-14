@@ -448,7 +448,7 @@ namespace Leap.Unity.Preview.Locomotion
                     if (_pinchStartTimeCurrent > 0)
                     {
                         _pinchItem.position = Vector3.Lerp(_pinchStartPosition,
-                            Vector3.Lerp(_pinchedHand.Fingers[0].TipPosition, _pinchedHand.Fingers[1].TipPosition, 0.5f),
+                            Vector3.Lerp(_pinchedHand.fingers[0].TipPosition, _pinchedHand.fingers[1].TipPosition, 0.5f),
                             Mathf.InverseLerp(_pinchStartTime, 0, _pinchStartTimeCurrent));
                         _pinchItem.rotation = Quaternion.Lerp(_pinchStartRotation,
                             _rayRotation,
@@ -456,7 +456,7 @@ namespace Leap.Unity.Preview.Locomotion
                     }
                     else
                     {
-                        _pinchItem.position = Vector3.Lerp(_pinchedHand.Fingers[0].TipPosition, _pinchedHand.Fingers[1].TipPosition, 0.5f);
+                        _pinchItem.position = Vector3.Lerp(_pinchedHand.fingers[0].TipPosition, _pinchedHand.fingers[1].TipPosition, 0.5f);
                         _pinchItem.rotation = _rayRotation;
                     }
                 }

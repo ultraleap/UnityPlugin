@@ -52,7 +52,7 @@ namespace Leap.Unity
          * @since 4.1.2
          */
         [Tooltip("The finger to observe.")]
-        public Finger.FingerType FingerName = Finger.FingerType.TYPE_INDEX;
+        public Finger.FingerType FingerName = Finger.FingerType.INDEX;
 
 
         /**
@@ -152,8 +152,8 @@ namespace Leap.Unity
                     hand = HandModel.GetLeapHand();
                     if (hand != null)
                     {
-                        targetDirection = selectedDirection(hand.Fingers[selectedFinger].TipPosition);
-                        fingerDirection = hand.Fingers[selectedFinger].Bone(Bone.BoneType.TYPE_DISTAL).Direction;
+                        targetDirection = selectedDirection(hand.fingers[selectedFinger].TipPosition);
+                        fingerDirection = hand.fingers[selectedFinger].GetBone(Bone.BoneType.DISTAL).Direction;
                         float angleTo = Vector3.Angle(fingerDirection, targetDirection);
                         if (HandModel.IsTracked && angleTo <= OnAngle)
                         {
@@ -193,15 +193,15 @@ namespace Leap.Unity
         {
             switch (FingerName)
             {
-                case Finger.FingerType.TYPE_INDEX:
+                case Finger.FingerType.INDEX:
                     return 1;
-                case Finger.FingerType.TYPE_MIDDLE:
+                case Finger.FingerType.MIDDLE:
                     return 2;
-                case Finger.FingerType.TYPE_PINKY:
+                case Finger.FingerType.PINKY:
                     return 4;
-                case Finger.FingerType.TYPE_RING:
+                case Finger.FingerType.RING:
                     return 3;
-                case Finger.FingerType.TYPE_THUMB:
+                case Finger.FingerType.THUMB:
                     return 0;
                 default:
                     return 1;
@@ -222,8 +222,8 @@ namespace Leap.Unity
                 {
                     innerColor = OffColor;
                 }
-                Finger finger = HandModel.GetLeapHand().Fingers[selectedFingerOrdinal()];
-                Vector3 fingerDirection = finger.Bone(Bone.BoneType.TYPE_DISTAL).Direction;
+                Finger finger = HandModel.GetLeapHand().fingers[selectedFingerOrdinal()];
+                Vector3 fingerDirection = finger.GetBone(Bone.BoneType.DISTAL).Direction;
                 Leap.Unity.Utils.DrawCone(finger.TipPosition, fingerDirection, OnAngle, finger.Length, innerColor);
                 Leap.Unity.Utils.DrawCone(finger.TipPosition, fingerDirection, OffAngle, finger.Length, LimitColor);
                 Gizmos.color = DirectionColor;
