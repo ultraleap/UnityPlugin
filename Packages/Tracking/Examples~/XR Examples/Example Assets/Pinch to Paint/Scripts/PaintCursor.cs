@@ -40,8 +40,7 @@ namespace Leap.Unity.Examples
         {
             get
             {
-                if (this.pinchDetector.HandModel == null) return false;
-                return this.pinchDetector.HandModel.IsTracked;
+                return this.pinchDetector.IsTracked();
             }
         }
         /// <summary>
@@ -51,7 +50,7 @@ namespace Leap.Unity.Examples
         {
             get
             {
-                return this.pinchDetector.DidStartPinch;
+                return this.pinchDetector.PinchStartedThisFrame;
             }
         }
 
@@ -63,10 +62,7 @@ namespace Leap.Unity.Examples
         protected virtual void Update()
         {
             Hand hand = null;
-            if (pinchDetector.HandModel != null)
-            {
-                hand = pinchDetector.HandModel.GetLeapHand();
-            }
+            pinchDetector.TryGetHand(out hand);
 
             if (hand == null || hand.GetIndex() == null || hand.GetThumb() == null)
             {
@@ -84,7 +80,7 @@ namespace Leap.Unity.Examples
 
             // Update the cursor position
             Vector3 indexThumbMiddle = (indexPos + thumbPos) / 2f;
-            float effectivePinchStrength = pinchDetector.IsActive ? 1f : indexThumbDist.Map(0.10f, 0.02f, 0f, 1f);
+            float effectivePinchStrength = pinchDetector.IsPinching ? 1f : indexThumbDist.Map(0.10f, 0.02f, 0f, 1f);
 
             var finalPos = Vector3.Lerp(hand.GetPredictedPinchPosition(), indexThumbMiddle, effectivePinchStrength);
             this.transform.position = finalPos;
