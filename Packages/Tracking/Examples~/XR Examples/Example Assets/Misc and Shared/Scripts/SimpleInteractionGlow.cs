@@ -16,32 +16,32 @@ using Leap.Unity.PhysicalHands;
 namespace Leap.Unity.Examples
 {
     /// <summary>
-    /// This simple script changes the color of an InteractionBehaviour as
+    /// This simple script changes the color of an object as
     /// a function of its distance to the palm of the closest hand that is
     /// hovering nearby.
     /// </summary>
-    //[AddComponentMenu("")]
     public class SimpleInteractionGlow : MonoBehaviour, IPhysicalHandHover, IPhysicalHandContact, IPhysicalHandGrab, IPhysicalHandPrimaryHover
     {
         [Tooltip("If enabled, the object will lerp to its hoverColor when a hand is nearby.")]
         public bool useHover = true;
 
-        [Tooltip("If enabled, the object will use its primaryHoverColor when the primary hover of an InteractionHand.")]
+        [Tooltip("If enabled, the object will use its primaryHoverColor when the primary hover of a PhysicalHand.")]
         public bool usePrimaryHover = false;
 
-        [Header("InteractionBehaviour Colors")]
+        [Header("Interaction Colors")]
         public Color defaultColor = Color.Lerp(Color.black, Color.white, 0.1F);
 
         public Color suspendedColor = Color.red;
         public Color hoverColor = Color.Lerp(Color.black, Color.white, 0.7F);
         public Color primaryHoverColor = Color.Lerp(Color.black, Color.white, 0.8F);
 
-        [Header("InteractionButton Colors")]
-        [Tooltip("This color only applies if the object is an InteractionButton or InteractionSlider.")]
+        [Header("Button Colors")]
+        [Tooltip("This color only applies if the object is a PhysicalHandsButton or PhyaicalHandsSlider.")]
         public Color pressedColor = Color.white;
 
         private Material[] _materials;
 
+        [SerializeField]
         private PhysicalHandsButton _physHandButton;
 
         [SerializeField]
@@ -56,6 +56,7 @@ namespace Leap.Unity.Examples
         bool _isPrimaryHoveredLeft = false;
         bool _isPrimaryHoveredRight = false;
 
+        Rigidbody _rigBody;
 
         [System.Serializable]
         public class Rend
@@ -88,13 +89,14 @@ namespace Leap.Unity.Examples
                     _materials[i] = rends[i].renderer.materials[rends[i].materialID];
                 }
             }
+
+            _rigBody = GetComponent<Rigidbody>();
         }
 
         void Update()
         {
             if (_materials != null)
             {
-
                 // The target color for the Interaction object will be determined by various simple state checks.
                 Color targetColor = defaultColor;
 
@@ -106,7 +108,8 @@ namespace Leap.Unity.Examples
                 {
                     if (_handHovering && useHover)
                     {
-                        float glow = PhysicalHandUtils.ClosestHandDistance(_interactingHands.Keys.ToList(), this.gameObject).Map(0F, 0.2F, 1F, 0.0F);
+                        float glow = PhysicalHandUtils.ClosestHandBoneDistance(_interactingHands.Keys.ToList(), _rigBody).Map(0F, 0.05F, 1F, 0.0F);
+
                         targetColor = Color.Lerp(defaultColor, hoverColor, glow);
                     }
                 }
@@ -208,7 +211,6 @@ namespace Leap.Unity.Examples
                 _isPrimaryHovered = false;
             }
         }
-
         #endregion
     }
 }
