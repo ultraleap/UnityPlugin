@@ -250,7 +250,6 @@ namespace Leap.Unity.PhysicalHands
                 foreach (var helper in _grabHelperObjects)
                 {
                     KeyValuePair<ContactBone, float>? leftPrimaryHover = helper.Value.GetPrimaryHoverValues(_leftContactHand);
-                    KeyValuePair<ContactBone, float>? rightPrimaryHover = helper.Value.GetPrimaryHoverValues(_rightContactHand);
 
                     if (leftPrimaryHover != null)
                     {
@@ -258,6 +257,16 @@ namespace Leap.Unity.PhysicalHands
                             helper.Value,
                             new PrimaryHoverValues(leftPrimaryHover.Value.Key, leftPrimaryHover.Value.Key.contactHand, leftPrimaryHover.Value.Value));
                     }
+                }
+
+                UpdatePrimaryHover();
+            }
+
+            if (primaryHoverObjectRight == null || (primaryHoverObjectRight.GrabState != GrabHelperObject.State.Contact || primaryHoverObjectRight.GrabState != GrabHelperObject.State.Grab))
+            {
+                foreach (var helper in _grabHelperObjects)
+                {
+                    KeyValuePair<ContactBone, float>? rightPrimaryHover = helper.Value.GetPrimaryHoverValues(_rightContactHand);
                     if (rightPrimaryHover != null)
                     {
                         closestHoverForEachGrabHelper.Add(
