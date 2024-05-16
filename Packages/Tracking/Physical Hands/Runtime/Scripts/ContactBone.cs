@@ -155,8 +155,8 @@ namespace Leap.Unity.PhysicalHands
         [SerializeField, Tooltip("The distance between the edge of the bone collider and the nearest object. Will report float.MaxValue if IsHovering is false.")]
         private float _nearestObjectDistance = float.MaxValue;
 
-        private GameObject _nearestObject = null;
-        public GameObject NearestObject => _nearestObject;
+        private Rigidbody _nearestObject = null;
+        public Rigidbody NearestObject => _nearestObject;
         #endregion
 
         private Vector3 _debugA, _debugB;
@@ -205,8 +205,6 @@ namespace Leap.Unity.PhysicalHands
         /// <param name="count">The number of colliders to look through</param>
         private void UpdateObjectDistances(Collider[] colliderCache, int count)
         {
-            _nearestObjectDistance = float.MaxValue;
-
             float distance, singleObjectDistance, boneDistance;
             Vector3 colliderPos, bonePos, midPoint, direction;
             bool hover;
@@ -317,6 +315,9 @@ namespace Leap.Unity.PhysicalHands
                 }
             }
 
+            _nearestObject = null;
+            _nearestObjectDistance = float.MaxValue;
+
             foreach (var colliderPairs in _nearbyObjects)
             {
                 singleObjectDistance = float.MaxValue;
@@ -328,7 +329,7 @@ namespace Leap.Unity.PhysicalHands
                         if (singleObjectDistance < _nearestObjectDistance)
                         {
                             _nearestObjectDistance = singleObjectDistance;
-                            _nearestObject = col.Key.gameObject;
+                            _nearestObject = colliderPairs.Key;
                             _debugA = col.Value.bonePos;
                             _debugB = col.Value.bonePos + (col.Value.direction * (col.Value.distance));
                         }

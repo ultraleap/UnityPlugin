@@ -97,7 +97,14 @@ namespace Leap.Unity.PhysicalHands
         private float oldAngularDrag;
 
         internal IgnorePhysicalHands _ignorePhysicalHands;
-        public bool isPrimaryHovered;
+
+        public bool IsPrimaryHovered => isPrimaryHoveredLeft && isPrimaryHoveredRight;
+
+        public bool isPrimaryHoveredLeft;
+        public bool isPrimaryHoveredRight;
+
+        private ContactHand primaryHoverHandLeft = null;
+        private ContactHand primaryHoverHandRight = null;
 
         private float ignoreGrabTime = 0f;
 
@@ -420,37 +427,18 @@ namespace Leap.Unity.PhysicalHands
             UpdateGrabEvents();
         }
 
-        internal KeyValuePair<ContactBone, float>? GetPrimaryHoverValues(ContactHand hand)
-        {
-            KeyValuePair<ContactBone, float>? closestBoneToObject = null;
-            float closestBoneDistance = float.MaxValue;
-
-            foreach (var grabbableHand in _grabbableHands) // Loop through the hands
-            {
-                if (grabbableHand == hand)
-                {
-                    for (int i = 0; i < 3; i++) // loop thumb, index & middle
-                    {
-                        ContactBone bone = grabbableHand.GetBone(i, 2); //get distal
-
-                        if (bone.NearestObject == _rigid.gameObject)
-                        {
-                            if (bone.NearestObjectDistance < closestBoneDistance)
-                            {
-                                closestBoneDistance = bone.NearestObjectDistance;
-                                closestBoneToObject = new KeyValuePair<ContactBone, float>(bone, closestBoneDistance);
-                            }
-                        }
-                    }
-                }
-            }
-
-            return closestBoneToObject;
-        }
-
         internal void HandlePrimaryHover(ContactHand hand)
         {
-            isPrimaryHovered = true;
+            if(hand.Handedness == Chirality.Left)
+            {
+                primaryHoverHandLeft = hand;
+                isPrimaryHoveredLeft = true;
+            }
+            else
+            {
+                primaryHoverHandRight = hand;
+                isPrimaryHoveredRight = true;
+            }
 
             if (_rigid != null && _rigid.TryGetComponents<IPhysicalHandPrimaryHover>(out var physicalHandPrimaryHovers))
             {
@@ -463,8 +451,16 @@ namespace Leap.Unity.PhysicalHands
 
         internal void HandlePrimaryHoverExit(ContactHand hand)
         {
-            isPrimaryHovered = false;
-
+            if (hand.Handedness == Chirality.Left)
+            {
+                primaryHoverHandLeft = null;
+                isPrimaryHoveredLeft = false;
+            }
+            else
+            {
+                primaryHoverHandRight = null;
+                isPrimaryHoveredLeft = false;
+            }
 
             if (_rigid != null && _rigid.TryGetComponents<IPhysicalHandPrimaryHover>(out var physicalHandPrimaryHovers))
             {
