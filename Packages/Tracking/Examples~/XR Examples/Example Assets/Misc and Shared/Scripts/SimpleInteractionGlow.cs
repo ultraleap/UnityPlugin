@@ -20,7 +20,7 @@ namespace Leap.Unity.Examples
     /// a function of its distance to the palm of the closest hand that is
     /// hovering nearby.
     /// </summary>
-    public class SimpleInteractionGlow : MonoBehaviour, IPhysicalHandHover, IPhysicalHandContact, IPhysicalHandGrab
+    public class SimpleInteractionGlow : MonoBehaviour, IPhysicalHandHover, IPhysicalHandContact, IPhysicalHandGrab, IPhysicalHandPrimaryHover
     {
         [Tooltip("If enabled, the object will lerp to its hoverColor when a hand is nearby.")]
         public bool useHover = true;
@@ -52,6 +52,9 @@ namespace Leap.Unity.Examples
 
         bool _handHovering = false;
         bool _handGrabbing = false;
+        bool _isPrimaryHovered = false;
+        bool _isPrimaryHoveredLeft = false;
+        bool _isPrimaryHoveredRight = false;
 
         Rigidbody _rigBody;
 
@@ -97,7 +100,7 @@ namespace Leap.Unity.Examples
                 // The target color for the Interaction object will be determined by various simple state checks.
                 Color targetColor = defaultColor;
 
-                if (usePrimaryHover)
+                if (usePrimaryHover && _isPrimaryHovered)
                 {
                     targetColor = primaryHoverColor;
                 }
@@ -173,6 +176,40 @@ namespace Leap.Unity.Examples
                 _interactingHands[hand][2] = false;
             }
             _handGrabbing = _interactingHands.Any(kv => kv.Value[2]);
+        }
+
+        public void OnHandPrimaryHover(ContactHand hand)
+        {
+            if (hand.Handedness == Chirality.Right)
+            {
+                _isPrimaryHoveredRight = true;
+            }
+            else if (hand.Handedness == Chirality.Left)
+            {
+                _isPrimaryHoveredLeft = true;
+            }
+
+            if (_isPrimaryHoveredLeft || _isPrimaryHoveredRight)
+            {
+                _isPrimaryHovered = true;
+            }
+        }
+
+        public void OnHandPrimaryHoverExit(ContactHand hand)
+        {
+            if (hand.Handedness == Chirality.Right)
+            {
+                _isPrimaryHoveredRight = false;
+            }
+            else if (hand.Handedness == Chirality.Left)
+            {
+                _isPrimaryHoveredLeft = false;
+            }
+
+            if (!_isPrimaryHoveredLeft && !_isPrimaryHoveredRight)
+            {
+                _isPrimaryHovered = false;
+            }
         }
         #endregion
     }

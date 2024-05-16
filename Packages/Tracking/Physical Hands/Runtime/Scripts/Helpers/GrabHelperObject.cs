@@ -98,6 +98,14 @@ namespace Leap.Unity.PhysicalHands
 
         internal IgnorePhysicalHands _ignorePhysicalHands;
 
+        public bool IsPrimaryHovered => isPrimaryHoveredLeft && isPrimaryHoveredRight;
+
+        public bool isPrimaryHoveredLeft;
+        public bool isPrimaryHoveredRight;
+
+        private ContactHand primaryHoverHandLeft = null;
+        private ContactHand primaryHoverHandRight = null;
+
         private float ignoreGrabTime = 0f;
 
         private bool anyBoneGrabbable = false;
@@ -418,6 +426,51 @@ namespace Leap.Unity.PhysicalHands
 
             UpdateGrabEvents();
         }
+
+        internal void HandlePrimaryHover(ContactHand hand)
+        {
+            if(hand.Handedness == Chirality.Left)
+            {
+                primaryHoverHandLeft = hand;
+                isPrimaryHoveredLeft = true;
+            }
+            else
+            {
+                primaryHoverHandRight = hand;
+                isPrimaryHoveredRight = true;
+            }
+
+            if (_rigid != null && _rigid.TryGetComponents<IPhysicalHandPrimaryHover>(out var physicalHandPrimaryHovers))
+            {
+                foreach (var primaryHoverEventReceiver in physicalHandPrimaryHovers)
+                {
+                    primaryHoverEventReceiver.OnHandPrimaryHover(hand);
+                }
+            }
+        }
+
+        internal void HandlePrimaryHoverExit(ContactHand hand)
+        {
+            if (hand.Handedness == Chirality.Left)
+            {
+                primaryHoverHandLeft = null;
+                isPrimaryHoveredLeft = false;
+            }
+            else
+            {
+                primaryHoverHandRight = null;
+                isPrimaryHoveredLeft = false;
+            }
+
+            if (_rigid != null && _rigid.TryGetComponents<IPhysicalHandPrimaryHover>(out var physicalHandPrimaryHovers))
+            {
+                foreach (var primaryHoverEventReceiver in physicalHandPrimaryHovers)
+                {
+                    primaryHoverEventReceiver.OnHandPrimaryHoverExit(hand);
+                }
+            }
+        }
+
 
         private void UpdateGrabbableBones(int handID)
         {
