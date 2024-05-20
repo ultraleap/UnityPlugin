@@ -357,7 +357,7 @@ namespace Leap.Unity.PhysicalHands
                 {
                     foreach (var hand in _contactedHands)
                     {
-                        if (_primaryHovered[hand.Key] == true)
+                        if (_primaryHovered.ContainsKey(hand.Key) && _primaryHovered[hand.Key] == true)
                         {
                             isPressedByPrimaryHover = true;
                         }
