@@ -153,87 +153,6 @@ namespace Leap.Unity
         }
 
         /// <summary>
-        /// Returns the first hand of the argument Chirality in the current frame,
-        /// otherwise returns null if no such hand is found.
-        /// </summary>
-        [Obsolete("Specifying Providers is highly recommended. Use LeapProvider.GetHand() instead")]
-        public static Hand Get(Chirality chirality)
-        {
-            if (chirality == Chirality.Left) return Left;
-            else return Right;
-        }
-
-        /// <summary>
-        /// As Get, but returns the FixedUpdate (physics timestep) hand as opposed to the Update hand.
-        /// </summary>
-        [Obsolete("Specifying Providers is highly recommended. Use LeapProvider.GetHand() instead")]
-        public static Hand GetFixed(Chirality chirality)
-        {
-            if (chirality == Chirality.Left) return FixedLeft;
-            else return FixedRight;
-        }
-
-        /// <summary>
-        /// Returns the first left hand found by Leap in the current frame, otherwise
-        /// returns null if no such hand is found.
-        /// </summary>
-        [Obsolete("Specifying Providers is highly recommended. Use LeapProvider.GetHand(Chirality.Left) instead")]
-        public static Hand Left
-        {
-            get
-            {
-                if (Provider == null) return null;
-                if (Provider.CurrentFrame == null) return null;
-                return Provider.CurrentFrame.GetHand(Chirality.Left);
-            }
-        }
-
-        /// <summary>
-        /// Returns the first right hand found by Leap in the current frame, otherwise
-        /// returns null if no such hand is found.
-        /// </summary>
-        [Obsolete("Specifying Providers is highly recommended. Use LeapProvider.GetHand(Chirality.Right) instead")]
-        public static Hand Right
-        {
-            get
-            {
-                if (Provider == null) return null;
-                if (Provider.CurrentFrame == null) return null;
-                return Provider.CurrentFrame.GetHand(Chirality.Right);
-            }
-        }
-
-        /// <summary>
-        /// Returns the first left hand found by Leap in the current fixed frame, otherwise
-        /// returns null if no such hand is found. The fixed frame is aligned with the physics timestep.
-        /// </summary>
-        [Obsolete("Specifying Providers is highly recommended. Use LeapProvider.GetHand(Chirality.Left) instead")]
-        public static Hand FixedLeft
-        {
-            get
-            {
-                if (Provider == null) return null;
-                if (Provider.CurrentFixedFrame == null) return null;
-                return Provider.CurrentFixedFrame.GetHand(Chirality.Left);
-            }
-        }
-
-        /// <summary> 
-        /// Returns the first right hand found by Leap in the current fixed frame, otherwise
-        /// returns null if no such hand is found. The fixed frame is aligned with the physics timestep.
-        /// </summary>
-        [Obsolete("Specifying Providers is highly recommended. Use LeapProvider.GetHand(Chirality.Right) instead")]
-        public static Hand FixedRight
-        {
-            get
-            {
-                if (Provider == null) return null;
-                if (Provider.CurrentFixedFrame == null) return null;
-                return Provider.CurrentFixedFrame.GetHand(Chirality.Right);
-            }
-        }
-
-        /// <summary>
         /// Shorthand for hand.Fingers[(int)Leap.Finger.FingerType.TYPE_THUMB],
         /// or, alternatively, hand.Fingers[0].
         /// </summary>
@@ -825,27 +744,6 @@ namespace Leap.Unity
         #endregion
 
         #region Provider Utils
-
-        /// <summary>
-        /// Finds a hand in the current frame.
-        /// </summary>
-        /// <returns>The first hand of the argument whichHand found in the current frame of 
-        /// the argument provider.</returns>
-        [Obsolete("Naming updated. Use LeapProvider.GetHand() instead")]
-        public static Hand Get(this LeapProvider provider, Chirality whichHand)
-        {
-            Frame frame;
-            if (Time.inFixedTimeStep)
-            {
-                frame = provider.CurrentFixedFrame;
-            }
-            else
-            {
-                frame = provider.CurrentFrame;
-            }
-
-            return frame.GetHand(whichHand);
-        }
 
         /// <summary>
         /// Finds a hand in the current frame.

@@ -1194,10 +1194,6 @@ namespace LeapInternal
         public static extern LEAP_VECTOR LeapPixelToRectilinear(IntPtr hConnection,
           eLeapPerspectiveType camera, LEAP_VECTOR pixel);
 
-        [Obsolete("Use of calibrationType is not valid. Use alternative LeapPixelToRectilinearEx method."), DllImport("LeapC", EntryPoint = "LeapPixelToRectilinearEx")]
-        public static extern LEAP_VECTOR LeapPixelToRectilinearEx(IntPtr hConnection,
-          IntPtr hDevice, eLeapPerspectiveType camera, eLeapCameraCalibrationType calibrationType, LEAP_VECTOR pixel);
-
         [DllImport("LeapC", EntryPoint = "LeapPixelToRectilinearEx")]
         public static extern LEAP_VECTOR LeapPixelToRectilinearEx(IntPtr hConnection,
             IntPtr hDevice, eLeapPerspectiveType camera, LEAP_VECTOR pixel);
@@ -1226,81 +1222,6 @@ namespace LeapInternal
 
         [DllImport("LeapC", EntryPoint = "LeapDestroyConnection")]
         public static extern void DestroyConnection(IntPtr connection);
-
-        [Obsolete("Config is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
-        [DllImport("LeapC", EntryPoint = "LeapSaveConfigValue")]
-        private static extern eLeapRS SaveConfigValue(IntPtr hConnection, string key, IntPtr value, out UInt32 requestId);
-
-        [Obsolete("Config is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
-        [DllImport("LeapC", EntryPoint = "LeapRequestConfigValue")]
-        public static extern eLeapRS RequestConfigValue(IntPtr hConnection, string name, out UInt32 request_id);
-
-        [Obsolete("Config is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
-        public static eLeapRS SaveConfigValue(IntPtr hConnection, string key, bool value, out UInt32 requestId)
-        {
-            LEAP_VARIANT_VALUE_TYPE valueStruct = new LEAP_VARIANT_VALUE_TYPE(); //This is a C# approximation of a C union
-            valueStruct.type = eLeapValueType.eLeapValueType_Boolean;
-            valueStruct.boolValue = value ? 1 : 0;
-            return SaveConfigWithValueType(hConnection, key, valueStruct, out requestId);
-        }
-        [Obsolete("Config is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
-        public static eLeapRS SaveConfigValue(IntPtr hConnection, string key, Int32 value, out UInt32 requestId)
-        {
-            LEAP_VARIANT_VALUE_TYPE valueStruct = new LEAP_VARIANT_VALUE_TYPE();
-            valueStruct.type = eLeapValueType.eLeapValueType_Int32;
-            valueStruct.intValue = value;
-            return SaveConfigWithValueType(hConnection, key, valueStruct, out requestId);
-        }
-        [Obsolete("Config is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
-        public static eLeapRS SaveConfigValue(IntPtr hConnection, string key, float value, out UInt32 requestId)
-        {
-            LEAP_VARIANT_VALUE_TYPE valueStruct = new LEAP_VARIANT_VALUE_TYPE();
-            valueStruct.type = eLeapValueType.eLeapValueType_Float;
-            valueStruct.floatValue = value;
-            return SaveConfigWithValueType(hConnection, key, valueStruct, out requestId);
-        }
-        [Obsolete("Config is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
-        public static eLeapRS SaveConfigValue(IntPtr hConnection, string key, string value, out UInt32 requestId)
-        {
-            LEAP_VARIANT_REF_TYPE valueStruct;
-            valueStruct.type = eLeapValueType.eLeapValueType_String;
-            valueStruct.stringValue = value;
-            return SaveConfigWithRefType(hConnection, key, valueStruct, out requestId);
-        }
-
-        [Obsolete("Config is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
-        private static eLeapRS SaveConfigWithValueType(IntPtr hConnection, string key, LEAP_VARIANT_VALUE_TYPE valueStruct, out UInt32 requestId)
-        {
-            IntPtr configValue = Marshal.AllocHGlobal(Marshal.SizeOf(valueStruct));
-            eLeapRS callResult = eLeapRS.eLeapRS_UnknownError;
-            try
-            {
-                Marshal.StructureToPtr(valueStruct, configValue, false);
-                callResult = SaveConfigValue(hConnection, key, configValue, out requestId);
-            }
-            finally
-            {
-                Marshal.FreeHGlobal(configValue);
-            }
-            return callResult;
-        }
-
-        [Obsolete("Config is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
-        private static eLeapRS SaveConfigWithRefType(IntPtr hConnection, string key, LEAP_VARIANT_REF_TYPE valueStruct, out UInt32 requestId)
-        {
-            IntPtr configValue = Marshal.AllocHGlobal(Marshal.SizeOf(valueStruct));
-            eLeapRS callResult = eLeapRS.eLeapRS_UnknownError;
-            try
-            {
-                Marshal.StructureToPtr(valueStruct, configValue, false);
-                callResult = SaveConfigValue(hConnection, key, configValue, out requestId);
-            }
-            finally
-            {
-                Marshal.FreeHGlobal(configValue);
-            }
-            return callResult;
-        }
 
         [DllImport("LeapC", EntryPoint = "LeapGetPointMappingSize")]
         public static extern eLeapRS GetPointMappingSize(IntPtr hConnection, ref ulong pSize);

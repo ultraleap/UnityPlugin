@@ -156,49 +156,6 @@ namespace Leap
     }
 
     /// <summary>
-    /// Dispatched when a configuration change is completed.
-    ///
-    /// Provides the configuration key, whether the change was successful, and the id of the original change request.
-    /// @since 3.0
-    /// </summary>
-    [Obsolete("Config is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
-    public class ConfigChangeEventArgs : LeapEventArgs
-    {
-        public ConfigChangeEventArgs(string config_key, bool succeeded, uint requestId) : base(LeapEvent.EVENT_CONFIG_CHANGE)
-        {
-            this.ConfigKey = config_key;
-            this.Succeeded = succeeded;
-            this.RequestId = requestId;
-        }
-        public string ConfigKey { get; set; }
-        public bool Succeeded { get; set; }
-        public uint RequestId { get; set; }
-
-    }
-
-    /// <summary>
-    /// Dispatched when a configuration change is completed.
-    ///
-    /// Provides the configuration key, whether the change was successful, and the id of the original change request.
-    /// @since 3.0
-    /// </summary>
-    [Obsolete("Config.cs is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
-    public class SetConfigResponseEventArgs : LeapEventArgs
-    {
-        public SetConfigResponseEventArgs(string config_key, Config.ValueType dataType, object value, uint requestId) : base(LeapEvent.EVENT_CONFIG_RESPONSE)
-        {
-            this.ConfigKey = config_key;
-            this.DataType = dataType;
-            this.Value = value;
-            this.RequestId = requestId;
-        }
-        public string ConfigKey { get; set; }
-        public Config.ValueType DataType { get; set; }
-        public object Value { get; set; }
-        public uint RequestId { get; set; }
-    }
-
-    /// <summary>
     /// Dispatched when the connection is established.
     /// @since 3.0
     /// </summary>

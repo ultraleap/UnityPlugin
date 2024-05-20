@@ -62,7 +62,6 @@ namespace LeapInternal
         }
 
         public Key ConnectionKey { get; private set; }
-        //public LEAP_TRACKING_EVENT LatestFrame { get; set; }
 
         private DeviceList _devices = new DeviceList();
         private FailedDeviceList _failedDevices;
@@ -82,10 +81,6 @@ namespace LeapInternal
 
         //Policy and enabled features, indexed by device ID
         private Dictionary<uint, UInt64> _activePolicies = new Dictionary<uint, ulong>();
-
-        //Config change status
-        [Obsolete("Config is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
-        private Dictionary<uint, string> _configRequests = new Dictionary<uint, string>();
 
         //Connection events
         public SynchronizationContext EventContext { get; set; }
@@ -121,10 +116,6 @@ namespace LeapInternal
         public EventHandler<FrameEventArgs> LeapFrame;
         public EventHandler<InternalFrameEventArgs> LeapInternalFrame;
         public EventHandler<LogEventArgs> LeapLogEvent;
-        [Obsolete("Config is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
-        public EventHandler<SetConfigResponseEventArgs> LeapConfigResponse;
-        [Obsolete("Config is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
-        public EventHandler<ConfigChangeEventArgs> LeapConfigChange;
         public EventHandler<DistortionEventArgs> LeapDistortionChange;
         public EventHandler<DroppedFrameEventArgs> LeapDroppedFrame;
         public EventHandler<ImageEventArgs> LeapImage;
@@ -167,8 +158,6 @@ namespace LeapInternal
         {
             ConnectionKey = connectionKey;
             _leapConnection = IntPtr.Zero;
-
-            //LatestFrame = new LEAP_TRACKING_EVENT();
         }
 
         private LEAP_ALLOCATOR _pLeapAllocator = new LEAP_ALLOCATOR();
@@ -432,8 +421,6 @@ namespace LeapInternal
 
         private void handleTrackingMessage(ref LEAP_TRACKING_EVENT trackingMsg, UInt32 deviceID)
         {
-            //LatestFrame = trackingMsg;
-
             if (LeapFrame != null)
             {
                 LeapFrame.DispatchOnContext(this, EventContext, new FrameEventArgs(new Frame(deviceID).CopyFrom(ref trackingMsg)));
@@ -444,16 +431,6 @@ namespace LeapInternal
                 LeapInternalFrame.DispatchOnContext(this, EventContext, new InternalFrameEventArgs(ref trackingMsg));
             }
         }
-
-        ///// <summary>
-        ///// Identical to Frame(history) but instead of constructing a new frame and returning
-        ///// it, the user provides a frame object to be filled with data instead.
-        ///// </summary>
-        //public void GetLatestFrame(Frame toFill)
-        //{
-        //    LEAP_TRACKING_EVENT trackingEvent = LatestFrame;
-        //    toFill.CopyFrom(ref trackingEvent);
-        //}
 
         public UInt64 GetInterpolatedFrameSize(Int64 time, Device device = null)
         {
@@ -539,19 +516,6 @@ namespace LeapInternal
             GetInterpolatedFrame(frame, time, device);
             return frame;
         }
-
-        ///// <summary>
-        ///// Returns the timestamp of a recent tracking frame.  Use the
-        ///// optional history parameter to specify how many frames in the past
-        ///// to retrieve the timestamp.  Leave the history parameter as
-        ///// it's default value to return the timestamp of the most recent
-        ///// tracked frame.
-        ///// </summary>
-        //public long FrameTimestamp()
-        //{
-        //    LEAP_TRACKING_EVENT trackingEvent = LatestFrame;
-        //    return trackingEvent.info.timestamp;
-        //}
 
         public void GetInterpolatedHeadPose(ref LEAP_HEAD_POSE_EVENT toFill, Int64 time)
         {
@@ -1091,47 +1055,6 @@ namespace LeapInternal
             return _activePolicies.ContainsKey(deviceID);
         }
 
-        [Obsolete("Config is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
-        public uint GetConfigValue(string config_key)
-        {
-            uint requestId = 0;
-            eLeapRS result = LeapC.RequestConfigValue(_leapConnection, config_key, out requestId);
-            reportAbnormalResults("LeapC RequestConfigValue call was ", result);
-            _configRequests[requestId] = config_key;
-            return requestId;
-        }
-
-        [Obsolete("Config is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
-        public uint SetConfigValue<T>(string config_key, T value) where T : IConvertible
-        {
-            uint requestId = 0;
-            eLeapRS result;
-            Type dataType = value.GetType();
-            if (dataType == typeof(bool))
-            {
-                result = LeapC.SaveConfigValue(_leapConnection, config_key, Convert.ToBoolean(value), out requestId);
-            }
-            else if (dataType == typeof(Int32))
-            {
-                result = LeapC.SaveConfigValue(_leapConnection, config_key, Convert.ToInt32(value), out requestId);
-            }
-            else if (dataType == typeof(float))
-            {
-                result = LeapC.SaveConfigValue(_leapConnection, config_key, Convert.ToSingle(value), out requestId);
-            }
-            else if (dataType == typeof(string))
-            {
-                result = LeapC.SaveConfigValue(_leapConnection, config_key, Convert.ToString(value), out requestId);
-            }
-            else
-            {
-                throw new ArgumentException("Only boolean, Int32, float, and string types are supported.");
-            }
-            reportAbnormalResults("LeapC SaveConfigValue call was ", result);
-            _configRequests[requestId] = config_key;
-            return requestId;
-        }
-
         /// <summary>
         /// Reports whether your application has a connection to the Leap Motion
         /// daemon/service. Can be true even if the Leap Motion hardware is not available.
@@ -1272,23 +1195,6 @@ namespace LeapInternal
                    (camera == Image.CameraType.LEFT ?
                    eLeapPerspectiveType.eLeapPerspectiveType_stereo_left :
                    eLeapPerspectiveType.eLeapPerspectiveType_stereo_right),
-                   pixelStruct);
-            return new UnityEngine.Vector3(ray.x, ray.y, ray.z);
-        }
-
-        [Obsolete("calibType is not necessary. Please use the alternative PixelToRectilinearEx method.")]
-        public UnityEngine.Vector3 PixelToRectilinearEx(IntPtr deviceHandle,
-                                           Image.CameraType camera, Image.CalibrationType calibType, UnityEngine.Vector3 pixel)
-        {
-            LEAP_VECTOR pixelStruct = new LEAP_VECTOR(pixel);
-            LEAP_VECTOR ray = LeapC.LeapPixelToRectilinearEx(_leapConnection,
-                   deviceHandle,
-                   (camera == Image.CameraType.LEFT ?
-                   eLeapPerspectiveType.eLeapPerspectiveType_stereo_left :
-                   eLeapPerspectiveType.eLeapPerspectiveType_stereo_right),
-                   (calibType == Image.CalibrationType.INFRARED ?
-                   eLeapCameraCalibrationType.eLeapCameraCalibrationType_infrared :
-                   eLeapCameraCalibrationType.eLeapCameraCalibrationType_visual),
                    pixelStruct);
             return new UnityEngine.Vector3(ray.x, ray.y, ray.z);
         }

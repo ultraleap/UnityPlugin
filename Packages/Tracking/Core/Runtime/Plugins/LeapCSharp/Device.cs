@@ -346,29 +346,11 @@ namespace Leap
             return status;
         }
 
-
-        /// <summary>
-        /// The software has detected a possible smudge on the translucent cover
-        /// over the Leap Motion cameras.
-        /// @since 3.0
-        /// </summary>
-        [Obsolete("IsSmudged is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
-        public bool IsSmudged { get; internal set; }
-
         /// <summary>
         /// The software has entered low-resource mode
         /// @since 3.0
         /// </summary>
         public bool IsLowResource { get; internal set; }
-
-        /// <summary>
-        /// The software has detected excessive IR illumination, which may interfere 
-        /// with tracking. If robust mode is enabled, the system will enter robust mode when 
-        /// isLightingBad() is true. 
-        /// @since 3.0 
-        /// </summary>
-        [Obsolete("IsLightingBad is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
-        public bool IsLightingBad { get; internal set; }
 
         /// <summary>
         /// The available types of Leap Motion controllers.
