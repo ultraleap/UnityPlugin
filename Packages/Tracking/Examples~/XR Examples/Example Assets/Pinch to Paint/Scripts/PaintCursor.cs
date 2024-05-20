@@ -68,7 +68,7 @@ namespace Leap.Unity.Examples
                 hand = pinchDetector.HandModel.GetLeapHand();
             }
 
-            if (hand == null || hand.GetIndex() == null || hand.GetThumb() == null)
+            if (hand == null || hand.Index == null || hand.Thumb == null)
             {
                 _rectToroidPinchTargetRenderer.enabled = false;
                 _rectToroidPinchStateRenderer.enabled = false;
@@ -78,8 +78,8 @@ namespace Leap.Unity.Examples
             _rectToroidPinchTargetRenderer.enabled = true;
             _rectToroidPinchStateRenderer.enabled = true;
 
-            var indexPos = hand.GetIndex().TipPosition;
-            var thumbPos = hand.GetThumb().TipPosition;
+            var indexPos = hand.Index.TipPosition;
+            var thumbPos = hand.Thumb.TipPosition;
             var indexThumbDist = Vector3.Distance(indexPos, thumbPos);
 
             // Update the cursor position

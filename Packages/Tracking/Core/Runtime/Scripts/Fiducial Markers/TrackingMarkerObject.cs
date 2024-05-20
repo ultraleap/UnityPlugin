@@ -85,19 +85,22 @@ namespace Leap.Unity
                 return;
             }
 
-            // Get the device position in world space as a LeapTransform to use in future calculations
-            trackerPosWorldSpace = leapServiceProvider.DeviceOriginWorldSpace;
+            //// Get the device position in world space as a LeapTransform to use in future calculations
+            //trackerPosWorldSpace = leapServiceProvider.DeviceOriginWorldSpace;
 
-            // Convert the Leap Pose to worldspace Unity units
-            Vector3 markerPos = GetMarkerWorldSpacePosition(poseEvent.translation.ToVector3());
-            Quaternion markerRot = GetMarkerWorldSpaceRotation(poseEvent.rotation.ToQuaternion());
+            //// Convert the Leap Pose to worldspace Unity units
+            //Vector3 markerPos = GetMarkerWorldSpacePosition(poseEvent.translation.ToVector3());
+            //Quaternion markerRot = GetMarkerWorldSpaceRotation(poseEvent.rotation.ToQuaternion());
 
-            // Find the offset from the marker to the tracked object, to apply the inverse to the tracked transform
-            Vector3 posOffset = trackedObject.position - markerObject.transform.position;
-            Quaternion rotOffset = Quaternion.Inverse(trackedObject.rotation) * markerObject.transform.rotation;
+            //// Find the offset from the marker to the tracked object, to apply the inverse to the tracked transform
+            //Vector3 posOffset = trackedObject.position - markerObject.transform.position;
+            //Quaternion rotOffset = Quaternion.Inverse(trackedObject.rotation) * markerObject.transform.rotation;
 
-            targetPos = markerPos + posOffset;
-            targetRot = markerRot * Quaternion.Inverse(rotOffset);
+            // Skip all world positioning
+            Vector3 markerPos = poseEvent.translation.ToVector3() * 0.001f; // still change units, but don't bother flipping Z for the rawest data
+            Quaternion markerRot = poseEvent.rotation.ToQuaternion();
+            targetPos = markerPos;// + posOffset;
+            targetRot = markerRot;// * Quaternion.Inverse(rotOffset);
         }
 
         private void Update()
