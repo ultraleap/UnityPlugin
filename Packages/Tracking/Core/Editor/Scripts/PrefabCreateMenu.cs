@@ -226,6 +226,13 @@ namespace Leap
             CreatePrefab("Physical Hands Slider");
         }
 
+        [MenuItem("GameObject/Ultraleap/Physical Interaction/3D UI Panel", false, 38),
+            MenuItem("Ultraleap/Physical Interaction/3D UI Panel", false, 38)]
+        public static void Create3DUIPanel()
+        {
+            CreatePrefab("Physical Hands 3D UI Panel");
+        }
+
         [MenuItem("GameObject/Ultraleap/Physical Interaction/Attachment Hand Menu", false, 50),
             MenuItem("Ultraleap/Physical Interaction/Attachment Hand Menu", false, 50)]
         public static void CreateAttachmentHandMenu()
