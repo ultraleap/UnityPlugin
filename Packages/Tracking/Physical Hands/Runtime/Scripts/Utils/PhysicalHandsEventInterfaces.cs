@@ -36,4 +36,13 @@ namespace Leap.Unity.PhysicalHands
         void OnHandGrab(ContactHand hand);
         void OnHandGrabExit(ContactHand hand);
     }
+
+    /// <summary>
+    /// Reports the primary hover event when a grab helper starts or stops being the primary hover object.
+    /// </summary>
+    public interface IPhysicalHandPrimaryHover
+    {
+        void OnHandPrimaryHover(ContactHand hand);
+        void OnHandPrimaryHoverExit(ContactHand hand);
+    }
 }

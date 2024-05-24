@@ -140,5 +140,13 @@ namespace Leap.Unity
                     return string.Empty;
             }
         }
+
+        public static void DrawScriptField(MonoBehaviour target)
+        {
+            EditorGUI.BeginDisabledGroup(true);
+            EditorGUILayout.ObjectField("Script", MonoScript.FromMonoBehaviour(target), target.GetType(), false);
+            EditorGUI.EndDisabledGroup();
+            EditorGUILayout.Space();
+        }
     }
 }

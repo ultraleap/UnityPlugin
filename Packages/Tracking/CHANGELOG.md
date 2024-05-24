@@ -6,6 +6,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
 
+## [PHYSHANDSPARITY] - xx/xx/xx
+
+### Added
+- PhysicalHandsButton with automatic setup
+- PhysicalHandsButtonToggle
+- PhysicalHandsAnchorable, including anchoring and un-anchoring based on grabs
+- PhysicalHandsSlider
+- TwoDimensionalPhysicalHandsSlider example
+- Ability to ignore collisions per hand separately from grabs
+- Added primary hover functionality to physical hands
+
+### Changed
+- Removed old PhysicalHandsButton
+- Anchors no longer require Interaction Engine
+- Turntable and Pullcord example scene now uses Physical Hands
+- Physical Hands Playground uses new PhysicalHandsButtons and Toggles
+- Grab Ball uses Physical Hands rather than Interaction Engine
+- Physical Hands events are sent to all event interfaces attached to the interacted rigidbody
+- Hard Contact Parent settings access levels to public
+- Prefab Create Menu uses Physical Hands prefabs as opposed to Interaction Engine
+- Prefab Create Menu chooses URP hands where available
+
+### Fixed
+- 
+
 ## [NEXT] - xx/xx/xx
 
 ### Tracking Client versions

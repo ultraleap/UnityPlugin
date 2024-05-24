@@ -98,6 +98,14 @@ namespace Leap.Unity.PhysicalHands
 
         internal IgnorePhysicalHands _ignorePhysicalHands;
 
+        public bool IsPrimaryHovered => isPrimaryHoveredLeft && isPrimaryHoveredRight;
+
+        public bool isPrimaryHoveredLeft;
+        public bool isPrimaryHoveredRight;
+
+        private ContactHand primaryHoverHandLeft = null;
+        private ContactHand primaryHoverHandRight = null;
+
         private float ignoreGrabTime = 0f;
 
         private bool anyBoneGrabbable = false;
@@ -252,17 +260,23 @@ namespace Leap.Unity.PhysicalHands
                 {
                     if (_grabbableHandsValues[i].isContacting)
                     {
-                        if (_rigid.TryGetComponent<IPhysicalHandContact>(out var physicalHandContact))
+                        if(_rigid.TryGetComponents<IPhysicalHandContact>(out var physicalHandContacts))
                         {
-                            physicalHandContact.OnHandContactExit(_grabbableHands[i]);
+                            foreach(var contactEventReceiver in physicalHandContacts)
+                            {
+                                contactEventReceiver.OnHandContactExit(_grabbableHands[i]);
+                            }
                         }
 
                         _grabbableHands[i].physicalHandsManager.OnHandContactExit(_grabbableHands[i], _rigid);
                     }
 
-                    if (_rigid.TryGetComponent<IPhysicalHandHover>(out var physicalHandHover))
+                    if (_rigid.TryGetComponents<IPhysicalHandHover>(out var physicalHandHovers))
                     {
-                        physicalHandHover.OnHandHoverExit(_grabbableHands[i]);
+                        foreach (var hoverEventReceiver in physicalHandHovers)
+                        {
+                            hoverEventReceiver.OnHandHoverExit(_grabbableHands[i]);
+                        }
                     }
 
                     _grabbableHands[i].physicalHandsManager.OnHandHoverExit(_grabbableHands[i], _rigid);
@@ -314,9 +328,12 @@ namespace Leap.Unity.PhysicalHands
                 _grabbableHands.RemoveAt(index);
                 _grabbableHandsValues.RemoveAt(index);
 
-                if (_rigid != null && _rigid.TryGetComponent<IPhysicalHandHover>(out var physicalHandHover))
+                if (_rigid != null && _rigid.TryGetComponents<IPhysicalHandHover>(out var physicalHandHovers))
                 {
-                    physicalHandHover.OnHandHoverExit(hand);
+                    foreach (var hoverEventReceiver in physicalHandHovers)
+                    {
+                        hoverEventReceiver.OnHandHoverExit(hand);
+                    }
                 }
 
                 hand.physicalHandsManager.OnHandHoverExit(hand, _rigid);
@@ -410,6 +427,51 @@ namespace Leap.Unity.PhysicalHands
             UpdateGrabEvents();
         }
 
+        internal void HandlePrimaryHover(ContactHand hand)
+        {
+            if(hand.Handedness == Chirality.Left)
+            {
+                primaryHoverHandLeft = hand;
+                isPrimaryHoveredLeft = true;
+            }
+            else
+            {
+                primaryHoverHandRight = hand;
+                isPrimaryHoveredRight = true;
+            }
+
+            if (_rigid != null && _rigid.TryGetComponents<IPhysicalHandPrimaryHover>(out var physicalHandPrimaryHovers))
+            {
+                foreach (var primaryHoverEventReceiver in physicalHandPrimaryHovers)
+                {
+                    primaryHoverEventReceiver.OnHandPrimaryHover(hand);
+                }
+            }
+        }
+
+        internal void HandlePrimaryHoverExit(ContactHand hand)
+        {
+            if (hand.Handedness == Chirality.Left)
+            {
+                primaryHoverHandLeft = null;
+                isPrimaryHoveredLeft = false;
+            }
+            else
+            {
+                primaryHoverHandRight = null;
+                isPrimaryHoveredLeft = false;
+            }
+
+            if (_rigid != null && _rigid.TryGetComponents<IPhysicalHandPrimaryHover>(out var physicalHandPrimaryHovers))
+            {
+                foreach (var primaryHoverEventReceiver in physicalHandPrimaryHovers)
+                {
+                    primaryHoverEventReceiver.OnHandPrimaryHoverExit(hand);
+                }
+            }
+        }
+
+
         private void UpdateGrabbableBones(int handID)
         {
             _grabbableHandsValues[handID].wasContacting = _grabbableHandsValues[handID].isContacting;
@@ -449,9 +511,12 @@ namespace Leap.Unity.PhysicalHands
             // Fire the contacting event whether it changed or not
             if (_grabbableHandsValues[handIndex].isContacting)
             {
-                if (_rigid.TryGetComponent<IPhysicalHandContact>(out var handContactEvent))
+                if (_rigid.TryGetComponents<IPhysicalHandContact>(out var physicalHandContacts))
                 {
-                    handContactEvent.OnHandContact(_grabbableHands[handIndex]);
+                    foreach (var contactEventReceiver in physicalHandContacts)
+                    {
+                        contactEventReceiver.OnHandContact(_grabbableHands[handIndex]);
+                    }
                 }
 
                 _grabbableHands[handIndex].physicalHandsManager.OnHandContact(_grabbableHands[handIndex], _rigid);
@@ -459,18 +524,24 @@ namespace Leap.Unity.PhysicalHands
             else if (_grabbableHandsValues[handIndex].wasContacting)
             {
                 // We stopped contacting, so fire the contact exit event
-                if (_rigid.TryGetComponent<IPhysicalHandContact>(out var handContactEvent))
+                if (_rigid.TryGetComponents<IPhysicalHandContact>(out var physicalHandContacts))
                 {
-                    handContactEvent.OnHandContactExit(_grabbableHands[handIndex]);
+                    foreach (var contactEventReceiver in physicalHandContacts)
+                    {
+                        contactEventReceiver.OnHandContactExit(_grabbableHands[handIndex]);
+                    }
                 }
 
                 _grabbableHands[handIndex].physicalHandsManager.OnHandContactExit(_grabbableHands[handIndex], _rigid);
             }
 
             // Fire the hovering event
-            if (_rigid.TryGetComponent<IPhysicalHandHover>(out var physicalHandHover))
+            if (_rigid.TryGetComponents<IPhysicalHandHover>(out var physicalHandHovers))
             {
-                physicalHandHover.OnHandHover(_grabbableHands[handIndex]);
+                foreach (var hoverEventReceiver in physicalHandHovers)
+                {
+                    hoverEventReceiver.OnHandHover(_grabbableHands[handIndex]);
+                }
             }
 
             _grabbableHands[handIndex].physicalHandsManager.OnHandHover(_grabbableHands[handIndex], _rigid);
@@ -481,9 +552,12 @@ namespace Leap.Unity.PhysicalHands
             // Send any active grabbing events
             foreach (var hand in _grabbingHands)
             {
-                if (_rigid.TryGetComponent<IPhysicalHandGrab>(out var physicalHandGrab))
+                if (_rigid.TryGetComponents<IPhysicalHandGrab>(out var physicalHandGrabs))
                 {
-                    physicalHandGrab.OnHandGrab(hand);
+                    foreach (var grabEventReceiver in physicalHandGrabs)
+                    {
+                        grabEventReceiver.OnHandGrab(hand);
+                    }
                 }
 
                 hand.physicalHandsManager.OnHandGrab(hand, _rigid);
@@ -494,9 +568,12 @@ namespace Leap.Unity.PhysicalHands
             {
                 if (!_grabbingHands.Contains(prev))
                 {
-                    if (_rigid.TryGetComponent<IPhysicalHandGrab>(out var physicalHandGrab))
+                    if (_rigid.TryGetComponents<IPhysicalHandGrab>(out var physicalHandGrabs))
                     {
-                        physicalHandGrab.OnHandGrabExit(prev);
+                        foreach (var grabEventReceiver in physicalHandGrabs)
+                        {
+                            grabEventReceiver.OnHandGrabExit(prev);
+                        }
                     }
 
                     prev.physicalHandsManager.OnHandGrabExit(prev, _rigid);
@@ -759,9 +836,12 @@ namespace Leap.Unity.PhysicalHands
                 return;
             }
 
-            if (_rigid != null && _rigid.TryGetComponent<IPhysicalHandGrab>(out var physicalHandGrab))
+            if (_rigid != null && _rigid.TryGetComponents<IPhysicalHandGrab>(out var physicalHandGrabs))
             {
-                physicalHandGrab.OnHandGrabExit(hand);
+                foreach (var grabEventReceiver in physicalHandGrabs)
+                {
+                    grabEventReceiver.OnHandGrabExit(hand);
+                }
             }
 
             hand.physicalHandsManager.OnHandGrabExit(hand, _rigid);

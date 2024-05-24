@@ -109,6 +109,7 @@ GameObject:
   - component: {fileID: 1425814782421875418}
   - component: {fileID: 8844366506104652733}
   - component: {fileID: 8844366506104652730}
+  - component: {fileID: 2495802599556206966}
   - component: {fileID: 7840689193471017874}
   - component: {fileID: 1767427943}
   m_Layer: 0
@@ -163,12 +164,65 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b67dea36f76f434eacfb21f46ad6352, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonObject: {fileID: 1425814784214717005}
   noseCone: {fileID: 2302522947457424395}
-  buttonHeightLimit: 0.02
   rocketPower: 30
   burnTime: 3
   _particleSystem: {fileID: 7840689193945078186}
+--- !u!114 &2495802599556206966
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1425814782421875397}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee6ba0f8f2ad7aa4d9e4c7ed108f8b46, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _automaticTravelDistance: 1
+  _whichHandCanPressButton: 2
+  springValue: 10
+  damperValue: 0
+  maxForceValue: 5
+  bouncinessValue: 0
+  _buttonTravelDistance: 0
+  _buttonTravelOffset: 0.02
+  _canBePressedByObjects: 0
+  _pressableObject: {fileID: 1425814784214717005}
+  _buttonPressExitThreshold: 0.5
+  _buttonPreset: 0
+  OnButtonPressed:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8844366506104652730}
+        m_TargetAssemblyTypeName: Leap.Unity.PhysicalHands.Examples.PhysicalHandsRocket,
+          Ultraleap.Tracking.PhysicalHandsExamples
+        m_MethodName: ButtonPressed
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  OnButtonUnPressed:
+    m_PersistentCalls:
+      m_Calls: []
+  OnHandContact:
+    m_PersistentCalls:
+      m_Calls: []
+  OnHandContactExit:
+    m_PersistentCalls:
+      m_Calls: []
+  OnHandHover:
+    m_PersistentCalls:
+      m_Calls: []
+  OnHandHoverExit:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &7840689193471017874
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -209,8 +263,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b3763add1152ac4aab69357a419a664, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  disableAllGrabbing: 0
-  disableAllHandCollisions: 0
+  HandToIgnore: 2
+  _disableAllGrabbing: 1
+  _disableAllHandCollisions: 1
+  _disableCollisionOnChildren: 1
 --- !u!1 &1425814782601253775
 GameObject:
   m_ObjectHideFlags: 0
