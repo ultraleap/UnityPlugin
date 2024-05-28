@@ -13,7 +13,7 @@ using UnityEngine;
 
 namespace Leap.Unity
 {
-    [CustomEditor(typeof(CapsuleHand), editorForChildClasses: true)]
+    [CustomEditor(typeof(CapsuleHand), editorForChildClasses: true), CanEditMultipleObjects]
     public class CapsuleHandEditor : CustomEditorBase<CapsuleHand>
     {
         public override void OnInspectorGUI()

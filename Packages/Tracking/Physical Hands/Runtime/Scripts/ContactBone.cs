@@ -16,7 +16,22 @@ namespace Leap.Unity.PhysicalHands
         #region Bone Parameters
         internal int finger, joint;
         internal bool isPalm = false;
+        /// <summary>
+        /// Finger:
+        /// 0 = thumb
+        /// 1 = index
+        /// 2 = middle
+        /// 3 = ring
+        /// 4 = pinky
+        /// 5 = palm
+        /// </summary>
         public int Finger => finger;
+        /// <summary>
+        /// Joint:
+        /// 0 = proximal
+        /// 1 = intermediate
+        /// 2 = distal
+        /// </summary>
         public int Joint => joint;
         public bool IsPalm => isPalm;
 
@@ -39,7 +54,7 @@ namespace Leap.Unity.PhysicalHands
         // The distance from any collider that the bone must be to allow the hand to re-enable collision after a teleportation event
         private static float SAFETY_CLOSE_DISTANCE = 0.005f;
 
-        internal class ClosestColliderDirection
+        public class ClosestColliderDirection
         {
             /// <summary>
             /// Is this bone contacting the collider associated with this ClosestColliderDirection?
@@ -69,13 +84,13 @@ namespace Leap.Unity.PhysicalHands
         /// Dictionary of dictionaries of the directions from this bone to a grabbable object's colliders
         ///</summary>
         private Dictionary<Rigidbody, Dictionary<Collider, ClosestColliderDirection>> _nearbyObjects = new Dictionary<Rigidbody, Dictionary<Collider, ClosestColliderDirection>>(30);
-        internal Dictionary<Rigidbody, Dictionary<Collider, ClosestColliderDirection>> NearbyObjects => _nearbyObjects;
+        public Dictionary<Rigidbody, Dictionary<Collider, ClosestColliderDirection>> NearbyObjects => _nearbyObjects;
 
         ///<summary>
         /// Dictionary of dictionaries of the directions from this bone to a grabbable object's colliders
         ///</summary>
         private Dictionary<Rigidbody, Dictionary<Collider, ClosestColliderDirection>> _grabbableDirections = new Dictionary<Rigidbody, Dictionary<Collider, ClosestColliderDirection>>(10);
-        internal Dictionary<Rigidbody, Dictionary<Collider, ClosestColliderDirection>> GrabbableDirections => _grabbableDirections;
+        public Dictionary<Rigidbody, Dictionary<Collider, ClosestColliderDirection>> GrabbableDirections => _grabbableDirections;
 
 
         [field: SerializeField, Tooltip("Is the bone hovering an object? The hover distances are set in the Physics Provider.")]
@@ -139,6 +154,9 @@ namespace Leap.Unity.PhysicalHands
         public float NearestObjectDistance => _nearestObjectDistance;
         [SerializeField, Tooltip("The distance between the edge of the bone collider and the nearest object. Will report float.MaxValue if IsHovering is false.")]
         private float _nearestObjectDistance = float.MaxValue;
+
+        private Rigidbody _nearestObject = null;
+        public Rigidbody NearestObject => _nearestObject;
         #endregion
 
         private Vector3 _debugA, _debugB;
@@ -187,8 +205,6 @@ namespace Leap.Unity.PhysicalHands
         /// <param name="count">The number of colliders to look through</param>
         private void UpdateObjectDistances(Collider[] colliderCache, int count)
         {
-            _nearestObjectDistance = float.MaxValue;
-
             float distance, singleObjectDistance, boneDistance;
             Vector3 colliderPos, bonePos, midPoint, direction;
             bool hover;
@@ -299,6 +315,9 @@ namespace Leap.Unity.PhysicalHands
                 }
             }
 
+            _nearestObject = null;
+            _nearestObjectDistance = float.MaxValue;
+
             foreach (var colliderPairs in _nearbyObjects)
             {
                 singleObjectDistance = float.MaxValue;
@@ -310,6 +329,7 @@ namespace Leap.Unity.PhysicalHands
                         if (singleObjectDistance < _nearestObjectDistance)
                         {
                             _nearestObjectDistance = singleObjectDistance;
+                            _nearestObject = colliderPairs.Key;
                             _debugA = col.Value.bonePos;
                             _debugB = col.Value.bonePos + (col.Value.direction * (col.Value.distance));
                         }

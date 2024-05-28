@@ -35,7 +35,7 @@ namespace Leap.Unity.PhysicalHands
         #region Setup
         internal void SetupBoneBody()
         {
-            Collider.material = ((HardContactParent)contactHand.contactParent).PhysicsMaterial;
+            Collider.material = ((HardContactParent)contactHand.contactParent).physicsMaterial;
             articulation = gameObject.AddComponent<ArticulationBody>();
 
             if (isPalm)

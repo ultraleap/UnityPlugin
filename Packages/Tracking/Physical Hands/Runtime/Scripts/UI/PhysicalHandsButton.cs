@@ -295,7 +295,8 @@ namespace Leap.Unity.PhysicalHands
                 _configurableJoint = _pressableObject.AddComponent<ConfigurableJoint>();
             }
 
-            _configurableJoint.targetPosition = new Vector3(0, -(_buttonTravelDistanceLocal / 2f), 0);
+            // Target position is set high as we hit the limit first, this means that the button is always trying to push agains the limit
+            _configurableJoint.targetPosition = new Vector3(0, -(_buttonTravelDistance * 2), 0); 
 
             // Connect the button to the parent object with a spring joint
             _configurableJoint.connectedBody = _rigidbody;
