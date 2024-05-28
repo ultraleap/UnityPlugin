@@ -806,6 +806,27 @@ namespace Leap.Unity.PhysicalHands
             HandleGrabbedRigidbody();
         }
 
+        public void RecalculateOffsets(Hand hand)
+        {
+            int grabHandIndex = -1;
+
+            for(int i = 0; i < _grabbableHands.Count; i++)
+            {
+                if (_grabbableHands[i]._handedness == hand.GetChirality())
+                {
+                    grabHandIndex = i;
+                    break;
+                }
+            }
+
+            if (grabHandIndex == -1)
+                return;
+
+            _grabbableHandsValues[grabHandIndex].offset = _rigid.position - hand.PalmPosition;
+            _grabbableHandsValues[grabHandIndex].rotationOffset = Quaternion.Inverse(hand.Rotation) * _rigid.rotation;
+            _grabbableHandsValues[grabHandIndex].originalHandRotationInverse = Quaternion.Inverse(hand.Rotation);
+        }
+
         private void ClearGrabbingHands()
         {
             for (int i = _grabbingHands.Count - 1; i >= 0; i--)
