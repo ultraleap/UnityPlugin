@@ -46,11 +46,13 @@ namespace Leap.Unity.PhysicalHands
         private bool _contactHandPressing = false;
         private bool _leftHandContacting = false;
         private bool _rightHandContacting = false;
+        private bool _leftHandPrimaryHovered = false;
+        private bool _rightHandPrimaryHovered = false;
+
         private Rigidbody _rigidbody = null;
         private Vector3 _initialButtonPosition = Vector3.zero;
         private List<GameObject> _objectsContactingButton = new List<GameObject>();
         private PhysicalHandsButtonHelper _buttonHelper;
-        private Dictionary<ContactHand, bool> _primaryHovered = new Dictionary<ContactHand, bool>();
         private Dictionary<ContactHand, bool> _contactedHands = new Dictionary<ContactHand, bool>();
 
         protected float _buttonTravelDistanceLocal;
@@ -357,7 +359,8 @@ namespace Leap.Unity.PhysicalHands
                 {
                     foreach (var hand in _contactedHands)
                     {
-                        if (_primaryHovered.ContainsKey(hand.Key) && _primaryHovered[hand.Key] == true)
+                        if (hand.Key.Handedness == Chirality.Left && _leftHandPrimaryHovered ||
+                            hand.Key.Handedness == Chirality.Right && _rightHandPrimaryHovered)
                         {
                             isPressedByPrimaryHover = true;
                         }
@@ -403,13 +406,9 @@ namespace Leap.Unity.PhysicalHands
 
             if (hand != null)
             {
-                if (_contactedHands.ContainsKey(hand))
+                if (!_contactedHands.TryAdd(hand, true));
                 {
                     _contactedHands[hand] = true;
-                }
-                else
-                {
-                    _contactedHands.Add(hand, true);
                 }
 
                 if (hand.Handedness == Chirality.Left)
@@ -437,13 +436,9 @@ namespace Leap.Unity.PhysicalHands
             // Update hand contact flags
             if (hand != null)
             {
-                if (_contactedHands.ContainsKey(hand))
+                if (!_contactedHands.TryAdd(hand, false));
                 {
                     _contactedHands[hand] = false;
-                }
-                else
-                {
-                    _contactedHands.Add(hand, false);
                 }
 
                 if (hand.Handedness == Chirality.Left)
@@ -511,24 +506,24 @@ namespace Leap.Unity.PhysicalHands
 
         private void OnHandPrimaryHoverPO(ContactHand hand)
         {
-            if(_primaryHovered.ContainsKey(hand))
+            if(hand.Handedness == Chirality.Right)
             {
-                _primaryHovered[hand] = true;
+                _rightHandPrimaryHovered = true;
             }
-            else
+            else if(hand.Handedness == Chirality.Left)
             {
-                _primaryHovered.Add(hand, true);
+                _leftHandPrimaryHovered = true;
             }
         }
         private void OnHandPrimaryHoverExitPO(ContactHand hand)
         {
-            if (_primaryHovered.ContainsKey(hand))
+            if (hand.Handedness == Chirality.Right)
             {
-                _primaryHovered[hand] = false;
+                _rightHandPrimaryHovered = false;
             }
-            else
+            else if (hand.Handedness == Chirality.Left)
             {
-                _primaryHovered.Add(hand, false);
+                _leftHandPrimaryHovered = false;
             }
         }
 

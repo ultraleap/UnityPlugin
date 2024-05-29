@@ -8,7 +8,10 @@
 
 using UnityEngine;
 
-public class KeyboardKey : MonoBehaviour
+namespace Leap.Unity.Examples
 {
-    public char keyCharacter;
+    public class KeyboardKey : MonoBehaviour
+    {
+        public char keyCharacter;
+    }
 }
