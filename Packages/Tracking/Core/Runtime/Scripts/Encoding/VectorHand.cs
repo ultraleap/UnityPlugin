@@ -71,6 +71,16 @@ namespace Leap.Unity.Encoding
             }
         }
 
+        /// <summary>
+        /// Elbow Position
+        /// </summary>
+        public Vector3 elbowPosition;
+
+        /// <summary>
+        /// Elbow Position
+        /// </summary>
+        public Vector3 wristPosition;
+
         // Correction for the 0th thumb bone rotation offsets to match LeapC
         private static readonly Quaternion[] ThumbMetacarpalRotationOffset =
         {
@@ -103,6 +113,18 @@ namespace Leap.Unity.Encoding
             this.palmPos = palmPos;
             this.palmRot = palmRot;
             this._backingJointPositions = jointPositions;
+            this.wristPosition = this.palmPose.mul(tweakWristPosition).position;
+            this.elbowPosition = ToWorld(new Vector3(0f, 0f, -0.3f), palmPos, palmRot); // make an assumed elbow from the palm rotation
+        }
+
+        public VectorHand(bool isLeft, Vector3 palmPos, Quaternion palmRot, Vector3 wristPosition, Vector3 elbowPos, Vector3[] jointPositions)
+        {
+            this.isLeft = isLeft;
+            this.palmPos = palmPos;
+            this.palmRot = palmRot;
+            this._backingJointPositions = jointPositions;
+            this.wristPosition = wristPosition;
+            this.elbowPosition = elbowPos;
         }
 
         /// <summary>
@@ -112,7 +134,7 @@ namespace Leap.Unity.Encoding
         {
             if (h != null)
             {
-                isLeft = h.isLeft; palmPos = h.palmPos; palmRot = h.palmRot;
+                isLeft = h.isLeft; palmPos = h.palmPos; palmRot = h.palmRot; elbowPosition = h.elbowPosition; wristPosition = h.wristPosition;
                 for (int i = 0; i < jointPositions.Length; i++)
                     _backingJointPositions[i] = h.jointPositions[i];
             }
@@ -130,6 +152,8 @@ namespace Leap.Unity.Encoding
             isLeft = fromHand.IsLeft;
             palmPos = fromHand.PalmPosition;
             palmRot = fromHand.Rotation;
+            wristPosition = fromHand.WristPosition;
+            elbowPosition = fromHand.Arm.ElbowPosition;
 
             int boneIdx = 0;
             for (int i = 0; i < 5; i++)
@@ -219,19 +243,14 @@ namespace Leap.Unity.Encoding
                   type: (Finger.FingerType)fingerIdx);
             }
 
-            // Fill arm data.
-            intoHand.Arm.Fill(ToWorld(new Vector3(0f, 0f, -0.3f), palmPos, palmRot),
-                            ToWorld(new Vector3(0f, 0f, -0.055f), palmPos, palmRot),
-                            ToWorld(new Vector3(0f, 0f, -0.125f), palmPos, palmRot),
-                            Vector3.zero,
-                            0.3f,
-                            0.05f,
-                            palmRot);
-
             // Finally, fill hand data.
             var palmPose = new Pose(palmPos, palmRot);
-            // var wristPos = ToWorld(new Vector3(0f, -0.015f, -0.065f), palmPos, palmRot);
-            var wristPos = palmPose.mul(tweakWristPosition).position;
+
+            if (wristPosition == Vector3.zero)
+            {
+                wristPosition = palmPose.mul(tweakWristPosition).position; ;
+            }
+
             intoHand.Fill(
               frameID: -1,
               id: (isLeft ? 0 : 1),
@@ -249,9 +268,27 @@ namespace Leap.Unity.Encoding
               palmNormal: palmRot * Vector3.down,
               rotation: palmRot,
               direction: palmRot * Vector3.forward,
-              wristPosition: wristPos
+              wristPosition: wristPosition
             );
 
+            if (elbowPosition == Vector3.zero)
+            {
+                elbowPosition = ToWorld(new Vector3(0f, 0f, -0.3f), palmPos, palmRot);
+            }
+
+            boneRot = Quaternion.LookRotation(
+            (elbowPosition - wristPosition).normalized,
+            Vector3.Cross((elbowPosition - wristPosition).normalized,
+                          palmRot * Vector3.right));
+
+            // Fill arm data.
+            intoHand.Arm.Fill(elbowPosition,
+                            wristPosition,
+                            (elbowPosition + palmPos) / 2,
+                            direction: (elbowPosition - wristPosition).normalized,
+                            length: (wristPosition - elbowPosition).magnitude,
+                            0.05f,
+                            palmRot * boneRot);
         }
 
         #endregion
