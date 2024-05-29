@@ -521,13 +521,40 @@ namespace Leap.Unity
             EditorGUI.EndDisabledGroup();
 
             EditorGUILayout.Space(10);
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("handPose"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("handPose"), true);
             EditorGUILayout.Space(10);
 
             EditorGUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
 
-            if (GUILayout.Button("Edit Pose", GUILayout.Width(Screen.width / 2), GUILayout.Height(30)))
+            if (!target.editingPoseJoints)
+            {
+                if (GUILayout.Button("Edit Pose Joints", GUILayout.Width(Screen.width / 2), GUILayout.Height(30)))
+                {
+                    target.BeginJointEditing();
+                }
+            }
+            else
+            {
+                if (GUILayout.Button("Save Edited Pose Joints", GUILayout.Width(Screen.width / 2), GUILayout.Height(30)))
+                {
+                    target.EndJointEditing(true);
+                }
+
+                if (GUILayout.Button("Discard Edited Pose Joints", GUILayout.Width(Screen.width / 2), GUILayout.Height(30)))
+                {
+                    target.EndJointEditing(false);
+                }
+            }
+
+            GUILayout.FlexibleSpace();
+            EditorGUILayout.EndHorizontal();
+            EditorGUILayout.Space(10);
+
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace();
+
+            if (GUILayout.Button("Edit Pose Thresholds", GUILayout.Width(Screen.width / 2), GUILayout.Height(30)))
             {
                 EditorGUIUtility.PingObject(target.handPose);
                 Selection.SetActiveObjectWithContext(target.handPose, target.handPose);
@@ -546,6 +573,8 @@ namespace Leap.Unity
             {
                 base.OnInspectorGUI();
             }
+
+            serializedObject.ApplyModifiedProperties();
         }
     }
 

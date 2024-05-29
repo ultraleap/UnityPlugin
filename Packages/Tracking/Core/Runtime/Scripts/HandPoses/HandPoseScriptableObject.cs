@@ -71,15 +71,15 @@ namespace Leap.Unity
 
         #endregion
 
-        [SerializeField, Attributes.Disable]
-        private Hand serializedHand;
+        [SerializeField]
+        public Hand serializedHand;
         public Hand GetSerializedHand()
         {
             return serializedHand;
         }
 
-        [SerializeField, Attributes.Disable]
-        private Hand mirroredHand;
+        [SerializeField]
+        public Hand mirroredHand;
         public Hand GetMirroredHand()
         {
             return mirroredHand;
@@ -99,6 +99,13 @@ namespace Leap.Unity
             serializedHand = serializedHand.CopyFrom(handToSerialise);
             MirrorHand(handToSerialise);
             SetAllBoneThresholds(globalRotation, true);
+        }
+
+        public void UpdateHandPose(Hand handToSerialise)
+        {
+            serializedHand = new Hand();
+            serializedHand = serializedHand.CopyFrom(handToSerialise);
+            MirrorHand(handToSerialise);
         }
 
         void MirrorHand(Hand handSource)

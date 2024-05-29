@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 
 using UnityEngine;
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -17,9 +18,9 @@ namespace Leap.Unity
             get
             {
                 List<Hand> hands = new List<Hand>();
-                foreach (var hand in currentHandsAndPosedObjects)
+                foreach (var hand in currentPosedHands)
                 {
-                    hands.Add(hand.Item1);
+                    hands.Add(hand);
                 }
 
                 return new Frame(0, (long)Time.realtimeSinceStartup, 90, hands);
@@ -32,15 +33,17 @@ namespace Leap.Unity
         /// <summary>
         /// Pose to use
         /// </summary>
+        [SerializeField]
         public HandPoseScriptableObject handPose;
 
         public Transform handsLocation;
 
-        private List<Tuple<Hand, HandPoseScriptableObject>> currentHandsAndPosedObjects = new List<Tuple<Hand, HandPoseScriptableObject>>();
+        private List<Hand> currentPosedHands = new List<Hand>();
 
         [SerializeField, Tooltip("Sets the colors of the gizmos that represent the rotation thresholds for each joint")]
         private Color[] gizmoColors = new Color[2] { Color.red, Color.blue };
 
+        public bool editingPoseJoints = false;
 
         public void SetHandPose(HandPoseScriptableObject poseToSet)
         {
@@ -50,11 +53,18 @@ namespace Leap.Unity
         private void Update()
         {
             UpdateHands();
+
+            if(editingPoseJoints && Application.isPlaying)
+            {
+                Debug.LogWarning("Pose Editing was still active when beginning application. Unsaved changed will be discarded to avoid conflicting pose data." +
+                    "\nTo avoid this, save your changes in the Pose Editor Component.", gameObject);
+                EndJointEditing(false);
+            }
         }
 
         private void UpdateHands()
         {
-            currentHandsAndPosedObjects.Clear();
+            currentPosedHands.Clear();
 
             if (handPose == null)
             {
@@ -85,8 +95,10 @@ namespace Leap.Unity
                 mirroredHand.SetTransform((handPosition + new Vector3(-0.15f, 0, 0)), mirroredHand.Rotation);
             }
 
-            currentHandsAndPosedObjects.Add(new Tuple<Hand, HandPoseScriptableObject>(posedHand, handPose));
-            currentHandsAndPosedObjects.Add(new Tuple<Hand, HandPoseScriptableObject>(mirroredHand, handPose));
+            GetEditingJointsForDisplay(ref posedHand);
+
+            currentPosedHands.Add(posedHand);
+            currentPosedHands.Add(mirroredHand);
 
             DispatchUpdateFrameEvent(CurrentFrame);
         }
@@ -94,15 +106,15 @@ namespace Leap.Unity
 #if UNITY_EDITOR
         private void OnDrawGizmos()
         {
-            foreach(var hand in currentHandsAndPosedObjects)
+            foreach(var hand in currentPosedHands)
             {
-                ShowEditorGizmos(hand.Item1, hand.Item2);
+                ShowEditorGizmos(hand);
             }
         }
 
-        private void ShowEditorGizmos(Hand hand, HandPoseScriptableObject handPoseScriptableObject)
+        private void ShowEditorGizmos(Hand hand)
         {
-            if(handPoseScriptableObject == null || hand == null)
+            if(handPose == null || hand == null)
             {
                 return;
             }
@@ -116,7 +128,7 @@ namespace Leap.Unity
                 Plane fingerNormalPlane = new Plane(proximal.PrevJoint, proximal.NextJoint, intermediate.NextJoint);
                 Vector3 normal = fingerNormalPlane.normal;
                 
-                if (handPoseScriptableObject.GetFingerIndexesToCheck().Contains(j))
+                if (handPose.GetFingerIndexesToCheck().Contains(j))
                 {
                     for (int i = 1; i < finger.bones.Length; i++) // start i at 1 to ignore metacarpal
                     {
@@ -124,14 +136,14 @@ namespace Leap.Unity
                         Gizmos.matrix = Matrix4x4.identity;
 
                         //currently only uses x threshold
-                        DrawThresholdGizmo(handPoseScriptableObject.GetBoneRotationthreshold(j, i - 1).x, // i-1 to ignore metacarpal
+                        DrawThresholdGizmo(handPose.GetBoneRotationthreshold(j, i - 1).x, // i-1 to ignore metacarpal
                         bone.Direction.normalized,
                         bone.PrevJoint, normal, gizmoColors[0], bone.Length);
 
                         if (finger.bones[i].Type == Bone.BoneType.TYPE_PROXIMAL) 
                         {
                             Vector3 proximalNormal = Quaternion.AngleAxis(90, bone.Direction.normalized) * normal;
-                            DrawThresholdGizmo(handPoseScriptableObject.GetBoneRotationthreshold(j, i - 1).y, // i-1 to ignore metacarpal
+                            DrawThresholdGizmo(handPose.GetBoneRotationthreshold(j, i - 1).y, // i-1 to ignore metacarpal
                             bone.Direction.normalized,
                             bone.PrevJoint, proximalNormal, gizmoColors[1], bone.Length);
                         }
@@ -169,6 +181,105 @@ namespace Leap.Unity
 
             return result;
         }
+
+        #region Joint Editing
+
+        public Transform[] handEditingJoints;
+
+        public GameObject editHand;
+
+        public void BeginJointEditing()
+        {
+            editingPoseJoints = true;
+            handEditingJoints = new Transform[20];
+
+            Hand hand = currentPosedHands[0];
+
+            editHand = new GameObject("Pose Editor Hand");
+
+            editHand.transform.position = hand.PalmPosition;
+            editHand.transform.rotation = hand.Rotation;
+            editHand.transform.SetParent(transform);
+
+            for (int fingerID = 0; fingerID < 5; fingerID++)
+            {
+                Transform finger = new GameObject("Pose Editor Finger " + (Finger.FingerType)fingerID).transform;
+                finger.position = hand.Fingers[fingerID].bones[0].PrevJoint;
+                finger.rotation = hand.Fingers[fingerID].bones[0].Rotation;
+                finger.SetParent(editHand.transform);
+
+                Transform prevBoneTransform = finger;
+
+                for (int boneID = 1; boneID < 4; boneID++)
+                {
+                    Transform newTransform = GameObject.CreatePrimitive(PrimitiveType.Sphere).transform;
+                    newTransform.name = "Pose Editor Joint " + (Finger.FingerType)fingerID + " " + (Bone.BoneType)boneID;
+                    newTransform.position = hand.Fingers[fingerID].bones[boneID].PrevJoint;
+                    newTransform.rotation = hand.Fingers[fingerID].bones[boneID].Rotation;
+                    newTransform.localScale = Vector3.one * 0.01f;
+                    newTransform.SetParent(prevBoneTransform);
+                    prevBoneTransform = newTransform;
+
+                    handEditingJoints[(fingerID * 4) + boneID] = newTransform;
+                }
+            }
+        }
+
+        public void EndJointEditing(bool andSave)
+        {
+            if (andSave)
+            {
+                // Edit Pose hand
+                Hand posedHand = new Hand();
+                posedHand.CopyFrom(handPose.GetSerializedHand());
+                Vector3 handPosition = Camera.main.transform.position + (Camera.main.transform.forward * 0.5f);
+
+                if (handsLocation != null)
+                {
+                    handPosition = handsLocation.position;
+                }
+
+                if (posedHand.IsLeft)
+                {
+                    posedHand.SetTransform((handPosition + new Vector3(-0.15f, 0, 0)), posedHand.Rotation);
+                }
+                else
+                {
+                    posedHand.SetTransform((handPosition + new Vector3(0.15f, 0, 0)), posedHand.Rotation);
+                }
+
+                GetEditingJointsForDisplay(ref posedHand);
+
+                Undo.RecordObject(handPose, "Hand Pose Edit");
+                handPose.UpdateHandPose(posedHand);
+
+                // Save changes
+                EditorUtility.SetDirty(handPose);
+                AssetDatabase.SaveAssets();
+                AssetDatabase.Refresh();
+            }
+
+            // Tidy up
+            DestroyImmediate(editHand);
+
+            editingPoseJoints = false;
+        }
+
+        void GetEditingJointsForDisplay(ref Hand handToChange)
+        {
+            if (!editingPoseJoints)
+                return;
+
+            for (int fingerID = 0; fingerID < 5; fingerID++)
+            {
+                for (int boneID = 1; boneID < 4; boneID++)
+                {
+                    handToChange.Fingers[fingerID].bones[boneID].SetTransform(handEditingJoints[(fingerID * 4) + boneID].position, handEditingJoints[(fingerID * 4) + boneID].rotation);
+                }
+            }
+        }
+
+        #endregion
 #endif
     }
 }
