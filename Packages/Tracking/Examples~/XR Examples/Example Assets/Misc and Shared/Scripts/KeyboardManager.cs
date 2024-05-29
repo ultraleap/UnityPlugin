@@ -71,7 +71,6 @@ namespace Leap.Unity.Examples
             }
 
             EnteredText = EnteredText + character;
-            Debug.Log(character);
 
             AppendText();
         }
