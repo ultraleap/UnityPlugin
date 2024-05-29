@@ -846,7 +846,10 @@ namespace Leap.Unity.PhysicalHands
 
             hand.physicalHandsManager.OnHandGrabExit(hand, _rigid);
 
+            prevHandPos = hand.palmBone.transform.position;
+            prevHandRot = hand.palmBone.transform.rotation;
             _grabbingHands.Remove(hand);
+            secondHandJustDropped = true;
         }
 
         private void UpdateGrabbingValues()
@@ -1018,6 +1021,12 @@ namespace Leap.Unity.PhysicalHands
             return thumb && otherFinger;
         }
 
+        bool secondHandJustDropped = false;
+        float lerpTime = 1f;
+        float lerpTimer = 0f;
+        Vector3 prevHandPos = Vector3.zero;
+        Quaternion prevHandRot = Quaternion.identity;
+
         private void UpdateHandPositions()
         {
             ContactHand hand = null;
@@ -1042,7 +1051,23 @@ namespace Leap.Unity.PhysicalHands
                     }
                 }
 
-                if (hand != null && _grabbingHands.Count == 1)
+                if(hand != null && secondHandJustDropped && _grabbingHands.Count > 0)
+                {
+                    if(lerpTimer < lerpTime)
+                    {
+                        lerpTimer += Time.deltaTime;
+                        AggregateGrabbedHands();
+                    }
+                    else
+                    {
+                        lerpTimer = 0f;
+                        secondHandJustDropped = false;
+                        prevHandPos = Vector3.zero;
+                        prevHandRot = Quaternion.identity;
+
+                    }
+                }
+                else if (hand != null && _grabbingHands.Count == 1)
                 {
                     _newRotation = hand.palmBone.transform.rotation * Quaternion.Euler(hand.AngularVelocity * Time.fixedDeltaTime); // for use in positioning
 
@@ -1052,6 +1077,10 @@ namespace Leap.Unity.PhysicalHands
                 else if(hand != null && _grabbingHands.Count > 1)
                 {
                     AggregateGrabbedHands();
+                }
+                else if(_grabbingHands.Count == 0)
+                {
+                    secondHandJustDropped = false;
                 }
             }
 
@@ -1064,9 +1093,12 @@ namespace Leap.Unity.PhysicalHands
         {
             List<Vector3> grabbingHandPositions = new List<Vector3>();
             List<Quaternion> grabbingHandRotations = new List<Quaternion>();
+            List<float> grabbingHandStrengths = new List<float>();
 
             for (int i = 0; i < _grabbingHands.Count; i++)
             {
+                grabbingHandStrengths.Add(_grabbingHands[i].DataHand.GrabStrength);
+
                 ContactHand hand = _grabbingHands[i];
                 int grabHandndex = _grabbableHands.IndexOf(hand);
                 if(grabHandndex < 0)
@@ -1084,16 +1116,30 @@ namespace Leap.Unity.PhysicalHands
                 grabbingHandRotations.Add(_newRotation * _grabbableHandsValues[grabHandndex].rotationOffset); // Include the original rotation offset
             }
 
-            if (grabbingHandPositions.Count > 1)
+            float lerpAmount = 0.5f;
+            if(grabbingHandStrengths.Count > 1)
             {
-                _newPosition = Vector3.Lerp(grabbingHandPositions.ElementAt(0), grabbingHandPositions.ElementAt(1), 0.5f);
-                _newRotation = Quaternion.Slerp(grabbingHandRotations.ElementAt(0), grabbingHandRotations.ElementAt(1), 0.5f);
+                var firstHand = 1 - grabbingHandStrengths[0];
+                var secondHand = grabbingHandStrengths[1];
+
+                lerpAmount = (firstHand + secondHand) / 2;
+            }
+
+            if (grabbingHandPositions.Count > 1)
+            { 
+                _newPosition = Vector3.Lerp(grabbingHandPositions.ElementAt(0), grabbingHandPositions.ElementAt(1), lerpAmount);
+                _newRotation = Quaternion.Slerp(grabbingHandRotations.ElementAt(0), grabbingHandRotations.ElementAt(1), lerpAmount);
+            }
+            else if(prevHandPos != Vector3.zero && prevHandRot != Quaternion.identity)
+            {
+                _newPosition = Vector3.Lerp(grabbingHandPositions.ElementAt(0), prevHandPos, lerpAmount);
+                _newRotation = Quaternion.Slerp(grabbingHandRotations.ElementAt(0), prevHandRot, lerpAmount);
             }
 
             for (int i = 0; i < _grabbingHands.Count; i++)
             {
                 ContactHand hand = _grabbingHands[i];
-                hand.palmBone.transform.rotation = Quaternion.FromToRotation(hand.palmBone.transform.position, _newPosition);
+                hand.palmBone.transform.rotation = Quaternion.Slerp(hand.palmBone.transform.rotation, Quaternion.FromToRotation(hand.palmBone.transform.position, _newPosition), grabbingHandStrengths[i]);
             }
         }
 
