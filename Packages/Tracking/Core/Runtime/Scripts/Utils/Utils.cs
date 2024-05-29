@@ -1413,6 +1413,73 @@ namespace Leap.Unity
             return Vector3.Distance(t0.position, t1.position);
         }
 
+        /// <summary>
+        /// Transforms position from local space to world space using parent
+        /// </summary>
+        public static Vector3 TransformPoint(Vector3 position, Vector3 parentPosition)
+        {
+            return TransformPoint(position, parentPosition, Quaternion.identity, Vector3.one);
+        }
+
+        /// <summary>
+        /// Transforms position from local space to world space using parent
+        /// </summary>
+        public static Vector3 TransformPoint(Vector3 position, Vector3 parentPosition, Vector3 parentScale)
+        {
+            return TransformPoint(position, parentPosition, Quaternion.identity, parentScale);
+        }
+
+        /// <summary>
+        /// Transforms position from local space to world space using parent
+        /// </summary>
+        public static Vector3 TransformPoint(Vector3 position, Vector3 parentPosition, Quaternion parentRotation)
+        {
+            return TransformPoint(position, parentPosition, parentRotation, Vector3.one);
+        }
+
+        /// <summary>
+        /// Transforms position from local space to world space using parent
+        /// </summary>
+        public static Vector3 TransformPoint(Vector3 position, Vector3 parentPosition, Quaternion parentRotation, Vector3 parentScale)
+        {
+            Matrix4x4 matrix = Matrix4x4.TRS(parentPosition, parentRotation, parentScale);
+            return matrix.MultiplyPoint3x4(position);
+        }
+
+        /// <summary>
+        /// Transforms position from world space to local space using parent.
+        /// </summary>
+        public static Vector3 InverseTransformPoint(Vector3 position, Vector3 parentPosition)
+        {
+            return InverseTransformPoint(position, parentPosition, Quaternion.identity, Vector3.one);
+        }
+
+        /// <summary>
+        /// Transforms position from world space to local space using parent.
+        /// </summary>
+        public static Vector3 InverseTransformPoint(Vector3 position, Vector3 parentPosition, Vector3 parentScale)
+        {
+            return InverseTransformPoint(position, parentPosition, Quaternion.identity, parentScale);
+        }
+
+        /// <summary>
+        /// Transforms position from world space to local space using parent.
+        /// </summary>
+        public static Vector3 InverseTransformPoint(Vector3 position, Vector3 parentPosition, Quaternion parentRotation)
+        {
+            return InverseTransformPoint(position, parentPosition, parentRotation, Vector3.one);
+        }
+
+        /// <summary>
+        /// Transforms position from world space to local space using parent.
+        /// </summary>
+        public static Vector3 InverseTransformPoint(Vector3 position, Vector3 parentPosition, Quaternion parentRotation, Vector3 parentScale)
+        {
+            Matrix4x4 matrix = Matrix4x4.TRS(parentPosition, parentRotation, parentScale);
+            matrix = matrix.inverse;
+            return matrix.MultiplyPoint3x4(position);
+        }
+
         #endregion
 
         #region Orientation Utils

@@ -26,21 +26,6 @@ namespace Leap.Unity.Preview.HandRays
     public abstract class HandRay : MonoBehaviour
     {
         /// <summary>
-        /// Called when a far field ray is calculated.
-        /// Subscribe to it to cast rays with the ray direction it provides
-        /// </summary>
-        public event Action<HandRayDirection> OnHandRayFrame;
-        /// <summary>
-        /// Called on the frame the ray is enabled or disabled
-        /// </summary>
-        public event Action<HandRayDirection, bool> OnHandRayStateChange;
-
-        /// <summary>
-        /// True if the ray should be enabled, false if it should be disabled
-        /// </summary>
-        public bool HandRayEnabled { get; protected set; }
-
-        /// <summary>
         /// The leap provider provides the hand data from which we calculate the far field ray directions 
         /// </summary>
         public LeapProvider leapProvider;
@@ -67,41 +52,7 @@ namespace Leap.Unity.Preview.HandRays
         // Update is called once per frame
         protected virtual void Update()
         {
-            if (leapProvider == null || leapProvider.CurrentFrame == null)
-            {
-                return;
-            }
-
-            if (HandRayEnabled)
-            {
-                if (!ShouldEnableRay())
-                {
-                    HandRayEnabled = false;
-                    InvokeHandRayStateChange();
-                }
-                else
-                {
-                    CalculateRayDirection();
-                }
-            }
-            else
-            {
-                if (ShouldEnableRay())
-                {
-                    HandRayEnabled = true;
-                    ResetRay();
-                    CalculateRayDirection();
-                    InvokeHandRayStateChange();
-                }
-            }
-        }
-
-        /// <summary>
-        /// Calculates the Ray Direction
-        /// </summary>
-        private void CalculateRayDirection()
-        {
-            Hand hand = leapProvider.CurrentFrame.GetHand(chirality);
+            Hand hand = leapProvider?.CurrentFrame?.GetHand(chirality);
             if (hand == null)
             {
                 return;
@@ -115,30 +66,6 @@ namespace Leap.Unity.Preview.HandRays
             handRayDirection.RayOrigin = CalculateRayOrigin();
 
             handRayDirection.Direction = CalculateDirection();
-            InvokeHandRayFrame();
-        }
-
-        protected void InvokeHandRayStateChange()
-        {
-            OnHandRayStateChange?.Invoke(handRayDirection, HandRayEnabled);
-        }
-
-        protected void InvokeHandRayFrame()
-        {
-            OnHandRayFrame?.Invoke(handRayDirection);
-        }
-
-        /// <summary>
-        /// Calculates whether the hand ray should be enabled
-        /// </summary>
-        /// <returns></returns>
-        protected virtual bool ShouldEnableRay()
-        {
-            if (leapProvider.CurrentFrame.GetHand(chirality) == null)
-            {
-                return false;
-            }
-            return true;
         }
 
         protected abstract Vector3 CalculateVisualAimPosition();
