@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Improved XRHands support for Meta Aim Input Actions
+- XRLeapProviderManager renamed LEAP_DIRECT to ULTRALEAP
 
 ### Fixed
 - Issue with the method signature for LeapPixelToRectilinearEx
