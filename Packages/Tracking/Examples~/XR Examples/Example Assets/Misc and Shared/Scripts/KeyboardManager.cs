@@ -13,17 +13,16 @@ using TMPro;
 
 namespace Leap.Unity.Examples
 {
-
     public class KeyboardManager : MonoBehaviour
     {
         private Dictionary<PhysicalHandsButton, char> keysAndCharacters = new Dictionary<PhysicalHandsButton, char>();
 
         public TextMeshProUGUI textMeshProText;
 
-
         public List<PhysicalHandsButton> Buttons;
         public PhysicalHandsButton Backspace;
         public PhysicalHandsButton Shift;
+        public PhysicalHandsButton Clear;
 
         public string EnteredText = "";
 
@@ -41,8 +40,6 @@ namespace Leap.Unity.Examples
         }
 #endif
 
-
-        // Start is called before the first frame update
         void Start()
         {
             for (int i = 0; i < Buttons.Count; i++)
@@ -58,6 +55,11 @@ namespace Leap.Unity.Examples
             if (Backspace != null)
             {
                 Backspace.OnButtonPressed.AddListener(DeleteCharacter);
+            }
+
+            if (Clear != null)
+            {
+                Clear.OnButtonPressed.AddListener(ClearText);
             }
         }
 
@@ -87,11 +89,16 @@ namespace Leap.Unity.Examples
             AppendText();
         }
 
+        private void ClearText()
+        {
+            EnteredText = "";
+
+            AppendText();
+        }
 
         private void AppendText()
         {
             textMeshProText.SetText(EnteredText);
         }
-
     }
 }
