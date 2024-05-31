@@ -35,23 +35,23 @@ namespace Leap.Unity
 
         [Header("Pinch Activation Settings")]
         [SerializeField, Tooltip("The distance between fingertip and thumb at which to enter the pinching state.")]
-        public float ActivateDistance = 0.018f;
+        public float activateDistance = 0.018f;
         [SerializeField, Tooltip("The distance between fingertip and thumb at which to leave the pinching state.")]
-        public float DeactivateDistance = 0.024f;
+        public float deactivateDistance = 0.024f;
 
         public Action<Hand> OnPinch, OnUnpinch, OnPinching;
 
         public bool IsPinching { get; private set; }
 
-        public bool PinchStartedThisFrame => _startedPinchThisFrame;
-        private bool _startedPinchThisFrame = false;
+        public bool PinchStartedThisFrame => startedPinchThisFrame;
+        private bool startedPinchThisFrame = false;
         /// <summary>
         /// The percent value (0-1) between the activate distance and absolute pinch.
         /// Note that it is virtually impossible for the hand to be completely pinched.
         /// </summary>
         public float SquishPercent { get; private set; }
 
-        private Chirality _chiralityLastFrame;
+        private Chirality chiralityLastFrame;
 
 
 
@@ -80,7 +80,7 @@ namespace Leap.Unity
 
         private void Start()
         {
-            _chiralityLastFrame = chirality;
+            chiralityLastFrame = chirality;
             if (leapProvider == null)
             {
                 leapProvider = Hands.Provider;
@@ -89,7 +89,7 @@ namespace Leap.Unity
 
         private void Update()
         {
-            if (_chiralityLastFrame != chirality)
+            if (chiralityLastFrame != chirality)
             {
                 IsPinching = false;
             }
@@ -97,7 +97,7 @@ namespace Leap.Unity
             {
                 UpdatePinchStatus(leapProvider.CurrentFrame.GetHand(chirality));
             }
-            _chiralityLastFrame = chirality;
+            chiralityLastFrame = chirality;
         }
 
         private void UpdatePinchStatus(Hand hand)
@@ -107,22 +107,22 @@ namespace Leap.Unity
                 return;
             }
 
-            float pinchDistance = hand.GetFingerPinchDistance((int)fingerType);
-            if (pinchDistance < ActivateDistance)
+            float _pinchDistance = hand.GetFingerPinchDistance((int)fingerType);
+            if (_pinchDistance < activateDistance)
             {
                 if (!IsPinching)
                 {
-                    _startedPinchThisFrame = true;
+                    startedPinchThisFrame = true;
                     OnPinch?.Invoke(hand);
                 }
                 else
                 {
-                    _startedPinchThisFrame = false;
+                    startedPinchThisFrame = false;
                 }
 
                 IsPinching = true;
             }
-            else if (pinchDistance > DeactivateDistance)
+            else if (_pinchDistance > deactivateDistance)
             {
                 if (IsPinching)
                 {
@@ -134,7 +134,7 @@ namespace Leap.Unity
             if (IsPinching)
             {
                 OnPinching?.Invoke(hand);
-                SquishPercent = Mathf.InverseLerp(ActivateDistance, 0, pinchDistance);
+                SquishPercent = Mathf.InverseLerp(activateDistance, 0, _pinchDistance);
             }
             else
             {

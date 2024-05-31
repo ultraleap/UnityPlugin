@@ -623,8 +623,8 @@ namespace Leap.Unity.Preview.Locomotion
             }
             if (_pinchDetector != null)
             {
-                _pinchDetector.ActivateDistance = _gemSize;
-                _pinchDetector.DeactivateDistance = _scaledGemSize;
+                _pinchDetector.activateDistance = _gemSize;
+                _pinchDetector.deactivateDistance = _scaledGemSize;
             }
 
             if (_audioSource == null)
