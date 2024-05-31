@@ -480,12 +480,12 @@ namespace Leap.Unity.HandsModule
                 {
                     for (int i = 0; i < 5; i++)
                     {
-                        var indexCheck = (int)Bone.BoneType.TYPE_METACARPAL;
+                        var indexCheck = (int)Bone.BoneType.METACARPAL;
 
                         //The hand binder does not use the METACARPAL bone for the thumb so draw a line to the proximal instead 
-                        if ((Leap.Finger.FingerType)i == Finger.FingerType.TYPE_THUMB)
+                        if ((Leap.Finger.FingerType)i == Finger.FingerType.THUMB)
                         {
-                            indexCheck = (int)Bone.BoneType.TYPE_PROXIMAL;
+                            indexCheck = (int)Bone.BoneType.PROXIMAL;
                         }
 
                         var joint = myTarget.BoundHand.fingers[i];
@@ -513,7 +513,7 @@ namespace Leap.Unity.HandsModule
             if (debugLeapHand.boolValue)
             {
                 Handles.color = leapHandDebugCol;
-                foreach (var finger in myTarget.LeapHand.Fingers)
+                foreach (var finger in myTarget.LeapHand.fingers)
                 {
                     var index = 0;
 
@@ -533,11 +533,11 @@ namespace Leap.Unity.HandsModule
                 }
 
                 Handles.SphereHandleCap(-1, myTarget.LeapHand.WristPosition, Quaternion.identity, gizmoSize.floatValue, EventType.Repaint);
-                Handles.DrawAAPolyLine(myTarget.LeapHand.WristPosition, myTarget.LeapHand.Fingers[0].bones[0].PrevJoint);
-                Handles.DrawAAPolyLine(myTarget.LeapHand.WristPosition, myTarget.LeapHand.Fingers[1].bones[0].PrevJoint);
-                Handles.DrawAAPolyLine(myTarget.LeapHand.WristPosition, myTarget.LeapHand.Fingers[2].bones[0].PrevJoint);
-                Handles.DrawAAPolyLine(myTarget.LeapHand.WristPosition, myTarget.LeapHand.Fingers[3].bones[0].PrevJoint);
-                Handles.DrawAAPolyLine(myTarget.LeapHand.WristPosition, myTarget.LeapHand.Fingers[4].bones[0].PrevJoint);
+                Handles.DrawAAPolyLine(myTarget.LeapHand.WristPosition, myTarget.LeapHand.fingers[0].bones[0].PrevJoint);
+                Handles.DrawAAPolyLine(myTarget.LeapHand.WristPosition, myTarget.LeapHand.fingers[1].bones[0].PrevJoint);
+                Handles.DrawAAPolyLine(myTarget.LeapHand.WristPosition, myTarget.LeapHand.fingers[2].bones[0].PrevJoint);
+                Handles.DrawAAPolyLine(myTarget.LeapHand.WristPosition, myTarget.LeapHand.fingers[3].bones[0].PrevJoint);
+                Handles.DrawAAPolyLine(myTarget.LeapHand.WristPosition, myTarget.LeapHand.fingers[4].bones[0].PrevJoint);
                 Handles.DrawAAPolyLine(myTarget.LeapHand.WristPosition, myTarget.LeapHand.Arm.PrevJoint);
                 Handles.SphereHandleCap(-1, myTarget.LeapHand.Arm.PrevJoint, Quaternion.identity, gizmoSize.floatValue, EventType.Repaint);
             }
@@ -550,7 +550,7 @@ namespace Leap.Unity.HandsModule
         {
             if (DebugLeapRotationAxis.boolValue)
             {
-                foreach (var FINGER in myTarget.LeapHand.Fingers)
+                foreach (var FINGER in myTarget.LeapHand.fingers)
                 {
                     foreach (var BONE in FINGER.bones)
                     {
@@ -739,7 +739,7 @@ namespace Leap.Unity.HandsModule
                     var objectFieldName = "";
                     for (int boneID = 0; boneID < handBinder.BoundHand.fingers[fingerID].boundBones.Length; boneID++)
                     {
-                        if ((Finger.FingerType)fingerID == Finger.FingerType.TYPE_THUMB && (Bone.BoneType)boneID == Bone.BoneType.TYPE_METACARPAL)
+                        if ((Finger.FingerType)fingerID == Finger.FingerType.THUMB && (Bone.BoneType)boneID == Bone.BoneType.METACARPAL)
                         {
                             continue;
                         }

@@ -173,9 +173,9 @@ namespace Leap.Unity
 
             int jointIndex = 2;
 
-            foreach (var finger in leapHand.Fingers)
+            foreach (var finger in leapHand.fingers)
             {
-                if (finger.Type == Finger.FingerType.TYPE_THUMB)
+                if (finger.Type == Finger.FingerType.THUMB)
                 {
                     for (int i = 1; i < 4; i++)
                     {
@@ -188,7 +188,7 @@ namespace Leap.Unity
                         jointIndex++;
                     }
 
-                    var distal = finger.Bone(Bone.BoneType.TYPE_DISTAL);
+                    var distal = finger.GetBone(Bone.BoneType.DISTAL);
                     handJoints[jointIndex] = XRHandProviderUtility.CreateJoint(handedness,
                         XRHandJointTrackingState.Pose,
                         XRHandJointIDUtility.FromIndex(jointIndex),
@@ -206,7 +206,7 @@ namespace Leap.Unity
                         jointIndex++;
                     }
 
-                    var distal = finger.Bone(Bone.BoneType.TYPE_DISTAL);
+                    var distal = finger.GetBone(Bone.BoneType.DISTAL);
                     handJoints[jointIndex] = XRHandProviderUtility.CreateJoint(handedness,
                         XRHandJointTrackingState.Pose,
                         XRHandJointIDUtility.FromIndex(jointIndex),
@@ -221,18 +221,18 @@ namespace Leap.Unity
         Pose CalculatePalmPose(Hand leapHand)
         {
             Pose palmPose = new Pose();
-            palmPose.position = Vector3.Lerp(leapHand.GetMiddle().Bone(Bone.BoneType.TYPE_METACARPAL).PrevJoint,
-                                                leapHand.GetMiddle().Bone(Bone.BoneType.TYPE_PROXIMAL).PrevJoint, 0.5f);
+            palmPose.position = Vector3.Lerp(leapHand.Middle.GetBone(Bone.BoneType.METACARPAL).PrevJoint,
+                                                leapHand.Middle.GetBone(Bone.BoneType.PROXIMAL).PrevJoint, 0.5f);
 
-            palmPose.rotation = leapHand.GetMiddle().Bone(Bone.BoneType.TYPE_METACARPAL).Rotation;
+            palmPose.rotation = leapHand.Middle.GetBone(Bone.BoneType.METACARPAL).Rotation;
 
             return palmPose;
         }
 
         Pose CalculateWristPose(Hand leapHand)
         {
-            Vector3 wristUp = leapHand.GetMiddle().Bone(Bone.BoneType.TYPE_METACARPAL).Rotation * Vector3.up;
-            Vector3 wristForward = leapHand.GetMiddle().Bone(Bone.BoneType.TYPE_METACARPAL).PrevJoint - leapHand.WristPosition;
+            Vector3 wristUp = leapHand.Middle.GetBone(Bone.BoneType.METACARPAL).Rotation * Vector3.up;
+            Vector3 wristForward = leapHand.Middle.GetBone(Bone.BoneType.METACARPAL).PrevJoint - leapHand.WristPosition;
 
             Pose wristPose = new Pose();
             wristPose.position = leapHand.WristPosition;

@@ -19,10 +19,10 @@ namespace Leap.Unity
     {
         public enum PinchableFingerType
         {
-            INDEX = Finger.FingerType.TYPE_INDEX,
-            MIDDLE = Finger.FingerType.TYPE_MIDDLE,
-            RING = Finger.FingerType.TYPE_RING,
-            PINKY = Finger.FingerType.TYPE_PINKY,
+            INDEX = Finger.FingerType.INDEX,
+            MIDDLE = Finger.FingerType.MIDDLE,
+            RING = Finger.FingerType.RING,
+            PINKY = Finger.FingerType.PINKY,
         }
 
         public LeapProvider leapProvider;

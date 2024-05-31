@@ -174,8 +174,8 @@ namespace Leap.Unity
         {
             PoseRule poseRule = new PoseRule();
             poseRule.enabled = true;
-            poseRule.finger = (int)Finger.FingerType.TYPE_INDEX;
-            poseRule.bone = (int)Bone.BoneType.TYPE_INTERMEDIATE;
+            poseRule.finger = (int)Finger.FingerType.INDEX;
+            poseRule.bone = (int)Bone.BoneType.INTERMEDIATE;
             poseRule.directions = new List<RuleDirection>();
 
             poseRules.Add(poseRule);
@@ -327,14 +327,14 @@ namespace Leap.Unity
                 Quaternion lastSerializedBoneRotation = serializedHand.Rotation;
 
                 // Each bone in the finger 
-                for (int boneNum = 0; boneNum < serializedHand.Fingers[fingerNum].bones.Length; boneNum++)
+                for (int boneNum = 0; boneNum < serializedHand.fingers[fingerNum].bones.Length; boneNum++)
                 {
                     // Get the same bone for both comparison hand and player hand
-                    Bone activeHandBone = playerHand.Fingers[fingerNum].bones[boneNum];
-                    Bone serializedHandBone = serializedHand.Fingers[fingerNum].bones[boneNum];
+                    Bone activeHandBone = playerHand.fingers[fingerNum].bones[boneNum];
+                    Bone serializedHandBone = serializedHand.fingers[fingerNum].bones[boneNum];
 
                     //Ignore the metacarpal as it will never really change.
-                    if (serializedHandBone.Type == Bone.BoneType.TYPE_METACARPAL)
+                    if (serializedHandBone.Type == Bone.BoneType.METACARPAL)
                     {
                         lastBoneRotation = activeHandBone.Rotation;
                         lastSerializedBoneRotation = serializedHandBone.Rotation;
@@ -343,7 +343,7 @@ namespace Leap.Unity
 
                     // Do not check distal for fingers, only for thumb
                     if (fingerNum != 0 &&
-                        serializedHandBone.Type == Bone.BoneType.TYPE_DISTAL)
+                        serializedHandBone.Type == Bone.BoneType.DISTAL)
                     {
                         continue;
                     }
@@ -372,7 +372,7 @@ namespace Leap.Unity
                     {
                         if (boneDifference.x <= (jointRotationThresholds.x + pose.GetHysteresisThreshold()) && boneDifference.x >= (-jointRotationThresholds.x - pose.GetHysteresisThreshold()))
                         {
-                            if (serializedHandBone.Type == Bone.BoneType.TYPE_PROXIMAL) // Proximal also uses Y rotation for Abduction/Splay
+                            if (serializedHandBone.Type == Bone.BoneType.PROXIMAL) // Proximal also uses Y rotation for Abduction/Splay
                             {
                                 if (boneDifference.y <= (jointRotationThresholds.y + pose.GetHysteresisThreshold()) && boneDifference.y >= (-jointRotationThresholds.y - pose.GetHysteresisThreshold()))
                                 {
@@ -390,7 +390,7 @@ namespace Leap.Unity
                     {
                         if (boneDifference.x <= jointRotationThresholds.x && boneDifference.x >= -jointRotationThresholds.x)
                         {
-                            if (serializedHandBone.Type == Bone.BoneType.TYPE_PROXIMAL) // Proximal also uses Y rotation for Abduction/Splay
+                            if (serializedHandBone.Type == Bone.BoneType.PROXIMAL) // Proximal also uses Y rotation for Abduction/Splay
                             {
                                 if (boneDifference.y <= jointRotationThresholds.y && boneDifference.y >= -jointRotationThresholds.y)
                                 {
@@ -454,8 +454,8 @@ namespace Leap.Unity
                         }
                         else
                         {
-                            pointDirection = playerHand.Fingers[(int)rule.finger].bones[rule.bone].Direction.normalized;
-                            pointPosition = playerHand.Fingers[(int)rule.finger].bones[rule.bone].NextJoint;
+                            pointDirection = playerHand.fingers[(int)rule.finger].bones[rule.bone].Direction.normalized;
+                            pointPosition = playerHand.fingers[(int)rule.finger].bones[rule.bone].NextJoint;
                         }
 
                         float hysteresisToAdd = 0;
@@ -505,7 +505,7 @@ namespace Leap.Unity
                                     }
                                     else
                                     {
-                                        jointRotation = playerHand.Fingers[(int)rule.finger].bones[rule.bone].Rotation;
+                                        jointRotation = playerHand.fingers[(int)rule.finger].bones[rule.bone].Rotation;
                                     }
 
                                     if (Quaternion.Angle(jointRotation, direction.poseTarget.rotation) < direction.rotationThreshold)
