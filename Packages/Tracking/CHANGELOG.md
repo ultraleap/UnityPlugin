@@ -22,6 +22,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - XRLeapProviderManager renamed LEAP_DIRECT to ULTRALEAP
 - Accessors for Hand.Finger, Hand.Bone and Finger.Bone
 - Renamed BoneType enum entries to remove redundancies
+- Replaced use of PinchStrength for IsPinching with PinchDistance
+- PinchDistance is now measured in Metres not Millimetres
 
 ### Fixed
 - Issue with the method signature for LeapPixelToRectilinearEx
