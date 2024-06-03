@@ -28,6 +28,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Hard Contact Parent settings access levels to public
 - Prefab Create Menu uses Physical Hands prefabs as opposed to Interaction Engine
 - Prefab Create Menu chooses URP hands where available
+- Shaders use _Color as the default color property name
+- Shaders all come under the Ultraleap folder
 
 ### Fixed
 - 

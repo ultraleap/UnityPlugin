@@ -3,7 +3,7 @@ Shader "Ultraleap/Teleport Anchor"
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
-        [HDR]_MainColor("Main Color", Color) = (1,1,1,1)
+        [HDR]_Color("Main Color", Color) = (1,1,1,1)
     }
     SubShader
     {
@@ -38,7 +38,7 @@ Shader "Ultraleap/Teleport Anchor"
                 };
 
                 sampler2D _MainTex;
-                float4 _MainColor;
+                float4 _Color;
                 float4 _MainTex_ST;
 
                 v2f vert (appdata_t v)
@@ -54,7 +54,7 @@ Shader "Ultraleap/Teleport Anchor"
 
                 fixed4 frag (v2f i) : SV_Target
                 {
-                    fixed4 col = tex2D(_MainTex, i.texcoord) * _MainColor;
+                    fixed4 col = tex2D(_MainTex, i.texcoord) * _Color;
                     UNITY_APPLY_FOG(i.fogCoord, col);
                     return col;
                 }

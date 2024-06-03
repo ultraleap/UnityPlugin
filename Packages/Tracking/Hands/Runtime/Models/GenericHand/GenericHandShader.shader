@@ -3,7 +3,8 @@
     Properties
     {
         [NoScaleOffset] _MainTex("Texture", 2D) = "white" {}
-        [HDR]_MainColor("Main Color", Color) = (0,0,0,1)
+        [HDR]_MainColor("Main Color (DEPRICATED)", Color) = (0,0,0,1)
+        [HDR]_Color("Main Color", Color) = (0,0,0,1)
 
         [MaterialToggle] _useOutline("Use Outline", Float) = 0
         [HDR]_OutlineColor("Outline Color", Color) = (0,0,0,1)
@@ -22,7 +23,7 @@
     #include "UnityCG.cginc"   // for & UNITY_VERTEX_OUTPUT_STEREO UnityObjectToWorldNormal() 
     #include "AutoLight.cginc" // for UNITY_SHADOW_COORDS() & UNITY_TRANSFER_SHADOW()
     
-    float4 _MainColor;
+    float4 _Color;
     float _Outline;
     float4 _OutlineColor;
     sampler2D _MainTex;
@@ -131,7 +132,7 @@
             half4 frag(v2f i) :COLOR
             {
                 fixed4 col = tex2D(_MainTex, i.uv);
-                col *= _MainColor;
+                col *= _Color;
 
                 if (_useLighting)
                     col.rgb *= (i.diff * _LightIntensity);
