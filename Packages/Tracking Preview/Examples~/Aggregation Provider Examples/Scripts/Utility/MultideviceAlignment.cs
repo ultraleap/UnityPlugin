@@ -53,8 +53,8 @@ namespace Leap.Unity
                         {
                             for (int k = 0; k < 4; k++)
                             {
-                                sourceHandPoints.Add(sourceHand.Fingers[j].bones[k].Center);
-                                targetHandPoints.Add(targetHand.Fingers[j].bones[k].Center);
+                                sourceHandPoints.Add(sourceHand.fingers[j].bones[k].Center);
+                                targetHandPoints.Add(targetHand.fingers[j].bones[k].Center);
                             }
                         }
 

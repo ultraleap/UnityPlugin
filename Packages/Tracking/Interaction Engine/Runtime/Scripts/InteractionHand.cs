@@ -400,7 +400,7 @@ namespace Leap.Unity.Interaction
                 {
                     _fingertipTransforms[i] = _backingFingertipTransforms[i];
 
-                    Finger finger = leapHand.Fingers[i];
+                    Finger finger = leapHand.fingers[i];
                     _fingertipTransforms[i].position = finger.TipPosition;
                     _fingertipTransforms[i].rotation = finger.bones[3].Rotation;
                 }
@@ -503,8 +503,8 @@ namespace Leap.Unity.Interaction
                     GameObject contactBoneObj = new GameObject("Contact Fingerbone", typeof(CapsuleCollider), typeof(Rigidbody), typeof(ContactBone));
                     contactBoneObj.layer = manager.contactBoneLayer;
 
-                    Bone bone = _unwarpedHandData.Fingers[fingerIndex]
-                                                 .Bone((Bone.BoneType)(jointIndex) + 1); // +1 to skip first bone.
+                    Bone bone = _unwarpedHandData.fingers[fingerIndex]
+                                                 .GetBone((Bone.BoneType)(jointIndex) + 1); // +1 to skip first bone.
                     int boneArrayIndex = fingerIndex * BONES_PER_FINGER + jointIndex;
                     contactBoneObj.transform.position = bone.Center;
                     contactBoneObj.transform.rotation = bone.Rotation;
@@ -517,7 +517,7 @@ namespace Leap.Unity.Interaction
                                                                     out Vector3 targetPosition,
                                                                     out Quaternion targetRotation) =>
                     {
-                        Bone theBone = hand.Fingers[fingerIndexCopy].Bone((Bone.BoneType)(jointIndexCopy + 1));
+                        Bone theBone = hand.fingers[fingerIndexCopy].GetBone((Bone.BoneType)(jointIndexCopy + 1));
                         targetPosition = theBone.Center;
                         targetRotation = theBone.Rotation;
                     };
@@ -544,7 +544,7 @@ namespace Leap.Unity.Interaction
                 // Palm is attached to the third metacarpal and derived from it.
                 GameObject contactBoneObj = new GameObject("Contact Palm Bone", typeof(BoxCollider), typeof(Rigidbody), typeof(ContactBone));
 
-                Bone bone = _unwarpedHandData.Fingers[(int)Finger.FingerType.TYPE_MIDDLE].Bone(Bone.BoneType.TYPE_METACARPAL);
+                Bone bone = _unwarpedHandData.fingers[(int)Finger.FingerType.MIDDLE].GetBone(Bone.BoneType.METACARPAL);
                 int boneArrayIndex = NUM_FINGERS * BONES_PER_FINGER;
                 contactBoneObj.transform.position = _unwarpedHandData.PalmPosition;
                 contactBoneObj.transform.rotation = _unwarpedHandData.Rotation;
@@ -612,14 +612,14 @@ namespace Leap.Unity.Interaction
             {
                 for (int jointIndex = 0; jointIndex < BONES_PER_FINGER; jointIndex++)
                 {
-                    Bone bone = _unwarpedHandData.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex) + 1); // +1 to skip first bone.
+                    Bone bone = _unwarpedHandData.fingers[fingerIndex].GetBone((Bone.BoneType)(jointIndex) + 1); // +1 to skip first bone.
                     int boneArrayIndex = fingerIndex * BONES_PER_FINGER + jointIndex;
 
                     FixedJoint joint = _contactBones[boneArrayIndex].gameObject.AddComponent<FixedJoint>();
                     joint.autoConfigureConnectedAnchor = false;
                     if (jointIndex != 0)
                     {
-                        Bone prevBone = _unwarpedHandData.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex));
+                        Bone prevBone = _unwarpedHandData.fingers[fingerIndex].GetBone((Bone.BoneType)(jointIndex));
                         joint.connectedBody = _contactBones[boneArrayIndex - 1].rigidbody;
                         joint.anchor = Vector3.back * bone.Length / 2f;
                         joint.connectedAnchor = Vector3.forward * prevBone.Length / 2f;
@@ -655,7 +655,7 @@ namespace Leap.Unity.Interaction
             {
                 for (int jointIndex = 0; jointIndex < BONES_PER_FINGER; jointIndex++)
                 {
-                    Bone bone = _unwarpedHandData.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex) + 1); // +1 to skip first bone.
+                    Bone bone = _unwarpedHandData.fingers[fingerIndex].GetBone((Bone.BoneType)(jointIndex) + 1); // +1 to skip first bone.
                     int boneArrayIndex = fingerIndex * BONES_PER_FINGER + jointIndex;
 
                     _contactBones[boneArrayIndex].transform.position = bone.Center;
@@ -667,7 +667,7 @@ namespace Leap.Unity.Interaction
 
                     if (jointIndex != 0 && _contactBones[boneArrayIndex].joint != null)
                     {
-                        Bone prevBone = _unwarpedHandData.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex));
+                        Bone prevBone = _unwarpedHandData.fingers[fingerIndex].GetBone((Bone.BoneType)(jointIndex));
                         _contactBones[boneArrayIndex].joint.connectedBody = _contactBones[boneArrayIndex - 1].rigidbody;
                         _contactBones[boneArrayIndex].joint.anchor = Vector3.back * bone.Length / 2f;
                         _contactBones[boneArrayIndex].joint.connectedAnchor = Vector3.forward * prevBone.Length / 2f;
@@ -699,7 +699,7 @@ namespace Leap.Unity.Interaction
                 {
                     for (int jointIndex = 0; jointIndex < BONES_PER_FINGER; jointIndex++)
                     {
-                        Bone bone = inHand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex) + 1);
+                        Bone bone = inHand.fingers[fingerIndex].GetBone((Bone.BoneType)(jointIndex) + 1);
                         int boneArrayIndex = fingerIndex * BONES_PER_FINGER + jointIndex;
                         Vector3 displacement = _contactBones[boneArrayIndex].rigidbody.position - bone.Center;
                         bone.Center += displacement;
@@ -743,7 +743,7 @@ namespace Leap.Unity.Interaction
                     // Update or add knuckle-joint and first-finger-bone positions as the grasp
                     // manipulator points for this Hand.
 
-                    Vector3 point = leapHand.Fingers[i].bones[boneIdx].NextJoint;
+                    Vector3 point = leapHand.fingers[i].bones[boneIdx].NextJoint;
 
                     if (_graspManipulatorPoints.Count - 1 < bufferIndex)
                     {
@@ -907,7 +907,7 @@ namespace Leap.Unity.Interaction
                 {
                     if (enabledPrimaryHoverFingertips[i])
                     {
-                        drawPrimaryHoverPoint(drawer, _testHand.Fingers[i].TipPosition);
+                        drawPrimaryHoverPoint(drawer, _testHand.fingers[i].TipPosition);
                     }
                 }
             }

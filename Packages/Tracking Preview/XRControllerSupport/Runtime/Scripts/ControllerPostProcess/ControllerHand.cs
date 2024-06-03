@@ -441,15 +441,15 @@ namespace Leap.Unity.Controllers
             SetFingerSizes(ref h, 0.013f);
 
             // Thumb
-            RotateFinger(h.Fingers[0], this.Thumb);
+            RotateFinger(h.fingers[0], this.Thumb);
 
             // index Finger
-            RotateFinger(h.Fingers[1], this.IndexFinger);
+            RotateFinger(h.fingers[1], this.IndexFinger);
 
             // Grip Fingers
-            RotateFinger(h.Fingers[2], this.MiddleFinger);
-            RotateFinger(h.Fingers[3], this.RingFinger);
-            RotateFinger(h.Fingers[4], this.PinkyFinger);
+            RotateFinger(h.fingers[2], this.MiddleFinger);
+            RotateFinger(h.fingers[3], this.RingFinger);
+            RotateFinger(h.fingers[4], this.PinkyFinger);
 
             h.Transform(_currentPosition, _currentRotation);
 
@@ -469,11 +469,11 @@ namespace Leap.Unity.Controllers
 
         private void SetFingerSizes(ref Hand hand, float boneWidth)
         {
-            for (int i = 0; i < hand.Fingers.Count; i++)
+            for (int i = 0; i < hand.fingers.Length; i++)
             {
-                for (int j = 0; j < hand.Fingers[i].bones.Length; j++)
+                for (int j = 0; j < hand.fingers[i].bones.Length; j++)
                 {
-                    hand.Fingers[i].bones[j].Width = boneWidth;
+                    hand.fingers[i].bones[j].Width = boneWidth;
                 }
             }
         }

@@ -191,7 +191,7 @@ namespace Leap.Unity.HandsModule
                 for (int i = 0; i < BoundHand.fingers.Length; i++)
                 {
                     var finger = BoundHand.fingers[i];
-                    var lastBone = finger.boundBones[(int)Bone.BoneType.TYPE_DISTAL];
+                    var lastBone = finger.boundBones[(int)Bone.BoneType.DISTAL];
 
                     if (lastBone.boundTransform == null || lastBone.startTransform.scale == Vector3.zero) continue;
 
@@ -241,9 +241,9 @@ namespace Leap.Unity.HandsModule
             for (int i = 0; i < BoundHand.fingers.Length; i++)
             {
                 BoundFinger finger = BoundHand.fingers[i];
-                BoundBone distalBone = finger.boundBones[(int)Bone.BoneType.TYPE_DISTAL];
-                BoundBone intermediateBone = finger.boundBones[(int)Bone.BoneType.TYPE_INTERMEDIATE];
-                Finger leapFinger = LeapHand.Fingers[i];
+                BoundBone distalBone = finger.boundBones[(int)Bone.BoneType.DISTAL];
+                BoundBone intermediateBone = finger.boundBones[(int)Bone.BoneType.INTERMEDIATE];
+                Finger leapFinger = LeapHand.fingers[i];
 
                 //Check we have the correct information to be able to scale
                 if (intermediateBone.boundTransform == null || distalBone.boundTransform == null || leapFinger == null || finger.fingerTipBaseLength == 0)
@@ -375,7 +375,7 @@ namespace Leap.Unity.HandsModule
                 {
                     var boundBone = finger.boundBones[boneIndex];
                     var startTransform = boundBone.startTransform;
-                    var leapBone = LeapHand.Fingers[fingerIndex].bones[boneIndex];
+                    var leapBone = LeapHand.fingers[fingerIndex].bones[boneIndex];
                     var boneOffset = boundBone.offset;
                     var boundTransform = boundBone.boundTransform;
 
@@ -427,13 +427,13 @@ namespace Leap.Unity.HandsModule
             bool AddedWristToFirstBone = false;
 
             var length = 0f;
-            for (int i = 0; i < hand.Fingers[(int)Finger.FingerType.TYPE_MIDDLE].bones.Length; i++)
+            for (int i = 0; i < hand.fingers[(int)Finger.FingerType.MIDDLE].bones.Length; i++)
             {
                 //If the bound hand does not contain a bone then don't count this in the calculation for leap length
-                var boundBone = BoundHand.fingers[(int)Finger.FingerType.TYPE_MIDDLE].boundBones[i];
+                var boundBone = BoundHand.fingers[(int)Finger.FingerType.MIDDLE].boundBones[i];
                 if (boundBone.boundTransform != null)
                 {
-                    var bone = hand.Fingers[(int)Finger.FingerType.TYPE_MIDDLE].bones[i];
+                    var bone = hand.fingers[(int)Finger.FingerType.MIDDLE].bones[i];
 
                     if (!AddedWristToFirstBone)
                     {

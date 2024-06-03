@@ -252,7 +252,7 @@ namespace Leap.Unity
                     }
 
                     // Populate the finger bone information
-                    var bone = hand.Fingers[fingerIndex].bones[boneIndex];
+                    var bone = hand.fingers[fingerIndex].bones[boneIndex];
 
                     bone.Fill(
                         prevJointPose.position,
@@ -265,12 +265,12 @@ namespace Leap.Unity
                         prevJointPose.rotation);
                     fingerWidth = Mathf.Max(fingerWidth, bone.Width);
 
-                    if (bone.Type == Bone.BoneType.TYPE_INTERMEDIATE)
+                    if (bone.Type == Bone.BoneType.INTERMEDIATE)
                     {
                         xrIntermediateIndex = xrPrevIndex;
                     }
 
-                    if (bone.Type == Bone.BoneType.TYPE_DISTAL)
+                    if (bone.Type == Bone.BoneType.DISTAL)
                     {
                         xrTipIndex = xrNextIndex;
                     }
@@ -283,7 +283,7 @@ namespace Leap.Unity
                 }
 
                 // Populate the higher - level finger data.
-                hand.Fingers[fingerIndex].Fill(
+                hand.fingers[fingerIndex].Fill(
                     _frameId,
                     (chirality == Chirality.Left ? 0 : 1),
                     fingerIndex,

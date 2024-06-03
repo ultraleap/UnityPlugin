@@ -124,12 +124,12 @@ namespace Leap.Unity.Examples
 
         private Vector3 Midpoint(Leap.Hand hand)
         {
-            return (hand.GetIndex().TipPosition + hand.GetThumb().TipPosition) / 2f;
+            return (hand.Index.TipPosition + hand.Thumb.TipPosition) / 2f;
         }
 
         private void UpdatePinching(Leap.Hand hand, float distanceToRestingPos)
         {
-            float distance = Vector3.Distance(hand.GetIndex().TipPosition, hand.GetThumb().TipPosition);
+            float distance = Vector3.Distance(hand.Index.TipPosition, hand.Thumb.TipPosition);
 
             if (_isPinching && (distance > _pinchDeactivateDistance || distanceToRestingPos > _stretchThreshold))
             {

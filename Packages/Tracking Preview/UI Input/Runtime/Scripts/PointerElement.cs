@@ -163,8 +163,8 @@ namespace Leap.Unity.InputModule
         /// </summary>
         private float DistanceOfTipToPointer(Hand hand)
         {
-            var tipPosition = hand.Fingers[(int)Finger.FingerType.TYPE_INDEX]
-                .Bone(Bone.BoneType.TYPE_DISTAL).NextJoint;
+            var tipPosition = hand.fingers[(int)Finger.FingerType.INDEX]
+                .GetBone(Bone.BoneType.DISTAL).NextJoint;
 
             var pointerTransform = transform;
             return -pointerTransform.transform.InverseTransformPoint(tipPosition).z * pointerTransform.transform.lossyScale.z - module.TactilePadding;
@@ -760,27 +760,27 @@ namespace Leap.Unity.InputModule
                 tipRaycast = true;
 
                 var farthest = 0f;
-                pointerPosition = hand.GetIndex().TipPosition;
+                pointerPosition = hand.Index.TipPosition;
                 for (var i = 1; i < 3; i++)
                 {
                     var fingerDistance = Vector3.Distance(mainCamera.transform.position,
-                        hand.Fingers[i].TipPosition);
+                        hand.fingers[i].TipPosition);
                     var fingerExtension =
                         Mathf.Clamp01(Vector3.Dot(
-                            hand.Fingers[i].Direction,
+                            hand.fingers[i].Direction,
                             leapDataProvider.CurrentFrame.Hands[0].Direction)) / 1.5f;
 
                     if (fingerDistance > farthest && fingerExtension > 0.5f)
                     {
                         farthest = fingerDistance;
-                        pointerPosition = hand.Fingers[i].TipPosition;
+                        pointerPosition = hand.fingers[i].TipPosition;
                     }
                 }
             }
             else
             {
                 //Raycast through the knuckle of the finger
-                pointerPosition = mainCamera.transform.position - origin + hand.Fingers[(int)Finger.FingerType.TYPE_INDEX].Bone(Bone.BoneType.TYPE_METACARPAL).Center;
+                pointerPosition = mainCamera.transform.position - origin + hand.fingers[(int)Finger.FingerType.INDEX].GetBone(Bone.BoneType.METACARPAL).Center;
             }
 
             //Set the Raycast Direction and Delta

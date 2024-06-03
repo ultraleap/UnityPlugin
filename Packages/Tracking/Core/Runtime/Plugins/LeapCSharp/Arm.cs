@@ -42,7 +42,7 @@ namespace Leap
                  direction,
                  length,
                  width,
-                 BoneType.TYPE_METACARPAL, //ignored for arms
+                 BoneType.METACARPAL, //ignored for arms
                  rotation)
         { }
 
