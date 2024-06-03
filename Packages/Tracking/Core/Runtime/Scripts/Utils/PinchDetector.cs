@@ -13,10 +13,11 @@ namespace Leap.Unity
 {
     /// <summary>
     /// A lightweight Pinch Detector, that calculates a pinch value based on the distance between the 
-    /// provided finger tip and the thumb tip. Utilises hysteresis in order to have different pinch and unpinch thresholds.
+    /// provided finger tip and the thumb tip. Utilizes hysteresis to have different pinch and unpinch thresholds.
     /// </summary>
     public class PinchDetector : MonoBehaviour
     {
+        // Enumeration for different types of pinchable fingers
         public enum PinchableFingerType
         {
             INDEX = Finger.FingerType.INDEX,
@@ -25,49 +26,59 @@ namespace Leap.Unity
             PINKY = Finger.FingerType.PINKY,
         }
 
-        public LeapProvider leapProvider;
-        public Chirality chirality;
+        public LeapProvider leapProvider;  // Reference to the Leap provider
+        public Chirality chirality;        // Specifies which hand (left or right) to track
 
         /// <summary>
-        /// The finger to check for pinches against the thumb
+        /// The finger to check for pinches against the thumb.
         /// </summary>
         public PinchableFingerType fingerType = PinchableFingerType.INDEX;
 
         [Header("Pinch Activation Settings")]
         [SerializeField, Tooltip("The distance between fingertip and thumb at which to enter the pinching state.")]
-        public float activateDistance = 0.018f;
+        public float activateDistance = 0.018f;  // Distance to activate pinch
+
         [SerializeField, Tooltip("The distance between fingertip and thumb at which to leave the pinching state.")]
-        public float deactivateDistance = 0.024f;
+        public float deactivateDistance = 0.024f;  // Distance to deactivate pinch
 
-        public Action<Hand> OnPinch, OnUnpinch, OnPinching;
+        public Action<Hand> onPinch, onUnpinch, onPinching;  // Events for pinch state changes
 
-        public bool IsPinching { get; private set; }
+        public bool IsPinching { get; private set; }  // Is the pinch currently active
 
         public bool PinchStartedThisFrame => startedPinchThisFrame;
-        private bool startedPinchThisFrame = false;
+        private bool startedPinchThisFrame = false;  // Indicates if pinch started this frame
+
         /// <summary>
         /// The percent value (0-1) between the activate distance and absolute pinch.
         /// Note that it is virtually impossible for the hand to be completely pinched.
         /// </summary>
         public float SquishPercent { get; private set; }
 
-        private Chirality chiralityLastFrame;
+        private Chirality chiralityLastFrame;  // Stores chirality state from last frame
 
-
-
-        public bool TryGetHand(out Hand hand)
+        /// <summary>
+        /// Tries to get the hand based on the provided chirality.
+        /// </summary>
+        /// <param name="_hand">Output parameter for the hand</param>
+        /// <returns>True if hand is found, otherwise false</returns>
+        public bool TryGetHand(out Hand _hand)
         {
-            if(leapProvider != null)
+            if (leapProvider != null)
             {
-                hand = leapProvider.GetHand(chirality);
-                if (hand != null)
+                _hand = leapProvider.GetHand(chirality);
+                if (_hand != null)
                 {
                     return true;
                 }
             }
-            hand = null;
+            _hand = null;
             return false;
         }
+
+        /// <summary>
+        /// Checks if the Leap Provider is tracking hands.
+        /// </summary>
+        /// <returns>True if tracking, otherwise false</returns>
         public bool IsTracked()
         {
             if (leapProvider != null)
@@ -77,7 +88,9 @@ namespace Leap.Unity
             return false;
         }
 
-
+        /// <summary>
+        /// Initializes the PinchDetector, sets initial chirality state, and gets the LeapProvider if not assigned.
+        /// </summary>
         private void Start()
         {
             chiralityLastFrame = chirality;
@@ -87,6 +100,9 @@ namespace Leap.Unity
             }
         }
 
+        /// <summary>
+        /// Updates the pinch status every frame.
+        /// </summary>
         private void Update()
         {
             if (chiralityLastFrame != chirality)
@@ -100,20 +116,24 @@ namespace Leap.Unity
             chiralityLastFrame = chirality;
         }
 
-        private void UpdatePinchStatus(Hand hand)
+        /// <summary>
+        /// Updates the pinch status based on the hand data.
+        /// </summary>
+        /// <param name="_hand">Hand data from the Leap provider</param>
+        private void UpdatePinchStatus(Hand _hand)
         {
-            if (hand == null)
+            if (_hand == null)
             {
                 return;
             }
 
-            float _pinchDistance = hand.GetFingerPinchDistance((int)fingerType);
+            float _pinchDistance = _hand.GetFingerPinchDistance((int)fingerType);
             if (_pinchDistance < activateDistance)
             {
                 if (!IsPinching)
                 {
                     startedPinchThisFrame = true;
-                    OnPinch?.Invoke(hand);
+                    onPinch?.Invoke(_hand);
                 }
                 else
                 {
@@ -126,14 +146,14 @@ namespace Leap.Unity
             {
                 if (IsPinching)
                 {
-                    OnUnpinch?.Invoke(hand);
+                    onUnpinch?.Invoke(_hand);
                 }
                 IsPinching = false;
             }
 
             if (IsPinching)
             {
-                OnPinching?.Invoke(hand);
+                onPinching?.Invoke(_hand);
                 SquishPercent = Mathf.InverseLerp(activateDistance, 0, _pinchDistance);
             }
             else

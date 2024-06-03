@@ -56,18 +56,18 @@ namespace Leap.Unity.Preview.Locomotion
 
         protected void OnEnable()
         {
-            _pinchDetector.OnPinch += OnPinch;
-            _pinchDetector.OnPinching += OnPinching;
-            _pinchDetector.OnUnpinch += OnUnpinch;
+            _pinchDetector.onPinch += OnPinch;
+            _pinchDetector.onPinching += OnPinching;
+            _pinchDetector.onUnpinch += OnUnpinch;
 
             UpdateChirality();
         }
 
         private void OnDisable()
         {
-            _pinchDetector.OnPinch -= OnPinch;
-            _pinchDetector.OnPinching -= OnPinching;
-            _pinchDetector.OnUnpinch -= OnUnpinch;
+            _pinchDetector.onPinch -= OnPinch;
+            _pinchDetector.onPinching -= OnPinching;
+            _pinchDetector.onUnpinch -= OnUnpinch;
         }
 
         private void UpdateChirality()
