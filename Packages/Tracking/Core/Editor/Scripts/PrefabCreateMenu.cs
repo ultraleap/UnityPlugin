@@ -84,8 +84,11 @@ namespace Leap
             bool created = false;
 
 #if UNITY_URP_AVAILABLE
-            var urpHands = CreatePrefab("LowPolyHandsWithArms (URP) Variant");
-            created = urpHands == null ? false : true;
+            if(QualitySettings.renderPipeline != null) // Only use URP models when there is an active render pipeline
+            {
+                var urpHands = CreatePrefab("LowPolyHandsWithArms (URP) Variant");
+                created = urpHands == null ? false : true;
+            }
 #endif
 
             if (!created)
@@ -99,8 +102,11 @@ namespace Leap
             bool created = false;
 
 #if UNITY_URP_AVAILABLE
-            var urpHands = CreatePrefab("Ghost Hands (URP) Variant");
-            created = urpHands == null ? false : true;
+            if(QualitySettings.renderPipeline != null) // Only use URP models when there is an active render pipeline
+            {
+                var urpHands = CreatePrefab("Ghost Hands (URP) Variant");
+                created = urpHands == null ? false : true;
+            }
 #endif
 
             if (!created)
@@ -114,8 +120,11 @@ namespace Leap
             bool created = false;
 
 #if UNITY_URP_AVAILABLE
-            var urpHands = CreatePrefab("Ghost Hands (URP) Variant");
-            created = urpHands == null ? false : true;
+            if(QualitySettings.renderPipeline != null) // Only use URP models when there is an active render pipeline
+            {
+                var urpHands = CreatePrefab("Ghost Hands (URP) Variant");
+                created = urpHands == null ? false : true;
+            }
 #endif
 
             if (!created)
@@ -129,8 +138,11 @@ namespace Leap
             bool created = false;
 
 #if UNITY_URP_AVAILABLE
-            var urpHands = CreatePrefab("Outline Hands (URP) Variant");
-            created = urpHands == null ? false : true;
+            if(QualitySettings.renderPipeline != null) // Only use URP models when there is an active render pipeline
+            {
+                var urpHands = CreatePrefab("Outline Hands (URP) Variant");
+                created = urpHands == null ? false : true;
+            }
 #endif
 
             if (!created)
@@ -144,8 +156,11 @@ namespace Leap
             bool created = false;
 
 #if UNITY_URP_AVAILABLE
-            var urpHands = CreatePrefab("Skeleton Hands (URP) Variant");
-            created = urpHands == null ? false : true;
+            if(QualitySettings.renderPipeline != null) // Only use URP models when there is an active render pipeline
+            {
+                var urpHands = CreatePrefab("Skeleton Hands (URP) Variant");
+                created = urpHands == null ? false : true;
+            }
 #endif
 
             if (!created)
@@ -159,8 +174,11 @@ namespace Leap
             bool created = false;
 
 #if UNITY_URP_AVAILABLE
-            var urpHands = CreatePrefab("Ghost Hands (URP) Variant");
-            created = urpHands == null ? false : true;
+            if(QualitySettings.renderPipeline != null) // Only use URP models when there is an active render pipeline
+            {
+                var urpHands = CreatePrefab("Ghost Hands (URP) Variant");
+                created = urpHands == null ? false : true;
+            }
 #endif
 
             if (!created)
