@@ -6,6 +6,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -38,20 +39,27 @@ namespace Leap.Unity.PhysicalHands
         [SerializeField]
         protected float _buttonPressExitThreshold = 0.5f;
         [SerializeField]
+        protected bool _usePrimaryHover = false;
+        [SerializeField]
         private bool _buttonIgnoreGrabs = true;
 
         private bool _contactHandPressing = false;
         private bool _leftHandContacting = false;
         private bool _rightHandContacting = false;
+        private bool _leftHandPrimaryHovered = false;
+        private bool _rightHandPrimaryHovered = false;
+
         private Rigidbody _rigidbody = null;
         private Vector3 _initialButtonPosition = Vector3.zero;
         private List<GameObject> _objectsContactingButton = new List<GameObject>();
         private PhysicalHandsButtonHelper _buttonHelper;
+        private Dictionary<ContactHand, bool> _contactedHands = new Dictionary<ContactHand, bool>();
 
         protected float _buttonTravelDistanceLocal;
         protected bool _isButtonPressed = false;
         protected Rigidbody _pressableObjectRB = null;
         protected ConfigurableJoint _configurableJoint;
+
         
         /// <summary>
         /// Some presets for how the button should act. 
@@ -82,6 +90,10 @@ namespace Leap.Unity.PhysicalHands
         public UnityEvent<ContactHand> OnHandHover;
         [SerializeField]
         public UnityEvent<ContactHand> OnHandHoverExit;
+        [SerializeField]
+        public UnityEvent<ContactHand> OnHandPrimaryHover;
+        [SerializeField]
+        public UnityEvent<ContactHand> OnHandPrimaryHoverExit;
         #endregion
 
         #region public getters
@@ -276,6 +288,8 @@ namespace Leap.Unity.PhysicalHands
             _buttonHelper._onHandHoverExit -= OnHandHoverExitPO;
             _buttonHelper._onCollisionEnter -= OnCollisionPO;
             _buttonHelper._onCollisionExit -= OnCollisionExitPO;
+            _buttonHelper._onHandPrimaryHover -= OnHandPrimaryHoverPO;
+            _buttonHelper._onHandPrimaryHoverExit -= OnHandPrimaryHoverExitPO;
 
             _buttonHelper._onHandContact += OnHandContactPO;
             _buttonHelper._onHandContactExit += OnHandContactExitPO;
@@ -283,6 +297,8 @@ namespace Leap.Unity.PhysicalHands
             _buttonHelper._onHandHoverExit += OnHandHoverExitPO;
             _buttonHelper._onCollisionEnter += OnCollisionPO;
             _buttonHelper._onCollisionExit += OnCollisionExitPO;
+            _buttonHelper._onHandPrimaryHover += OnHandPrimaryHoverPO;
+            _buttonHelper._onHandPrimaryHoverExit += OnHandPrimaryHoverExitPO;
         }
 
         /// <summary>
@@ -333,13 +349,28 @@ namespace Leap.Unity.PhysicalHands
         private void FixedUpdate()
         {
             float distance = Mathf.Abs(_pressableObject.transform.localPosition.y - _initialButtonPosition.y);
+            bool isPressedByPrimaryHover = false;
 
             // Check if the button should be pressed
             if (!_isButtonPressed && distance >= (_buttonTravelDistanceLocal * 0.95f) &&
                 (_contactHandPressing || (_canBePressedByObjects && _objectsContactingButton.Count > 0)))
             {
-                _isButtonPressed = true;
-                ButtonPressed();
+                if (_usePrimaryHover)
+                {
+                    foreach (var hand in _contactedHands)
+                    {
+                        if (hand.Key.Handedness == Chirality.Left && _leftHandPrimaryHovered ||
+                            hand.Key.Handedness == Chirality.Right && _rightHandPrimaryHovered)
+                        {
+                            isPressedByPrimaryHover = true;
+                        }
+                    }
+                }
+                if (!_usePrimaryHover || isPressedByPrimaryHover)
+                {
+                    _isButtonPressed = true;
+                    ButtonPressed();
+                }
             }
 
             // Check if the button should be released
@@ -375,6 +406,11 @@ namespace Leap.Unity.PhysicalHands
 
             if (hand != null)
             {
+                if (!_contactedHands.TryAdd(hand, true));
+                {
+                    _contactedHands[hand] = true;
+                }
+
                 if (hand.Handedness == Chirality.Left)
                 {
                     _leftHandContacting = true;
@@ -400,6 +436,11 @@ namespace Leap.Unity.PhysicalHands
             // Update hand contact flags
             if (hand != null)
             {
+                if (!_contactedHands.TryAdd(hand, false));
+                {
+                    _contactedHands[hand] = false;
+                }
+
                 if (hand.Handedness == Chirality.Left)
                 {
                     _leftHandContacting = false;
@@ -462,6 +503,30 @@ namespace Leap.Unity.PhysicalHands
             // Remove the colliding object from the list of objects contacting the button
             _objectsContactingButton.Remove(collision.gameObject);
         }
+
+        private void OnHandPrimaryHoverPO(ContactHand hand)
+        {
+            if(hand.Handedness == Chirality.Right)
+            {
+                _rightHandPrimaryHovered = true;
+            }
+            else if(hand.Handedness == Chirality.Left)
+            {
+                _leftHandPrimaryHovered = true;
+            }
+        }
+        private void OnHandPrimaryHoverExitPO(ContactHand hand)
+        {
+            if (hand.Handedness == Chirality.Right)
+            {
+                _rightHandPrimaryHovered = false;
+            }
+            else if (hand.Handedness == Chirality.Left)
+            {
+                _leftHandPrimaryHovered = false;
+            }
+        }
+
 
         /// <summary>
         /// Determines whether any chosen hand is in contact with the pressable object.

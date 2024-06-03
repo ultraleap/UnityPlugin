@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - PhysicalHandsSlider
 - TwoDimensionalPhysicalHandsSlider example
 - Ability to ignore collisions per hand separately from grabs
+- Primary hover functionality to physical hands
+- PhysicalHandsButton can now use primary hover functionality
 
 ### Changed
 - Removed old PhysicalHandsButton

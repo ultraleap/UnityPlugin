@@ -14,13 +14,15 @@ using UnityEngine;
 
 namespace Leap.Unity.PhysicalHands
 {
-    public class PhysicalHandsButtonHelper : MonoBehaviour, IPhysicalHandContact, IPhysicalHandHover
+    public class PhysicalHandsButtonHelper : MonoBehaviour, IPhysicalHandContact, IPhysicalHandHover, IPhysicalHandPrimaryHover
     {
 
         internal Action<ContactHand> _onHandContact;
         internal Action<ContactHand> _onHandContactExit;
         internal Action<ContactHand> _onHandHover;
         internal Action<ContactHand> _onHandHoverExit;
+        internal Action<ContactHand> _onHandPrimaryHover;
+        internal Action<ContactHand> _onHandPrimaryHoverExit;
         internal Action<Collision> _onCollisionEnter;
         internal Action<Collision> _onCollisionExit;
 
@@ -52,6 +54,16 @@ namespace Leap.Unity.PhysicalHands
         private void OnCollisionExit(Collision collision)
         {
             _onCollisionExit?.Invoke(collision);
+        }
+
+        public void OnHandPrimaryHover(ContactHand hand)
+        {
+            _onHandPrimaryHover?.Invoke(hand);
+        }
+
+        public void OnHandPrimaryHoverExit(ContactHand hand)
+        {
+            _onHandPrimaryHoverExit?.Invoke(hand);
         }
     }
 }
