@@ -20,44 +20,41 @@ namespace Leap.Unity
     /// </summary>
     public class HandEnableDisable : MonoBehaviour
     {
-        public LeapProvider leapProvider;
-        public Chirality chirality;
+        [SerializeField]
+        private LeapProvider leapProvider;
+        [SerializeField]
+        private Chirality chirality;
 
-        [Space, Tooltip("Should this GameObject begin disabled?")]
-        public bool disableOnAwake = true;
+        [Space, Tooltip("Should this GameObject begin disabled?"), SerializeField]
+        private bool disableOnAwake = true;
 
         [Tooltip("When enabled, freezes the hand in its current active state")]
-        public bool FreezeHandState = false;
+        public bool freezeHandState = false;
 
         [Header("Fading")]
         public bool fadeOnHandFound = false;
-        [Indent, Units("Seconds")]
-        public float fadeInTime = 0.1f;
+        [Indent, Units("Seconds"), SerializeField]
+        private float fadeInTime = 0.1f;
 
         public bool fadeOnHandLost = true;
-        [Indent, Units("Seconds")]
-        public float fadeOutTime = 0.1f;
+        [Indent, Units("Seconds"), SerializeField]
+        private float fadeOutTime = 0.1f;
 
         [Space, Tooltip("Show options to reference specific Renderers, Materials and Color parameters to fade. \n\nWhen not enabled, hand renderers are automatically detected.")]
         public bool customFadeRenderers;
-        public RendererMaterialColorReference[] renderersToFade;
+        [SerializeField]
+        private RendererMaterialColorReference[] renderersToFade;
 
-        bool fadingIn = false;
-        bool fadingOut = false;
+        private bool fadingIn = false;
+        private bool fadingOut = false;
 
-        float fadeEndTime;
+        private float fadeEndTime;
 
         private void Awake()
         {
             if (leapProvider == null)
             {
-                var handModelBase = GetComponent<HandModelBase>();
-
-                if (handModelBase != null)
-                {
-                    leapProvider = handModelBase.leapProvider;
-                    chirality = handModelBase.Handedness;
-                }
+                Hands.TryGetProviderAndChiralityFromHandModel(gameObject, out leapProvider, out chirality);
             }
 
             leapProvider.OnHandFound -= HandFound;
@@ -94,19 +91,13 @@ namespace Leap.Unity
         {
             if (leapProvider == null)
             {
-                var handModelBase = GetComponent<HandModelBase>();
-
-                if (handModelBase != null)
-                {
-                    leapProvider = handModelBase.leapProvider;
-                    chirality = handModelBase.Handedness;
-                }
+                Hands.TryGetProviderAndChiralityFromHandModel(gameObject, out leapProvider, out chirality);
             }
         }
 
-        private void HandFound(Chirality foundChirality)
+        private void HandFound(Chirality _foundChirality)
         {
-            if (FreezeHandState || foundChirality != chirality)
+            if (freezeHandState || _foundChirality != chirality)
             {
                 return;
             }
@@ -139,9 +130,9 @@ namespace Leap.Unity
             }
         }
 
-        private void HandLost(Chirality lostChirality)
+        private void HandLost(Chirality _lostChirality)
         {
-            if (FreezeHandState || lostChirality != chirality)
+            if (freezeHandState || _lostChirality != chirality)
             {
                 return;
             }
@@ -190,25 +181,16 @@ namespace Leap.Unity
             {
                 for (int i = 0; i < _renderRef.colorParamNames.Length; i++)
                 {
-                    float _t = 0;
-
-                    if(_fadeIn)
-                    {
-                        _t = Utils.Map(fadeInTime - (fadeEndTime - Time.time), 0f, fadeInTime, 0f, 1f);
-                    }
-                    else
-                    {
-                        _t = Utils.Map(fadeOutTime - (fadeEndTime - Time.time), 0f, fadeOutTime, 0f, 1f);
-                    }
-
                     Color _col = _renderRef.renderer.materials[_renderRef.materialID].GetColor(_renderRef.colorParamNames[i]);
 
                     if (_fadeIn)
                     {
+                        float _t = Utils.Map(fadeInTime - (fadeEndTime - Time.time), 0f, fadeInTime, 0f, 1f);
                         _col.a = Mathf.Lerp(_renderRef.fadeStartAlphas[i], _renderRef.defaultAlphas[i], _t); // Fade to default alpha
                     }
                     else
                     {
+                        float _t = Utils.Map(fadeOutTime - (fadeEndTime - Time.time), 0f, fadeOutTime, 0f, 1f);
                         _col.a = Mathf.Lerp(_renderRef.fadeStartAlphas[i], 0, _t); // Fade to 0
                     }
 

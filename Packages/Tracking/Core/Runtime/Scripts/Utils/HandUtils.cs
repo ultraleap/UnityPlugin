@@ -25,7 +25,6 @@ namespace Leap.Unity
     public static class Hands
     {
         private static LeapProvider s_provider;
-        private static GameObject s_leapRig;
 
         /// <summary>
         /// Assign a static reference to the most suitable provider in the scene.
@@ -117,6 +116,35 @@ namespace Leap.Unity
                 return s_provider;
             }
             set { s_provider = value; }
+        }
+
+        /// <summary>
+        /// Try to get the LeapProvider and Chirality of the HandModelBase component attached to this GameObject
+        /// </summary>
+        /// <returns>True if a HandModelBase exists. This can still return a null _provider if the HandModelBase has no LeapProvider</returns>
+        public static bool TryGetProviderAndChiralityFromHandModel(GameObject _handModelGameObject, out LeapProvider _provider, out Chirality _chirality)
+        {
+            if (_handModelGameObject == null)
+            {
+                _provider = null;
+                _chirality = default;
+                return false;
+            }
+
+            var _handModelBase = _handModelGameObject.GetComponent<HandModelBase>();
+
+            if (_handModelBase != null)
+            {
+                _provider = _handModelBase.leapProvider;
+                _chirality = _handModelBase.Handedness;
+                return true;
+            }
+            else
+            {
+                _provider = null;
+                _chirality = default;
+                return false;
+            }
         }
 
         /// <summary>
