@@ -145,7 +145,7 @@ public class JointOcclusion : MonoBehaviour
         // and how many pixels of a joint would be seen if the joint was not occluded at all (in optimalPixelsCount)
         int[] pixelsSeenCount = new int[confidences.Length];
         int[] optimalPixelsCount = new int[confidences.Length];
-        foreach (var finger in hand.Fingers)
+        foreach (var finger in hand.fingers)
         {
             for (int j = 0; j < 4; j++)
             {
@@ -158,7 +158,7 @@ public class JointOcclusion : MonoBehaviour
 
                 // get the joint position from the given hand and use it to calculate the screen position of the joint's center and 
                 // a point on the outside border of the joint (both in pixel coordinates)
-                Vector3 jointPos = finger.Bone((Leap.Bone.BoneType)j).NextJoint;
+                Vector3 jointPos = finger.GetBone((Leap.Bone.BoneType)j).NextJoint;
                 Vector3 screenPosCenter = cam.WorldToScreenPoint(jointPos);
                 Vector3 screenPosSphereOutside = cam.WorldToScreenPoint(jointPos + cam.transform.right * jointRadius);
 

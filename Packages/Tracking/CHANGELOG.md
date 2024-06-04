@@ -43,12 +43,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Support for reading the camera matrix
+- ImageRetriever allows more than 6 reconnections
 
 ### Changed
-- 
+- Improved XRHands support for Meta Aim Input Actions
+- XRLeapProviderManager renamed LEAP_DIRECT to ULTRALEAP
+- Accessors for Hand.Finger, Hand.Bone and Finger.Bone
+- Renamed BoneType enum entries to remove redundancies
 
 ### Fixed
 - Issue with the method signature for LeapPixelToRectilinearEx
+- Duplicate meta aim hands when using XRHands Input
+- A caching issue with LeapToUnityTransform
+- Editor stuck in unending loop when no service running
 
 ## [6.15.0] - 19/04/24
 

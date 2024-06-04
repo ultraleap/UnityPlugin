@@ -589,7 +589,7 @@ namespace Leap.Unity.Interaction
                 // Skip non-index fingers for InteractionHands if they aren't extended.
                 if (intHand != null)
                 {
-                    if (!(intHand.leapHand).Fingers[i].IsExtended && i != 1) { continue; }
+                    if (!(intHand.leapHand).fingers[i].IsExtended && i != 1) { continue; }
                 }
 
                 // Check primary hover for the primary hover point.

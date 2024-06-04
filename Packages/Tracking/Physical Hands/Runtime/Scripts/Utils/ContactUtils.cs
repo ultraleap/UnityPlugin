@@ -18,15 +18,15 @@ namespace Leap.Unity.PhysicalHands
 
         internal static Vector3 CalculateAverageKnucklePosition(this Hand hand)
         {
-            return (hand.Fingers[1].bones[0].NextJoint +
-                hand.Fingers[2].bones[0].NextJoint +
-                hand.Fingers[3].bones[0].NextJoint +
-                hand.Fingers[4].bones[0].NextJoint) / 4;
+            return (hand.fingers[1].bones[0].NextJoint +
+                hand.fingers[2].bones[0].NextJoint +
+                hand.fingers[3].bones[0].NextJoint +
+                hand.fingers[4].bones[0].NextJoint) / 4;
         }
 
         internal static Vector3 CalculatePalmSize(Hand hand)
         {
-            return new Vector3(hand.PalmWidth, hand.Fingers[2].Bone(0).Width, Vector3.Distance(CalculateAverageKnucklePosition(hand), hand.WristPosition));
+            return new Vector3(hand.PalmWidth, hand.fingers[2].GetBone(0).Width, Vector3.Distance(CalculateAverageKnucklePosition(hand), hand.WristPosition));
         }
 
         internal static void SetupPalmCollider(BoxCollider collider, CapsuleCollider[] palmEdges, Hand hand, PhysicMaterial material = null)

@@ -25,12 +25,16 @@ namespace LeapInternal
             if (lastRequestTimestamp + requestInterval < Time.realtimeSinceStartup)
             {
                 IntPtr statusPtr = new IntPtr();
-                LeapC.GetServerStatus(1000, ref statusPtr);
+                LeapC.GetServerStatus(500, ref statusPtr);
 
-                lastStatus = Marshal.PtrToStructure<LeapC.LEAP_SERVER_STATUS>(statusPtr);
+                if (statusPtr != IntPtr.Zero)
+                {
+                    lastStatus = Marshal.PtrToStructure<LeapC.LEAP_SERVER_STATUS>(statusPtr);
 
-                MarshalUnmananagedArray2Struct(lastStatus.devices, (int)lastStatus.device_count, out lastDevices);
-                LeapC.ReleaseServerStatus(ref lastStatus);
+                    MarshalUnmananagedArray2Struct(lastStatus.devices, (int)lastStatus.device_count, out lastDevices);
+                    LeapC.ReleaseServerStatus(ref lastStatus);
+                }
+
                 lastRequestTimestamp = Time.realtimeSinceStartup;
             }
         }
@@ -97,7 +101,7 @@ namespace LeapInternal
             return "";
         }
 
-        public static void MarshalUnmananagedArray2Struct<T>(IntPtr unmanagedArray, int length, out T[] mangagedArray)
+        static void MarshalUnmananagedArray2Struct<T>(IntPtr unmanagedArray, int length, out T[] mangagedArray)
         {
             var size = Marshal.SizeOf(typeof(T));
             mangagedArray = new T[length];

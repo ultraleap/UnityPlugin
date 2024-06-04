@@ -40,8 +40,7 @@ namespace Leap.Unity.Examples
         {
             get
             {
-                if (this.pinchDetector.HandModel == null) return false;
-                return this.pinchDetector.HandModel.IsTracked;
+                return this.pinchDetector.IsTracked();
             }
         }
         /// <summary>
@@ -51,24 +50,21 @@ namespace Leap.Unity.Examples
         {
             get
             {
-                return this.pinchDetector.DidStartPinch;
+                return this.pinchDetector.PinchStartedThisFrame;
             }
         }
 
         protected virtual void OnEnable()
         {
-            _minRadius = pinchDetector.ActivateDistance / 2F;
+            _minRadius = pinchDetector.activateDistance / 2F;
         }
 
         protected virtual void Update()
         {
             Hand hand = null;
-            if (pinchDetector.HandModel != null)
-            {
-                hand = pinchDetector.HandModel.GetLeapHand();
-            }
+            pinchDetector.TryGetHand(out hand);
 
-            if (hand == null || hand.GetIndex() == null || hand.GetThumb() == null)
+            if (hand == null || hand.Index == null || hand.Thumb == null)
             {
                 _rectToroidPinchTargetRenderer.enabled = false;
                 _rectToroidPinchStateRenderer.enabled = false;
@@ -78,13 +74,13 @@ namespace Leap.Unity.Examples
             _rectToroidPinchTargetRenderer.enabled = true;
             _rectToroidPinchStateRenderer.enabled = true;
 
-            var indexPos = hand.GetIndex().TipPosition;
-            var thumbPos = hand.GetThumb().TipPosition;
+            var indexPos = hand.Index.TipPosition;
+            var thumbPos = hand.Thumb.TipPosition;
             var indexThumbDist = Vector3.Distance(indexPos, thumbPos);
 
             // Update the cursor position
             Vector3 indexThumbMiddle = (indexPos + thumbPos) / 2f;
-            float effectivePinchStrength = pinchDetector.IsActive ? 1f : indexThumbDist.Map(0.10f, 0.02f, 0f, 1f);
+            float effectivePinchStrength = pinchDetector.IsPinching ? 1f : indexThumbDist.Map(0.10f, 0.02f, 0f, 1f);
 
             var finalPos = Vector3.Lerp(hand.GetPredictedPinchPosition(), indexThumbMiddle, effectivePinchStrength);
             this.transform.position = finalPos;
