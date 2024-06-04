@@ -18,21 +18,27 @@ namespace Leap.Unity
     /// The parent gameobjet is activated when tracking begins and deactivated when
     /// tracking ends.
     /// </summary>
-    public class HandEnableDisable : HandTransitionBehavior
+    public class HandEnableDisable : MonoBehaviour
     {
+        public LeapProvider leapProvider;
+        public Chirality chirality;
+
+        [Space, Tooltip("Should this GameObject begin disabled?")]
+        public bool disableOnAwake = true;
+
         [Tooltip("When enabled, freezes the hand in its current active state")]
         public bool FreezeHandState = false;
 
         [Header("Fading")]
         public bool fadeOnHandFound = false;
-        [Indent]
+        [Indent, Units("Seconds")]
         public float fadeInTime = 0.1f;
 
         public bool fadeOnHandLost = true;
-        [Indent]
+        [Indent, Units("Seconds")]
         public float fadeOutTime = 0.1f;
 
-        [Space, Tooltip("Show options to reference specific Renderers, Materials and Color parameters to fade")]
+        [Space, Tooltip("Show options to reference specific Renderers, Materials and Color parameters to fade. \n\nWhen not enabled, hand renderers are automatically detected.")]
         public bool customFadeRenderers;
         public RendererMaterialColorReference[] renderersToFade;
 
@@ -40,6 +46,28 @@ namespace Leap.Unity
         bool fadingOut = false;
 
         float fadeEndTime;
+
+        private void Awake()
+        {
+            if (leapProvider == null)
+            {
+                var handModelBase = GetComponent<HandModelBase>();
+
+                if (handModelBase != null)
+                {
+                    leapProvider = handModelBase.leapProvider;
+                    chirality = handModelBase.Handedness;
+                }
+            }
+
+            leapProvider.OnHandFound -= HandFound;
+            leapProvider.OnHandFound += HandFound;
+
+            leapProvider.OnHandLost -= HandLost;
+            leapProvider.OnHandLost += HandLost;
+
+            this.gameObject.SetActive(disableOnAwake ? false : this.gameObject.activeInHierarchy);
+        }
 
         private void Start()
         {
@@ -51,9 +79,34 @@ namespace Leap.Unity
             PopulateFadeDefaultAlphas();
         }
 
-        protected override void HandReset()
+        private void OnDestroy()
         {
-            if (FreezeHandState)
+            if (leapProvider == null)
+            {
+                return;
+            }
+
+            leapProvider.OnHandFound -= HandFound;
+            leapProvider.OnHandLost -= HandLost;
+        }
+
+        private void OnValidate()
+        {
+            if (leapProvider == null)
+            {
+                var handModelBase = GetComponent<HandModelBase>();
+
+                if (handModelBase != null)
+                {
+                    leapProvider = handModelBase.leapProvider;
+                    chirality = handModelBase.Handedness;
+                }
+            }
+        }
+
+        private void HandFound(Chirality foundChirality)
+        {
+            if (FreezeHandState || foundChirality != chirality)
             {
                 return;
             }
@@ -86,9 +139,9 @@ namespace Leap.Unity
             }
         }
 
-        protected override void HandFinish()
+        private void HandLost(Chirality lostChirality)
         {
-            if (FreezeHandState)
+            if (FreezeHandState || lostChirality != chirality)
             {
                 return;
             }
@@ -221,19 +274,19 @@ namespace Leap.Unity
 
             CacheFadeStartAlphas();
         }
-    }
 
-    [System.Serializable]
-    public class RendererMaterialColorReference
-    {
-        public Renderer renderer;
-        public int materialID;
-        public string[] colorParamNames;
+        [System.Serializable]
+        public class RendererMaterialColorReference
+        {
+            public Renderer renderer;
+            public int materialID;
+            public string[] colorParamNames;
 
-        [HideInInspector]
-        public float[] defaultAlphas;
+            [HideInInspector]
+            public float[] defaultAlphas;
 
-        [HideInInspector]
-        public float[] fadeStartAlphas; // The alpha values when the current fade started
+            [HideInInspector]
+            public float[] fadeStartAlphas; // The alpha values when the current fade started
+        }
     }
 }
