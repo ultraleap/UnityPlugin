@@ -95,39 +95,6 @@ namespace Leap.Unity
         }
 
         /// <summary>
-        /// Finds the Camera Rig; Assuming a Camera is a child of the Camera Rig and the static Provider is a child of the Camera.
-        /// </summary>
-        private static void AssignCameraRig()
-        {
-            Camera providerCamera = Provider?.GetComponentInParent<Camera>();
-
-            if (providerCamera == null || providerCamera.transform.parent == null)
-            {
-                return;
-            }
-
-            s_leapRig = providerCamera.transform.parent.gameObject;
-        }
-
-        /// <summary>
-        /// Static convenience accessor for the Leap camera rig. This is the parent
-        /// of the Camera that contains a LeapProvider in one of its children,
-        /// or null if there is no such GameObject.
-        /// </summary>
-        public static GameObject CameraRig
-        {
-            get
-            {
-                if (s_leapRig == null)
-                {
-                    AssignCameraRig();
-                }
-                return s_leapRig;
-            }
-            set { s_leapRig = value; }
-        }
-
-        /// <summary>
         /// Static convenience accessor for a LeapProvider in the scene. Preference is given
         /// to a LeapServiceProvider if there is one.
         /// 
@@ -153,48 +120,33 @@ namespace Leap.Unity
         }
 
         /// <summary>
-        /// Shorthand for hand.Fingers[(int)Leap.Finger.FingerType.TYPE_THUMB],
-        /// or, alternatively, hand.Fingers[0].
+        /// Return the specified bone of the specified finger
+        /// 
+        /// Shorthand for finger.bones[(int)boneType],
         /// </summary>
-        public static Finger GetThumb(this Hand hand)
+        public static Bone GetBone(this Finger finger, Bone.BoneType boneType)
         {
-            return hand.Fingers[(int)Leap.Finger.FingerType.TYPE_THUMB];
+            return finger.bones[(int)boneType];
         }
 
         /// <summary>
-        /// Shorthand for hand.Fingers[(int)Leap.Finger.FingerType.TYPE_INDEX],
-        /// or, alternatively, hand.Fingers[1].
+        /// Return the specified bone of the specified finger of the specificed hand
+        /// 
+        /// Shorthand for hand.Fingers[(int)fingerType].bones[(int)boneType],
         /// </summary>
-        public static Finger GetIndex(this Hand hand)
+        public static Bone GetBone(this Hand hand, Finger.FingerType fingerType, Bone.BoneType boneType)
         {
-            return hand.Fingers[(int)Leap.Finger.FingerType.TYPE_INDEX];
+            return hand.fingers[(int)fingerType].bones[(int)boneType];
         }
 
         /// <summary>
-        /// Shorthand for hand.Fingers[(int)Leap.Finger.FingerType.TYPE_MIDDLE],
-        /// or, alternatively, hand.Fingers[2].
+        /// Return the specified finger of the specificed hand
+        /// 
+        /// Shorthand for hand.Fingers[(int)fingerType].Bones[],
         /// </summary>
-        public static Finger GetMiddle(this Hand hand)
+        public static Finger GetFinger(this Hand hand, Finger.FingerType fingerType)
         {
-            return hand.Fingers[(int)Leap.Finger.FingerType.TYPE_MIDDLE];
-        }
-
-        /// <summary>
-        /// Shorthand for hand.Fingers[(int)Leap.Finger.FingerType.TYPE_RING],
-        /// or, alternatively, hand.Fingers[3].
-        /// </summary>
-        public static Finger GetRing(this Hand hand)
-        {
-            return hand.Fingers[(int)Leap.Finger.FingerType.TYPE_RING];
-        }
-
-        /// <summary>
-        /// Shorthand for hand.Fingers[(int)Leap.Finger.FingerType.TYPE_PINKY],
-        /// or, alternatively, hand.Fingers[4].
-        /// </summary>
-        public static Finger GetPinky(this Hand hand)
-        {
-            return hand.Fingers[(int)Leap.Finger.FingerType.TYPE_PINKY];
+            return hand.fingers[(int)fingerType];
         }
 
         /// <summary>
@@ -267,8 +219,8 @@ namespace Leap.Unity
         /// </summary>
         public static Vector3 GetPinchPosition(this Hand hand)
         {
-            Vector3 indexPosition = hand.Fingers[(int)Finger.FingerType.TYPE_INDEX].TipPosition;
-            Vector3 thumbPosition = hand.Fingers[(int)Finger.FingerType.TYPE_THUMB].TipPosition;
+            Vector3 indexPosition = hand.fingers[(int)Finger.FingerType.INDEX].TipPosition;
+            Vector3 thumbPosition = hand.fingers[(int)Finger.FingerType.THUMB].TipPosition;
             return (2 * thumbPosition + indexPosition) * 0.333333F;
         }
 
@@ -280,14 +232,14 @@ namespace Leap.Unity
         /// </summary>
         public static Vector3 GetPredictedPinchPosition(this Hand hand)
         {
-            Vector3 indexTip = hand.GetIndex().TipPosition;
-            Vector3 thumbTip = hand.GetThumb().TipPosition;
+            Vector3 indexTip = hand.Index.TipPosition;
+            Vector3 thumbTip = hand.Thumb.TipPosition;
 
             // The predicted pinch point is a rigid point in hand-space linearly offset by the
             // index finger knuckle position, scaled by the index finger's length, and lightly
             // influenced by the actual thumb and index tip positions.
-            Vector3 indexKnuckle = hand.Fingers[1].bones[1].PrevJoint;
-            float indexLength = hand.Fingers[1].Length;
+            Vector3 indexKnuckle = hand.fingers[1].bones[1].PrevJoint;
+            float indexLength = hand.fingers[1].Length;
             Vector3 radialAxis = hand.RadialAxis();
             float thumbInfluence = Vector3.Dot((thumbTip - indexKnuckle).normalized, radialAxis).Map(0F, 1F, 0.5F, 0F);
             Vector3 predictedPinchPoint = indexKnuckle + hand.PalmarAxis() * indexLength * 0.85F
@@ -309,8 +261,8 @@ namespace Leap.Unity
             // The stable pinch point is a rigid point in hand-space linearly offset by the
             // index finger knuckle position and scaled by the index finger's length
 
-            Vector3 indexKnuckle = hand.Fingers[1].bones[1].PrevJoint;
-            float indexLength = hand.Fingers[1].Length;
+            Vector3 indexKnuckle = hand.fingers[1].bones[1].PrevJoint;
+            float indexLength = hand.fingers[1].Length;
             Vector3 radialAxis = hand.RadialAxis();
             Vector3 stablePinchPoint = indexKnuckle + hand.PalmarAxis() * indexLength * 0.85F
                                                        + hand.DistalAxis() * indexLength * 0.20F
@@ -337,11 +289,11 @@ namespace Leap.Unity
                 return 0;
             }
 
-            return (Vector3.Dot(hand.Fingers[1].Direction, -hand.DistalAxis())
-                    + Vector3.Dot(hand.Fingers[2].Direction, -hand.DistalAxis())
-                    + Vector3.Dot(hand.Fingers[3].Direction, -hand.DistalAxis())
-                    + Vector3.Dot(hand.Fingers[4].Direction, -hand.DistalAxis())
-                    + Vector3.Dot(hand.Fingers[0].Direction, -hand.RadialAxis())
+            return (Vector3.Dot(hand.fingers[1].Direction, -hand.DistalAxis())
+                    + Vector3.Dot(hand.fingers[2].Direction, -hand.DistalAxis())
+                    + Vector3.Dot(hand.fingers[3].Direction, -hand.DistalAxis())
+                    + Vector3.Dot(hand.fingers[4].Direction, -hand.DistalAxis())
+                    + Vector3.Dot(hand.fingers[0].Direction, -hand.RadialAxis())
                     ).Map(-5, 5, 0, 1);
         }
 
@@ -357,10 +309,10 @@ namespace Leap.Unity
 
             if (finger == 0)
             {
-                return Vector3.Dot(hand.Fingers[finger].Direction, -hand.RadialAxis()).Map(-1, 1, 0, 1);
+                return Vector3.Dot(hand.fingers[finger].Direction, -hand.RadialAxis()).Map(-1, 1, 0, 1);
             }
 
-            return Vector3.Dot(hand.Fingers[finger].Direction, -hand.DistalAxis()).Map(-1, 1, 0, 1);
+            return Vector3.Dot(hand.fingers[finger].Direction, -hand.DistalAxis()).Map(-1, 1, 0, 1);
         }
 
         /// <summary>
@@ -374,7 +326,7 @@ namespace Leap.Unity
                 return float.MaxValue;
             }
 
-            return Vector3.Distance(hand.Fingers[0].TipPosition, hand.Fingers[finger].TipPosition);
+            return Vector3.Distance(hand.fingers[0].TipPosition, hand.fingers[finger].TipPosition);
         }
 
         /// <summary>
@@ -395,9 +347,9 @@ namespace Leap.Unity
         {
             // Iterate through the fingers, skipping the thumb and accumulate the scale.
             float scale = 0.0f;
-            for (var i = 1; i < hand.Fingers.Count; ++i)
+            for (var i = 1; i < hand.fingers.Length; ++i)
             {
-                scale += (hand.Fingers[i].Bone(Bone.BoneType.TYPE_METACARPAL).Length / DefaultMetacarpalLengths[i]) / 4.0f;
+                scale += (hand.fingers[i].GetBone(Bone.BoneType.METACARPAL).Length / DefaultMetacarpalLengths[i]) / 4.0f;
             }
 
             return scale;
@@ -411,15 +363,15 @@ namespace Leap.Unity
         public static float CalculatePinchStrength(ref Hand hand)
         {
             // Get the thumb position.
-            Vector3 thumbTipPosition = hand.GetThumb().TipPosition;
+            Vector3 thumbTipPosition = hand.Thumb.TipPosition;
 
             // Compute the distance midpoints between the thumb and the each finger and find the smallest.
             float minDistanceSquared = float.MaxValue;
 
             // Iterate through the fingers, skipping the thumb.
-            for (var i = 1; i < hand.Fingers.Count; ++i)
+            for (var i = 1; i < hand.fingers.Length; ++i)
             {
-                float distanceSquared = (hand.Fingers[i].TipPosition - thumbTipPosition).sqrMagnitude;
+                float distanceSquared = (hand.fingers[i].TipPosition - thumbTipPosition).sqrMagnitude;
                 minDistanceSquared = Mathf.Min(distanceSquared, minDistanceSquared);
             }
 
@@ -440,13 +392,13 @@ namespace Leap.Unity
         {
             // Get the farthest 2 segments of thumb and index finger, respectively, and compute distances.
             float minDistanceSquared = float.MaxValue;
-            for (var thumbBoneIndex = 2; thumbBoneIndex < hand.GetThumb().bones.Length; ++thumbBoneIndex)
+            for (var thumbBoneIndex = 2; thumbBoneIndex < hand.Thumb.bones.Length; ++thumbBoneIndex)
             {
-                for (var indexBoneIndex = 2; indexBoneIndex < hand.GetIndex().bones.Length; ++indexBoneIndex)
+                for (var indexBoneIndex = 2; indexBoneIndex < hand.Index.bones.Length; ++indexBoneIndex)
                 {
                     var distanceSquared = CalculateBoneDistanceSquared(
-                        hand.GetThumb().bones[thumbBoneIndex],
-                        hand.GetIndex().bones[indexBoneIndex]);
+                        hand.Thumb.bones[thumbBoneIndex],
+                        hand.Index.bones[indexBoneIndex]);
                     minDistanceSquared = Mathf.Min(distanceSquared, minDistanceSquared);
                 }
             }
@@ -513,7 +465,7 @@ namespace Leap.Unity
             // Compare against this
             //Vector3 ProjectionOrigin    = headTransform.position + shoulderYaw * 
             //                                new Vector3(0.15f * (hand.IsLeft ? -1f : 1f), -0.13f, 0.05f);
-            Vector3 ProjectionDirection = hand.Fingers[1].bones[0].NextJoint - ProjectionOrigin;
+            Vector3 ProjectionDirection = hand.fingers[1].bones[0].NextJoint - ProjectionOrigin;
             return new Ray(ProjectionOrigin, ProjectionDirection);
         }
 
@@ -598,7 +550,7 @@ namespace Leap.Unity
                                 bool isLeft,
                                 float timeVisible,
                                 /* Arm arm,*/
-                                List<Finger> fingers,
+                                Finger[] fingers,
                                 Vector3 palmPosition,
                                 Vector3 stabilizedPalmPosition,
                                 Vector3 palmVelocity,
@@ -616,7 +568,7 @@ namespace Leap.Unity
             toFill.PalmWidth = palmWidth;
             toFill.IsLeft = isLeft;
             toFill.TimeVisible = timeVisible;
-            if (fingers != null) toFill.Fingers = fingers;
+            if (fingers != null) toFill.fingers = fingers;
             toFill.PalmPosition = palmPosition;
             toFill.StabilizedPalmPosition = stabilizedPalmPosition;
             toFill.PalmVelocity = palmVelocity;
@@ -744,6 +696,27 @@ namespace Leap.Unity
         #endregion
 
         #region Provider Utils
+
+        /// <summary>
+        /// Finds a hand in the current frame.
+        /// </summary>
+        /// <returns>The first hand of the argument whichHand found in the current frame of 
+        /// the argument provider.</returns>
+        [Obsolete("Naming updated. Use LeapProvider.GetHand() instead")]
+        public static Hand Get(this LeapProvider provider, Chirality whichHand)
+        {
+            Frame frame;
+            if (Time.inFixedTimeStep)
+            {
+                frame = provider.CurrentFixedFrame;
+            }
+            else
+            {
+                frame = provider.CurrentFrame;
+            }
+
+            return frame.GetHand(whichHand);
+        }
 
         /// <summary>
         /// Finds a hand in the current frame.

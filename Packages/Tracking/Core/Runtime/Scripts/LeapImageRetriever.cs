@@ -570,21 +570,24 @@ namespace Leap.Unity
 
             if (_currentImage != null)
             {
+                int deviceIndex = _provider.Connection.Devices.IndexOf(_provider.CurrentDevice);
+
+
                 if (_eyeTextureData.CheckStale(_currentImage))
                 {
                     _needQueueReset = true;
 
-                    _eyeTextureData.Reconstruct(_currentImage, (int)_provider.CurrentDevice.DeviceID);
+                    _eyeTextureData.Reconstruct(_currentImage, deviceIndex);
 
                     // if there is a quad that renders the infrared image, set the correct deviceID on its material
                     Renderer quadRenderer = GetComponentInChildren<Renderer>();
                     if (quadRenderer != null)
                     {
-                        quadRenderer.material.SetFloat("_DeviceID", _provider.CurrentDevice.DeviceID);
+                        quadRenderer.material.SetFloat("_DeviceID", deviceIndex);
                     }
                 }
 
-                _eyeTextureData.UpdateTextures(_currentImage, (int)_provider.CurrentDevice.DeviceID, _provider?.Connection);
+                _eyeTextureData.UpdateTextures(_currentImage, deviceIndex, _provider?.Connection);
             }
         }
 

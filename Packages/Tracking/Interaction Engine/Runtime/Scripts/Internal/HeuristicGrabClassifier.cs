@@ -79,10 +79,10 @@ namespace Leap.Unity.Interaction.Internal
                 // Ensure layer mask is up-to-date.
                 _scaledGrabParams.LAYER_MASK = interactionHand.manager.GetInteractionLayerMask();
 
-                for (int i = 0; i < hand.Fingers.Count; i++)
+                for (int i = 0; i < hand.fingers.Length; i++)
                 {
-                    _fingerTipPositions[i] = hand.Fingers[i].TipPosition;
-                    _fingerKnucklePositions[i] = hand.Fingers[i].Bone(Bone.BoneType.TYPE_METACARPAL).NextJoint;
+                    _fingerTipPositions[i] = hand.fingers[i].TipPosition;
+                    _fingerKnucklePositions[i] = hand.fingers[i].GetBone(Bone.BoneType.METACARPAL).NextJoint;
                 }
 
                 GrabClassifierHeuristics.UpdateAllProbeColliders(_fingerTipPositions, _fingerKnucklePositions, ref _collidingCandidates, ref _numberOfColliders, _scaledGrabParams);
@@ -261,9 +261,9 @@ namespace Leap.Unity.Interaction.Internal
             classifier.handGrabCenter = (hand.PalmPosition
                                          + (hand.Direction * 0.05f * simScale)
                                          + (hand.PalmNormal * 0.01f * simScale));
-            for (int i = 0; i < hand.Fingers.Count; i++)
+            for (int i = 0; i < hand.fingers.Length; i++)
             {
-                classifier.probes[i].direction = hand.Fingers[i].Direction;
+                classifier.probes[i].direction = hand.fingers[i].Direction;
             }
             classifier.isGrabbed = behaviour.isGrasped;
         }

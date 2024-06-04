@@ -100,7 +100,7 @@ namespace Leap.Unity.Examples
                 UpdateStroke();
             }
 
-            if ((!_paintCursor.IsTracked || !_paintCursor.pinchDetector.IsActive) && _strokeProcessor.IsActualizingStroke)
+            if ((!_paintCursor.IsTracked || !_paintCursor.pinchDetector.IsPinching) && _strokeProcessor.IsActualizingStroke)
             {
                 StopActualizingStroke();
             }

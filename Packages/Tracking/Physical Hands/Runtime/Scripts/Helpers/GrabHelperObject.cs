@@ -901,14 +901,14 @@ namespace Leap.Unity.PhysicalHands
                             if (thumb)
                                 continue;
 
-                            if (lHand.Fingers[bone.Finger].bones[bone.Joint].IsBoneWithinObject(_colliders))
+                            if (lHand.fingers[bone.Finger].bones[bone.Joint].IsBoneWithinObject(_colliders))
                             {
                                 thumb = true;
                                 earlyQuit = true;
                             }
                             break;
                         case 1: // index
-                            if (lHand.Fingers[bone.Finger].bones[bone.Joint].IsBoneWithinObject(_colliders))
+                            if (lHand.fingers[bone.Finger].bones[bone.Joint].IsBoneWithinObject(_colliders))
                             {
                                 otherFinger = true;
                                 earlyQuit = true;
@@ -917,7 +917,7 @@ namespace Leap.Unity.PhysicalHands
                         case 2: // middle
                         case 3: // ring
                         case 4: // pinky
-                            if (bone.Joint == 2 && lHand.Fingers[bone.Finger].bones[bone.Joint].IsBoneWithinObject(_colliders))
+                            if (bone.Joint == 2 && lHand.fingers[bone.Finger].bones[bone.Joint].IsBoneWithinObject(_colliders))
                             {
                                 otherFinger = true;
                                 earlyQuit = true;
