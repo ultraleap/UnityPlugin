@@ -26,12 +26,14 @@ namespace Leap.Unity
     /// </summary>
     public abstract class LeapProvider : MonoBehaviour
     {
-
         public TestHandPose editTimePose = TestHandPose.HeadMountedB;
 
         public event Action<Frame> OnUpdateFrame;
         public event Action<Frame> OnFixedFrame;
         public event Action<Frame> OnPostUpdateFrame;
+
+        public event Action<Chirality> OnHandFound;
+        public event Action<Chirality> OnHandLost;
 
         /// <summary>
         /// The current frame for this update cycle, in world space. 
@@ -53,6 +55,9 @@ namespace Leap.Unity
         /// </summary>
         public abstract Frame CurrentFixedFrame { get; }
 
+        public bool LeftHandTracked { get; private set; }
+        public bool RightHandTracked { get; private set; }
+
         protected TrackingSource _trackingSource;
 
         /// <summary>
@@ -70,6 +75,8 @@ namespace Leap.Unity
             {
                 OnPostUpdateFrame(frame);
             }
+
+            DispatchLostAndFoundEvents(frame);
         }
 
         protected void DispatchFixedFrameEvent(Frame frame)
@@ -78,8 +85,42 @@ namespace Leap.Unity
             {
                 OnFixedFrame(frame);
             }
+
+            DispatchLostAndFoundEvents(frame);
         }
 
+        protected void DispatchLostAndFoundEvents(Frame frame)
+        {
+            bool leftHandTracked = LeftHandTracked;
+            HandleHandLostFound(frame, Chirality.Left, ref leftHandTracked);
+            LeftHandTracked = leftHandTracked;
+
+            bool rightHandTracked = RightHandTracked;
+            HandleHandLostFound(frame, Chirality.Right, ref rightHandTracked);
+            RightHandTracked = rightHandTracked;
+        }
+
+        private void HandleHandLostFound(Frame frame, Chirality chirality, ref bool tracked)
+        {
+            Hand hand = frame.GetHand(chirality);
+
+            if (hand != null)
+            {
+                if (!tracked)
+                {
+                    tracked = true;
+                    OnHandFound?.Invoke(chirality);
+                }
+            }
+            else
+            {
+                if (tracked)
+                {
+                    tracked = false;
+                    OnHandLost?.Invoke(chirality);
+                }
+            }
+        }
     }
 
     /// <summary>
@@ -99,7 +140,6 @@ namespace Leap.Unity
 
     public static class LeapProviderExtensions
     {
-
         public static Leap.Hand MakeTestHand(this LeapProvider provider, bool isLeft)
         {
             return TestHandFactory.MakeTestHand(isLeft, provider.editTimePose)

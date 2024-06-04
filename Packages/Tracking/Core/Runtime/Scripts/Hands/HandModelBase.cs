@@ -49,14 +49,28 @@ namespace Leap.Unity
 
         private bool init = false;
 
-        private bool isTracked = false;
         /// <summary>
         /// Reports whether the hand is detected and tracked in the current frame.
-        /// It is set to true after the event OnBegin and set to false after the event OnFinish
         /// </summary>
         public bool IsTracked
         {
-            get { return isTracked; }
+            get 
+            {
+                if(!Application.isPlaying)
+                {
+                    return true;
+                }
+
+                switch (Handedness)
+                {
+                    case Chirality.Left:
+                        return leapProvider.LeftHandTracked;
+                    case Chirality.Right:
+                        return leapProvider.RightHandTracked;
+                }
+
+                return false;
+            }
         }
 
         /// <summary>
@@ -82,7 +96,6 @@ namespace Leap.Unity
             {
                 OnBegin();
             }
-            isTracked = true;
         }
         /// <summary>
         /// Called once per frame when the LeapProvider calls the event 
@@ -111,7 +124,6 @@ namespace Leap.Unity
             {
                 OnFinish();
             }
-            isTracked = false;
         }
         /// <summary>
         /// Returns the Leap Hand object represented by this HandModelBase. 
