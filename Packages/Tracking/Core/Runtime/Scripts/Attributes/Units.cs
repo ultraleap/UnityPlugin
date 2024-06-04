@@ -26,7 +26,7 @@ namespace Leap.Unity.Attributes
 #if UNITY_EDITOR
         public float GetWidth()
         {
-            return EditorStyles.label.CalcSize(new GUIContent(unitsName)).x;
+            return EditorStyles.label.CalcSize(new GUIContent(unitsName)).x * 1.1f;
         }
 
         public void Draw(Rect rect, SerializedProperty property)
