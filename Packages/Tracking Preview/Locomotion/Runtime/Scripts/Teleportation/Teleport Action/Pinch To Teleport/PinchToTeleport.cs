@@ -56,18 +56,18 @@ namespace Leap.Unity.Preview.Locomotion
 
         protected void OnEnable()
         {
-            _pinchDetector.onPinch += OnPinch;
-            _pinchDetector.onPinching += OnPinching;
-            _pinchDetector.onUnpinch += OnUnpinch;
+            _pinchDetector.onActionStart += OnPinch;
+            _pinchDetector.onAction += OnPinching;
+            _pinchDetector.onActionEnd += OnUnpinch;
 
             UpdateChirality();
         }
 
         private void OnDisable()
         {
-            _pinchDetector.onPinch -= OnPinch;
-            _pinchDetector.onPinching -= OnPinching;
-            _pinchDetector.onUnpinch -= OnUnpinch;
+            _pinchDetector.onActionStart -= OnPinch;
+            _pinchDetector.onAction -= OnPinching;
+            _pinchDetector.onActionEnd -= OnUnpinch;
         }
 
         private void UpdateChirality()
@@ -104,7 +104,7 @@ namespace Leap.Unity.Preview.Locomotion
             bool isFacingObjectValue = _isFacingObject.ValueThisFrame;
             if (!IsSelected)
             {
-                if (!isFacingObjectValue && handRayInteractor.handRay.HandRayEnabled && !_pinchDetector.IsPinching)
+                if (!isFacingObjectValue && handRayInteractor.handRay.HandRayEnabled && !_pinchDetector.IsDoingAction)
                 {
                     SelectTeleport(true);
                 }
