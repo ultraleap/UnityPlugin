@@ -736,7 +736,7 @@ namespace Leap.Unity.HandsModule
 
                 for (int fingerID = 0; fingerID < handBinder.BoundHand.fingers.Length; fingerID++)
                 {
-                    var fingerType = ((Finger.FingerType)fingerID).ToString()ToString();
+                    var fingerType = ((Finger.FingerType)fingerID).ToString();
                     var objectFieldName = "";
                     for (int boneID = 0; boneID < handBinder.BoundHand.fingers[fingerID].boundBones.Length; boneID++)
                     {
@@ -745,7 +745,7 @@ namespace Leap.Unity.HandsModule
                             continue;
                         }
 
-                        var boneType = ((Bone.BoneType)boneID).ToString()ToString();
+                        var boneType = ((Bone.BoneType)boneID).ToString();
 
                         objectFieldName = ((fingerType + " " + boneType + " :").ToString());
                         DrawObjectField(objectFieldName, ref handBinder.BoundHand.fingers[fingerID].boundBones[boneID], true, fingerID, boneID);
