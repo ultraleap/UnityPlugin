@@ -6,9 +6,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
 
-## [PHYSHANDSPARITY] - xx/xx/xx
+## [NEXT] - xx/xx/xx
+
+### Tracking Client versions
+- Windows 	v6.0.0
+- MacOS 	v6.0.0
+- Android 	v6.0.0
 
 ### Added
+- Support for reading the camera matrix
+- ImageRetriever allows more than 6 reconnections
 - PhysicalHandsButton with automatic setup
 - PhysicalHandsButtonToggle
 - PhysicalHandsAnchorable, including anchoring and un-anchoring based on grabs
@@ -19,6 +26,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - PhysicalHandsButton can now use primary hover functionality
 
 ### Changed
+- Improved XRHands support for Meta Aim Input Actions
+- XRLeapProviderManager renamed LEAP_DIRECT to ULTRALEAP
+- Accessors for Hand.Finger, Hand.Bone and Finger.Bone
+- Renamed BoneType enum entries to remove redundancies
 - Removed old PhysicalHandsButton
 - Anchors no longer require Interaction Engine
 - Turntable and Pullcord example scene now uses Physical Hands
@@ -30,26 +41,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Prefab Create Menu chooses URP hands where available
 - Shaders use _Color as the default color property name
 - Shaders all come under the Ultraleap folder
-
-### Fixed
-- 
-
-## [NEXT] - xx/xx/xx
-
-### Tracking Client versions
-- Windows 	v6.0.0
-- MacOS 	v6.0.0
-- Android 	v6.0.0
-
-### Added
-- Support for reading the camera matrix
-- ImageRetriever allows more than 6 reconnections
-
-### Changed
-- Improved XRHands support for Meta Aim Input Actions
-- XRLeapProviderManager renamed LEAP_DIRECT to ULTRALEAP
-- Accessors for Hand.Finger, Hand.Bone and Finger.Bone
-- Renamed BoneType enum entries to remove redundancies
 
 ### Fixed
 - Issue with the method signature for LeapPixelToRectilinearEx
