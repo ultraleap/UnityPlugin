@@ -298,7 +298,7 @@ dotnet_naming_symbols.5e729aa869c94a6581e49b8a1f05990a.applicable_accessibilitie
 dotnet_naming_symbols.5e729aa869c94a6581e49b8a1f05990a.required_modifiers = 
 
 dotnet_naming_symbols.localfield.applicable_kinds = field, parameter, type_parameter, local
-dotnet_naming_symbols.localfield.applicable_accessibilities = public, internal, local
+dotnet_naming_symbols.localfield.applicable_accessibilities = public, protected, private, internal, local
 dotnet_naming_symbols.localfield.required_modifiers = 
 
 # Naming styles
