@@ -7,7 +7,7 @@
  ******************************************************************************/
 
 using System;
-namespace Leap
+namespace Ultraleap
 {
     /// <summary>
     /// Various C# extensions used by the Leap C# classes.

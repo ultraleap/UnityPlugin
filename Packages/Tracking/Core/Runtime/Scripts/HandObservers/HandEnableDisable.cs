@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Leap.Unity
+namespace Ultraleap
 {
     /// <summary>
     /// A component to be attached to a HandModelBase to handle starting and ending of

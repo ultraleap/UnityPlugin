@@ -6,11 +6,11 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity.Attachments;
+using Ultraleap.Attachments;
 using System;
 using UnityEngine;
 
-namespace Leap.Unity.Preview.Locomotion
+namespace Ultraleap.Preview.Locomotion
 {
     /// <summary>
     /// Used in conjunction with JumpGemTeleport, a Jump Gem can be pinched, aimed and released in order to teleport

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Leap.Unity
+namespace Ultraleap
 {
     [ExecuteInEditMode]
     public class HandPoseViewer : LeapProvider

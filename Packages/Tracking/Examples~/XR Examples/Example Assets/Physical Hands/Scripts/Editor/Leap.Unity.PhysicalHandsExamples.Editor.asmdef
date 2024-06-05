@@ -1,5 +1,5 @@
 {
-    "name": "Leap.Unity.PhysicalHandsExamples.Editor",
+    "name": "Ultraleap.PhysicalHandsExamples.Editor",
     "rootNamespace": "",
     "references": [
         "GUID:db4e617c04f44c144bc19216a63dd19b",

@@ -1,7 +1,7 @@
-using Leap.Unity.PhysicalHands;
+using Ultraleap.PhysicalHands;
 using UnityEngine;
 
-namespace Leap.Unity
+namespace Ultraleap
 {
     public class PhysicalHandsAnchorable : AnchorableBehaviour, IPhysicalHandGrab, IPhysicalHandHover
     {

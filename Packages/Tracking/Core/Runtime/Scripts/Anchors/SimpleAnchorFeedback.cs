@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Leap.Unity.Interaction
+namespace Ultraleap
 {
     [RequireComponent(typeof(Anchor))]
     [AddComponentMenu("")]

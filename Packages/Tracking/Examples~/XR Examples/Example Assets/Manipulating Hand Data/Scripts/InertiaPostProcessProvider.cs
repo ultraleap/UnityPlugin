@@ -6,12 +6,12 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity;
+using Ultraleap;
 
 using System.Linq;
 using UnityEngine;
 
-namespace Leap.Examples
+namespace Ultraleap.Examples
 {
     public class InertiaPostProcessProvider : PostProcessProvider
     {

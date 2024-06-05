@@ -6,10 +6,10 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity.Preview.Locomotion;
+using Ultraleap.Preview.Locomotion;
 using UnityEngine;
 
-namespace Leap.Unity.Examples.Preview
+namespace Ultraleap.Examples.Preview
 {
     /// <summary>
     /// Alternates between the active Teleportation techniques depending on which was last teleported to

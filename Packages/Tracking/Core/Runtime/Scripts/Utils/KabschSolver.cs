@@ -9,7 +9,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Leap.Unity.Interaction
+namespace Ultraleap
 {
 
     public class KabschSolver
@@ -119,8 +119,8 @@ namespace Leap.Unity.Interaction
 
     public static class FromMatrixExtension
     {
-        public static Vector3 GetVector3(this Matrix4x4 m) { return m.GetColumn(3); }
-        public static Quaternion GetQuaternion(this Matrix4x4 m)
+        public static Vector3 GetVector3Kabsch(this Matrix4x4 m) { return m.GetColumn(3); }
+        public static Quaternion GetQuaternionKabsch(this Matrix4x4 m)
         {
             if (m.GetColumn(2) == m.GetColumn(1)) { return Quaternion.identity; }
             return Quaternion.LookRotation(m.GetColumn(2), m.GetColumn(1));

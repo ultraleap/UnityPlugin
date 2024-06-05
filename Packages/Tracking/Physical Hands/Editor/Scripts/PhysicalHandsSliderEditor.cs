@@ -9,7 +9,7 @@
 using UnityEngine;
 using UnityEditor;
 
-namespace Leap.Unity.PhysicalHands
+namespace Ultraleap.PhysicalHands
 {
     [CustomEditor(typeof(PhysicalHandsSlider))]
     public class PhysicalHandsSliderEditor : CustomEditorBase<PhysicalHandsSlider>

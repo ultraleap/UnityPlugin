@@ -1,7 +1,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace Leap.Unity.Recording
+namespace Ultraleap.Recording
 {
     [CustomEditor(typeof(HandRecorder))]
     [CanEditMultipleObjects]

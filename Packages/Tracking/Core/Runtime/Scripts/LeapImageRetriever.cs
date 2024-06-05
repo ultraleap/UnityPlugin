@@ -13,7 +13,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-namespace Leap.Unity
+namespace Ultraleap
 {
 
     /// <summary>

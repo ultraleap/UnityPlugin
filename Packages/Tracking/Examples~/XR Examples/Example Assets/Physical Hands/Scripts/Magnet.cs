@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Leap.Unity.Examples
+namespace Ultraleap.Examples
 {
     public class Magnet : MonoBehaviour
     {

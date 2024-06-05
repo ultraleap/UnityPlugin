@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Leap
+namespace Ultraleap
 {
     using System;
     public static class TransformExtensions

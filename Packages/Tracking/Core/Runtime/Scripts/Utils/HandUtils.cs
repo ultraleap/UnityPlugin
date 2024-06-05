@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Leap.Unity
+namespace Ultraleap
 {
     public enum ChiralitySelection
     {

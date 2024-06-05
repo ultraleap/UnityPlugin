@@ -6,12 +6,12 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity.Encoding;
+using Ultraleap.Encoding;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Leap.Unity
+namespace Ultraleap
 {
     /// <summary>
     /// John's and Flo's aggregation code. An example of how aggregation could be implemented.
@@ -113,7 +113,7 @@ namespace Leap.Unity
         private Hand AngularInterpolate(Hand[] handList, ref float alpha, ref float angle)
         {
             /* 
-             * Combines list of hands (of one chiarality) into one Leap.Hand, by weighing the relative angle to the devices
+             * Combines list of hands (of one chiarality) into one Ultraleap.Hand, by weighing the relative angle to the devices
             */
 
             /*

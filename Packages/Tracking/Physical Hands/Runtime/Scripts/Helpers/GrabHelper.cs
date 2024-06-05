@@ -9,7 +9,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Leap.Unity.PhysicalHands
+namespace Ultraleap.PhysicalHands
 {
     [RequireComponent(typeof(PhysicalHandsManager))]
     public class GrabHelper : MonoBehaviour
@@ -205,7 +205,7 @@ namespace Leap.Unity.PhysicalHands
             {
                 _fingerStrengths.Add(hand, new float[5]);
             }
-            Leap.Hand lHand = hand.dataHand;
+            Ultraleap.Hand lHand = hand.dataHand;
             for (int i = 0; i < 5; i++)
             {
                 _fingerStrengths[hand][i] = lHand.GetFingerStrength(i);

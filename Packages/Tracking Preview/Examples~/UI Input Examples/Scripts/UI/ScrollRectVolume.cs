@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Leap.Unity.InputModule
+namespace Ultraleap.InputModule
 {
     public class ScrollRectVolume : MonoBehaviour
     {

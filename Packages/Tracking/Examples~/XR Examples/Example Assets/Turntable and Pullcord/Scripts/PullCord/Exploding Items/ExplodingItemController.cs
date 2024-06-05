@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Leap.Unity.Examples
+namespace Ultraleap.Examples
 {
     /// <summary>
     /// Handles exploding object by being given a float value of progress and progresses all ExplodingItems that are the children of a given object

@@ -7,7 +7,7 @@
  ******************************************************************************/
 using UnityEngine;
 
-namespace Leap
+namespace Ultraleap
 {
     using System;
     using System.Collections.Generic;
