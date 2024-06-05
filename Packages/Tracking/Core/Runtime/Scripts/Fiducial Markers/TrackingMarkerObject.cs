@@ -34,6 +34,8 @@ namespace Leap.Unity
         private Vector3 targetPos;
         private Quaternion targetRot;
 
+        [SerializeField] private float lerpAmount = 60f;
+
         private void Start()
         {
             // Ensure the LeapServiceProvider exists for us to position the device in world space
@@ -106,8 +108,8 @@ namespace Leap.Unity
 
         private void Update()
         {
-            trackedObject.position = targetPos;
-            trackedObject.rotation = targetRot;
+            trackedObject.position = Vector3.Lerp(trackedObject.position, targetPos, Time.deltaTime * lerpAmount);
+            trackedObject.rotation = Quaternion.Slerp(trackedObject.rotation, targetRot, Time.deltaTime * lerpAmount);
         }
 
         #region Utilities
