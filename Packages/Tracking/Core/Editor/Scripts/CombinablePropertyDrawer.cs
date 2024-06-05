@@ -95,8 +95,10 @@ namespace Leap.Unity.Attributes
             CombinablePropertyDrawer.OnGUI(this.attributes, this.fieldInfo, position,
               property, label);
 
-            if(currentlyDrawing == property)
+            if (currentlyDrawing == property)
+            {
                 currentlyDrawing = null;
+            }
         }
 
         public static void OnGUI(List<CombinablePropertyAttribute> attributes,

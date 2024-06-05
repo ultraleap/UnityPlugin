@@ -151,10 +151,6 @@ namespace Leap.Unity
         {
             get
             {
-                if (Application.isPlaying && _leapProvider == null)
-                {
-                    leapProvider = Hands.Provider;
-                }
                 return _leapProvider;
             }
             set

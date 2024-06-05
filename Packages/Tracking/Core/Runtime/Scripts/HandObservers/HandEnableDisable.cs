@@ -32,18 +32,20 @@ namespace Leap.Unity
         public bool freezeHandState = false;
 
         [Header("Fading")]
+        [Tooltip("Should the hand fade it's alpha when the hand begins tracking?")]
         public bool fadeOnHandFound = false;
-        [Indent, Units("Seconds"), SerializeField]
+        [Indent, Units("Seconds"), SerializeField, Tooltip("The length of time the fade will take when the hand begins tracking")]
         private float fadeInTime = 0.1f;
 
+        [Tooltip("Should the hand fade it's alpha, before disabling, when the hand stops tracking?")]
         public bool fadeOnHandLost = true;
-        [Indent, Units("Seconds"), SerializeField]
+        [Indent, Units("Seconds"), SerializeField, Tooltip("The length of time the fade will take when the hand stops tracking")]
         private float fadeOutTime = 0.1f;
 
         [Space, Tooltip("Show options to reference specific Renderers, Materials and Color parameters to fade. \n\nWhen not enabled, hand renderers are automatically detected.")]
         public bool customFadeRenderers;
-        [SerializeField]
-        private RendererMaterialColorReference[] renderersToFade;
+        [SerializeField, Tooltip("A collection of Shader Color parameters that will be used to fade, referenced via Renderer, Material ID and Color parameter names")]
+        private FadeRendererMaterialColorReferences[] renderersToFade;
 
         private bool fadingIn = false;
         private bool fadingOut = false;
@@ -54,7 +56,11 @@ namespace Leap.Unity
         {
             if (leapProvider == null)
             {
-                Hands.TryGetProviderAndChiralityFromHandModel(gameObject, out leapProvider, out chirality);
+                if(!Hands.TryGetProviderAndChiralityFromHandModel(gameObject, out leapProvider, out chirality))
+                {
+                    Debug.LogWarning("HandEnableDisable can not work as intended as no LeapProvider was associated with the component.", gameObject);
+                    return;
+                }
             }
 
             leapProvider.OnHandFound -= HandFound;
@@ -63,7 +69,10 @@ namespace Leap.Unity
             leapProvider.OnHandLost -= HandLost;
             leapProvider.OnHandLost += HandLost;
 
-            this.gameObject.SetActive(disableOnAwake ? false : this.gameObject.activeInHierarchy);
+            if(disableOnAwake)
+            {
+                gameObject.SetActive(false);
+            }
         }
 
         private void Start()
@@ -216,11 +225,11 @@ namespace Leap.Unity
         {
             Renderer[] _renderers = gameObject.GetComponentsInChildren<Renderer>(true);
 
-            renderersToFade = new RendererMaterialColorReference[_renderers.Length];
+            renderersToFade = new FadeRendererMaterialColorReferences[_renderers.Length];
 
             for (int i = 0; i < _renderers.Length; i++)
             {
-                renderersToFade[i] = new RendererMaterialColorReference();
+                renderersToFade[i] = new FadeRendererMaterialColorReferences();
                 renderersToFade[i].renderer = _renderers[i];
                 renderersToFade[i].materialID = 0;
 
@@ -258,14 +267,19 @@ namespace Leap.Unity
         }
 
         [System.Serializable]
-        public class RendererMaterialColorReference
+        public class FadeRendererMaterialColorReferences
         {
+            [Tooltip("The renderer to use when accessing the Color parameters")]
             public Renderer renderer;
+
+            [Tooltip("The ID of the material from the Renderer's Materials array")]
             public int materialID;
+
+            [Tooltip("An array of Color parameter names which will be used")]
             public string[] colorParamNames;
 
             [HideInInspector]
-            public float[] defaultAlphas;
+            public float[] defaultAlphas; // The original alpha values
 
             [HideInInspector]
             public float[] fadeStartAlphas; // The alpha values when the current fade started

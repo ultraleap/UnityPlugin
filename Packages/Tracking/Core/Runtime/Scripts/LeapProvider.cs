@@ -55,7 +55,13 @@ namespace Leap.Unity
         /// </summary>
         public abstract Frame CurrentFixedFrame { get; }
 
+        /// <summary>
+        /// The current tracked state of the left hand. See also OnHandFound and OnHandLost events.
+        /// </summary>
         public bool LeftHandTracked { get; private set; }
+        /// <summary>
+        /// The current tracked state of the right hand. See also OnHandFound and OnHandLost events.
+        /// </summary>
         public bool RightHandTracked { get; private set; }
 
         protected TrackingSource _trackingSource;
