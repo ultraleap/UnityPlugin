@@ -21,44 +21,56 @@ namespace Leap.Unity.Interaction
         public Transform toFaceCamera;
         public Camera cameraToFace;
 
-        private bool _initialized = false;
-
         public UnityEvent OnBeginFacingCamera;
         public UnityEvent OnEndFacingCamera;
 
         void Start()
         {
-            if (toFaceCamera != null) initialize();
-        }
+            if (cameraToFace == null)
+            {
+                cameraToFace = Camera.main;
+            }
 
-        private void initialize()
-        {
-            if (cameraToFace == null) { cameraToFace = Camera.main; }
-            // Set "_isFacingCamera" to be whatever the current state ISN'T, so that we are
-            // guaranteed to fire a UnityEvent on the first initialized Update().
-            IsFacingCamera = !GetIsFacingCamera(toFaceCamera, cameraToFace);
-            _initialized = true;
+            if (cameraToFace == null)
+            {
+                return;
+            }
+
+            IsFacingCamera = GetIsFacingCamera(toFaceCamera, cameraToFace);
+
+            if (IsFacingCamera)
+            {
+                OnBeginFacingCamera?.Invoke();
+            }
+            else
+            {
+                OnEndFacingCamera?.Invoke();
+            }
         }
 
         void Update()
         {
-            if (toFaceCamera != null && !_initialized)
+            if (cameraToFace == null)
             {
-                initialize();
+                cameraToFace = Camera.main;
             }
-            if (!_initialized) return;
+
+            if(cameraToFace == null)
+            {
+                return;
+            }
 
             if (GetIsFacingCamera(toFaceCamera, cameraToFace, IsFacingCamera ? 0.77F : 0.82F) != IsFacingCamera)
             {
-                IsFacingCamera = !IsFacingCamera;
+                IsFacingCamera = !IsFacingCamera; // state changed
 
                 if (IsFacingCamera)
                 {
-                    OnBeginFacingCamera.Invoke();
+                    OnBeginFacingCamera?.Invoke();
                 }
                 else
                 {
-                    OnEndFacingCamera.Invoke();
+                    OnEndFacingCamera?.Invoke();
                 }
             }
         }
@@ -67,7 +79,5 @@ namespace Leap.Unity.Interaction
         {
             return Vector3.Dot((camera.transform.position - facingTransform.position).normalized, facingTransform.forward) > minAllowedDotProduct;
         }
-
     }
-
 }

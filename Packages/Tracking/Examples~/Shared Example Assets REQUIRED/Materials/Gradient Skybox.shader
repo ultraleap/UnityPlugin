@@ -1,4 +1,4 @@
-Shader "Gradient Skybox"
+Shader "Ultraleap/Gradient Skybox"
 {
 	Properties
 	{
