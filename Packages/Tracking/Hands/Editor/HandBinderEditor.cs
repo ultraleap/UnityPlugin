@@ -262,9 +262,10 @@ namespace Leap.Unity.HandsModule
                     for (int i = 0; i < myTarget.BoundHand.fingers.Length; i++)
                     {
                         var offset = boundHand.FindPropertyRelative("fingers").GetArrayElementAtIndex(i).FindPropertyRelative("fingerTipScaleOffset");
-                        var fingerType = ((Finger.FingerType)i).ToString().Remove(0, 5).ToString();
+                        var fingerType = ((Finger.FingerType)i).ToString();
                         EditorGUILayout.PropertyField(offset, new GUIContent(fingerType + " Tip Offset", "The hand finger tip scale will be modified by this amount"));
                     }
+
                 }
 
                 GUI.enabled = true;
@@ -735,7 +736,7 @@ namespace Leap.Unity.HandsModule
 
                 for (int fingerID = 0; fingerID < handBinder.BoundHand.fingers.Length; fingerID++)
                 {
-                    var fingerType = ((Finger.FingerType)fingerID).ToString().Remove(0, 5).ToString();
+                    var fingerType = ((Finger.FingerType)fingerID).ToString();
                     var objectFieldName = "";
                     for (int boneID = 0; boneID < handBinder.BoundHand.fingers[fingerID].boundBones.Length; boneID++)
                     {
@@ -744,7 +745,7 @@ namespace Leap.Unity.HandsModule
                             continue;
                         }
 
-                        var boneType = ((Bone.BoneType)boneID).ToString().Remove(0, 5).ToString();
+                        var boneType = ((Bone.BoneType)boneID).ToString();
 
                         objectFieldName = ((fingerType + " " + boneType + " :").ToString());
                         DrawObjectField(objectFieldName, ref handBinder.BoundHand.fingers[fingerID].boundBones[boneID], true, fingerID, boneID);
