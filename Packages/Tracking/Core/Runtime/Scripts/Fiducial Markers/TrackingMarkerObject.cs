@@ -44,8 +44,9 @@ namespace Leap.Unity
             if (leapServiceProvider != null)
             {
                 Controller controller = leapServiceProvider.GetLeapController();
+                controller.FiducialPose -= FiducialCalculateMinMax;
                 controller.FiducialPose += FiducialCalculateMinMax;
-                //controller.FiducialPose += FiducialOutputAllMarkers;
+                controller.FiducialPose -= FiducialSaveFrameData;
                 controller.FiducialPose += FiducialSaveFrameData;
             }
             else
@@ -58,40 +59,6 @@ namespace Leap.Unity
 
             targetPos = trackedObject.position;
             targetRot = trackedObject.rotation;
-        }
-
-        private float _maxError = float.NegativeInfinity;
-        private float _minError = float.PositiveInfinity;
-
-        private void OnDestroy()
-        {
-            Debug.Log("MIN Error: " + _minError);
-            Debug.Log("MAX Error: " + _maxError);
-        }
-
-        private void FiducialCalculateMinMax(object sender, FiducialPoseEventArgs poseEvent)
-        {
-            if (poseEvent.estimated_error < _minError)
-            {
-                _minError = poseEvent.estimated_error;
-            }
-            if (poseEvent.estimated_error > _maxError)
-            {
-                _maxError = poseEvent.estimated_error;
-            }
-        }
-
-        private void FiducialOutputAllMarkers(object sender, FiducialPoseEventArgs poseEvent)
-        {
-            TrackingMarker m = markers.FirstOrDefault(o => o.id == poseEvent.id);
-            if (m == null)
-                return;
-
-            m.FiducialPose = poseEvent;
-
-            trackerPosWorldSpace = leapServiceProvider.DeviceOriginWorldSpace;
-            m.transform.position = GetMarkerWorldSpacePosition(poseEvent.translation.ToVector3());
-            m.transform.rotation = GetMarkerWorldSpaceRotation(poseEvent.rotation.ToQuaternion());
         }
 
         private List<FiducialPoseEventArgs> _poses = new List<FiducialPoseEventArgs>();
@@ -157,7 +124,8 @@ namespace Leap.Unity
                     }
                 }
 
-                //Now, for debugging, lets position every marker to see which we ended up using & how far out the others were relative to that
+                //For debugging: lets position every marker to see which we ended up using & how far out the others were relative to that
+                /*
                 for (int i = 0; i < markers.Length; i++)
                 {
                     if (markers[i] == null)
@@ -172,6 +140,7 @@ namespace Leap.Unity
                         markers[i].transform.rotation = GetMarkerWorldSpaceRotation(pose.rotation.ToQuaternion());
                     }
                 }
+                */
 
                 //Clear the previous frame data ready to log the current AprilTag frame
                 _poses.Clear();
@@ -181,6 +150,31 @@ namespace Leap.Unity
             _poses.Add(poseEvent);
             _previousFiducialFrameTime = timeSinceFirstFiducial;
         }
+
+        #region Error Testing
+
+        private float _maxError = float.NegativeInfinity;
+        private float _minError = float.PositiveInfinity;
+
+        private void OnDestroy()
+        {
+            Debug.Log("MIN Error: " + _minError);
+            Debug.Log("MAX Error: " + _maxError);
+        }
+
+        private void FiducialCalculateMinMax(object sender, FiducialPoseEventArgs poseEvent)
+        {
+            if (poseEvent.estimated_error < _minError)
+            {
+                _minError = poseEvent.estimated_error;
+            }
+            if (poseEvent.estimated_error > _maxError)
+            {
+                _maxError = poseEvent.estimated_error;
+            }
+        }
+
+        #endregion
 
         #region Utilities
 

@@ -39,6 +39,7 @@ namespace Leap.Unity
             _renderer = GetComponentInChildren<MeshRenderer>(); 
         }
 
+#if UNITY_EDITOR
         private void OnDrawGizmosSelected()
         {
             if (_fiducialPose == null)
@@ -47,5 +48,6 @@ namespace Leap.Unity
             //Handles.Label(this.transform.position, _fiducialPose.timestamp.ToString());
             Handles.Label(this.transform.position, _fiducialPose.estimated_error.ToString());
         }
+#endif
     }
 }
