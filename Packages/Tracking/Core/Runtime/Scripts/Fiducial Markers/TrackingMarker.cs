@@ -17,37 +17,5 @@ namespace Leap.Unity
         [Tooltip("The AprilTag marker ID associated with this marker." +
             "\n\nNote: This must be unique within the scene")]
         public int id;
-
-        public FiducialPoseEventArgs FiducialPose
-        {
-            set
-            {
-                _fiducialPose = value;
-                _renderer.enabled = _fiducialPose != null;
-            }
-            get
-            {
-                return _fiducialPose;
-            }
-        }
-        private FiducialPoseEventArgs _fiducialPose = null;
-
-        private MeshRenderer _renderer;
-
-        private void Awake()
-        {
-            _renderer = GetComponentInChildren<MeshRenderer>(); 
-        }
-
-#if UNITY_EDITOR
-        private void OnDrawGizmosSelected()
-        {
-            if (_fiducialPose == null)
-                return;
-
-            //Handles.Label(this.transform.position, _fiducialPose.timestamp.ToString());
-            Handles.Label(this.transform.position, _fiducialPose.estimated_error.ToString());
-        }
-#endif
     }
 }

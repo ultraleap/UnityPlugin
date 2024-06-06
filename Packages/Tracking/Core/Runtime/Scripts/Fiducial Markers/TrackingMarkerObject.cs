@@ -10,37 +10,35 @@ using LeapInternal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 
 namespace Leap.Unity
 {
     public class TrackingMarkerObject : MonoBehaviour
     {
-        [Tooltip("The source of the tracking data." +
-            "\n\nUsed to gather the updated Marker positions and to position the Tracked Object in world space")]
+        [Tooltip("The source of the tracking data.")]
         public LeapServiceProvider leapServiceProvider;
 
-        [Tooltip("The virtual object that the markers are associated with." +
-            "\n\nIf not set, this Component's Transform will be used")]
-        public Transform trackedObject;
+        private LeapTransform _trackerPosWorldspace;
+        private TrackingMarker[] _markers;
 
-        [Tooltip("A collections of markers positioned relative to the Tracked Object." +
-            "\n\nNote: These should be children of the Tracked Object in the hierarchy")]
-        public TrackingMarker[] markers;
+        private List<FiducialPoseEventArgs> _poses = new List<FiducialPoseEventArgs>();
+        private float _previousFiducialFrameTime = -1;
 
-        LeapTransform trackerPosWorldSpace;
+        private float _fiducialBaseTime = -1;
+        private float _fiducialFPS = 0;
 
-        public Vector3 TargetPos { get { return targetPos; } }
-        public Quaternion TargetRot { get { return targetRot; } }
+        private void Awake()
+        {
+            _markers = GetComponentsInChildren<TrackingMarker>();
 
-        private Vector3 targetPos;
-        private Quaternion targetRot;
+            if (leapServiceProvider == null)
+                leapServiceProvider = FindObjectOfType<LeapServiceProvider>();
+        }
 
         private void Start()
         {
-            if (leapServiceProvider == null)
-                leapServiceProvider = FindObjectOfType<LeapServiceProvider>();
-
             if (leapServiceProvider != null)
             {
                 Controller controller = leapServiceProvider.GetLeapController();
@@ -53,34 +51,12 @@ namespace Leap.Unity
             {
                 Debug.Log("Unable to begin Fiducial Marker tracking. Cannot connect to a Leap Service Provider.");
             }
-
-            if (trackedObject == null)
-                trackedObject = transform;
-
-            targetPos = trackedObject.position;
-            targetRot = trackedObject.rotation;
         }
-
-        private List<FiducialPoseEventArgs> _poses = new List<FiducialPoseEventArgs>();
-        private float _previousFiducialFrameTime = -1;
-
-        private float _fiducialBaseTime = -1;
 
         private void FiducialSaveFrameData(object sender, FiducialPoseEventArgs poseEvent)
         {
             if (_fiducialBaseTime == -1)
                 _fiducialBaseTime = poseEvent.timestamp;
-
-            //
-            //      NOTE:
-            //
-            //      this logic assumes two things:
-            //        - that you don't get multiple entries of the same marker in the same AprilTag frame
-            //        - that you don't get old AprilTag frames through alongside new ones (causing the frame time differ down rather than up)
-            //
-            //      those assumptions have been made because on my setup i've not had them happen, and sense would tell you that they wouldn't
-            //      ... but i'm leaving this comment for the future people fixing issues when they inevitably do
-            //
 
             //Work out how long it has been since we saw the first fiducial
             float timeSinceFirstFiducial = (poseEvent.timestamp - _fiducialBaseTime) / 1000000;
@@ -89,7 +65,7 @@ namespace Leap.Unity
             if (_previousFiducialFrameTime != -1 && timeSinceFirstFiducial != _previousFiducialFrameTime)
             {
                 //Get the device position in world space as a LeapTransform to use in future calculations
-                trackerPosWorldSpace = leapServiceProvider.DeviceOriginWorldSpace;
+                _trackerPosWorldspace = leapServiceProvider.DeviceOriginWorldSpace;
 
                 //Find the pose in the prev frame with the lowest error
                 FiducialPoseEventArgs lowestErrorPose = null;
@@ -107,49 +83,59 @@ namespace Leap.Unity
                 //If we have a pose to use, find the associated marker GameObject and position us
                 if (lowestErrorPose != null)
                 {
-                    TrackingMarker markerObject = markers.FirstOrDefault(o => o.id == lowestErrorPose.id);
+                    TrackingMarker markerObject = _markers.FirstOrDefault(o => o.id == lowestErrorPose.id);
                     if (markerObject != null)
                     {
-                        //Convert the Leap Pose to worldspace Unity units
-                        Vector3 markerPos = GetMarkerWorldSpacePosition(poseEvent.translation.ToVector3());
-                        Quaternion markerRot = GetMarkerWorldSpaceRotation(poseEvent.rotation.ToQuaternion());
+                        Vector3 desiredPosition = GetMarkerWorldSpacePosition(poseEvent.translation.ToVector3());
+                        Quaternion desiredRotation = GetMarkerWorldSpaceRotation(poseEvent.rotation.ToQuaternion());
 
-                        //Find the offset from the marker to the tracked object, to apply the inverse to the tracked transform
-                        Vector3 posOffset = trackedObject.position - markerObject.transform.position;
-                        Quaternion rotOffset = Quaternion.Inverse(trackedObject.rotation) * markerObject.transform.rotation;
+                        // Reference to the parent and child transforms
+                        Transform parentTransform = transform;
+                        Transform childTransform = markerObject.transform;
 
-                        //Position the whole object
-                        this.transform.position = markerPos + posOffset;
-                        this.transform.rotation = markerRot * Quaternion.Inverse(rotOffset);
+                        // Calculate the world position and rotation needed for the parent
+                        Vector3 parentPosition = desiredPosition - parentTransform.TransformVector(childTransform.localPosition);
+                        Quaternion parentRotation = desiredRotation * Quaternion.Inverse(childTransform.localRotation);
+
+                        // Apply the calculated position and rotation to the parent
+                        parentTransform.position = parentPosition;
+                        parentTransform.rotation = parentRotation;
                     }
                 }
 
                 //For debugging: lets position every marker to see which we ended up using & how far out the others were relative to that
-                /*
-                for (int i = 0; i < markers.Length; i++)
+                for (int i = 0; i < _markers.Length; i++)
                 {
-                    if (markers[i] == null)
+                    continue;
+
+                    if (_markers[i] == null)
                         continue;
 
-                    FiducialPoseEventArgs pose = _poses.FirstOrDefault(o => o.id == markers[i].id);
-                    markers[i].FiducialPose = pose;
-
+                    FiducialPoseEventArgs pose = _poses.FirstOrDefault(o => o.id == _markers[i].id);
                     if (pose != null)
                     {
-                        markers[i].transform.position = GetMarkerWorldSpacePosition(pose.translation.ToVector3());
-                        markers[i].transform.rotation = GetMarkerWorldSpaceRotation(pose.rotation.ToQuaternion());
+                        _markers[i].transform.position = GetMarkerWorldSpacePosition(pose.translation.ToVector3());
+                        _markers[i].transform.rotation = GetMarkerWorldSpaceRotation(pose.rotation.ToQuaternion());
                     }
+                    _markers[i].gameObject.SetActive(pose != null);
                 }
-                */
 
                 //Clear the previous frame data ready to log the current AprilTag frame
                 _poses.Clear();
+                _fiducialFPS = 1.0f / (timeSinceFirstFiducial - _previousFiducialFrameTime);
             }
 
             //Store data into the current AprilTag frame
             _poses.Add(poseEvent);
             _previousFiducialFrameTime = timeSinceFirstFiducial;
         }
+
+#if UNITY_EDITOR
+        private void OnDrawGizmosSelected()
+        {
+            Handles.Label(transform.position, "Fiducial FPS: " + _fiducialFPS);
+        }
+#endif
 
         #region Error Testing
 
@@ -182,7 +168,7 @@ namespace Leap.Unity
         {
             // Apply the leapToUnityTransform Transform and then apply the trackerPosWorldSpace Transform
             trackedMarkerPosition = CopyFromLeapCExtensions.LeapToUnityTransform.TransformPoint(trackedMarkerPosition);
-            trackedMarkerPosition = trackerPosWorldSpace.TransformPoint(trackedMarkerPosition);
+            trackedMarkerPosition = _trackerPosWorldspace.TransformPoint(trackedMarkerPosition);
 
             return trackedMarkerPosition;
         }
@@ -191,7 +177,7 @@ namespace Leap.Unity
         {
             // Apply the leapToUnityTransform Transform and then apply the trackerPosWorldSpace Transform
             trackedMarkerRotation = CopyFromLeapCExtensions.LeapToUnityTransform.TransformQuaternion(trackedMarkerRotation);
-            trackedMarkerRotation = trackerPosWorldSpace.TransformQuaternion(trackedMarkerRotation);
+            trackedMarkerRotation = _trackerPosWorldspace.TransformQuaternion(trackedMarkerRotation);
 
             return trackedMarkerRotation;
         }
