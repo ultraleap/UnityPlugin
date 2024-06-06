@@ -38,15 +38,15 @@ namespace Leap.Unity
 
         private void Start()
         {
-            // Ensure the LeapServiceProvider exists for us to position the device in world space
             if (leapServiceProvider == null)
                 leapServiceProvider = FindObjectOfType<LeapServiceProvider>();
 
-            // Listen to events for the new marker poses
             if (leapServiceProvider != null)
             {
                 Controller controller = leapServiceProvider.GetLeapController();
-                controller.FiducialPose -= OnFiducialMarkerPose;
+                controller.FiducialPose += FiducialCalculateMinMax;
+                //controller.FiducialPose += FiducialOutputAllMarkers;
+                controller.FiducialPose += FiducialSaveFrameData;
                 controller.FiducialPose += OnFiducialMarkerPose;
             }
             else
@@ -61,9 +61,6 @@ namespace Leap.Unity
             targetRot = trackedObject.rotation;
         }
 
-        private float _latestWrittenTimestamp = -1;
-        private Dictionary<float, List<FiducialPoseEventArgs>> _fiducialFrames = new Dictionary<float, List<FiducialPoseEventArgs>>();
-
         private float _maxError = float.NegativeInfinity;
         private float _minError = float.PositiveInfinity;
 
@@ -73,7 +70,7 @@ namespace Leap.Unity
             Debug.Log("MAX Error: " + _maxError);
         }
 
-        private void OnFiducialMarkerPose(object sender, FiducialPoseEventArgs poseEvent)
+        private void FiducialCalculateMinMax(object sender, FiducialPoseEventArgs poseEvent)
         {
             if (poseEvent.estimated_error < _minError)
             {
@@ -83,9 +80,10 @@ namespace Leap.Unity
             {
                 _maxError = poseEvent.estimated_error;
             }
-            //--
+        }
 
-
+        private void FiducialOutputAllMarkers(object sender, FiducialPoseEventArgs poseEvent)
+        {
             TrackingMarker m = markers.FirstOrDefault(o => o.id == poseEvent.id);
             if (m == null)
                 return;
@@ -95,28 +93,29 @@ namespace Leap.Unity
             trackerPosWorldSpace = leapServiceProvider.DeviceOriginWorldSpace;
             m.transform.position = GetMarkerWorldSpacePosition(poseEvent.translation.ToVector3());
             m.transform.rotation = GetMarkerWorldSpaceRotation(poseEvent.rotation.ToQuaternion());
+        }
 
-            return;
+        private Dictionary<float, List<FiducialPoseEventArgs>> _posesByTime = new Dictionary<float, List<FiducialPoseEventArgs>>();
+        private float _lastTime = -1;
+        private float _fiducialBaseTime = -1;
 
+        private void FiducialSaveFrameData(object sender, FiducialPoseEventArgs poseEvent)
+        {
+            if (_fiducialBaseTime == -1)
+                _fiducialBaseTime = poseEvent.timestamp;
 
-            Debug.Log((poseEvent.timestamp* 100000) + " -> " + poseEvent.id);
+            //Work out how long it has been since we saw the first fiducial
+            float timeSinceFirstFiducial = (poseEvent.timestamp - _fiducialBaseTime) / 1000000;
 
-            if (!_fiducialFrames.ContainsKey(poseEvent.timestamp))
+            //Add the current pose to the current AprilTag frame, using our time since first
+            if (!_posesByTime.ContainsKey(timeSinceFirstFiducial))
+                _posesByTime.Add(timeSinceFirstFiducial, new List<FiducialPoseEventArgs>());
+            _posesByTime[timeSinceFirstFiducial].Add(poseEvent);
+
+            //If the current AprilTag frame has advanced, process the previous one
+            if (_lastTime != -1 && timeSinceFirstFiducial != _lastTime)
             {
-                _fiducialFrames.Add(poseEvent.timestamp, new List<FiducialPoseEventArgs>());
-            }
-            _fiducialFrames[poseEvent.timestamp].Add(poseEvent);
-
-            if (_latestWrittenTimestamp > poseEvent.timestamp)
-            {
-                Debug.LogWarning("Prev timestamp was greater than this one!");
-            }
-
-            //We've started a new frame. Consume the last one.
-            if (_latestWrittenTimestamp < poseEvent.timestamp)
-            {
-                List<FiducialPoseEventArgs> poses = _fiducialFrames[poseEvent.timestamp];
-
+                List<FiducialPoseEventArgs> poses = _posesByTime[_lastTime];
                 for (int i = 0; i < poses.Count; i++)
                 {
                     TrackingMarker markerObject = markers.FirstOrDefault(o => o.id == poses[i].id);
@@ -129,19 +128,49 @@ namespace Leap.Unity
                     markerObject.transform.position = GetMarkerWorldSpacePosition(poses[i].translation.ToVector3());
                     markerObject.transform.rotation = GetMarkerWorldSpaceRotation(poses[i].rotation.ToQuaternion());
                 }
+                _posesByTime.Remove(_lastTime);
+            }
+            _lastTime = timeSinceFirstFiducial;
+        }
 
-                if (poses.Count > 1)
-                {
-                    Debug.LogWarning("Multiple poses in this timestamp: " + poses.Count);
-                }
+        private void Update()
+        {
+            int frameID = Time.frameCount - 1;
+
+            //_framePoses.
+        }
+
+        /*
+        //We've started a new frame. Consume the last one.
+        if (_latestWrittenTimestamp < poseEvent.timestamp)
+        {
+            List<FiducialPoseEventArgs> poses = _fiducialFrames[poseEvent.timestamp];
+
+            for (int i = 0; i < poses.Count; i++)
+            {
+                TrackingMarker markerObject = markers.FirstOrDefault(o => o.id == poses[i].id);
+                if (markerObject == null)
+                    continue;
+
+                markerObject.FiducialPose = poses[i];
+
+                trackerPosWorldSpace = leapServiceProvider.DeviceOriginWorldSpace;
+                markerObject.transform.position = GetMarkerWorldSpacePosition(poses[i].translation.ToVector3());
+                markerObject.transform.rotation = GetMarkerWorldSpaceRotation(poses[i].rotation.ToQuaternion());
             }
 
-            _latestWrittenTimestamp = poseEvent.timestamp;
-            return;
+            if (poses.Count > 1)
+            {
+                Debug.LogWarning("Multiple poses in this timestamp: " + poses.Count);
+            }
+        }
 
+        _latestWrittenTimestamp = poseEvent.timestamp;
+        return;
+        */
 
-
-            /*
+        private void OnFiducialMarkerPose(object sender, FiducialPoseEventArgs poseEvent)
+        {
             // We cannot place the marker properly while the ServiceProvider does not exist
             if (leapServiceProvider == null || leapServiceProvider.enabled == false)
             {
@@ -179,15 +208,14 @@ namespace Leap.Unity
 
             targetPos = markerPos + posOffset;
             targetRot = markerRot * Quaternion.Inverse(rotOffset);
-            */
         }
 
 
-        private void Update()
-        {
-            trackedObject.position = targetPos;
-            trackedObject.rotation = targetRot;
-        }
+        //private void Update()
+        //{
+        //    trackedObject.position = targetPos;
+        //    trackedObject.rotation = targetRot;
+        //}
 
         #region Utilities
 
