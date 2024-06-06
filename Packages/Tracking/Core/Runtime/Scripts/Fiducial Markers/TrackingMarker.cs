@@ -19,6 +19,7 @@ namespace Leap.Unity
         public int id;
 
         public bool IsActiveMarker = false;
+        public bool IsTracked = false;
 
         private MeshRenderer _renderer;
 
@@ -29,7 +30,7 @@ namespace Leap.Unity
 
         private void Update()
         {
-            _renderer.material.color = IsActiveMarker ? Color.green : Color.red;
+            _renderer.material.color = IsActiveMarker ? Color.green : IsTracked ? new Color(1, 0.5f, 0) : Color.red;
         }
     }
 }

@@ -29,11 +29,10 @@ namespace Leap.Unity
 
         private List<FiducialPoseEventArgs> _poses = new List<FiducialPoseEventArgs>();
         private float _previousFiducialFrameTime = -1;
+        private int _previousBestFiducialID = -1;
 
         private float _fiducialBaseTime = -1;
         private float _fiducialFPS = 0;
-
-        private bool _isDoingFirstTimeSetup = false;
 
         private void Awake()
         {
@@ -54,12 +53,27 @@ namespace Leap.Unity
                 Controller controller = _leapServiceProvider.GetLeapController();
                 controller.FiducialPose -= CaptureAndProcessFiducialFrames;
                 controller.FiducialPose += CaptureAndProcessFiducialFrames;
+                //controller.FiducialPose -= FiducialOutputAllMarkers;
+                //controller.FiducialPose += FiducialOutputAllMarkers;
             }
             else
             {
                 Debug.Log("Unable to begin Fiducial Marker tracking. Cannot connect to a Leap Service Provider.");
             }
         }
+
+        /*
+        private void FiducialOutputAllMarkers(object sender, FiducialPoseEventArgs poseEvent)
+        {
+            TrackingMarker m = _markers.FirstOrDefault(o => o.id == poseEvent.id);
+            if (m == null)
+                return;
+
+            _trackerPosWorldspace = _leapServiceProvider.DeviceOriginWorldSpace;
+            m.transform.position = GetMarkerWorldSpacePosition(poseEvent.translation.ToVector3());
+            m.transform.rotation = GetMarkerWorldSpaceRotation(poseEvent.rotation.ToQuaternion());
+        }
+        */
 
         private void CaptureAndProcessFiducialFrames(object sender, FiducialPoseEventArgs poseEvent)
         {
@@ -88,6 +102,16 @@ namespace Leap.Unity
                         lowestErrorPose = _poses[i];
                 }
 
+                //TODO: add some "smartness" to it, so if the "best" one from prev frame is still highly rated & hasn't moved far (rotation to cam?), just use that instead
+                _poses = _poses.OrderBy(o => o.estimated_error).ToList();
+                FiducialPoseEventArgs previousBest = _poses.FirstOrDefault(o => o.id == _previousBestFiducialID);
+
+
+                //TODO: just thought - for barista, we could just run through EVERY tracked marker & calculate the avg transform, then average that
+                //, so basically loop this code for every tracked marker and then take an average of the position
+                //would be high on compute but would work better nice for handoffs, and could add a tiny lerp to that using the delta for april
+
+
                 //If we have a pose to use, find the associated marker GameObject
                 if (lowestErrorPose != null)
                 {
@@ -95,7 +119,7 @@ namespace Leap.Unity
                     if (markerObject != null)
                     {
                         //Position all markers relative to the best tracked marker by parenting, moving, then unparenting
-                        Transform[] prevParents = new Transform[_markers.Length];
+                        Transform[] prevParents = new Transform[_markers.Length + 1];
                         for (int x = 0; x < _markers.Length; x++)
                         {
                             if (_markers[x].id == markerObject.id)
@@ -103,6 +127,8 @@ namespace Leap.Unity
                             prevParents[x] = _markers[x].transform.parent;
                             _markers[x].transform.parent = markerObject.transform;
                         }
+                        prevParents[_markers.Length] = _targetObject.parent;
+                        _targetObject.parent = markerObject.transform;
 
                         markerObject.transform.position = GetMarkerWorldSpacePosition(lowestErrorPose.translation.ToVector3());
                         markerObject.transform.rotation = GetMarkerWorldSpaceRotation(lowestErrorPose.rotation.ToQuaternion());
@@ -114,11 +140,14 @@ namespace Leap.Unity
                                 continue;
                             _markers[x].transform.parent = prevParents[x];
                         }
-
-                        //Update our target transform
-                        _targetObject.position = GetCentralPosition(_markerTransforms);
-                        _targetObject.rotation = GetAverageRotation(_markerTransforms);
+                        _targetObject.parent = prevParents[_markers.Length];
                     }
+                }
+
+                //Update debug "IsTracked" state
+                for (int x = 0; x < _markers.Length; x++)
+                {
+                    _markers[x].IsTracked = _poses.FirstOrDefault(o => o.id == _markers[x].id) != null;
                 }
 
                 //Clear the previous frame data ready to log the current AprilTag frame
@@ -156,63 +185,6 @@ namespace Leap.Unity
             trackedMarkerRotation = _trackerPosWorldspace.TransformQuaternion(trackedMarkerRotation);
 
             return trackedMarkerRotation;
-        }
-
-        Vector3 GetCentralPosition(Transform[] transforms)
-        {
-            if (transforms == null || transforms.Length == 0)
-                return Vector3.zero;
-
-            Vector3 sum = Vector3.zero;
-            foreach (Transform t in transforms)
-            {
-                sum += t.position;
-            }
-            return sum / transforms.Length;
-        }
-
-        Quaternion GetAverageRotation(Transform[] transforms)
-        {
-            if (transforms == null || transforms.Length == 0)
-                return Quaternion.identity;
-
-            Quaternion averageRotation = new Quaternion(0, 0, 0, 0);
-            foreach (Transform t in transforms)
-            {
-                if (Quaternion.Dot(t.rotation, averageRotation) > 0)
-                {
-                    averageRotation.x += t.rotation.x;
-                    averageRotation.y += t.rotation.y;
-                    averageRotation.z += t.rotation.z;
-                    averageRotation.w += t.rotation.w;
-                }
-                else
-                {
-                    averageRotation.x -= t.rotation.x;
-                    averageRotation.y -= t.rotation.y;
-                    averageRotation.z -= t.rotation.z;
-                    averageRotation.w -= t.rotation.w;
-                }
-            }
-
-            float magnitude = Mathf.Sqrt(averageRotation.x * averageRotation.x +
-                                         averageRotation.y * averageRotation.y +
-                                         averageRotation.z * averageRotation.z +
-                                         averageRotation.w * averageRotation.w);
-
-            if (magnitude > 0.0001f)
-            {
-                averageRotation.x /= magnitude;
-                averageRotation.y /= magnitude;
-                averageRotation.z /= magnitude;
-                averageRotation.w /= magnitude;
-            }
-            else
-            {
-                averageRotation = Quaternion.identity;
-            }
-
-            return averageRotation;
         }
 
         #endregion
