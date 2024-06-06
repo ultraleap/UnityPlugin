@@ -64,8 +64,27 @@ namespace Leap.Unity
         private float _latestWrittenTimestamp = -1;
         private Dictionary<float, List<FiducialPoseEventArgs>> _fiducialFrames = new Dictionary<float, List<FiducialPoseEventArgs>>();
 
+        private float _maxError = float.NegativeInfinity;
+        private float _minError = float.PositiveInfinity;
+
+        private void OnDestroy()
+        {
+            Debug.Log("MIN Error: " + _minError);
+            Debug.Log("MAX Error: " + _maxError);
+        }
+
         private void OnFiducialMarkerPose(object sender, FiducialPoseEventArgs poseEvent)
         {
+            if (poseEvent.estimated_error < _minError)
+            {
+                _minError = poseEvent.estimated_error;
+            }
+            if (poseEvent.estimated_error > _maxError)
+            {
+                _maxError = poseEvent.estimated_error;
+            }
+            //--
+
 
             TrackingMarker m = markers.FirstOrDefault(o => o.id == poseEvent.id);
             if (m == null)
