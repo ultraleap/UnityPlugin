@@ -66,6 +66,20 @@ namespace Leap.Unity
 
         private void OnFiducialMarkerPose(object sender, FiducialPoseEventArgs poseEvent)
         {
+
+            TrackingMarker m = markers.FirstOrDefault(o => o.id == poseEvent.id);
+            if (m == null)
+                return;
+
+            m.FiducialPose = poseEvent;
+
+            trackerPosWorldSpace = leapServiceProvider.DeviceOriginWorldSpace;
+            m.transform.position = GetMarkerWorldSpacePosition(poseEvent.translation.ToVector3());
+            m.transform.rotation = GetMarkerWorldSpaceRotation(poseEvent.rotation.ToQuaternion());
+
+            return;
+
+
             Debug.Log((poseEvent.timestamp* 100000) + " -> " + poseEvent.id);
 
             if (!_fiducialFrames.ContainsKey(poseEvent.timestamp))
@@ -90,7 +104,7 @@ namespace Leap.Unity
                     if (markerObject == null)
                         continue;
 
-                    markerObject.pose = poses[i];
+                    markerObject.FiducialPose = poses[i];
 
                     trackerPosWorldSpace = leapServiceProvider.DeviceOriginWorldSpace;
                     markerObject.transform.position = GetMarkerWorldSpacePosition(poses[i].translation.ToVector3());
