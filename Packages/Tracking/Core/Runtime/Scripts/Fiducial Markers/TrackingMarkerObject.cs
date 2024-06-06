@@ -26,6 +26,10 @@ namespace Leap.Unity
             "\n\nNote: These should be children of the Tracked Object in the hierarchy")]
         public TrackingMarker[] markers;
 
+        public bool IsTracked { get { return isTracked; } }
+
+        private bool isTracked = false;
+
         LeapTransform trackerPosWorldSpace;
 
         public Vector3 TargetPos { get { return targetPos; } }
@@ -34,7 +38,12 @@ namespace Leap.Unity
         private Vector3 targetPos;
         private Quaternion targetRot;
 
+        private float framesBeforeLostTracking = 30f;
+        private float frameLastTracked;
+
         [SerializeField] private float lerpAmount = 60f;
+
+        public Action OnTrackingStart, OnTrackingLost;
 
         private void Start()
         {
@@ -103,6 +112,8 @@ namespace Leap.Unity
 
             targetPos = markerPos + posOffset;
             targetRot = markerRot * Quaternion.Inverse(rotOffset);
+
+            frameLastTracked = Time.frameCount;
         }
 
 
@@ -110,6 +121,23 @@ namespace Leap.Unity
         {
             trackedObject.position = Vector3.Lerp(trackedObject.position, targetPos, Time.deltaTime * lerpAmount);
             trackedObject.rotation = Quaternion.Slerp(trackedObject.rotation, targetRot, Time.deltaTime * lerpAmount);
+
+            if (Time.frameCount - frameLastTracked > framesBeforeLostTracking )
+            {
+                if(isTracked)
+                {
+                    isTracked = false;
+                    OnTrackingLost?.Invoke();
+                }
+            } 
+            else
+            {
+                if(!isTracked)
+                {
+                    isTracked = true;
+                    OnTrackingStart?.Invoke();
+                }
+            }
         }
 
         #region Utilities
