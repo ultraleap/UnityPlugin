@@ -23,7 +23,7 @@ namespace Leap.Unity
             set
             {
                 _fiducialPose = value;
-                _lastUpdateFrame = Time.frameCount;
+                _renderer.enabled = _fiducialPose != null;
             }
             get
             {
@@ -31,7 +31,6 @@ namespace Leap.Unity
             }
         }
         private FiducialPoseEventArgs _fiducialPose = null;
-        private int _lastUpdateFrame = -1;
 
         private MeshRenderer _renderer;
 
@@ -40,48 +39,13 @@ namespace Leap.Unity
             _renderer = GetComponentInChildren<MeshRenderer>(); 
         }
 
-        private void Update()
-        {
-            if (_renderer == null)
-                return;
-
-            if (_lastUpdateFrame < Time.frameCount - 60)
-            {
-                _renderer.enabled = false;
-            }
-            else if (!_renderer.enabled)
-            {
-                _renderer.enabled = true;
-            }
-
-            if (_renderer.enabled && _fiducialPose != null)
-            {
-                float remap = RemapValue(_fiducialPose.estimated_error, 6.991618E-13f, 4.107744E-06f, 0.0f, 1.0f);
-                _renderer.material.color = new Color(remap, 0.0f, 0.0f);
-            }
-        }
-
         private void OnDrawGizmosSelected()
         {
-            if (_fiducialPose == null || _renderer == null || !_renderer.enabled)
+            if (_fiducialPose == null)
                 return;
 
             //Handles.Label(this.transform.position, _fiducialPose.timestamp.ToString());
             Handles.Label(this.transform.position, _fiducialPose.estimated_error.ToString());
-        }
-
-        private float RemapValue(float value, float fromMin, float fromMax, float toMin, float toMax)
-        {
-            if (value > fromMax)
-                value = fromMax;
-            else if (value < fromMin)
-                value = fromMin;
-
-            float fromRange = fromMax - fromMin;
-            float toRange = toMax - toMin;
-            float scaledValue = (value - fromMin) / fromRange;
-            float remappedValue = toMin + (scaledValue * toRange);
-            return remappedValue;
         }
     }
 }

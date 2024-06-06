@@ -47,7 +47,6 @@ namespace Leap.Unity
                 controller.FiducialPose += FiducialCalculateMinMax;
                 //controller.FiducialPose += FiducialOutputAllMarkers;
                 controller.FiducialPose += FiducialSaveFrameData;
-                controller.FiducialPose += OnFiducialMarkerPose;
             }
             else
             {
@@ -95,8 +94,9 @@ namespace Leap.Unity
             m.transform.rotation = GetMarkerWorldSpaceRotation(poseEvent.rotation.ToQuaternion());
         }
 
-        private Dictionary<float, List<FiducialPoseEventArgs>> _posesByTime = new Dictionary<float, List<FiducialPoseEventArgs>>();
-        private float _lastTime = -1;
+        private List<FiducialPoseEventArgs> _poses = new List<FiducialPoseEventArgs>();
+        private float _previousFiducialFrameTime = -1;
+
         private float _fiducialBaseTime = -1;
 
         private void FiducialSaveFrameData(object sender, FiducialPoseEventArgs poseEvent)
@@ -104,118 +104,83 @@ namespace Leap.Unity
             if (_fiducialBaseTime == -1)
                 _fiducialBaseTime = poseEvent.timestamp;
 
+            //
+            //      NOTE:
+            //
+            //      this logic assumes two things:
+            //        - that you don't get multiple entries of the same marker in the same AprilTag frame
+            //        - that you don't get old AprilTag frames through alongside new ones (causing the frame time differ down rather than up)
+            //
+            //      those assumptions have been made because on my setup i've not had them happen, and sense would tell you that they wouldn't
+            //      ... but i'm leaving this comment for the future people fixing issues when they inevitably do
+            //
+
             //Work out how long it has been since we saw the first fiducial
             float timeSinceFirstFiducial = (poseEvent.timestamp - _fiducialBaseTime) / 1000000;
 
-            //Add the current pose to the current AprilTag frame, using our time since first
-            if (!_posesByTime.ContainsKey(timeSinceFirstFiducial))
-                _posesByTime.Add(timeSinceFirstFiducial, new List<FiducialPoseEventArgs>());
-            _posesByTime[timeSinceFirstFiducial].Add(poseEvent);
-
             //If the current AprilTag frame has advanced, process the previous one
-            if (_lastTime != -1 && timeSinceFirstFiducial != _lastTime)
+            if (_previousFiducialFrameTime != -1 && timeSinceFirstFiducial != _previousFiducialFrameTime)
             {
-                List<FiducialPoseEventArgs> poses = _posesByTime[_lastTime];
-                for (int i = 0; i < poses.Count; i++)
+                //Get the device position in world space as a LeapTransform to use in future calculations
+                trackerPosWorldSpace = leapServiceProvider.DeviceOriginWorldSpace;
+
+                //Find the pose in the prev frame with the lowest error
+                FiducialPoseEventArgs lowestErrorPose = null;
+                for (int i = 0; i < _poses.Count; i++)
                 {
-                    TrackingMarker markerObject = markers.FirstOrDefault(o => o.id == poses[i].id);
-                    if (markerObject == null)
+                    if (lowestErrorPose == null)
+                    {
+                        lowestErrorPose = _poses[i];
+                        continue;
+                    }
+                    if (lowestErrorPose.estimated_error > _poses[i].estimated_error)
+                        lowestErrorPose = _poses[i];
+                }
+
+                //If we have a pose to use, find the associated marker GameObject and position us
+                if (lowestErrorPose != null)
+                {
+                    TrackingMarker markerObject = markers.FirstOrDefault(o => o.id == lowestErrorPose.id);
+                    if (markerObject != null)
+                    {
+                        //Convert the Leap Pose to worldspace Unity units
+                        Vector3 markerPos = GetMarkerWorldSpacePosition(poseEvent.translation.ToVector3());
+                        Quaternion markerRot = GetMarkerWorldSpaceRotation(poseEvent.rotation.ToQuaternion());
+
+                        //Find the offset from the marker to the tracked object, to apply the inverse to the tracked transform
+                        Vector3 posOffset = trackedObject.position - markerObject.transform.position;
+                        Quaternion rotOffset = Quaternion.Inverse(trackedObject.rotation) * markerObject.transform.rotation;
+
+                        //Position the whole object
+                        this.transform.position = markerPos + posOffset;
+                        this.transform.rotation = markerRot * Quaternion.Inverse(rotOffset);
+                    }
+                }
+
+                //Now, for debugging, lets position every marker to see which we ended up using & how far out the others were relative to that
+                for (int i = 0; i < markers.Length; i++)
+                {
+                    if (markers[i] == null)
                         continue;
 
-                    markerObject.FiducialPose = poses[i];
+                    FiducialPoseEventArgs pose = _poses.FirstOrDefault(o => o.id == markers[i].id);
+                    markers[i].FiducialPose = pose;
 
-                    trackerPosWorldSpace = leapServiceProvider.DeviceOriginWorldSpace;
-                    markerObject.transform.position = GetMarkerWorldSpacePosition(poses[i].translation.ToVector3());
-                    markerObject.transform.rotation = GetMarkerWorldSpaceRotation(poses[i].rotation.ToQuaternion());
+                    if (pose != null)
+                    {
+                        markers[i].transform.position = GetMarkerWorldSpacePosition(pose.translation.ToVector3());
+                        markers[i].transform.rotation = GetMarkerWorldSpaceRotation(pose.rotation.ToQuaternion());
+                    }
                 }
-                _posesByTime.Remove(_lastTime);
+
+                //Clear the previous frame data ready to log the current AprilTag frame
+                _poses.Clear();
             }
-            _lastTime = timeSinceFirstFiducial;
+
+            //Store data into the current AprilTag frame
+            _poses.Add(poseEvent);
+            _previousFiducialFrameTime = timeSinceFirstFiducial;
         }
-
-        private void Update()
-        {
-            int frameID = Time.frameCount - 1;
-
-            //_framePoses.
-        }
-
-        /*
-        //We've started a new frame. Consume the last one.
-        if (_latestWrittenTimestamp < poseEvent.timestamp)
-        {
-            List<FiducialPoseEventArgs> poses = _fiducialFrames[poseEvent.timestamp];
-
-            for (int i = 0; i < poses.Count; i++)
-            {
-                TrackingMarker markerObject = markers.FirstOrDefault(o => o.id == poses[i].id);
-                if (markerObject == null)
-                    continue;
-
-                markerObject.FiducialPose = poses[i];
-
-                trackerPosWorldSpace = leapServiceProvider.DeviceOriginWorldSpace;
-                markerObject.transform.position = GetMarkerWorldSpacePosition(poses[i].translation.ToVector3());
-                markerObject.transform.rotation = GetMarkerWorldSpaceRotation(poses[i].rotation.ToQuaternion());
-            }
-
-            if (poses.Count > 1)
-            {
-                Debug.LogWarning("Multiple poses in this timestamp: " + poses.Count);
-            }
-        }
-
-        _latestWrittenTimestamp = poseEvent.timestamp;
-        return;
-        */
-
-        private void OnFiducialMarkerPose(object sender, FiducialPoseEventArgs poseEvent)
-        {
-            // We cannot place the marker properly while the ServiceProvider does not exist
-            if (leapServiceProvider == null || leapServiceProvider.enabled == false)
-            {
-                return;
-            }
-
-            // Find a matching TrackingMarker to the one from the event by matching ids
-            TrackingMarker markerObject = null;
-
-            for (int i = 0; i < markers.Length; i++)
-            {
-                if (markers[i] != null && markers[i].id == poseEvent.id)
-                {
-                    markerObject = markers[i];
-                    break;
-                }
-            }
-
-            if (markerObject == null)
-            {
-                // We don't have this marker
-                return;
-            }
-
-            // Get the device position in world space as a LeapTransform to use in future calculations
-            trackerPosWorldSpace = leapServiceProvider.DeviceOriginWorldSpace;
-
-            // Convert the Leap Pose to worldspace Unity units
-            Vector3 markerPos = GetMarkerWorldSpacePosition(poseEvent.translation.ToVector3());
-            Quaternion markerRot = GetMarkerWorldSpaceRotation(poseEvent.rotation.ToQuaternion());
-
-            // Find the offset from the marker to the tracked object, to apply the inverse to the tracked transform
-            Vector3 posOffset = trackedObject.position - markerObject.transform.position;
-            Quaternion rotOffset = Quaternion.Inverse(trackedObject.rotation) * markerObject.transform.rotation;
-
-            targetPos = markerPos + posOffset;
-            targetRot = markerRot * Quaternion.Inverse(rotOffset);
-        }
-
-
-        //private void Update()
-        //{
-        //    trackedObject.position = targetPos;
-        //    trackedObject.rotation = targetRot;
-        //}
 
         #region Utilities
 
