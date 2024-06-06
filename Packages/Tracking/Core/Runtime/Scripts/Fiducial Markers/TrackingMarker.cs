@@ -17,5 +17,19 @@ namespace Leap.Unity
         [Tooltip("The AprilTag marker ID associated with this marker." +
             "\n\nNote: This must be unique within the scene")]
         public int id;
+
+        public bool IsActiveMarker = false;
+
+        private MeshRenderer _renderer;
+
+        private void Awake()
+        {
+            _renderer = GetComponentInChildren<MeshRenderer>();
+        }
+
+        private void Update()
+        {
+            _renderer.material.color = IsActiveMarker ? Color.green : Color.red;
+        }
     }
 }

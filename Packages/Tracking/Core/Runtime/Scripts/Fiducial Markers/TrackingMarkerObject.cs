@@ -18,10 +18,14 @@ namespace Leap.Unity
     public class TrackingMarkerObject : MonoBehaviour
     {
         [Tooltip("The source of the tracking data.")]
-        public LeapServiceProvider leapServiceProvider;
+        [SerializeField] private LeapServiceProvider _leapServiceProvider;
+
+        [Tooltip("The Transform to keep aligned to the center of this tracked object")]
+        [SerializeField] private Transform _targetObject;
 
         private LeapTransform _trackerPosWorldspace;
         private TrackingMarker[] _markers;
+        private Transform[] _markerTransforms;
 
         private List<FiducialPoseEventArgs> _poses = new List<FiducialPoseEventArgs>();
         private float _previousFiducialFrameTime = -1;
@@ -29,23 +33,27 @@ namespace Leap.Unity
         private float _fiducialBaseTime = -1;
         private float _fiducialFPS = 0;
 
+        private bool _isDoingFirstTimeSetup = false;
+
         private void Awake()
         {
             _markers = GetComponentsInChildren<TrackingMarker>();
 
-            if (leapServiceProvider == null)
-                leapServiceProvider = FindObjectOfType<LeapServiceProvider>();
+            _markerTransforms = new Transform[_markers.Length];
+            for (int x = 0; x < _markers.Length; x++)
+                _markerTransforms[x] = _markers[x].transform;
+
+            if (_leapServiceProvider == null)
+                _leapServiceProvider = FindObjectOfType<LeapServiceProvider>();
         }
 
         private void Start()
         {
-            if (leapServiceProvider != null)
+            if (_leapServiceProvider != null)
             {
-                Controller controller = leapServiceProvider.GetLeapController();
-                controller.FiducialPose -= FiducialCalculateMinMax;
-                controller.FiducialPose += FiducialCalculateMinMax;
-                controller.FiducialPose -= FiducialSaveFrameData;
-                controller.FiducialPose += FiducialSaveFrameData;
+                Controller controller = _leapServiceProvider.GetLeapController();
+                controller.FiducialPose -= CaptureAndProcessFiducialFrames;
+                controller.FiducialPose += CaptureAndProcessFiducialFrames;
             }
             else
             {
@@ -53,7 +61,7 @@ namespace Leap.Unity
             }
         }
 
-        private void FiducialSaveFrameData(object sender, FiducialPoseEventArgs poseEvent)
+        private void CaptureAndProcessFiducialFrames(object sender, FiducialPoseEventArgs poseEvent)
         {
             if (_fiducialBaseTime == -1)
                 _fiducialBaseTime = poseEvent.timestamp;
@@ -65,7 +73,7 @@ namespace Leap.Unity
             if (_previousFiducialFrameTime != -1 && timeSinceFirstFiducial != _previousFiducialFrameTime)
             {
                 //Get the device position in world space as a LeapTransform to use in future calculations
-                _trackerPosWorldspace = leapServiceProvider.DeviceOriginWorldSpace;
+                _trackerPosWorldspace = _leapServiceProvider.DeviceOriginWorldSpace;
 
                 //Find the pose in the prev frame with the lowest error
                 FiducialPoseEventArgs lowestErrorPose = null;
@@ -80,44 +88,37 @@ namespace Leap.Unity
                         lowestErrorPose = _poses[i];
                 }
 
-                //If we have a pose to use, find the associated marker GameObject and position us
+                //If we have a pose to use, find the associated marker GameObject
                 if (lowestErrorPose != null)
                 {
                     TrackingMarker markerObject = _markers.FirstOrDefault(o => o.id == lowestErrorPose.id);
                     if (markerObject != null)
                     {
-                        Vector3 desiredPosition = GetMarkerWorldSpacePosition(poseEvent.translation.ToVector3());
-                        Quaternion desiredRotation = GetMarkerWorldSpaceRotation(poseEvent.rotation.ToQuaternion());
+                        //Position all markers relative to the best tracked marker by parenting, moving, then unparenting
+                        Transform[] prevParents = new Transform[_markers.Length];
+                        for (int x = 0; x < _markers.Length; x++)
+                        {
+                            if (_markers[x].id == markerObject.id)
+                                continue;
+                            prevParents[x] = _markers[x].transform.parent;
+                            _markers[x].transform.parent = markerObject.transform;
+                        }
 
-                        // Reference to the parent and child transforms
-                        Transform parentTransform = transform;
-                        Transform childTransform = markerObject.transform;
+                        markerObject.transform.position = GetMarkerWorldSpacePosition(lowestErrorPose.translation.ToVector3());
+                        markerObject.transform.rotation = GetMarkerWorldSpaceRotation(lowestErrorPose.rotation.ToQuaternion());
 
-                        // Calculate the world position and rotation needed for the parent
-                        Vector3 parentPosition = desiredPosition - parentTransform.TransformVector(childTransform.localPosition);
-                        Quaternion parentRotation = desiredRotation * Quaternion.Inverse(childTransform.localRotation);
+                        for (int x = 0; x < _markers.Length; x++)
+                        {
+                            _markers[x].IsActiveMarker = _markers[x].id == markerObject.id;
+                            if (_markers[x].IsActiveMarker)
+                                continue;
+                            _markers[x].transform.parent = prevParents[x];
+                        }
 
-                        // Apply the calculated position and rotation to the parent
-                        parentTransform.position = parentPosition;
-                        parentTransform.rotation = parentRotation;
+                        //Update our target transform
+                        _targetObject.position = GetCentralPosition(_markerTransforms);
+                        _targetObject.rotation = GetAverageRotation(_markerTransforms);
                     }
-                }
-
-                //For debugging: lets position every marker to see which we ended up using & how far out the others were relative to that
-                for (int i = 0; i < _markers.Length; i++)
-                {
-                    continue;
-
-                    if (_markers[i] == null)
-                        continue;
-
-                    FiducialPoseEventArgs pose = _poses.FirstOrDefault(o => o.id == _markers[i].id);
-                    if (pose != null)
-                    {
-                        _markers[i].transform.position = GetMarkerWorldSpacePosition(pose.translation.ToVector3());
-                        _markers[i].transform.rotation = GetMarkerWorldSpaceRotation(pose.rotation.ToQuaternion());
-                    }
-                    _markers[i].gameObject.SetActive(pose != null);
                 }
 
                 //Clear the previous frame data ready to log the current AprilTag frame
@@ -137,31 +138,6 @@ namespace Leap.Unity
         }
 #endif
 
-        #region Error Testing
-
-        private float _maxError = float.NegativeInfinity;
-        private float _minError = float.PositiveInfinity;
-
-        private void OnDestroy()
-        {
-            Debug.Log("MIN Error: " + _minError);
-            Debug.Log("MAX Error: " + _maxError);
-        }
-
-        private void FiducialCalculateMinMax(object sender, FiducialPoseEventArgs poseEvent)
-        {
-            if (poseEvent.estimated_error < _minError)
-            {
-                _minError = poseEvent.estimated_error;
-            }
-            if (poseEvent.estimated_error > _maxError)
-            {
-                _maxError = poseEvent.estimated_error;
-            }
-        }
-
-        #endregion
-
         #region Utilities
 
         Vector3 GetMarkerWorldSpacePosition(Vector3 trackedMarkerPosition)
@@ -180,6 +156,63 @@ namespace Leap.Unity
             trackedMarkerRotation = _trackerPosWorldspace.TransformQuaternion(trackedMarkerRotation);
 
             return trackedMarkerRotation;
+        }
+
+        Vector3 GetCentralPosition(Transform[] transforms)
+        {
+            if (transforms == null || transforms.Length == 0)
+                return Vector3.zero;
+
+            Vector3 sum = Vector3.zero;
+            foreach (Transform t in transforms)
+            {
+                sum += t.position;
+            }
+            return sum / transforms.Length;
+        }
+
+        Quaternion GetAverageRotation(Transform[] transforms)
+        {
+            if (transforms == null || transforms.Length == 0)
+                return Quaternion.identity;
+
+            Quaternion averageRotation = new Quaternion(0, 0, 0, 0);
+            foreach (Transform t in transforms)
+            {
+                if (Quaternion.Dot(t.rotation, averageRotation) > 0)
+                {
+                    averageRotation.x += t.rotation.x;
+                    averageRotation.y += t.rotation.y;
+                    averageRotation.z += t.rotation.z;
+                    averageRotation.w += t.rotation.w;
+                }
+                else
+                {
+                    averageRotation.x -= t.rotation.x;
+                    averageRotation.y -= t.rotation.y;
+                    averageRotation.z -= t.rotation.z;
+                    averageRotation.w -= t.rotation.w;
+                }
+            }
+
+            float magnitude = Mathf.Sqrt(averageRotation.x * averageRotation.x +
+                                         averageRotation.y * averageRotation.y +
+                                         averageRotation.z * averageRotation.z +
+                                         averageRotation.w * averageRotation.w);
+
+            if (magnitude > 0.0001f)
+            {
+                averageRotation.x /= magnitude;
+                averageRotation.y /= magnitude;
+                averageRotation.z /= magnitude;
+                averageRotation.w /= magnitude;
+            }
+            else
+            {
+                averageRotation = Quaternion.identity;
+            }
+
+            return averageRotation;
         }
 
         #endregion
