@@ -6,6 +6,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
+using UnityEditor;
 using UnityEngine;
 
 namespace Leap.Unity
@@ -15,5 +16,15 @@ namespace Leap.Unity
         [Tooltip("The AprilTag marker ID associated with this marker." +
             "\n\nNote: This must be unique within the scene")]
         public int id;
+
+        public FiducialPoseEventArgs pose = null;
+
+        private void OnDrawGizmosSelected()
+        {
+            if (pose == null)
+                return;
+
+            Handles.Label(this.transform.position, pose.timestamp.ToString());
+        }
     }
 }
