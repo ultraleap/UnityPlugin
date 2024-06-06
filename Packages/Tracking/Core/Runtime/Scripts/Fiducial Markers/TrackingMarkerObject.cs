@@ -34,6 +34,8 @@ namespace Leap.Unity
         private float _fiducialBaseTime = -1;
         private float _fiducialFPS = 0;
 
+        private bool _onlyUpdateVisibleMarkers = false;
+
         private void Awake()
         {
             _markers = GetComponentsInChildren<TrackingMarker>();
@@ -53,27 +55,12 @@ namespace Leap.Unity
                 Controller controller = _leapServiceProvider.GetLeapController();
                 controller.FiducialPose -= CaptureAndProcessFiducialFrames;
                 controller.FiducialPose += CaptureAndProcessFiducialFrames;
-                //controller.FiducialPose -= FiducialOutputAllMarkers;
-                //controller.FiducialPose += FiducialOutputAllMarkers;
             }
             else
             {
                 Debug.Log("Unable to begin Fiducial Marker tracking. Cannot connect to a Leap Service Provider.");
             }
         }
-
-        /*
-        private void FiducialOutputAllMarkers(object sender, FiducialPoseEventArgs poseEvent)
-        {
-            TrackingMarker m = _markers.FirstOrDefault(o => o.id == poseEvent.id);
-            if (m == null)
-                return;
-
-            _trackerPosWorldspace = _leapServiceProvider.DeviceOriginWorldSpace;
-            m.transform.position = GetMarkerWorldSpacePosition(poseEvent.translation.ToVector3());
-            m.transform.rotation = GetMarkerWorldSpaceRotation(poseEvent.rotation.ToQuaternion());
-        }
-        */
 
         private void CaptureAndProcessFiducialFrames(object sender, FiducialPoseEventArgs poseEvent)
         {
@@ -89,65 +76,85 @@ namespace Leap.Unity
                 //Get the device position in world space as a LeapTransform to use in future calculations
                 _trackerPosWorldspace = _leapServiceProvider.DeviceOriginWorldSpace;
 
-                //Find the pose in the prev frame with the lowest error
-                FiducialPoseEventArgs lowestErrorPose = null;
-                for (int i = 0; i < _poses.Count; i++)
+                if (_onlyUpdateVisibleMarkers)
                 {
-                    if (lowestErrorPose == null)
+                    //For testing
+                    for (int x = 0; x < _markers.Length; x++)
                     {
-                        lowestErrorPose = _poses[i];
-                        continue;
-                    }
-                    if (lowestErrorPose.estimated_error > _poses[i].estimated_error)
-                        lowestErrorPose = _poses[i];
-                }
+                        if (_markers[x] == null)
+                            continue;
 
-                //TODO: add some "smartness" to it, so if the "best" one from prev frame is still highly rated & hasn't moved far (rotation to cam?), just use that instead
-                _poses = _poses.OrderBy(o => o.estimated_error).ToList();
-                FiducialPoseEventArgs previousBest = _poses.FirstOrDefault(o => o.id == _previousBestFiducialID);
-
-
-                //TODO: just thought - for barista, we could just run through EVERY tracked marker & calculate the avg transform, then average that
-                //, so basically loop this code for every tracked marker and then take an average of the position
-                //would be high on compute but would work better nice for handoffs, and could add a tiny lerp to that using the delta for april
-
-
-                //If we have a pose to use, find the associated marker GameObject
-                if (lowestErrorPose != null)
-                {
-                    TrackingMarker markerObject = _markers.FirstOrDefault(o => o.id == lowestErrorPose.id);
-                    if (markerObject != null)
-                    {
-                        //Position all markers relative to the best tracked marker by parenting, moving, then unparenting
-                        Transform[] prevParents = new Transform[_markers.Length + 1];
-                        for (int x = 0; x < _markers.Length; x++)
+                        FiducialPoseEventArgs pose = _poses.FirstOrDefault(o => o.id == _markers[x].id);
+                        if (pose != null)
                         {
-                            if (_markers[x].id == markerObject.id)
-                                continue;
-                            prevParents[x] = _markers[x].transform.parent;
-                            _markers[x].transform.parent = markerObject.transform;
+                            _markers[x].transform.position = GetMarkerWorldSpacePosition(pose.translation.ToVector3());
+                            _markers[x].transform.rotation = GetMarkerWorldSpaceRotation(pose.rotation.ToQuaternion());
                         }
-                        prevParents[_markers.Length] = _targetObject.parent;
-                        _targetObject.parent = markerObject.transform;
-
-                        markerObject.transform.position = GetMarkerWorldSpacePosition(lowestErrorPose.translation.ToVector3());
-                        markerObject.transform.rotation = GetMarkerWorldSpaceRotation(lowestErrorPose.rotation.ToQuaternion());
-
-                        for (int x = 0; x < _markers.Length; x++)
-                        {
-                            _markers[x].IsActiveMarker = _markers[x].id == markerObject.id;
-                            if (_markers[x].IsActiveMarker)
-                                continue;
-                            _markers[x].transform.parent = prevParents[x];
-                        }
-                        _targetObject.parent = prevParents[_markers.Length];
+                        _markers[x].gameObject.SetActive(pose != null);
                     }
                 }
-
-                //Update debug "IsTracked" state
-                for (int x = 0; x < _markers.Length; x++)
+                else
                 {
-                    _markers[x].IsTracked = _poses.FirstOrDefault(o => o.id == _markers[x].id) != null;
+                    //Find the pose in the prev frame with the lowest error
+                    FiducialPoseEventArgs lowestErrorPose = null;
+                    for (int i = 0; i < _poses.Count; i++)
+                    {
+                        if (lowestErrorPose == null)
+                        {
+                            lowestErrorPose = _poses[i];
+                            continue;
+                        }
+                        if (lowestErrorPose.estimated_error > _poses[i].estimated_error)
+                            lowestErrorPose = _poses[i];
+                    }
+
+                    //TODO: add some "smartness" to it, so if the "best" one from prev frame is still highly rated & hasn't moved far (rotation to cam?), just use that instead
+                    _poses = _poses.OrderBy(o => o.estimated_error).ToList();
+                    FiducialPoseEventArgs previousBest = _poses.FirstOrDefault(o => o.id == _previousBestFiducialID);
+
+
+                    //TODO: just thought - for barista, we could just run through EVERY tracked marker & calculate the avg transform, then average that
+                    //, so basically loop this code for every tracked marker and then take an average of the position
+                    //would be high on compute but would work better nice for handoffs, and could add a tiny lerp to that using the delta for april
+
+
+                    //If we have a pose to use, find the associated marker GameObject
+                    if (lowestErrorPose != null)
+                    {
+                        TrackingMarker markerObject = _markers.FirstOrDefault(o => o.id == lowestErrorPose.id);
+                        if (markerObject != null)
+                        {
+                            //Position all markers relative to the best tracked marker by parenting, moving, then unparenting
+                            Transform[] prevParents = new Transform[_markers.Length + 1];
+                            for (int x = 0; x < _markers.Length; x++)
+                            {
+                                if (_markers[x].id == markerObject.id)
+                                    continue;
+                                prevParents[x] = _markers[x].transform.parent;
+                                _markers[x].transform.parent = markerObject.transform;
+                            }
+                            prevParents[_markers.Length] = _targetObject.parent;
+                            _targetObject.parent = markerObject.transform;
+
+                            markerObject.transform.position = GetMarkerWorldSpacePosition(lowestErrorPose.translation.ToVector3());
+                            markerObject.transform.rotation = GetMarkerWorldSpaceRotation(lowestErrorPose.rotation.ToQuaternion());
+
+                            for (int x = 0; x < _markers.Length; x++)
+                            {
+                                _markers[x].IsActiveMarker = _markers[x].id == markerObject.id;
+                                if (_markers[x].IsActiveMarker)
+                                    continue;
+                                _markers[x].transform.parent = prevParents[x];
+                            }
+                            _targetObject.parent = prevParents[_markers.Length];
+                        }
+                    }
+
+                    //Update debug "IsTracked" state
+                    for (int x = 0; x < _markers.Length; x++)
+                    {
+                        _markers[x].IsTracked = _poses.FirstOrDefault(o => o.id == _markers[x].id) != null;
+                    }
                 }
 
                 //Clear the previous frame data ready to log the current AprilTag frame
