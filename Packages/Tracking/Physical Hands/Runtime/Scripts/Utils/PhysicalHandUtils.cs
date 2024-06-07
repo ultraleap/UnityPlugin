@@ -43,6 +43,8 @@ namespace Leap.Unity.PhysicalHands
         {
             float shortestDistance = float.PositiveInfinity;
 
+            Dictionary<Collider, ClosestColliderDirection> result;
+
             if (objectToCheckDistanceFrom == null)
                 return shortestDistance;
 
@@ -52,7 +54,7 @@ namespace Leap.Unity.PhysicalHands
                 foreach (var bone in hand.bones)
                 {
                     // Only check for distal joints
-                    if (bone.Joint == 2 && bone.NearbyObjects.TryGetValue(objectToCheckDistanceFrom, out Dictionary<Collider, ClosestColliderDirection> result))
+                    if (bone.Joint == 2 && bone.NearbyObjects.TryGetValue(objectToCheckDistanceFrom, out result))
                     {
                         foreach (var value in result.Values)
                         {

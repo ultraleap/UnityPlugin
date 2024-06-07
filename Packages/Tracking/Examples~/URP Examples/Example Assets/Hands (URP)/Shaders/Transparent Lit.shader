@@ -3,7 +3,7 @@ Shader "Ultraleap/URP/Transparent Lit"
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
-        _BaseColor("Base Color", color) = (1,1,1,1)
+        _Color("Base Color", color) = (1,1,1,1)
 
         [Space(20)]
         _Smoothness("Smoothness", Range(0,1)) = 0
@@ -73,7 +73,7 @@ Shader "Ultraleap/URP/Transparent Lit"
             sampler2D _MainTex;
             float4 _MainTex_ST;
 
-            float4 _BaseColor;
+            float4 _Color;
             float _Smoothness, _Metallic;
 
             float _useFresnel;
@@ -114,14 +114,14 @@ Shader "Ultraleap/URP/Transparent Lit"
                 inputdata.bakedGI = SAMPLE_GI( i.lightmapUV, i.vertexSH, inputdata.normalWS );
 
                 SurfaceData surfacedata;
-                surfacedata.albedo = mainTex * _BaseColor;
+                surfacedata.albedo = mainTex * _Color;
                 surfacedata.specular = 0;
                 surfacedata.metallic = _Metallic;
                 surfacedata.smoothness = _Smoothness;
                 surfacedata.normalTS = 0;
                 surfacedata.emission = 0;
                 surfacedata.occlusion = 1;
-                surfacedata.alpha = mainTex.a * _BaseColor.a;
+                surfacedata.alpha = mainTex.a * _Color.a;
                 surfacedata.clearCoatMask = 0;
                 surfacedata.clearCoatSmoothness = 0;
 

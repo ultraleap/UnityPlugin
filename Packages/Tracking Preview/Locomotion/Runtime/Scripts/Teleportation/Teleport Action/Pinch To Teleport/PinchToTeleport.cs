@@ -23,7 +23,7 @@ namespace Leap.Unity.Preview.Locomotion
         private IsFacingObject _isFacingObject;
 
         [SerializeField]
-        private LightweightPinchDetector _pinchDetector;
+        private PinchDetector _pinchDetector;
 
         [Tooltip("The chirality which will be used for pinch to teleport. This will update the chirality in the pinch detector and hand ray.")]
         public Chirality chirality;
@@ -194,7 +194,7 @@ namespace Leap.Unity.Preview.Locomotion
 
             if (_pinchDetector == null)
             {
-                _pinchDetector = GetComponentInChildren<LightweightPinchDetector>(true);
+                _pinchDetector = GetComponentInChildren<PinchDetector>(true);
             }
         }
     }

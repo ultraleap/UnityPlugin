@@ -135,12 +135,12 @@ namespace Leap.Unity.Encoding
             for (int i = 0; i < 5; i++)
             {
                 Vector3 baseMetacarpal = ToLocal(
-                  fromHand.Fingers[i].bones[0].PrevJoint, palmPos, palmRot);
+                  fromHand.fingers[i].bones[0].PrevJoint, palmPos, palmRot);
                 jointPositions[boneIdx++] = baseMetacarpal;
                 for (int j = 0; j < 4; j++)
                 {
                     Vector3 joint = ToLocal(
-                      fromHand.Fingers[i].bones[j].NextJoint, palmPos, palmRot);
+                      fromHand.fingers[i].bones[j].NextJoint, palmPos, palmRot);
                     jointPositions[boneIdx++] = joint;
                 }
             }
@@ -206,7 +206,7 @@ namespace Leap.Unity.Encoding
                       type: (Bone.BoneType)jointIdx,
                       rotation: boneRot);
                 }
-                intoHand.Fingers[fingerIdx].Fill(
+                intoHand.fingers[fingerIdx].Fill(
                   frameId: -1,
                   handId: (isLeft ? 0 : 1),
                   fingerId: fingerIdx,
@@ -545,7 +545,7 @@ namespace Leap.Unity.Encoding
         /// </summary>
         public static Bone GetBone(this Hand hand, int boneIdx)
         {
-            return hand.Fingers[boneIdx / 4].bones[boneIdx % 4];
+            return hand.fingers[boneIdx / 4].bones[boneIdx % 4];
         }
 
         /// <summary>

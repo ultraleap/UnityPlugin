@@ -111,26 +111,26 @@ namespace Leap.Unity.HandsModule
         /// </summary>
         public readonly static Dictionary<BoundTypes, (Finger.FingerType, Bone.BoneType)> boundTypeMapping = new Dictionary<BoundTypes, (Finger.FingerType, Bone.BoneType)>
             {
-            {BoundTypes.THUMB_METACARPAL, (Finger.FingerType.TYPE_THUMB, Bone.BoneType.TYPE_METACARPAL)},
-            {BoundTypes.THUMB_PROXIMAL, (Finger.FingerType.TYPE_THUMB, Bone.BoneType.TYPE_PROXIMAL)},
-            {BoundTypes.THUMB_INTERMEDIATE, (Finger.FingerType.TYPE_THUMB, Bone.BoneType.TYPE_INTERMEDIATE)},
-            {BoundTypes.THUMB_DISTAL, (Finger.FingerType.TYPE_THUMB, Bone.BoneType.TYPE_DISTAL)},
-            {BoundTypes.INDEX_METACARPAL, (Finger.FingerType.TYPE_INDEX, Bone.BoneType.TYPE_METACARPAL)},
-            {BoundTypes.INDEX_PROXIMAL, (Finger.FingerType.TYPE_INDEX, Bone.BoneType.TYPE_PROXIMAL)},
-            {BoundTypes.INDEX_INTERMEDIATE, (Finger.FingerType.TYPE_INDEX, Bone.BoneType.TYPE_INTERMEDIATE)},
-            {BoundTypes.INDEX_DISTAL, (Finger.FingerType.TYPE_INDEX, Bone.BoneType.TYPE_DISTAL)},
-            {BoundTypes.MIDDLE_METACARPAL, (Finger.FingerType.TYPE_MIDDLE, Bone.BoneType.TYPE_METACARPAL)},
-            {BoundTypes.MIDDLE_PROXIMAL, (Finger.FingerType.TYPE_MIDDLE, Bone.BoneType.TYPE_PROXIMAL)},
-            {BoundTypes.MIDDLE_INTERMEDIATE, (Finger.FingerType.TYPE_MIDDLE, Bone.BoneType.TYPE_INTERMEDIATE)},
-            {BoundTypes.MIDDLE_DISTAL, (Finger.FingerType.TYPE_MIDDLE, Bone.BoneType.TYPE_DISTAL)},
-            {BoundTypes.RING_METACARPAL, (Finger.FingerType.TYPE_RING, Bone.BoneType.TYPE_METACARPAL)},
-            {BoundTypes.RING_PROXIMAL, (Finger.FingerType.TYPE_RING, Bone.BoneType.TYPE_PROXIMAL)},
-            {BoundTypes.RING_INTERMEDIATE, (Finger.FingerType.TYPE_RING, Bone.BoneType.TYPE_INTERMEDIATE)},
-            {BoundTypes.RING_DISTAL, (Finger.FingerType.TYPE_RING, Bone.BoneType.TYPE_DISTAL)},
-            {BoundTypes.PINKY_METACARPAL, (Finger.FingerType.TYPE_PINKY, Bone.BoneType.TYPE_METACARPAL)},
-            {BoundTypes.PINKY_PROXIMAL, (Finger.FingerType.TYPE_PINKY, Bone.BoneType.TYPE_PROXIMAL)},
-            {BoundTypes.PINKY_INTERMEDIATE, (Finger.FingerType.TYPE_PINKY, Bone.BoneType.TYPE_INTERMEDIATE)},
-            {BoundTypes.PINKY_DISTAL, (Finger.FingerType.TYPE_PINKY, Bone.BoneType.TYPE_DISTAL)},
+            {BoundTypes.THUMB_METACARPAL, (Finger.FingerType.THUMB, Bone.BoneType.METACARPAL)},
+            {BoundTypes.THUMB_PROXIMAL, (Finger.FingerType.THUMB, Bone.BoneType.PROXIMAL)},
+            {BoundTypes.THUMB_INTERMEDIATE, (Finger.FingerType.THUMB, Bone.BoneType.INTERMEDIATE)},
+            {BoundTypes.THUMB_DISTAL, (Finger.FingerType.THUMB, Bone.BoneType.DISTAL)},
+            {BoundTypes.INDEX_METACARPAL, (Finger.FingerType.INDEX, Bone.BoneType.METACARPAL)},
+            {BoundTypes.INDEX_PROXIMAL, (Finger.FingerType.INDEX, Bone.BoneType.PROXIMAL)},
+            {BoundTypes.INDEX_INTERMEDIATE, (Finger.FingerType.INDEX, Bone.BoneType.INTERMEDIATE)},
+            {BoundTypes.INDEX_DISTAL, (Finger.FingerType.INDEX, Bone.BoneType.DISTAL)},
+            {BoundTypes.MIDDLE_METACARPAL, (Finger.FingerType.MIDDLE, Bone.BoneType.METACARPAL)},
+            {BoundTypes.MIDDLE_PROXIMAL, (Finger.FingerType.MIDDLE, Bone.BoneType.PROXIMAL)},
+            {BoundTypes.MIDDLE_INTERMEDIATE, (Finger.FingerType.MIDDLE, Bone.BoneType.INTERMEDIATE)},
+            {BoundTypes.MIDDLE_DISTAL, (Finger.FingerType.MIDDLE, Bone.BoneType.DISTAL)},
+            {BoundTypes.RING_METACARPAL, (Finger.FingerType.RING, Bone.BoneType.METACARPAL)},
+            {BoundTypes.RING_PROXIMAL, (Finger.FingerType.RING, Bone.BoneType.PROXIMAL)},
+            {BoundTypes.RING_INTERMEDIATE, (Finger.FingerType.RING, Bone.BoneType.INTERMEDIATE)},
+            {BoundTypes.RING_DISTAL, (Finger.FingerType.RING, Bone.BoneType.DISTAL)},
+            {BoundTypes.PINKY_METACARPAL, (Finger.FingerType.PINKY, Bone.BoneType.METACARPAL)},
+            {BoundTypes.PINKY_PROXIMAL, (Finger.FingerType.PINKY, Bone.BoneType.PROXIMAL)},
+            {BoundTypes.PINKY_INTERMEDIATE, (Finger.FingerType.PINKY, Bone.BoneType.INTERMEDIATE)},
+            {BoundTypes.PINKY_DISTAL, (Finger.FingerType.PINKY, Bone.BoneType.DISTAL)},
         };
 
         /// <summary>
@@ -144,10 +144,10 @@ namespace Leap.Unity.HandsModule
             }
 
             //Loop through all the fingers of the hand to calculate where the leap data should be in relation to the Bound Hand
-            for (int leapFingerID = 0; leapFingerID < leapHand.Fingers.Count; leapFingerID++)
+            for (int leapFingerID = 0; leapFingerID < leapHand.fingers.Length; leapFingerID++)
             {
                 //Get the leap Finger
-                Finger leapFinger = leapHand.Fingers[leapFingerID];
+                Finger leapFinger = leapHand.fingers[leapFingerID];
 
                 for (int leapBoneID = 0; leapBoneID < leapFinger.bones.Length; leapBoneID++)
                 {
@@ -155,7 +155,7 @@ namespace Leap.Unity.HandsModule
                     Bone leapBone = leapFinger.bones[leapBoneID];
 
                     //If this bone is the distal bone, calculate a finger tip position
-                    if (leapBoneID == (int)Bone.BoneType.TYPE_DISTAL)
+                    if (leapBoneID == (int)Bone.BoneType.DISTAL)
                     {
                         BoundBone distalBoundBone = boundHand.fingers[leapFingerID].boundBones[leapBoneID];
                         BoundBone intermediateBoundBone = boundHand.fingers[leapFingerID].boundBones[leapBoneID - 1];
@@ -206,9 +206,9 @@ namespace Leap.Unity.HandsModule
                         }
 
                         //If the bone is a metacarpal, use the wrist bone as the previous joint
-                        else if (leapBoneID == (int)Bone.BoneType.TYPE_METACARPAL)
+                        else if (leapBoneID == (int)Bone.BoneType.METACARPAL)
                         {
-                            BoundBone proximalBoundBone = boundHand.fingers[leapFingerID].boundBones[(int)Bone.BoneType.TYPE_PROXIMAL];
+                            BoundBone proximalBoundBone = boundHand.fingers[leapFingerID].boundBones[(int)Bone.BoneType.PROXIMAL];
                             BoundBone wristBoundBone = boundHand.wrist;
 
                             if (proximalBoundBone.boundTransform && wristBoundBone.boundTransform)
@@ -249,12 +249,12 @@ namespace Leap.Unity.HandsModule
             }
 
             //Calculate the palm position half way between the wrist and the middle proximal bone
-            Vector3 palmPos = Vector3.Lerp(leapHand.WristPosition, leapHand.GetMiddle().bones[(int)Bone.BoneType.TYPE_PROXIMAL].PrevJoint, 0.5f);
+            Vector3 palmPos = Vector3.Lerp(leapHand.WristPosition, leapHand.Middle.bones[(int)Bone.BoneType.PROXIMAL].PrevJoint, 0.5f);
 
             //Set the data on the leap hand
             leapHand.PalmPosition = palmPos;
             leapHand.StabilizedPalmPosition = leapHand.PalmPosition;
-            leapHand.PalmWidth = (leapHand.GetPinky().bones[1].PrevJoint - leapHand.GetIndex().bones[1].PrevJoint).magnitude;
+            leapHand.PalmWidth = (leapHand.Pinky.bones[1].PrevJoint - leapHand.Index.bones[1].PrevJoint).magnitude;
             leapHand.Arm.NextJoint = leapHand.WristPosition;
             return leapHand;
         }

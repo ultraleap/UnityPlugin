@@ -89,8 +89,8 @@ namespace Leap.Unity.PhysicalHands
         ///<summary>
         /// Dictionary of dictionaries of the directions from this bone to a grabbable object's colliders
         ///</summary>
-        private Dictionary<Rigidbody, Dictionary<Collider, ClosestColliderDirection>> _grabbableDirections = new Dictionary<Rigidbody, Dictionary<Collider, ClosestColliderDirection>>(10);
-        public Dictionary<Rigidbody, Dictionary<Collider, ClosestColliderDirection>> GrabbableDirections => _grabbableDirections;
+        private Dictionary<Rigidbody, List<ClosestColliderDirection>> _grabbableDirections = new Dictionary<Rigidbody, List<ClosestColliderDirection>>(10);
+        public Dictionary<Rigidbody, List<ClosestColliderDirection>> GrabbableDirections => _grabbableDirections;
 
 
         [field: SerializeField, Tooltip("Is the bone hovering an object? The hover distances are set in the Physics Provider.")]
@@ -218,11 +218,14 @@ namespace Leap.Unity.PhysicalHands
             {
                 collider = colliderCache[i];
 
+                Vector3 colliderTransformPosition = collider.transform.position;
+                Vector3 boneTransformPosition = transform.position;
+
                 if (IsPalm)
                 {
                     // Do palm logic
                     colliderPos = ContactUtils.ClosestPointEstimationFromRectangle(_palmColCenter, _palmColRotation, _palmExtentsReduced.xz(), collider);
-                    bonePos = ContactUtils.ClosestPointToRectangleFace(_palmPoints, _palmPlane.ClosestPointOnPlane(collider.transform.position));
+                    bonePos = ContactUtils.ClosestPointToRectangleFace(_palmPoints, _palmPlane.ClosestPointOnPlane(colliderTransformPosition));
                     midPoint = colliderPos + (bonePos + ((bonePos - colliderPos).normalized * width) - colliderPos) / 2f;
 
                     colliderPos = collider.ClosestPoint(midPoint);
@@ -230,14 +233,19 @@ namespace Leap.Unity.PhysicalHands
                 }
                 else
                 {
-                    colliderPos = collider.ClosestPoint(Vector3.Lerp(transform.position, tipPosition, 0.5f));
+                    // Precalculate line length and normalized direction for efficiency
+                    Vector3 lineDir = tipPosition - boneTransformPosition;
+                    float lineLength = lineDir.magnitude;
+                    lineDir.Normalize();
+
+                    colliderPos = collider.ClosestPoint((boneTransformPosition + tipPosition) * 0.5f);
                     // Do joint logic
-                    bonePos = ContactUtils.GetClosestPointOnFiniteLine(collider.transform.position, transform.position, tipPosition);
+                    bonePos = ContactUtils.GetClosestPointOnFiniteLine(colliderTransformPosition, boneTransformPosition, lineDir, lineLength);
                     // We need to extrude the line to get the bone's edge
                     midPoint = colliderPos + (bonePos + ((bonePos - colliderPos).normalized * width) - colliderPos) / 2f;
 
                     colliderPos = collider.ClosestPoint(midPoint);
-                    bonePos = ContactUtils.GetClosestPointOnFiniteLine(midPoint, transform.position, tipPosition);
+                    bonePos = ContactUtils.GetClosestPointOnFiniteLine(midPoint, boneTransformPosition, lineDir, lineLength);
                 }
 
                 distance = Vector3.Distance(colliderPos, bonePos);
@@ -267,10 +275,13 @@ namespace Leap.Unity.PhysicalHands
                         {
                             if (_nearbyObjects[collider.attachedRigidbody].ContainsKey(collider))
                             {
-                                _nearbyObjects[collider.attachedRigidbody][collider].isContactingCollider = contacting;
-                                _nearbyObjects[collider.attachedRigidbody][collider].direction = direction;
-                                _nearbyObjects[collider.attachedRigidbody][collider].bonePos = bonePos + (direction * width);
-                                _nearbyObjects[collider.attachedRigidbody][collider].distance = boneDistance;
+                                ClosestColliderDirection closestColliderDirectionPoolObj = _nearbyObjects[collider.attachedRigidbody][collider];
+                                closestColliderDirectionPoolObj.isContactingCollider = contacting;
+                                closestColliderDirectionPoolObj.direction = direction;
+                                closestColliderDirectionPoolObj.bonePos = bonePos + (direction * width);
+                                closestColliderDirectionPoolObj.distance = boneDistance;
+
+                                _nearbyObjects[collider.attachedRigidbody][collider] = closestColliderDirectionPoolObj;
                             }
                             else
                             {
@@ -370,11 +381,16 @@ namespace Leap.Unity.PhysicalHands
 
                         if (_grabbableDirections.ContainsKey(rigid))
                         {
-                            _grabbableDirections[rigid] = _nearbyObjects[rigid];
+                            _grabbableDirections[rigid].Clear();
                         }
                         else
                         {
-                            _grabbableDirections.Add(rigid, _nearbyObjects[rigid]);
+                            _grabbableDirections.Add(rigid, new List<ClosestColliderDirection>());
+                        }
+
+                        foreach (var direction in _nearbyObjects[rigid])
+                        {
+                            _grabbableDirections[rigid].Add(direction.Value);
                         }
                     }
                     else
@@ -396,8 +412,6 @@ namespace Leap.Unity.PhysicalHands
                 }
                 _nearbyObjects.Remove(_oldRigids[i]);
                 _grabbableObjects.Remove(_oldRigids[i]);
-
-
             }
         }
 

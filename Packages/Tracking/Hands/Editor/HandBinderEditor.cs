@@ -262,9 +262,10 @@ namespace Leap.Unity.HandsModule
                     for (int i = 0; i < myTarget.BoundHand.fingers.Length; i++)
                     {
                         var offset = boundHand.FindPropertyRelative("fingers").GetArrayElementAtIndex(i).FindPropertyRelative("fingerTipScaleOffset");
-                        var fingerType = ((Finger.FingerType)i).ToString().Remove(0, 5).ToString();
+                        var fingerType = ((Finger.FingerType)i).ToString();
                         EditorGUILayout.PropertyField(offset, new GUIContent(fingerType + " Tip Offset", "The hand finger tip scale will be modified by this amount"));
                     }
+
                 }
 
                 GUI.enabled = true;
@@ -480,12 +481,12 @@ namespace Leap.Unity.HandsModule
                 {
                     for (int i = 0; i < 5; i++)
                     {
-                        var indexCheck = (int)Bone.BoneType.TYPE_METACARPAL;
+                        var indexCheck = (int)Bone.BoneType.METACARPAL;
 
                         //The hand binder does not use the METACARPAL bone for the thumb so draw a line to the proximal instead 
-                        if ((Leap.Finger.FingerType)i == Finger.FingerType.TYPE_THUMB)
+                        if ((Leap.Finger.FingerType)i == Finger.FingerType.THUMB)
                         {
-                            indexCheck = (int)Bone.BoneType.TYPE_PROXIMAL;
+                            indexCheck = (int)Bone.BoneType.PROXIMAL;
                         }
 
                         var joint = myTarget.BoundHand.fingers[i];
@@ -513,7 +514,7 @@ namespace Leap.Unity.HandsModule
             if (debugLeapHand.boolValue)
             {
                 Handles.color = leapHandDebugCol;
-                foreach (var finger in myTarget.LeapHand.Fingers)
+                foreach (var finger in myTarget.LeapHand.fingers)
                 {
                     var index = 0;
 
@@ -533,11 +534,11 @@ namespace Leap.Unity.HandsModule
                 }
 
                 Handles.SphereHandleCap(-1, myTarget.LeapHand.WristPosition, Quaternion.identity, gizmoSize.floatValue, EventType.Repaint);
-                Handles.DrawAAPolyLine(myTarget.LeapHand.WristPosition, myTarget.LeapHand.Fingers[0].bones[0].PrevJoint);
-                Handles.DrawAAPolyLine(myTarget.LeapHand.WristPosition, myTarget.LeapHand.Fingers[1].bones[0].PrevJoint);
-                Handles.DrawAAPolyLine(myTarget.LeapHand.WristPosition, myTarget.LeapHand.Fingers[2].bones[0].PrevJoint);
-                Handles.DrawAAPolyLine(myTarget.LeapHand.WristPosition, myTarget.LeapHand.Fingers[3].bones[0].PrevJoint);
-                Handles.DrawAAPolyLine(myTarget.LeapHand.WristPosition, myTarget.LeapHand.Fingers[4].bones[0].PrevJoint);
+                Handles.DrawAAPolyLine(myTarget.LeapHand.WristPosition, myTarget.LeapHand.fingers[0].bones[0].PrevJoint);
+                Handles.DrawAAPolyLine(myTarget.LeapHand.WristPosition, myTarget.LeapHand.fingers[1].bones[0].PrevJoint);
+                Handles.DrawAAPolyLine(myTarget.LeapHand.WristPosition, myTarget.LeapHand.fingers[2].bones[0].PrevJoint);
+                Handles.DrawAAPolyLine(myTarget.LeapHand.WristPosition, myTarget.LeapHand.fingers[3].bones[0].PrevJoint);
+                Handles.DrawAAPolyLine(myTarget.LeapHand.WristPosition, myTarget.LeapHand.fingers[4].bones[0].PrevJoint);
                 Handles.DrawAAPolyLine(myTarget.LeapHand.WristPosition, myTarget.LeapHand.Arm.PrevJoint);
                 Handles.SphereHandleCap(-1, myTarget.LeapHand.Arm.PrevJoint, Quaternion.identity, gizmoSize.floatValue, EventType.Repaint);
             }
@@ -550,7 +551,7 @@ namespace Leap.Unity.HandsModule
         {
             if (DebugLeapRotationAxis.boolValue)
             {
-                foreach (var FINGER in myTarget.LeapHand.Fingers)
+                foreach (var FINGER in myTarget.LeapHand.fingers)
                 {
                     foreach (var BONE in FINGER.bones)
                     {
@@ -735,16 +736,16 @@ namespace Leap.Unity.HandsModule
 
                 for (int fingerID = 0; fingerID < handBinder.BoundHand.fingers.Length; fingerID++)
                 {
-                    var fingerType = ((Finger.FingerType)fingerID).ToString().Remove(0, 5).ToString();
+                    var fingerType = ((Finger.FingerType)fingerID).ToString();
                     var objectFieldName = "";
                     for (int boneID = 0; boneID < handBinder.BoundHand.fingers[fingerID].boundBones.Length; boneID++)
                     {
-                        if ((Finger.FingerType)fingerID == Finger.FingerType.TYPE_THUMB && (Bone.BoneType)boneID == Bone.BoneType.TYPE_METACARPAL)
+                        if ((Finger.FingerType)fingerID == Finger.FingerType.THUMB && (Bone.BoneType)boneID == Bone.BoneType.METACARPAL)
                         {
                             continue;
                         }
 
-                        var boneType = ((Bone.BoneType)boneID).ToString().Remove(0, 5).ToString();
+                        var boneType = ((Bone.BoneType)boneID).ToString();
 
                         objectFieldName = ((fingerType + " " + boneType + " :").ToString());
                         DrawObjectField(objectFieldName, ref handBinder.BoundHand.fingers[fingerID].boundBones[boneID], true, fingerID, boneID);

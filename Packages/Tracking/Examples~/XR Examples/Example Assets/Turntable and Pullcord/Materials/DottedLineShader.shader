@@ -1,4 +1,4 @@
-﻿Shader "Unlit/DottedLineShader"
+﻿Shader "Ultraleap/DottedLineShader"
 {
     Properties
     {
