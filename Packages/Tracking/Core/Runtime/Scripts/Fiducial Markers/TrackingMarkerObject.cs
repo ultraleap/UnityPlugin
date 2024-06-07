@@ -38,6 +38,7 @@ namespace Leap.Unity
 
         private List<FiducialPoseEventArgs> _poses = new List<FiducialPoseEventArgs>();
         private float _previousFiducialFrameTime = -1;
+        private int _previousBestFiducialID = -1;
 
         private float _fiducialBaseTime = -1;
         private float _fiducialFPS = 0;
@@ -94,10 +95,16 @@ namespace Leap.Unity
                 {
                     _markers.ForEach(o => o?.gameObject?.SetActive(true));
 
-                    //Get the pose with the lowest bias and add it to the pose list multiple times - we want to bias our average towards this
+                    //Get the pose with the lowest error: if the previous best is still tracked, stick with it
                     _poses = _poses.OrderBy(o => o.estimated_error).ToList();
+                    FiducialPoseEventArgs best = _poses[0];
+                    FiducialPoseEventArgs lastBest = _poses.FirstOrDefault(o => o.id == _previousBestFiducialID);
+                    if (lastBest != null) best = lastBest;
+                    _previousBestFiducialID = best.id;
+
+                    //Add the best pose multiple times to bias our average towards it
                     for (int i = 0; i < _bestBias; i++)
-                        _poses.Add(_poses[0]);
+                        _poses.Add(best);
 
                     //Transform to every pose
                     _positions = new Vector3[_poses.Count];
@@ -135,7 +142,7 @@ namespace Leap.Unity
                         }
                         _markers[i].gameObject.SetActive(hasPose);
                         _markers[i].IsTracked = hasPose;
-                        _markers[i].IsHighlighted = hasPose && _poses[0] == pose;
+                        _markers[i].IsHighlighted = hasPose && best == pose;
                     }
                 }
                 else
