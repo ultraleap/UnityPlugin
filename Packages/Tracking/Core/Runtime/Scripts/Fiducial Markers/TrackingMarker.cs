@@ -18,9 +18,9 @@ namespace Leap.Unity
             "\n\nNote: This must be unique within the scene")]
         public int id;
 
-        public bool IsHighlighted = false;
-        public bool IsTracked = false;
-        public string DebugText = "";
+        [HideInInspector] public bool IsHighlighted = false;
+        [HideInInspector] public bool IsTracked = false;
+        [HideInInspector] public string DebugText = "";
 
         private MeshRenderer _renderer;
 
@@ -31,6 +31,9 @@ namespace Leap.Unity
 
         private void Update()
         {
+            if (_renderer == null)
+                return;
+
             _renderer.material.color = IsHighlighted ? Color.green : IsTracked ? new Color(1, 0.5f, 0) : Color.red;
         }
 
