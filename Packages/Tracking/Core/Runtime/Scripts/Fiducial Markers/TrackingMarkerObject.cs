@@ -7,7 +7,6 @@
  ******************************************************************************/
 
 using LeapInternal;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
@@ -20,12 +19,20 @@ namespace Leap.Unity
         [Tooltip("The source of the tracking data.")]
         [SerializeField] private LeapServiceProvider _leapServiceProvider;
 
-        [Tooltip("The Transform to keep aligned to the center of this tracked object")]
+        [Tooltip("The Transform to keep aligned to this tracked object")]
         [SerializeField] private Transform _targetObject;
+
+        [Tooltip("The way to keep the target object aligned: use the highest rated marker, or average of all tracked")]
+        [SerializeField] private PositioningMethod _positioningMethod = PositioningMethod.USE_BEST;
+        private enum PositioningMethod { USE_BEST, USE_AVERAGE }
+
+        [Tooltip("Enable this to position/render TrackingMarker objects at their tracked position")]
+        [SerializeField] private bool _showRawMarkerData = false;
 
         private LeapTransform _trackerPosWorldspace;
         private TrackingMarker[] _markers;
         private Transform[] _markerTransforms;
+        private Transform _targetTransform;
 
         private List<FiducialPoseEventArgs> _poses = new List<FiducialPoseEventArgs>();
         private float _previousFiducialFrameTime = -1;
@@ -34,18 +41,22 @@ namespace Leap.Unity
         private float _fiducialBaseTime = -1;
         private float _fiducialFPS = 0;
 
-        private bool _onlyUpdateVisibleMarkers = false;
+        private Vector3[] _positions = null;
+        private Vector3[] _forwards = null;
+        private Vector3[] _ups = null;
 
         private void Awake()
         {
             _markers = GetComponentsInChildren<TrackingMarker>();
 
             _markerTransforms = new Transform[_markers.Length];
-            for (int x = 0; x < _markers.Length; x++)
-                _markerTransforms[x] = _markers[x].transform;
+            for (int i = 0; i < _markers.Length; i++)
+                _markerTransforms[i] = _markers[i].transform;
 
             if (_leapServiceProvider == null)
                 _leapServiceProvider = FindObjectOfType<LeapServiceProvider>();
+
+            _targetTransform = new GameObject("TargetTransform").transform;
         }
 
         private void Start()
@@ -76,85 +87,78 @@ namespace Leap.Unity
                 //Get the device position in world space as a LeapTransform to use in future calculations
                 _trackerPosWorldspace = _leapServiceProvider.DeviceOriginWorldSpace;
 
-                if (_onlyUpdateVisibleMarkers)
-                {
-                    //For testing
-                    for (int x = 0; x < _markers.Length; x++)
-                    {
-                        if (_markers[x] == null)
-                            continue;
+                //Enable all markers
+                _markers.ForEach(o => o?.gameObject?.SetActive(true));
 
-                        FiducialPoseEventArgs pose = _poses.FirstOrDefault(o => o.id == _markers[x].id);
-                        if (pose != null)
+                //Position the target object based on marker data
+                switch (_positioningMethod)
+                {
+                    case PositioningMethod.USE_BEST:
+                        //Find the pose in the prev frame with the lowest error
+                        FiducialPoseEventArgs lowestErrorPose = null;
+                        for (int i = 0; i < _poses.Count; i++)
                         {
-                            _markers[x].transform.position = GetMarkerWorldSpacePosition(pose.translation.ToVector3());
-                            _markers[x].transform.rotation = GetMarkerWorldSpaceRotation(pose.rotation.ToQuaternion());
+                            if (lowestErrorPose == null)
+                            {
+                                lowestErrorPose = _poses[i];
+                                continue;
+                            }
+                            if (lowestErrorPose.estimated_error > _poses[i].estimated_error)
+                                lowestErrorPose = _poses[i];
                         }
-                        _markers[x].gameObject.SetActive(pose != null);
-                    }
+
+                        //Transform the target object to the best pose
+                        if (lowestErrorPose != null)
+                            TransformTargetObjectToPose(lowestErrorPose, true);
+
+                        //TODO: add some "smartness" to it, so if the "best" one from prev frame is still highly rated & hasn't moved far (rotation to cam?), just use that instead
+                        // _poses = _poses.OrderBy(o => o.estimated_error).ToList();
+                        // FiducialPoseEventArgs previousBest = _poses.FirstOrDefault(o => o.id == _previousBestFiducialID);
+                        break;
+
+                    case PositioningMethod.USE_AVERAGE:
+                        if (_poses.Count != 0)
+                        {
+                            //Transform to every tracked pose
+                            _positions = new Vector3[_poses.Count];
+                            _forwards = new Vector3[_poses.Count];
+                            _ups = new Vector3[_poses.Count];
+                            for (int i = 0; i < _poses.Count; i++)
+                            {
+                                TransformTargetObjectToPose(_poses[i], false);
+                                _positions[i] = _targetTransform.transform.position;
+                                _forwards[i] = _targetTransform.transform.forward;
+                                _ups[i] = _targetTransform.transform.up;
+                            }
+
+                            //Take the average position & calculate rotation based on forwards/up
+                            Vector3 avgPosition = GetAverageVector3(_positions);
+                            Vector3 avgUp = GetAverageVector3(_ups);
+                            Vector3 avgForward = GetAverageVector3(_forwards);
+                            _targetObject.transform.position = avgPosition;
+                            _targetObject.transform.rotation = Quaternion.LookRotation(avgForward, avgUp);
+                        }
+                        break;
                 }
-                else
+
+                //Only enable tracked markers, and update them to their real positions (gives us a nice render)
+                for (int i = 0; i < _markers.Length; i++)
                 {
-                    //Find the pose in the prev frame with the lowest error
-                    FiducialPoseEventArgs lowestErrorPose = null;
-                    for (int i = 0; i < _poses.Count; i++)
+                    if (_markers[i] == null)
+                        continue;
+
+                    FiducialPoseEventArgs pose = _poses.FirstOrDefault(o => o.id == _markers[i].id);
+                    bool hasPose = pose != null;
+                    if (_showRawMarkerData)
                     {
-                        if (lowestErrorPose == null)
+                        if (hasPose)
                         {
-                            lowestErrorPose = _poses[i];
-                            continue;
+                            _markers[i].transform.position = GetMarkerWorldSpacePosition(pose.translation.ToVector3());
+                            _markers[i].transform.rotation = GetMarkerWorldSpaceRotation(pose.rotation.ToQuaternion());
                         }
-                        if (lowestErrorPose.estimated_error > _poses[i].estimated_error)
-                            lowestErrorPose = _poses[i];
+                        _markers[i].gameObject.SetActive(hasPose);
                     }
-
-                    //TODO: add some "smartness" to it, so if the "best" one from prev frame is still highly rated & hasn't moved far (rotation to cam?), just use that instead
-                    _poses = _poses.OrderBy(o => o.estimated_error).ToList();
-                    FiducialPoseEventArgs previousBest = _poses.FirstOrDefault(o => o.id == _previousBestFiducialID);
-
-
-                    //TODO: just thought - for barista, we could just run through EVERY tracked marker & calculate the avg transform, then average that
-                    //, so basically loop this code for every tracked marker and then take an average of the position
-                    //would be high on compute but would work better nice for handoffs, and could add a tiny lerp to that using the delta for april
-
-
-                    //If we have a pose to use, find the associated marker GameObject
-                    if (lowestErrorPose != null)
-                    {
-                        TrackingMarker markerObject = _markers.FirstOrDefault(o => o.id == lowestErrorPose.id);
-                        if (markerObject != null)
-                        {
-                            //Position all markers relative to the best tracked marker by parenting, moving, then unparenting
-                            Transform[] prevParents = new Transform[_markers.Length + 1];
-                            for (int x = 0; x < _markers.Length; x++)
-                            {
-                                if (_markers[x].id == markerObject.id)
-                                    continue;
-                                prevParents[x] = _markers[x].transform.parent;
-                                _markers[x].transform.parent = markerObject.transform;
-                            }
-                            prevParents[_markers.Length] = _targetObject.parent;
-                            _targetObject.parent = markerObject.transform;
-
-                            markerObject.transform.position = GetMarkerWorldSpacePosition(lowestErrorPose.translation.ToVector3());
-                            markerObject.transform.rotation = GetMarkerWorldSpaceRotation(lowestErrorPose.rotation.ToQuaternion());
-
-                            for (int x = 0; x < _markers.Length; x++)
-                            {
-                                _markers[x].IsActiveMarker = _markers[x].id == markerObject.id;
-                                if (_markers[x].IsActiveMarker)
-                                    continue;
-                                _markers[x].transform.parent = prevParents[x];
-                            }
-                            _targetObject.parent = prevParents[_markers.Length];
-                        }
-                    }
-
-                    //Update debug "IsTracked" state
-                    for (int x = 0; x < _markers.Length; x++)
-                    {
-                        _markers[x].IsTracked = _poses.FirstOrDefault(o => o.id == _markers[x].id) != null;
-                    }
+                    _markers[i].IsTracked = hasPose;
                 }
 
                 //Clear the previous frame data ready to log the current AprilTag frame
@@ -167,10 +171,59 @@ namespace Leap.Unity
             _previousFiducialFrameTime = timeSinceFirstFiducial;
         }
 
+        private void TransformTargetObjectToPose(FiducialPoseEventArgs pose, bool highlight)
+        {
+            //Position all markers relative to the tracked marker pose by parenting, moving, then unparenting
+            TrackingMarker markerObject = _markers.FirstOrDefault(o => o.id == pose.id);
+            if (markerObject != null)
+            {
+                Transform[] prevParents = new Transform[_markers.Length + 1];
+                for (int x = 0; x < _markers.Length; x++)
+                {
+                    if (_markers[x].id == markerObject.id)
+                        continue;
+                    prevParents[x] = _markers[x].transform.parent;
+                    _markers[x].transform.parent = markerObject.transform;
+                }
+                prevParents[_markers.Length] = _targetTransform.parent;
+                _targetTransform.parent = markerObject.transform;
+
+                markerObject.transform.position = GetMarkerWorldSpacePosition(pose.translation.ToVector3());
+                markerObject.transform.rotation = GetMarkerWorldSpaceRotation(pose.rotation.ToQuaternion());
+
+                for (int x = 0; x < _markers.Length; x++)
+                {
+                    _markers[x].IsHighlighted = highlight && _markers[x].id == markerObject.id;
+                    if (_markers[x].id == markerObject.id)
+                        continue;
+                    _markers[x].transform.parent = prevParents[x];
+                }
+                _targetTransform.parent = prevParents[_markers.Length];
+            }
+        }
+
 #if UNITY_EDITOR
         private void OnDrawGizmosSelected()
         {
             Handles.Label(transform.position, "Fiducial FPS: " + _fiducialFPS);
+
+            if (_positions != null)
+            {
+                Vector3[] forwards = new Vector3[_positions.Length];
+                for (int i = 0; i < _positions.Length; i++)
+                {
+                    forwards[i] = _positions[i] + (_forwards[i] * 1.0f);
+
+                    Gizmos.color = GetRandomColor();
+                    Gizmos.DrawSphere(_positions[i], 0.01f);
+                    Gizmos.DrawSphere(forwards[i], 0.01f);
+                    Gizmos.DrawLine(_positions[i], forwards[i]);
+                }
+
+                Gizmos.color = Color.red;
+                Gizmos.DrawWireSphere(GetAverageVector3(_positions), 0.1f);
+                Gizmos.DrawWireSphere(GetAverageVector3(forwards), 0.1f);
+            }
         }
 #endif
 
@@ -192,6 +245,22 @@ namespace Leap.Unity
             trackedMarkerRotation = _trackerPosWorldspace.TransformQuaternion(trackedMarkerRotation);
 
             return trackedMarkerRotation;
+        }
+
+        Vector3 GetAverageVector3(Vector3[] v)
+        {
+            Vector3 sum = Vector3.zero;
+            for (int i = 0; i < v.Length; i++)
+                sum += v[i];
+            return sum / v.Length;
+        }
+
+        Color GetRandomColor()
+        {
+            float red = Random.Range(0f, 1f);
+            float green = Random.Range(0f, 1f);
+            float blue = Random.Range(0f, 1f);
+            return new Color(red, green, blue);
         }
 
         #endregion
