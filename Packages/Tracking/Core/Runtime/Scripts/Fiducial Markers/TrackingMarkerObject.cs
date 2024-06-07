@@ -22,13 +22,6 @@ namespace Leap.Unity
         [Tooltip("The Transform to keep aligned to this tracked object")]
         [SerializeField] private Transform _targetObject;
 
-        [Tooltip("The way to keep the target object aligned: use the highest rated marker, or average of all tracked")]
-        [SerializeField] private PositioningMethod _positioningMethod = PositioningMethod.USE_BEST;
-        private enum PositioningMethod { USE_BEST, USE_AVERAGE }
-
-        [Tooltip("Enable this to position/render TrackingMarker objects at their tracked position")]
-        [SerializeField] private bool _showRawMarkerData = false;
-
         private LeapTransform _trackerPosWorldspace;
         private TrackingMarker[] _markers;
         private Transform[] _markerTransforms;
@@ -36,7 +29,6 @@ namespace Leap.Unity
 
         private List<FiducialPoseEventArgs> _poses = new List<FiducialPoseEventArgs>();
         private float _previousFiducialFrameTime = -1;
-        private int _previousBestFiducialID = -1;
 
         private float _fiducialBaseTime = -1;
         private float _fiducialFPS = 0;
@@ -44,6 +36,8 @@ namespace Leap.Unity
         private Vector3[] _positions = null;
         private Vector3[] _forwards = null;
         private Vector3[] _ups = null;
+
+        private int _bestBias = 3;
 
         private void Awake()
         {
@@ -87,81 +81,60 @@ namespace Leap.Unity
                 //Get the device position in world space as a LeapTransform to use in future calculations
                 _trackerPosWorldspace = _leapServiceProvider.DeviceOriginWorldSpace;
 
-                //Enable all markers
-                _markers.ForEach(o => o?.gameObject?.SetActive(true));
 
-                //Position the target object based on marker data
-                switch (_positioningMethod)
+                if (_poses.Count != 0)
                 {
-                    case PositioningMethod.USE_BEST:
-                        //Find the pose in the prev frame with the lowest error
-                        FiducialPoseEventArgs lowestErrorPose = null;
-                        for (int i = 0; i < _poses.Count; i++)
-                        {
-                            if (lowestErrorPose == null)
-                            {
-                                lowestErrorPose = _poses[i];
-                                continue;
-                            }
-                            if (lowestErrorPose.estimated_error > _poses[i].estimated_error)
-                                lowestErrorPose = _poses[i];
-                        }
+                    _markers.ForEach(o => o?.gameObject?.SetActive(true));
 
-                        //Transform the target object to the best pose
-                        if (lowestErrorPose != null)
-                            TransformTargetObjectToPose(lowestErrorPose, true);
+                    //Get the pose with the lowest bias and add it to the pose list multiple times - we want to bias our average towards this
+                    _poses = _poses.OrderBy(o => o.estimated_error).ToList();
+                    for (int i = 0; i < _bestBias; i++)
+                        _poses.Add(_poses[0]);
 
-                        //TODO: add some "smartness" to it, so if the "best" one from prev frame is still highly rated & hasn't moved far (rotation to cam?), just use that instead
-                        // _poses = _poses.OrderBy(o => o.estimated_error).ToList();
-                        // FiducialPoseEventArgs previousBest = _poses.FirstOrDefault(o => o.id == _previousBestFiducialID);
-                        break;
-
-                    case PositioningMethod.USE_AVERAGE:
-                        if (_poses.Count != 0)
-                        {
-                            //Transform to every tracked pose
-                            _positions = new Vector3[_poses.Count];
-                            _forwards = new Vector3[_poses.Count];
-                            _ups = new Vector3[_poses.Count];
-                            for (int i = 0; i < _poses.Count; i++)
-                            {
-                                TransformTargetObjectToPose(_poses[i], false);
-                                _positions[i] = _targetTransform.transform.position;
-                                _forwards[i] = _targetTransform.transform.forward;
-                                _ups[i] = _targetTransform.transform.up;
-                            }
-
-                            //Take the average position & calculate rotation based on forwards/up
-                            Vector3 avgPosition = GetAverageVector3(_positions);
-                            Vector3 avgUp = GetAverageVector3(_ups);
-                            Vector3 avgForward = GetAverageVector3(_forwards);
-                            _targetObject.transform.position = avgPosition;
-                            _targetObject.transform.rotation = Quaternion.LookRotation(avgForward, avgUp);
-                        }
-                        break;
-                }
-
-                //Only enable tracked markers, and update them to their real positions (gives us a nice render)
-                for (int i = 0; i < _markers.Length; i++)
-                {
-                    if (_markers[i] == null)
-                        continue;
-
-                    FiducialPoseEventArgs pose = _poses.FirstOrDefault(o => o.id == _markers[i].id);
-                    bool hasPose = pose != null;
-                    if (_showRawMarkerData)
+                    //Transform to every pose
+                    _positions = new Vector3[_poses.Count];
+                    _forwards = new Vector3[_poses.Count];
+                    _ups = new Vector3[_poses.Count];
+                    for (int i = 0; i < _poses.Count; i++)
                     {
+                        TransformToPose(_poses[i], false);
+                        _positions[i] = _targetTransform.transform.position;
+                        _forwards[i] = _targetTransform.transform.forward;
+                        _ups[i] = _targetTransform.transform.up;
+                    }
+
+                    //Take the average position & calculate rotation based on forwards/up
+                    Vector3 avgPosition = GetAverageVector3(_positions);
+                    Vector3 avgUp = GetAverageVector3(_ups);
+                    Vector3 avgForward = GetAverageVector3(_forwards);
+                    _targetObject.transform.position = avgPosition;
+                    _targetObject.transform.rotation = Quaternion.LookRotation(avgForward, avgUp);
+
+                    //Only enable tracked markers, and update them to their real positions (gives us a nice render)
+                    for (int i = 0; i < _markers.Length; i++)
+                    {
+                        if (_markers[i] == null)
+                            continue;
+                        _markers[i].DebugText = "";
+
+                        FiducialPoseEventArgs pose = _poses.FirstOrDefault(o => o.id == _markers[i].id);
+                        bool hasPose = pose != null;
                         if (hasPose)
                         {
                             _markers[i].transform.position = GetMarkerWorldSpacePosition(pose.translation.ToVector3());
                             _markers[i].transform.rotation = GetMarkerWorldSpaceRotation(pose.rotation.ToQuaternion());
+                            _markers[i].DebugText = "Error: " + pose.estimated_error.ToString("F20");
                         }
                         _markers[i].gameObject.SetActive(hasPose);
+                        _markers[i].IsTracked = hasPose;
+                        _markers[i].IsHighlighted = hasPose && _poses[0] == pose;
                     }
-                    _markers[i].IsTracked = hasPose;
+                }
+                else
+                {
+                    _markers.ForEach(o => o?.gameObject?.SetActive(false));
                 }
 
-                //Clear the previous frame data ready to log the current AprilTag frame
                 _poses.Clear();
                 _fiducialFPS = 1.0f / (timeSinceFirstFiducial - _previousFiducialFrameTime);
             }
@@ -171,7 +144,7 @@ namespace Leap.Unity
             _previousFiducialFrameTime = timeSinceFirstFiducial;
         }
 
-        private void TransformTargetObjectToPose(FiducialPoseEventArgs pose, bool highlight)
+        private void TransformToPose(FiducialPoseEventArgs pose, bool highlight)
         {
             //Position all markers relative to the tracked marker pose by parenting, moving, then unparenting
             TrackingMarker markerObject = _markers.FirstOrDefault(o => o.id == pose.id);

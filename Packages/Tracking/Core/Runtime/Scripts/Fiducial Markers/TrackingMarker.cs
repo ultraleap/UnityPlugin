@@ -20,6 +20,7 @@ namespace Leap.Unity
 
         public bool IsHighlighted = false;
         public bool IsTracked = false;
+        public string DebugText = "";
 
         private MeshRenderer _renderer;
 
@@ -32,5 +33,12 @@ namespace Leap.Unity
         {
             _renderer.material.color = IsHighlighted ? Color.green : IsTracked ? new Color(1, 0.5f, 0) : Color.red;
         }
+
+#if UNITY_EDITOR
+        private void OnDrawGizmosSelected()
+        {
+            Handles.Label(transform.position, DebugText);
+        }
+#endif
     }
 }
