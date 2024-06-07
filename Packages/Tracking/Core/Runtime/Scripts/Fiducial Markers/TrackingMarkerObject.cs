@@ -7,6 +7,7 @@
  ******************************************************************************/
 
 using LeapInternal;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
@@ -21,6 +22,14 @@ namespace Leap.Unity
 
         [Tooltip("The Transform to keep aligned to this tracked object")]
         [SerializeField] private Transform _targetObject;
+
+        public Action OnTrackingStart, OnTrackingLost;
+
+        public bool Tracked { get { return _tracked; } }
+        private bool _tracked = false;
+
+        private int _framesBeforeLostTracking = 30;
+        private int _frameLastTracked;
 
         private LeapTransform _trackerPosWorldspace;
         private TrackingMarker[] _markers;
@@ -81,7 +90,6 @@ namespace Leap.Unity
                 //Get the device position in world space as a LeapTransform to use in future calculations
                 _trackerPosWorldspace = _leapServiceProvider.DeviceOriginWorldSpace;
 
-
                 if (_poses.Count != 0)
                 {
                     _markers.ForEach(o => o?.gameObject?.SetActive(true));
@@ -137,6 +145,7 @@ namespace Leap.Unity
 
                 _poses.Clear();
                 _fiducialFPS = 1.0f / (timeSinceFirstFiducial - _previousFiducialFrameTime);
+                _frameLastTracked = Time.frameCount;
             }
 
             //Store data into the current AprilTag frame
@@ -172,6 +181,26 @@ namespace Leap.Unity
                     _markers[x].transform.parent = prevParents[x];
                 }
                 _targetTransform.parent = prevParents[_markers.Length];
+            }
+        }
+
+        private void Update()
+        {
+            if (Time.frameCount - _frameLastTracked > _framesBeforeLostTracking)
+            {
+                if (_tracked)
+                {
+                    _tracked = false;
+                    OnTrackingLost?.Invoke();
+                }
+            }
+            else
+            {
+                if (!_tracked)
+                {
+                    _tracked = true;
+                    OnTrackingStart?.Invoke();
+                }
             }
         }
 
@@ -230,9 +259,9 @@ namespace Leap.Unity
 
         Color GetRandomColor()
         {
-            float red = Random.Range(0f, 1f);
-            float green = Random.Range(0f, 1f);
-            float blue = Random.Range(0f, 1f);
+            float red = UnityEngine.Random.Range(0f, 1f);
+            float green = UnityEngine.Random.Range(0f, 1f);
+            float blue = UnityEngine.Random.Range(0f, 1f);
             return new Color(red, green, blue);
         }
 
