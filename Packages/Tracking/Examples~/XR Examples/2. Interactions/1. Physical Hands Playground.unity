@@ -1348,7 +1348,7 @@ MeshRenderer:
   m_RenderingLayerMask: 257
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 8bf483d1467d72c418541702679a30a2, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1724,6 +1724,28 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1425814782421875418, guid: b19d51e6a7ac86045884866247967cc6, type: 3}
   m_PrefabInstance: {fileID: 386809003}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &386809005 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1425814784214717005, guid: b19d51e6a7ac86045884866247967cc6, type: 3}
+  m_PrefabInstance: {fileID: 386809003}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &386809006
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 386809005}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b3763add1152ac4aab69357a419a664, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  HandToIgnoreGrabs: 2
+  _disableAllGrabbing: 1
+  HandToIgnoreCollisions: 3
+  _disableAllHandCollisions: 0
+  _disableCollisionOnChildren: 0
 --- !u!1 &387812141
 GameObject:
   m_ObjectHideFlags: 0
@@ -2434,6 +2456,7 @@ GameObject:
   - component: {fileID: 502643502}
   - component: {fileID: 502643501}
   - component: {fileID: 502643500}
+  - component: {fileID: 502643504}
   m_Layer: 0
   m_Name: Pressable Object
   m_TagString: Untagged
@@ -2522,6 +2545,23 @@ Transform:
   m_Father: {fileID: 3461729855441357325}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &502643504
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 502643499}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b3763add1152ac4aab69357a419a664, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  HandToIgnoreGrabs: 2
+  _disableAllGrabbing: 1
+  HandToIgnoreCollisions: 2
+  _disableAllHandCollisions: 0
+  _disableCollisionOnChildren: 0
 --- !u!1 &509404234
 GameObject:
   m_ObjectHideFlags: 0
@@ -5178,7 +5218,7 @@ MeshRenderer:
   m_RenderingLayerMask: 257
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 8bf483d1467d72c418541702679a30a2, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -5549,6 +5589,7 @@ GameObject:
   - component: {fileID: 1044119790}
   - component: {fileID: 1044119789}
   - component: {fileID: 1044119788}
+  - component: {fileID: 1044119791}
   m_Layer: 0
   m_Name: Pressable Object (1)
   m_TagString: Untagged
@@ -5637,6 +5678,23 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1044119786}
   m_Mesh: {fileID: -5495902117074765545, guid: 920bda1c94dbacd4fa4b38c310d4dc4b, type: 3}
+--- !u!114 &1044119791
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1044119786}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b3763add1152ac4aab69357a419a664, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  HandToIgnoreGrabs: 2
+  _disableAllGrabbing: 1
+  HandToIgnoreCollisions: 2
+  _disableAllHandCollisions: 0
+  _disableCollisionOnChildren: 0
 --- !u!1 &1086534614
 GameObject:
   m_ObjectHideFlags: 0
@@ -6542,7 +6600,7 @@ MeshRenderer:
   m_RenderingLayerMask: 257
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 8bf483d1467d72c418541702679a30a2, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -8102,6 +8160,14 @@ PrefabInstance:
       propertyPath: m_StaticEditorFlags
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3443015247324668383, guid: 86476b805c5eb3249acaf2519bc48704, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 8bf483d1467d72c418541702679a30a2, type: 2}
+    - target: {fileID: 3443015247374020541, guid: 86476b805c5eb3249acaf2519bc48704, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 8bf483d1467d72c418541702679a30a2, type: 2}
     - target: {fileID: 3443015247374020543, guid: 86476b805c5eb3249acaf2519bc48704, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 0
@@ -8110,14 +8176,26 @@ PrefabInstance:
       propertyPath: m_StaticEditorFlags
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3443015248070672698, guid: 86476b805c5eb3249acaf2519bc48704, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 8bf483d1467d72c418541702679a30a2, type: 2}
     - target: {fileID: 3443015248277677681, guid: 86476b805c5eb3249acaf2519bc48704, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3443015248277677687, guid: 86476b805c5eb3249acaf2519bc48704, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 8bf483d1467d72c418541702679a30a2, type: 2}
     - target: {fileID: 3813034981144363593, guid: 86476b805c5eb3249acaf2519bc48704, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5759763415519514150, guid: 86476b805c5eb3249acaf2519bc48704, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 8bf483d1467d72c418541702679a30a2, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 86476b805c5eb3249acaf2519bc48704, type: 3}
 --- !u!4 &1530142549 stripped
@@ -10724,6 +10802,14 @@ PrefabInstance:
       propertyPath: m_StaticEditorFlags
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3443015247324668383, guid: 86476b805c5eb3249acaf2519bc48704, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 8bf483d1467d72c418541702679a30a2, type: 2}
+    - target: {fileID: 3443015247374020541, guid: 86476b805c5eb3249acaf2519bc48704, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 8bf483d1467d72c418541702679a30a2, type: 2}
     - target: {fileID: 3443015247374020543, guid: 86476b805c5eb3249acaf2519bc48704, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 0
@@ -10732,14 +10818,26 @@ PrefabInstance:
       propertyPath: m_StaticEditorFlags
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3443015248070672698, guid: 86476b805c5eb3249acaf2519bc48704, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 8bf483d1467d72c418541702679a30a2, type: 2}
     - target: {fileID: 3443015248277677681, guid: 86476b805c5eb3249acaf2519bc48704, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3443015248277677687, guid: 86476b805c5eb3249acaf2519bc48704, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 8bf483d1467d72c418541702679a30a2, type: 2}
     - target: {fileID: 3813034981144363593, guid: 86476b805c5eb3249acaf2519bc48704, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5759763415519514150, guid: 86476b805c5eb3249acaf2519bc48704, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 8bf483d1467d72c418541702679a30a2, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 86476b805c5eb3249acaf2519bc48704, type: 3}
 --- !u!4 &1850344967 stripped
@@ -11341,6 +11439,14 @@ PrefabInstance:
       propertyPath: m_StaticEditorFlags
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3443015247324668383, guid: 86476b805c5eb3249acaf2519bc48704, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 8bf483d1467d72c418541702679a30a2, type: 2}
+    - target: {fileID: 3443015247374020541, guid: 86476b805c5eb3249acaf2519bc48704, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 8bf483d1467d72c418541702679a30a2, type: 2}
     - target: {fileID: 3443015247374020543, guid: 86476b805c5eb3249acaf2519bc48704, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 0
@@ -11349,14 +11455,26 @@ PrefabInstance:
       propertyPath: m_StaticEditorFlags
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3443015248070672698, guid: 86476b805c5eb3249acaf2519bc48704, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 8bf483d1467d72c418541702679a30a2, type: 2}
     - target: {fileID: 3443015248277677681, guid: 86476b805c5eb3249acaf2519bc48704, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3443015248277677687, guid: 86476b805c5eb3249acaf2519bc48704, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 8bf483d1467d72c418541702679a30a2, type: 2}
     - target: {fileID: 3813034981144363593, guid: 86476b805c5eb3249acaf2519bc48704, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5759763415519514150, guid: 86476b805c5eb3249acaf2519bc48704, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 8bf483d1467d72c418541702679a30a2, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 86476b805c5eb3249acaf2519bc48704, type: 3}
 --- !u!4 &2012823008 stripped
@@ -11945,7 +12063,6 @@ MonoBehaviour:
   _pressableObject: {fileID: 1044119786}
   _buttonPressExitThreshold: 0.5
   _usePrimaryHover: 0
-  _buttonIgnoreGrabs: 1
   _buttonPreset: 0
   OnButtonPressed:
     m_PersistentCalls:
@@ -12102,7 +12219,6 @@ MonoBehaviour:
   _pressableObject: {fileID: 502643499}
   _buttonPressExitThreshold: 0.5
   _usePrimaryHover: 0
-  _buttonIgnoreGrabs: 1
   _buttonPreset: 0
   OnButtonPressed:
     m_PersistentCalls:
@@ -12792,7 +12908,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _automaticTravelDistance: 0
-  _whichHandCanPressButton: 2
+  _whichHandCanPressButton: 1
   springValue: 10
   damperValue: 0
   maxForceValue: 5
@@ -12803,7 +12919,6 @@ MonoBehaviour:
   _pressableObject: {fileID: 385804509}
   _buttonPressExitThreshold: 0.5
   _usePrimaryHover: 0
-  _buttonIgnoreGrabs: 1
   _buttonPreset: 0
   OnButtonPressed:
     m_PersistentCalls:
@@ -12902,7 +13017,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _automaticTravelDistance: 0
-  _whichHandCanPressButton: 2
+  _whichHandCanPressButton: 1
   springValue: 10
   damperValue: 0
   maxForceValue: 5
@@ -12913,7 +13028,6 @@ MonoBehaviour:
   _pressableObject: {fileID: 686586950}
   _buttonPressExitThreshold: 0.5
   _usePrimaryHover: 0
-  _buttonIgnoreGrabs: 1
   _buttonPreset: 0
   OnButtonPressed:
     m_PersistentCalls:
@@ -12997,7 +13111,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _automaticTravelDistance: 0
-  _whichHandCanPressButton: 2
+  _whichHandCanPressButton: 1
   springValue: 10
   damperValue: 0
   maxForceValue: 5
@@ -13008,7 +13122,6 @@ MonoBehaviour:
   _pressableObject: {fileID: 419655438}
   _buttonPressExitThreshold: 0.5
   _usePrimaryHover: 0
-  _buttonIgnoreGrabs: 1
   _buttonPreset: 0
   OnButtonPressed:
     m_PersistentCalls:
