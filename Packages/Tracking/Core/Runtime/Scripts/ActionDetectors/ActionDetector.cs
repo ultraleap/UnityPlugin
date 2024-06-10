@@ -1,31 +1,28 @@
-using JetBrains.Annotations;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using Unity.Android.Types;
-using UnityEngine;
+/******************************************************************************
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
+ *                                                                            *
+ * Use subject to the terms of the Apache License 2.0 available at            *
+ * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
+ * between Ultraleap and you, your company or other organization.             *
+ ******************************************************************************/
 
+using System;
+using UnityEngine;
 
 namespace Leap.Unity
 {
     public abstract class ActionDetector : MonoBehaviour
     {
-
         public bool IsDoingAction { get; protected set; }
+
+        protected bool actionStartedThisFrame = false;
         public bool ActionStartedThisFrame => actionStartedThisFrame;
-        public bool actionStartedThisFrame = false;
 
         public LeapProvider leapProvider;  // Reference to the Leap provider
         public Chirality chirality;        // Specifies which hand (left or right) to track
         public Action<Hand> onActionStart, onActionEnd, onAction;  // Events for pinch state changes
 
         protected Chirality chiralityLastFrame;  // Stores chirality state from last frame
-
-        /// <summary>
-        /// The percent value (0-1) between the activate distance and absolute pinch.
-        /// Note that it is virtually impossible for the hand to be completely pinched.
-        /// </summary>
-        public float SquishPercent { get; protected set; }
 
         /// <summary>
         /// Tries to get the hand based on the provided chirality.

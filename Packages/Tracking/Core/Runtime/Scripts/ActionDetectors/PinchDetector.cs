@@ -6,7 +6,6 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using System;
 using UnityEngine;
 
 namespace Leap.Unity
@@ -33,12 +32,17 @@ namespace Leap.Unity
 
         [Header("Pinch Activation Settings")]
         [SerializeField, Tooltip("The distance between fingertip and thumb at which to enter the pinching state.")]
-        public float activateDistance = 0.018f;  // Distance to activate pinch
+        public float activateDistance = 0.025f;
 
         [SerializeField, Tooltip("The distance between fingertip and thumb at which to leave the pinching state.")]
-        public float deactivateDistance = 0.024f;  // Distance to deactivate pinch
+        public float deactivateDistance = 0.03f;
 
-        
+        /// <summary>
+        /// The percent value (0-1) between the activate distance and absolute pinch.
+        /// Note that it is virtually impossible for the hand to be completely pinched.
+        /// </summary>
+        public float SquishPercent { get; protected set; }
+
         /// <summary>
         /// Updates the pinch status based on the hand data.
         /// </summary>

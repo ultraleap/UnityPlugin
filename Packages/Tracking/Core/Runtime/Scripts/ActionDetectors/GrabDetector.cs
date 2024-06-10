@@ -1,9 +1,9 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2024.
- *
- * Use subject to the terms of the Apache License 2.0 available at
- * http://www.apache.org/licenses/LICENSE-2.0, or another agreement
- * between Ultraleap and you, your company or other organization.
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
+ *                                                                            *
+ * Use subject to the terms of the Apache License 2.0 available at            *
+ * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
+ * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
 using System;
@@ -17,12 +17,11 @@ namespace Leap.Unity
     /// </summary>
     public class GrabDetector : ActionDetector
     {
-
         [SerializeField, Range(0, 1), Tooltip("The grab strength needed to initiate a grab. 1 being hand fully closed, 0 being open hand")]
-        public float activateStrength = 0.8f;  // Strength required to start grab
+        public float activateStrength = 0.8f;
 
         [SerializeField, Range(0, 1), Tooltip("The grab strength needed to release a grab. 1 being hand fully closed, 0 being open hand")]
-        public float deactivateStrength = 0.6f;  // Strength required to release grab
+        public float deactivateStrength = 0.6f;
 
         /// <summary>
         /// Updates the grab status based on the hand data.
@@ -62,11 +61,6 @@ namespace Leap.Unity
             if (IsDoingAction)
             {
                 onAction?.Invoke(_hand);
-                SquishPercent = Mathf.InverseLerp(activateStrength, 0, _grabStrength);
-            }
-            else
-            {
-                SquishPercent = 0;
             }
         }
     }

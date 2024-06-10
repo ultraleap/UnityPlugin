@@ -17,12 +17,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support for reading the camera matrix
 - ImageRetriever allows more than 6 reconnections
 - New Pinch and Grab detection utilities
+- PhysicalHandsButton with automatic setup
+- PhysicalHandsButtonToggle
+- PhysicalHandsAnchorable, including anchoring and un-anchoring based on grabs
+- PhysicalHandsSlider
+- TwoDimensionalPhysicalHandsSlider example
+- Ability to ignore collisions per hand separately from grabs
+- Primary hover functionality to physical hands
+- PhysicalHandsButton can now use primary hover functionality
 
 ### Changed
 - Improved XRHands support for Meta Aim Input Actions
 - XRLeapProviderManager renamed LEAP_DIRECT to ULTRALEAP
 - Accessors for Hand.Finger, Hand.Bone and Finger.Bone
 - Renamed BoneType enum entries to remove redundancies
+- Replaced use of PinchStrength for IsPinching with PinchDistance
+- PinchDistance is now measured in Metres not Millimetres
+- Removed old PhysicalHandsButton
+- Anchors no longer require Interaction Engine
+- Turntable and Pullcord example scene now uses Physical Hands
+- Physical Hands Playground uses new PhysicalHandsButtons and Toggles
+- Grab Ball uses Physical Hands rather than Interaction Engine
+- Physical Hands events are sent to all event interfaces attached to the interacted rigidbody
+- Hard Contact Parent settings access levels to public
+- Prefab Create Menu uses Physical Hands prefabs as opposed to Interaction Engine
+- Prefab Create Menu chooses URP hands where available
+- Shaders use _Color as the default color property name
+- Shaders all come under the Ultraleap folder
 
 ### Fixed
 - Issue with the method signature for LeapPixelToRectilinearEx

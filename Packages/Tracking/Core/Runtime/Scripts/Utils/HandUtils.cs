@@ -207,11 +207,11 @@ namespace Leap.Unity
 
         /// <summary>
         /// Returns whether the pinch strength for the hand is greater than 0.8.
-        /// For more reliable pinch behavior, try applying hysteresis to the PinchStrength property.
+        /// For more reliable pinch behavior, try applying hysteresis to the PinchDistance property.
         /// </summary>
         public static bool IsPinching(this Hand hand)
         {
-            return hand.PinchStrength > 0.8F;
+            return hand.PinchDistance < 0.03f;
         }
 
         /// <summary>
@@ -384,7 +384,7 @@ namespace Leap.Unity
         }
 
         /// <summary>
-        /// Returns a pinch distance (in mm) for the hand based on the provided joint data.
+        /// Returns a pinch distance (in m) for the hand based on the provided joint data.
         /// 
         /// Only use this where the pinch distance has not already been provided. Alternatively, use the provided Hand.PinchDistance.
         /// </summary>
@@ -404,7 +404,7 @@ namespace Leap.Unity
             }
 
             // Return the pinch distance, converted to millimeters to match other providers.
-            return Mathf.Sqrt(minDistanceSquared) * 1000.0f;
+            return Mathf.Sqrt(minDistanceSquared);
         }
 
         static float CalculateBoneDistanceSquared(Bone boneA, Bone boneB)
