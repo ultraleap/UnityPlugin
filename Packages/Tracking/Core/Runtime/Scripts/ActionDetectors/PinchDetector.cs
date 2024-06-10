@@ -6,6 +6,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
+using System;
 using UnityEngine;
 
 namespace Leap.Unity
@@ -42,6 +43,21 @@ namespace Leap.Unity
         /// Note that it is virtually impossible for the hand to be completely pinched.
         /// </summary>
         public float SquishPercent { get; protected set; }
+
+        /// <summary>
+        /// Did the Pinch start this frame?
+        /// </summary>
+        public bool PinchStartedThisFrame => actionStartedThisFrame;
+
+        /// <summary>
+        /// Is the PinchDetector currenty detecting a pinch?
+        /// </summary>
+        public bool IsPinching => IsDoingAction;
+
+        // Accessor actions for readability
+        public Action<Hand> OnPinchStart => onActionStart;
+        public Action<Hand> OnPinchEnd => onActionEnd;
+        public Action<Hand> OnPinching => onAction;
 
         /// <summary>
         /// Updates the pinch status based on the hand data.

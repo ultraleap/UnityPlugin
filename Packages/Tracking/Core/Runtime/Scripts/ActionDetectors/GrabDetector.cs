@@ -24,6 +24,21 @@ namespace Leap.Unity
         public float deactivateStrength = 0.6f;
 
         /// <summary>
+        /// Did the Grab start this frame?
+        /// </summary>
+        public bool GrabStartedThisFrame => actionStartedThisFrame;
+
+        /// <summary>
+        /// Is the PinchDetector currenty detecting a pinch?
+        /// </summary>
+        public bool IsGrabbing => IsDoingAction;
+
+        // Accessor actions for readability
+        public Action<Hand> OnGrabStart => onActionStart;
+        public Action<Hand> OnGrabEnd => onActionEnd;
+        public Action<Hand> OnGrabbing => onAction;
+
+        /// <summary>
         /// Updates the grab status based on the hand data.
         /// </summary>
         /// <param name="_hand">Hand data from the Leap provider</param>

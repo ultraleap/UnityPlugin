@@ -20,7 +20,7 @@ namespace Leap.Unity
 
         public LeapProvider leapProvider;  // Reference to the Leap provider
         public Chirality chirality;        // Specifies which hand (left or right) to track
-        public Action<Hand> onActionStart, onActionEnd, onAction;  // Events for pinch state changes
+        public Action<Hand> onActionStart, onActionEnd, onAction;  // Events for action state changes
 
         protected Chirality chiralityLastFrame;  // Stores chirality state from last frame
 
@@ -57,7 +57,7 @@ namespace Leap.Unity
         }
 
         /// <summary>
-        /// Initializes the PinchDetector, sets initial chirality state, and gets the LeapProvider if not assigned.
+        /// Initializes the ActionDetector, sets initial chirality state, and gets the LeapProvider if not assigned.
         /// </summary>
         private void Start()
         {
@@ -69,7 +69,7 @@ namespace Leap.Unity
         }
 
         /// <summary>
-        /// Updates the pinch status every frame.
+        /// Updates the action status every frame.
         /// </summary>
         private void Update()
         {
