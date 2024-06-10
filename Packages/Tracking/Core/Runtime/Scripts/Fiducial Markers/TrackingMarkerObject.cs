@@ -73,6 +73,11 @@ namespace Leap.Unity
             {
                 Debug.Log("Unable to begin Fiducial Marker tracking. Cannot connect to a Leap Service Provider.");
             }
+
+            if (_trackedObject == null)
+            {
+                _trackedObject = transform;
+            }
         }
 
         private void OnDisable()
@@ -178,30 +183,30 @@ namespace Leap.Unity
 
                 // Find the offset from the marker to the tracked object, to apply the inverse to the tracked transform
                 Vector3 posOffset = _trackedObject.position - markerObject.transform.position;
-                Quaternion rotOffset = Quaternion.Inverse(_trackedObject.rotation) * _trackedObject.transform.rotation;
+                Quaternion rotOffset = Quaternion.Inverse(_trackedObject.rotation) * markerObject.transform.rotation;
 
                 targetPos = markerPos + posOffset;
                 targetRot = markerRot * Quaternion.Inverse(rotOffset);
 
                 //Only enable tracked markers, and update them to their real positions (gives us a nice render)
-                for (int i = 0; i < _markers.Length; i++)
-                {
-                    if (_markers[i] == null)
-                        continue;
-                    _markers[i].DebugText = "";
-
-                    FiducialPoseEventArgs pose = _poses.FirstOrDefault(o => o.id == _markers[i].id);
-                    bool hasPose = pose != null;
-                    if (hasPose)
-                    {
-                        _markers[i].transform.position = GetMarkerWorldSpacePosition(pose.translation.ToVector3());
-                        _markers[i].transform.rotation = GetMarkerWorldSpaceRotation(pose.rotation.ToQuaternion());
-                        _markers[i].DebugText = "Error: " + pose.estimated_error.ToString("F20");
-                    }
-                    _markers[i].gameObject.SetActive(hasPose);
-                    _markers[i].IsTracked = hasPose;
-                    _markers[i].IsHighlighted = hasPose && best == pose;
-                }
+               //for (int i = 0; i < _markers.Length; i++)
+               //{
+               //    if (_markers[i] == null)
+               //        continue;
+               //    _markers[i].DebugText = "";
+               //
+               //    FiducialPoseEventArgs pose = _poses.FirstOrDefault(o => o.id == _markers[i].id);
+               //    bool hasPose = pose != null;
+               //    if (hasPose)
+               //    {
+               //        _markers[i].transform.position = GetMarkerWorldSpacePosition(pose.translation.ToVector3());
+               //        _markers[i].transform.rotation = GetMarkerWorldSpaceRotation(pose.rotation.ToQuaternion());
+               //        _markers[i].DebugText = "Error: " + pose.estimated_error.ToString("F20");
+               //    }
+               //    _markers[i].gameObject.SetActive(hasPose);
+               //    _markers[i].IsTracked = hasPose;
+               //    _markers[i].IsHighlighted = hasPose && best == pose;
+               //}
             }
             else
             {

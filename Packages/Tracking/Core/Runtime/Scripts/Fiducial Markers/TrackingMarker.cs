@@ -18,30 +18,7 @@ namespace Leap.Unity
             "\n\nNote: This must be unique within the scene")]
         public int id;
 
-        [HideInInspector] public bool IsHighlighted = false;
         [HideInInspector] public bool IsTracked = false;
-        [HideInInspector] public string DebugText = "";
 
-        private MeshRenderer _renderer;
-
-        private void Awake()
-        {
-            _renderer = GetComponentInChildren<MeshRenderer>();
-        }
-
-        private void Update()
-        {
-            if (_renderer == null)
-                return;
-
-            _renderer.material.color = IsHighlighted ? Color.green : IsTracked ? new Color(1, 0.5f, 0) : Color.red;
-        }
-
-#if UNITY_EDITOR
-        private void OnDrawGizmosSelected()
-        {
-            Handles.Label(transform.position, DebugText);
-        }
-#endif
     }
 }
