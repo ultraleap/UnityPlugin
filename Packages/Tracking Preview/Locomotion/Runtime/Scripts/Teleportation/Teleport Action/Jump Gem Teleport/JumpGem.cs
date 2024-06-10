@@ -281,7 +281,7 @@ namespace Leap.Unity.Preview.Locomotion
                 }
             }
 
-            if (_wasPinched && _pinchDetector.IsPinching)
+            if (_wasPinched && _pinchDetector.IsDoingAction)
             {
                 return;
             }
@@ -291,7 +291,7 @@ namespace Leap.Unity.Preview.Locomotion
                 return;
             }
 
-            _wasPinched = _pinchDetector.IsPinching;
+            _wasPinched = _pinchDetector.IsDoingAction;
 
             if (!_wasPinched)
             {
@@ -387,7 +387,7 @@ namespace Leap.Unity.Preview.Locomotion
                     _hasPinchedEnough = true;
                 }
 
-                if (!_pinchDetector.IsPinching)
+                if (!_pinchDetector.IsDoingAction)
                 {
                     if (_releaseTimeCurrent > 0f)
                     {

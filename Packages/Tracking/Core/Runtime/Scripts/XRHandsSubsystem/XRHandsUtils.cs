@@ -114,6 +114,22 @@ namespace Leap.Unity
             return 0;
         }
 
+        public static float CalculatePinchDistance(this XRHand hand, XRHandJointID jointToCompare = XRHandJointID.IndexTip)
+        {
+            // Get the thumb position.
+            Vector3 thumbTip = Vector3.zero;
+            if (hand.GetJoint(XRHandJointID.ThumbTip).TryGetPose(out Pose thumbTipPose)) thumbTip = thumbTipPose.position;
+
+            // Compute the distance midpoints between the thumb and thejointToCompare.
+            if (hand.GetJoint(jointToCompare).TryGetPose(out var fingerTipPose))
+            {
+                float distance = (fingerTipPose.position - thumbTip).magnitude;
+                return distance;
+            }
+
+            return 0;
+        }
+
         public static Vector3 GetStablePinchPosition(this XRHand hand)
         {
             Vector3 indexTip = Vector3.zero;
