@@ -4,7 +4,7 @@ function global:Export-VersionTxt
 {
     Param(
         [Parameter(Mandatory)]
-        [ValidateScript({$(Test-Path $_ -PathType Container) -and $(Test-Path $(Join-Path $_ "package.json") -PathType Leaf)}, ErrorMessage = "Path provided must exist and contain a package.json file.")]
+        [ValidateScript({$(Test-Path $_ -PathType Container) -and $(Test-Path $(Join-Path $_ "package.json") -PathType Leaf)})]
         [string]
         $PackagePath
     )
@@ -36,7 +36,7 @@ function global:Export-UnityPackage
     {
         param(
             [Parameter(Mandatory)]
-            [ValidateScript({Test-Path $_ -PathType Container}, ErrorMessage = "Path not found or is not a directory")]
+            [ValidateScript({Test-Path $_ -PathType Container})]
             [string]
             $ExportPath,
             [Parameter(Mandatory)]

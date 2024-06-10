@@ -17,6 +17,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support for reading the camera matrix
 - ImageRetriever allows more than 6 reconnections
 - New Pinch and Grab detection utilities
+- Option to fade hands on found/lost in HandEnableDisable component
+- OnHandFound and OnHandLost events to LeapProviders
+- LeftHandTracked and RightHandTracked access booleans to LeapProviders
 - PhysicalHandsButton with automatic setup
 - PhysicalHandsButtonToggle
 - PhysicalHandsAnchorable, including anchoring and un-anchoring based on grabs

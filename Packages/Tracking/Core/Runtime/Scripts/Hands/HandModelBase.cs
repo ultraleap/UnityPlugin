@@ -149,7 +149,10 @@ namespace Leap.Unity
 
         public LeapProvider leapProvider
         {
-            get { return _leapProvider; }
+            get
+            {
+                return _leapProvider;
+            }
             set
             {
                 if (_leapProvider != null && Application.isPlaying)

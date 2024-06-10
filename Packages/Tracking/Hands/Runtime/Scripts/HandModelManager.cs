@@ -224,14 +224,14 @@ namespace Leap.Unity.HandsModule
             List<HandModelBase> activeHands = new List<HandModelBase>();
             foreach (HandModelPair handModelPair in HandModelPairs)
             {
-                if (!handModelPair.LeftEnableDisable.FreezeHandState ||
-                    handModelPair.LeftEnableDisable.FreezeHandState && handModelPair.Left.isActiveAndEnabled)
+                if (!handModelPair.LeftEnableDisable.freezeHandState ||
+                    handModelPair.LeftEnableDisable.freezeHandState && handModelPair.Left.isActiveAndEnabled)
                 {
                     activeHands.Add(handModelPair.Left);
                 }
 
-                if (!handModelPair.RightEnableDisable.FreezeHandState ||
-                    handModelPair.RightEnableDisable.FreezeHandState && handModelPair.Right.isActiveAndEnabled)
+                if (!handModelPair.RightEnableDisable.freezeHandState ||
+                    handModelPair.RightEnableDisable.freezeHandState && handModelPair.Right.isActiveAndEnabled)
                 {
                     activeHands.Add(handModelPair.Right);
                 }
@@ -394,7 +394,7 @@ namespace Leap.Unity.HandsModule
             {
                 if (handModelPair.LeftEnableDisable != null)
                 {
-                    handModelPair.LeftEnableDisable.FreezeHandState = false;
+                    handModelPair.LeftEnableDisable.freezeHandState = false;
                 }
                 if (handModelPair.Left != null)
                 {
@@ -409,7 +409,7 @@ namespace Leap.Unity.HandsModule
             {
                 if (handModelPair.RightEnableDisable != null)
                 {
-                    handModelPair.RightEnableDisable.FreezeHandState = false;
+                    handModelPair.RightEnableDisable.freezeHandState = false;
                 }
 
                 if (handModelPair.Right != null)
@@ -495,7 +495,7 @@ namespace Leap.Unity.HandsModule
                 }
                 if (handModelPair.LeftEnableDisable != null)
                 {
-                    handModelPair.LeftEnableDisable.FreezeHandState = true;
+                    handModelPair.LeftEnableDisable.freezeHandState = true;
                 }
             }
             else
@@ -507,7 +507,7 @@ namespace Leap.Unity.HandsModule
                 }
                 if (handModelPair.RightEnableDisable != null)
                 {
-                    handModelPair.RightEnableDisable.FreezeHandState = true;
+                    handModelPair.RightEnableDisable.freezeHandState = true;
                 }
             }
         }
