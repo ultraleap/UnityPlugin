@@ -48,6 +48,7 @@ namespace Leap.Unity
         private Vector3[] _ups = null;
 
         private int _bestBias = 3;
+        private Controller _leapController;
 
         private void Awake()
         {
@@ -63,13 +64,12 @@ namespace Leap.Unity
             _targetTransform = new GameObject("TargetTransform").transform;
         }
 
-        private void Start()
+        private void OnEnable()
         {
             if (_leapServiceProvider != null)
             {
-                Controller controller = _leapServiceProvider.GetLeapController();
-                controller.FiducialPose -= CaptureAndProcessFiducialFrames;
-                controller.FiducialPose += CaptureAndProcessFiducialFrames;
+                _leapController = _leapServiceProvider.GetLeapController();
+                _leapController.FiducialPose += CaptureAndProcessFiducialFrames;
             }
             else
             {
@@ -77,8 +77,37 @@ namespace Leap.Unity
             }
         }
 
+        private void OnDisable()
+        {
+            _leapController.FiducialPose -= CaptureAndProcessFiducialFrames;
+        }
+
+        private void OnDestroy()
+        {
+            _leapController.FiducialPose -= CaptureAndProcessFiducialFrames;
+        }
+
         private void CaptureAndProcessFiducialFrames(object sender, FiducialPoseEventArgs poseEvent)
         {
+            try
+            {
+                // If this object is destroyed, return
+                if (gameObject == null && !ReferenceEquals(gameObject, null))
+                {
+                    _leapController.FiducialPose -= CaptureAndProcessFiducialFrames;
+                    return;
+                }
+            }
+            catch
+            {
+                // Sometimes things get destroyed too fast and we get a missing reference exception when trying to access the gameobject,
+                // This lets us exit that scenario gracefully
+                _leapController.FiducialPose -= CaptureAndProcessFiducialFrames;
+                return;
+            }
+
+
+
             if (_fiducialBaseTime == -1)
                 _fiducialBaseTime = poseEvent.timestamp;
 
