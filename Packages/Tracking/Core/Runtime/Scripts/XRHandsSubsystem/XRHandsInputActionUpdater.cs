@@ -185,10 +185,10 @@ namespace Leap.Unity.InputActions
                 InputSystem.QueueDeltaStateEvent(metaAimHand.trackingState, UnityEngine.XR.InputTrackingState.Position | UnityEngine.XR.InputTrackingState.Rotation);
                 InputSystem.QueueDeltaStateEvent(metaAimHand.isTracked, true);
 
-                InputSystem.QueueDeltaStateEvent(metaAimHand.indexPressed, hand.CalculatePinchStrength(XRHandJointID.IndexTip) > 0.5f ? true : false);
-                InputSystem.QueueDeltaStateEvent(metaAimHand.middlePressed, hand.CalculatePinchStrength(XRHandJointID.MiddleTip) > 0.5f ? true : false);
-                InputSystem.QueueDeltaStateEvent(metaAimHand.ringPressed, hand.CalculatePinchStrength(XRHandJointID.RingTip) > 0.5f ? true : false);
-                InputSystem.QueueDeltaStateEvent(metaAimHand.littlePressed, hand.CalculatePinchStrength(XRHandJointID.LittleTip) > 0.5f ? true : false);
+                InputSystem.QueueDeltaStateEvent(metaAimHand.indexPressed, hand.CalculatePinchDistance(XRHandJointID.IndexTip) < 0.02f ? true : false);
+                InputSystem.QueueDeltaStateEvent(metaAimHand.middlePressed, hand.CalculatePinchDistance(XRHandJointID.MiddleTip) < 0.02f ? true : false);
+                InputSystem.QueueDeltaStateEvent(metaAimHand.ringPressed, hand.CalculatePinchDistance(XRHandJointID.RingTip) < 0.02f ? true : false);
+                InputSystem.QueueDeltaStateEvent(metaAimHand.littlePressed, hand.CalculatePinchDistance(XRHandJointID.LittleTip) < 0.02f ? true : false);
 
                 InputSystem.QueueDeltaStateEvent(metaAimHand.pinchStrengthIndex, hand.CalculatePinchStrength(XRHandJointID.IndexTip));
                 InputSystem.QueueDeltaStateEvent(metaAimHand.pinchStrengthMiddle, hand.CalculatePinchStrength(XRHandJointID.MiddleTip));
@@ -245,7 +245,7 @@ namespace Leap.Unity.InputActions
 
         static float GetActvating(XRHand hand)
         {
-            return hand.CalculatePinchStrength() > 0.8 ? 1 : 0;
+            return hand.CalculatePinchDistance() < 0.02f ? 1 : 0;
         }
 
         static Vector3 GetPalmPosition(XRHand hand)

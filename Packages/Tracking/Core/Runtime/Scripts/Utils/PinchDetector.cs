@@ -35,9 +35,9 @@ namespace Leap.Unity
 
         [Header("Pinch Activation Settings")]
         [SerializeField, Tooltip("The distance between fingertip and thumb at which to enter the pinching state.")]
-        public float activateDistance = 0.018f;
+        public float activateDistance = 0.025f;
         [SerializeField, Tooltip("The distance between fingertip and thumb at which to leave the pinching state.")]
-        public float deactivateDistance = 0.024f;
+        public float deactivateDistance = 0.03f;
 
         public Action<Hand> OnPinch, OnUnpinch, OnPinching;
 
@@ -52,8 +52,6 @@ namespace Leap.Unity
         public float SquishPercent { get; private set; }
 
         private Chirality chiralityLastFrame;
-
-
 
         public bool TryGetHand(out Hand hand)
         {
@@ -76,7 +74,6 @@ namespace Leap.Unity
             }
             return false;
         }
-
 
         private void Start()
         {
