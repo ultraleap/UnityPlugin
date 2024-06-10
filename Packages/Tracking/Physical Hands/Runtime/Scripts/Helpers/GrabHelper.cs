@@ -90,7 +90,7 @@ namespace Leap.Unity.PhysicalHands
             UpdateHandStates();
         }
 
-        public void ResetHelper()
+        internal void ResetHelper()
         {
             // The current hands need to be cleared, including firing all relevand exit events on all grab helper objects
             foreach (var helper in _grabHelperObjects.Values)
