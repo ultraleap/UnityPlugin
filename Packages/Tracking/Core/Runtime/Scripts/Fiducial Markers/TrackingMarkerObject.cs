@@ -185,7 +185,10 @@ namespace Leap.Unity
             }
 
             //Store data into the current AprilTag frame
-            _poses.Add(poseEvent);
+            if (_markers.Count(m => m.id == poseEvent.id) > 0)
+            {
+                _poses.Add(poseEvent);
+            }
             _previousFiducialFrameTime = timeSinceFirstFiducial;
         }
 
