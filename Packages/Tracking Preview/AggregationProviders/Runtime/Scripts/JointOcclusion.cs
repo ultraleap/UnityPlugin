@@ -1,7 +1,5 @@
 using Ultraleap;
-using Ultraleap;
 using Ultraleap.Encoding;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;

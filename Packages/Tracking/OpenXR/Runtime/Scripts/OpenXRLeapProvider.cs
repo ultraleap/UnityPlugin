@@ -1,5 +1,4 @@
 using Ultraleap;
-using Ultraleap;
 using Ultraleap.Encoding;
 using System;
 using System.Collections.Generic;

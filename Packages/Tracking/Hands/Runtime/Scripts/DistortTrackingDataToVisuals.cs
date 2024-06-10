@@ -7,7 +7,6 @@
  ******************************************************************************/
 
 using Ultraleap;
-using Ultraleap;
 using Ultraleap.HandsModule;
 using System.Collections;
 using System.Collections.Generic;
