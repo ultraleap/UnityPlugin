@@ -18,6 +18,7 @@ namespace Leap.Unity
     /// The parent gameobjet is activated when tracking begins and deactivated when
     /// tracking ends.
     /// </summary>
+    [DefaultExecutionOrder(1)]
     public class HandEnableDisable : MonoBehaviour
     {
         [SerializeField]
@@ -56,7 +57,7 @@ namespace Leap.Unity
         {
             if (leapProvider == null)
             {
-                if(!Hands.TryGetProviderAndChiralityFromHandModel(gameObject, out leapProvider, out chirality))
+                if(!Hands.TryGetProviderAndChiralityFromHandModel(gameObject, out leapProvider, out chirality) || leapProvider == null)
                 {
                     Debug.LogWarning("HandEnableDisable can not work as intended as no LeapProvider was associated with the component.", gameObject);
                     return;
