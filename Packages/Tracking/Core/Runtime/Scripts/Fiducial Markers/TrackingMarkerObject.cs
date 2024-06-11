@@ -10,6 +10,8 @@ using LeapInternal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
+using Unity.VisualScripting.YamlDotNet.Core.Events;
 using UnityEditor;
 using UnityEngine;
 
@@ -23,11 +25,15 @@ namespace Leap.Unity
         [Tooltip("The Transform to keep aligned to this tracked object")]
         [SerializeField] private Transform _targetObject;
 
+        [Tooltip("Reduce latancy at the expense of pose fidelity")]
+        [SerializeField] private bool _improveSwim = false;
+
         public Action OnTrackingStart, OnTrackingLost;
 
         public bool Tracked { get { return _tracked; } }
         private bool _tracked = false;
 
+        
         private int _framesBeforeLostTracking = 30;
         private int _frameLastTracked;
 
@@ -36,7 +42,7 @@ namespace Leap.Unity
         private Transform[] _markerTransforms;
         private Transform _targetTransform;
 
-        private List<FiducialPoseEventArgs> _poses = new List<FiducialPoseEventArgs>();
+        private List<(FiducialPoseEventArgs PoseEvent, LeapTransform Transform)> _poses = new List<(FiducialPoseEventArgs PoseEvent, LeapTransform Transform)>();
         private float _previousFiducialFrameTime = -1;
         private int _previousBestFiducialID = -1;
 
@@ -48,6 +54,7 @@ namespace Leap.Unity
         private Vector3[] _ups = null;
 
         private int _bestBias = 3;
+
 
         private void Awake()
         {
@@ -77,13 +84,10 @@ namespace Leap.Unity
             }
         }
 
-        private void CaptureAndProcessFiducialFrames(object sender, FiducialPoseEventArgs poseEvent)
+        private void UpdateFiducials()
         {
-            if (_fiducialBaseTime == -1)
-                _fiducialBaseTime = poseEvent.timestamp;
-
-            //Work out how long it has been since we saw the first fiducial
-            float timeSinceFirstFiducial = (poseEvent.timestamp - _fiducialBaseTime) / 1000000;
+            // Work out how long it has been since we saw the first fiducial
+            float timeSinceFirstFiducial = (LeapC.GetNow() - _fiducialBaseTime) / 1000000;
 
             //If the current AprilTag frame has advanced, process the previous one
             if (_previousFiducialFrameTime != -1 && timeSinceFirstFiducial != _previousFiducialFrameTime)
@@ -95,12 +99,17 @@ namespace Leap.Unity
                 {
                     _markers.ForEach(o => o?.gameObject?.SetActive(true));
 
-                    //Get the pose with the lowest error: if the previous best is still tracked, stick with it
-                    _poses = _poses.OrderBy(o => o.estimated_error).ToList();
-                    FiducialPoseEventArgs best = _poses[0];
-                    FiducialPoseEventArgs lastBest = _poses.FirstOrDefault(o => o.id == _previousBestFiducialID);
-                    if (lastBest != null) best = lastBest;
-                    _previousBestFiducialID = best.id;
+                    //Get the pose with the lowest timestamp: if the previous best is still tracked, stick with it
+                    _poses = _poses.OrderBy(o => o.PoseEvent.timestamp).ToList();
+                    var best = _poses[0];
+                    var lastBest = _poses.FirstOrDefault(o => o.PoseEvent.id == _previousBestFiducialID);
+
+                    if (lastBest.PoseEvent != null)
+                    {
+                        best = lastBest;
+                    }
+
+                    _previousBestFiducialID = best.PoseEvent.id;
 
                     //Add the best pose multiple times to bias our average towards it
                     for (int i = 0; i < _bestBias; i++)
@@ -132,17 +141,114 @@ namespace Leap.Unity
                             continue;
                         _markers[i].DebugText = "";
 
-                        FiducialPoseEventArgs pose = _poses.FirstOrDefault(o => o.id == _markers[i].id);
-                        bool hasPose = pose != null;
+                        var pose = _poses.FirstOrDefault(o => o.PoseEvent.id == _markers[i].id);
+                        bool hasPose = pose.PoseEvent != null;
                         if (hasPose)
                         {
-                            _markers[i].transform.position = GetMarkerWorldSpacePosition(pose.translation.ToVector3());
-                            _markers[i].transform.rotation = GetMarkerWorldSpaceRotation(pose.rotation.ToQuaternion());
-                            _markers[i].DebugText = "Error: " + pose.estimated_error.ToString("F20");
+                            _markers[i].transform.position = GetMarkerWorldSpacePosition(pose.PoseEvent.translation.ToVector3(), pose.Transform);
+                            _markers[i].transform.rotation = GetMarkerWorldSpaceRotation(pose.PoseEvent.rotation.ToQuaternion(), pose.Transform);
+                            _markers[i].DebugText = "Error: " + pose.PoseEvent.estimated_error.ToString("F20");
                         }
                         _markers[i].gameObject.SetActive(hasPose);
                         _markers[i].IsTracked = hasPose;
-                        _markers[i].IsHighlighted = hasPose && best == pose;
+                        _markers[i].IsHighlighted = hasPose && best.PoseEvent == pose.PoseEvent;
+                    }
+
+                    _poses.Clear();
+                    _poses.Add(best);
+                }
+                else
+                {
+                    _poses.Clear();
+                    _markers.ForEach(o => o?.gameObject?.SetActive(false));
+                }
+
+                
+                _fiducialFPS = 1.0f / (timeSinceFirstFiducial - _previousFiducialFrameTime);
+                _frameLastTracked = Time.frameCount;
+            }
+
+            //Store data into the current AprilTag frame
+            _previousFiducialFrameTime = timeSinceFirstFiducial;
+        }
+
+
+        private void CaptureAndProcessFiducialFrames(object sender, FiducialPoseEventArgs poseEvent)
+        {
+            if (_fiducialBaseTime == -1)
+                _fiducialBaseTime = poseEvent.timestamp;
+
+            //Work out how long it has been since we saw the first fiducial
+            float timeSinceFirstFiducial = (poseEvent.timestamp - _fiducialBaseTime) / 1000000;
+
+            //If the current AprilTag frame has advanced, process the previous one
+            if (_previousFiducialFrameTime != -1 && timeSinceFirstFiducial != _previousFiducialFrameTime)
+            {
+                //Get the device position in world space as a LeapTransform to use in future calculations
+                _trackerPosWorldspace = _leapServiceProvider.DeviceOriginWorldSpace;
+
+                if (_poses.Count != 0)
+                {
+                    _markers.ForEach(o => o?.gameObject?.SetActive(true));
+
+                    //Get the pose with the lowest error: if the previous best is still tracked, stick with it
+                    if (_improveSwim)
+                        _poses = _poses.OrderBy(o => o.PoseEvent.estimated_error).ToList();
+                    else
+                        _poses = _poses.OrderBy(o => o.PoseEvent.estimated_error).ToList();
+
+                    var best = _poses[0];
+                    var lastBest = _poses.FirstOrDefault(o => o.PoseEvent.id == _previousBestFiducialID);
+
+                    if (lastBest.PoseEvent != null)
+                    {
+                        best = lastBest;
+                    }
+
+                    _previousBestFiducialID = best.PoseEvent.id;
+
+                    //Add the best pose multiple times to bias our average towards it
+                    for (int i = 0; i < _bestBias; i++)
+                        _poses.Add(best);
+
+                    //Transform to every pose
+                    _positions = new Vector3[_poses.Count];
+                    _forwards = new Vector3[_poses.Count];
+                    _ups = new Vector3[_poses.Count];
+                    for (int i = 0; i < _poses.Count; i++)
+                    {
+                        TransformToPose(_poses[i], false);
+                        _positions[i] = _targetTransform.transform.position;
+                        _forwards[i] = _targetTransform.transform.forward;
+                        _ups[i] = _targetTransform.transform.up;
+                    }
+
+                    //Take the average position & calculate rotation based on forwards/up
+                    Vector3 avgPosition = GetAverageVector3(_positions);
+                    Vector3 avgUp = GetAverageVector3(_ups);
+                    Vector3 avgForward = GetAverageVector3(_forwards);
+                    _targetObject.transform.position = avgPosition;
+                    _targetObject.transform.rotation = Quaternion.LookRotation(avgForward, avgUp);
+
+                    //Only enable tracked markers, and update them to their real positions (gives us a nice render)
+                    for (int i = 0; i < _markers.Length; i++)
+                    {
+                        if (_markers[i] == null)
+                            continue;
+                        _markers[i].DebugText = "";
+
+                        var pose = _poses.FirstOrDefault(o => o.PoseEvent.id == _markers[i].id);
+                        bool hasPose = pose.PoseEvent != null;
+                        if (hasPose)
+                        {
+                            _markers[i].transform.position = GetMarkerWorldSpacePosition(pose.PoseEvent.translation.ToVector3(), pose.Transform);
+                            _markers[i].transform.rotation = GetMarkerWorldSpaceRotation(pose.PoseEvent.rotation.ToQuaternion(), pose.Transform);
+                            _markers[i].DebugText = "Error: " + pose.PoseEvent.estimated_error.ToString("F20");
+                        }
+
+                        //_markers[i].gameObject.SetActive(hasPose);
+                        //_markers[i].IsTracked = hasPose;
+                        _markers[i].IsHighlighted = hasPose && best.PoseEvent == pose.PoseEvent;
                     }
                 }
                 else
@@ -156,14 +262,14 @@ namespace Leap.Unity
             }
 
             //Store data into the current AprilTag frame
-            _poses.Add(poseEvent);
+            _poses.Add((poseEvent, _leapServiceProvider.DeviceOriginWorldSpace));
             _previousFiducialFrameTime = timeSinceFirstFiducial;
         }
 
-        private void TransformToPose(FiducialPoseEventArgs pose, bool highlight)
+        private void TransformToPose((FiducialPoseEventArgs PoseEvent, LeapTransform Transform) pose, bool highlight)
         {
             //Position all markers relative to the tracked marker pose by parenting, moving, then unparenting
-            TrackingMarker markerObject = _markers.FirstOrDefault(o => o.id == pose.id);
+            TrackingMarker markerObject = _markers.FirstOrDefault(o => o.id == pose.PoseEvent.id);
             if (markerObject != null)
             {
                 Transform[] prevParents = new Transform[_markers.Length + 1];
@@ -176,9 +282,9 @@ namespace Leap.Unity
                 }
                 prevParents[_markers.Length] = _targetTransform.parent;
                 _targetTransform.parent = markerObject.transform;
-
-                markerObject.transform.position = GetMarkerWorldSpacePosition(pose.translation.ToVector3());
-                markerObject.transform.rotation = GetMarkerWorldSpaceRotation(pose.rotation.ToQuaternion());
+ 
+                markerObject.transform.position = GetMarkerWorldSpacePosition(pose.PoseEvent.translation.ToVector3(), pose.Transform);
+                markerObject.transform.rotation = GetMarkerWorldSpaceRotation(pose.PoseEvent.rotation.ToQuaternion(), pose.Transform);
 
                 for (int x = 0; x < _markers.Length; x++)
                 {
@@ -209,6 +315,11 @@ namespace Leap.Unity
                     OnTrackingStart?.Invoke();
                 }
             }
+
+            if (_improveSwim)
+            {
+                UpdateFiducials();
+            }
         }
 
 #if UNITY_EDITOR
@@ -238,20 +349,39 @@ namespace Leap.Unity
 
         #region Utilities
 
-        Vector3 GetMarkerWorldSpacePosition(Vector3 trackedMarkerPosition)
+        Vector3 GetMarkerWorldSpacePosition(Vector3 trackedMarkerPosition, LeapTransform transform)
         {
-            // Apply the leapToUnityTransform Transform and then apply the trackerPosWorldSpace Transform
-            trackedMarkerPosition = CopyFromLeapCExtensions.LeapToUnityTransform.TransformPoint(trackedMarkerPosition);
-            trackedMarkerPosition = _trackerPosWorldspace.TransformPoint(trackedMarkerPosition);
+            if (_improveSwim)
+            {
+                // Apply the leapToUnityTransform Transform and then apply the trackerPosWorldSpace Transform
+                trackedMarkerPosition = CopyFromLeapCExtensions.LeapToUnityTransform.TransformPoint(trackedMarkerPosition);
+                trackedMarkerPosition = transform.TransformPoint(trackedMarkerPosition);
+            }
+            else
+            {
+                // Apply the leapToUnityTransform Transform and then apply the trackerPosWorldSpace Transform
+                trackedMarkerPosition = CopyFromLeapCExtensions.LeapToUnityTransform.TransformPoint(trackedMarkerPosition);
+                trackedMarkerPosition = _trackerPosWorldspace.TransformPoint(trackedMarkerPosition);
+            }
 
             return trackedMarkerPosition;
         }
 
-        Quaternion GetMarkerWorldSpaceRotation(Quaternion trackedMarkerRotation)
+        Quaternion GetMarkerWorldSpaceRotation(Quaternion trackedMarkerRotation, LeapTransform transform)
         {
-            // Apply the leapToUnityTransform Transform and then apply the trackerPosWorldSpace Transform
-            trackedMarkerRotation = CopyFromLeapCExtensions.LeapToUnityTransform.TransformQuaternion(trackedMarkerRotation);
-            trackedMarkerRotation = _trackerPosWorldspace.TransformQuaternion(trackedMarkerRotation);
+            if (_improveSwim)
+            {
+                // Apply the leapToUnityTransform Transform and then apply the trackerPosWorldSpace Transform
+                trackedMarkerRotation = CopyFromLeapCExtensions.LeapToUnityTransform.TransformQuaternion(trackedMarkerRotation);
+                trackedMarkerRotation = transform.TransformQuaternion(trackedMarkerRotation);
+            }
+            else
+            {
+                // Apply the leapToUnityTransform Transform and then apply the trackerPosWorldSpace Transform
+                trackedMarkerRotation = CopyFromLeapCExtensions.LeapToUnityTransform.TransformQuaternion(trackedMarkerRotation);
+                trackedMarkerRotation = _trackerPosWorldspace.TransformQuaternion(trackedMarkerRotation);
+            }
+
 
             return trackedMarkerRotation;
         }
