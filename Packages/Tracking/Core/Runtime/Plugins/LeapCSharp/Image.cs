@@ -6,9 +6,8 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-namespace Ultraleap
+namespace LeapInternal
 {
-    using LeapInternal;
     using System;
 
     /// <summary>

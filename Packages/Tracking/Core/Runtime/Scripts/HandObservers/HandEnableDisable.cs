@@ -6,9 +6,9 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity.Attributes;
 using System.Collections.Generic;
 using UnityEngine;
+using Ultraleap.Attributes;
 
 namespace Ultraleap
 {
