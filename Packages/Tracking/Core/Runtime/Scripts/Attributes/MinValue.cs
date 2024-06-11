@@ -12,7 +12,7 @@ using UnityEditor;
 #endif
 using System.Collections.Generic;
 
-namespace Leap.Unity.Attributes
+namespace Ultraleap.Attributes
 {
 
     public class MinValue : CombinablePropertyAttribute, IPropertyConstrainer

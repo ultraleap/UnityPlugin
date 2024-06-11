@@ -10,7 +10,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-namespace Leap.Unity.InputModule
+namespace Ultraleap.InputModule
 {
     /// <summary>
     /// Supports layer-based, compressible animations that lend a 3D affordance to otherwise flat UI elements.

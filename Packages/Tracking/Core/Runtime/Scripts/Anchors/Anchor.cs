@@ -9,9 +9,9 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using Leap.Unity.Attachments;
+using Ultraleap.Attachments;
 
-namespace Leap.Unity
+namespace Ultraleap
 {
     public class Anchor : MonoBehaviour
     {
@@ -245,7 +245,7 @@ namespace Leap.Unity
                 {
                     continue;
                 }
-                Leap.Unity.Utils.DrawCircle(pos, dir, radius, AnchorGizmoColor, quality: 24, depthTest: true);
+                Ultraleap.Utils.DrawCircle(pos, dir, radius, AnchorGizmoColor, quality: 24, depthTest: true);
             }
         }
 
@@ -257,7 +257,7 @@ namespace Leap.Unity
             for (int i = 0; i < numCircles; i++)
             {
                 float curTheta = (dTheta * i) + halfTheta;
-                Leap.Unity.Utils.DrawCircle(pos + poleDir * Mathf.Cos(curTheta * Mathf.Deg2Rad) * radius, poleDir, Mathf.Sin(curTheta * Mathf.Deg2Rad) * radius, AnchorGizmoColor, quality: 16, depthTest: true);
+                Ultraleap.Utils.DrawCircle(pos + poleDir * Mathf.Cos(curTheta * Mathf.Deg2Rad) * radius, poleDir, Mathf.Sin(curTheta * Mathf.Deg2Rad) * radius, AnchorGizmoColor, quality: 16, depthTest: true);
             }
         }
 

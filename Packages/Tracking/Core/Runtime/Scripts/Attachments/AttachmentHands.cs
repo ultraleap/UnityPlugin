@@ -6,7 +6,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity.Attributes;
+using Ultraleap.Attributes;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -15,7 +15,7 @@ using UnityEditor;
 #endif
 using UnityEngine;
 
-namespace Leap.Unity.Attachments
+namespace Ultraleap.Attachments
 {
 
     /// <summary>
@@ -61,7 +61,7 @@ namespace Leap.Unity.Attachments
 
         private Func<Hand>[] _handAccessors;
         /// <summary>
-        /// Gets or sets the functions used to get the latest Leap.Hand data for the corresponding
+        /// Gets or sets the functions used to get the latest Ultraleap.Hand data for the corresponding
         /// AttachmentHand objects in the attachmentHands array. Modify this if you'd like to customize
         /// how hand data is sent to AttachmentHands; e.g. a networked multiplayer game receiving
         /// serialized hand data for a networked player representation.
@@ -137,7 +137,7 @@ namespace Leap.Unity.Attachments
         void Update()
         {
 #if UNITY_EDITOR
-            if (Leap.Unity.Utils.IsObjectPartOfPrefabAsset(this.gameObject))
+            if (Ultraleap.Utils.IsObjectPartOfPrefabAsset(this.gameObject))
             {
                 return;
             }
@@ -303,7 +303,7 @@ namespace Leap.Unity.Attachments
 #if UNITY_EDITOR
         private bool getIsPrefab()
         {
-            return Leap.Unity.Utils.IsObjectPartOfPrefabAsset(this.gameObject);
+            return Ultraleap.Utils.IsObjectPartOfPrefabAsset(this.gameObject);
         }
 #endif
 

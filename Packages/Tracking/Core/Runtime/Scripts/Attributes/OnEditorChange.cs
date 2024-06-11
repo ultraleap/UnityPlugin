@@ -14,7 +14,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityObject = UnityEngine.Object;
 
-namespace Leap.Unity.Attributes
+namespace Ultraleap.Attributes
 {
 
     /// <summary>

@@ -9,7 +9,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Leap.Unity
+namespace Ultraleap
 {
     [System.Serializable]
     public class AnchorSet : SerializableHashSet<Anchor> { }

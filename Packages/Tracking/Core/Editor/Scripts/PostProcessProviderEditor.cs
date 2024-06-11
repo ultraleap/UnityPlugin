@@ -6,13 +6,13 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity;
+using Ultraleap;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace Leap.Unity
+namespace Ultraleap
 {
 
     [CustomEditor(typeof(PostProcessProvider), editorForChildClasses: true)]

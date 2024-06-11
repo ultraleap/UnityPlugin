@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Leap.Unity.Preview.HandRays
+namespace Ultraleap.Preview.HandRays
 {
     /// <summary>
     /// Casts a ray out in a straight line

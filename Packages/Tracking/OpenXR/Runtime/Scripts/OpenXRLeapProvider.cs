@@ -1,13 +1,12 @@
-using Leap;
-using Leap.Unity;
-using Leap.Unity.Encoding;
+using Ultraleap;
+using Ultraleap.Encoding;
 using System;
 using System.Collections.Generic;
 
 using UnityEngine;
 
-using Bone = Leap.Bone;
-using Hand = Leap.Hand;
+using Bone = Ultraleap.Bone;
+using Hand = Ultraleap.Hand;
 
 namespace Ultraleap.Tracking.OpenXR
 {

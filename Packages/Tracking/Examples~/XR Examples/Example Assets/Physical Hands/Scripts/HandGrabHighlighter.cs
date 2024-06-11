@@ -10,7 +10,7 @@ using System.Collections;
 using UnityEngine;
 
 
-namespace Leap.Unity.PhysicalHands.Examples
+namespace Ultraleap.PhysicalHands.Examples
 {
     public class HandGrabHighlighter : MonoBehaviour
     {

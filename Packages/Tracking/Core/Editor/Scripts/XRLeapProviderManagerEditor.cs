@@ -9,7 +9,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace Leap.Unity
+namespace Ultraleap
 {
     [CustomEditor(typeof(XRLeapProviderManager))]
     public class XRLeapProviderManagerEditor : CustomEditorBase<XRLeapProviderManager>

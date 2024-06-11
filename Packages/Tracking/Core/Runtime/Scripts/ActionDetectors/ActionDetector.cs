@@ -9,7 +9,7 @@
 using System;
 using UnityEngine;
 
-namespace Leap.Unity
+namespace Ultraleap
 {
     public abstract class ActionDetector : MonoBehaviour
     {

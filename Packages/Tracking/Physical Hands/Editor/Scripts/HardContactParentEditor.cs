@@ -9,7 +9,7 @@
 using UnityEngine;
 using UnityEditor;
 
-namespace Leap.Unity.PhysicalHands
+namespace Ultraleap.PhysicalHands
 {
     [CustomEditor(typeof(HardContactParent))]
     public class HardContactParentEditor : CustomEditorBase<HardContactParent>

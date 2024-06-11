@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace Leap.Unity.PhysicalHands
+namespace Ultraleap.PhysicalHands
 {
     [RequireComponent(typeof(Rigidbody))]
     public class PhysicalHandsButton: MonoBehaviour
@@ -395,7 +395,7 @@ namespace Leap.Unity.PhysicalHands
 
             if (hand != null)
             {
-                if (!_contactedHands.TryAdd(hand, true));
+                if (!_contactedHands.TryAdd(hand, true))
                 {
                     _contactedHands[hand] = true;
                 }

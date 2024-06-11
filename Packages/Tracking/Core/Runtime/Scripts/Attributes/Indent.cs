@@ -11,7 +11,7 @@ using UnityEditor;
 using UnityEngine;
 #endif
 
-namespace Leap.Unity.Attributes
+namespace Ultraleap.Attributes
 {
     public class IndentAttribute : CombinablePropertyAttribute, IBeforeLabelAdditiveDrawer
     {

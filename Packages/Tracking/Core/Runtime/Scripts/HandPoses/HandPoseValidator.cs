@@ -1,4 +1,4 @@
-using Leap.Unity;
+using Ultraleap;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -94,8 +94,8 @@ public class HandPoseValidator : MonoBehaviour
 
         if (colourCapsuleHand != null)
         {
-            Leap.Unity.Utils.Fill(leftCapsuleHandColours, Color.grey);
-            Leap.Unity.Utils.Fill(rightCapsuleHandColours, Color.grey);
+            Ultraleap.Utils.Fill(leftCapsuleHandColours, Color.grey);
+            Ultraleap.Utils.Fill(rightCapsuleHandColours, Color.grey);
         }
 
         if (storedValidationHands.Count > 0)
@@ -215,8 +215,8 @@ public class HandPoseValidator : MonoBehaviour
                                 if (capsuleHand != null && capsuleHand.enabled)
                                 {
                                     if ((int)boneDirectionTarget.finger != 5 &&
-                                        boneDirectionTarget.finger != (int)Leap.Finger.FingerType.UNKNOWN &&
-                                        boneDirectionTarget.bone != (int)Leap.Bone.BoneType.UNKNOWN)
+                                        boneDirectionTarget.finger != (int)Ultraleap.Finger.FingerType.UNKNOWN &&
+                                        boneDirectionTarget.bone != (int)Ultraleap.Bone.BoneType.UNKNOWN)
                                     {
                                         int fingNum = (int)boneDirectionTarget.finger;
                                         int boneNum = (int)boneDirectionTarget.bone;

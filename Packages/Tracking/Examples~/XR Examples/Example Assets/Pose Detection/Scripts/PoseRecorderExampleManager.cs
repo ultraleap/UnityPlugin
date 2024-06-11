@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-namespace Leap.Unity.Examples
+namespace Ultraleap.Examples
 {
     public class PoseRecorderExampleManager : MonoBehaviour
     {

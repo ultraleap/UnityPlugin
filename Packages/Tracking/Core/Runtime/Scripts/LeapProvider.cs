@@ -9,7 +9,7 @@
 using System;
 using UnityEngine;
 
-namespace Leap.Unity
+namespace Ultraleap
 {
 
     using TestHandPose = TestHandFactory.TestHandPose;
@@ -146,7 +146,8 @@ namespace Leap.Unity
 
     public static class LeapProviderExtensions
     {
-        public static Leap.Hand MakeTestHand(this LeapProvider provider, bool isLeft)
+
+        public static Ultraleap.Hand MakeTestHand(this LeapProvider provider, bool isLeft)
         {
             return TestHandFactory.MakeTestHand(isLeft, provider.editTimePose)
                                   .Transform(new LeapTransform(provider.transform));

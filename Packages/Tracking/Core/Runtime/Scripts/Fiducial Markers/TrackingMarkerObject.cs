@@ -10,7 +10,7 @@ using LeapInternal;
 
 using UnityEngine;
 
-namespace Leap.Unity
+namespace Ultraleap
 {
     public class TrackingMarkerObject : MonoBehaviour
     {

@@ -6,12 +6,9 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap;
-using Leap.Unity;
-using Leap.Unity.Preview.HandRays;
 using UnityEngine;
 
-namespace Leap.Unity.Preview.HandRays
+namespace Ultraleap.Preview.HandRays
 {
     /// <summary>
     /// Calculates a far field hand ray that goes from the eye through the pinch position.

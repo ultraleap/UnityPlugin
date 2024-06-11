@@ -12,7 +12,7 @@ using UnityEngine;
 using UnityEditor;
 #endif
 
-namespace Leap.Unity.Attributes
+namespace Ultraleap.Attributes
 {
 
     public class MaxValue : CombinablePropertyAttribute, IPropertyConstrainer

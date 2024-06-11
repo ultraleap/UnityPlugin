@@ -6,11 +6,11 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity.Preview.HandRays;
+using Ultraleap.Preview.HandRays;
 using System;
 using UnityEngine;
 
-namespace Leap.Unity.Preview.Locomotion
+namespace Ultraleap.Preview.Locomotion
 {
     /// <summary>
     /// A teleport anchor is a point in space a user is able to teleport to

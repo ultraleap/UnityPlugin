@@ -1,4 +1,4 @@
-using Leap.Unity;
+using Ultraleap;
 using UnityEditor;
 using UnityEngine;
 

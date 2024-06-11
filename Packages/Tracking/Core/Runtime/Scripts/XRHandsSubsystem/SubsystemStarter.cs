@@ -12,7 +12,7 @@ using UnityEngine.SubsystemsImplementation.Extensions;
 using UnityEngine.XR.Hands;
 using UnityEngine.XR.Hands.ProviderImplementation;
 
-namespace Leap.Unity
+namespace Ultraleap
 {
     public class SubsystemStarter
     {

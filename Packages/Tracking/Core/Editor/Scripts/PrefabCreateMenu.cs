@@ -10,7 +10,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 
-namespace Leap
+namespace Ultraleap
 {
     public class PrefabCreateMenu
     {
@@ -214,7 +214,7 @@ namespace Leap
             GameObject physicalHandsManager = CreatePrefab("Physical Hands Manager");
             if (physicalHandsManager != null)
             {
-                var physHandsManager = physicalHandsManager.GetComponent<Leap.Unity.PhysicalHands.PhysicalHandsManager>();
+                var physHandsManager = physicalHandsManager.GetComponent<Ultraleap.PhysicalHands.PhysicalHandsManager>();
                 // Ensure that there is a contact parent at runtime
                 if (physHandsManager != null)
                 {

@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Leap.Unity
+namespace Ultraleap
 {
     /**
      * A HandModel that draws lines for the bones in the hand and its fingers.

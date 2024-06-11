@@ -9,7 +9,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace Leap.Unity.PhysicalHands
+namespace Ultraleap.PhysicalHands
 {
     [CanEditMultipleObjects]
     [CustomEditor(typeof(GrabBall))]
