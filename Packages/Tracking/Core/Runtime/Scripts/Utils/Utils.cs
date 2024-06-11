@@ -1812,11 +1812,13 @@ namespace Leap.Unity
             return new Quaternion(q.x, q.y, -q.z, -q.w);
         }
 
+        /// <summary> Transforms Rotation from local space to world space </summary>
         public static Quaternion TransformRotation(this Transform transform, Quaternion rotation)
         {
             return transform.rotation * rotation;
         }
 
+        /// <summary> Transforms Rotation from world space to local space </summary>
         public static Quaternion InverseTransformRotation(this Transform transform, Quaternion rotation)
         {
             return Quaternion.Inverse(transform.rotation) * rotation;
