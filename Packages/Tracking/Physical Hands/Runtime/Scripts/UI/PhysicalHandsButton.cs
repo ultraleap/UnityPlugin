@@ -395,7 +395,7 @@ namespace Ultraleap.PhysicalHands
 
             if (hand != null)
             {
-                if (!_contactedHands.TryAdd(hand, true));
+                if (!_contactedHands.TryAdd(hand, true))
                 {
                     _contactedHands[hand] = true;
                 }
