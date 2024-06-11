@@ -40,8 +40,6 @@ namespace Ultraleap.PhysicalHands
         protected float _buttonPressExitThreshold = 0.5f;
         [SerializeField]
         protected bool _usePrimaryHover = false;
-        [SerializeField]
-        private bool _buttonIgnoreGrabs = true;
 
         private bool _contactHandPressing = false;
         private bool _leftHandContacting = false;
@@ -264,15 +262,6 @@ namespace Ultraleap.PhysicalHands
             {
                 _pressableObjectRB = _pressableObject.AddComponent<Rigidbody>();
                 _pressableObjectRB.useGravity = false;
-            }
-
-            // Ensure the pressable object has an IgnorePhysicalHands component
-            if (_buttonIgnoreGrabs && !_pressableObject.TryGetComponent<IgnorePhysicalHands>(out IgnorePhysicalHands ignorePhysHands))
-            {
-                ignorePhysHands = _pressableObject.AddComponent<IgnorePhysicalHands>();
-                ignorePhysHands.DisableAllGrabbing = true;
-                ignorePhysHands.DisableAllHandCollisions = false;
-                ignorePhysHands.DisableCollisionOnChildObjects = false;
             }
 
             // Ensure the pressable object has a PhysicalHandsButtonHelper component

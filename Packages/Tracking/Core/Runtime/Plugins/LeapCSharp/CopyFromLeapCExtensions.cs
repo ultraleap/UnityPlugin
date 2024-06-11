@@ -73,7 +73,7 @@ namespace LeapInternal
             hand.Confidence = leapHand.confidence;
             hand.GrabStrength = leapHand.grab_strength;
             hand.PinchStrength = leapHand.pinch_strength;
-            hand.PinchDistance = leapHand.pinch_distance;
+            hand.PinchDistance = leapHand.pinch_distance * MM_TO_M; // This is not converted to M when scaling the hand, so we should convert it here
             hand.PalmWidth = leapHand.palm.width;
             hand.IsLeft = leapHand.type == eLeapHandType.eLeapHandType_Left;
             hand.TimeVisible = (float)(leapHand.visible_time * 1e-6);

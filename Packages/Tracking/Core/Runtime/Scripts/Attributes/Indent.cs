@@ -6,33 +6,35 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
+using UnityEngine;
 #endif
 
 namespace Ultraleap.Attributes
 {
-
-    public class UnitsAttribute : CombinablePropertyAttribute, IAfterFieldAdditiveDrawer
+    public class IndentAttribute : CombinablePropertyAttribute, IBeforeLabelAdditiveDrawer
     {
-        public readonly string unitsName;
+        float width = 20;
 
-        public UnitsAttribute(string _unitsName)
+        public IndentAttribute()
         {
-            this.unitsName = _unitsName;
+            width = 20;
         }
 
-#if UNITY_EDITOR
-        public float GetWidth()
+        public IndentAttribute(float _width)
         {
-            return EditorStyles.label.CalcSize(new GUIContent(unitsName)).x + 5; // Give it a small 5 unit buffer
+            width = _width;
         }
 
         public void Draw(Rect _rect, SerializedProperty _property)
         {
-            GUI.Label(_rect, unitsName);
+
         }
-#endif
+
+        public float GetWidth()
+        {
+            return width;
+        }
     }
 }

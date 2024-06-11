@@ -225,7 +225,7 @@ namespace Ultraleap.PhysicalHands
                 foreach (var objectCollider in GetComponentsInChildren<Collider>(true))
                 {
                     if ((disableOnParent && objectCollider.gameObject == gameObject) ||
-                        (disableOnChild && objectCollider.gameObject != gameObject))
+                        (disableOnChild && objectCollider.gameObject != gameObject && !objectCollider.TryGetComponent<IgnorePhysicalHands>(out _)))
                     {
                         IgnoreCollisionOnAllHandBones(contactHand, objectCollider, true);
                     }

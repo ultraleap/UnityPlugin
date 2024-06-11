@@ -56,18 +56,18 @@ namespace Ultraleap.Preview.Locomotion
 
         protected void OnEnable()
         {
-            _pinchDetector.OnPinch += OnPinch;
-            _pinchDetector.OnPinching += OnPinching;
-            _pinchDetector.OnUnpinch += OnUnpinch;
+            _pinchDetector.onActionStart += OnPinch;
+            _pinchDetector.onAction += OnPinching;
+            _pinchDetector.onActionEnd += OnUnpinch;
 
             UpdateChirality();
         }
 
         private void OnDisable()
         {
-            _pinchDetector.OnPinch -= OnPinch;
-            _pinchDetector.OnPinching -= OnPinching;
-            _pinchDetector.OnUnpinch -= OnUnpinch;
+            _pinchDetector.onActionStart -= OnPinch;
+            _pinchDetector.onAction -= OnPinching;
+            _pinchDetector.onActionEnd -= OnUnpinch;
         }
 
         private void UpdateChirality()
@@ -104,7 +104,7 @@ namespace Ultraleap.Preview.Locomotion
             bool isFacingObjectValue = _isFacingObject.ValueThisFrame;
             if (!IsSelected)
             {
-                if (!isFacingObjectValue && handRayInteractor.handRay.HandRayEnabled && !_pinchDetector.IsPinching)
+                if (!isFacingObjectValue && handRayInteractor.handRay.HandRayEnabled && !_pinchDetector.IsDoingAction)
                 {
                     SelectTeleport(true);
                 }

@@ -168,7 +168,7 @@ namespace Ultraleap.PhysicalHands
                 hand.palmBone.transform.position + (-hand.palmBone.transform.up * Mathf.Lerp(0.025f, 0.07f, lerp)) + (hand.palmBone.transform.forward * Mathf.Lerp(0.06f, 0.02f, lerp)),
                 radiusAmount + physicalHandsManager.HoverDistance,
                 _colliderCache,
-                physicalHandsManager.InteractionMask);
+                physicalHandsManager.InteractionMask, QueryTriggerInteraction.Ignore);
 
             RemoveUnhoveredHandsFromGrabHelperObjects(nearbyObjectCount, hand);
 

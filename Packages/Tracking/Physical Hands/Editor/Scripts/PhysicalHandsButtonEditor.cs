@@ -37,7 +37,7 @@ namespace Ultraleap.PhysicalHands
                 EditorGUI.indentLevel = 0;
             }
 
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("_whichHandCanPressButton"), new GUIContent("Which Hand Can Activate Button Presses", "Specifies which hand(s) can press the button."));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("_whichHandCanPressButton"), new GUIContent("Which Hand Can Activate Button Presses", "Specifies which hand(s) can press the button. \n\nIf you wish to ignore collisions. Use an IgnorePhysicalHands component on the PressableObject."));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("_usePrimaryHover"), new GUIContent("Use Primary Hover", "When ticked, the button will only register presses when it is primary hovered by either hand \n \n (Only one button can be primary hovered by each hand at a time)."));
 
 
@@ -61,7 +61,6 @@ namespace Ultraleap.PhysicalHands
             EditorGUILayout.Space(5);
 
             EditorGUILayout.PropertyField(serializedObject.FindProperty("_canBePressedByObjects"), new GUIContent("Can Be Pressed By Objects", "Determines whether the button can be pressed by objects which are not the hand."));
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("_buttonIgnoreGrabs"), new GUIContent("Ignore Grabbing Button", "Specifies whether grabs should be ignored on the Pressable Object."));
 
             EditorGUILayout.Space(10);
 
