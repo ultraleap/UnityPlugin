@@ -7,9 +7,11 @@
  ******************************************************************************/
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 
 namespace Leap.Unity.InputModule
 {
@@ -125,7 +127,37 @@ namespace Leap.Unity.InputModule
             enabled = false;
             return;
 #endif
+                       StartCoroutine(Setup());
 
+            base.Awake();
+        }
+
+
+        private void Update()
+        {
+            _projectionOriginProvider?.Update();
+        }
+
+        protected override void OnEnable()
+        {
+            SceneManager.sceneLoaded += OnSceneLoad;
+            base.OnEnable();
+        }
+
+        protected override void OnDisable()
+        {
+            SceneManager.sceneLoaded -= OnSceneLoad;
+            base.OnDisable();
+        }
+
+        private void OnSceneLoad(Scene scene, LoadSceneMode mode)
+        {
+           StartCoroutine(Setup());
+        }
+
+        private IEnumerator Setup()
+        {
+            yield return new WaitForEndOfFrame();
             //Find and apply LSP/Camera if not already
             if (leapDataProvider == null)
             {
@@ -134,9 +166,10 @@ namespace Leap.Unity.InputModule
                 {
                     Debug.LogError("Failed to find active LeapProvider", leapDataProvider);
                     enabled = false;
-                    return;
+                    yield break;
                 }
             }
+
             if (mainCamera == null)
             {
                 if (leapDataProvider != null && leapDataProvider is LeapXRServiceProvider)
@@ -145,16 +178,13 @@ namespace Leap.Unity.InputModule
                 {
                     Debug.LogError("Failed to find main camera", mainCamera);
                     enabled = false;
-                    return;
+                    yield break;
                 }
             }
 
-            base.Awake();
-        }
-        protected override void Start()
-        {
-            var shoulderProjectionOriginProvider = new ShoulderProjectionOriginProvider(mainCamera);
-            _projectionOriginProvider = shoulderProjectionOriginProvider;
+            yield return new WaitForEndOfFrame();
+
+            _projectionOriginProvider = new ShoulderProjectionOriginProvider(mainCamera);
 
             //Assign mainCamera to Canvases
             var canvases = Resources.FindObjectsOfTypeAll<Canvas>();
@@ -175,11 +205,6 @@ namespace Leap.Unity.InputModule
             {
                 projectiveToTactileTransitionDistance = float.MaxValue;
             }
-        }
-
-        private void Update()
-        {
-            _projectionOriginProvider?.Update();
         }
 
         /// <summary>
@@ -249,7 +274,7 @@ namespace Leap.Unity.InputModule
         /// <returns>True if hands are in the scene, otherwise false</returns>
         public override bool ShouldActivateModule()
         {
-            return leapDataProvider.CurrentFrame != null && leapDataProvider.CurrentFrame.Hands.Count > 0 &&
+            return leapDataProvider != null && leapDataProvider.CurrentFrame != null && leapDataProvider.CurrentFrame.Hands.Count > 0 &&
                    base.ShouldActivateModule();
         }
 

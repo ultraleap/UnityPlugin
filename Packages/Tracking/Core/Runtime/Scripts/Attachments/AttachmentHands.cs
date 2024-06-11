@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using UnityEditor;
 #endif
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Leap.Unity.Attachments
 {
@@ -113,6 +114,21 @@ namespace Leap.Unity.Attachments
         }
 #endif
 
+        private void OnEnable()
+        {
+            SceneManager.sceneLoaded += SceneLoaded;
+        }
+
+        private void OnDisable()
+        {
+            SceneManager.sceneLoaded -= SceneLoaded;
+        }
+
+        private void SceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            reinitialize();
+        }
+
         void Awake()
         {
 #if UNITY_EDITOR
@@ -176,15 +192,17 @@ namespace Leap.Unity.Attachments
 
         private void refreshHandAccessors()
         {
+
+            if (_leapProvider == null)
+            {
+                _leapProvider = Hands.Provider;
+            }
+
             // If necessary, generate a left-hand and right-hand set of accessors.
             if (_handAccessors == null || _handAccessors.Length == 0)
             {
                 _handAccessors = new Func<Hand>[2];
 
-                if (_leapProvider == null)
-                {
-                    _leapProvider = Hands.Provider;
-                }
                 if (_leapProvider != null)
                 {
                     _handAccessors[0] = new Func<Hand>(() => _leapProvider.CurrentFrame?.GetHand(Chirality.Left));

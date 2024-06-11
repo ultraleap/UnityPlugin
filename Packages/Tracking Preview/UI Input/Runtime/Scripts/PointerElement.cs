@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace Leap.Unity.InputModule
@@ -24,8 +25,8 @@ namespace Leap.Unity.InputModule
 
         public event Action<PointerElement, Hand> OnPointerStateChanged;
 
-        private Camera mainCamera;
-        private LeapProvider leapDataProvider;
+        private Camera MainCamera { get { return module.MainCamera; } }
+        private LeapProvider LeapDataProvider { get { return module.LeapDataProvider; } }
 
         [SerializeField] private EventSystem eventSystem;
         [SerializeField] private UIInputModule module;
@@ -154,8 +155,6 @@ namespace Leap.Unity.InputModule
         {
             EventData = new PointerEventData(eventSystem);
 
-            leapDataProvider = module.LeapDataProvider;
-            mainCamera = module.MainCamera;
         }
 
         /// <summary>
@@ -763,12 +762,12 @@ namespace Leap.Unity.InputModule
                 pointerPosition = hand.Index.TipPosition;
                 for (var i = 1; i < 3; i++)
                 {
-                    var fingerDistance = Vector3.Distance(mainCamera.transform.position,
+                    var fingerDistance = Vector3.Distance(MainCamera.transform.position,
                         hand.fingers[i].TipPosition);
                     var fingerExtension =
                         Mathf.Clamp01(Vector3.Dot(
                             hand.fingers[i].Direction,
-                            leapDataProvider.CurrentFrame.Hands[0].Direction)) / 1.5f;
+                            LeapDataProvider.CurrentFrame.Hands[0].Direction)) / 1.5f;
 
                     if (fingerDistance > farthest && fingerExtension > 0.5f)
                     {
@@ -780,11 +779,11 @@ namespace Leap.Unity.InputModule
             else
             {
                 //Raycast through the knuckle of the finger
-                pointerPosition = mainCamera.transform.position - origin + hand.fingers[(int)Finger.FingerType.INDEX].GetBone(Bone.BoneType.METACARPAL).Center;
+                pointerPosition = MainCamera.transform.position - origin + hand.fingers[(int)Finger.FingerType.INDEX].GetBone(Bone.BoneType.METACARPAL).Center;
             }
 
             //Set the Raycast Direction and Delta
-            EventData.position = mainCamera.WorldToScreenPoint(pointerPosition);
+            EventData.position = MainCamera.WorldToScreenPoint(pointerPosition);
             EventData.delta = EventData.position - PrevScreenPosition;
             EventData.scrollDelta = Vector2.zero;
 
