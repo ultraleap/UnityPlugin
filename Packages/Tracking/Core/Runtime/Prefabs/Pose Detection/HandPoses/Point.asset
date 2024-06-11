@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0667b9b5dda6fcd4aa2bfe808e328cdd, type: 3}
   m_Name: Point
   m_EditorClassIdentifier: 
-  detectThumb: 1
+  detectThumb: 0
   detectIndex: 1
   detectMiddle: 1
   detectRing: 1
