@@ -1905,6 +1905,124 @@ MonoBehaviour:
   pinchPoint: {fileID: 0}
   _chirality: 1
   _isTracked: 1
+--- !u!1 &390104576 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1621093567131514, guid: 42e8bd39fe145a8419d212958fac6589, type: 3}
+  m_PrefabInstance: {fileID: 864494514}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &390104577 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1459816614749062, guid: 42e8bd39fe145a8419d212958fac6589, type: 3}
+  m_PrefabInstance: {fileID: 864494514}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &390104578 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1478740925613056, guid: 42e8bd39fe145a8419d212958fac6589, type: 3}
+  m_PrefabInstance: {fileID: 864494514}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &390104579 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1375438037617704, guid: 42e8bd39fe145a8419d212958fac6589, type: 3}
+  m_PrefabInstance: {fileID: 864494514}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &390104580
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 390104576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b3763add1152ac4aab69357a419a664, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  HandToIgnoreGrabs: 2
+  _disableAllGrabbing: 1
+  HandToIgnoreCollisions: 2
+  _disableAllHandCollisions: 0
+  _disableCollisionOnChildren: 0
+--- !u!114 &390104581
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 390104577}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b3763add1152ac4aab69357a419a664, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  HandToIgnoreGrabs: 2
+  _disableAllGrabbing: 1
+  HandToIgnoreCollisions: 2
+  _disableAllHandCollisions: 0
+  _disableCollisionOnChildren: 0
+--- !u!114 &390104582
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 390104578}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b3763add1152ac4aab69357a419a664, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  HandToIgnoreGrabs: 2
+  _disableAllGrabbing: 1
+  HandToIgnoreCollisions: 2
+  _disableAllHandCollisions: 0
+  _disableCollisionOnChildren: 0
+--- !u!114 &390104583
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 390104579}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b3763add1152ac4aab69357a419a664, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  HandToIgnoreGrabs: 2
+  _disableAllGrabbing: 1
+  HandToIgnoreCollisions: 2
+  _disableAllHandCollisions: 0
+  _disableCollisionOnChildren: 0
+--- !u!114 &398601488
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 864494518}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b3763add1152ac4aab69357a419a664, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  HandToIgnoreGrabs: 2
+  _disableAllGrabbing: 1
+  HandToIgnoreCollisions: 2
+  _disableAllHandCollisions: 0
+  _disableCollisionOnChildren: 0
+--- !u!65 &398601489
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 864494518}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1.0000002, y: 1.0000011, z: 1.0000005}
+  m_Center: {x: 0.0000009536743, y: 0.000030517578, z: 0}
 --- !u!1 &455620454
 GameObject:
   m_ObjectHideFlags: 0
@@ -1983,7 +2101,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   physicalHandsManager: {fileID: 324960590}
-  _physicsMaterial: {fileID: 0}
+  physicsMaterial: {fileID: 0}
   maxPalmVelocity: 300
   minFingerVelocity: 50
   maxFingerVelocity: 200
@@ -1995,6 +2113,10 @@ MonoBehaviour:
   useProjectPhysicsIterations: 0
   handSolverIterations: 30
   handSolverVelocityIterations: 20
+  contactEnterDistance: 0.002
+  contactExitDistance: 0.012
+  contactThumbEnterDistance: 0.005
+  contactThumbExitDistance: 0.02
 --- !u!1 &545972868
 GameObject:
   m_ObjectHideFlags: 0
@@ -2349,13 +2471,124 @@ PrefabInstance:
       propertyPath: m_IsKinematic
       value: 1
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 5833509367062515929, guid: 42e8bd39fe145a8419d212958fac6589, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 42e8bd39fe145a8419d212958fac6589, type: 3}
+--- !u!1 &864494515 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1048560995433658, guid: 42e8bd39fe145a8419d212958fac6589, type: 3}
+  m_PrefabInstance: {fileID: 864494514}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &864494516 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4854436900119490, guid: 42e8bd39fe145a8419d212958fac6589, type: 3}
   m_PrefabInstance: {fileID: 864494514}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &864494517 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1316306599176216, guid: 42e8bd39fe145a8419d212958fac6589, type: 3}
+  m_PrefabInstance: {fileID: 864494514}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &864494518 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1591033481820154, guid: 42e8bd39fe145a8419d212958fac6589, type: 3}
+  m_PrefabInstance: {fileID: 864494514}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &864494519 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1607714312898442, guid: 42e8bd39fe145a8419d212958fac6589, type: 3}
+  m_PrefabInstance: {fileID: 864494514}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &864494520
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 864494515}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b3763add1152ac4aab69357a419a664, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  HandToIgnoreGrabs: 2
+  _disableAllGrabbing: 1
+  HandToIgnoreCollisions: 2
+  _disableAllHandCollisions: 0
+  _disableCollisionOnChildren: 0
+--- !u!65 &864494521
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 864494515}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1.0000002, y: 1.0000011, z: 1.0000005}
+  m_Center: {x: 0.0000009536743, y: 0.000034332275, z: -0.00000047683716}
+--- !u!114 &864494522
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 864494517}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b3763add1152ac4aab69357a419a664, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  HandToIgnoreGrabs: 2
+  _disableAllGrabbing: 1
+  HandToIgnoreCollisions: 2
+  _disableAllHandCollisions: 0
+  _disableCollisionOnChildren: 0
+--- !u!65 &864494523
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 864494517}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1.0000002, y: 1.0000011, z: 1.0000005}
+  m_Center: {x: 0.0000009536743, y: 0.000038146973, z: 0.0000009536743}
+--- !u!114 &864494524
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 864494519}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b3763add1152ac4aab69357a419a664, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  HandToIgnoreGrabs: 2
+  _disableAllGrabbing: 1
+  HandToIgnoreCollisions: 2
+  _disableAllHandCollisions: 0
+  _disableCollisionOnChildren: 0
+--- !u!65 &864494525
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 864494519}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1.0000001, y: 1.0000012, z: 1.0000004}
+  m_Center: {x: -0.0000009536743, y: 0.000045776367, z: 0.0000014305115}
 --- !u!1 &868321149
 GameObject:
   m_ObjectHideFlags: 0

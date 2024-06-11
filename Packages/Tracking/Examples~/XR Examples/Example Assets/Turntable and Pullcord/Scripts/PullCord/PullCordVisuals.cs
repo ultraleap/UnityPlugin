@@ -104,7 +104,7 @@ namespace Ultraleap.Examples
                     break;
 
                 case PullCordHandle.PullCordState.Pinched:
-                    newHandleScale = initialHandleScale * 0.3f;
+                    newHandleScale = initialHandleScale;
                     newHandleColor = Color.white;
                     newLineColor = Color.white;
                     _pullCordLine.enabled = true;

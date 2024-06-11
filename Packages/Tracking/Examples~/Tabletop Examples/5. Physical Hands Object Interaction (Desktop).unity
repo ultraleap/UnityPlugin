@@ -176,7 +176,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 8bf483d1467d72c418541702679a30a2, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1154,6 +1154,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 210582894}
     m_Modifications:
+    - target: {fileID: 2167320533068517812, guid: 43eaa06112baf304ba03b0e3634d568d, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 8748f3e035e707e44997d3f72091272c, type: 2}
+    - target: {fileID: 2350758326909340329, guid: 43eaa06112baf304ba03b0e3634d568d, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 8bf483d1467d72c418541702679a30a2, type: 2}
     - target: {fileID: 6504037249797295756, guid: 43eaa06112baf304ba03b0e3634d568d, type: 3}
       propertyPath: m_Name
       value: Physical Hands Button
@@ -1258,6 +1266,28 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2504497278577001491, guid: 43eaa06112baf304ba03b0e3634d568d, type: 3}
   m_PrefabInstance: {fileID: 920974890}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1547023217 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8988865282199578529, guid: 43eaa06112baf304ba03b0e3634d568d, type: 3}
+  m_PrefabInstance: {fileID: 920974890}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1547023221
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1547023217}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b3763add1152ac4aab69357a419a664, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  HandToIgnoreGrabs: 2
+  _disableAllGrabbing: 1
+  HandToIgnoreCollisions: 2
+  _disableAllHandCollisions: 0
+  _disableCollisionOnChildren: 0
 --- !u!4 &1658689217 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6504037249797295763, guid: 43eaa06112baf304ba03b0e3634d568d, type: 3}
