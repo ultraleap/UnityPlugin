@@ -326,6 +326,12 @@ namespace Ultraleap
         {
             Application.OpenURL("https://discord.com/invite/3VCndThqxS");
         }
+
+        [MenuItem("Ultraleap/Updating/6.X to 7.X/Update Existing Pose Recordings", false, 200)]
+        private static void UpdateExistingPoseRecordings()
+        {
+            ReplaceUseOfFingersInPoseScriptableObjects();
+        }
 #endif
 
         private static UltraleapSettings FindSettingsSO()
@@ -391,6 +397,24 @@ namespace Ultraleap
             }
 
             return pluginVersionFromAssets;
+        }
+
+
+        private static void ReplaceUseOfFingersInPoseScriptableObjects()
+        {
+            HandPoseScriptableObject[] _handPoseSOs = Resources.FindObjectsOfTypeAll(typeof(HandPoseScriptableObject)) as HandPoseScriptableObject[];
+
+            foreach (var _handPoseSO in _handPoseSOs)
+            {
+                var _path = AssetDatabase.GetAssetPath(_handPoseSO);
+                var _text = File.ReadAllText(_path);
+                _text = _text.Replace("Fingers", "fingers");
+                File.WriteAllText(_path, _text);
+
+                EditorUtility.SetDirty(_handPoseSO);
+                AssetDatabase.Refresh();
+            }
+
         }
 #endif
     }
