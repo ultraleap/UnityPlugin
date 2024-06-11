@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0667b9b5dda6fcd4aa2bfe808e328cdd, type: 3}
   m_Name: Thumbs Up
   m_EditorClassIdentifier: 
-  DetectThumb: 1
-  DetectIndex: 1
-  DetectMiddle: 1
-  DetectRing: 1
-  DetectPinky: 1
+  detectThumb: 1
+  detectIndex: 1
+  detectMiddle: 1
+  detectRing: 1
+  detectPinky: 1
   globalRotation: 20
   fingerJointRotationThresholds:
   - jointThresholds:
@@ -42,7 +42,7 @@ MonoBehaviour:
   serializedHand:
     FrameId: 0
     Id: 51
-    Fingers:
+    fingers:
     - bones:
       - PrevJoint: {x: -0.09547917, y: 1.0375451, z: 0.31567657}
         NextJoint: {x: -0.09547917, y: 1.0375451, z: 0.31567657}
@@ -279,7 +279,7 @@ MonoBehaviour:
   mirroredHand:
     FrameId: 0
     Id: 51
-    Fingers:
+    fingers:
     - bones:
       - PrevJoint: {x: 0.09547917, y: 1.0375451, z: 0.31567657}
         NextJoint: {x: 0.09547917, y: 1.0375451, z: 0.31567657}
