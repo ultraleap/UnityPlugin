@@ -15,7 +15,7 @@ using UnityEditor;
 using System.IO;
 #endif
 
-namespace Leap.Unity
+namespace Ultraleap
 {
 #if UNITY_EDITOR
     [CustomEditor(typeof(UltraleapSettings))]

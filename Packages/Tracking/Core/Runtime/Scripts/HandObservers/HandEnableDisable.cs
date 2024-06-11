@@ -6,11 +6,11 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity.Attributes;
 using System.Collections.Generic;
 using UnityEngine;
+using Ultraleap.Attributes;
 
-namespace Leap.Unity
+namespace Ultraleap
 {
     /// <summary>
     /// A component to be attached to a HandModelBase to handle starting and ending of

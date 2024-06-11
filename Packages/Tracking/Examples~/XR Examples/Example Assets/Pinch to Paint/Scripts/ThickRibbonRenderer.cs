@@ -9,7 +9,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Leap.Unity.Examples
+namespace Ultraleap.Examples
 {
     /// <summary>
     /// Renderer for a PinchStrokeProcessor that renders thick ribbons.

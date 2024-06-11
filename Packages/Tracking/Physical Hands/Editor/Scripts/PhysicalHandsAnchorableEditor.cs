@@ -10,12 +10,12 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace Leap.Unity
+namespace Ultraleap
 {
 
     [CanEditMultipleObjects]
     [CustomEditor(typeof(PhysicalHandsAnchorable))]
-    public class PhysicalHandsAnchorableEditor : Leap.Unity.Interaction.AnchorableBehaviourEditor
+    public class PhysicalHandsAnchorableEditor : Ultraleap.AnchorableBehaviourEditor
     {
 
         protected override void OnEnable()

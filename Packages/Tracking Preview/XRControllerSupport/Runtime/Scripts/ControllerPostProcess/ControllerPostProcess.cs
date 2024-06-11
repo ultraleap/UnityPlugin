@@ -13,7 +13,7 @@ using UnityEngine;
 using UnityEngine.InputSystem.XR;
 #endif
 
-namespace Leap.Unity.Controllers
+namespace Ultraleap.Controllers
 {
     public enum InputMethodType
     {

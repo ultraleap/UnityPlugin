@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Leap.Unity.Preview.Locomotion
+namespace Ultraleap.Preview.Locomotion
 {
     /// <summary>
     /// PinchToTeleport allows you to point with a hand ray interactor and pinch with your hand to teleport where you're pointing to

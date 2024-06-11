@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
-namespace Leap.Unity.HandsModule
+namespace Ultraleap.HandsModule
 {
     /// <summary>
     /// A script to manage the active hand models in the scene

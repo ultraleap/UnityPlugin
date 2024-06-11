@@ -13,7 +13,7 @@ using UnityEngine.InputSystem.XR;
 using UnityEngine.InputSystem;
 #endif
 
-namespace Leap.Unity.Controllers
+namespace Ultraleap.Controllers
 {
     /// <summary>
     /// Takes in XR Controller data and converts it to Leap Hand Data

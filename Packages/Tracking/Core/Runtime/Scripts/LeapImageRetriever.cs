@@ -13,9 +13,10 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-namespace Leap.Unity
-{
+using Image = LeapInternal.Image;
 
+namespace Ultraleap
+{
     /// <summary>
     /// Acquires images from a LeapServiceProvider and uploads image data as shader global
     /// data for use by any shaders that render those images.

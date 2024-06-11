@@ -9,7 +9,7 @@
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace Leap.Unity.PhysicalHands
+namespace Ultraleap.PhysicalHands
 {
     [RequireComponent(typeof(Rigidbody))]
     public class PhysicalHandEvents : MonoBehaviour, IPhysicalHandHover, IPhysicalHandContact, IPhysicalHandGrab

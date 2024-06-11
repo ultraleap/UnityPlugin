@@ -6,8 +6,8 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity;
-using Leap.Unity.PhysicalHands;
+using Ultraleap;
+using Ultraleap.PhysicalHands;
 
 using System.Linq;
 using System.Collections.Generic;
@@ -15,7 +15,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace Leap.Unity.Examples
+namespace Ultraleap.Examples
 {
     /// <summary>
     /// PullCordHandle keeps track of the handle's position and moves it according to hand attraction and pinching.
@@ -130,12 +130,12 @@ namespace Leap.Unity.Examples
             return Vector3.Lerp(target, current, exp);
         }
 
-        private Vector3 Midpoint(Leap.Hand hand)
+        private Vector3 Midpoint(Ultraleap.Hand hand)
         {
             return (hand.Index.TipPosition + hand.Thumb.TipPosition) / 2f;
         }
 
-        private void UpdatePinching(Leap.Hand hand, float distanceToRestingPos)
+        private void UpdatePinching(Ultraleap.Hand hand, float distanceToRestingPos)
         {
             float distance = Vector3.Distance(hand.Index.TipPosition, hand.Thumb.TipPosition);
 

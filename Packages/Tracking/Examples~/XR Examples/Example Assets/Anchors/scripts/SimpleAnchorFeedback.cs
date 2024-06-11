@@ -8,21 +8,21 @@
 
 using UnityEngine;
 
-namespace Leap.Unity.Examples
+namespace Ultraleap.Examples
 {
-    [RequireComponent(typeof(Leap.Unity.Anchor))]
+    [RequireComponent(typeof(Ultraleap.Anchor))]
     public class SimpleAnchorFeedback : MonoBehaviour
     {
         public Transform scaleTarget;
 
-        private Leap.Unity.Anchor _anchor;
+        private Ultraleap.Anchor _anchor;
 
         private Vector3 _initScaleVector;
         private float _curScale = 1F;
 
         void Start()
         {
-            _anchor = GetComponent<Leap.Unity.Anchor>();
+            _anchor = GetComponent<Ultraleap.Anchor>();
 
             _initScaleVector = scaleTarget.transform.localScale;
         }

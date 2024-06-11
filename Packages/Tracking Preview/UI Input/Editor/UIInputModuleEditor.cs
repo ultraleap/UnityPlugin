@@ -8,7 +8,7 @@
 
 using UnityEditor;
 
-namespace Leap.Unity.InputModule
+namespace Ultraleap.InputModule
 {
     [CustomEditor(typeof(UIInputModule))]
     public class UIInputModuleEditor : CustomEditorBase<UIInputModule>

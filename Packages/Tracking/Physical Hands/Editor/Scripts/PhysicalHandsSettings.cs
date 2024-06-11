@@ -6,7 +6,7 @@ using UnityEditor;
 
 using UnityEngine;
 
-namespace Leap.Unity.PhysicalHands
+namespace Ultraleap.PhysicalHands
 {
     [Serializable]
     internal class PhysicalHandsSettings

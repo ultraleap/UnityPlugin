@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEditor;
 #endif
 
-namespace Leap.Unity
+namespace Ultraleap
 {
     [ExecuteInEditMode]
     public class HandPoseEditor : LeapProvider

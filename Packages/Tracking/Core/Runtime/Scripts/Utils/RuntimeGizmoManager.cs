@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace Leap.Unity.RuntimeGizmos
+namespace Ultraleap.RuntimeGizmos
 {
 
     /// <summary>

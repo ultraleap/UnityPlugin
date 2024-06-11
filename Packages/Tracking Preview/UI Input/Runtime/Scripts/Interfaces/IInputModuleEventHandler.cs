@@ -9,7 +9,7 @@
 using System;
 using UnityEngine;
 
-namespace Leap.Unity.InputModule
+namespace Ultraleap.InputModule
 {
     /// <summary>
     /// Defines the set of events supported by the UI input module

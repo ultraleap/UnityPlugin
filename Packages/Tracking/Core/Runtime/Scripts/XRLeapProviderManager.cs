@@ -14,7 +14,7 @@ using UnityEngine;
 using UnityEngine.XR.Management;
 #endif
 
-namespace Leap.Unity
+namespace Ultraleap
 {
     /// <summary>
     /// XRLeapProviderManager offers a single access point while selecting the most suitable Hand Tracking Data source

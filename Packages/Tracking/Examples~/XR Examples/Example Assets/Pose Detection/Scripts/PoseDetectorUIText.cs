@@ -9,7 +9,7 @@
 using TMPro;
 using UnityEngine;
 
-namespace Leap.Unity.Examples
+namespace Ultraleap.Examples
 {
     public class PoseDetectorUIText : MonoBehaviour
     {

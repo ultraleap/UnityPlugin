@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace Leap.Unity.Attachments
+namespace Ultraleap.Attachments
 {
 
     [CustomEditor(typeof(AttachmentHands))]
@@ -39,7 +39,7 @@ namespace Leap.Unity.Attachments
             EditorGUILayout.LabelField("Attachment Transforms", EditorStyles.boldLabel);
 
             // Determine whether the target object is a prefab. AttachmentPoints cannot be edited on prefabs.
-            var isTargetPrefab = Leap.Unity.Utils.IsObjectPartOfPrefabAsset(target.gameObject);
+            var isTargetPrefab = Ultraleap.Utils.IsObjectPartOfPrefabAsset(target.gameObject);
 
             if (isTargetPrefab)
             {

@@ -11,7 +11,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.XR;
 
-namespace Leap.Unity.PhysicalHands
+namespace Ultraleap.PhysicalHands
 {
     [System.Serializable]
     public class GrabHelperObject
@@ -979,7 +979,7 @@ namespace Leap.Unity.PhysicalHands
             bool thumb = false, otherFinger = false;
             bool earlyQuit;
 
-            Leap.Hand lHand = hand.dataHand;
+            Ultraleap.Hand lHand = hand.dataHand;
 
             if (lHand == null)
             {

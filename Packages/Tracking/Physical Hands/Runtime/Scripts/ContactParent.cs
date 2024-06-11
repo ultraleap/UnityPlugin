@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Leap.Unity.PhysicalHands
+namespace Ultraleap.PhysicalHands
 {
     public abstract class ContactParent : MonoBehaviour
     {

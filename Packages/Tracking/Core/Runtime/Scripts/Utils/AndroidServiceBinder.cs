@@ -1,5 +1,5 @@
 #if UNITY_ANDROID
-namespace Leap.Unity
+namespace Ultraleap
 {
     using System;
     using UnityEngine;

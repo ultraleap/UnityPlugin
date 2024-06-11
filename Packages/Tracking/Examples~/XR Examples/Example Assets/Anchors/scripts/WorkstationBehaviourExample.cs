@@ -7,9 +7,9 @@
  ******************************************************************************/
 
 using UnityEngine;
-using Leap.Unity.PhysicalHands;
+using Ultraleap.PhysicalHands;
 
-namespace Leap.Unity.Examples
+namespace Ultraleap.Examples
 {
     /// <summary>
     /// This example script constructs behavior for a UI object that can open

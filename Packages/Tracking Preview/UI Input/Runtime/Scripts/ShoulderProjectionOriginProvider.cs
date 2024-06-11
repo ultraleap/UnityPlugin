@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Leap.Unity.InputModule
+namespace Ultraleap.InputModule
 {
     /// <summary>
     /// Provides information about the current inferred shoulder position. Uses the head rotation internally, so can provide that information too

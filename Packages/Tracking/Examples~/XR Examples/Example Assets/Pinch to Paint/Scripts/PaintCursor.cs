@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Leap.Unity.Examples
+namespace Ultraleap.Examples
 {
     /// <summary>
     /// The paint cursor deals with the visuals of the paint cursor, 

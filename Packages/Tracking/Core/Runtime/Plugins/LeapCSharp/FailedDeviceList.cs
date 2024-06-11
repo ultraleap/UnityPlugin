@@ -6,7 +6,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-namespace Leap
+namespace Ultraleap
 {
     using System.Collections.Generic;
 

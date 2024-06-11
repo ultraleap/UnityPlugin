@@ -11,7 +11,7 @@ using UnityEngine;
 using UnityEditor;
 #endif
 
-namespace Leap.Unity.Attributes
+namespace Ultraleap.Attributes
 {
 
     public class UnitsAttribute : CombinablePropertyAttribute, IAfterFieldAdditiveDrawer
