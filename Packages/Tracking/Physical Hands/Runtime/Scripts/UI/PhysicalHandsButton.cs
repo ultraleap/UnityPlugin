@@ -406,7 +406,7 @@ namespace Leap.Unity.PhysicalHands
 
             if (hand != null)
             {
-                if (!_contactedHands.TryAdd(hand, true));
+                if (!_contactedHands.TryAdd(hand, true))
                 {
                     _contactedHands[hand] = true;
                 }
@@ -436,7 +436,7 @@ namespace Leap.Unity.PhysicalHands
             // Update hand contact flags
             if (hand != null)
             {
-                if (!_contactedHands.TryAdd(hand, false));
+                if (!_contactedHands.TryAdd(hand, false))
                 {
                     _contactedHands[hand] = false;
                 }
