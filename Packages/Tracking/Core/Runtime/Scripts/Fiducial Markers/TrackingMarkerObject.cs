@@ -10,9 +10,6 @@ using LeapInternal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
-using Unity.VisualScripting.YamlDotNet.Core.Events;
-using UnityEditor;
 using UnityEngine;
 
 namespace Leap.Unity
