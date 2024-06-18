@@ -240,7 +240,7 @@ namespace Leap.Unity
                 }
 
                 bestPose = _poses[0];
-                var lastBest = _poses.FirstOrDefault(o => o.PoseEvent.timestamp == _previousBestFiducialID);
+                var lastBest = _poses.FirstOrDefault(o => o.PoseEvent.id == _previousBestFiducialID);
 
                 if (lastBest.PoseEvent != null)
                 {
