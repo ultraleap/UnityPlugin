@@ -21,14 +21,14 @@ namespace Ultraleap
         private Vector3 _initScaleVector;
         private float _curScale = 1F;
 
-        void Start()
+        private void Start()
         {
             _anchor = GetComponent<Anchor>();
 
             _initScaleVector = scaleTarget.transform.localScale;
         }
 
-        void Update()
+        private void Update()
         {
             float _targetScale = 1F;
 

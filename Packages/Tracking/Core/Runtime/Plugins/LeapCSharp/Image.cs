@@ -67,7 +67,9 @@ namespace LeapInternal
         public byte[] Data(CameraType camera)
         {
             if (camera != CameraType.LEFT && camera != CameraType.RIGHT)
+            {
                 return null;
+            }
 
             return imageData(camera).AsByteArray;
         }
@@ -100,7 +102,9 @@ namespace LeapInternal
         public UInt32 ByteOffset(CameraType camera)
         {
             if (camera != CameraType.LEFT && camera != CameraType.RIGHT)
+            {
                 return 0;
+            }
 
             return imageData(camera).byteOffset;
         }
@@ -148,7 +152,9 @@ namespace LeapInternal
         public float[] Distortion(CameraType camera)
         {
             if (camera != CameraType.LEFT && camera != CameraType.RIGHT)
+            {
                 return null;
+            }
 
             // We return the FlippedData, not the Data member as this corrects for a Y flip in the distortion matrix coming from the service.
             return imageData(camera).DistortionData.FlippedData;
@@ -365,7 +371,9 @@ namespace LeapInternal
         public float RayOffsetX(CameraType camera)
         {
             if (camera != CameraType.LEFT && camera != CameraType.RIGHT)
+            {
                 return 0;
+            }
 
             return imageData(camera).RayOffsetX;
         }
@@ -381,7 +389,9 @@ namespace LeapInternal
         public float RayOffsetY(CameraType camera)
         {
             if (camera != CameraType.LEFT && camera != CameraType.RIGHT)
+            {
                 return 0;
+            }
 
             return imageData(camera).RayOffsetY;
         }
@@ -397,7 +407,9 @@ namespace LeapInternal
         public float RayScaleX(CameraType camera)
         {
             if (camera != CameraType.LEFT && camera != CameraType.RIGHT)
+            {
                 return 0;
+            }
 
             return imageData(camera).RayScaleX;
         }
@@ -413,7 +425,9 @@ namespace LeapInternal
         public float RayScaleY(CameraType camera)
         {
             if (camera != CameraType.LEFT && camera != CameraType.RIGHT)
+            {
                 return 0;
+            }
 
             return imageData(camera).RayScaleY;
         }

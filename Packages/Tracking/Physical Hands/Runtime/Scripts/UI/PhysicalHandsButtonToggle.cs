@@ -33,7 +33,7 @@ namespace Ultraleap.PhysicalHands
             }
         }
 
-        Coroutine delayedUnpressCoroutine;
+        private Coroutine delayedUnpressCoroutine;
 
         private void OnEnable()
         {
@@ -197,7 +197,7 @@ namespace Ultraleap.PhysicalHands
             _canUnpress = true;
             delayedUnpressCoroutine = null;
         }
-        #endregion
 
+        #endregion Collision handling methods
     }
 }

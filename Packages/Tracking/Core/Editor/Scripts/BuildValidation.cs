@@ -1,12 +1,12 @@
-using Ultraleap;
 using System;
+using Ultraleap;
 using UnityEditor;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 
 public class BuildValidation : IPreprocessBuildWithReport
 {
-    enum ValidationPopupType
+    private enum ValidationPopupType
     {
         ANDROID_ARCHITECTURE
     }

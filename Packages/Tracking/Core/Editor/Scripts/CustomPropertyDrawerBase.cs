@@ -34,7 +34,7 @@ namespace Ultraleap
         {
             init(property);
 
-            foreach (var drawable in _drawables)
+            foreach (IDrawable drawable in _drawables)
             {
                 drawable.Draw(ref position);
             }
@@ -45,7 +45,7 @@ namespace Ultraleap
             init(property);
 
             float height = 0;
-            foreach (var drawable in _drawables)
+            foreach (IDrawable drawable in _drawables)
             {
                 if (drawable is PropertyContainer)
                 {

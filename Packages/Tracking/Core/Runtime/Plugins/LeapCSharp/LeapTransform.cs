@@ -54,7 +54,7 @@ namespace Ultraleap
         /// </summary>
         public Vector3 TransformPoint(Vector3 point)
         {
-            return _xBasisScaled * point.x + _yBasisScaled * point.y + _zBasisScaled * point.z + translation;
+            return (_xBasisScaled * point.x) + (_yBasisScaled * point.y) + (_zBasisScaled * point.z) + translation;
         }
 
         /// <summary>
@@ -62,7 +62,7 @@ namespace Ultraleap
         /// </summary>
         public Vector3 TransformDirection(Vector3 direction)
         {
-            return _xBasis * direction.x + _yBasis * direction.y + _zBasis * direction.z;
+            return (_xBasis * direction.x) + (_yBasis * direction.y) + (_zBasis * direction.z);
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace Ultraleap
         /// </summary>
         public Vector3 TransformVelocity(Vector3 velocity)
         {
-            return _xBasisScaled * velocity.x + _yBasisScaled * velocity.y + _zBasisScaled * velocity.z;
+            return (_xBasisScaled * velocity.x) + (_yBasisScaled * velocity.y) + (_zBasisScaled * velocity.z);
         }
 
         /// <summary>
@@ -85,7 +85,9 @@ namespace Ultraleap
         public Quaternion TransformQuaternion(Quaternion rhs)
         {
             if (_quaternionDirty)
+            {
                 throw new InvalidOperationException("Calling TransformQuaternion after Basis vectors have been modified.");
+            }
 
             if (_flip)
             {
@@ -231,14 +233,17 @@ namespace Ultraleap
             get
             {
                 if (_quaternionDirty)
+                {
                     throw new InvalidOperationException("Requesting rotation after Basis vectors have been modified.");
+                }
+
                 return _quaternion;
             }
             set
             {
                 _quaternion = value;
 
-                float d = value.x * value.x + value.y * value.y + value.z * value.z + value.w * value.w;
+                float d = (value.x * value.x) + (value.y * value.y) + (value.z * value.z) + (value.w * value.w);
                 float s = 2.0f / d;
                 float xs = value.x * s, ys = value.y * s, zs = value.z * s;
                 float wx = value.w * xs, wy = value.w * ys, wz = value.w * zs;

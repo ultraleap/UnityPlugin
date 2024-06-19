@@ -34,13 +34,18 @@ namespace Ultraleap
                                           TestHandPose handPose = TestHandPose.HeadMountedA)
         {
 
-            var testFrame = new Frame(frameId, 0, 120.0f,
+            Frame testFrame = new Frame(frameId, 0, 120.0f,
                                       new List<Hand>());
 
             if (includeLeftHand)
+            {
                 testFrame.Hands.Add(MakeTestHand(true, handPose, frameId, 10));
+            }
+
             if (includeRightHand)
+            {
                 testFrame.Hands.Add(MakeTestHand(false, handPose, frameId, 20));
+            }
 
             return testFrame;
         }
@@ -70,10 +75,10 @@ namespace Ultraleap
             }
 
             // Leap space is oriented differently than Unity space, so correct for this here.
-            var hand = makeLeapSpaceTestHand(frameId, handId, isLeft)
+            Hand hand = makeLeapSpaceTestHand(frameId, handId, isLeft)
                          .Transform(leftHandTransform);
 
-            var transformedHand = hand.Transform(new LeapTransform(Vector3.zero,
+            Hand transformedHand = hand.Transform(new LeapTransform(Vector3.zero,
                   Quaternion.Euler(90f, 0f, 180f)));
 
             transformedHand.TransformToUnityUnits();
@@ -126,15 +131,15 @@ namespace Ultraleap
                     transform.translation = new Vector3(220f, 270f, 130f);
                     break;
                 case TestHandPose.DesktopModeA:
-                    transform.rotation = (angleAxis(0f * Mathf.Deg2Rad, Vector3.back)
+                    transform.rotation = angleAxis(0f * Mathf.Deg2Rad, Vector3.back)
                                           * angleAxis(-90f * Mathf.Deg2Rad, Vector3.right)
-                                          * angleAxis(180f * Mathf.Deg2Rad, Vector3.up));
+                                          * angleAxis(180f * Mathf.Deg2Rad, Vector3.up);
                     transform.translation = new Vector3(120f, 0f, -170f);
                     break;
                 case TestHandPose.Screentop:
-                    transform.rotation = (angleAxis(0 * Mathf.Deg2Rad, Vector3.back)
+                    transform.rotation = angleAxis(0 * Mathf.Deg2Rad, Vector3.back)
                                           * angleAxis(140 * Mathf.Deg2Rad, Vector3.right)
-                                          * angleAxis(0 * Mathf.Deg2Rad, Vector3.up));
+                                          * angleAxis(0 * Mathf.Deg2Rad, Vector3.up);
                     transform.translation = new Vector3(-120f, 20f, -380f);
                     transform.scale = new Vector3(1, 1, 1);
                     break;
@@ -157,7 +162,7 @@ namespace Ultraleap
             fingers[4] = makePinky(frameId, handId, isLeft);
 
             Vector3 armWrist = new Vector3(-7.05809944059f, 4.0f, 50.0f);
-            Vector3 elbow = armWrist + 250f * Vector3.forward;
+            Vector3 elbow = armWrist + (250f * Vector3.forward);
 
             // Adrian: The previous "armBasis" used "elbow" as a translation component.
             Arm arm = new Arm(elbow, armWrist, (elbow + armWrist) / 2, Vector3.back,
@@ -201,8 +206,8 @@ namespace Ultraleap
 
         private static Quaternion rotationBetween(Vector3 fromDirection, Vector3 toDirection)
         {
-            float m = Mathf.Sqrt(2.0f + 2.0f * Vector3.Dot(fromDirection, toDirection));
-            Vector3 w = (1.0f / m) * Vector3.Cross(fromDirection, toDirection);
+            float m = Mathf.Sqrt(2.0f + (2.0f * Vector3.Dot(fromDirection, toDirection)));
+            Vector3 w = 1.0f / m * Vector3.Cross(fromDirection, toDirection);
             return new Quaternion(w.x, w.y, w.z, 0.5f * m);
         }
 
@@ -261,19 +266,19 @@ namespace Ultraleap
 
             Bone[] bones = new Bone[5];
             float proximalDistance = -jointLengths[0];
-            Bone metacarpal = makeBone(Bone.BoneType.METACARPAL, position + forward * proximalDistance, jointLengths[0], 8f, forward, up, isLeft);
+            Bone metacarpal = makeBone(Bone.BoneType.METACARPAL, position + (forward * proximalDistance), jointLengths[0], 8f, forward, up, isLeft);
             proximalDistance += jointLengths[0];
             bones[0] = metacarpal;
 
-            Bone proximal = makeBone(Bone.BoneType.PROXIMAL, position + forward * proximalDistance, jointLengths[1], 8f, forward, up, isLeft);
+            Bone proximal = makeBone(Bone.BoneType.PROXIMAL, position + (forward * proximalDistance), jointLengths[1], 8f, forward, up, isLeft);
             proximalDistance += jointLengths[1];
             bones[1] = proximal;
 
-            Bone intermediate = makeBone(Bone.BoneType.INTERMEDIATE, position + forward * proximalDistance, jointLengths[2], 8f, forward, up, isLeft);
+            Bone intermediate = makeBone(Bone.BoneType.INTERMEDIATE, position + (forward * proximalDistance), jointLengths[2], 8f, forward, up, isLeft);
             proximalDistance += jointLengths[2];
             bones[2] = intermediate;
 
-            Bone distal = makeBone(Bone.BoneType.DISTAL, position + forward * proximalDistance, jointLengths[3], 8f, forward, up, isLeft);
+            Bone distal = makeBone(Bone.BoneType.DISTAL, position + (forward * proximalDistance), jointLengths[3], 8f, forward, up, isLeft);
             bones[3] = distal;
 
             return new Finger(frameId,
@@ -299,8 +304,8 @@ namespace Ultraleap
 
             return new Bone(
                  proximalPosition,
-                 proximalPosition + direction * length,
-                 Vector3.Lerp(proximalPosition, proximalPosition + direction * length, .5f),
+                 proximalPosition + (direction * length),
+                 Vector3.Lerp(proximalPosition, proximalPosition + (direction * length), .5f),
                  direction,
                  length,
                  width,

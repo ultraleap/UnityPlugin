@@ -118,13 +118,22 @@ namespace Ultraleap
         internal void UpdateStatus(eLeapDeviceStatus status)
         {
             if ((status & eLeapDeviceStatus.eLeapDeviceStatus_Streaming) == eLeapDeviceStatus.eLeapDeviceStatus_Streaming)
+            {
                 IsStreaming = true;
+            }
             else
+            {
                 IsStreaming = false;
+            }
+
             if ((status & eLeapDeviceStatus.eLeapDeviceStatus_LowResource) == eLeapDeviceStatus.eLeapDeviceStatus_LowResource)
+            {
                 IsLowResource = true;
+            }
             else
+            {
                 IsLowResource = false;
+            }
         }
 
         /// <summary>
@@ -340,7 +349,10 @@ namespace Ultraleap
             result = LeapC.GetDeviceInfo(Handle, ref deviceInfo);
 
             if (result != eLeapRS.eLeapRS_Success)
+            {
                 return 0;
+            }
+
             uint status = deviceInfo.status;
             System.Runtime.InteropServices.Marshal.FreeCoTaskMem(deviceInfo.serial);
             return status;

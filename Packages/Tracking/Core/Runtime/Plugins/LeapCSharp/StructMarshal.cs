@@ -82,7 +82,7 @@ namespace LeapInternal
          */
         public static void ArrayElementToStruct(IntPtr ptr, int arrayIndex, out T t)
         {
-            PtrToStruct(new IntPtr(ptr.ToInt64() + _sizeofT * arrayIndex), out t);
+            PtrToStruct(new IntPtr(ptr.ToInt64() + (_sizeofT * arrayIndex)), out t);
         }
     }
 }

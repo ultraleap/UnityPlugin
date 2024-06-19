@@ -30,29 +30,29 @@ namespace Ultraleap
         /// </summary>
         public static void ReplaceSceneReferences<T>(T a, T b) where T : UnityObject
         {
-            var aId = a.GetInstanceID();
-            var refType = typeof(T);
+            int aId = a.GetInstanceID();
+            Type refType = typeof(T);
 
-            var curScene = SceneManager.GetActiveScene();
-            var rootObjs = curScene.GetRootGameObjects();
-            foreach (var rootObj in rootObjs)
+            Scene curScene = SceneManager.GetActiveScene();
+            GameObject[] rootObjs = curScene.GetRootGameObjects();
+            foreach (GameObject rootObj in rootObjs)
             {
-                var transforms = rootObj.GetComponentsInChildren<Transform>();
-                foreach (var transform in transforms)
+                Transform[] transforms = rootObj.GetComponentsInChildren<Transform>();
+                foreach (Transform transform in transforms)
                 {
-                    var components = transform.GetComponents<Component>();
+                    Component[] components = transform.GetComponents<Component>();
 
-                    var objectChanges = new List<Action>();
-                    foreach (var component in components)
+                    List<Action> objectChanges = new List<Action>();
+                    foreach (Component component in components)
                     {
-                        var compType = typeof(Component);
-                        var fieldInfos = compType.GetFields(BindingFlags.Instance
+                        Type compType = typeof(Component);
+                        FieldInfo[] fieldInfos = compType.GetFields(BindingFlags.Instance
                           | BindingFlags.FlattenHierarchy | BindingFlags.NonPublic
                           | BindingFlags.Public);
-                        foreach (var fieldInfo in fieldInfos.
+                        foreach (FieldInfo fieldInfo in fieldInfos.
                             Where(fi => fi.FieldType.IsAssignableFrom(refType)))
                         {
-                            var refValue = fieldInfo.GetValue(component) as T;
+                            T refValue = fieldInfo.GetValue(component) as T;
                             if (refValue.GetInstanceID() == aId)
                             {
                                 objectChanges.Add(() =>
@@ -66,7 +66,7 @@ namespace Ultraleap
                     {
                         Undo.RecordObject(transform.gameObject,
                           "Swap " + transform.name + " references from " + a.name + " to " + b.name);
-                        foreach (var change in objectChanges)
+                        foreach (Action change in objectChanges)
                         {
                             change();
                         }

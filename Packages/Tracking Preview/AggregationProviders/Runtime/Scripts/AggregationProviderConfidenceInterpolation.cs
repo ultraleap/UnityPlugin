@@ -6,10 +6,9 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Ultraleap.Encoding;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Ultraleap.Encoding;
 using UnityEngine;
 
 namespace Ultraleap
@@ -29,9 +28,11 @@ namespace Ultraleap
         [Tooltip("How much should the Palm position relative to the tracking camera influence the overall hand confidence? A confidence value is determined by whether the hand is within the optimal FOV of the tracking camera")]
         [Range(0f, 1f)]
         public float palmPosFactor = 0;
+
         [Tooltip("How much should the Palm orientation relative to the tracking camera influence the overall hand confidence? A confidence value is determined by looking at the angle between the palm normal and the direction from hand to camera.")]
         [Range(0f, 1f)]
         public float palmRotFactor = 0;
+
         [Tooltip("How much should the Palm velocity relative to the tracking camera influence the overall hand confidence?")]
         [Range(0f, 1f)]
         public float palmVelocityFactor = 0;
@@ -39,43 +40,46 @@ namespace Ultraleap
         [Tooltip("How much should the joint rotation relative to the tracking camera influence the overall hand confidence? A confidence value is determined for a joint by looking at the angle between the joint normal and the direction from hand to camera.")]
         [Range(0f, 1f)]
         public float jointRotFactor = 0;
+
         [Tooltip("How much should the joint rotation relative to the palm normal influence the overall hand confidence?")]
         [Range(0f, 1f)]
         public float jointRotToPalmFactor = 0;
+
         [Tooltip("How much should joint occlusion influence the overall hand confidence?")]
         [Range(0f, 1f)]
         public float jointOcclusionFactor = 0;
 
-
         public bool debugJointOrigins = false;
+
         [Tooltip("if the debug hand is not null, its joint colors are given by interpolating between the debugColors based on which hand the aggregated joint data came from (in order of the providers)")]
         public CapsuleHand debugHandLeft;
+
         [Tooltip("if the debug hand is not null, its joint colors are given by interpolating between the debugColors based on which hand the aggregated joint data came from (in order of the providers)")]
         public CapsuleHand debugHandRight;
 
         [Tooltip("The debug colors should have the same order and length as the provider list")]
         public Color[] debugColors = new Color[] { Color.red, Color.green };
 
-        Dictionary<LeapProvider, HandPositionHistory> lastLeftHandPositions = new Dictionary<LeapProvider, HandPositionHistory>();
-        Dictionary<LeapProvider, HandPositionHistory> lastRightHandPositions = new Dictionary<LeapProvider, HandPositionHistory>();
+        private Dictionary<LeapProvider, HandPositionHistory> lastLeftHandPositions = new Dictionary<LeapProvider, HandPositionHistory>();
+        private Dictionary<LeapProvider, HandPositionHistory> lastRightHandPositions = new Dictionary<LeapProvider, HandPositionHistory>();
 
-        Dictionary<LeapProvider, float> leftHandFirstVisible = new Dictionary<LeapProvider, float>();
-        Dictionary<LeapProvider, float> rightHandFirstVisible = new Dictionary<LeapProvider, float>();
+        private Dictionary<LeapProvider, float> leftHandFirstVisible = new Dictionary<LeapProvider, float>();
+        private Dictionary<LeapProvider, float> rightHandFirstVisible = new Dictionary<LeapProvider, float>();
 
-        List<JointOcclusion> jointOcclusions;
+        private List<JointOcclusion> jointOcclusions;
 
-        Vector3[] mergedJointPositions = new Vector3[VectorHand.NUM_JOINT_POSITIONS];
+        private Vector3[] mergedJointPositions = new Vector3[VectorHand.NUM_JOINT_POSITIONS];
 
         private float[][] jointConfidences;
         private float[][] confidences_jointRot;
         private float[][] confidences_jointPalmRot;
         private float[][] confidences_jointOcclusion;
 
-        Dictionary<LeapProvider, JointConfidenceHistory> jointConfidenceHistoriesLeft = new Dictionary<LeapProvider, JointConfidenceHistory>();
-        Dictionary<LeapProvider, JointConfidenceHistory> jointConfidenceHistoriesRight = new Dictionary<LeapProvider, JointConfidenceHistory>();
+        private Dictionary<LeapProvider, JointConfidenceHistory> jointConfidenceHistoriesLeft = new Dictionary<LeapProvider, JointConfidenceHistory>();
+        private Dictionary<LeapProvider, JointConfidenceHistory> jointConfidenceHistoriesRight = new Dictionary<LeapProvider, JointConfidenceHistory>();
 
-        Dictionary<LeapProvider, HandConfidenceHistory> handConfidenceHistoriesLeft = new Dictionary<LeapProvider, HandConfidenceHistory>();
-        Dictionary<LeapProvider, HandConfidenceHistory> handConfidenceHistoriesRight = new Dictionary<LeapProvider, HandConfidenceHistory>();
+        private Dictionary<LeapProvider, HandConfidenceHistory> handConfidenceHistoriesLeft = new Dictionary<LeapProvider, HandConfidenceHistory>();
+        private Dictionary<LeapProvider, HandConfidenceHistory> handConfidenceHistoriesRight = new Dictionary<LeapProvider, HandConfidenceHistory>();
 
         protected override Frame MergeFrames(Frame[] frames)
         {
@@ -86,7 +90,6 @@ namespace Ultraleap
                 confidences_jointPalmRot = new float[providers.Length * 2][];
                 confidences_jointOcclusion = new float[providers.Length * 2][];
             }
-
 
             List<Hand> leftHands = new List<Hand>();
             List<Hand> rightHands = new List<Hand>();
@@ -120,7 +123,6 @@ namespace Ultraleap
                         leftHandConfidences.Add(handConfidence);
                         leftJointConfidences.Add(jointConfidences);
                     }
-
                     else
                     {
                         rightHands.Add(hand);
@@ -276,8 +278,14 @@ namespace Ultraleap
             mergedHand.Arm = new Arm(mergedArmElbow, mergedHand.WristPosition, mergedArmPos, mergedArmRot * Vector3.forward, hands[0].Arm.Length, hands[0].Arm.Width, mergedArmRot);
 
             // visualize the joint merge:
-            if (debugJointOrigins && isLeft && debugHandLeft != null) VisualizeMergedJoints(debugHandLeft, jointConfidences);
-            else if (debugJointOrigins && !isLeft && debugHandRight != null) VisualizeMergedJoints(debugHandRight, jointConfidences);
+            if (debugJointOrigins && isLeft && debugHandLeft != null)
+            {
+                VisualizeMergedJoints(debugHandLeft, jointConfidences);
+            }
+            else if (debugJointOrigins && !isLeft && debugHandRight != null)
+            {
+                VisualizeMergedJoints(debugHandRight, jointConfidences);
+            }
 
             return mergedHand;
         }
@@ -333,7 +341,7 @@ namespace Ultraleap
         public float[] CalculateJointConfidence(int frame_idx, Hand hand)
         {
             // get index in confidence arrays
-            int idx = frame_idx * 2 + (hand.IsLeft ? 0 : 1);
+            int idx = (frame_idx * 2) + (hand.IsLeft ? 0 : 1);
 
             if (jointConfidences[idx] == null || confidences_jointRot[idx] == null || confidences_jointPalmRot[idx] == null || confidences_jointOcclusion[idx] == null)
             {
@@ -362,16 +370,16 @@ namespace Ultraleap
             {
                 for (int bone_idx = 0; bone_idx < 5; bone_idx++)
                 {
-                    int key = finger_idx * 5 + bone_idx;
+                    int key = (finger_idx * 5) + bone_idx;
                     jointConfidences[idx][key] =
-                                    jointRotFactor * confidences_jointRot[idx][key] +
-                    jointRotToPalmFactor * confidences_jointPalmRot[idx][key] +
-                   jointOcclusionFactor * confidences_jointOcclusion[idx][key];
+                                    (jointRotFactor * confidences_jointRot[idx][key]) +
+                    (jointRotToPalmFactor * confidences_jointPalmRot[idx][key]) +
+                   (jointOcclusionFactor * confidences_jointOcclusion[idx][key]);
 
                     if (bone_idx != 0)
                     {
                         // average with the confidence from the last joint on the same finger,
-                        // so that outer joints jump around less. 
+                        // so that outer joints jump around less.
                         // eg. when a confidence is low on the knuckle of a finger, the finger tip confidence for the same finger
                         // should take that into account and be slightly lower too
                         jointConfidences[idx][key] += jointConfidences[idx][key - 1];
@@ -408,10 +416,10 @@ namespace Ultraleap
         /// <summary>
         /// uses the hand pos relative to the device to calculate a confidence.
         /// using a 2d gauss with bigger spread when further away from the device
-        /// and amplitude depending on the ideal depth of the specific device and 
+        /// and amplitude depending on the ideal depth of the specific device and
         /// the distance from hand to device
         /// </summary>
-        float Confidence_RelativeHandPos(LeapProvider provider, Transform deviceOrigin, Vector3 handPos)
+        private float Confidence_RelativeHandPos(LeapProvider provider, Transform deviceOrigin, Vector3 handPos)
         {
             Vector3 relativeHandPos = deviceOrigin.InverseTransformPoint(handPos);
 
@@ -430,7 +438,6 @@ namespace Ultraleap
             float x = relativeHandPos.x;
             float y = relativeHandPos.z;
 
-
             // if the frame is coming from a LeapServiceProvider, use different values depending on the type of device
             if (provider is LeapServiceProvider || provider.GetType().BaseType == typeof(LeapServiceProvider))
             {
@@ -443,7 +450,7 @@ namespace Ultraleap
                     // Field Of View: 170 x 170 degrees typical (160 x 160 degrees minimum)
                     float currentDepth = relativeHandPos.y;
 
-                    float requiredWidth = (currentDepth / 2) / Mathf.Sin(Mathf.Deg2Rad * 170 / 2);
+                    float requiredWidth = currentDepth / 2 / Mathf.Sin(Mathf.Deg2Rad * 170 / 2);
                     sigmaX = 0.2f * requiredWidth;
                     sigmaY = 0.2f * requiredWidth;
 
@@ -454,11 +461,11 @@ namespace Ultraleap
                     }
                     else if (currentDepth < 0.1f)
                     {
-                        a = 0.55f / (Mathf.PI / 2) * Mathf.Atan(100 * (currentDepth + 0.05f)) + 0.5f;
+                        a = (0.55f / (Mathf.PI / 2) * Mathf.Atan(100 * (currentDepth + 0.05f))) + 0.5f;
                     }
                     else if (currentDepth > 0.75f)
                     {
-                        a = -0.55f / (Mathf.PI / 2) * Mathf.Atan(50 * (currentDepth - 0.875f)) + 0.5f;
+                        a = (-0.55f / (Mathf.PI / 2) * Mathf.Atan(50 * (currentDepth - 0.875f))) + 0.5f;
                     }
                 }
                 else if (deviceType == Device.DeviceType.TYPE_PERIPHERAL)
@@ -466,8 +473,8 @@ namespace Ultraleap
                     // Depth: Between 10cm to 60cm preferred, up to 80cm maximum
                     // Field Of View: 140 x 120 degrees typical
                     float currentDepth = relativeHandPos.y;
-                    float requiredWidthX = (currentDepth / 2) / Mathf.Sin(Mathf.Deg2Rad * 120 / 2);
-                    float requiredWidthY = (currentDepth / 2) / Mathf.Sin(Mathf.Deg2Rad * 140 / 2);
+                    float requiredWidthX = currentDepth / 2 / Mathf.Sin(Mathf.Deg2Rad * 120 / 2);
+                    float requiredWidthY = currentDepth / 2 / Mathf.Sin(Mathf.Deg2Rad * 140 / 2);
                     sigmaX = 0.2f * requiredWidthX;
                     sigmaY = 0.2f * requiredWidthY;
 
@@ -478,18 +485,21 @@ namespace Ultraleap
                     }
                     else if (currentDepth < 0.1f)
                     {
-                        a = 0.55f / (Mathf.PI / 2) * Mathf.Atan(100 * (currentDepth + 0.05f)) + 0.5f;
+                        a = (0.55f / (Mathf.PI / 2) * Mathf.Atan(100 * (currentDepth + 0.05f))) + 0.5f;
                     }
                     else if (currentDepth > 0.6f)
                     {
-                        a = -0.55f / (Mathf.PI / 2) * Mathf.Atan(50 * (currentDepth - 0.7f)) + 0.5f;
+                        a = (-0.55f / (Mathf.PI / 2) * Mathf.Atan(50 * (currentDepth - 0.7f))) + 0.5f;
                     }
                 }
             }
 
-            float confidence = a * Mathf.Exp(-(Mathf.Pow(x - x0, 2) / (2 * Mathf.Pow(sigmaX, 2)) + Mathf.Pow(y - y0, 2) / (2 * Mathf.Pow(sigmaY, 2))));
+            float confidence = a * Mathf.Exp(-((Mathf.Pow(x - x0, 2) / (2 * Mathf.Pow(sigmaX, 2))) + (Mathf.Pow(y - y0, 2) / (2 * Mathf.Pow(sigmaY, 2)))));
 
-            if (confidence < 0) confidence = 0;
+            if (confidence < 0)
+            {
+                confidence = 0;
+            }
 
             return confidence;
         }
@@ -497,7 +507,7 @@ namespace Ultraleap
         /// <summary>
         /// uses the palm normal relative to the direction from hand to device to calculate a confidence
         /// </summary>
-        float Confidence_RelativeHandRot(Transform deviceOrigin, Vector3 handPos, Vector3 palmNormal)
+        private float Confidence_RelativeHandRot(Transform deviceOrigin, Vector3 handPos, Vector3 palmNormal)
         {
             // angle between palm normal and the direction from hand pos to device origin
             float palmAngle = Vector3.Angle(palmNormal, deviceOrigin.position - handPos);
@@ -514,7 +524,7 @@ namespace Ultraleap
         /// returns a high confidence, if the velocity is low, and a low confidence otherwise.
         /// Returns 0, if the hand hasn't been consistently tracked for about the last 10 frames
         /// </summary>
-        float Confidence_RelativeHandVelocity(LeapProvider provider, Transform deviceOrigin, Vector3 handPos, bool isLeft)
+        private float Confidence_RelativeHandVelocity(LeapProvider provider, Transform deviceOrigin, Vector3 handPos, bool isLeft)
         {
             Vector3 oldPosition;
             float oldTime;
@@ -532,13 +542,13 @@ namespace Ultraleap
             float confidence = 0;
             if (velocity < 2)
             {
-                confidence = -0.5f * velocity + 1;
+                confidence = (-0.5f * velocity) + 1;
             }
 
             return confidence;
         }
 
-        float Confidence_TimeSinceHandFirstVisible(LeapProvider provider, bool isLeft)
+        private float Confidence_TimeSinceHandFirstVisible(LeapProvider provider, bool isLeft)
         {
             if ((isLeft ? leftHandFirstVisible[provider] : rightHandFirstVisible[provider]) == 0)
             {
@@ -555,34 +565,40 @@ namespace Ultraleap
 
             return confidence;
         }
-        #endregion
+
+        #endregion Hand Confidence Methods
 
         #region Joint Confidence Methods
 
         /// <summary>
-        /// uses the normal vector of a joint / bone (outwards pointing one) and the direction from joint to device 
+        /// uses the normal vector of a joint / bone (outwards pointing one) and the direction from joint to device
         /// to calculate per-joint confidence values
         /// </summary>
-        float[] Confidence_RelativeJointRot(float[] confidences, Transform deviceOrigin, Hand hand)
+        private float[] Confidence_RelativeJointRot(float[] confidences, Transform deviceOrigin, Hand hand)
         {
             if (confidences == null)
             {
                 confidences = new float[VectorHand.NUM_JOINT_POSITIONS];
             }
 
-            foreach (var finger in hand.fingers)
+            foreach (Finger finger in hand.fingers)
             {
                 for (int bone_idx = 0; bone_idx < 4; bone_idx++)
                 {
-                    int key = (int)finger.Type * 4 + bone_idx;
+                    int key = ((int)finger.Type * 4) + bone_idx;
 
                     Vector3 jointPos = finger.GetBone((Bone.BoneType)bone_idx).NextJoint;
                     Vector3 jointNormalVector = new Vector3();
-                    if ((int)finger.Type == 0) jointNormalVector = finger.GetBone((Bone.BoneType)bone_idx).Rotation * Vector3.right;
-                    else jointNormalVector = finger.GetBone((Bone.BoneType)bone_idx).Rotation * Vector3.up * -1;
+                    if ((int)finger.Type == 0)
+                    {
+                        jointNormalVector = finger.GetBone((Bone.BoneType)bone_idx).Rotation * Vector3.right;
+                    }
+                    else
+                    {
+                        jointNormalVector = finger.GetBone((Bone.BoneType)bone_idx).Rotation * Vector3.up * -1;
+                    }
 
                     float angle = Vector3.Angle(jointPos - deviceOrigin.position, jointNormalVector);
-
 
                     // get confidence based on a cos where it should be 1 if the angle is 0 or 180 degrees,
                     // and it should be 0 if it is 90 degrees
@@ -597,18 +613,18 @@ namespace Ultraleap
         /// uses the normal vector of a joint / bone (outwards pointing one) and the palm normal vector
         /// to calculate per-joint confidence values
         /// </summary>
-        float[] Confidence_relativeJointRotToPalmRot(float[] confidences, Transform deviceOrigin, Hand hand)
+        private float[] Confidence_relativeJointRotToPalmRot(float[] confidences, Transform deviceOrigin, Hand hand)
         {
             if (confidences == null)
             {
                 confidences = new float[VectorHand.NUM_JOINT_POSITIONS];
             }
 
-            foreach (var finger in hand.fingers)
+            foreach (Finger finger in hand.fingers)
             {
                 for (int bone_idx = 0; bone_idx < 4; bone_idx++)
                 {
-                    int key = (int)finger.Type * 4 + bone_idx;
+                    int key = ((int)finger.Type * 4) + bone_idx;
 
                     Vector3 jointNormalVector = finger.GetBone((Bone.BoneType)bone_idx).Rotation * Vector3.up * -1;
 
@@ -623,17 +639,17 @@ namespace Ultraleap
             return confidences;
         }
 
-        #endregion
+        #endregion Joint Confidence Methods
 
         #region Helper Methods
 
         // small class to save hand positions from old frames along with a timestamp
-        class HandPositionHistory
+        private class HandPositionHistory
         {
-            LeapProvider provider;
-            Vector3[] positions;
-            float[] times;
-            int index;
+            private LeapProvider provider;
+            private Vector3[] positions;
+            private float[] times;
+            private int index;
 
             public HandPositionHistory()
             {
@@ -688,7 +704,7 @@ namespace Ultraleap
         /// add all hands in the frame given by frames[frameIdx] to the Dictionaries lastLeftHandPositions and lastRightHandPositions,
         /// and update leftHandFirstVisible and rightHandFirstVisible
         /// </summary>
-        void AddFrameToTimeVisibleDicts(Frame[] frames, int frameIdx)
+        private void AddFrameToTimeVisibleDicts(Frame[] frames, int frameIdx)
         {
             bool[] handsVisible = new bool[2];
 
@@ -724,7 +740,6 @@ namespace Ultraleap
                     }
 
                     lastRightHandPositions[providers[frameIdx]].AddPosition(hand.PalmPosition, Time.time);
-
                 }
             }
 
@@ -741,13 +756,13 @@ namespace Ultraleap
         /// <summary>
         /// small helper class to save previous joint confidences and average over them
         /// </summary>
-        class JointConfidenceHistory
+        private class JointConfidenceHistory
         {
-            int length;
-            float[,] jointConfidences;
-            float[] averageConfidences;
-            int index;
-            List<int> validIndices;
+            private int length;
+            private float[,] jointConfidences;
+            private float[] averageConfidences;
+            private int index;
+            private List<int> validIndices;
 
             public JointConfidenceHistory(int length = 60)
             {
@@ -806,12 +821,12 @@ namespace Ultraleap
         /// <summary>
         /// small helper class to save previous whole-hand confidences and average over them
         /// </summary>
-        class HandConfidenceHistory
+        private class HandConfidenceHistory
         {
-            int length;
-            float[] handConfidences;
-            int index;
-            List<int> validIndices;
+            private int length;
+            private float[] handConfidences;
+            private int index;
+            private List<int> validIndices;
 
             public HandConfidenceHistory(int length = 60)
             {
@@ -857,7 +872,7 @@ namespace Ultraleap
         /// <summary>
         /// create joint occlusion gameobjects if they are not there yet and update the position of all joint occlusion gameobjects that are attached to a xr service provider
         /// </summary>
-        void SetupJointOcclusion()
+        private void SetupJointOcclusion()
         {
             if (jointOcclusions == null)
             {
@@ -897,7 +912,6 @@ namespace Ultraleap
                     jointOcclusions[i].transform.SetPose(deviceOrigin.GetPose());
                     jointOcclusions[i].transform.Rotate(new Vector3(-90, 0, 180));
                 }
-
             }
         }
 
@@ -906,7 +920,7 @@ namespace Ultraleap
         /// If it is a desktop or screentop provider, this is simply provider.transform.
         /// If it is an XR provider, the main camera's transform is taken into account as well as the manual head offset values of the device
         /// </summary>
-        Transform GetDeviceOrigin(LeapProvider provider)
+        private Transform GetDeviceOrigin(LeapProvider provider)
         {
             Transform deviceOrigin = provider.transform;
 
@@ -934,18 +948,16 @@ namespace Ultraleap
         /// visualize where the merged joint data comes from, by using the debugColors in the same order as the providers in the provider list.
         /// the color is then linearly interpolated based on the joint confidences
         /// </summary>
-        void VisualizeMergedJoints(CapsuleHand hand, List<float[]> jointConfidences)
+        private void VisualizeMergedJoints(CapsuleHand hand, List<float[]> jointConfidences)
         {
-
-
             Color[] colors = hand.SphereColors;
 
             for (int finger_idx = 0; finger_idx < 5; finger_idx++)
             {
                 for (int bone_idx = 0; bone_idx < 4; bone_idx++)
                 {
-                    int confidence_idx = finger_idx * 5 + bone_idx + 1;
-                    int capsuleHand_idx = finger_idx * 4 + bone_idx;
+                    int confidence_idx = (finger_idx * 5) + bone_idx + 1;
+                    int capsuleHand_idx = (finger_idx * 4) + bone_idx;
 
                     colors[capsuleHand_idx] = debugColors[0];
 
@@ -961,6 +973,6 @@ namespace Ultraleap
             hand.SetIndividualSphereColors = true;
         }
 
-        #endregion
+        #endregion Helper Methods
     }
 }

@@ -13,7 +13,7 @@ namespace Ultraleap
             get
             {
                 List<Hand> hands = new List<Hand>();
-                foreach (var hand in currentHandsAndPosedObjects)
+                foreach (Tuple<Hand, HandPoseScriptableObject> hand in currentHandsAndPosedObjects)
                 {
                     hands.Add(hand.Item1);
                 }

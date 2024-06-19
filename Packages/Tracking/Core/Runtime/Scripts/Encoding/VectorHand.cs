@@ -114,7 +114,9 @@ namespace Ultraleap.Encoding
             {
                 isLeft = h.isLeft; palmPos = h.palmPos; palmRot = h.palmRot;
                 for (int i = 0; i < jointPositions.Length; i++)
+                {
                     _backingJointPositions[i] = h.jointPositions[i];
+                }
             }
             return this;
         }
@@ -167,9 +169,9 @@ namespace Ultraleap.Encoding
             {
                 for (int jointIdx = 0; jointIdx < 4; jointIdx++)
                 {
-                    boneIdx = fingerIdx * 4 + jointIdx;
-                    prevJoint = jointPositions[fingerIdx * 5 + jointIdx];
-                    nextJoint = jointPositions[fingerIdx * 5 + jointIdx + 1];
+                    boneIdx = (fingerIdx * 4) + jointIdx;
+                    prevJoint = jointPositions[(fingerIdx * 5) + jointIdx];
+                    nextJoint = jointPositions[(fingerIdx * 5) + jointIdx + 1];
 
                     if ((nextJoint - prevJoint).normalized == Vector3.zero)
                     {
@@ -181,9 +183,9 @@ namespace Ultraleap.Encoding
                         boneRot = Quaternion.LookRotation(
                                     (nextJoint - prevJoint).normalized,
                                     Vector3.Cross((nextJoint - prevJoint).normalized,
-                                                  (fingerIdx == 0 ?
+                                                  fingerIdx == 0 ?
                                                     (isLeft ? -Vector3.up : Vector3.up)
-                                                   : Vector3.right)));
+                                                   : Vector3.right));
                     }
 
                     // Convert to world space from palm space.
@@ -199,7 +201,7 @@ namespace Ultraleap.Encoding
                     intoHand.GetBone(boneIdx).Fill(
                       prevJoint: prevJoint,
                       nextJoint: nextJoint,
-                      center: ((nextJoint + prevJoint) / 2f),
+                      center: (nextJoint + prevJoint) / 2f,
                       direction: (nextJoint - prevJoint).normalized,
                       length: (prevJoint - nextJoint).magnitude,
                       width: 0.01f,
@@ -208,7 +210,7 @@ namespace Ultraleap.Encoding
                 }
                 intoHand.fingers[fingerIdx].Fill(
                   frameId: -1,
-                  handId: (isLeft ? 0 : 1),
+                  handId: isLeft ? 0 : 1,
                   fingerId: fingerIdx,
                   timeVisible: 10f,// Time.time, <- This is unused and main thread only
                   tipPosition: nextJoint,
@@ -229,12 +231,12 @@ namespace Ultraleap.Encoding
                             palmRot);
 
             // Finally, fill hand data.
-            var palmPose = new Pose(palmPos, palmRot);
+            Pose palmPose = new Pose(palmPos, palmRot);
             // var wristPos = ToWorld(new Vector3(0f, -0.015f, -0.065f), palmPos, palmRot);
-            var wristPos = palmPose.mul(tweakWristPosition).position;
+            Vector3 wristPos = palmPose.mul(tweakWristPosition).position;
             intoHand.Fill(
               frameID: -1,
-              id: (isLeft ? 0 : 1),
+              id: isLeft ? 0 : 1,
               confidence: 1f,
               grabStrength: 0.5f,
               pinchStrength: 0.5f,
@@ -501,7 +503,11 @@ namespace Ultraleap.Encoding
         /// </summary>
         public bool FillLerped(VectorHand a, VectorHand b, float t)
         {
-            if (a == null || b == null) return false;
+            if (a == null || b == null)
+            {
+                return false;
+            }
+
             if (a.isLeft != b.isLeft)
             {
                 throw new System.Exception("VectorHands must be interpolated with the " +

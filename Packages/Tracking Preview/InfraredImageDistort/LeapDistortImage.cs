@@ -51,7 +51,7 @@ public class LeapDistortImage : MonoBehaviour
     public Renderer ImageRenderer;
 
     // Start is called before the first frame update
-    void OnEnable()
+    private void OnEnable()
     {
         if (GraphicsSettings.renderPipelineAsset != null)
         {
@@ -80,7 +80,7 @@ public class LeapDistortImage : MonoBehaviour
     protected virtual void onBeginRendering(ScriptableRenderContext context, Camera camera) { OnCameraPreCull(camera); }
 
     // Update is called once per frame
-    void OnCameraPreCull(Camera cam)
+    private void OnCameraPreCull(Camera cam)
     {
         float deviceOffsetY = 0;
         float deviceOffsetZ = 0;
@@ -115,7 +115,7 @@ public class LeapDistortImage : MonoBehaviour
 
             imageMatWarp *= MVP;
             imageMatWarp *= Matrix4x4.Scale(new Vector3(1, -1, 1));
-            imageMatWarp *= Matrix4x4.Translate(new Vector3(0, deviceOffsetY * 0.55f, -deviceOffsetZ / (9 * deviceOffsetZ + 1f) * scale.z));
+            imageMatWarp *= Matrix4x4.Translate(new Vector3(0, deviceOffsetY * 0.55f, -deviceOffsetZ / ((9 * deviceOffsetZ) + 1f) * scale.z));
             imageMatWarp *= MVP.inverse;
         }
 

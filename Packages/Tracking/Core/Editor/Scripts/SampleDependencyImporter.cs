@@ -1,6 +1,4 @@
 #if UNITY_EDITOR
-using Ultraleap;
-
 using System.Collections.Generic;
 
 using UnityEditor;
@@ -21,7 +19,7 @@ namespace Ultraleap.Examples
         /// <param name="dependencyNames">The names of each of the samples that sampleName is dependent on</param>
         public static void FindAndImportSampleDependencies(string packageName, string sampleName, string[] dependencyNames)
         {
-            if (IsPackageAvailable(packageName, out var packageInfo)) // Check the package exists so we can use package manage wizardry
+            if (IsPackageAvailable(packageName, out UnityEditor.PackageManager.PackageInfo packageInfo)) // Check the package exists so we can use package manage wizardry
             {
                 if (CheckForAndImportDependecies(packageName, sampleName, dependencyNames, packageInfo)) // Check if the dependencies have been imported already - if not, import them and tell the user
                 {
@@ -35,13 +33,13 @@ namespace Ultraleap.Examples
             }
         }
 
-        static bool CheckForAndImportDependecies(string packageName, string sampleName, string[] dependencyNames, UnityEditor.PackageManager.PackageInfo packageInfo)
+        private static bool CheckForAndImportDependecies(string packageName, string sampleName, string[] dependencyNames, UnityEditor.PackageManager.PackageInfo packageInfo)
         {
             bool sampleImported = false;
 
             IEnumerable<Sample> samples = Sample.FindByPackage(packageName, packageInfo.version);
 
-            foreach (var sample in samples)
+            foreach (Sample sample in samples)
             {
                 if (dependencyNames.Contains(sample.displayName) && !sample.isImported)
                 {
@@ -54,7 +52,7 @@ namespace Ultraleap.Examples
             return sampleImported;
         }
 
-        static bool IsPackageAvailable(string packageName, out UnityEditor.PackageManager.PackageInfo packageInfo)
+        private static bool IsPackageAvailable(string packageName, out UnityEditor.PackageManager.PackageInfo packageInfo)
         {
             packageInfo = GetPackageInfo(packageName);
 
@@ -66,10 +64,10 @@ namespace Ultraleap.Examples
             return false;
         }
 
-        static UnityEditor.PackageManager.PackageInfo GetPackageInfo(string packageName)
+        private static UnityEditor.PackageManager.PackageInfo GetPackageInfo(string packageName)
         {
-            var allPackages = UnityEditor.PackageManager.PackageInfo.GetAllRegisteredPackages();
-            foreach (var package in allPackages)
+            UnityEditor.PackageManager.PackageInfo[] allPackages = UnityEditor.PackageManager.PackageInfo.GetAllRegisteredPackages();
+            foreach (UnityEditor.PackageManager.PackageInfo package in allPackages)
             {
                 if (package.name == packageName)
                 {
@@ -83,15 +81,15 @@ namespace Ultraleap.Examples
         /// Check through the directory names of the Assets folder, looking for matches to our dependencies.
         /// If they don't match, warn the user that they may need to import them
         /// </summary>
-        static void FindDependenciesInAssets(string sampleName, string[] dependencyNames)
+        private static void FindDependenciesInAssets(string sampleName, string[] dependencyNames)
         {
-            var folders = AssetDatabase.GetSubFolders("Assets");
+            string[] folders = AssetDatabase.GetSubFolders("Assets");
 
-            foreach (var dependencyName in dependencyNames)
+            foreach (string dependencyName in dependencyNames)
             {
                 bool found = false;
 
-                foreach (var folder in folders)
+                foreach (string folder in folders)
                 {
                     if (FindDependenciesInFolder(folder, dependencyName))
                     {
@@ -107,7 +105,7 @@ namespace Ultraleap.Examples
             }
         }
 
-        static bool FindDependenciesInFolder(string folder, string dependencyName)
+        private static bool FindDependenciesInFolder(string folder, string dependencyName)
         {
             string[] split = folder.Split('/');
 
@@ -116,8 +114,8 @@ namespace Ultraleap.Examples
                 return true;
             }
 
-            var folders = AssetDatabase.GetSubFolders(folder);
-            foreach (var fld in folders)
+            string[] folders = AssetDatabase.GetSubFolders(folder);
+            foreach (string fld in folders)
             {
                 if (FindDependenciesInFolder(fld, dependencyName))
                 {

@@ -269,7 +269,7 @@ namespace Ultraleap
         protected bool isInFoldout(string propertyName)
         {
             bool isInFoldout = false;
-            foreach (var foldout in _foldoutProperties)
+            foreach (KeyValuePair<string, List<string>> foldout in _foldoutProperties)
             {
                 foreach (string property in foldout.Value)
                 {
@@ -282,7 +282,7 @@ namespace Ultraleap
 
         protected void drawScriptField(bool disable = true)
         {
-            var scriptProp = serializedObject.FindProperty("m_Script");
+            SerializedProperty scriptProp = serializedObject.FindProperty("m_Script");
             EditorGUI.BeginDisabledGroup(disable);
             EditorGUILayout.PropertyField(scriptProp);
             EditorGUI.EndDisabledGroup();
@@ -358,7 +358,7 @@ namespace Ultraleap
                 {
                     if (_drawFoldoutInLine)
                     {
-                        foreach (var foldout in _foldoutProperties)
+                        foreach (KeyValuePair<string, List<string>> foldout in _foldoutProperties)
                         {
                             if (_foldoutDrawn.ContainsKey(foldout.Key) && _foldoutDrawn[foldout.Key]) { continue; }
 
@@ -389,7 +389,7 @@ namespace Ultraleap
                 isFirst = false;
             }
 
-            foreach (var deferredProperty in _deferredProperties)
+            foreach (string deferredProperty in _deferredProperties)
             {
                 if (!isInFoldout(deferredProperty))
                 {
@@ -399,7 +399,7 @@ namespace Ultraleap
 
             if (!_drawFoldoutInLine)
             {
-                foreach (var foldout in _foldoutProperties)
+                foreach (KeyValuePair<string, List<string>> foldout in _foldoutProperties)
                 {
                     drawFoldout(foldout);
                 }
@@ -415,7 +415,7 @@ namespace Ultraleap
             if (_foldoutStates[foldout.Key])
             {
                 // Draw normal priority properties first
-                foreach (var property in foldout.Value)
+                foreach (string property in foldout.Value)
                 {
                     if (!_deferredProperties.Contains(property))
                     {
@@ -423,7 +423,7 @@ namespace Ultraleap
                     }
                 }
                 // Draw deferred properties second
-                foreach (var property in foldout.Value)
+                foreach (string property in foldout.Value)
                 {
                     if (_deferredProperties.Contains(property))
                     {

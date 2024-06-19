@@ -1,6 +1,4 @@
 using Ultraleap;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class VisualizeJointConfidence : MonoBehaviour
@@ -8,19 +6,22 @@ public class VisualizeJointConfidence : MonoBehaviour
     public AggregationProviderConfidenceInterpolation aggregationProvider;
     public CapsuleHand hand;
 
-    int provider_idx;
+    private int provider_idx;
 
     // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
         provider_idx = System.Array.IndexOf(aggregationProvider.providers, hand.leapProvider);
         hand.SetIndividualSphereColors = true;
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        if (hand.GetLeapHand() == null) return;
+        if (hand.GetLeapHand() == null)
+        {
+            return;
+        }
 
         Color[] colors = hand.SphereColors;
         Ultraleap.Utils.Fill(colors, hand.SphereColour);
@@ -31,14 +32,13 @@ public class VisualizeJointConfidence : MonoBehaviour
         {
             for (int j = 0; j < 4; j++)
             {
-                int key = i * 5 + j + 1;
-                int capsuleHandKey = i * 4 + j;
+                int key = (i * 5) + j + 1;
+                int capsuleHandKey = (i * 4) + j;
 
                 colors[capsuleHandKey] = Color.Lerp(Color.black, colors[key], confidences[key]);
             }
         }
 
         hand.SphereColors = colors;
-
     }
 }

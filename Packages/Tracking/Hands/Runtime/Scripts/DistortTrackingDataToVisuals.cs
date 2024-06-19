@@ -6,11 +6,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Ultraleap;
-using Ultraleap.HandsModule;
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace Ultraleap.HandsModule
 {
@@ -27,11 +23,11 @@ namespace Ultraleap.HandsModule
 
         public override void ProcessFrame(ref Frame inputFrame)
         {
-            var hands = new List<Hand>();
+            List<Hand> hands = new List<Hand>();
 
             if (LeftHand != null && LeftHand.gameObject.activeInHierarchy)
             {
-                var leftLeapHand = inputFrame.GetHand(Chirality.Left);
+                Hand leftLeapHand = inputFrame.GetHand(Chirality.Left);
                 if (leftLeapHand != null)
                 {
                     leftLeapHand = LeftHand.BoundHand.GenerateLeapHand(leftLeapHand, fingerTipScale);
@@ -46,7 +42,7 @@ namespace Ultraleap.HandsModule
 
             if (RightHand != null && RightHand.gameObject.activeInHierarchy)
             {
-                var rightLeapHand = inputFrame.GetHand(Chirality.Right);
+                Hand rightLeapHand = inputFrame.GetHand(Chirality.Right);
                 if (rightLeapHand != null)
                 {
                     rightLeapHand = RightHand.BoundHand.GenerateLeapHand(rightLeapHand, fingerTipScale);

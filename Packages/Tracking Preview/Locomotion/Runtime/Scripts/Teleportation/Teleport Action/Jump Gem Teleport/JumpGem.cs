@@ -6,8 +6,8 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Ultraleap.Attachments;
 using System;
+using Ultraleap.Attachments;
 using UnityEngine;
 
 namespace Ultraleap.Preview.Locomotion
@@ -595,7 +595,9 @@ namespace Ultraleap.Preview.Locomotion
         protected void PlaySound(AudioClip clip)
         {
             if (clip == null || _audioSource == null)
+            {
                 return;
+            }
 
             if (_audioSource.isPlaying)
             {

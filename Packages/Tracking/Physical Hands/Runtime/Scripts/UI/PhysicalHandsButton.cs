@@ -6,7 +6,6 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -14,30 +13,41 @@ using UnityEngine.Events;
 namespace Ultraleap.PhysicalHands
 {
     [RequireComponent(typeof(Rigidbody))]
-    public class PhysicalHandsButton: MonoBehaviour
+    public class PhysicalHandsButton : MonoBehaviour
     {
         [SerializeField]
         private bool _automaticTravelDistance = true;
+
         [SerializeField]
         private ChiralitySelection _whichHandCanPressButton = ChiralitySelection.BOTH;
+
         [SerializeField]
         private float springValue = 0;
+
         [SerializeField]
         private float damperValue = 0;
+
         [SerializeField]
         private float maxForceValue = Mathf.Infinity;
+
         [SerializeField]
         private float bouncinessValue = 0;
+
         [SerializeField, Min(0.001f)]
         private float _buttonTravelDistance = 0.01f;
+
         [SerializeField]
         protected float _buttonTravelOffset = 0;
-        [SerializeField] 
+
+        [SerializeField]
         protected bool _canBePressedByObjects = false;
+
         [SerializeField]
         protected GameObject _pressableObject;
+
         [SerializeField]
         protected float _buttonPressExitThreshold = 0.5f;
+
         [SerializeField]
         protected bool _usePrimaryHover = false;
 
@@ -58,10 +68,9 @@ namespace Ultraleap.PhysicalHands
         protected Rigidbody _pressableObjectRB = null;
         protected ConfigurableJoint _configurableJoint;
 
-        
         /// <summary>
-        /// Some presets for how the button should act. 
-        /// Try them out and work out what feels best for your specific button. 
+        /// Some presets for how the button should act.
+        /// Try them out and work out what feels best for your specific button.
         /// Custom allows you to create your own feeling buttons
         /// </summary>
         private enum ButtonPreset
@@ -76,25 +85,35 @@ namespace Ultraleap.PhysicalHands
         private ButtonPreset _buttonPreset = ButtonPreset.Standard;
 
         #region Events
+
         [SerializeField]
         public UnityEvent OnButtonPressed;
+
         [SerializeField]
         public UnityEvent OnButtonUnPressed;
+
         [SerializeField]
         public UnityEvent<ContactHand> OnHandContact;
+
         [SerializeField]
         public UnityEvent<ContactHand> OnHandContactExit;
+
         [SerializeField]
         public UnityEvent<ContactHand> OnHandHover;
+
         [SerializeField]
         public UnityEvent<ContactHand> OnHandHoverExit;
+
         [SerializeField]
         public UnityEvent<ContactHand> OnHandPrimaryHover;
+
         [SerializeField]
         public UnityEvent<ContactHand> OnHandPrimaryHoverExit;
-        #endregion
+
+        #endregion Events
 
         #region public getters
+
         /// <summary>
         /// Indicates whether the button is currently pressed.
         /// </summary>
@@ -105,7 +124,8 @@ namespace Ultraleap.PhysicalHands
                 return _isButtonPressed;
             }
         }
-        #endregion
+
+        #endregion public getters
 
         /// <summary>
         /// Updates inspector values such as button travel distance and preset values.
@@ -125,7 +145,7 @@ namespace Ultraleap.PhysicalHands
 
                 if (_pressableObject.TryGetComponent<MeshFilter>(out meshFilter) && meshFilter.sharedMesh != null)
                 {
-                    _buttonTravelOffset += (meshFilter.sharedMesh.bounds.extents.y * _pressableObject.transform.localScale.y);
+                    _buttonTravelOffset += meshFilter.sharedMesh.bounds.extents.y * _pressableObject.transform.localScale.y;
                 }
 
                 _buttonTravelDistance = (_pressableObject.transform.localPosition.y - _buttonTravelOffset) * transform.lossyScale.y;
@@ -179,7 +199,7 @@ namespace Ultraleap.PhysicalHands
 
                 if (_pressableObject.TryGetComponent<MeshFilter>(out meshFilter) && meshFilter.sharedMesh != null)
                 {
-                    _buttonTravelOffset += (meshFilter.sharedMesh.bounds.extents.y * _pressableObject.transform.localScale.y);
+                    _buttonTravelOffset += meshFilter.sharedMesh.bounds.extents.y * _pressableObject.transform.localScale.y;
                 }
 
                 _buttonTravelDistanceLocal = _pressableObject.transform.localPosition.y - _buttonTravelOffset;
@@ -228,7 +248,6 @@ namespace Ultraleap.PhysicalHands
         {
             Initialize();
         }
-
 
         /// <summary>
         /// Initialize the button.
@@ -301,7 +320,7 @@ namespace Ultraleap.PhysicalHands
             }
 
             // Target position is set high as we hit the limit first, this means that the button is always trying to push agains the limit
-            _configurableJoint.targetPosition = new Vector3(0, -(_buttonTravelDistance * 2), 0); 
+            _configurableJoint.targetPosition = new Vector3(0, -(_buttonTravelDistance * 2), 0);
 
             // Connect the button to the parent object with a spring joint
             _configurableJoint.connectedBody = _rigidbody;
@@ -325,7 +344,7 @@ namespace Ultraleap.PhysicalHands
             // Adjust anchor position for button travel distance
             _configurableJoint.anchor = Vector3.zero;
             _configurableJoint.autoConfigureConnectedAnchor = false;
-            _configurableJoint.connectedAnchor = new Vector3(0, _buttonTravelOffset + (_buttonTravelDistanceLocal / 2) ,0);
+            _configurableJoint.connectedAnchor = new Vector3(0, _buttonTravelOffset + (_buttonTravelDistanceLocal / 2), 0);
 
             // Set linear limit for button travel
             _configurableJoint.linearLimit = new SoftJointLimit
@@ -346,10 +365,10 @@ namespace Ultraleap.PhysicalHands
             {
                 if (_usePrimaryHover)
                 {
-                    foreach (var hand in _contactedHands)
+                    foreach (KeyValuePair<ContactHand, bool> hand in _contactedHands)
                     {
-                        if (hand.Key.Handedness == Chirality.Left && _leftHandPrimaryHovered ||
-                            hand.Key.Handedness == Chirality.Right && _rightHandPrimaryHovered)
+                        if ((hand.Key.Handedness == Chirality.Left && _leftHandPrimaryHovered) ||
+                            (hand.Key.Handedness == Chirality.Right && _rightHandPrimaryHovered))
                         {
                             isPressedByPrimaryHover = true;
                         }
@@ -495,15 +514,16 @@ namespace Ultraleap.PhysicalHands
 
         private void OnHandPrimaryHoverPO(ContactHand hand)
         {
-            if(hand.Handedness == Chirality.Right)
+            if (hand.Handedness == Chirality.Right)
             {
                 _rightHandPrimaryHovered = true;
             }
-            else if(hand.Handedness == Chirality.Left)
+            else if (hand.Handedness == Chirality.Left)
             {
                 _leftHandPrimaryHovered = true;
             }
         }
+
         private void OnHandPrimaryHoverExitPO(ContactHand hand)
         {
             if (hand.Handedness == Chirality.Right)
@@ -516,7 +536,6 @@ namespace Ultraleap.PhysicalHands
             }
         }
 
-
         /// <summary>
         /// Determines whether any chosen hand is in contact with the pressable object.
         /// </summary>
@@ -527,10 +546,13 @@ namespace Ultraleap.PhysicalHands
             {
                 case ChiralitySelection.LEFT:
                     return _leftHandContacting;
+
                 case ChiralitySelection.RIGHT:
                     return _rightHandContacting;
+
                 case ChiralitySelection.BOTH:
                     return _rightHandContacting || _leftHandContacting;
+
                 default:
                     return false;
             }
@@ -542,7 +564,9 @@ namespace Ultraleap.PhysicalHands
         private void OnDrawGizmosSelected()
         {
             if (_pressableObject == null)
+            {
                 return;
+            }
 
             Vector3 startPosition = Vector3.zero;
             Vector3 endPosition = -(Vector3.up * _buttonTravelDistance / _pressableObject.transform.lossyScale.y);

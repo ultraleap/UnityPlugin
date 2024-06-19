@@ -93,7 +93,7 @@ namespace Ultraleap.PhysicalHands
         internal void ResetHelper()
         {
             // The current hands need to be cleared, including firing all relevand exit events on all grab helper objects
-            foreach (var helper in _grabHelperObjects.Values)
+            foreach (GrabHelperObject helper in _grabHelperObjects.Values)
             {
                 if (helper.GrabState == GrabHelperObject.State.Grab)
                 {
@@ -144,7 +144,7 @@ namespace Ultraleap.PhysicalHands
             if (_fingerStrengths.ContainsKey(hand))
             {
                 // Get the least curled finger excluding the thumb
-                var curls = _fingerStrengths[hand];
+                float[] curls = _fingerStrengths[hand];
 
                 for (int i = 1; i < curls.Length; i++)
                 {
@@ -182,7 +182,7 @@ namespace Ultraleap.PhysicalHands
                     _hoveredRigids.Add(collidersRigid);
 
                     // Find the associated GrabHelperObject, if there isn't one, make one
-                    if (!_grabHelperObjects.TryGetValue(collidersRigid, out var helper))
+                    if (!_grabHelperObjects.TryGetValue(collidersRigid, out GrabHelperObject helper))
                     {
                         helper = new GrabHelperObject(collidersRigid, this);
                         _grabHelperObjects.Add(collidersRigid, helper);
@@ -193,7 +193,7 @@ namespace Ultraleap.PhysicalHands
             }
 
             hand.palmBone.ProcessColliderQueue(_colliderCache, nearbyObjectCount);
-            foreach (var bone in hand.bones)
+            foreach (ContactBone bone in hand.bones)
             {
                 bone.ProcessColliderQueue(_colliderCache, nearbyObjectCount);
             }
@@ -215,14 +215,14 @@ namespace Ultraleap.PhysicalHands
 
         #region Helper Updating
 
-        GrabHelperObject primaryHoverObjectLeft = null;
-        GrabHelperObject primaryHoverObjectRight = null;
+        private GrabHelperObject primaryHoverObjectLeft = null;
+        private GrabHelperObject primaryHoverObjectRight = null;
 
         private void UpdateHelpers()
         {
             RemoveUnhoveredGrabHelperObjects();
 
-            foreach (var helper in _grabHelperObjects)
+            foreach (KeyValuePair<Rigidbody, GrabHelperObject> helper in _grabHelperObjects)
             {
                 helper.Value.UpdateHelper();
             }
@@ -236,7 +236,7 @@ namespace Ultraleap.PhysicalHands
             UpdatePrimaryHoverForHand(ref primaryHoverObjectRight, _rightContactHand);
         }
 
-        void UpdatePrimaryHoverForHand(ref GrabHelperObject prevPrimaryHoverObject, ContactHand contactHand)
+        private void UpdatePrimaryHoverForHand(ref GrabHelperObject prevPrimaryHoverObject, ContactHand contactHand)
         {
             // If we are contacting or grabbing, we are still primary hovering the same object. break out
             if (prevPrimaryHoverObject != null && contactHand.IsContacting &&
@@ -261,7 +261,7 @@ namespace Ultraleap.PhysicalHands
 
             if (nearestObject != null && TryGetGrabHelperObjectFromRigid(nearestObject, out GrabHelperObject helperObject)) // Find the nearest GrabHelperObject
             {
-                if(prevPrimaryHoverObject != null && prevPrimaryHoverObject != helperObject) // Update events and states
+                if (prevPrimaryHoverObject != null && prevPrimaryHoverObject != helperObject) // Update events and states
                 {
                     prevPrimaryHoverObject.HandlePrimaryHoverExit(contactHand);
                 }
@@ -269,7 +269,7 @@ namespace Ultraleap.PhysicalHands
                 helperObject.HandlePrimaryHover(contactHand);
                 prevPrimaryHoverObject = helperObject; // cache for next frame
             }
-            else if(prevPrimaryHoverObject != null)
+            else if (prevPrimaryHoverObject != null)
             {
                 prevPrimaryHoverObject.HandlePrimaryHoverExit(contactHand);
             }
@@ -284,7 +284,7 @@ namespace Ultraleap.PhysicalHands
             _previousHoveredRigids.RemoveWhere(ValidateUnhoverRigids);
 
             // Update _previousHoveredRigids with newly hovered rigidbodies, ready for next frame
-            foreach (var rigid in _hoveredRigids)
+            foreach (Rigidbody rigid in _hoveredRigids)
             {
                 _previousHoveredRigids.Add(rigid);
             }
@@ -296,7 +296,7 @@ namespace Ultraleap.PhysicalHands
         private void RemoveUnhoveredHandsFromGrabHelperObjects(int nearbyObjectCount, ContactHand hand)
         {
             // Loop through the current GrabHelperObejcts
-            foreach (var helperObject in _grabHelperObjects.Values)
+            foreach (GrabHelperObject helperObject in _grabHelperObjects.Values)
             {
                 // Check if the GrabHelperObject has reference to the hand we should see if we have stopped hovering
                 if (helperObject.GrabbableHands.Contains(hand))
@@ -346,11 +346,11 @@ namespace Ultraleap.PhysicalHands
                     _grabHelperObjects.Remove(rigid);
                 }
 
-                foreach (var bone in _leftContactHand.bones)
+                foreach (ContactBone bone in _leftContactHand.bones)
                 {
                     bone.RemoveGrabbing(rigid);
                 }
-                foreach (var bone in _rightContactHand.bones)
+                foreach (ContactBone bone in _rightContactHand.bones)
                 {
                     bone.RemoveGrabbing(rigid);
                 }
@@ -377,7 +377,7 @@ namespace Ultraleap.PhysicalHands
 
             bool found = false;
 
-            foreach (var item in _grabHelperObjects)
+            foreach (KeyValuePair<Rigidbody, GrabHelperObject> item in _grabHelperObjects)
             {
                 if (item.Value.GrabbingHands.Contains(hand))
                 {

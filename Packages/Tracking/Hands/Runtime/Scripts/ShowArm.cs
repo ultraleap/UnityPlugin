@@ -26,12 +26,11 @@ namespace Ultraleap.HandsModule
         /// If true, the mesh without an arm is deactivated and the mesh with an arm is activated
         /// </summary>
         public bool showArm = true;
-
-        bool currentlyShowingArm;
+        private bool currentlyShowingArm;
 
 
         // Update is called once per frame
-        void Update()
+        private void Update()
         {
             if (showArm != currentlyShowingArm)
             {
@@ -48,7 +47,7 @@ namespace Ultraleap.HandsModule
             UpdateArm();
         }
 
-        void AttemptToFindMeshes()
+        private void AttemptToFindMeshes()
         {
             meshWithArm = null;
             meshWithoutArm = null;
@@ -70,7 +69,7 @@ namespace Ultraleap.HandsModule
             }
         }
 
-        void UpdateArm()
+        private void UpdateArm()
         {
             if (meshWithArm == null || meshWithoutArm == null)
             {

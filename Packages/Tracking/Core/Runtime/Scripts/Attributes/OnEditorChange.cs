@@ -96,7 +96,7 @@ namespace Ultraleap.Attributes
 
             property.serializedObject.ApplyModifiedProperties();
 
-            foreach (var target in targets)
+            foreach (UnityObject target in targets)
             {
                 object newValue = fieldInfo.GetValue(target);
                 _cachedDelegate(target, newValue);

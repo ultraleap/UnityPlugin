@@ -68,8 +68,8 @@ namespace Ultraleap.PhysicalHands
         {
             orientation = box.transform.rotation;
             center = box.transform.TransformPoint(box.center + offset);
-            var lossyScale = box.transform.lossyScale;
-            var scale = AbsVec3(lossyScale);
+            Vector3 lossyScale = box.transform.lossyScale;
+            Vector3 scale = AbsVec3(lossyScale);
             halfExtents = (Vector3.Scale(scale, box.size) * 0.5f) + (extraRadius == 0 ? Vector3.zero : new Vector3(extraRadius, extraRadius, extraRadius));
         }
 
@@ -153,7 +153,7 @@ namespace Ultraleap.PhysicalHands
         /// <param name="radius">Radius of the capsule.</param>
         public static void ToWorldSpaceCapsuleOffset(this CapsuleCollider capsule, Vector3 offset, out Vector3 point0, out Vector3 point1, out float radius)
         {
-            var center = capsule.transform.TransformPoint(capsule.center + offset);
+            Vector3 center = capsule.transform.TransformPoint(capsule.center + offset);
             radius = 0f;
             float height = 0f;
             Vector3 lossyScale = AbsVec3(capsule.transform.lossyScale);
@@ -183,8 +183,8 @@ namespace Ultraleap.PhysicalHands
                 dir = Vector3.zero;
             }
 
-            point0 = center + dir * (height * 0.5f - radius);
-            point1 = center - dir * (height * 0.5f - radius);
+            point0 = center + (dir * ((height * 0.5f) - radius));
+            point1 = center - (dir * ((height * 0.5f) - radius));
         }
 
         /// <summary>

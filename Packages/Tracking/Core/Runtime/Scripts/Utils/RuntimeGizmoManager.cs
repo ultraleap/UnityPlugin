@@ -247,7 +247,7 @@ namespace Ultraleap.RuntimeGizmos
             bool isDisabled = false;
             do
             {
-                var toggle = transform.GetComponentInParent<RuntimeGizmoToggle>();
+                RuntimeGizmoToggle toggle = transform.GetComponentInParent<RuntimeGizmoToggle>();
                 if (toggle == null)
                 {
                     break;
@@ -350,8 +350,8 @@ namespace Ultraleap.RuntimeGizmos
 
                 for (int j = 0; j < 3; j++)
                 {
-                    indexes.Add((i * 3 + j + 0) % totalVerts);
-                    indexes.Add((i * 3 + j + 3) % totalVerts);
+                    indexes.Add(((i * 3) + j + 0) % totalVerts);
+                    indexes.Add(((i * 3) + j + 3) % totalVerts);
                 }
 
                 verts.Add(new Vector3(dx, dy, 0));
@@ -637,7 +637,7 @@ namespace Ultraleap.RuntimeGizmos
             PushMatrix();
             Vector3 ellipseCenter = (foci1 + foci2) / 2f;
             Quaternion ellipseRotation = Quaternion.LookRotation(foci1 - foci2);
-            var majorAxis = Mathf.Sqrt(Mathf.Pow(Vector3.Distance(foci1, foci2) / 2f, 2f)
+            float majorAxis = Mathf.Sqrt(Mathf.Pow(Vector3.Distance(foci1, foci2) / 2f, 2f)
                                        + Mathf.Pow(minorAxis / 2f, 2f)) * 2f;
             Vector3 ellipseScale = new Vector3(minorAxis, minorAxis, majorAxis);
 
@@ -771,8 +771,8 @@ namespace Ultraleap.RuntimeGizmos
                         case 1: capsuleDir = Vector3.up; break;
                         case 2: default: capsuleDir = Vector3.forward; break;
                     }
-                    DrawWireCapsule(capsule.center + capsuleDir * (capsule.height / 2F - capsule.radius),
-                                    capsule.center - capsuleDir * (capsule.height / 2F - capsule.radius), capsule.radius);
+                    DrawWireCapsule(capsule.center + (capsuleDir * ((capsule.height / 2F) - capsule.radius)),
+                                    capsule.center - (capsuleDir * ((capsule.height / 2F) - capsule.radius)), capsule.radius);
                 }
                 else
                 {
@@ -780,7 +780,7 @@ namespace Ultraleap.RuntimeGizmos
                     size += Vector3.one * capsule.radius * 2;
                     size += new Vector3(capsule.direction == 0 ? 1 : 0,
                                         capsule.direction == 1 ? 1 : 0,
-                                        capsule.direction == 2 ? 1 : 0) * (capsule.height - capsule.radius * 2);
+                                        capsule.direction == 2 ? 1 : 0) * (capsule.height - (capsule.radius * 2));
                     DrawCube(capsule.center, size);
                 }
             }
@@ -827,8 +827,8 @@ namespace Ultraleap.RuntimeGizmos
             {
                 targetScale = 0.06f; // 6 cm at 1m away.
 
-                var curCam = Camera.current;
-                var posWorldSpace = matrix * pos;
+                Camera curCam = Camera.current;
+                Vector4 posWorldSpace = matrix * pos;
                 if (curCam != null)
                 {
                     float camDistance = Vector3.Distance(posWorldSpace, curCam.transform.position);
@@ -837,30 +837,30 @@ namespace Ultraleap.RuntimeGizmos
                 }
             }
 
-            float extent = (targetScale / 2f);
+            float extent = targetScale / 2f;
 
             float negativeAlpha = 0.6f;
 
             color = Color.red;
             if (lerpCoeff != 0f) { color = color.LerpHSV(lerpColor, lerpCoeff); }
-            DrawLine(pos, pos + Vector3.right * extent);
+            DrawLine(pos, pos + (Vector3.right * extent));
             color = Color.black.WithAlpha(negativeAlpha);
             if (lerpCoeff != 0f) { color = color.LerpHSV(lerpColor, lerpCoeff); }
-            DrawLine(pos, pos - Vector3.right * extent);
+            DrawLine(pos, pos - (Vector3.right * extent));
 
             color = Color.green;
             if (lerpCoeff != 0f) { color = color.LerpHSV(lerpColor, lerpCoeff); }
-            DrawLine(pos, pos + Vector3.up * extent);
+            DrawLine(pos, pos + (Vector3.up * extent));
             color = Color.black.WithAlpha(negativeAlpha);
             if (lerpCoeff != 0f) { color = color.LerpHSV(lerpColor, lerpCoeff); }
-            DrawLine(pos, pos - Vector3.up * extent);
+            DrawLine(pos, pos - (Vector3.up * extent));
 
             color = Color.blue;
             if (lerpCoeff != 0f) { color = color.LerpHSV(lerpColor, lerpCoeff); }
-            DrawLine(pos, pos + Vector3.forward * extent);
+            DrawLine(pos, pos + (Vector3.forward * extent));
             color = Color.black.WithAlpha(negativeAlpha);
             if (lerpCoeff != 0f) { color = color.LerpHSV(lerpColor, lerpCoeff); }
-            DrawLine(pos, pos - Vector3.forward * extent);
+            DrawLine(pos, pos - (Vector3.forward * extent));
         }
 
         /// <summary>
@@ -1014,36 +1014,36 @@ namespace Ultraleap.RuntimeGizmos
                                                  float fractionOfCircleToDraw = 1.0f,
                                                  int numCircleSegments = 16)
         {
-            var origCurrColor = _currColor;
+            Color origCurrColor = _currColor;
 
-            var onPlaneDir = Vector3.Cross(planeNormal, circleNormal);
-            var Q = Quaternion.AngleAxis(360f / numCircleSegments, circleNormal);
-            var r = radialStartDirection * radius;
+            Vector3 onPlaneDir = Vector3.Cross(planeNormal, circleNormal);
+            Quaternion Q = Quaternion.AngleAxis(360f / numCircleSegments, circleNormal);
+            Vector3 r = radialStartDirection * radius;
             for (int i = 0; i < numCircleSegments + 1; i++)
             {
-                var nextR = Q * r;
-                var onPlaneAngle = Vector3.SignedAngle(r, onPlaneDir, circleNormal);
-                var nextOnPlaneAngle = Vector3.SignedAngle(nextR, onPlaneDir, circleNormal);
-                var front = onPlaneAngle < 0;
-                var nextFront = nextOnPlaneAngle < 0;
+                Vector3 nextR = Q * r;
+                float onPlaneAngle = Vector3.SignedAngle(r, onPlaneDir, circleNormal);
+                float nextOnPlaneAngle = Vector3.SignedAngle(nextR, onPlaneDir, circleNormal);
+                bool front = onPlaneAngle < 0;
+                bool nextFront = nextOnPlaneAngle < 0;
 
                 if (front != nextFront)
                 {
-                    var targetColor = Color.Lerp(inFrontOfPlaneColor, behindPlaneColor, 0.5f);
+                    Color targetColor = Color.Lerp(inFrontOfPlaneColor, behindPlaneColor, 0.5f);
                     GL.End();
                     setPass(ref curPass, isUnlit: true, desiredCurrColor: targetColor);
                     GL.Begin(GL.LINES);
                 }
                 else if (front)
                 {
-                    var targetColor = inFrontOfPlaneColor;
+                    Color targetColor = inFrontOfPlaneColor;
                     GL.End();
                     setPass(ref curPass, isUnlit: true, desiredCurrColor: targetColor);
                     GL.Begin(GL.LINES);
                 }
                 else
                 {
-                    var targetColor = behindPlaneColor;
+                    Color targetColor = behindPlaneColor;
                     GL.End();
                     setPass(ref curPass, isUnlit: true, desiredCurrColor: targetColor);
                     GL.Begin(GL.LINES);
@@ -1060,13 +1060,13 @@ namespace Ultraleap.RuntimeGizmos
         private void drawWireSphereNow(WireSphere wireSphere,
                                        ref int curPass)
         {
-            var position = wireSphere.pose.position;
-            var rotation = wireSphere.pose.rotation;
+            Vector3 position = wireSphere.pose.position;
+            Quaternion rotation = wireSphere.pose.rotation;
 
-            var worldPosition = _currMatrix.MultiplyPoint3x4(position);
+            Vector3 worldPosition = _currMatrix.MultiplyPoint3x4(position);
 
-            var dirToCamera = (Camera.current.transform.position - worldPosition).normalized;
-            var dirToCameraInMatrix = _currMatrix.inverse.MultiplyVector(dirToCamera);
+            Vector3 dirToCamera = (Camera.current.transform.position - worldPosition).normalized;
+            Vector3 dirToCameraInMatrix = _currMatrix.inverse.MultiplyVector(dirToCamera);
 
             // Wire sphere outline. This is just a wire sphere that faces the camera.
             drawWireArcNow(position, dirToCameraInMatrix, dirToCameraInMatrix.Perpendicular(),
@@ -1074,9 +1074,9 @@ namespace Ultraleap.RuntimeGizmos
                            numCircleSegments: wireSphere.numSegments);
 
 
-            var x = rotation * Vector3.right;
-            var y = rotation * Vector3.up;
-            var z = rotation * Vector3.forward;
+            Vector3 x = rotation * Vector3.right;
+            Vector3 y = rotation * Vector3.up;
+            Vector3 z = rotation * Vector3.forward;
 
             drawPlaneSoftenedWireArcNow(position, y, x, wireSphere.radius,
                                         inFrontOfPlaneColor: _currColor,
@@ -1203,7 +1203,7 @@ namespace Ultraleap.RuntimeGizmos
 
             drawer.matrix = Matrix4x4.TRS(pose.position, pose.rotation, Vector3.one);
 
-            var origColor = drawer.color;
+            Color origColor = drawer.color;
 
             //drawer.DrawWireSphere(Vector3.zero, radius);
             if (drawCube)

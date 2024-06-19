@@ -126,12 +126,12 @@ namespace Ultraleap.Attachments
         /// </summary>
         public bool isTracked { get { return _isTracked; } set { _isTracked = value; } }
 
-        void OnValidate()
+        private void OnValidate()
         {
             initializeAttachmentPointFlagConstants();
         }
 
-        void Awake()
+        private void Awake()
         {
             initializeAttachmentPointFlagConstants();
         }
@@ -141,7 +141,7 @@ namespace Ultraleap.Attachments
         private bool _isBeingDestroyed = false;
 #if !UNITY_EDITOR
 #endif
-        void OnDestroy()
+        private void OnDestroy()
         {
             _isBeingDestroyed = true;
         }
@@ -200,9 +200,12 @@ namespace Ultraleap.Attachments
 
             // First just _check_ whether we'll need to do any destruction or creation
             bool requiresDestructionOrCreation = false;
-            foreach (var flag in _attachmentPointFlagConstants)
+            foreach (AttachmentPointFlags flag in _attachmentPointFlagConstants)
             {
-                if (flag == AttachmentPointFlags.None) continue;
+                if (flag == AttachmentPointFlags.None)
+                {
+                    continue;
+                }
 
                 if ((!points.Contains(flag) && GetBehaviourForPoint(flag) != null)
                      || (points.Contains(flag) && GetBehaviourForPoint(flag) == null))
@@ -220,7 +223,10 @@ namespace Ultraleap.Attachments
 
                 foreach (AttachmentPointFlags flag in _attachmentPointFlagConstants)
                 {
-                    if (flag == AttachmentPointFlags.None) continue;
+                    if (flag == AttachmentPointFlags.None)
+                    {
+                        continue;
+                    }
 
                     if (points.Contains(flag))
                     {
@@ -247,7 +253,10 @@ namespace Ultraleap.Attachments
         {
 #if UNITY_EDITOR
             // Only valid if the AttachmentHand itself is also not being destroyed.
-            if (_isBeingDestroyed) return;
+            if (_isBeingDestroyed)
+            {
+                return;
+            }
 
             // Refresh this hand's attachment transforms on a slight delay.
             // Only AttachmentHands can _truly_ remove attachment points!
@@ -331,7 +340,7 @@ namespace Ultraleap.Attachments
             if (pointBehaviour == null)
             {
                 // First, see if there's already one in the hierarchy! Might exist due to, e.g. an Undo operation
-                var existingPointBehaviour = this.gameObject.GetComponentsInChildren<AttachmentPointBehaviour>()
+                AttachmentPointBehaviour existingPointBehaviour = this.gameObject.GetComponentsInChildren<AttachmentPointBehaviour>()
                                                             .FirstOrDefault(p => p.attachmentPoint == singlePoint);
 
                 // Only make a new object if the transform really doesn't exist.
@@ -384,7 +393,7 @@ namespace Ultraleap.Attachments
                 return;
             }
 
-            var pointBehaviour = GetBehaviourForPoint(singlePoint);
+            AttachmentPointBehaviour pointBehaviour = GetBehaviourForPoint(singlePoint);
             if (pointBehaviour != null)
             {
 #if UNITY_EDITOR
@@ -417,7 +426,7 @@ namespace Ultraleap.Attachments
 
         private void flattenAttachmentTransformHierarchy()
         {
-            foreach (var point in this.points)
+            foreach (AttachmentPointBehaviour point in this.points)
             {
                 SetTransformParent(point.transform, this.transform);
             }
@@ -506,7 +515,7 @@ namespace Ultraleap.Attachments
 
             int hierarchyCount = 0;
 
-            foreach (var transform in transforms)
+            foreach (Transform transform in transforms)
             {
                 if (transform != null)
                 {
@@ -536,7 +545,7 @@ namespace Ultraleap.Attachments
             }
 
             int tIdx = 0;
-            foreach (var behaviour in monoBehaviours)
+            foreach (MonoBehaviour behaviour in monoBehaviours)
             {
                 if (behaviour != null)
                 {
@@ -580,7 +589,10 @@ namespace Ultraleap.Attachments
             {
                 get
                 {
-                    if (_hand == null) return null;
+                    if (_hand == null)
+                    {
+                        return null;
+                    }
 
                     return _hand.GetBehaviourForPoint(GetFlagFromFlagIdx(_curIdx));
                 }
@@ -599,7 +611,7 @@ namespace Ultraleap.Attachments
 
         private static AttachmentPointFlags GetFlagFromFlagIdx(int pointIdx)
         {
-            return (AttachmentPointFlags)(1 << pointIdx + 1);
+            return (AttachmentPointFlags)(1 << (pointIdx + 1));
         }
 
         #endregion

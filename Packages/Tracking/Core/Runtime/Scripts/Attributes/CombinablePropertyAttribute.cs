@@ -120,9 +120,9 @@ namespace Ultraleap.Attributes
         /// </summary>
         public void Init(SerializedProperty property)
         {
-            var propertyName = property.name;
-            var serializedObject = property.serializedObject;
-            var targetObjectType = serializedObject.targetObject.GetType();
+            string propertyName = property.name;
+            SerializedObject serializedObject = property.serializedObject;
+            Type targetObjectType = serializedObject.targetObject.GetType();
             fieldInfo = targetObjectType.GetField(propertyName,
               BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance
               | BindingFlags.FlattenHierarchy);

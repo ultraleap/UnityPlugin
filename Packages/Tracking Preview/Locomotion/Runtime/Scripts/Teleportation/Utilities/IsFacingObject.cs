@@ -6,9 +6,9 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
+using System.Collections.Generic;
 using Ultraleap.PhysicalHands;
 using Ultraleap.Preview.HandRays;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Ultraleap.Preview.Locomotion
@@ -47,7 +47,7 @@ namespace Ultraleap.Preview.Locomotion
             }
         }
 
-        void Start()
+        private void Start()
         {
             SetLayerMask();
         }
@@ -78,7 +78,7 @@ namespace Ultraleap.Preview.Locomotion
                 _layerMask ^= _farFieldLayerManager.FloorLayer.layerMask;
             }
 
-            foreach (var _layers in _layersToIgnore)
+            foreach (SingleLayer _layers in _layersToIgnore)
             {
                 _layerMask ^= _layers.layerMask;
             }

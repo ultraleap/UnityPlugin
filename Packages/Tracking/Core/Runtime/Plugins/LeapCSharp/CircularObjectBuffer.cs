@@ -52,7 +52,9 @@ namespace LeapInternal
                     }
                 }
                 if (Count < Capacity)
+                {
                     Count++;
+                }
 
                 lock (array)
                 {

@@ -130,7 +130,7 @@ namespace Ultraleap
         /// 
         /// Also ensures the Frame is a copy if it is transformed to avoid transforming the original Frame
         /// </summary>
-        Frame GetLatestTrackingFrameCopy()
+        private Frame GetLatestTrackingFrameCopy()
         {
             Frame currentFrame = TrackingProvider.CurrentFrame;
 
@@ -149,7 +149,7 @@ namespace Ultraleap
             return currentFrame;
         }
 
-        bool PopulateXRHandFromLeap(Hand leapHand, ref Pose rootPose, ref NativeArray<XRHandJoint> handJoints, XRHandSubsystem.UpdateType updateType)
+        private bool PopulateXRHandFromLeap(Hand leapHand, ref Pose rootPose, ref NativeArray<XRHandJoint> handJoints, XRHandSubsystem.UpdateType updateType)
         {
             if (leapHand == null)
             {
@@ -173,13 +173,13 @@ namespace Ultraleap
 
             int jointIndex = 2;
 
-            foreach (var finger in leapHand.fingers)
+            foreach (Finger finger in leapHand.fingers)
             {
                 if (finger.Type == Finger.FingerType.THUMB)
                 {
                     for (int i = 1; i < 4; i++)
                     {
-                        var bone = finger.bones[i];
+                        Bone bone = finger.bones[i];
 
                         handJoints[jointIndex] = XRHandProviderUtility.CreateJoint(handedness,
                             XRHandJointTrackingState.Pose,
@@ -188,7 +188,7 @@ namespace Ultraleap
                         jointIndex++;
                     }
 
-                    var distal = finger.GetBone(Bone.BoneType.DISTAL);
+                    Bone distal = finger.GetBone(Bone.BoneType.DISTAL);
                     handJoints[jointIndex] = XRHandProviderUtility.CreateJoint(handedness,
                         XRHandJointTrackingState.Pose,
                         XRHandJointIDUtility.FromIndex(jointIndex),
@@ -197,7 +197,7 @@ namespace Ultraleap
                 }
                 else
                 {
-                    foreach (var bone in finger.bones)
+                    foreach (Bone bone in finger.bones)
                     {
                         handJoints[jointIndex] = XRHandProviderUtility.CreateJoint(handedness,
                             XRHandJointTrackingState.Pose,
@@ -206,7 +206,7 @@ namespace Ultraleap
                         jointIndex++;
                     }
 
-                    var distal = finger.GetBone(Bone.BoneType.DISTAL);
+                    Bone distal = finger.GetBone(Bone.BoneType.DISTAL);
                     handJoints[jointIndex] = XRHandProviderUtility.CreateJoint(handedness,
                         XRHandJointTrackingState.Pose,
                         XRHandJointIDUtility.FromIndex(jointIndex),
@@ -218,7 +218,7 @@ namespace Ultraleap
             return true;
         }
 
-        Pose CalculatePalmPose(Hand leapHand)
+        private Pose CalculatePalmPose(Hand leapHand)
         {
             Pose palmPose = new Pose();
             palmPose.position = Vector3.Lerp(leapHand.Middle.GetBone(Bone.BoneType.METACARPAL).PrevJoint,
@@ -229,7 +229,7 @@ namespace Ultraleap
             return palmPose;
         }
 
-        Pose CalculateWristPose(Hand leapHand)
+        private Pose CalculateWristPose(Hand leapHand)
         {
             Vector3 wristUp = leapHand.Middle.GetBone(Bone.BoneType.METACARPAL).Rotation * Vector3.up;
             Vector3 wristForward = leapHand.Middle.GetBone(Bone.BoneType.METACARPAL).PrevJoint - leapHand.WristPosition;
@@ -246,7 +246,7 @@ namespace Ultraleap
 
         //This method registers the subsystem descriptor with the SubsystemManager
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-        static void RegisterDescriptor()
+        private static void RegisterDescriptor()
         {
             UltraleapSettings ultraleapSettings = UltraleapSettings.Instance;
 
@@ -255,7 +255,7 @@ namespace Ultraleap
                 return;
             }
 
-            var handsSubsystemCinfo = new XRHandSubsystemDescriptor.Cinfo
+            XRHandSubsystemDescriptor.Cinfo handsSubsystemCinfo = new XRHandSubsystemDescriptor.Cinfo
             {
                 id = "UL XR Hands",
                 providerType = typeof(LeapXRHandProvider),
@@ -265,11 +265,11 @@ namespace Ultraleap
             XRHandSubsystemDescriptor.Register(handsSubsystemCinfo);
         }
 
-        static bool DoesDescriptorExist()
+        private static bool DoesDescriptorExist()
         {
             List<XRHandSubsystemDescriptor> descriptors = new List<XRHandSubsystemDescriptor>();
             SubsystemManager.GetSubsystemDescriptors(descriptors);
-            foreach (var descriptor in descriptors)
+            foreach (XRHandSubsystemDescriptor descriptor in descriptors)
             {
                 if (descriptor.id == "UL XR Hands")
                 {

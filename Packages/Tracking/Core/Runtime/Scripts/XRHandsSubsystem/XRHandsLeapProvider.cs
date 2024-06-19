@@ -6,11 +6,9 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Ultraleap.Encoding;
-
 using System;
 using System.Collections.Generic;
-
+using Ultraleap.Encoding;
 using UnityEngine;
 using UnityEngine.SpatialTracking;
 using UnityEngine.XR.Hands;
@@ -23,7 +21,7 @@ namespace Ultraleap
     /// </summary>
     public class XRHandsLeapProvider : LeapProvider
     {
-        XRHandSubsystem currentSubsystem;
+        private XRHandSubsystem currentSubsystem;
 
         private LeapTransform trackerTransform = new LeapTransform(Vector3.zero, Quaternion.identity);
 
@@ -69,7 +67,7 @@ namespace Ultraleap
             List<XRHandSubsystem> availableSubsystems = new List<XRHandSubsystem>();
             SubsystemManager.GetSubsystems(availableSubsystems);
 
-            foreach (var subsystem in availableSubsystems)
+            foreach (XRHandSubsystem subsystem in availableSubsystems)
             {
                 if (subsystem != null)
                 {
@@ -100,7 +98,9 @@ namespace Ultraleap
         private void OnDestroy()
         {
             if (currentSubsystem != null)
+            {
                 currentSubsystem.updatedHands -= UpdateHands;
+            }
         }
 
         private void Update()
@@ -111,13 +111,13 @@ namespace Ultraleap
             }
         }
 
-        void CheckForSubsystem()
+        private void CheckForSubsystem()
         {
             // Find the first available subsystem
             List<XRHandSubsystem> availableSubsystems = new List<XRHandSubsystem>();
             SubsystemManager.GetSubsystems(availableSubsystems);
 
-            foreach (var subsystem in availableSubsystems)
+            foreach (XRHandSubsystem subsystem in availableSubsystems)
             {
                 if (subsystem != null)
                 {
@@ -155,7 +155,7 @@ namespace Ultraleap
             }
 
             // Adjust for the camera parent transform if this camera is part of a rig.
-            var parentTransform = Camera.main.transform.parent;
+            Transform parentTransform = Camera.main.transform.parent;
             if (parentTransform != null)
             {
                 trackerTransform.translation += parentTransform.position;
@@ -203,7 +203,7 @@ namespace Ultraleap
 
         private void PopulateLeapHandFromXRHand(XRHand xrhand, float timeVisible, ref Hand hand)
         {
-            var joints = xrhand.GetRawJointArray();
+            Unity.Collections.NativeArray<XRHandJoint> joints = xrhand.GetRawJointArray();
 
             Chirality chirality = xrhand.handedness == UnityEngine.XR.Hands.Handedness.Left ? Chirality.Left : Chirality.Right;
 
@@ -214,17 +214,17 @@ namespace Ultraleap
 
             for (int fingerIndex = 0; fingerIndex < 5; fingerIndex++)
             {
-                var xrTipIndex = 0;
-                var xrIntermediateIndex = 0;
-                var fingerWidth = 0f;
-                var fingerLength = 0f;
+                int xrTipIndex = 0;
+                int xrIntermediateIndex = 0;
+                float fingerWidth = 0f;
+                float fingerLength = 0f;
 
                 for (int boneIndex = 0; boneIndex < 4; boneIndex++)
                 {
-                    var xrPrevIndex = fingerIndex * 5 + boneIndex + 1;
-                    var xrNextIndex = xrPrevIndex + 1;
-                    var prevJoint = joints[xrPrevIndex];
-                    var nextJoint = joints[xrNextIndex];
+                    int xrPrevIndex = (fingerIndex * 5) + boneIndex + 1;
+                    int xrNextIndex = xrPrevIndex + 1;
+                    XRHandJoint prevJoint = joints[xrPrevIndex];
+                    XRHandJoint nextJoint = joints[xrNextIndex];
 
                     prevJoint.TryGetPose(out Pose prevJointPose);
                     nextJoint.TryGetPose(out Pose nextJointPose);
@@ -233,7 +233,7 @@ namespace Ultraleap
                     // Ignore thumb Metacarpal
                     if (fingerIndex == 0 && boneIndex == 0)
                     {
-                        var metacarpalPosition = joints[(int)XRHandJointID.ThumbProximal].TryGetPose(out Pose thumbProximalPose) ? thumbProximalPose.position : Vector3.zero;
+                        Vector3 metacarpalPosition = joints[(int)XRHandJointID.ThumbProximal].TryGetPose(out Pose thumbProximalPose) ? thumbProximalPose.position : Vector3.zero;
 
                         // Use the average of the thumb proximal to the wrist to account for XRHands not having suitable metacarpal positions
                         metacarpalPosition += wristPose.position;
@@ -252,12 +252,12 @@ namespace Ultraleap
                     }
 
                     // Populate the finger bone information
-                    var bone = hand.fingers[fingerIndex].bones[boneIndex];
+                    Bone bone = hand.fingers[fingerIndex].bones[boneIndex];
 
                     bone.Fill(
                         prevJointPose.position,
                         nextJointPose.position,
-                        ((prevJointPose.position + nextJointPose.position) / 2f),
+                        (prevJointPose.position + nextJointPose.position) / 2f,
                         prevJointPose.forward,
                         (prevJointPose.position - nextJointPose.position).magnitude,
                         prevJointRadius * 2f,
@@ -285,7 +285,7 @@ namespace Ultraleap
                 // Populate the higher - level finger data.
                 hand.fingers[fingerIndex].Fill(
                     _frameId,
-                    (chirality == Chirality.Left ? 0 : 1),
+                    chirality == Chirality.Left ? 0 : 1,
                     fingerIndex,
                     timeVisible,
                     joints[xrTipIndex].TryGetPose(out Pose xrTipIndexPose) ? xrTipIndexPose.position : Vector3.zero,
@@ -310,7 +310,7 @@ namespace Ultraleap
 
             // Calculate adjusted palm position, rotation and direction.
             hand.Rotation = palmPose.rotation * PalmOffset[hand.IsLeft ? 0 : 1].rotation;
-            hand.PalmPosition = palmPose.position + hand.Rotation * PalmOffset[hand.IsLeft ? 0 : 1].position;
+            hand.PalmPosition = palmPose.position + (hand.Rotation * PalmOffset[hand.IsLeft ? 0 : 1].position);
             hand.StabilizedPalmPosition = hand.PalmPosition;
             hand.PalmNormal = hand.Rotation * Vector3.down;
             hand.Direction = hand.Rotation * Vector3.forward;
@@ -325,15 +325,15 @@ namespace Ultraleap
             hand.PalmNormal = hand.Rotation * Vector3.down;
 
             // Fill arm data.
-            var palmPosition = palmPose.position;
-            var wristPosition = wristPose.position;
-            var wristWidth = hand.PalmWidth * 0.6f;
+            Vector3 palmPosition = palmPose.position;
+            Vector3 wristPosition = wristPose.position;
+            float wristWidth = hand.PalmWidth * 0.6f;
 
             const float elbowLength = 0.3f;
-            var elbowRotation = palmPose.rotation;
-            var elbowDirection = elbowRotation * Vector3.back;
-            var elbowPosition = palmPose.position + (elbowDirection * elbowLength);
-            var centerPosition = (elbowPosition + palmPosition) / 2f;
+            Quaternion elbowRotation = palmPose.rotation;
+            Vector3 elbowDirection = elbowRotation * Vector3.back;
+            Vector3 elbowPosition = palmPose.position + (elbowDirection * elbowLength);
+            Vector3 centerPosition = (elbowPosition + palmPosition) / 2f;
             hand.Arm.Fill(
                 elbowPosition,
                 wristPosition,
@@ -345,7 +345,7 @@ namespace Ultraleap
             );
         }
 
-        float GetHandTimeVisible(Chirality chirality)
+        private float GetHandTimeVisible(Chirality chirality)
         {
             long currentDateTimeTicks = DateTime.Now.Ticks;
 

@@ -62,18 +62,18 @@ namespace Ultraleap.PhysicalHands
         /// <param name="contactMode">
         /// 0 = Hard Contact
         /// 1 = Soft Contact
-        /// 2 = No Contact 
+        /// 2 = No Contact
         /// </param>
         public void SetContactModeEnum(int contactModeInt)
         {
             contactMode = (ContactMode)contactModeInt;
         }
 
-
         private ContactParent _contactParent;
         public ContactParent ContactParent => _contactParent;
 
         #region Layers
+
         // Layers
         // Hand Layers
         public SingleLayer HandsLayer
@@ -108,17 +108,23 @@ namespace Ultraleap.PhysicalHands
 
         private LayerMask _interactionMask;
         public LayerMask InteractionMask => _interactionMask;
-        #endregion
+
+        #endregion Layers
 
         #region Hand Settings
+
         [Space, SerializeField, Tooltip("The distance that bones will have their radius inflated by when calculating if an object is hovered.")]
         private float _hoverDistance = 0.04f;
+
         public float HoverDistance => _hoverDistance;
+
         [SerializeField, Tooltip("The distance that bones will have their radius inflated by when calculating if an object is grabbed. " +
                 "If you increase this value too much, you may cause physics errors.")]
         private float _contactDistance = 0.002f;
+
         public float ContactDistance => _contactDistance;
-        #endregion
+
+        #endregion Hand Settings
 
         private WaitForFixedUpdate _postFixedUpdateWait = null;
 
@@ -165,9 +171,13 @@ namespace Ultraleap.PhysicalHands
         public Action OnContactModeChanged;
 
         #region Quick Accessors
-        public ContactHand LeftHand { get { return ContactParent?.LeftHand; } }
-        public ContactHand RightHand { get { return ContactParent?.RightHand; } }
-        #endregion
+
+        public ContactHand LeftHand
+        { get { return ContactParent?.LeftHand; } }
+        public ContactHand RightHand
+        { get { return ContactParent?.RightHand; } }
+
+        #endregion Quick Accessors
 
         private void Awake()
         {
@@ -204,7 +214,7 @@ namespace Ultraleap.PhysicalHands
 
         private void Reset()
         {
-            foreach (var parent in GetComponentsInChildren<ContactParent>())
+            foreach (ContactParent parent in GetComponentsInChildren<ContactParent>())
             {
                 if (parent != null) // delete old contact hands
                 {
@@ -314,14 +324,15 @@ namespace Ultraleap.PhysicalHands
                 case ContactMode.HardContact:
                     _contactParent = newContactParent.AddComponent(typeof(HardContactParent)) as ContactParent;
                     break;
+
                 case ContactMode.SoftContact:
                     _contactParent = newContactParent.AddComponent(typeof(SoftContactParent)) as ContactParent;
                     break;
+
                 case ContactMode.NoContact:
                     _contactParent = newContactParent.AddComponent(typeof(NoContactParent)) as ContactParent;
                     break;
             }
-
 
             if (transform != null) // catches some edit-time issues
             {
@@ -333,6 +344,7 @@ namespace Ultraleap.PhysicalHands
         }
 
         #region Layer Generation
+
         protected void GenerateLayers()
         {
             if (_layersGenerated)
@@ -409,7 +421,7 @@ namespace Ultraleap.PhysicalHands
             Physics.IgnoreLayerCollision(_handsLayer, _handsLayer, true);
         }
 
-        #endregion
+        #endregion Layer Generation
 
         private void OnValidate()
         {
@@ -423,14 +435,17 @@ namespace Ultraleap.PhysicalHands
 
         [Space, Header("Hover Events"), Space]
         public UnityEvent<ContactHand, Rigidbody> onHover;
+
         public UnityEvent<ContactHand, Rigidbody> onHoverExit;
 
         [Space, Header("Contact Events"), Space]
         public UnityEvent<ContactHand, Rigidbody> onContact;
+
         public UnityEvent<ContactHand, Rigidbody> onContactExit;
 
         [Space, Header("Grab Events"), Space]
         public UnityEvent<ContactHand, Rigidbody> onGrab;
+
         public UnityEvent<ContactHand, Rigidbody> onGrabExit;
 
         internal static Action<ContactParent> OnHandsInitialized;
@@ -465,6 +480,6 @@ namespace Ultraleap.PhysicalHands
             onGrabExit?.Invoke(contacthand, rbody);
         }
 
-        #endregion
+        #endregion Events
     }
 }

@@ -70,7 +70,7 @@ namespace Ultraleap
                 _entryMap.Clear();
             }
 
-            foreach (var entry in _entries)
+            foreach (Entry entry in _entries)
             {
                 _entryMap[entry.enumValue] = entry.callback;
             }

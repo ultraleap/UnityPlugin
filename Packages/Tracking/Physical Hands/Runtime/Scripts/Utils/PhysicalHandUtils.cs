@@ -1,5 +1,3 @@
-using Ultraleap.PhysicalHands;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using static Ultraleap.PhysicalHands.ContactBone;
@@ -18,7 +16,7 @@ namespace Ultraleap.PhysicalHands
         {
             float shortestDistance = float.PositiveInfinity;
             // Loop through each hand in the list
-            foreach (var hand in handsToCompare)
+            foreach (ContactHand hand in handsToCompare)
             {
                 // Calculate the distance between the hand and the object
                 float handDistance = Vector3.Distance(
@@ -46,17 +44,19 @@ namespace Ultraleap.PhysicalHands
             Dictionary<Collider, ClosestColliderDirection> result;
 
             if (objectToCheckDistanceFrom == null)
+            {
                 return shortestDistance;
+            }
 
             // Loop through each hand in the list
-            foreach (var hand in handsToCompare)
+            foreach (ContactHand hand in handsToCompare)
             {
-                foreach (var bone in hand.bones)
+                foreach (ContactBone bone in hand.bones)
                 {
                     // Only check for distal joints
                     if (bone.Joint == 2 && bone.NearbyObjects.TryGetValue(objectToCheckDistanceFrom, out result))
                     {
-                        foreach (var value in result.Values)
+                        foreach (ClosestColliderDirection value in result.Values)
                         {
                             if (value.distance < shortestDistance)
                             {
@@ -84,7 +84,7 @@ namespace Ultraleap.PhysicalHands
             if (contactHands.Count > 0)
             {
                 // Loop through each contact hand in the list
-                foreach (var hand in contactHands)
+                foreach (ContactHand hand in contactHands)
                 {
                     // Calculate the distance between the hand and the object
                     float distanceFromHand = Vector3.Distance(
@@ -119,7 +119,7 @@ namespace Ultraleap.PhysicalHands
             if (contactHands.Count > 0)
             {
                 // Loop through each hand in the list
-                foreach (var hand in contactHands)
+                foreach (Hand hand in contactHands)
                 {
                     // Calculate the distance between the hand and the object
                     float distanceFromHand = Vector3.Distance(

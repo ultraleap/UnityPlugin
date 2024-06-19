@@ -1,8 +1,6 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace Ultraleap.HandsModule
@@ -119,12 +117,12 @@ namespace Ultraleap.HandsModule
         private string GetDistinctHandModelId(string desiredHandModelId)
         {
             int iteration = 0;
-            var name = desiredHandModelId;
+            string name = desiredHandModelId;
             List<string> existingIds = HandModelPairs.Select(hmp => hmp.HandModelPairId).ToList();
 
             while (existingIds.Contains(name))
             {
-                name = desiredHandModelId + "_[" + (iteration++) + "]";
+                name = desiredHandModelId + "_[" + iteration++ + "]";
             }
 
             return name;
@@ -225,13 +223,13 @@ namespace Ultraleap.HandsModule
             foreach (HandModelPair handModelPair in HandModelPairs)
             {
                 if (!handModelPair.LeftEnableDisable.freezeHandState ||
-                    handModelPair.LeftEnableDisable.freezeHandState && handModelPair.Left.isActiveAndEnabled)
+                    (handModelPair.LeftEnableDisable.freezeHandState && handModelPair.Left.isActiveAndEnabled))
                 {
                     activeHands.Add(handModelPair.Left);
                 }
 
                 if (!handModelPair.RightEnableDisable.freezeHandState ||
-                    handModelPair.RightEnableDisable.freezeHandState && handModelPair.Right.isActiveAndEnabled)
+                    (handModelPair.RightEnableDisable.freezeHandState && handModelPair.Right.isActiveAndEnabled))
                 {
                     activeHands.Add(handModelPair.Right);
                 }

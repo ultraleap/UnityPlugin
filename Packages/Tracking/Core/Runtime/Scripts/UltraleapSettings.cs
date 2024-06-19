@@ -6,9 +6,9 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
+using System;
 using System.Collections.Generic;
 using UnityEngine;
-using System;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -35,16 +35,16 @@ namespace Ultraleap
 #endif
 
 #if UNITY_EDITOR
-    static class UltraleapProjectSettings
+    internal static class UltraleapProjectSettings
     {
-        static SerializedObject settings = UltraleapSettings.GetSerializedSettings();
+        private static SerializedObject settings = UltraleapSettings.GetSerializedSettings();
 
         [SettingsProvider]
         public static SettingsProvider CreateUltraleapSettingsProvider()
         {
             // First parameter is the path in the Settings window.
             // Second parameter is the scope of this setting: it only appears in the Project Settings window.
-            var provider = new SettingsProvider("Project/Ultraleap", SettingsScope.Project)
+            SettingsProvider provider = new SettingsProvider("Project/Ultraleap", SettingsScope.Project)
             {
                 // By default the last token of the path is used as display name if no label is provided.
                 label = "Ultraleap",
@@ -160,7 +160,7 @@ namespace Ultraleap
         {
             EditorGUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
-            if (GUILayout.Button("Reset To Defaults", GUILayout.MaxWidth(EditorGUIUtility.currentViewWidth/2)))
+            if (GUILayout.Button("Reset To Defaults", GUILayout.MaxWidth(EditorGUIUtility.currentViewWidth / 2)))
             {
                 if (EditorUtility.DisplayDialog("Reset all settings", "This will reset all settings in this Ultraleap settings file", "Yes", "No"))
                 {
@@ -177,15 +177,19 @@ namespace Ultraleap
 
     public class UltraleapSettings : ScriptableObject
     {
-        static UltraleapSettings instance;
+        private static UltraleapSettings instance;
         public static UltraleapSettings Instance
         {
             get
             {
                 if (instance != null)
+                {
                     return instance;
+                }
                 else
+                {
                     return instance = FindSettingsSO();
+                }
             }
             set { instance = value; }
         }
@@ -249,11 +253,11 @@ namespace Ultraleap
 
 #if UNITY_EDITOR
 
-        static string GetPluginVersion()
+        private static string GetPluginVersion()
         {
             string version = "Unknown";
 
-            if (Utils.IsPackageAvailable("com.ultraleap.tracking", out var packageInfo)) // Check the package exists so we can use package manage wizardry
+            if (Utils.IsPackageAvailable("com.ultraleap.tracking", out UnityEditor.PackageManager.PackageInfo packageInfo)) // Check the package exists so we can use package manage wizardry
             {
                 version = packageInfo.version;
             }
@@ -263,7 +267,7 @@ namespace Ultraleap
             }
 
             // Parse through system.version to improve formatting standardisation
-            if(Version.TryParse(version, out var ver))
+            if (Version.TryParse(version, out Version ver))
             {
                 version = ver.ToString();
             }
@@ -271,9 +275,9 @@ namespace Ultraleap
             return version;
         }
 
-        static string GetPluginSource()
+        private static string GetPluginSource()
         {
-            if (Utils.IsPackageAvailable("com.ultraleap.tracking", out var packageInfo)) // Check the package exists so we can use package manage wizardry
+            if (Utils.IsPackageAvailable("com.ultraleap.tracking", out UnityEditor.PackageManager.PackageInfo packageInfo)) // Check the package exists so we can use package manage wizardry
             {
                 if (packageInfo.source == UnityEditor.PackageManager.PackageSource.Registry &&
                     packageInfo.registry != null &&
@@ -288,7 +292,7 @@ namespace Ultraleap
             }
             else
             {
-                if(FindPluginVersionInAssets() != "")
+                if (FindPluginVersionInAssets() != "")
                 {
                     return "Unity Package";
                 }
@@ -359,7 +363,7 @@ namespace Ultraleap
             return instance;
         }
 
-        static UltraleapSettings CreateSettingsSO()
+        private static UltraleapSettings CreateSettingsSO()
         {
             UltraleapSettings newSO = null;
 #if UNITY_EDITOR
@@ -377,13 +381,13 @@ namespace Ultraleap
             return new SerializedObject(Instance);
         }
 
-        static string FindPluginVersionInAssets()
+        private static string FindPluginVersionInAssets()
         {
             string pluginVersionFromAssets = "";
 
             string[] fileGUIDs = AssetDatabase.FindAssets("Version");
 
-            foreach (var guid in fileGUIDs)
+            foreach (string guid in fileGUIDs)
             {
                 string path = AssetDatabase.GUIDToAssetPath(guid);
 
@@ -404,10 +408,10 @@ namespace Ultraleap
         {
             HandPoseScriptableObject[] _handPoseSOs = Resources.FindObjectsOfTypeAll(typeof(HandPoseScriptableObject)) as HandPoseScriptableObject[];
 
-            foreach (var _handPoseSO in _handPoseSOs)
+            foreach (HandPoseScriptableObject _handPoseSO in _handPoseSOs)
             {
-                var _path = AssetDatabase.GetAssetPath(_handPoseSO);
-                var _text = File.ReadAllText(_path);
+                string _path = AssetDatabase.GetAssetPath(_handPoseSO);
+                string _text = File.ReadAllText(_path);
                 _text = _text.Replace("Fingers", "fingers");
                 File.WriteAllText(_path, _text);
 

@@ -6,8 +6,6 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Ultraleap.Examples
@@ -25,8 +23,7 @@ namespace Ultraleap.Examples
     /// </summary>
     public class IgnoreCollisionsInChildren : MonoBehaviour
     {
-
-        void Start()
+        private void Start()
         {
             IgnoreCollisionsInChildrenOf(this.transform);
         }
@@ -38,7 +35,10 @@ namespace Ultraleap.Examples
             {
                 for (int j = 0; j < colliders.Length; j++)
                 {
-                    if (i == j) continue;
+                    if (i == j)
+                    {
+                        continue;
+                    }
 
                     Physics.IgnoreCollision(colliders[i], colliders[j], ignore);
                 }

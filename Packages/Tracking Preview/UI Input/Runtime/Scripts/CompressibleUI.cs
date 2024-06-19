@@ -79,7 +79,7 @@ namespace Ultraleap.InputModule
         private void Start()
         {
             //Reset the Positions of the UI Elements on both Start and Quit
-            for (var i = 0; i < Layers.Length; i++)
+            for (int i = 0; i < Layers.Length; i++)
             {
                 if (Layers[i].LayerTransform != null && Layers[i].LayerTransform != transform)
                 {
@@ -266,7 +266,7 @@ namespace Ultraleap.InputModule
     {
         public static float Remap(this float value, float from1, float to1, float from2, float to2)
         {
-            return (value - from1) / (to1 - from1) * (to2 - from2) + from2;
+            return ((value - from1) / (to1 - from1) * (to2 - from2)) + from2;
         }
     }
 }

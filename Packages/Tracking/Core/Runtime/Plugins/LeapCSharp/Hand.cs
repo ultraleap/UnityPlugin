@@ -10,7 +10,6 @@ using UnityEngine;
 namespace Ultraleap
 {
     using System;
-    using System.Collections.Generic;
     /// <summary>
     /// The Hand class reports the physical characteristics of a detected hand.
     /// 
@@ -179,8 +178,7 @@ namespace Ultraleap
         /// @since 1.0
         /// </summary>
         public Vector3 Direction;
-
-        LeapTransform _basis = new LeapTransform(Vector3.one, Quaternion.identity);
+        private LeapTransform _basis = new LeapTransform(Vector3.one, Quaternion.identity);
 
         /// <summary>
         /// The transform of the hand.

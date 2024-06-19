@@ -32,14 +32,12 @@ namespace Ultraleap
     [CustomEditor(typeof(HandPoseScriptableObject))]
     public class HandPoseSerializableObjectEditor : CustomEditorBase<HandPoseScriptableObject>
     {
-        const float TOGGLE_SIZE = 15.0F;
-
-        Texture _handTex;
-        Rect _handTexRect;
-
-        float _boneThresholdSlider = 15f;
-        bool _sliderHasChanged = false;
-        bool _showFineTuningOptions = false;
+        private const float TOGGLE_SIZE = 15.0F;
+        private Texture _handTex;
+        private Rect _handTexRect;
+        private float _boneThresholdSlider = 15f;
+        private bool _sliderHasChanged = false;
+        private bool _showFineTuningOptions = false;
 
         protected override void OnEnable()
         {
@@ -120,8 +118,8 @@ namespace Ultraleap
                         EditorGUILayout.BeginHorizontal();
                         EditorGUILayout.LabelField(new GUIContent(GetJointName(jointID), thresholdTooltip), GUILayout.Width(120));
                         GUILayout.FlexibleSpace();
-                        var flex = EditorGUILayout.FloatField(new GUIContent("Flex:", thresholdTooltip), target.fingerJointRotationThresholds[fingerID].jointThresholds[jointID].x, GUILayout.Width(80));
-                        var abd = EditorGUILayout.FloatField(new GUIContent("Abd:", thresholdTooltip), target.fingerJointRotationThresholds[fingerID].jointThresholds[jointID].y, GUILayout.Width(80));
+                        float flex = EditorGUILayout.FloatField(new GUIContent("Flex:", thresholdTooltip), target.fingerJointRotationThresholds[fingerID].jointThresholds[jointID].x, GUILayout.Width(80));
+                        float abd = EditorGUILayout.FloatField(new GUIContent("Abd:", thresholdTooltip), target.fingerJointRotationThresholds[fingerID].jointThresholds[jointID].y, GUILayout.Width(80));
                         EditorGUILayout.EndHorizontal();
 
                         target.fingerJointRotationThresholds[fingerID].jointThresholds[jointID] = new Vector2(flex, abd);
@@ -133,7 +131,7 @@ namespace Ultraleap
                         EditorGUILayout.BeginHorizontal();
                         EditorGUILayout.LabelField(new GUIContent(GetJointName(jointID), thresholdTooltip), GUILayout.Width(120));
                         GUILayout.FlexibleSpace();
-                        var flex = EditorGUILayout.FloatField(new GUIContent("Flex:", thresholdTooltip), target.fingerJointRotationThresholds[fingerID].jointThresholds[jointID].x, GUILayout.Width(80));
+                        float flex = EditorGUILayout.FloatField(new GUIContent("Flex:", thresholdTooltip), target.fingerJointRotationThresholds[fingerID].jointThresholds[jointID].x, GUILayout.Width(80));
                         GUILayout.Space(83);
                         EditorGUILayout.EndHorizontal();
 
@@ -145,7 +143,7 @@ namespace Ultraleap
             }
         }
 
-        string GetJointName(int jointID)
+        private string GetJointName(int jointID)
         {
             switch (jointID)
             {
@@ -160,7 +158,7 @@ namespace Ultraleap
             return "Joint " + jointID;
         }
 
-        string GetFingerName(int fingerID)
+        private string GetFingerName(int fingerID)
         {
             switch (fingerID)
             {
@@ -179,7 +177,7 @@ namespace Ultraleap
             return "Finger " + fingerID;
         }
 
-        bool ShouldShowFinger(int fingerID)
+        private bool ShouldShowFinger(int fingerID)
         {
             switch (fingerID)
             {
@@ -254,15 +252,15 @@ namespace Ultraleap
         }
         private Rect MakeToggleRect(Vector2 centerPos)
         {
-            return new Rect(centerPos.x - TOGGLE_SIZE / 2F, centerPos.y - TOGGLE_SIZE / 2F, TOGGLE_SIZE, TOGGLE_SIZE);
+            return new Rect(centerPos.x - (TOGGLE_SIZE / 2F), centerPos.y - (TOGGLE_SIZE / 2F), TOGGLE_SIZE, TOGGLE_SIZE);
         }
     }
 
     [CustomEditor(typeof(HandPoseDetector))]
     public class PoseDetectionEditor : Editor
     {
-        bool _showFineTuningOptions = false;
-        string fineTuningOptionsButtonLabel = "Show Fine Tuning Options";
+        private bool _showFineTuningOptions = false;
+        private string fineTuningOptionsButtonLabel = "Show Fine Tuning Options";
 
         private enum FingerName
         {
@@ -273,16 +271,17 @@ namespace Ultraleap
             PinkyFinger = 4,
             Palm = 5
         }
-        FingerName fingerName = FingerName.IndexFinger;
+
+        private FingerName fingerName = FingerName.IndexFinger;
         private enum BoneName
         {
             Proximal = 1,
             Intermediate = 2,
             Distal = 3
         }
-        BoneName boneName = BoneName.Distal;
 
-        List<bool> sourceFoldout = new List<bool>();
+        private BoneName boneName = BoneName.Distal;
+        private List<bool> sourceFoldout = new List<bool>();
 
         public override void OnInspectorGUI()
         {
@@ -310,7 +309,7 @@ namespace Ultraleap
             #region Bone Directions 
 
             EditorGUILayout.LabelField("Direction Rules", EditorStyles.boldLabel);
-            var thinGreyLine = EditorGUILayout.GetControlRect(false, GUILayout.Height(2), GUILayout.Width(Screen.width));
+            Rect thinGreyLine = EditorGUILayout.GetControlRect(false, GUILayout.Height(2), GUILayout.Width(Screen.width));
             EditorGUI.DrawRect(thinGreyLine, Color.grey);
 
             string poseDirectionExplanationText = "Rules allow you to limit when your pose will be detected. \n\n" +
@@ -318,7 +317,7 @@ namespace Ultraleap
 
             GUILayout.BeginVertical();
             EditorStyles.textField.clipping = TextClipping.Overflow;
-            var textArea = EditorStyles.textArea.CalcHeight(new GUIContent(poseDirectionExplanationText), Screen.width);
+            float textArea = EditorStyles.textArea.CalcHeight(new GUIContent(poseDirectionExplanationText), Screen.width);
             EditorStyles.textField.wordWrap = true;
             GUILayout.Label(poseDirectionExplanationText, EditorStyles.textField);
             GUILayout.EndVertical();
@@ -339,7 +338,7 @@ namespace Ultraleap
             if (sourceFoldout.Count != sources.arraySize)
             {
                 sourceFoldout.Clear();
-                foreach (var item in sources)
+                foreach (object item in sources)
                 {
                     sourceFoldout.Add(true);
                 }
@@ -347,7 +346,7 @@ namespace Ultraleap
 
             for (int i = 0; i < sources.arraySize; i++)
             {
-                var source = sources.GetArrayElementAtIndex(i);
+                SerializedProperty source = sources.GetArrayElementAtIndex(i);
                 fingerName = (FingerName)source.FindPropertyRelative("finger").intValue;
 
                 sourceFoldout[i] = EditorGUILayout.BeginFoldoutHeaderGroup(sourceFoldout.ElementAt(i),
@@ -373,14 +372,14 @@ namespace Ultraleap
                     GUILayout.Space(5);
 
                     GUILayout.Space(5);
-                    var thinnerGreyLine = EditorGUILayout.GetControlRect(false, GUILayout.Height(1), GUILayout.Width(Screen.width));
+                    Rect thinnerGreyLine = EditorGUILayout.GetControlRect(false, GUILayout.Height(1), GUILayout.Width(Screen.width));
                     EditorGUI.DrawRect(thinnerGreyLine, Color.grey);
 
-                    var directionList = source.FindPropertyRelative("directions");
+                    SerializedProperty directionList = source.FindPropertyRelative("directions");
                     for (int j = 0; j < directionList.arraySize; j++)
                     {
                         EditorGUI.indentLevel = 0;
-                        var direction = directionList.GetArrayElementAtIndex(j);
+                        SerializedProperty direction = directionList.GetArrayElementAtIndex(j);
 
                         direction.FindPropertyRelative("enabled").boolValue = EditorGUILayout.BeginToggleGroup(GetTargetName(direction), direction.FindPropertyRelative("enabled").boolValue);
 
@@ -421,7 +420,7 @@ namespace Ultraleap
                         EditorGUILayout.EndHorizontal();
                         GUILayout.Space(5);
 
-                        var thinnerGreyLine2 = EditorGUILayout.GetControlRect(false, GUILayout.Height(1), GUILayout.Width(Screen.width));
+                        Rect thinnerGreyLine2 = EditorGUILayout.GetControlRect(false, GUILayout.Height(1), GUILayout.Width(Screen.width));
                         EditorGUI.DrawRect(thinnerGreyLine2, Color.grey);
                         GUILayout.Space(5);
                     }
@@ -455,7 +454,7 @@ namespace Ultraleap
             #endregion
 
             EditorGUILayout.LabelField("Pose Events", EditorStyles.boldLabel);
-            var thinGreyLine2 = EditorGUILayout.GetControlRect(false, GUILayout.Height(2), GUILayout.Width(Screen.width));
+            Rect thinGreyLine2 = EditorGUILayout.GetControlRect(false, GUILayout.Height(2), GUILayout.Width(Screen.width));
             EditorGUI.DrawRect(thinGreyLine2, Color.grey);
 
             EditorGUILayout.PropertyField(serializedObject.FindProperty("OnPoseDetected"));
@@ -478,7 +477,8 @@ namespace Ultraleap
             }
             serializedObject.ApplyModifiedProperties();
         }
-        string GetTargetName(SerializedProperty direction)
+
+        private string GetTargetName(SerializedProperty direction)
         {
             HandPoseDetector.TypeOfDirectionCheck dir = (HandPoseDetector.TypeOfDirectionCheck)direction.FindPropertyRelative("typeOfDirectionCheck").enumValueIndex;
 
@@ -501,7 +501,7 @@ namespace Ultraleap
     [CustomEditor(typeof(HandPoseEditor), editorForChildClasses: true)]
     public class HandPoseEditorEditor : CustomEditorBase<HandPoseEditor>
     {
-        bool _showFineTuningOptions = false;
+        private bool _showFineTuningOptions = false;
 
         protected override void OnEnable()
         {

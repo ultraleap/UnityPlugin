@@ -124,7 +124,7 @@ namespace LeapInternal
             finger.TipPosition = distal.NextJoint;
             finger.Direction = intermediate.Direction;
             finger.Width = intermediate.Width;
-            finger.Length = (leapBone.finger_id == 0 ? 0.0f : 0.5f * proximal.Length) + intermediate.Length + 0.77f * distal.Length; //The values 0.5 for proximal and 0.77 for distal are used in platform code for this calculation
+            finger.Length = (leapBone.finger_id == 0 ? 0.0f : 0.5f * proximal.Length) + intermediate.Length + (0.77f * distal.Length); //The values 0.5 for proximal and 0.77 for distal are used in platform code for this calculation
             finger.IsExtended = leapBone.is_extended != 0;
             finger.Type = type;
 
@@ -142,7 +142,7 @@ namespace LeapInternal
             bone.Type = type;
             bone.PrevJoint = leapBone.prev_joint.ToVector3();
             bone.NextJoint = leapBone.next_joint.ToVector3();
-            bone.Direction = (bone.NextJoint - bone.PrevJoint);
+            bone.Direction = bone.NextJoint - bone.PrevJoint;
             bone.Length = bone.Direction.magnitude;
 
             if (bone.Length < float.Epsilon)

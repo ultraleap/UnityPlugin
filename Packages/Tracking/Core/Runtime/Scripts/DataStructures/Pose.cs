@@ -58,7 +58,7 @@ namespace Ultraleap
         /// </summary>
         public static Pose mul(this Pose pose, Vector3 localPosition)
         {
-            return new Pose(pose.position + pose.rotation * localPosition,
+            return new Pose(pose.position + (pose.rotation * localPosition),
                             pose.rotation);
         }
 
@@ -91,8 +91,16 @@ namespace Ultraleap
         /// </summary>
         public static Pose Lerp(this Pose a, Pose b, float t)
         {
-            if (t >= 1f) return b;
-            if (t <= 0f) return a;
+            if (t >= 1f)
+            {
+                return b;
+            }
+
+            if (t <= 0f)
+            {
+                return a;
+            }
+
             return new Pose(Vector3.Lerp(a.position, b.position, t),
                             Quaternion.Lerp(Quaternion.Slerp(a.rotation, b.rotation, t), Quaternion.identity, 0f));
         }

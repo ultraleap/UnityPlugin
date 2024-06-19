@@ -101,7 +101,10 @@ namespace Ultraleap
         public bool TryEnqueue(ref T t)
         {
             uint nextTail = (_tail + 1) & _bufferMask;
-            if (nextTail == _head) return false;
+            if (nextTail == _head)
+            {
+                return false;
+            }
 
             _buffer[_tail] = t;
             _tail = nextTail;

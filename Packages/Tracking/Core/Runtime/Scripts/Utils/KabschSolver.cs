@@ -14,8 +14,8 @@ namespace Ultraleap
 
     public class KabschSolver
     {
-        Vector3[] QuatBasis = new Vector3[3];
-        Vector3[] DataCovariance = new Vector3[3];
+        private Vector3[] QuatBasis = new Vector3[3];
+        private Vector3[] DataCovariance = new Vector3[3];
         public Vector3 translation = Vector3.zero;
         public Quaternion OptimalRotation = Quaternion.identity;
         public float scaleRatio = 1f;
@@ -50,7 +50,7 @@ namespace Ultraleap
                     inScale += (new Vector3(inPoints[i].x, inPoints[i].y, inPoints[i].z) - inCentroid).magnitude;
                     refScale += (new Vector3(refPoints[i].x, refPoints[i].y, refPoints[i].z) - refCentroid).magnitude;
                 }
-                scaleRatio = (refScale / inScale);
+                scaleRatio = refScale / inScale;
             }
             else { scaleRatio = 1f; }
 
@@ -71,7 +71,7 @@ namespace Ultraleap
         }
 
         //https://animation.rwth-aachen.de/media/papers/2016-MIG-StableRotation.pdf
-        void extractRotation(Vector3[] A, ref Quaternion q, int optimalRotationIterations = 9)
+        private void extractRotation(Vector3[] A, ref Quaternion q, int optimalRotationIterations = 9)
         {
             for (int iter = 0; iter < optimalRotationIterations; iter++)
             {
@@ -85,14 +85,17 @@ namespace Ultraleap
 
                 float w = omega.magnitude;
                 if (w < 0.000000001f)
+                {
                     break;
+                }
+
                 q = Quaternion.AngleAxis(w * Mathf.Rad2Deg, omega / w) * q;
                 q = Quaternion.Lerp(q, q, 0f); //Normalizes the Quaternion; critical for error suppression
             }
         }
 
         //Calculate Covariance Matrices --------------------------------------------------
-        Vector3[] TransposeMult(List<Vector3> vec1, List<Vector3> vec2, Vector3[] covariance)
+        private Vector3[] TransposeMult(List<Vector3> vec1, List<Vector3> vec2, Vector3[] covariance)
         {
             for (int i = 0; i < 3; i++)
             { //i is the row in this matrix

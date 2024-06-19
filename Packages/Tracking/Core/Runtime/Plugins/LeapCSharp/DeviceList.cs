@@ -36,7 +36,9 @@ namespace Ultraleap
             for (int d = 0; d < this.Count; d++)
             {
                 if (this[d].Handle == deviceHandle)
+                {
                     return this[d];
+                }
             }
             return null;
         }
@@ -49,7 +51,9 @@ namespace Ultraleap
             for (int d = 0; d < this.Count; d++)
             {
                 if (this[d].DeviceID == deviceID)
+                {
                     return this[d];
+                }
             }
             return null;
         }

@@ -174,14 +174,14 @@ namespace Ultraleap.HandsModule
                             Vector3 direction = leapBone.Direction;
 
                             //Calculate the tip position
-                            Vector3 tipPosition = (distalBoundBonePosition + direction * (length * fingerTipScale));
+                            Vector3 tipPosition = distalBoundBonePosition + (direction * (length * fingerTipScale));
                             leapFinger.TipPosition = tipPosition;
 
                             //Calculate the center of the finger
                             Vector3 center = Vector3.Lerp(distalBoundBonePosition, tipPosition, 0.5f);
 
                             //Get the direction of distal to tip
-                            Vector3 distalDirection = (distalBoundBonePosition - tipPosition);
+                            Vector3 distalDirection = distalBoundBonePosition - tipPosition;
 
                             //Set the leap finger
                             leapFinger.bones[leapBoneID] = new Bone(distalBoundBonePosition, tipPosition, center, distalDirection, distalDirection.magnitude, leapBone.Width, leapBone.Type, leapBone.Rotation);
@@ -239,7 +239,7 @@ namespace Ultraleap.HandsModule
                     Vector3 elbowPos = boundHand.elbow.boundTransform.position;
                     Vector3 wristPos = boundHand.wrist.boundTransform.position;
                     Vector3 center = Vector3.Lerp(elbowPos, wristPos, 0.5f);
-                    Vector3 dir = (elbowPos - wristPos);
+                    Vector3 dir = elbowPos - wristPos;
                     float length = dir.magnitude;
 
                     //Set the data on the leap Arm

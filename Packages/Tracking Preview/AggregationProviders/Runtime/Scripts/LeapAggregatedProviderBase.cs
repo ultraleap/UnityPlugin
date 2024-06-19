@@ -6,8 +6,6 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Ultraleap.Encoding;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -36,21 +34,23 @@ namespace Ultraleap
             ReuseUpdateForPhysics,
             ReusePhysicsForUpdate,
         }
+
         [Tooltip("When enabled, the provider will only calculate one leap frame instead of two.")]
         [SerializeField]
         protected FrameOptimizationMode _frameOptimization = FrameOptimizationMode.None;
 
-        #endregion
+        #endregion Inspector
 
         #region Internal Settings & Memory
 
         protected Frame _transformedUpdateFrame, _transformedFixedFrame;
 
         // list of frames that are send to MergeFrames() to aggregate to a single frame
-        Frame[] updateFramesToCombine;
-        Frame[] fixedUpdateFramesToCombine;
+        private Frame[] updateFramesToCombine;
 
-        #endregion
+        private Frame[] fixedUpdateFramesToCombine;
+
+        #endregion Internal Settings & Memory
 
         #region Edit-time Frame Data
 
@@ -82,6 +82,7 @@ namespace Ultraleap
 
         private Dictionary<TestHandFactory.TestHandPose, Hand> _cachedLeftHands
           = new Dictionary<TestHandFactory.TestHandPose, Hand>();
+
         private Hand _editTimeLeftHand
         {
             get
@@ -102,6 +103,7 @@ namespace Ultraleap
 
         private Dictionary<TestHandFactory.TestHandPose, Hand> _cachedRightHands
           = new Dictionary<TestHandFactory.TestHandPose, Hand>();
+
         private Hand _editTimeRightHand
         {
             get
@@ -122,7 +124,7 @@ namespace Ultraleap
 
 #endif
 
-        #endregion
+        #endregion Edit-time Frame Data
 
         #region LeapProvider Implementation
 
@@ -178,7 +180,7 @@ namespace Ultraleap
             }
         }
 
-        #endregion
+        #endregion LeapProvider Implementation
 
         #region Unity Events
 
@@ -208,9 +210,15 @@ namespace Ultraleap
         /// </summary>
         private bool detectCircularProviderReference(LeapAggregatedProviderBase currentProvider, List<LeapAggregatedProviderBase> seenProviders)
         {
-            if (currentProvider.providers == null) return false;
+            if (currentProvider.providers == null)
+            {
+                return false;
+            }
 
-            if (seenProviders.Contains(currentProvider)) return true;
+            if (seenProviders.Contains(currentProvider))
+            {
+                return true;
+            }
 
             foreach (LeapProvider provider in currentProvider.providers)
             {
@@ -218,7 +226,10 @@ namespace Ultraleap
                 {
                     List<LeapAggregatedProviderBase> newSeenProvider = new List<LeapAggregatedProviderBase>(seenProviders);
                     newSeenProvider.Add(currentProvider);
-                    if (detectCircularProviderReference(provider as LeapAggregatedProviderBase, newSeenProvider)) return true;
+                    if (detectCircularProviderReference(provider as LeapAggregatedProviderBase, newSeenProvider))
+                    {
+                        return true;
+                    }
                 }
             }
             return false;
@@ -226,7 +237,7 @@ namespace Ultraleap
 
         protected virtual void Awake()
         {
-            // if any of the providers are aggregation providers, warn the user 
+            // if any of the providers are aggregation providers, warn the user
             foreach (LeapProvider provider in providers)
             {
                 if (provider is LeapAggregatedProviderBase)
@@ -248,12 +259,18 @@ namespace Ultraleap
                 providers[i].OnUpdateFrame += (x) =>
                 {
                     updateFramesToCombine[idx] = x;
-                    if (CheckFramesFilled(updateFramesToCombine)) UpdateFrame();
+                    if (CheckFramesFilled(updateFramesToCombine))
+                    {
+                        UpdateFrame();
+                    }
                 };
                 providers[i].OnFixedFrame += (x) =>
                 {
                     fixedUpdateFramesToCombine[idx] = x;
-                    if (CheckFramesFilled(fixedUpdateFramesToCombine)) UpdateFixedFrame();
+                    if (CheckFramesFilled(fixedUpdateFramesToCombine))
+                    {
+                        UpdateFixedFrame();
+                    }
                 };
             }
         }
@@ -272,16 +289,18 @@ namespace Ultraleap
             Ultraleap.Utils.Fill(fixedUpdateFramesToCombine, null);
         }
 
-
-        #endregion
+        #endregion Unity Events
 
         #region aggregation functions
 
-        bool CheckFramesFilled(Frame[] frames)
+        private bool CheckFramesFilled(Frame[] frames)
         {
             foreach (Frame frame in frames)
             {
-                if (frame == null) return false;
+                if (frame == null)
+                {
+                    return false;
+                }
             }
             return true;
         }
@@ -317,7 +336,6 @@ namespace Ultraleap
 
         protected virtual void UpdateFixedFrame()
         {
-
             // merge all fixed update frames
             _transformedFixedFrame = MergeFrames(fixedUpdateFramesToCombine);
 
@@ -337,14 +355,14 @@ namespace Ultraleap
         }
 
         /// <summary>
-        /// defines how a list of frames can be merged into a single frame. 
+        /// defines how a list of frames can be merged into a single frame.
         /// This needs to be implemented in every aggregation provider
         /// </summary>
         /// <param name="frames"> a list of all frames received from the providers</param>
         /// <returns> a merged frame </returns>
         protected abstract Frame MergeFrames(Frame[] frames);
 
-        #endregion
+        #endregion aggregation functions
 
         #region Internal Methods
 
@@ -353,8 +371,6 @@ namespace Ultraleap
             dest.CopyFrom(source).Transform(new LeapTransform(transform));
         }
 
-        #endregion
-
+        #endregion Internal Methods
     }
-
 }

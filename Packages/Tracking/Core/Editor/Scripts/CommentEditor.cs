@@ -65,7 +65,7 @@ namespace Ultraleap
             else
             {
                 EditorGUILayout.Space();
-                var rect = GUILayoutUtility.GetRect(new GUIContent(text), _displayStyle);
+                Rect rect = GUILayoutUtility.GetRect(new GUIContent(text), _displayStyle);
                 EditorGUI.SelectableLabel(rect, text, _displayStyle);
             }
         }

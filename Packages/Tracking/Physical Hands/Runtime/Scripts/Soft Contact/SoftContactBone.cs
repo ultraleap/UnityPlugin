@@ -40,9 +40,9 @@ namespace Ultraleap.PhysicalHands
             ContactUtils.SetupBoneCollider(boneCollider, bone);
         }
 
-        Vector3 lastTargetPosition;
-        float softContactDislocationDistance = 0.03F;
-        float teleportDistance = 0.05F;
+        private Vector3 lastTargetPosition;
+        private float softContactDislocationDistance = 0.03F;
+        private float teleportDistance = 0.05F;
 
         private const float DEAD_ZONE = 0.0005F;
         private float scale { get { return this.transform.lossyScale.x; } }
@@ -77,7 +77,7 @@ namespace Ultraleap.PhysicalHands
             // Attempt to move the contact bone to its target position and rotation
             // by setting its target velocity and angular velocity. Include a "deadzone"
             // for position to avoid tiny vibrations.
-            Vector3 delta = (targetPosition - Collider.attachedRigidbody.position);
+            Vector3 delta = targetPosition - Collider.attachedRigidbody.position;
             float deltaMag = delta.magnitude;
 
             if (deltaMag <= DEAD_ZONE)

@@ -39,7 +39,10 @@ namespace Ultraleap.Attributes
                 int index = 0;
                 for (int i = 0; i < names.Length; i++)
                 {
-                    if (values[i] == 0) continue;
+                    if (values[i] == 0)
+                    {
+                        continue;
+                    }
 
                     _enumNames[index] = names[i];
                     _enumValues[index] = values[i];
@@ -52,7 +55,7 @@ namespace Ultraleap.Attributes
             {
                 if ((property.intValue & _enumValues[i]) != 0)
                 {
-                    convertedMask |= (1 << i);
+                    convertedMask |= 1 << i;
                 }
             }
 

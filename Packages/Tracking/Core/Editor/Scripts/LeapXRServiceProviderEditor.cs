@@ -14,9 +14,8 @@ namespace Ultraleap
     [CustomEditor(typeof(LeapXRServiceProvider))]
     public class LeapXRServiceProviderEditor : LeapServiceProviderEditor
     {
-        SerializedProperty _mainCamera;
-
-        string[] testHandPoses = new string[] { "HeadMountedA", "HeadMountedB" };
+        private SerializedProperty _mainCamera;
+        private string[] testHandPoses = new string[] { "HeadMountedA", "HeadMountedB" };
 
         protected override void OnEnable()
         {

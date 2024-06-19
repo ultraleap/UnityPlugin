@@ -94,7 +94,7 @@ namespace Ultraleap
 
             Rect btPosition = GUILayoutUtility.GetRect(_addButtonContent, GUI.skin.button);
             const float addButonWidth = 200f;
-            btPosition.x = btPosition.x + (btPosition.width - addButonWidth) / 2;
+            btPosition.x = btPosition.x + ((btPosition.width - addButonWidth) / 2);
             btPosition.width = addButonWidth;
             if (GUI.Button(btPosition, _addButtonContent))
             {
@@ -106,11 +106,15 @@ namespace Ultraleap
 
         public bool HasAnyCallbacks(int enumValue)
         {
-            if (_entries == null) return false;
+            if (_entries == null)
+            {
+                return false;
+            }
+
             for (int i = 0; i < _entries.arraySize; i++)
             {
-                var entryProperty = _entries.GetArrayElementAtIndex(i);
-                var enumValueProperty = entryProperty.FindPropertyRelative("enumValue");
+                SerializedProperty entryProperty = _entries.GetArrayElementAtIndex(i);
+                SerializedProperty enumValueProperty = entryProperty.FindPropertyRelative("enumValue");
                 if (enumValueProperty.intValue == enumValue)
                 {
                     return true;

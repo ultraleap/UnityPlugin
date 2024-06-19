@@ -6,8 +6,8 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Ultraleap.Attributes;
 using System;
+using Ultraleap.Attributes;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -397,9 +397,9 @@ namespace Ultraleap
             }
         }
 
-        void LateUpdate()
+        private void LateUpdate()
         {
-            var projectionMatrix = mainCamera == null ? Matrix4x4.identity
+            Matrix4x4 projectionMatrix = mainCamera == null ? Matrix4x4.identity
               : mainCamera.projectionMatrix;
             switch (SystemInfo.graphicsDeviceType)
             {
@@ -412,8 +412,8 @@ namespace Ultraleap
                     // Scale and bias from OpenGL -> D3D depth range
                     for (int i = 0; i < 4; i++)
                     {
-                        projectionMatrix[2, i] = projectionMatrix[2, i] * 0.5f
-                                               + projectionMatrix[3, i] * 0.5f;
+                        projectionMatrix[2, i] = (projectionMatrix[2, i] * 0.5f)
+                                               + (projectionMatrix[3, i] * 0.5f);
                     }
                     break;
             }
@@ -426,9 +426,9 @@ namespace Ultraleap
                                              out pastPosition, out pastRotation);
 
             // Use _tweenImageWarping
-            var currCenterRotation = XRSupportUtil.GetXRNodeCenterEyeLocalRotation();
+            Quaternion currCenterRotation = XRSupportUtil.GetXRNodeCenterEyeLocalRotation();
 
-            var imageReferenceRotation = _temporalWarpingMode != TemporalWarpingMode.Off
+            Quaternion imageReferenceRotation = _temporalWarpingMode != TemporalWarpingMode.Off
                                                               ? pastRotation
                                                               : currCenterRotation;
 
@@ -478,8 +478,8 @@ namespace Ultraleap
                 {
                     if (mainCamera.transform.parent != null)
                     {
-                        var cameraSpacePosition = mainCamera.transform.parent.InverseTransformPoint(mainCamera.transform.position);
-                        var cameraSpaceRotation = mainCamera.transform.parent.InverseTransformRotation(mainCamera.transform.rotation);
+                        Vector3 cameraSpacePosition = mainCamera.transform.parent.InverseTransformPoint(mainCamera.transform.position);
+                        Quaternion cameraSpaceRotation = mainCamera.transform.parent.InverseTransformRotation(mainCamera.transform.rotation);
 
                         trackedPose = new Pose(cameraSpacePosition, cameraSpaceRotation);
                     }
@@ -538,7 +538,11 @@ namespace Ultraleap
         /// </summary>
         protected override void initializeFlags()
         {
-            if (_preventInitializingTrackingMode) return;
+            if (_preventInitializingTrackingMode)
+            {
+                return;
+            }
+
             ChangeTrackingMode(TrackingOptimizationMode.HMD);
         }
 
@@ -607,8 +611,8 @@ namespace Ultraleap
             //Calculate a Temporally Warped Pose
             else if (updateTemporalCompensation)
             {
-                var imageAdjustment = _temporalWarpingMode == TemporalWarpingMode.Images ? -20000 : 0;
-                var sampleTimestamp = timestamp - (long)(warpingAdjustment * 1000f) - imageAdjustment;
+                int imageAdjustment = _temporalWarpingMode == TemporalWarpingMode.Images ? -20000 : 0;
+                long sampleTimestamp = timestamp - (long)(warpingAdjustment * 1000f) - imageAdjustment;
                 transformHistory.SampleTransform(sampleTimestamp, _useInterpolation, out warpedPosition, out warpedRotation);
             }
 
@@ -625,15 +629,15 @@ namespace Ultraleap
                     }
                     else // Fall back to the consts if we are given a Pose.identity as it is assumed to be false
                     {
-                        warpedPosition += warpedRotation * Vector3.up * deviceOffsetYAxis
-                                        + warpedRotation * Vector3.forward * deviceOffsetZAxis;
+                        warpedPosition += (warpedRotation * Vector3.up * deviceOffsetYAxis)
+                                        + (warpedRotation * Vector3.forward * deviceOffsetZAxis);
                         warpedRotation *= Quaternion.Euler(deviceTiltXAxis, 0f, 0f);
                         warpedRotation *= Quaternion.Euler(-90f, 180f, 0f); // Tracking devices point forward in XR, not up!
                     }
                     break;
                 case DeviceOffsetMode.ManualHeadOffset:
-                    warpedPosition += warpedRotation * Vector3.up * deviceOffsetYAxis
-                                    + warpedRotation * Vector3.forward * deviceOffsetZAxis;
+                    warpedPosition += (warpedRotation * Vector3.up * deviceOffsetYAxis)
+                                    + (warpedRotation * Vector3.forward * deviceOffsetZAxis);
                     warpedRotation *= Quaternion.Euler(deviceTiltXAxis, 0f, 0f);
                     warpedRotation *= Quaternion.Euler(-90f, 180f, 0f); // Tracking devices point forward in XR, not up!
                     break;
@@ -713,12 +717,12 @@ namespace Ultraleap
                     }
 
                     //Determine their new Transforms
-                    var interpolationTime = CalculateInterpolationTime();
+                    long interpolationTime = CalculateInterpolationTime();
                     _leapController.GetInterpolatedLeftRightTransform(
                                       interpolationTime + (ExtrapolationAmount * 1000),
                                       interpolationTime - (BounceAmount * 1000),
-                                      (leftHand != null ? leftHand.Id : 0),
-                                      (rightHand != null ? rightHand.Id : 0),
+                                      leftHand != null ? leftHand.Id : 0,
+                                      rightHand != null ? rightHand.Id : 0,
                                       _currentDevice,
                                       out precullLeftHand,
                                       out precullRightHand);

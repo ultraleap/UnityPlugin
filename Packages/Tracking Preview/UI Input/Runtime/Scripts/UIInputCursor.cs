@@ -6,7 +6,6 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using System;
 using UnityEngine;
 using UnityEngine.UI;
 

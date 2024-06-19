@@ -211,13 +211,13 @@ namespace Ultraleap.PhysicalHands
             for (int fingerIndex = 0; fingerIndex < FINGERS; fingerIndex++)
             {
                 lastTransform = palmBone.transform;
-                knuckleBone = leapHand.fingers[fingerIndex].GetBone((Bone.BoneType)(0));
+                knuckleBone = leapHand.fingers[fingerIndex].GetBone((Bone.BoneType)0);
 
                 for (int jointIndex = 0; jointIndex < FINGER_BONES; jointIndex++)
                 {
-                    prevBone = leapHand.fingers[fingerIndex].GetBone((Bone.BoneType)(jointIndex));
+                    prevBone = leapHand.fingers[fingerIndex].GetBone((Bone.BoneType)jointIndex);
 
-                    boneArrayIndex = fingerIndex * FINGER_BONES + jointIndex;
+                    boneArrayIndex = (fingerIndex * FINGER_BONES) + jointIndex;
 
                     bones[boneArrayIndex] = new GameObject($"{HandUtils.FingerIndexToName(fingerIndex)} {HandUtils.JointIndexToName(jointIndex + 1)}", boneType).GetComponent<ContactBone>();
                     bone = bones[boneArrayIndex];
@@ -263,7 +263,7 @@ namespace Ultraleap.PhysicalHands
         /// <returns></returns>
         public ContactBone GetBone(int fingerIndex, int jointIndex)
         {
-            return bones[fingerIndex * FINGER_BONES + jointIndex];
+            return bones[(fingerIndex * FINGER_BONES) + jointIndex];
         }
 
         protected void CacheHandData(Hand dataHand)
@@ -340,16 +340,16 @@ namespace Ultraleap.PhysicalHands
                 return;
             }
 
-            foreach (var collider in colliders)
+            foreach (Collider collider in colliders)
             {
                 Physics.IgnoreCollision(collider, palmBone.palmCollider, ignore);
 
-                foreach (var palmEdgeCollider in palmBone.palmEdgeColliders)
+                foreach (CapsuleCollider palmEdgeCollider in palmBone.palmEdgeColliders)
                 {
                     Physics.IgnoreCollision(collider, palmEdgeCollider, ignore);
                 }
 
-                foreach (var bone in bones)
+                foreach (ContactBone bone in bones)
                 {
                     Physics.IgnoreCollision(collider, bone.boneCollider, ignore);
                 }
@@ -382,14 +382,16 @@ namespace Ultraleap.PhysicalHands
         private bool IsObjectInHandRadius(Rigidbody rigid, float extraRadius = 0f)
         {
             if (rigid == null)
+            {
                 return false;
+            }
 
             if (IsObjectInBoneRadius(rigid, palmBone, extraRadius))
             {
                 return true;
             }
 
-            foreach (var bone in bones)
+            foreach (ContactBone bone in bones)
             {
                 if (IsObjectInBoneRadius(rigid, bone, extraRadius))
                 {

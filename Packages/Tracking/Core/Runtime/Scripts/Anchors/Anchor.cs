@@ -8,8 +8,8 @@
 
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 using Ultraleap.Attachments;
+using UnityEngine;
 
 namespace Ultraleap
 {
@@ -100,28 +100,28 @@ namespace Ultraleap
 
         #endregion
 
-        void Awake()
+        private void Awake()
         {
             allAnchors.Add(this);
         }
 
-        void OnEnable()
+        private void OnEnable()
         {
             if (matchActiveStateWithAttachedObjects)
             {
-                foreach (var anchObj in _anchoredObjects)
+                foreach (AnchorableBehaviour anchObj in _anchoredObjects)
                 {
                     anchObj.gameObject.SetActive(true);
                 }
             }
         }
 
-        void Start()
+        private void Start()
         {
             initUnityEvents();
         }
 
-        void Update()
+        private void Update()
         {
             updateAnchorCallbacks();
         }
@@ -136,7 +136,7 @@ namespace Ultraleap
 
             if (handObject != null)
             {
-                return (ChiralitySelection)((int)handObject.chirality);
+                return (ChiralitySelection)(int)handObject.chirality;
             }
             else
             {
@@ -144,21 +144,21 @@ namespace Ultraleap
             }
         }
 
-        void OnDisable()
+        private void OnDisable()
         {
             if (matchActiveStateWithAttachedObjects)
             {
-                foreach (var anchObj in _anchoredObjects)
+                foreach (AnchorableBehaviour anchObj in _anchoredObjects)
                 {
                     anchObj.gameObject.SetActive(false);
                 }
             }
         }
 
-        void OnDestroy()
+        private void OnDestroy()
         {
-            var tempGroups = new HashSet<AnchorGroup>(groups);
-            foreach (var group in tempGroups)
+            HashSet<AnchorGroup> tempGroups = new HashSet<AnchorGroup>(groups);
+            foreach (AnchorGroup group in tempGroups)
             {
                 group.Remove(this);
             }
@@ -221,7 +221,7 @@ namespace Ultraleap
 
         public static Color AnchorGizmoColor = new Color(0.6F, 0.2F, 0.8F);
 
-        void OnDrawGizmosSelected()
+        private void OnDrawGizmosSelected()
         {
             Matrix4x4 origMatrix = Gizmos.matrix;
             Gizmos.matrix = this.transform.localToWorldMatrix;
@@ -239,7 +239,7 @@ namespace Ultraleap
 
         private void drawWireSphereGizmo(Vector3 pos, float radius)
         {
-            foreach (var dir in worldDirs)
+            foreach (Vector3 dir in worldDirs)
             {
                 if (dir == Vector3.forward)
                 {
@@ -257,7 +257,7 @@ namespace Ultraleap
             for (int i = 0; i < numCircles; i++)
             {
                 float curTheta = (dTheta * i) + halfTheta;
-                Ultraleap.Utils.DrawCircle(pos + poleDir * Mathf.Cos(curTheta * Mathf.Deg2Rad) * radius, poleDir, Mathf.Sin(curTheta * Mathf.Deg2Rad) * radius, AnchorGizmoColor, quality: 16, depthTest: true);
+                Ultraleap.Utils.DrawCircle(pos + (poleDir * Mathf.Cos(curTheta * Mathf.Deg2Rad) * radius), poleDir, Mathf.Sin(curTheta * Mathf.Deg2Rad) * radius, AnchorGizmoColor, quality: 16, depthTest: true);
             }
         }
 

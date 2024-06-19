@@ -49,7 +49,7 @@ namespace Ultraleap.PhysicalHands
 
         internal static void ResetRecommendedSettingsStates()
         {
-            foreach (var recommendedSetting in recommendedSettings)
+            foreach (KeyValuePair<string, RecommendedSetting> recommendedSetting in recommendedSettings)
             {
                 RecommendedSetting modifiedSetting = recommendedSetting.Value;
                 recommendedSettings[recommendedSetting.Key] = modifiedSetting;
@@ -236,7 +236,7 @@ namespace Ultraleap.PhysicalHands
 
         internal static void ApplyAllRecommendedSettings()
         {
-            foreach (var key in recommendedSettings.Keys)
+            foreach (string key in recommendedSettings.Keys)
             {
                 ApplyRecommendedSetting(key);
             }

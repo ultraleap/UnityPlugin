@@ -101,7 +101,7 @@ namespace Ultraleap
             SetAllBoneThresholds(globalRotation, true);
         }
 
-        void MirrorHand(Hand handSource)
+        private void MirrorHand(Hand handSource)
         {
             mirroredHand = new Hand();
             mirroredHand = mirroredHand.CopyFrom(handSource);

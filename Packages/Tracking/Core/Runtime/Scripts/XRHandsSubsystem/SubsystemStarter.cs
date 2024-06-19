@@ -16,10 +16,10 @@ namespace Ultraleap
 {
     public class SubsystemStarter
     {
-        static XRHandSubsystem m_Subsystem = null;
-        static XRHandProviderUtility.SubsystemUpdater updater = null;
-        static GameObject leapProviderGO = null;
-        static XRHandSubsystemProvider subsystemProvider = null;
+        private static XRHandSubsystem m_Subsystem = null;
+        private static XRHandProviderUtility.SubsystemUpdater updater = null;
+        private static GameObject leapProviderGO = null;
+        private static XRHandSubsystemProvider subsystemProvider = null;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void RunBeforeSceneLoad()
@@ -43,7 +43,7 @@ namespace Ultraleap
             // Stop all existing subsystems and produce a new one
             List<LeapHandsSubsystem> subsystems = new List<LeapHandsSubsystem>();
             SubsystemManager.GetSubsystems(subsystems);
-            foreach (var subsystem in subsystems)
+            foreach (LeapHandsSubsystem subsystem in subsystems)
             {
                 subsystem.Stop();
                 subsystem.Destroy();
@@ -53,7 +53,7 @@ namespace Ultraleap
 
             List<XRHandSubsystemDescriptor> descriptors = new List<XRHandSubsystemDescriptor>();
             SubsystemManager.GetSubsystemDescriptors(descriptors);
-            foreach (var descriptor in descriptors)
+            foreach (XRHandSubsystemDescriptor descriptor in descriptors)
             {
                 if (descriptor.id == "UL XR Hands")
                 {
@@ -124,7 +124,7 @@ namespace Ultraleap
             List<LeapHandsSubsystem> subsystems = new List<LeapHandsSubsystem>();
             SubsystemManager.GetSubsystems(subsystems);
 
-            foreach (var subsystem in subsystems)
+            foreach (LeapHandsSubsystem subsystem in subsystems)
             {
                 subsystem.Stop();
                 subsystem.Destroy();

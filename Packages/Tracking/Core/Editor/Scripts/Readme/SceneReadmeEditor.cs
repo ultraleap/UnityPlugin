@@ -45,7 +45,7 @@ namespace Ultraleap.Readme
 
         public static bool SelectSceneReadme(bool silent = false)
         {
-            var ids = AssetDatabase.FindAssets("t:SceneReadme");
+            string[] ids = AssetDatabase.FindAssets("t:SceneReadme");
             bool found = false;
             if (ids.Length > 0)
             {
@@ -83,10 +83,10 @@ namespace Ultraleap.Readme
 
         protected override void OnHeaderGUI()
         {
-            var readme = (SceneReadme)target;
+            SceneReadme readme = (SceneReadme)target;
             Init();
 
-            var iconWidth = Mathf.Min(EditorGUIUtility.currentViewWidth / 3f - 20f, 128f);
+            float iconWidth = Mathf.Min((EditorGUIUtility.currentViewWidth / 3f) - 20f, 128f);
 
             GUILayout.BeginHorizontal("In BigTitle");
             {
@@ -117,13 +117,13 @@ namespace Ultraleap.Readme
 
         public override void OnInspectorGUI()
         {
-            var readme = (SceneReadme)target;
+            SceneReadme readme = (SceneReadme)target;
             Init();
 
             if (readme.sections != null)
             {
                 GUILayout.Space(miniSpace);
-                foreach (var section in readme.sections)
+                foreach (SceneReadme.Section section in readme.sections)
                 {
                     if (!string.IsNullOrEmpty(section.heading))
                     {
@@ -218,27 +218,30 @@ namespace Ultraleap.Readme
         private bool m_Initialized;
 
         private GUIStyle LinkStyle { get { return m_LinkStyle; } }
-        [SerializeField] GUIStyle m_LinkStyle;
+        [SerializeField] private GUIStyle m_LinkStyle;
 
         private GUIStyle ImageStyle { get { return m_ImageStyle; } }
-        [SerializeField] GUIStyle m_ImageStyle;
+        [SerializeField] private GUIStyle m_ImageStyle;
 
         private GUIStyle TitleStyle { get { return m_TitleStyle; } }
-        [SerializeField] GUIStyle m_TitleStyle;
+        [SerializeField] private GUIStyle m_TitleStyle;
 
         private GUIStyle HeadingStyle { get { return m_HeadingStyle; } }
-        [SerializeField] GUIStyle m_HeadingStyle;
+        [SerializeField] private GUIStyle m_HeadingStyle;
 
         private GUIStyle BodyStyle { get { return m_BodyStyle; } }
-        [SerializeField] GUIStyle m_BodyStyle;
+        [SerializeField] private GUIStyle m_BodyStyle;
 
         private GUIStyle InfoStyle { get { return m_InfoStyle; } }
-        [SerializeField] GUIStyle m_InfoStyle;
+        [SerializeField] private GUIStyle m_InfoStyle;
 
-        void Init()
+        private void Init()
         {
             if (m_Initialized)
+            {
                 return;
+            }
+
             m_BodyStyle = new GUIStyle(EditorStyles.label);
             m_BodyStyle.wordWrap = true;
             m_BodyStyle.richText = true;
@@ -266,9 +269,9 @@ namespace Ultraleap.Readme
             m_Initialized = true;
         }
 
-        bool LinkLabel(GUIContent label, params GUILayoutOption[] options)
+        private bool LinkLabel(GUIContent label, params GUILayoutOption[] options)
         {
-            var position = GUILayoutUtility.GetRect(label, LinkStyle, options);
+            Rect position = GUILayoutUtility.GetRect(label, LinkStyle, options);
 
             Handles.BeginGUI();
             Handles.color = LinkStyle.normal.textColor;

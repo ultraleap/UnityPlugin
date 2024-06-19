@@ -8,9 +8,12 @@
 
 using System.Collections.Generic;
 using UnityEngine;
+
 #if ENABLE_INPUT_SYSTEM
+
 using UnityEngine.InputSystem.XR;
 using UnityEngine.InputSystem;
+
 #endif
 
 namespace Ultraleap.Controllers
@@ -62,6 +65,7 @@ namespace Ultraleap.Controllers
                 }
                 _inputAction.Enable();
             }
+
 #endif
 
             public void Update()
@@ -126,8 +130,10 @@ namespace Ultraleap.Controllers
         }
 
 #if ENABLE_INPUT_SYSTEM
+
         [HideInInspector]
         public XRController controller;
+
         [Tooltip("An offset to the device position read in from the input system")]
         public Vector3 offsetPosition;
 
@@ -178,12 +184,14 @@ namespace Ultraleap.Controllers
 
         [Tooltip("An offset to the device rotation read in from the input system")]
         public Vector3 offsetRotationEuler;
+
         public ControllerFinger[] fingers = new ControllerFinger[5];
 
         private Chirality _chirality = Chirality.Left;
 
         [HideInInspector]
         public float timeVisible = 0;
+
         private float _oldTime = 0;
 
         public ControllerHand(Chirality chirality)
@@ -192,6 +200,7 @@ namespace Ultraleap.Controllers
         }
 
         #region Properties
+
         public ControllerFinger Thumb
         {
             get
@@ -251,7 +260,8 @@ namespace Ultraleap.Controllers
                 fingers[4] = value;
             }
         }
-        #endregion
+
+        #endregion Properties
 
         public void Setup(Chirality chirality)
         {
@@ -263,6 +273,7 @@ namespace Ultraleap.Controllers
                 case Chirality.Left:
                     controller = XRController.leftHand;
                     break;
+
                 case Chirality.Right:
                     controller = XRController.rightHand;
                     break;
@@ -381,6 +392,7 @@ namespace Ultraleap.Controllers
                 }
             }
         }
+
 #if ENABLE_INPUT_SYSTEM
 
         /// <summary>
@@ -403,6 +415,7 @@ namespace Ultraleap.Controllers
             this.RingFinger.axes = new List<string>() { "<XRController>{" + hand + "Hand}/grip" };
             this.PinkyFinger.axes = new List<string>() { "<XRController>{" + hand + "Hand}/grip" };
         }
+
 #else
         /// <summary>
         /// Links legacy controller axes to fingers
@@ -425,7 +438,8 @@ namespace Ultraleap.Controllers
             this.PinkyFinger.axes.Add($"XRI_{hand}_Grip");
         }
 #endif
-        #endregion
+
+        #endregion Generate Fingers
 
         #region Generate Hands
 
@@ -477,6 +491,7 @@ namespace Ultraleap.Controllers
                 }
             }
         }
+
         /// <summary>
         /// Generates a Leap Finger from ControllerFinger
         /// </summary>
@@ -502,7 +517,9 @@ namespace Ultraleap.Controllers
         private void RotateJoint(ref Bone b, ref Bone b2, Vector3 deg)
         {
             if (deg == Vector3.zero)
+            {
                 return;
+            }
 
             b.NextJoint = RotatePointAroundPivot(b.NextJoint, b.PrevJoint, deg);
             Vector3 diffPos = b.NextJoint - b2.PrevJoint;
@@ -527,9 +544,9 @@ namespace Ultraleap.Controllers
 
         public Vector3 RotatePointAroundPivot(Vector3 point, Vector3 pivot, Vector3 angles)
         {
-            return Quaternion.Euler(angles) * (point - pivot) + pivot;
+            return (Quaternion.Euler(angles) * (point - pivot)) + pivot;
         }
 
-        #endregion
+        #endregion Generate Hands
     }
 }

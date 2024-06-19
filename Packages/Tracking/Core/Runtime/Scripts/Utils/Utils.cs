@@ -73,7 +73,7 @@ namespace Ultraleap
         /// </summary>
         public static void Reverse<T>(this T[] array, int start, int length)
         {
-            int mid = start + length / 2;
+            int mid = start + (length / 2);
             int i = start;
             int j = start + length;
             while (i < mid)
@@ -161,8 +161,15 @@ namespace Ultraleap
 
         public static string MakeRelativePath(string relativeTo, string path)
         {
-            if (string.IsNullOrEmpty(relativeTo)) throw new ArgumentNullException("relativeTo");
-            if (string.IsNullOrEmpty(path)) throw new ArgumentNullException("path");
+            if (string.IsNullOrEmpty(relativeTo))
+            {
+                throw new ArgumentNullException("relativeTo");
+            }
+
+            if (string.IsNullOrEmpty(path))
+            {
+                throw new ArgumentNullException("path");
+            }
 
             Uri relativeToUri = new Uri(relativeTo);
             Uri pathUri = new Uri(path);
@@ -188,11 +195,11 @@ namespace Ultraleap
         {
             if (arr == null)
             {
-                var oldArr = arr;
+                T[] oldArr = arr;
                 arr = new T[0];
                 if (oldArr != null)
                 {
-                    for (var i = 0; i < oldArr.Length && i < arr.Length; i++)
+                    for (int i = 0; i < oldArr.Length && i < arr.Length; i++)
                     {
                         arr[i] = oldArr[i];
                     }
@@ -208,7 +215,7 @@ namespace Ultraleap
             if (arr == null || arr.Length != length)
             {
                 arr = new T[length];
-                for (var i = 0; i < length; i++)
+                for (int i = 0; i < length; i++)
                 {
                     arr[i] = createAtIdx(i);
                 }
@@ -229,11 +236,11 @@ namespace Ultraleap
         {
             if (arr == null || arr.Length != length)
             {
-                var oldArr = arr;
+                T[] oldArr = arr;
                 arr = new T[length];
                 if (oldArr != null)
                 {
-                    for (var i = 0; i < oldArr.Length && i < arr.Length; i++)
+                    for (int i = 0; i < oldArr.Length && i < arr.Length; i++)
                     {
                         arr[i] = oldArr[i];
                     }
@@ -469,7 +476,7 @@ namespace Ultraleap
 
         public static string[] GetNamePieces(string value)
         {
-            var niceName = GenerateNiceName(value).ToLower();
+            string niceName = GenerateNiceName(value).ToLower();
             return niceName.Split(new char[] { ' ' });
         }
 
@@ -610,7 +617,7 @@ namespace Ultraleap
         public static int Count(this string str, char toCount)
         {
             int count = 0;
-            foreach (var c in str)
+            foreach (char c in str)
             {
                 if (c == toCount) { count++; }
             }
@@ -660,13 +667,16 @@ namespace Ultraleap
         public static string ToArrayString<T>(this IEnumerable<T> enumerable,
           System.Func<T, string> toStringFunc = null, int? limit = null)
         {
-            var sb = new System.Text.StringBuilder();
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
             sb.Append("[" + typeof(T).Name + ": ");
             bool addedFirstElement = false;
-            var count = 0;
-            foreach (var t in enumerable)
+            int count = 0;
+            foreach (T t in enumerable)
             {
-                count += 1; if (limit.HasValue && count == limit.Value) break;
+                count += 1; if (limit.HasValue && count == limit.Value)
+                {
+                    break;
+                }
 
                 if (addedFirstElement)
                 {
@@ -691,18 +701,18 @@ namespace Ultraleap
         /// <summary> Supported languages: "csharp", "python" </summary>
         public static string ToCodeArrayString(this IEnumerable<Vector3> vectors, string language = null)
         {
-            var sb = new System.Text.StringBuilder();
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
 
             bool csharp = false, python = false;
             if (language == null || language.Equals("csharp")) { csharp = true; }
             if (language.Equals("python")) { python = true; }
 
-            var arrPrefix = "";
+            string arrPrefix = "";
             if (csharp) { arrPrefix = "new Vector3[] { \n"; }
             else if (python) { arrPrefix = "np.array([ \n"; }
             sb.Append(arrPrefix);
 
-            var elPrefix = "";
+            string elPrefix = "";
             if (csharp) { elPrefix = "  new Vector3("; }
             else if (python) { elPrefix = "  ["; }
 
@@ -710,15 +720,15 @@ namespace Ultraleap
             if (csharp) { f2s = f => f.ToString("R") + "f"; }
             else if (python) { f2s = f => (f * 1000).ToString("R") + ""; }
 
-            var compSep = ", ";
+            string compSep = ", ";
             if (csharp) { compSep = ", "; }
             else if (python) { compSep = ", "; }
 
-            var elPostfix = "";
+            string elPostfix = "";
             if (csharp) { elPostfix = "),\n"; }
             else if (python) { elPostfix = "],\n"; }
 
-            foreach (var v in vectors)
+            foreach (Vector3 v in vectors)
             {
                 sb.Append(elPrefix);
                 sb.Append(f2s(v[0]) + compSep);
@@ -743,9 +753,9 @@ namespace Ultraleap
 
         public static string ToCodeArrayString(this IEnumerable<Quaternion> quats)
         {
-            var sb = new System.Text.StringBuilder();
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
             sb.Append("new Quaternion[] { \n");
-            foreach (var q in quats)
+            foreach (Quaternion q in quats)
             {
                 sb.Append("  new Quaternion(");
                 sb.Append(q[0].ToString("R") + "f, ");
@@ -850,14 +860,20 @@ namespace Ultraleap
 
         public static bool IsBetween(this float f, float f0, float f1)
         {
-            if (f0 > f1) Ultraleap.Utils.Swap(ref f0, ref f1);
+            if (f0 > f1)
+            {
+                Ultraleap.Utils.Swap(ref f0, ref f1);
+            }
 
             return f0 <= f && f <= f1;
         }
 
         public static bool IsBetween(this double d, double d0, double d1)
         {
-            if (d0 > d1) Ultraleap.Utils.Swap(ref d0, ref d1);
+            if (d0 > d1)
+            {
+                Ultraleap.Utils.Swap(ref d0, ref d1);
+            }
 
             return d0 <= d && d <= d1;
         }
@@ -932,7 +948,7 @@ namespace Ultraleap
         public static void ForEach<T>(this T[] arr, Action<T> doFunc)
           where T : class
         {
-            foreach (var t in arr)
+            foreach (T t in arr)
             {
                 if (t != null) { doFunc(t); }
             }
@@ -944,9 +960,9 @@ namespace Ultraleap
         public static void ForEach<T>(this object[] arr, Action<T> doFunc)
           where T : class
         {
-            foreach (var obj in arr)
+            foreach (object obj in arr)
             {
-                var t = obj as T;
+                T t = obj as T;
                 if (t != null) { doFunc(t); }
             }
         }
@@ -955,7 +971,7 @@ namespace Ultraleap
         /// </summary>
         public static void Transform<T, Aux>(this T[] arr, Aux aux, Func<T, Aux, T> mapFunc)
         {
-            for (var i = 0; i < arr.Length; i++)
+            for (int i = 0; i < arr.Length; i++)
             {
                 arr[i] = mapFunc(arr[i], aux);
             }
@@ -965,7 +981,7 @@ namespace Ultraleap
         /// </summary>
         public static void Transform<T>(this T[] arr, Func<T, T> mapFunc)
         {
-            for (var i = 0; i < arr.Length; i++)
+            for (int i = 0; i < arr.Length; i++)
             {
                 arr[i] = mapFunc(arr[i]);
             }
@@ -975,7 +991,7 @@ namespace Ultraleap
         /// e.g. many standard value types like `int` and `float`. </summary>
         public static bool ContainsValue<T>(this T[] arr, T value) where T : IEquatable<T>
         {
-            for (var i = 0; i < arr.Length; i++)
+            for (int i = 0; i < arr.Length; i++)
             {
                 if (arr[i].Equals(value)) { return true; }
             }
@@ -991,14 +1007,30 @@ namespace Ultraleap
         /// <summary> Copy with range arguments. sO = sourceOffset, dO = dstOffset, num = number of elements to copy. </summary>
         public static T[] CopyFrom<T>(this T[] dst, T[] src, int sO, int dO, int num)
         {
-            if (sO < 0) throw new IndexOutOfRangeException();
-            if (sO + num - 1 >= src.Length) throw new IndexOutOfRangeException();
-            if (dO < 0) throw new IndexOutOfRangeException();
-            if (dO + num - 1 >= dst.Length) throw new IndexOutOfRangeException();
-            for (var i = 0; i < num; i++)
+            if (sO < 0)
             {
-                var srcIdx = sO + i;
-                var dstIdx = dO + i;
+                throw new IndexOutOfRangeException();
+            }
+
+            if (sO + num - 1 >= src.Length)
+            {
+                throw new IndexOutOfRangeException();
+            }
+
+            if (dO < 0)
+            {
+                throw new IndexOutOfRangeException();
+            }
+
+            if (dO + num - 1 >= dst.Length)
+            {
+                throw new IndexOutOfRangeException();
+            }
+
+            for (int i = 0; i < num; i++)
+            {
+                int srcIdx = sO + i;
+                int dstIdx = dO + i;
                 dst[dstIdx] = src[srcIdx];
             }
             return dst;
@@ -1051,7 +1083,10 @@ namespace Ultraleap
 
         public static void EnsureListCount<T>(this List<T> list, int count)
         {
-            if (list.Count == count) return;
+            if (list.Count == count)
+            {
+                return;
+            }
 
             while (list.Count < count)
             {
@@ -1117,7 +1152,7 @@ namespace Ultraleap
         /// Also known as a "map" operation. </summary>
         public static void ForEach<T>(this List<T> list, Func<T, T> applyFunc)
         {
-            for (var i = 0; i < list.Count; i++)
+            for (int i = 0; i < list.Count; i++)
             {
                 list[i] = applyFunc(list[i]);
             }
@@ -1127,7 +1162,7 @@ namespace Ultraleap
         /// Also known as a "map" operation. Supports an auxiliary argument to avoid allocation in lambdas. </summary>
         public static void ForEach<T, Aux>(this List<T> list, Aux aux, Func<T, Aux, T> applyFunc)
         {
-            for (var i = 0; i < list.Count; i++)
+            for (int i = 0; i < list.Count; i++)
             {
                 list[i] = applyFunc(list[i], aux);
             }
@@ -1152,9 +1187,9 @@ namespace Ultraleap
         {
             if (!dontClear) { dst.Clear(); }
             if (src == null) { return dst; }
-            foreach (var srcT in src)
+            foreach (T srcT in src)
             {
-                var dstT = new T();
+                T dstT = new T();
                 copyElementFunc(srcT, dstT);
                 dst.Add(dstT);
             }
@@ -1203,7 +1238,7 @@ namespace Ultraleap
         /// </summary>
         public static bool TryGetComponents<T>(this Component source, out T[] components)
         {
-            if(source.TryGetComponent<T>(out _))
+            if (source.TryGetComponent<T>(out _))
             {
                 components = source.GetComponents<T>();
                 return true;
@@ -1218,7 +1253,7 @@ namespace Ultraleap
         /// </summary>
         public static bool TryGetComponentInParent<T>(this Component source, out T component)
         {
-            if(source.transform.parent != null)
+            if (source.transform.parent != null)
             {
                 return source.transform.parent.TryGetComponent(out component);
             }
@@ -1246,28 +1281,28 @@ namespace Ultraleap
         /// </summary>
         public static bool TryGetComponentInChildren<T>(this Component source, out T component, bool includeSelf = true, bool includeInactive = false)
         {
-            if(!source.gameObject.activeInHierarchy && !includeInactive) // No children can be active either
+            if (!source.gameObject.activeInHierarchy && !includeInactive) // No children can be active either
             {
                 component = default;
                 return false;
             }
 
-            if(includeSelf && source.TryGetComponent(out component))
+            if (includeSelf && source.TryGetComponent(out component))
             {
                 return true;
             }
             else
             {
-                foreach(Transform child in source.transform)
+                foreach (Transform child in source.transform)
                 {
                     component = child.GetComponentInChildren<T>(includeInactive);
 
-                    if(component != null)
+                    if (component != null)
                     {
                         return true;
                     }
                 }
-            }    
+            }
 
             component = default;
             return false;
@@ -1278,7 +1313,7 @@ namespace Ultraleap
         /// </summary>
         public static bool TryGetComponentsInChildren<T>(this Component source, out T[] components, bool includeSelf = true, bool includeInactive = false)
         {
-            if(includeSelf)
+            if (includeSelf)
             {
                 components = source.GetComponentsInChildren<T>(includeInactive);
                 return components != null;
@@ -1292,7 +1327,7 @@ namespace Ultraleap
                     componentList.AddRange(child.GetComponentsInChildren<T>(includeInactive));
                 }
 
-                if(componentList.Count > 0)
+                if (componentList.Count > 0)
                 {
                     components = componentList.ToArray();
                     return true;
@@ -1332,7 +1367,11 @@ namespace Ultraleap
 
             public bool MoveNext()
             {
-                if (_idx < _count) _idx += 1;
+                if (_idx < _count)
+                {
+                    _idx += 1;
+                }
+
                 if (_idx == _count) { return false; } else { return true; }
             }
             public Transform Current
@@ -1351,7 +1390,7 @@ namespace Ultraleap
         public static List<Transform> GetSelfAndAllChildren(this Transform t,
           bool breadthFirst = false)
         {
-            var transforms = new List<Transform>();
+            List<Transform> transforms = new List<Transform>();
             transforms.Add(t);
             GetAllChildren(t, transforms, breadthFirst);
             return transforms;
@@ -1368,12 +1407,16 @@ namespace Ultraleap
         {
             if (breadthFirst)
             {
-                var cursor = t; var cursorIdx = toFill.Count; var endIdx = cursorIdx;
+                Transform cursor = t; int cursorIdx = toFill.Count; int endIdx = cursorIdx;
                 do
                 {
                     endIdx += addImmediateChildren(cursor, toFill);
                     cursorIdx += 1;
-                    if (cursorIdx >= endIdx) break;
+                    if (cursorIdx >= endIdx)
+                    {
+                        break;
+                    }
+
                     cursor = toFill[cursorIdx];
                 } while (true);
             }
@@ -1385,7 +1428,7 @@ namespace Ultraleap
         private static void addChildrenRecursive(Transform t, List<Transform> list)
         {
             if (t == null) { return; }
-            foreach (var child in t.GetChildren())
+            foreach (Transform child in t.GetChildren())
             {
                 list.Add(child);
                 addChildrenRecursive(child, list);
@@ -1394,7 +1437,7 @@ namespace Ultraleap
         private static int addImmediateChildren(Transform t, List<Transform> list)
         {
             int numChildren = 0;
-            foreach (var child in t.GetChildren())
+            foreach (Transform child in t.GetChildren())
             {
                 list.Add(child); numChildren++;
             }
@@ -1405,9 +1448,9 @@ namespace Ultraleap
         public static Transform FindChild(this Transform t, string[] possibleNames,
           bool caseSensitive = true)
         {
-            foreach (var name in possibleNames)
+            foreach (string name in possibleNames)
             {
-                var found = FindChild(t, name, caseSensitive);
+                Transform found = FindChild(t, name, caseSensitive);
                 if (found != null) { return found; }
             }
             return null;
@@ -1417,13 +1460,13 @@ namespace Ultraleap
         public static Transform FindChild(this Transform t, string withName,
           bool caseSensitive = true)
         {
-            var children = Ultraleap.Utils.Require(ref _b_findChildBuffer);
+            List<Transform> children = Ultraleap.Utils.Require(ref _b_findChildBuffer);
             children.Clear();
             t.GetAllChildren(children);
             if (!caseSensitive) { withName = withName.ToLower(); }
-            foreach (var child in children)
+            foreach (Transform child in children)
             {
-                var name = child.name;
+                string name = child.name;
                 if (!caseSensitive) { name = name.ToLower(); }
                 if (child.name.Contains(withName)) { return child; }
             }
@@ -1471,8 +1514,8 @@ namespace Ultraleap
         public static void SetMatrix(this Transform t, Matrix4x4 targetMatrix,
           bool allowAtEditTime = false)
         {
-            var pose = targetMatrix.GetPose();
-            var scale = targetMatrix.lossyScale;
+            Pose pose = targetMatrix.GetPose();
+            Vector3 scale = targetMatrix.lossyScale;
 
             if (!Application.isPlaying && !allowAtEditTime)
             {
@@ -1506,7 +1549,7 @@ namespace Ultraleap
         /// Will likely fail in various edge cases, use at your own risk. </summary>
         public static void SetLossyScale(this Transform t, Vector3 lossyScale)
         {
-            var scale = lossyScale;
+            Vector3 scale = lossyScale;
             if (t.parent != null) { scale = scale.CompDiv(t.parent.lossyScale); }
             t.localScale = scale;
         }
@@ -1559,15 +1602,15 @@ namespace Ultraleap
         public static Vector3 GetClosestAxisDirection(this Quaternion q,
           Vector3 toDir)
         {
-            var localDir = (Quaternion.Inverse(q) * toDir).normalized;
-            var closestAxis = Vector3.right;
-            var largestDot = -1f;
-            for (var sign = 1; sign >= -1; sign -= 2)
+            Vector3 localDir = (Quaternion.Inverse(q) * toDir).normalized;
+            Vector3 closestAxis = Vector3.right;
+            float largestDot = -1f;
+            for (int sign = 1; sign >= -1; sign -= 2)
             {
-                for (var axis = 0; axis < 3; axis++)
+                for (int axis = 0; axis < 3; axis++)
                 {
-                    var testAxis = Vector3.zero; testAxis[axis] = 1f * sign;
-                    var testDot = Vector3.Dot(localDir, testAxis);
+                    Vector3 testAxis = Vector3.zero; testAxis[axis] = 1f * sign;
+                    float testDot = Vector3.Dot(localDir, testAxis);
                     if (testDot > largestDot)
                     {
                         largestDot = testDot;
@@ -1585,14 +1628,14 @@ namespace Ultraleap
         /// </summary>
         public static Vector3 GetClosestLocalAxisDirection(Vector3 toLocalDir)
         {
-            var closestAxis = Vector3.right;
-            var largestDot = -1f;
-            for (var sign = 1; sign >= -1; sign -= 2)
+            Vector3 closestAxis = Vector3.right;
+            float largestDot = -1f;
+            for (int sign = 1; sign >= -1; sign -= 2)
             {
-                for (var axis = 0; axis < 3; axis++)
+                for (int axis = 0; axis < 3; axis++)
                 {
-                    var testAxis = Vector3.zero; testAxis[axis] = 1f * sign;
-                    var testDot = Vector3.Dot(toLocalDir, testAxis);
+                    Vector3 testAxis = Vector3.zero; testAxis[axis] = 1f * sign;
+                    float testDot = Vector3.Dot(toLocalDir, testAxis);
                     if (testDot > largestDot)
                     {
                         largestDot = testDot;
@@ -1639,8 +1682,8 @@ namespace Ultraleap
         public static Vector3 Pivot(this Vector3 point, Vector3 pivot,
           Quaternion rotation)
         {
-            var pointFromPivot = point - pivot;
-            var rotatedPointFromPivot = rotation * pointFromPivot;
+            Vector3 pointFromPivot = point - pivot;
+            Vector3 rotatedPointFromPivot = rotation * pointFromPivot;
             return pivot + rotatedPointFromPivot;
         }
 
@@ -1656,11 +1699,11 @@ namespace Ultraleap
           float? maxAngle = null)
         {
             v = Vector3.ProjectOnPlane(v, axis);
-            var toDir_axis = Vector3.ProjectOnPlane(toDir, axis);
+            Vector3 toDir_axis = Vector3.ProjectOnPlane(toDir, axis);
             angle = Vector3.SignedAngle(v, toDir_axis, axis);
             if (minAngle != null) { angle = Mathf.Max(minAngle.Value, angle); }
             if (maxAngle != null) { angle = Mathf.Min(maxAngle.Value, angle); }
-            var rotation = Quaternion.AngleAxis(angle, axis);
+            Quaternion rotation = Quaternion.AngleAxis(angle, axis);
             return rotation;
         }
 
@@ -1671,15 +1714,15 @@ namespace Ultraleap
         public static Quaternion GetAxisFromToRotation(this Vector3 v, Vector3 toDir,
           Vector3 axis, float? minAngle = null, float? maxAngle = null)
         {
-            var unusedAngle = 0f;
+            float unusedAngle = 0f;
             return GetAxisFromToRotation(v, toDir, axis, out unusedAngle, minAngle,
               maxAngle);
         }
 
         public static Vector3 GetCentroid(Vector3[] points)
         {
-            var centroid = Vector3.zero;
-            for (var i = 0; i < points.Length; i++)
+            Vector3 centroid = Vector3.zero;
+            for (int i = 0; i < points.Length; i++)
             {
                 centroid += points[i];
             }
@@ -1691,8 +1734,16 @@ namespace Ultraleap
         public static Vector3 ConstrainToNormal(this Vector3 direction,
           Vector3 normalDirection, float maxAngle)
         {
-            if (maxAngle <= 0f) return normalDirection.normalized * direction.magnitude;
-            if (maxAngle >= 180f) return direction;
+            if (maxAngle <= 0f)
+            {
+                return normalDirection.normalized * direction.magnitude;
+            }
+
+            if (maxAngle >= 180f)
+            {
+                return direction;
+            }
+
             float angle = Mathf.Acos(Mathf.Clamp(
               Vector3.Dot(direction.normalized, normalDirection.normalized),
               -1f, 1f)) * Mathf.Rad2Deg;
@@ -1732,7 +1783,11 @@ namespace Ultraleap
         /// </summary>
         public static Quaternion QuaternionFromAngleAxisVector(Vector3 angleAxisVector)
         {
-            if (angleAxisVector == Vector3.zero) return Quaternion.identity;
+            if (angleAxisVector == Vector3.zero)
+            {
+                return Quaternion.identity;
+            }
+
             return Quaternion.AngleAxis(angleAxisVector.magnitude, angleAxisVector);
         }
 
@@ -1744,7 +1799,7 @@ namespace Ultraleap
         public static Quaternion ToNormalized(this Quaternion quaternion)
         {
             float x = quaternion.x, y = quaternion.y, z = quaternion.z, w = quaternion.w;
-            float magnitude = Mathf.Sqrt(x * x + y * y + z * z + w * w);
+            float magnitude = Mathf.Sqrt((x * x) + (y * y) + (z * z) + (w * w));
 
             if (Mathf.Approximately(magnitude, 0f))
             {
@@ -1892,15 +1947,15 @@ namespace Ultraleap
             uint sentData = ((uint)largest) << 30;
             // a
             normalizedValue = Mathf.Clamp01((a - minimum) / delta);
-            integerValue = (uint)Mathf.Floor(normalizedValue * maxIntegerValueF + 0.5f);
+            integerValue = (uint)Mathf.Floor((normalizedValue * maxIntegerValueF) + 0.5f);
             sentData = sentData | ((integerValue & maxIntegerValue) << 20);
             // b
             normalizedValue = Mathf.Clamp01((b - minimum) / delta);
-            integerValue = (uint)Mathf.Floor(normalizedValue * maxIntegerValueF + 0.5f);
+            integerValue = (uint)Mathf.Floor((normalizedValue * maxIntegerValueF) + 0.5f);
             sentData = sentData | ((integerValue & maxIntegerValue) << 10);
             // c
             normalizedValue = Mathf.Clamp01((c - minimum) / delta);
-            integerValue = (uint)Mathf.Floor(normalizedValue * maxIntegerValueF + 0.5f);
+            integerValue = (uint)Mathf.Floor((normalizedValue * maxIntegerValueF) + 0.5f);
             sentData = sentData | (integerValue & maxIntegerValue);
 
             BitConverterNonAlloc.GetBytes(sentData, buffer, ref offset);
@@ -1947,7 +2002,7 @@ namespace Ultraleap
             c = (normalizedValue * delta) + minimum;
 
             Quaternion value = Quaternion.identity;
-            float d = Mathf.Sqrt(1f - a * a - b * b - c * c);
+            float d = Mathf.Sqrt(1f - (a * a) - (b * b) - (c * c));
             value[largest] = d;
             value[(largest + 1) % 4] = a;
             value[(largest + 2) % 4] = b;
@@ -1995,7 +2050,7 @@ namespace Ultraleap
             // Q.x = _copysign( Q.x, m21 - m12 )
             // Q.y = _copysign( Q.y, m02 - m20 )
             // Q.z = _copysign( Q.z, m10 - m01 )
-            var q = new Quaternion();
+            Quaternion q = new Quaternion();
 
             q.w = Mathf.Sqrt(Mathf.Max(0, 1 + m.m00 + m.m11 + m.m22)) / 2;
 
@@ -2059,11 +2114,11 @@ namespace Ultraleap
             //     q.z = 0.25f * s;
             //   }
             // }
-            var q = new Quaternion();
-            var trace = m.m00 + m.m11 + m.m22;
+            Quaternion q = new Quaternion();
+            float trace = m.m00 + m.m11 + m.m22;
             if (trace > 0)
             {
-                var s = 0.5f / Mathf.Sqrt(trace + 1.0f);
+                float s = 0.5f / Mathf.Sqrt(trace + 1.0f);
                 q.w = 0.25f / s;
                 q.x = (m.m21 - m.m12) * s;
                 q.y = (m.m02 - m.m20) * s;
@@ -2073,7 +2128,7 @@ namespace Ultraleap
             {
                 if (m.m00 > m.m11 && m.m00 > m.m22)
                 {
-                    var s = 2.0f * Mathf.Sqrt(1f + m.m00 - m.m11 - m.m22);
+                    float s = 2.0f * Mathf.Sqrt(1f + m.m00 - m.m11 - m.m22);
                     q.w = (m.m21 - m.m12) / s;
                     q.x = 0.25f * s;
                     q.y = (m.m01 + m.m10) / s;
@@ -2081,7 +2136,7 @@ namespace Ultraleap
                 }
                 else if (m.m11 > m.m22)
                 {
-                    var s = 2.0f * Mathf.Sqrt(1f + m.m11 - m.m00 - m.m22);
+                    float s = 2.0f * Mathf.Sqrt(1f + m.m11 - m.m00 - m.m22);
                     q.w = (m.m02 - m.m20) / s;
                     q.x = (m.m01 + m.m10) / s;
                     q.y = 0.25f * s;
@@ -2089,7 +2144,7 @@ namespace Ultraleap
                 }
                 else
                 {
-                    var s = 2.0f * Mathf.Sqrt(1f + m.m22 - m.m00 - m.m11);
+                    float s = 2.0f * Mathf.Sqrt(1f + m.m22 - m.m00 - m.m11);
                     q.w = (m.m10 - m.m01) / s;
                     q.x = (m.m02 + m.m20) / s;
                     q.y = (m.m12 + m.m21) / s;
@@ -2121,8 +2176,8 @@ namespace Ultraleap
         /// </summary>
         public static Quaternion GetQuaternion(this Matrix4x4 m)
         {
-            var forward = m.MultiplyVector(Vector3.forward);
-            var up = m.MultiplyVector(Vector3.up);
+            Vector3 forward = m.MultiplyVector(Vector3.forward);
+            Vector3 up = m.MultiplyVector(Vector3.up);
             if (forward == Vector3.zero || up == Vector3.zero)
             {
                 return Quaternion.identity;
@@ -2146,15 +2201,15 @@ namespace Ultraleap
         /// </summary>
         public static Vector3 GetClosestAxisDirection(this Matrix4x4 m, Vector3 toDir)
         {
-            var localDir = (m.inverse.MultiplyVector(toDir)).normalized;
-            var closestAxis = Vector3.right;
-            var largestDot = -1f;
-            for (var sign = 1; sign >= -1; sign -= 2)
+            Vector3 localDir = m.inverse.MultiplyVector(toDir).normalized;
+            Vector3 closestAxis = Vector3.right;
+            float largestDot = -1f;
+            for (int sign = 1; sign >= -1; sign -= 2)
             {
-                for (var axis = 0; axis < 2; axis++)
+                for (int axis = 0; axis < 2; axis++)
                 {
-                    var testAxis = Vector3.zero; testAxis[axis] = 1f * sign;
-                    var testDot = Vector3.Dot(localDir, testAxis);
+                    Vector3 testAxis = Vector3.zero; testAxis[axis] = 1f * sign;
+                    float testDot = Vector3.Dot(localDir, testAxis);
                     if (testDot > largestDot)
                     {
                         largestDot = testDot;
@@ -2162,7 +2217,7 @@ namespace Ultraleap
                     }
                 }
             }
-            return (m.MultiplyVector(closestAxis)).normalized;
+            return m.MultiplyVector(closestAxis).normalized;
         }
 
         /// <summary> Non-projective only (MultiplyPoint3x4(Vector3.zero)). </summary>
@@ -2202,10 +2257,10 @@ namespace Ultraleap
         /// origin by the argument quaternion. </summary>
         public static Matrix4x4 Pivot(this Matrix4x4 m, Quaternion q)
         {
-            var origPos = m.GetPosition();
-            var toTranslateBack = Matrix4x4.Rotate(q) * m;
-            var newPos = toTranslateBack.GetPosition();
-            var translatedBack = Matrix4x4.Translate(origPos - newPos) * toTranslateBack;
+            Vector3 origPos = m.GetPosition();
+            Matrix4x4 toTranslateBack = Matrix4x4.Rotate(q) * m;
+            Vector3 newPos = toTranslateBack.GetPosition();
+            Matrix4x4 translatedBack = Matrix4x4.Translate(origPos - newPos) * toTranslateBack;
             return translatedBack;
         }
 
@@ -2217,11 +2272,11 @@ namespace Ultraleap
         {
             // m is worldFromRoot
             // preservePos = worldFromRoot * MultiplyPoint3x4(p == wristFromRoot.inverse)
-            var preservePos = p;
-            var preservePos_local = m.inverse.MultiplyPoint3x4(p);
-            var toTranslateBack = Matrix4x4.Rotate(q) * m;
-            var newPos = toTranslateBack.MultiplyPoint3x4(preservePos_local);
-            var translatedBack = Matrix4x4.Translate(preservePos - newPos) *
+            Vector3 preservePos = p;
+            Vector3 preservePos_local = m.inverse.MultiplyPoint3x4(p);
+            Matrix4x4 toTranslateBack = Matrix4x4.Rotate(q) * m;
+            Vector3 newPos = toTranslateBack.MultiplyPoint3x4(preservePos_local);
+            Matrix4x4 translatedBack = Matrix4x4.Translate(preservePos - newPos) *
               toTranslateBack;
             return translatedBack;
         }
@@ -2230,12 +2285,12 @@ namespace Ultraleap
         /// of being rotated by `q` at the end. </summary>
         public static Matrix4x4 PivotTo(this Matrix4x4 m, Quaternion q)
         {
-            var origPos = m.GetPosition();
-            var origRot = m.GetQuaternion();
-            var toTranslateBack = Matrix4x4.Rotate(q * Quaternion.Inverse(origRot)) *
+            Vector3 origPos = m.GetPosition();
+            Quaternion origRot = m.GetQuaternion();
+            Matrix4x4 toTranslateBack = Matrix4x4.Rotate(q * Quaternion.Inverse(origRot)) *
               m;
-            var newPos = toTranslateBack.GetPosition();
-            var translatedBack = Matrix4x4.Translate(origPos - newPos) * toTranslateBack;
+            Vector3 newPos = toTranslateBack.GetPosition();
+            Matrix4x4 translatedBack = Matrix4x4.Translate(origPos - newPos) * toTranslateBack;
             return translatedBack;
         }
 
@@ -2262,7 +2317,7 @@ namespace Ultraleap
 
         public static float GetEffectiveRadiusMultiplier(this CapsuleCollider capsule)
         {
-            var effRadiusMult = 0f;
+            float effRadiusMult = 0f;
             switch (capsule.direction)
             {
                 case 0:
@@ -2282,8 +2337,8 @@ namespace Ultraleap
         public static void GetCapsulePoints(this CapsuleCollider capsule, out Vector3 a,
                                                                           out Vector3 b)
         {
-            var effRadiusMult = capsule.GetEffectiveRadiusMultiplier();
-            var capsuleDir = capsule.GetDirection();
+            float effRadiusMult = capsule.GetEffectiveRadiusMultiplier();
+            Vector3 capsuleDir = capsule.GetDirection();
 
             a = capsuleDir * (capsule.height / 2f);
             b = -a;
@@ -2346,7 +2401,7 @@ namespace Ultraleap
                 toVisitQueue.TryDequeue(out curTransform);
 
                 // Recursively search children and children's children
-                foreach (var child in curTransform.GetChildren())
+                foreach (Transform child in curTransform.GetChildren())
                 {
                     // Ignore children with Rigidbodies of their own; its own Rigidbody
                     // owns its own colliders and the colliders of its children
@@ -2361,7 +2416,7 @@ namespace Ultraleap
                 // of every transform we visit.
                 collidersBuffer.Clear();
                 curTransform.GetComponents<T>(collidersBuffer);
-                foreach (var collider in collidersBuffer)
+                foreach (T collider in collidersBuffer)
                 {
                     colliders.Add(collider);
                 }
@@ -2410,8 +2465,16 @@ namespace Ultraleap
             Color.RGBToHSV(towardsColor, out h1, out s1, out v1);
 
             // Cyclically lerp hue. (Input hues are always between 0 and 1.)
-            if (h0 - h1 < -0.5f) h0 += 1f;
-            if (h0 - h1 > 0.5f) h1 += 1f;
+            if (h0 - h1 < -0.5f)
+            {
+                h0 += 1f;
+            }
+
+            if (h0 - h1 > 0.5f)
+            {
+                h1 += 1f;
+            }
+
             float hL = Mathf.Lerp(h0, h1, t) % 1f;
 
             float sL = Mathf.Lerp(s0, s1, t);
@@ -2425,13 +2488,36 @@ namespace Ultraleap
         public static float LerpHue(float h0, float h1, float t)
         {
             // Enforce hue values between 0f and 1f.
-            if (h0 < 0f) h0 = 1f - (-h0 % 1f);
-            if (h1 < 0f) h1 = 1f - (-h1 % 1f);
-            if (h0 > 1f) h0 = h0 % 1f;
-            if (h1 > 1f) h1 = h1 % 1f;
+            if (h0 < 0f)
+            {
+                h0 = 1f - (-h0 % 1f);
+            }
 
-            if (h0 - h1 < -0.5f) h0 += 1f;
-            if (h0 - h1 > 0.5f) h1 += 1f;
+            if (h1 < 0f)
+            {
+                h1 = 1f - (-h1 % 1f);
+            }
+
+            if (h0 > 1f)
+            {
+                h0 = h0 % 1f;
+            }
+
+            if (h1 > 1f)
+            {
+                h1 = h1 % 1f;
+            }
+
+            if (h0 - h1 < -0.5f)
+            {
+                h0 += 1f;
+            }
+
+            if (h0 - h1 > 0.5f)
+            {
+                h1 += 1f;
+            }
+
             return Mathf.Lerp(h0, h1, t) % 1f;
         }
 
@@ -2439,7 +2525,7 @@ namespace Ultraleap
         /// Color components are floats from 0-1. </summary>
         public static Vector3 HSVToRGB(Vector3 hsv)
         {
-            var c = Color.HSVToRGB(hsv.x, hsv.y, hsv.z);
+            Color c = Color.HSVToRGB(hsv.x, hsv.y, hsv.z);
             return new Vector3(c.r, c.g, c.b);
         }
 
@@ -2473,15 +2559,15 @@ namespace Ultraleap
             Gizmos.color = color;
             Vector3 right = Vector3.Cross(normal, forward).normalized;
             float deltaAngle = arc / quality;
-            Vector3 thisPoint = center + forward * radius;
+            Vector3 thisPoint = center + (forward * radius);
             Vector3 nextPoint = new Vector3();
             for (float angle = 0; Mathf.Abs(angle) <= Mathf.Abs(arc); angle += deltaAngle)
             {
                 float cosAngle = Mathf.Cos(angle * Mathf.Deg2Rad);
                 float sinAngle = Mathf.Sin(angle * Mathf.Deg2Rad);
-                nextPoint.x = center.x + radius * (cosAngle * forward.x + sinAngle * right.x);
-                nextPoint.y = center.y + radius * (cosAngle * forward.y + sinAngle * right.y);
-                nextPoint.z = center.z + radius * (cosAngle * forward.z + sinAngle * right.z);
+                nextPoint.x = center.x + (radius * ((cosAngle * forward.x) + (sinAngle * right.x)));
+                nextPoint.y = center.y + (radius * ((cosAngle * forward.y) + (sinAngle * right.y)));
+                nextPoint.z = center.z + (radius * ((cosAngle * forward.z) + (sinAngle * right.z)));
                 Gizmos.DrawLine(thisPoint, nextPoint);
                 thisPoint = nextPoint;
             }
@@ -2500,7 +2586,7 @@ namespace Ultraleap
             float step = height / quality;
             for (float q = step; q <= height; q += step)
             {
-                DrawCircle(origin + direction * q, direction, Mathf.Tan(angle * Mathf.Deg2Rad) * q, color, quality * 8, duration, depthTest);
+                DrawCircle(origin + (direction * q), direction, Mathf.Tan(angle * Mathf.Deg2Rad) * q, color, quality * 8, duration, depthTest);
             }
         }
 
@@ -2569,18 +2655,18 @@ namespace Ultraleap
         public static Rect PadInner(this Rect r, float padTop, float padBottom,
                                                  float padLeft, float padRight)
         {
-            var x = r.x + padLeft;
-            var y = r.y + padBottom;
-            var w = r.width - padRight - padLeft;
-            var h = r.height - padTop - padBottom;
+            float x = r.x + padLeft;
+            float y = r.y + padBottom;
+            float w = r.width - padRight - padLeft;
+            float h = r.height - padTop - padBottom;
             if (w < 0f)
             {
-                x = r.x + (padLeft / (padLeft + padRight)) * r.width;
+                x = r.x + (padLeft / (padLeft + padRight) * r.width);
                 w = 0;
             }
             if (h < 0f)
             {
-                y = r.y + (padBottom / (padBottom + padTop)) * r.height;
+                y = r.y + (padBottom / (padBottom + padTop) * r.height);
                 h = 0;
             }
             return new Rect(x, y, w, h);
@@ -2792,8 +2878,8 @@ namespace Ultraleap
                                           out Rect theRest,
                                           bool fromTop = true)
         {
-            theRest = new Rect(r.x, (fromTop ? r.y + lineHeight : r.y), r.width, r.height - lineHeight);
-            return new Rect(r.x, (fromTop ? r.y : r.y + r.height - lineHeight), r.width, lineHeight);
+            theRest = new Rect(r.x, fromTop ? r.y + lineHeight : r.y, r.width, r.height - lineHeight);
+            return new Rect(r.x, fromTop ? r.y : r.y + r.height - lineHeight, r.width, lineHeight);
         }
 
         public static void SplitHorizontallyWithLeft(this Rect rect, out Rect left, out Rect right, float leftWidth)
@@ -2821,9 +2907,9 @@ namespace Ultraleap
 
         public struct HorizontalLineRectEnumerator
         {
-            Rect rect;
-            int numLines;
-            int index;
+            private Rect rect;
+            private int numLines;
+            private int index;
 
             public HorizontalLineRectEnumerator(Rect rect, int numLines)
             {
@@ -2838,7 +2924,7 @@ namespace Ultraleap
             {
                 get
                 {
-                    return new Rect(rect.x, rect.y + eachHeight * index, rect.width,
+                    return new Rect(rect.x, rect.y + (eachHeight * index), rect.width,
                       eachHeight);
                 }
             }
@@ -2874,10 +2960,10 @@ namespace Ultraleap
             return false;
         }
 
-        static UnityEditor.PackageManager.PackageInfo GetPackageInfo(string packageName)
+        private static UnityEditor.PackageManager.PackageInfo GetPackageInfo(string packageName)
         {
-            var allPackages = UnityEditor.PackageManager.PackageInfo.GetAllRegisteredPackages();
-            foreach (var package in allPackages)
+            UnityEditor.PackageManager.PackageInfo[] allPackages = UnityEditor.PackageManager.PackageInfo.GetAllRegisteredPackages();
+            foreach (UnityEditor.PackageManager.PackageInfo package in allPackages)
             {
                 if (package.name == packageName)
                 {
@@ -2915,8 +3001,8 @@ namespace Ultraleap
         /// </summary>
         public static Pose MirroredX(this Pose pose)
         {
-            var v = pose.position;
-            var q = pose.rotation;
+            Vector3 v = pose.position;
+            Quaternion q = pose.rotation;
             return new Pose(new Vector3(-v.x, v.y, v.z),
                             new Quaternion(-q.x, q.y, q.z, -q.w).Flipped());
         }
@@ -2926,8 +3012,8 @@ namespace Ultraleap
         /// </summary>
         public static Pose Negated(this Pose pose)
         {
-            var v = pose.position;
-            var q = pose.rotation;
+            Vector3 v = pose.position;
+            Quaternion q = pose.rotation;
             return new Pose(new Vector3(-v.x, -v.y, -v.z),
                             new Quaternion(-q.z, -q.y, -q.z, q.w));
         }
@@ -2935,32 +3021,32 @@ namespace Ultraleap
         /// <summary> Given a Pose with some possibly non-identity translation, this operation rotates the pose by the quaternion `q`, then compensates for any translation the rotation might have introduced. Essentially, this operation "pivots" poses about their translated origin by the argument quaternion. </summary>
         public static Pose Pivot(this Pose p, Quaternion q)
         {
-            var origPos = p.position;
-            var toTranslateBack = q.mul(p);
-            var newPos = toTranslateBack.position;
-            var translatedBack = new Pose(origPos - newPos, Quaternion.identity).mul(toTranslateBack);
+            Vector3 origPos = p.position;
+            Pose toTranslateBack = q.mul(p);
+            Vector3 newPos = toTranslateBack.position;
+            Pose translatedBack = new Pose(origPos - newPos, Quaternion.identity).mul(toTranslateBack);
             return translatedBack;
         }
 
         /// <summary> As `Pivot()` with no Vector3 argument, but instead of pivoting the pose about its own local Vector3.zero position, the pose is pivoted about the argument world position `pivotPoint`. </summary>
         public static Pose Pivot(this Pose p, Quaternion q, Vector3 pivotPoint)
         {
-            var preservePos = pivotPoint;
-            var preservePos_local = p.inverse().mul(pivotPoint);
-            var toTranslateBack = q.mul(p);
-            var newPos = toTranslateBack.mul(preservePos_local).position;
-            var translatedBack = new Pose(preservePos - newPos, Quaternion.identity).mul(toTranslateBack);
+            Vector3 preservePos = pivotPoint;
+            Pose preservePos_local = p.inverse().mul(pivotPoint);
+            Pose toTranslateBack = q.mul(p);
+            Vector3 newPos = toTranslateBack.mul(preservePos_local).position;
+            Pose translatedBack = new Pose(preservePos - newPos, Quaternion.identity).mul(toTranslateBack);
             return translatedBack;
         }
 
         /// <summary> As `Pivot` but the pose's rotation matches `q` instead of being rotated by `q` at the end. </summary>
         public static Pose PivotTo(this Pose p, Quaternion q)
         {
-            var origPos = p.position;
-            var origRot = p.rotation;
-            var toTranslateBack = new Pose(Vector3.zero, q * Quaternion.Inverse(origRot)).mul(p);
-            var newPos = toTranslateBack.position;
-            var translatedBack = new Pose(origPos - newPos, Quaternion.identity).mul(toTranslateBack);
+            Vector3 origPos = p.position;
+            Quaternion origRot = p.rotation;
+            Pose toTranslateBack = new Pose(Vector3.zero, q * Quaternion.Inverse(origRot)).mul(p);
+            Vector3 newPos = toTranslateBack.position;
+            Pose translatedBack = new Pose(origPos - newPos, Quaternion.identity).mul(toTranslateBack);
             return translatedBack;
         }
 
@@ -3030,8 +3116,12 @@ namespace Ultraleap
         /// </summary>
         public static float Map(this float value, float valueMin, float valueMax, float resultMin, float resultMax)
         {
-            if (valueMin == valueMax) return resultMin;
-            return Mathf.Lerp(resultMin, resultMax, ((value - valueMin) / (valueMax - valueMin)));
+            if (valueMin == valueMax)
+            {
+                return resultMin;
+            }
+
+            return Mathf.Lerp(resultMin, resultMax, (value - valueMin) / (valueMax - valueMin));
         }
 
         /// <summary>
@@ -3040,8 +3130,12 @@ namespace Ultraleap
         /// </summary>
         public static float MapUnclamped(this float value, float valueMin, float valueMax, float resultMin, float resultMax)
         {
-            if (valueMin == valueMax) return resultMin;
-            return Mathf.LerpUnclamped(resultMin, resultMax, ((value - valueMin) / (valueMax - valueMin)));
+            if (valueMin == valueMax)
+            {
+                return resultMin;
+            }
+
+            return Mathf.LerpUnclamped(resultMin, resultMax, (value - valueMin) / (valueMax - valueMin));
         }
 
         /// <summary>

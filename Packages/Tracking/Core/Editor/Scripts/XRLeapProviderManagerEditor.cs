@@ -14,9 +14,9 @@ namespace Ultraleap
     [CustomEditor(typeof(XRLeapProviderManager))]
     public class XRLeapProviderManagerEditor : CustomEditorBase<XRLeapProviderManager>
     {
-        SerializedProperty serviceProviderProp;
-        SerializedProperty openXRProviderProp;
-        SerializedProperty trackingSourceProp;
+        private SerializedProperty serviceProviderProp;
+        private SerializedProperty openXRProviderProp;
+        private SerializedProperty trackingSourceProp;
 
         protected override void OnEnable()
         {

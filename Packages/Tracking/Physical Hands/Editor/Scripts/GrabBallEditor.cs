@@ -15,18 +15,17 @@ namespace Ultraleap.PhysicalHands
     [CustomEditor(typeof(GrabBall))]
     public class GrabBallEditor : CustomEditorBase<GrabBall>
     {
-        SerializedProperty _useAttachedObjectsXRotation;
-        SerializedProperty _xRotation;
-        SerializedProperty _restrictGrabBallDistanceFromHead;
-        SerializedProperty _maxHorizontalDistanceFromHead;
-        SerializedProperty _minHorizontalDistanceFromHead;
-        SerializedProperty _maxHeightFromHead;
-        SerializedProperty _minHeightFromHead;
-        SerializedProperty _drawGrabBallRestrictionGizmos;
-        SerializedProperty _attachedObject;
-        SerializedProperty _lerpSpeed;
-
-        SerializedProperty _continuouslyRestrictGrabBallDistanceFromHead;
+        private SerializedProperty _useAttachedObjectsXRotation;
+        private SerializedProperty _xRotation;
+        private SerializedProperty _restrictGrabBallDistanceFromHead;
+        private SerializedProperty _maxHorizontalDistanceFromHead;
+        private SerializedProperty _minHorizontalDistanceFromHead;
+        private SerializedProperty _maxHeightFromHead;
+        private SerializedProperty _minHeightFromHead;
+        private SerializedProperty _drawGrabBallRestrictionGizmos;
+        private SerializedProperty _attachedObject;
+        private SerializedProperty _lerpSpeed;
+        private SerializedProperty _continuouslyRestrictGrabBallDistanceFromHead;
 
         public override void OnInspectorGUI()
         {

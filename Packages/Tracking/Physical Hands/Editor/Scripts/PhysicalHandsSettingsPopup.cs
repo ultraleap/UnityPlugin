@@ -12,7 +12,7 @@ namespace Ultraleap.PhysicalHands
     [InitializeOnLoad]
     internal static class PhysicalHandsSettingsPopup
     {
-        static PhysicalHandsSettingsPopupWindow window;
+        private static PhysicalHandsSettingsPopupWindow window;
 
         static PhysicalHandsSettingsPopup()
         {
@@ -80,7 +80,7 @@ namespace Ultraleap.PhysicalHands
 
             if (showAgain != UltraleapSettings.Instance.showPhysicalHandsPhysicsSettingsWarning)
             {
-                if(!showAgain)
+                if (!showAgain)
                 {
                     Debug.Log("You have chosen to not show the Physical Hands Recommended Settings warning, you can enable it via Ultraleap Settings in the Project Settings panel");
                 }

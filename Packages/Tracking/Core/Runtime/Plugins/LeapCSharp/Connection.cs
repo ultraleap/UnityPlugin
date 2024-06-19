@@ -8,11 +8,11 @@
 
 namespace LeapInternal
 {
-    using Ultraleap;
     using System;
     using System.Collections.Generic;
     using System.Runtime.InteropServices;
     using System.Threading;
+    using Ultraleap;
     using UnityEngine;
 
     public class Connection
@@ -98,7 +98,9 @@ namespace LeapInternal
             {
                 _leapInit += value;
                 if (_leapConnection != IntPtr.Zero)
+                {
                     value(this, new LeapEventArgs(LeapEvent.EVENT_INIT));
+                }
             }
             remove { _leapInit -= value; }
         }
@@ -110,7 +112,9 @@ namespace LeapInternal
             {
                 _leapConnectionEvent += value;
                 if (IsServiceConnected)
+                {
                     value(this, new ConnectionEventArgs());
+                }
             }
             remove { _leapConnectionEvent -= value; }
         }
@@ -150,7 +154,9 @@ namespace LeapInternal
         protected virtual void Dispose(bool disposing)
         {
             if (_disposed)
+            {
                 return;
+            }
 
             Stop();
             LeapC.DestroyConnection(_leapConnection);
@@ -186,7 +192,9 @@ namespace LeapInternal
         public void Start(LEAP_CONNECTION_CONFIG config)
         {
             if (_isRunning)
+            {
                 return;
+            }
 
             eLeapRS result;
             if (_leapConnection == IntPtr.Zero)
@@ -246,7 +254,9 @@ namespace LeapInternal
         public void Stop()
         {
             if (!_isRunning)
+            {
                 return;
+            }
 
             _isRunning = false;
 
@@ -615,7 +625,7 @@ namespace LeapInternal
         }
         private void handleDeviceStatusEvent(ref LEAP_DEVICE_STATUS_CHANGE_EVENT statusEvent)
         {
-            var device = _devices.FindDeviceByHandle(statusEvent.device.handle);
+            Device device = _devices.FindDeviceByHandle(statusEvent.device.handle);
             if (device == null)
             {
                 return;
@@ -637,11 +647,15 @@ namespace LeapInternal
         {
             IntPtr deviceHandle = deviceMsg.device.handle;
             if (deviceHandle == IntPtr.Zero)
+            {
                 return;
+            }
 
             IntPtr connectionHandle = deviceMsg.device.handle;
             if (connectionHandle == IntPtr.Zero)
+            {
                 return;
+            }
 
             LEAP_DEVICE_INFO deviceInfo = new LEAP_DEVICE_INFO();
             eLeapRS result;
@@ -649,13 +663,17 @@ namespace LeapInternal
             IntPtr device;
             result = LeapC.OpenDevice(deviceMsg.device, out device);
             if (result != eLeapRS.eLeapRS_Success)
+            {
                 return;
+            }
 
             deviceInfo.serial = IntPtr.Zero;
             deviceInfo.size = (uint)Marshal.SizeOf(deviceInfo);
             result = LeapC.GetDeviceInfo(device, ref deviceInfo); //Query the serial length
             if (result != eLeapRS.eLeapRS_Success)
+            {
                 return;
+            }
 
             deviceInfo.serial = Marshal.AllocCoTaskMem((int)deviceInfo.serial_length);
             result = LeapC.GetDeviceInfo(device, ref deviceInfo); //Query the serial
@@ -689,7 +707,9 @@ namespace LeapInternal
             IntPtr deviceHandle;
             eLeapRS result = LeapC.OpenDevice(deviceMsg.device, out deviceHandle);
             if (result != eLeapRS.eLeapRS_Success)
+            {
                 return;
+            }
 
             //UnityEngine.Debug.Log("handleLostDevice: " + deviceHandle);
             Device lost = _devices.FindDeviceByHandle(deviceHandle);
@@ -1101,7 +1121,9 @@ namespace LeapInternal
             get
             {
                 if (_leapConnection == IntPtr.Zero)
+                {
                     return false;
+                }
 
                 LEAP_CONNECTION_INFO pInfo = new LEAP_CONNECTION_INFO();
                 pInfo.size = (uint)Marshal.SizeOf(pInfo);
@@ -1109,7 +1131,9 @@ namespace LeapInternal
                 reportAbnormalResults("LeapC GetConnectionInfo call was ", result);
 
                 if (pInfo.status == eLeapConnectionStatus.eLeapConnectionStatus_Connected)
+                {
                     return true;
+                }
 
                 return false;
             }
@@ -1189,9 +1213,9 @@ namespace LeapInternal
         {
             LEAP_VECTOR pixelStruct = new LEAP_VECTOR(pixel);
             LEAP_VECTOR ray = LeapC.LeapPixelToRectilinear(_leapConnection,
-                   (camera == Image.CameraType.LEFT ?
+                   camera == Image.CameraType.LEFT ?
                    eLeapPerspectiveType.eLeapPerspectiveType_stereo_left :
-                   eLeapPerspectiveType.eLeapPerspectiveType_stereo_right),
+                   eLeapPerspectiveType.eLeapPerspectiveType_stereo_right,
                    pixelStruct);
             return new UnityEngine.Vector3(ray.x, ray.y, ray.z);
         }
@@ -1203,12 +1227,12 @@ namespace LeapInternal
             LEAP_VECTOR pixelStruct = new LEAP_VECTOR(pixel);
             LEAP_VECTOR ray = LeapC.LeapPixelToRectilinearEx(_leapConnection,
                    deviceHandle,
-                   (camera == Image.CameraType.LEFT ?
+                   camera == Image.CameraType.LEFT ?
                    eLeapPerspectiveType.eLeapPerspectiveType_stereo_left :
-                   eLeapPerspectiveType.eLeapPerspectiveType_stereo_right),
-                   (calibType == Image.CalibrationType.INFRARED ?
+                   eLeapPerspectiveType.eLeapPerspectiveType_stereo_right,
+                   calibType == Image.CalibrationType.INFRARED ?
                    eLeapCameraCalibrationType.eLeapCameraCalibrationType_infrared :
-                   eLeapCameraCalibrationType.eLeapCameraCalibrationType_visual),
+                   eLeapCameraCalibrationType.eLeapCameraCalibrationType_visual,
                    pixelStruct);
             return new UnityEngine.Vector3(ray.x, ray.y, ray.z);
         }
@@ -1224,9 +1248,9 @@ namespace LeapInternal
             LEAP_VECTOR pixelStruct = new LEAP_VECTOR(pixel);
             LEAP_VECTOR ray = LeapC.LeapPixelToRectilinearEx(_leapConnection,
                    deviceHandle,
-                   (camera == Image.CameraType.LEFT ?
+                   camera == Image.CameraType.LEFT ?
                    eLeapPerspectiveType.eLeapPerspectiveType_stereo_left :
-                   eLeapPerspectiveType.eLeapPerspectiveType_stereo_right),
+                   eLeapPerspectiveType.eLeapPerspectiveType_stereo_right,
                    pixelStruct);
             return new UnityEngine.Vector3(ray.x, ray.y, ray.z);
         }
@@ -1238,9 +1262,9 @@ namespace LeapInternal
         {
             LEAP_VECTOR rayStruct = new LEAP_VECTOR(ray);
             LEAP_VECTOR pixel = LeapC.LeapRectilinearToPixel(_leapConnection,
-                   (camera == Image.CameraType.LEFT ?
+                   camera == Image.CameraType.LEFT ?
                    eLeapPerspectiveType.eLeapPerspectiveType_stereo_left :
-                   eLeapPerspectiveType.eLeapPerspectiveType_stereo_right),
+                   eLeapPerspectiveType.eLeapPerspectiveType_stereo_right,
                    rayStruct);
             return new UnityEngine.Vector3(pixel.x, pixel.y, pixel.z);
         }
@@ -1256,9 +1280,9 @@ namespace LeapInternal
             LEAP_VECTOR rayStruct = new LEAP_VECTOR(ray);
             LEAP_VECTOR pixel = LeapC.LeapRectilinearToPixelEx(_leapConnection,
                    deviceHandle,
-                   (camera == Image.CameraType.LEFT ?
+                   camera == Image.CameraType.LEFT ?
                    eLeapPerspectiveType.eLeapPerspectiveType_stereo_left :
-                   eLeapPerspectiveType.eLeapPerspectiveType_stereo_right),
+                   eLeapPerspectiveType.eLeapPerspectiveType_stereo_right,
                    rayStruct);
             return new UnityEngine.Vector3(pixel.x, pixel.y, pixel.z);
         }
@@ -1279,7 +1303,10 @@ namespace LeapInternal
                 if (result == eLeapRS.eLeapRS_InsufficientBuffer)
                 {
                     if (buffer != IntPtr.Zero)
+                    {
                         Marshal.FreeHGlobal(buffer);
+                    }
+
                     buffer = Marshal.AllocHGlobal((Int32)size);
                     continue;
                 }

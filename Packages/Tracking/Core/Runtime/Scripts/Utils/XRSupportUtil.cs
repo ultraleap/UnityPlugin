@@ -26,7 +26,7 @@ namespace Ultraleap
 
         private static System.Collections.Generic.List<XRNodeState> nodeStates =
           new System.Collections.Generic.List<XRNodeState>();
-        static List<Vector3> _boundaryPoints = new List<Vector3>();
+        private static List<Vector3> _boundaryPoints = new List<Vector3>();
 
         public static bool IsXREnabled()
         {
@@ -46,10 +46,10 @@ namespace Ultraleap
 #endif
         }
 
-        static bool outputPresenceWarning = false;
+        private static bool outputPresenceWarning = false;
         public static bool IsUserPresent(bool defaultPresence = true)
         {
-            var devices = new List<InputDevice>();
+            List<InputDevice> devices = new List<InputDevice>();
             InputDevices.GetDevicesWithCharacteristics(InputDeviceCharacteristics.HeadMounted, devices);
 
             if (devices.Count == 0 && !outputPresenceWarning)
@@ -60,8 +60,8 @@ namespace Ultraleap
 
             if (devices.Count != 0)
             {
-                var device = devices[0];
-                if (device.TryGetFeatureValue(CommonUsages.userPresence, out var userPresent))
+                InputDevice device = devices[0];
+                if (device.TryGetFeatureValue(CommonUsages.userPresence, out bool userPresent))
                 {
                     return userPresent;
                 }
@@ -172,12 +172,14 @@ namespace Ultraleap
 
         public static void Recenter()
         {
-            var devices = new List<InputDevice>();
+            List<InputDevice> devices = new List<InputDevice>();
             InputDevices.GetDevicesWithCharacteristics(InputDeviceCharacteristics.HeadMounted, devices);
             if (devices.Count == 0)
+            {
                 return;
+            }
 
-            var hmdDevice = devices[0];
+            InputDevice hmdDevice = devices[0];
             hmdDevice.subsystem.TryRecenter();
 #pragma warning disable CS0618 // Type or member is obsolete
             InputTracking.Recenter();
@@ -199,7 +201,7 @@ namespace Ultraleap
         /// <summary> Returns whether there's a floor available. </summary>
         public static bool IsRoomScale()
         {
-            var devices = new List<InputDevice>();
+            List<InputDevice> devices = new List<InputDevice>();
             InputDevices.GetDevicesWithCharacteristics(InputDeviceCharacteristics.HeadMounted, devices);
 
             if (devices.Count == 0)
@@ -207,14 +209,14 @@ namespace Ultraleap
                 return false;
             }
 
-            var hmdDevice = devices[0];
+            InputDevice hmdDevice = devices[0];
             return hmdDevice.subsystem.GetTrackingOriginMode().HasFlag(TrackingOriginModeFlags.Floor);
         }
 
         /// <summary> Returns whether the playspace is larger than 1m on its shortest side. </summary>
         public static bool IsLargePlayspace()
         {
-            var devices = new List<InputDevice>();
+            List<InputDevice> devices = new List<InputDevice>();
             InputDevices.GetDevicesWithCharacteristics(InputDeviceCharacteristics.HeadMounted, devices);
 
             if (devices.Count == 0)
@@ -222,7 +224,7 @@ namespace Ultraleap
                 return false;
             }
 
-            var hmdDevice = devices[0];
+            InputDevice hmdDevice = devices[0];
             hmdDevice.subsystem.TryGetBoundaryPoints(_boundaryPoints);
             Bounds playspaceSize = new Bounds();
             foreach (Vector3 boundaryPoint in _boundaryPoints)

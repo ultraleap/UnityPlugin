@@ -6,9 +6,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using System.Linq;
 using UnityEditor;
-using UnityEngine;
 
 namespace Ultraleap
 {

@@ -14,11 +14,10 @@ namespace LeapInternal
 
     public static class ServerStatus
     {
-        const double requestInterval = 1.0f;
-        static double lastRequestTimestamp;
-
-        static LeapC.LEAP_SERVER_STATUS lastStatus;
-        static LeapC.LEAP_SERVER_STATUS_DEVICE[] lastDevices;
+        private const double requestInterval = 1.0f;
+        private static double lastRequestTimestamp;
+        private static LeapC.LEAP_SERVER_STATUS lastStatus;
+        private static LeapC.LEAP_SERVER_STATUS_DEVICE[] lastDevices;
 
         public static void GetStatus()
         {
@@ -101,14 +100,14 @@ namespace LeapInternal
             return "";
         }
 
-        static void MarshalUnmananagedArray2Struct<T>(IntPtr unmanagedArray, int length, out T[] mangagedArray)
+        private static void MarshalUnmananagedArray2Struct<T>(IntPtr unmanagedArray, int length, out T[] mangagedArray)
         {
-            var size = Marshal.SizeOf(typeof(T));
+            int size = Marshal.SizeOf(typeof(T));
             mangagedArray = new T[length];
 
             for (int i = 0; i < length; i++)
             {
-                IntPtr ins = new IntPtr(unmanagedArray.ToInt64() + i * size);
+                IntPtr ins = new IntPtr(unmanagedArray.ToInt64() + (i * size));
                 mangagedArray[i] = Marshal.PtrToStructure<T>(ins);
             }
         }

@@ -131,8 +131,7 @@ namespace Ultraleap
         /// @since 2.0
         /// </summary>
         public Quaternion Rotation;
-
-        LeapTransform _basis = new LeapTransform(Vector3.one, Quaternion.identity);
+        private LeapTransform _basis = new LeapTransform(Vector3.one, Quaternion.identity);
 
         /// <summary>
         /// The orthonormal basis vectors for this Bone as a Matrix.

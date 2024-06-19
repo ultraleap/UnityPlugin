@@ -62,7 +62,7 @@ namespace Ultraleap.InputModule
 
         private void drawElement(Rect rect, int index, bool isActive, bool isFocused)
         {
-            var element = list.serializedProperty.GetArrayElementAtIndex(index);
+            SerializedProperty element = list.serializedProperty.GetArrayElementAtIndex(index);
             Rect r = rect;
             r.height /= 7;
 

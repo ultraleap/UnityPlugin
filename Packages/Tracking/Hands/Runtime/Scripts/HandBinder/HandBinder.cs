@@ -166,7 +166,7 @@ namespace Ultraleap.HandsModule
         /// <summary>
         /// Set the hand model scale based on the CalculatedRatio()
         /// </summary>
-        void SetHandScale()
+        private void SetHandScale()
         {
             if (leapProvider == null)
             {
@@ -190,10 +190,13 @@ namespace Ultraleap.HandsModule
 
                 for (int i = 0; i < BoundHand.fingers.Length; i++)
                 {
-                    var finger = BoundHand.fingers[i];
-                    var lastBone = finger.boundBones[(int)Bone.BoneType.DISTAL];
+                    BoundFinger finger = BoundHand.fingers[i];
+                    BoundBone lastBone = finger.boundBones[(int)Bone.BoneType.DISTAL];
 
-                    if (lastBone.boundTransform == null || lastBone.startTransform.scale == Vector3.zero) continue;
+                    if (lastBone.boundTransform == null || lastBone.startTransform.scale == Vector3.zero)
+                    {
+                        continue;
+                    }
 
                     lastBone.boundTransform.localScale = lastBone.startTransform.scale;
                 }
@@ -205,10 +208,10 @@ namespace Ultraleap.HandsModule
         /// <summary>
         /// Set the scale of the model 
         /// </summary>
-        void ScaleModel()
+        private void ScaleModel()
         {
-            float middleFingerRatio = (CalculateLeapMiddleFingerLength(LeapHand) / BoundHand.baseScale);
-            float scaleRatio = (middleFingerRatio * BoundHand.scaleOffset);
+            float middleFingerRatio = CalculateLeapMiddleFingerLength(LeapHand) / BoundHand.baseScale;
+            float scaleRatio = middleFingerRatio * BoundHand.scaleOffset;
 
             //Apply the target scale directly during editor
             if (!Application.isPlaying)
@@ -217,7 +220,7 @@ namespace Ultraleap.HandsModule
             }
             else // Lerp the scale during playmode
             {
-                var targetScale = BoundHand.startScale * scaleRatio;
+                Vector3 targetScale = BoundHand.startScale * scaleRatio;
 
                 if (Time.time - lastHandFoundTime < instantScaleAfterHandFoundTime)
                 {
@@ -235,7 +238,7 @@ namespace Ultraleap.HandsModule
         /// <summary>
         /// Set the scale for each finger tip
         /// </summary>
-        void ScaleFingertips()
+        private void ScaleFingertips()
         {
             //Scale all the finger tips to match the leap data 
             for (int i = 0; i < BoundHand.fingers.Length; i++)
@@ -258,9 +261,9 @@ namespace Ultraleap.HandsModule
                 //Calculate a ratio to use for scaling the finger tip
                 float ratio = leapFingerLength / fingerTipLength;
                 //Adjust the ratio by an offset value exposed in the inspector and the overal scale that has been calculated
-                float adjustedRatio = (ratio * (finger.fingerTipScaleOffset) - BoundHand.scaleOffset);
+                float adjustedRatio = (ratio * finger.fingerTipScaleOffset) - BoundHand.scaleOffset;
                 //Adjust the ratio to account for service provider scale, assuming the service provider is uniformly scaled
-                var serviceProviderScale = leapProvider?.gameObject.transform.lossyScale.x ?? 1f;
+                float serviceProviderScale = leapProvider?.gameObject.transform.lossyScale.x ?? 1f;
                 adjustedRatio /= serviceProviderScale;
                 //Calculate the direction that goes up the bone towards the next bone
                 Vector3 direction = (intermediateBone.boundTransform.position - distalBone.boundTransform.position).normalized;
@@ -286,7 +289,7 @@ namespace Ultraleap.HandsModule
         /// <summary>
         /// Set the Elbow joint into the correct position and rotation
         /// </summary>
-        void TransformElbow()
+        private void TransformElbow()
         {
 
 
@@ -303,19 +306,19 @@ namespace Ultraleap.HandsModule
                 Vector3 dir = -LeapHand.Arm.Direction.normalized;
 
                 //Position the elbow at the models elbow length
-                Vector3 position = LeapHand.WristPosition + dir * (ElbowLength * scaleElbowLength);
+                Vector3 position = LeapHand.WristPosition + (dir * (ElbowLength * scaleElbowLength));
 
                 if (SetModelScale)
                 {
                     if (SetPositions)
                     {
                         //Use the leap length to position the elbow and allow it to be mofied by the user
-                        position = LeapHand.WristPosition + dir * (LeapHand.Arm.Length * BoundHand.elbowOffset);
+                        position = LeapHand.WristPosition + (dir * (LeapHand.Arm.Length * BoundHand.elbowOffset));
                     }
                     else
                     {
                         //Use the models length to position the elbow and allow it to be mofied by elbow offset
-                        position = LeapHand.WristPosition + dir * ((ElbowLength * scaleElbowLength) * BoundHand.elbowOffset);
+                        position = LeapHand.WristPosition + (dir * (ElbowLength * scaleElbowLength * BoundHand.elbowOffset));
                     }
                 }
                 else
@@ -344,16 +347,16 @@ namespace Ultraleap.HandsModule
         /// <summary>
         /// Set the wrist into the correct position and rotation
         /// </summary>
-        void TransformWrist()
+        private void TransformWrist()
         {
             //Update the wrist's position and rotation to leap data
             if (BoundHand.wrist.boundTransform != null)
             {
                 //Calculate the position of the wrist to the leap position + offset defined by the user
-                var wristPosition = LeapHand.WristPosition + BoundHand.wrist.offset.position;
+                Vector3 wristPosition = LeapHand.WristPosition + BoundHand.wrist.offset.position;
 
                 //Calculate rotation offset needed to get the wrist into the same rotation as the leap based on the calculated wrist offset
-                var leapRotationOffset = ((Quaternion.Inverse(BoundHand.wrist.boundTransform.transform.rotation) * LeapHand.Rotation) * Quaternion.Euler(WristRotationOffset)).eulerAngles;
+                Vector3 leapRotationOffset = (Quaternion.Inverse(BoundHand.wrist.boundTransform.transform.rotation) * LeapHand.Rotation * Quaternion.Euler(WristRotationOffset)).eulerAngles;
 
                 //Set the wrist bone to the calculated values
                 BoundHand.wrist.boundTransform.transform.position = wristPosition;
@@ -364,20 +367,20 @@ namespace Ultraleap.HandsModule
         /// <summary>
         /// Set a bone of the hand model into the correct position and rotation
         /// </summary>
-        void TransformFingerBones()
+        private void TransformFingerBones()
         {
 
             for (int fingerIndex = 0; fingerIndex < BoundHand.fingers.Length; fingerIndex++)
             {
-                var finger = BoundHand.fingers[fingerIndex];
+                BoundFinger finger = BoundHand.fingers[fingerIndex];
 
                 for (int boneIndex = 0; boneIndex < finger.boundBones.Length; boneIndex++)
                 {
-                    var boundBone = finger.boundBones[boneIndex];
-                    var startTransform = boundBone.startTransform;
-                    var leapBone = LeapHand.fingers[fingerIndex].bones[boneIndex];
-                    var boneOffset = boundBone.offset;
-                    var boundTransform = boundBone.boundTransform;
+                    BoundBone boundBone = finger.boundBones[boneIndex];
+                    TransformStore startTransform = boundBone.startTransform;
+                    Bone leapBone = LeapHand.fingers[fingerIndex].bones[boneIndex];
+                    TransformStore boneOffset = boundBone.offset;
+                    Transform boundTransform = boundBone.boundTransform;
 
                     //Continue if the user has not defined a transform for this finger
                     if (boundBone.boundTransform == null)
@@ -422,18 +425,18 @@ namespace Ultraleap.HandsModule
         /// <summary>
         /// Calculate the leap hand size
         /// </summary>
-        float CalculateLeapMiddleFingerLength(Hand hand)
+        private float CalculateLeapMiddleFingerLength(Hand hand)
         {
             bool AddedWristToFirstBone = false;
 
-            var length = 0f;
+            float length = 0f;
             for (int i = 0; i < hand.fingers[(int)Finger.FingerType.MIDDLE].bones.Length; i++)
             {
                 //If the bound hand does not contain a bone then don't count this in the calculation for leap length
-                var boundBone = BoundHand.fingers[(int)Finger.FingerType.MIDDLE].boundBones[i];
+                BoundBone boundBone = BoundHand.fingers[(int)Finger.FingerType.MIDDLE].boundBones[i];
                 if (boundBone.boundTransform != null)
                 {
-                    var bone = hand.fingers[(int)Finger.FingerType.MIDDLE].bones[i];
+                    Bone bone = hand.fingers[(int)Finger.FingerType.MIDDLE].bones[i];
 
                     if (!AddedWristToFirstBone)
                     {
@@ -450,9 +453,9 @@ namespace Ultraleap.HandsModule
         /// <summary>
         /// Calculate the local axis given a direcition
         /// </summary>
-        Vector3 CalculateAxis(Transform t, Vector3 dir)
+        private Vector3 CalculateAxis(Transform t, Vector3 dir)
         {
-            var boneForward = t.InverseTransformDirection(dir.normalized).normalized;
+            Vector3 boneForward = t.InverseTransformDirection(dir.normalized).normalized;
             // Ensure axes are positive to account for negative model scaling
             boneForward.x = Mathf.Abs(boneForward.x);
             boneForward.y = Mathf.Abs(boneForward.y);
@@ -487,17 +490,17 @@ namespace Ultraleap.HandsModule
             }
         }
 
-        void SetDefaultHandPose()
+        private void SetDefaultHandPose()
         {
             //Store all children transforms so the user has the ability to reset back to a default pose
-            var allChildren = new List<Transform>();
+            List<Transform> allChildren = new List<Transform>();
             allChildren.Add(transform);
             allChildren.AddRange(HandBinderAutoBinder.GetAllChildren(transform));
 
-            var baseTransforms = new List<SerializedTransform>();
-            foreach (var child in allChildren)
+            List<SerializedTransform> baseTransforms = new List<SerializedTransform>();
+            foreach (Transform child in allChildren)
             {
-                var serializedTransform = new SerializedTransform();
+                SerializedTransform serializedTransform = new SerializedTransform();
                 serializedTransform.reference = child.gameObject;
                 serializedTransform.transform = new TransformStore();
                 serializedTransform.transform.position = child.localPosition;
@@ -514,7 +517,10 @@ namespace Ultraleap.HandsModule
         /// </summary>
         public void ResetHand(bool forceReset = false)
         {
-            if (this == null) return;
+            if (this == null)
+            {
+                return;
+            }
 
             if (DefaultHandPose == null)
             {
@@ -530,7 +536,7 @@ namespace Ultraleap.HandsModule
             for (int i = 0; i < DefaultHandPose.Length; i++)
             {
 
-                var baseTransform = DefaultHandPose[i];
+                SerializedTransform baseTransform = DefaultHandPose[i];
                 if (baseTransform != null && baseTransform.reference != null)
                 {
                     baseTransform.reference.transform.localPosition = baseTransform.transform.position;
@@ -546,7 +552,7 @@ namespace Ultraleap.HandsModule
             }
         }
 
-        bool CanUseScaleFeature()
+        private bool CanUseScaleFeature()
         {
             if (BoundHand.startScale == Vector3.zero || BoundHand.baseScale == 0 || BoundHand.fingers.Any(x => x.fingerTipBaseLength == 0) || BoundHand.fingers.Any(x => x.boundBones.Any(y => y.boundTransform != null && y.startTransform.scale == Vector3.zero)))
             {
@@ -571,46 +577,46 @@ namespace Ultraleap.HandsModule
         /// Set the assigned transforms to the leap hand during editor 
         /// </summary>
         [Tooltip("Set the assigned transforms to the leap hand during editor"), SerializeField]
-        bool SetEditorPose = true;
+        private bool SetEditorPose = true;
 
         /// <summary> 
         /// The size of the debug gizmos 
         /// </summary>
         [Tooltip("The size of the debug gizmos"), SerializeField]
-        float GizmoSize = 0.004f;
+        private float GizmoSize = 0.004f;
 
         /// <summary> 
         /// Show the Leap Hand in the scene 
         /// </summary>
         [Tooltip("Show the Leap Hand in the scene"), SerializeField]
-        bool DebugLeapHand = true;
+        private bool DebugLeapHand = true;
         /// <summary> 
         /// Show the leap's rotation axis in the scene 
         /// </summary>
         [Tooltip("Show the leap's rotation axis in the scene"), SerializeField]
-        bool DebugLeapRotationAxis = false;
+        private bool DebugLeapRotationAxis = false;
         /// <summary> 
         /// Show the assigned gameobjects as gizmos in the scene 
         /// </summary>
         [Tooltip("Show the assigned gameobjects as gizmos in the scene"), SerializeField]
-        bool DebugModelTransforms = true;
+        private bool DebugModelTransforms = true;
         /// <summary> 
         /// Show the assigned gameobjects rotation axis in the scene 
         /// </summary>
         [Tooltip("Show the assigned gameobjects rotation axis in the scene"), SerializeField]
-        bool DebugModelRotationAxis;
+        private bool DebugModelRotationAxis;
 
         /// <summary> 
         /// Used by the editor script. Fine tuning allows to specify custom wrist and 
         /// finger rotation offsets. 
         /// </summary>
-        [SerializeField] bool FineTuning;
+        [SerializeField] private bool FineTuning;
 
         /// <summary>  
         /// Used by the editor script. The DebugOptions allow to show a debug hand in the scene view
         /// and visualize its rotation and its attached gameobjects
         /// </summary>
-        [SerializeField] bool DebugOptions;
+        [SerializeField] private bool DebugOptions;
 
 #pragma warning restore 0414
 
@@ -635,7 +641,7 @@ namespace Ultraleap.HandsModule
             return editorPersistance;
         }
 
-        bool resetScale = false;
+        private bool resetScale = false;
 
         #endregion
     }

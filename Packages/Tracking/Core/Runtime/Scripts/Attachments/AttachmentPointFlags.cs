@@ -86,7 +86,11 @@ namespace Ultraleap.Attachments
         /// <returns></returns>
         public static bool Contains(this AttachmentPointFlags points, AttachmentPointFlags otherPoints)
         {
-            if (points == AttachmentPointFlags.None || otherPoints == AttachmentPointFlags.None) return false;
+            if (points == AttachmentPointFlags.None || otherPoints == AttachmentPointFlags.None)
+            {
+                return false;
+            }
+
             return (points & otherPoints) == otherPoints;
         }
 

@@ -1,5 +1,4 @@
 using Ultraleap.PhysicalHands;
-using UnityEngine;
 
 namespace Ultraleap
 {
@@ -31,7 +30,7 @@ namespace Ultraleap
         }
 
         // If the anchor is an attachment hand, we should ignore grabbing with the specific achored hand
-        void OnAttached()
+        private void OnAttached()
         {
             if (Anchor.AttahedHandChirality != ChiralitySelection.NONE)
             {
@@ -46,9 +45,9 @@ namespace Ultraleap
         }
 
         // Revert to original ignorehand state if there was one
-        void OnDetached()
+        private void OnDetached()
         {
-            if(_ignorePhysicalHands != null)
+            if (_ignorePhysicalHands != null)
             {
                 _ignorePhysicalHands.HandToIgnoreGrabs = originalIgnoreHandsGrab;
                 _ignorePhysicalHands.HandToIgnoreCollisions = originalIgnoreHandsCollisions;
@@ -84,7 +83,7 @@ namespace Ultraleap
                 rightHandGrabbing = false;
             }
 
-            if(!leftHandGrabbing && !rightHandGrabbing && TryAnchorNearestOnGraspEnd)
+            if (!leftHandGrabbing && !rightHandGrabbing && TryAnchorNearestOnGraspEnd)
             {
                 // Neither hand is grabbing. Object has been dropped
                 TryAttachToNearestAnchor();

@@ -24,27 +24,27 @@ namespace Ultraleap.InputModule
 
         //The event that is triggered upon clicking on a non-canvas UI element.
         [Tooltip("The event that is triggered upon clicking on a non-canvas UI element.")]
-        [SerializeField] PositionEvent onClickDown;
+        [SerializeField] private PositionEvent onClickDown;
 
         //The event that is triggered upon lifting up from a non-canvas UI element (Not 1:1 with onClickDown!)
         [Tooltip("The event that is triggered upon lifting up from a non-canvas UI element (Not 1:1 with onClickDown!)")]
-        [SerializeField] PositionEvent onClickUp;
+        [SerializeField] private PositionEvent onClickUp;
 
         //The event that is triggered upon hovering over a non-canvas UI element.
         [Tooltip("The event that is triggered upon hovering over a non-canvas UI element.")]
-        [SerializeField] PositionEvent onBeginHover;
+        [SerializeField] private PositionEvent onBeginHover;
 
         //The event that is triggered upon hovering over a non-canvas UI element.
         [Tooltip("The event that is triggered upon ending hovering over a non-canvas UI element.")]
-        [SerializeField] PositionEvent onEndHover;
+        [SerializeField] private PositionEvent onEndHover;
 
         //The event that is triggered upon hovering over a non-canvas UI element.
         [Tooltip("The event that is triggered upon missing a non-canvas UI element.")]
-        [SerializeField] PositionEvent onBeginMissed;
+        [SerializeField] private PositionEvent onBeginMissed;
 
         //The event that is triggered upon hovering over a non-canvas UI element.
         [Tooltip("The event that is triggered upon ending missing a non-canvas UI element.")]
-        [SerializeField] PositionEvent onEndMissed;
+        [SerializeField] private PositionEvent onEndMissed;
 
         private void OnClickDown(object sender, Vector3 pos) => onClickDown?.Invoke(pos);
         private void OnClickUp(object sender, Vector3 pos) => onClickUp?.Invoke(pos);

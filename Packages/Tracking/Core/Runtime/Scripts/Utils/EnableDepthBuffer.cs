@@ -19,7 +19,7 @@ namespace Ultraleap
         [SerializeField]
         private DepthTextureMode _depthTextureMode = DepthTextureMode.Depth;
 
-        void Awake()
+        private void Awake()
         {
             if (_camera == null)
             {

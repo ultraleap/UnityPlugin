@@ -15,7 +15,7 @@ namespace Ultraleap.Attributes
 {
     public class IndentAttribute : CombinablePropertyAttribute, IBeforeLabelAdditiveDrawer
     {
-        float width = 20;
+        private float width = 20;
 
         public IndentAttribute()
         {

@@ -114,10 +114,12 @@ namespace Ultraleap.PhysicalHands
 
             if (result != null)
             {
-                foreach (var value in result.Values) // loop through values
+                foreach (ClosestColliderDirection value in result.Values) // loop through values
                 {
                     if (value.isContactingCollider)
+                    {
                         return true;
+                    }
                 }
             }
 
@@ -187,7 +189,7 @@ namespace Ultraleap.PhysicalHands
             }
             else
             {
-                boneCollider.ToWorldSpaceCapsule(out tipPosition, out var temp, out width);
+                boneCollider.ToWorldSpaceCapsule(out tipPosition, out Vector3 temp, out width);
             }
 
             UpdateObjectDistances(colliderCache, count);
@@ -226,7 +228,7 @@ namespace Ultraleap.PhysicalHands
                     // Do palm logic
                     colliderPos = ContactUtils.ClosestPointEstimationFromRectangle(_palmColCenter, _palmColRotation, _palmExtentsReduced.xz(), collider);
                     bonePos = ContactUtils.ClosestPointToRectangleFace(_palmPoints, _palmPlane.ClosestPointOnPlane(colliderTransformPosition));
-                    midPoint = colliderPos + (bonePos + ((bonePos - colliderPos).normalized * width) - colliderPos) / 2f;
+                    midPoint = colliderPos + ((bonePos + ((bonePos - colliderPos).normalized * width) - colliderPos) / 2f);
 
                     colliderPos = collider.ClosestPoint(midPoint);
                     bonePos = ContactUtils.ClosestPointToRectangleFace(_palmPoints, _palmPlane.ClosestPointOnPlane(midPoint));
@@ -242,7 +244,7 @@ namespace Ultraleap.PhysicalHands
                     // Do joint logic
                     bonePos = ContactUtils.GetClosestPointOnFiniteLine(colliderTransformPosition, boneTransformPosition, lineDir, lineLength);
                     // We need to extrude the line to get the bone's edge
-                    midPoint = colliderPos + (bonePos + ((bonePos - colliderPos).normalized * width) - colliderPos) / 2f;
+                    midPoint = colliderPos + ((bonePos + ((bonePos - colliderPos).normalized * width) - colliderPos) / 2f);
 
                     colliderPos = collider.ClosestPoint(midPoint);
                     bonePos = ContactUtils.GetClosestPointOnFiniteLine(midPoint, boneTransformPosition, lineDir, lineLength);
@@ -329,10 +331,10 @@ namespace Ultraleap.PhysicalHands
             _nearestObject = null;
             _nearestObjectDistance = float.MaxValue;
 
-            foreach (var colliderPairs in _nearbyObjects)
+            foreach (KeyValuePair<Rigidbody, Dictionary<Collider, ClosestColliderDirection>> colliderPairs in _nearbyObjects)
             {
                 singleObjectDistance = float.MaxValue;
-                foreach (var col in colliderPairs.Value)
+                foreach (KeyValuePair<Collider, ClosestColliderDirection> col in colliderPairs.Value)
                 {
                     if (col.Value.distance < singleObjectDistance)
                     {
@@ -342,7 +344,7 @@ namespace Ultraleap.PhysicalHands
                             _nearestObjectDistance = singleObjectDistance;
                             _nearestObject = colliderPairs.Key;
                             _debugA = col.Value.bonePos;
-                            _debugB = col.Value.bonePos + (col.Value.direction * (col.Value.distance));
+                            _debugB = col.Value.bonePos + (col.Value.direction * col.Value.distance);
                         }
                     }
                 }
@@ -353,7 +355,7 @@ namespace Ultraleap.PhysicalHands
         {
             int oldRigidCount = 0;
 
-            foreach (var rigid in _nearbyObjects.Keys)
+            foreach (Rigidbody rigid in _nearbyObjects.Keys)
             {
                 if (_nearbyObjects[rigid].Count == 0)
                 {
@@ -364,7 +366,7 @@ namespace Ultraleap.PhysicalHands
                 {
                     bool isGrabable = false;
 
-                    foreach (var value in _nearbyObjects[rigid].Values)
+                    foreach (ClosestColliderDirection value in _nearbyObjects[rigid].Values)
                     {
                         if (value.isContactingCollider)
                         {
@@ -388,7 +390,7 @@ namespace Ultraleap.PhysicalHands
                             _grabbableDirections.Add(rigid, new List<ClosestColliderDirection>());
                         }
 
-                        foreach (var direction in _nearbyObjects[rigid])
+                        foreach (KeyValuePair<Collider, ClosestColliderDirection> direction in _nearbyObjects[rigid])
                         {
                             _grabbableDirections[rigid].Add(direction.Value);
                         }

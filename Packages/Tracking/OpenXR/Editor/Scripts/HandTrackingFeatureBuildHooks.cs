@@ -25,8 +25,8 @@ namespace Ultraleap.Tracking.OpenXR
 
         protected override void OnPostGenerateGradleAndroidProjectExt(string path)
         {
-            var manifest = new AndroidManifest(GetAndroidManifestPath(path));
-            var feature = OpenXRSettings.ActiveBuildTargetInstance.GetFeature<HandTrackingFeature>();
+            AndroidManifest manifest = new AndroidManifest(GetAndroidManifestPath(path));
+            HandTrackingFeature feature = OpenXRSettings.ActiveBuildTargetInstance.GetFeature<HandTrackingFeature>();
 
             if (PlayerSettings.Android.targetSdkVersion >= AndroidSdkVersions.AndroidApiLevel30)
             {

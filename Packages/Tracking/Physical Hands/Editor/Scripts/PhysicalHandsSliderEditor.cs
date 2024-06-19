@@ -6,8 +6,8 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using UnityEngine;
 using UnityEditor;
+using UnityEngine;
 
 namespace Ultraleap.PhysicalHands
 {
@@ -20,7 +20,7 @@ namespace Ultraleap.PhysicalHands
         {
             EditorUtils.DrawScriptField((MonoBehaviour)target);
 
-            if(target._slideableObject != null && target._slideableObject.transform.localRotation != Quaternion.identity)
+            if (target._slideableObject != null && target._slideableObject.transform.localRotation != Quaternion.identity)
             {
                 EditorGUILayout.HelpBox("Warning! Slideable object cannot be rotated. This will cause unexpected behaviour. \n " +
                     "Please rotate the slider instead, leaving slideable object rotation 0,0,0", MessageType.Warning);
@@ -70,7 +70,7 @@ namespace Ultraleap.PhysicalHands
         private float CreateAxisAttribute(string label, string property, string tooltip)
         {
             float result = 0f;
-            var enumName = serializedObject.FindProperty("_sliderDirection").enumDisplayNames[serializedObject.FindProperty("_sliderDirection").enumValueIndex];
+            string enumName = serializedObject.FindProperty("_sliderDirection").enumDisplayNames[serializedObject.FindProperty("_sliderDirection").enumValueIndex];
 
             EditorGUILayout.LabelField(new GUIContent(label, tooltip), EditorStyles.boldLabel);
             GUILayout.FlexibleSpace();

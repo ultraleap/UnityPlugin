@@ -86,7 +86,7 @@ namespace Ultraleap
             Hand hand = GetLeapHand();
             Debug.DrawLine(hand.Arm.ElbowPosition, hand.Arm.WristPosition, Color.red); //Arm
             Debug.DrawLine(hand.WristPosition, hand.PalmPosition, Color.white); //Wrist to palm line
-            Debug.DrawLine(hand.PalmPosition, hand.PalmPosition + hand.PalmNormal * hand.PalmWidth / 2, Color.black); //Hand Normal
+            Debug.DrawLine(hand.PalmPosition, hand.PalmPosition + (hand.PalmNormal * hand.PalmWidth / 2), Color.black); //Hand Normal
 
             if (VisualizeBasis)
             {
@@ -100,9 +100,11 @@ namespace Ultraleap
                 for (int i = 0; i < 4; ++i)
                 {
                     Bone bone = finger.GetBone((Bone.BoneType)i);
-                    Debug.DrawLine(bone.PrevJoint, bone.PrevJoint + bone.Direction * bone.Length, colors[i]);
+                    Debug.DrawLine(bone.PrevJoint, bone.PrevJoint + (bone.Direction * bone.Length), colors[i]);
                     if (VisualizeBasis)
+                    {
                         DrawBasis(bone.PrevJoint, bone.Basis, .01f);
+                    }
                 }
             }
         }
@@ -110,9 +112,9 @@ namespace Ultraleap
         public void DrawBasis(Vector3 position, LeapTransform basis, float scale)
         {
             Vector3 origin = position;
-            Debug.DrawLine(origin, origin + basis.xBasis * scale, Color.red);
-            Debug.DrawLine(origin, origin + basis.yBasis * scale, Color.green);
-            Debug.DrawLine(origin, origin + basis.zBasis * scale, Color.blue);
+            Debug.DrawLine(origin, origin + (basis.xBasis * scale), Color.red);
+            Debug.DrawLine(origin, origin + (basis.yBasis * scale), Color.green);
+            Debug.DrawLine(origin, origin + (basis.zBasis * scale), Color.blue);
         }
 
     }

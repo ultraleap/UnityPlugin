@@ -78,22 +78,26 @@ namespace Ultraleap.InputModule
         //When not using a PinchDetector, the distance in mm that the tip of the thumb and forefinger should be to activate selection during projective interaction.
         [Tooltip("When not using a PinchDetector, the distance in mm that the tip of the thumb and forefinger should be to activate selection during projective interaction.")]
         [SerializeField] private float pinchingThreshold = 30f;
+
         public float PinchingThreshold => pinchingThreshold;
 
         //The distance from the base of a UI element that tactile interaction is triggered.
         [Tooltip("The distance from the base of a UI element that tactile interaction is triggered.")]
         [SerializeField]
         private float tactilePadding = 0.005f;
+
         public float TactilePadding => tactilePadding;
 
         //The distance from the canvas at which to switch to projective mode.
         [Tooltip("The distance from the base of a UI element that interaction switches from Projective-Pointer based to Touch based.")]
         [SerializeField] private float projectiveToTactileTransitionDistance = 0.4f;
+
         public float ProjectiveToTactileTransitionDistance => projectiveToTactileTransitionDistance;
 
         //Trigger a Hover Event when switching between UI elements.
         [Tooltip("Trigger a Hover Event when switching between UI elements.")]
         [SerializeField] private bool triggerHoverOnElementSwitch;
+
         public bool TriggerHoverOnElementSwitch => triggerHoverOnElementSwitch;
 
         //Transform the Interaction Pointer to allow the Module to work in a non-stationary reference frame.
@@ -102,16 +106,18 @@ namespace Ultraleap.InputModule
 
         //Event related data
         [SerializeField] private PointerElement _pointerLeft;
+
         [SerializeField] private PointerElement _pointerRight;
 
         //Misc. Objects
         private bool _prevTouchingMode;
+
         private IProjectionOriginProvider _projectionOriginProvider;
         public IProjectionOriginProvider ProjectionOriginProvider => _projectionOriginProvider;
 
         [SerializeField] private bool _drawGizmos = false;
 
-        #endregion
+        #endregion Properties
 
         #region Unity methods
 
@@ -140,7 +146,10 @@ namespace Ultraleap.InputModule
             if (mainCamera == null)
             {
                 if (leapDataProvider != null && leapDataProvider is LeapXRServiceProvider)
+                {
                     mainCamera = ((LeapXRServiceProvider)leapDataProvider).mainCamera;
+                }
+
                 if (mainCamera == null)
                 {
                     Debug.LogError("Failed to find main camera", mainCamera);
@@ -151,13 +160,14 @@ namespace Ultraleap.InputModule
 
             base.Awake();
         }
+
         protected override void Start()
         {
-            var shoulderProjectionOriginProvider = new ShoulderProjectionOriginProvider(mainCamera);
+            ShoulderProjectionOriginProvider shoulderProjectionOriginProvider = new ShoulderProjectionOriginProvider(mainCamera);
             _projectionOriginProvider = shoulderProjectionOriginProvider;
 
             //Assign mainCamera to Canvases
-            var canvases = Resources.FindObjectsOfTypeAll<Canvas>();
+            Canvas[] canvases = Resources.FindObjectsOfTypeAll<Canvas>();
             for (int i = 0; i < canvases.Length; i++)
             {
                 if (canvases[i].worldCamera == null)
@@ -189,7 +199,7 @@ namespace Ultraleap.InputModule
         {
             if (movingReferenceFrame)
             {
-                var provider = leapDataProvider as LeapServiceProvider;
+                LeapServiceProvider provider = leapDataProvider as LeapServiceProvider;
                 if (provider != null)
                 {
                     provider.RetransformFrames();
@@ -214,7 +224,7 @@ namespace Ultraleap.InputModule
         /// <returns>Matching hand, if one exist else null</returns>
         private Hand GetHand(Chirality chirality)
         {
-            foreach (var current in leapDataProvider.CurrentFrame.Hands)
+            foreach (Hand current in leapDataProvider.CurrentFrame.Hands)
             {
                 if (chirality == Chirality.Left && current.IsLeft)
                 {
@@ -239,7 +249,6 @@ namespace Ultraleap.InputModule
             if (_projectionOriginProvider != null)
             {
                 _projectionOriginProvider.DrawGizmos();
-
             }
         }
 
@@ -252,8 +261,6 @@ namespace Ultraleap.InputModule
             return leapDataProvider.CurrentFrame != null && leapDataProvider.CurrentFrame.Hands.Count > 0 &&
                    base.ShouldActivateModule();
         }
-
-
 
         /// <summary>
         ///  Delegates through to the base class method. Enables pointer class to call into this
@@ -275,7 +282,7 @@ namespace Ultraleap.InputModule
             return BaseInputModule.FindFirstRaycast(candidates);
         }
 
-        #endregion
+        #endregion Unity methods
 
         #region Private methods
 
@@ -290,6 +297,6 @@ namespace Ultraleap.InputModule
             ExecuteEvents.Execute(eventSystem.currentSelectedGameObject, data, ExecuteEvents.updateSelectedHandler);
         }
 
-        #endregion
+        #endregion Private methods
     }
 }

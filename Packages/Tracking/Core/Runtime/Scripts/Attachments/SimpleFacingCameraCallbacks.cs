@@ -6,8 +6,6 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -24,7 +22,7 @@ namespace Ultraleap
         public UnityEvent OnBeginFacingCamera;
         public UnityEvent OnEndFacingCamera;
 
-        void Start()
+        private void Start()
         {
             if (cameraToFace == null)
             {
@@ -48,14 +46,14 @@ namespace Ultraleap
             }
         }
 
-        void Update()
+        private void Update()
         {
             if (cameraToFace == null)
             {
                 cameraToFace = Camera.main;
             }
 
-            if(cameraToFace == null)
+            if (cameraToFace == null)
             {
                 return;
             }

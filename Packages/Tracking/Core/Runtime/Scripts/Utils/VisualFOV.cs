@@ -62,7 +62,7 @@ namespace Ultraleap
             {
                 DrawFOV(NoTrackingFOVMesh, 0, MinDistance);
             }
-            var _currentMinDistance = MinDistance;
+            float _currentMinDistance = MinDistance;
             if (ShowOptimalField)
             {
                 DrawFOV(OptimalFOVMesh, _currentMinDistance, OptimalMaxDistance);
@@ -76,42 +76,51 @@ namespace Ultraleap
 
         private void DrawFOV(Mesh mesh, float minDistance, float maxDistance)
         {
-            var origins = new List<Vector3>();
-            var verts = new List<Vector3>();
-            var triangles = new List<int>();
-            var uvs = new List<Vector2>();
+            List<Vector3> origins = new List<Vector3>();
+            List<Vector3> verts = new List<Vector3>();
+            List<int> triangles = new List<int>();
+            List<Vector2> uvs = new List<Vector2>();
             if (RayCount <= 0 || HorizontalFOV <= 0 || VerticalFOV <= 0)
+            {
                 return;
+            }
+
             int offset = RayCount * RayCount;
 
-            var ray = new Ray
+            Ray ray = new Ray
             {
                 origin = Vector3.zero
             };
 
             RaycastHit hit;
-            var i = -HorizontalFOV / 2;
+            float i = -HorizontalFOV / 2;
             for (int horizontalFOVCount = 0; horizontalFOVCount < RayCount; horizontalFOVCount++)
             {
-                var j = -VerticalFOV / 2;
+                float j = -VerticalFOV / 2;
                 for (int verticalFOVCount = 0; verticalFOVCount < RayCount; verticalFOVCount++)
                 {
                     ray.direction = Quaternion.Euler(-90, 0, 0) * Quaternion.Euler(j, i, 0) * Vector3.forward;
                     //check for distance
                     if (Physics.Raycast(ray, out hit, maxDistance, LayerMask.GetMask()))
                     {
-                        var distance = Vector3.Distance(hit.point, ray.origin);
+                        float distance = Vector3.Distance(hit.point, ray.origin);
                         if (distance < minDistance)
                         {
                             if (ShowRaycasts)
-                                Debug.DrawRay(ray.origin + ((hit.point - ray.origin).normalized), (hit.point - ray.origin).normalized, intersectedRayColor);
+                            {
+                                Debug.DrawRay(ray.origin + (hit.point - ray.origin).normalized, (hit.point - ray.origin).normalized, intersectedRayColor);
+                            }
+
                             origins.Add(ray.origin + ((hit.point - ray.origin).normalized * distance));
                             verts.Add(hit.point - ray.origin);
                         }
                         else
                         {
                             if (ShowRaycasts)
+                            {
                                 Debug.DrawRay(ray.origin + ((hit.point - ray.origin).normalized * minDistance), (hit.point - ray.origin).normalized * Vector3.Distance(hit.point, ray.origin + ((hit.point - ray.origin).normalized * minDistance)), intersectedRayColor);
+                            }
+
                             origins.Add(ray.origin + ((hit.point - ray.origin).normalized * minDistance));
                             verts.Add(hit.point - ray.origin);
                         }
@@ -119,7 +128,10 @@ namespace Ultraleap
                     else
                     {
                         if (ShowRaycasts)
+                        {
                             Debug.DrawRay(ray.origin + (ray.direction * minDistance), ray.direction * (maxDistance - minDistance), rayColor);
+                        }
+
                         origins.Add(ray.origin + (ray.direction * minDistance));
                         verts.Add(ray.direction * maxDistance);
                     }
@@ -150,7 +162,7 @@ namespace Ultraleap
                             triangles.Add(offset + verts.Count - RayCount - 1);
                         }
                     }
-                    j += (VerticalFOV / (RayCount - 1));
+                    j += VerticalFOV / (RayCount - 1);
                 }
 
 
@@ -173,7 +185,7 @@ namespace Ultraleap
                     triangles.Add(offset + verts.Count - 1);
                     triangles.Add(verts.Count - RayCount - 1);
                 }
-                i += (HorizontalFOV / (RayCount - 1));
+                i += HorizontalFOV / (RayCount - 1);
             }
 
             //Add sides

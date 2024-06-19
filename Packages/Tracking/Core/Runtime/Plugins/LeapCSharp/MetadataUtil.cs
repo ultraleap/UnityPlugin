@@ -6,8 +6,6 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -48,13 +46,13 @@ namespace Ultraleap
 
 #if UNITY_EDITOR
         // Fire a one-off call to capture metadata at edit time on the first editor update
-        static MetadataUtil() 
+        static MetadataUtil()
         {
             UnityEditor.EditorApplication.update -= FirstEditorUpdate;
             UnityEditor.EditorApplication.update += FirstEditorUpdate;
         }
 
-        static void FirstEditorUpdate()
+        private static void FirstEditorUpdate()
         {
             UnityEditor.EditorApplication.update -= FirstEditorUpdate;
 
@@ -83,7 +81,7 @@ namespace Ultraleap
             return json;
         }
 
-        static string GetAppType()
+        private static string GetAppType()
         {
             string appType = "Build";
 
@@ -94,11 +92,11 @@ namespace Ultraleap
             return appType;
         }
 
-        static string GetAppSceneName()
+        private static string GetAppSceneName()
         {
             string sceneMane = "Unknown";
 
-            if(SceneManager.GetActiveScene() != null)
+            if (SceneManager.GetActiveScene() != null)
             {
                 sceneMane = SceneManager.GetActiveScene().name;
             }
@@ -106,7 +104,7 @@ namespace Ultraleap
             return sceneMane;
         }
 
-        static string GetRenderPipeline()
+        private static string GetRenderPipeline()
         {
             string renderPipeline = "Built In";
 
@@ -122,7 +120,7 @@ namespace Ultraleap
             return renderPipeline;
         }
 
-        static string GetInteractionSystem()
+        private static string GetInteractionSystem()
         {
             // Physical Hands
             if (GameObject.Find("Physical Hands Manager") ||
@@ -140,7 +138,7 @@ namespace Ultraleap
             }
 
             // XRI
-            if(GameObject.Find("Complete XR Origin Hands Set Up") ||
+            if (GameObject.Find("Complete XR Origin Hands Set Up") ||
                 GameObject.Find("Complete XR Origin Set Up") ||
                 GameObject.Find("Poke Interactor"))
             {
@@ -155,13 +153,13 @@ namespace Ultraleap
                 return "UL XR Hands";
             }
 
-            if(GameObject.Find("Hand Visualizer"))
+            if (GameObject.Find("Hand Visualizer"))
             {
                 return "XR Hands";
             }
 
             // MRTK
-            if(GameObject.Find("MRTK Interaction Manager"))
+            if (GameObject.Find("MRTK Interaction Manager"))
             {
                 return "MRTK";
             }

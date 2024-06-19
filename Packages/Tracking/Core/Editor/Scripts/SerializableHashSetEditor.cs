@@ -87,7 +87,7 @@ namespace Ultraleap
         {
             SerializedProperty values = property.FindPropertyRelative("_values");
 
-            var dup = (fieldInfo.GetValue(property.serializedObject.targetObject) as ICanReportDuplicateInformation).GetDuplicationInformation();
+            List<int> dup = (fieldInfo.GetValue(property.serializedObject.targetObject) as ICanReportDuplicateInformation).GetDuplicationInformation();
 
             _values.Clear();
             int count = values.arraySize;

@@ -226,7 +226,7 @@ namespace Ultraleap.PhysicalHands
         internal static Vector3 GetClosestPointOnFiniteLine(Vector3 point, Vector3 lineStart, Vector3 lineDirNormalized, float lineLength)
         {
             float projectLength = Mathf.Clamp(Vector3.Dot(point - lineStart, lineDirNormalized), 0f, lineLength);
-            return lineStart + lineDirNormalized * projectLength;
+            return lineStart + (lineDirNormalized * projectLength);
         }
 
         internal static Vector3 GetClosestPointOnLine(Vector3 point, Vector3 lineStart, Vector3 lineEnd)
@@ -240,7 +240,7 @@ namespace Ultraleap.PhysicalHands
         internal static Vector3 GetClosestPointOnLine(Vector3 point, Vector3 lineStart, Vector3 lineEnd, Vector3 lineDirNormalized)
         {
             float dot = Vector3.Dot(point - lineStart, lineDirNormalized);
-            return lineStart + lineDirNormalized * dot;
+            return lineStart + (lineDirNormalized * dot);
         }
 
         /// <summary>
@@ -300,12 +300,12 @@ namespace Ultraleap.PhysicalHands
         internal static Vector3 ClosestPointToRectangleFace(Vector3[] face, Vector3 point)
         {
             // 1_ get sqrDist to closest face point
-            var closestDistance = float.MaxValue;
-            var chosenIndex = -1;
-            for (var i = 0; i < face.Length; i++)
+            float closestDistance = float.MaxValue;
+            int chosenIndex = -1;
+            for (int i = 0; i < face.Length; i++)
             {
-                var f = face[i];
-                var sqrDist = Vector3.SqrMagnitude(f - point);
+                Vector3 f = face[i];
+                float sqrDist = Vector3.SqrMagnitude(f - point);
                 if (sqrDist < closestDistance)
                 {
                     chosenIndex = i;
@@ -315,10 +315,10 @@ namespace Ultraleap.PhysicalHands
 
             // 2_ get the distance to the 2 neighbour points of the face's closest point.
             // if we have a smaller distance to the 2 neighbour points than the distance between the chosen point and the neighbour point: we are inside the face.
-            var chosenClosestCorner = face[chosenIndex];
+            Vector3 chosenClosestCorner = face[chosenIndex];
 
-            var nextNeighbour = face[(chosenIndex + 1) % face.Length];
-            var prevNeighbour = face[(-1 + chosenIndex + face.Length) % (face.Length)];
+            Vector3 nextNeighbour = face[(chosenIndex + 1) % face.Length];
+            Vector3 prevNeighbour = face[(-1 + chosenIndex + face.Length) % face.Length];
 
             // We are inside of the face.
             if (GetClosestPointOnLine(point, nextNeighbour, chosenClosestCorner).IsBetween(chosenClosestCorner, nextNeighbour) &&
@@ -328,15 +328,15 @@ namespace Ultraleap.PhysicalHands
             }
             else // we are outside the face! That means the closest point is necessarily on the lines defined by the 4 corners points of the face.
             {
-                var prevNearestPoint = GetClosestPointOnFiniteLine(point, chosenClosestCorner, prevNeighbour);
-                var nextNearestPoint = GetClosestPointOnFiniteLine(point, chosenClosestCorner, nextNeighbour);
+                Vector3 prevNearestPoint = GetClosestPointOnFiniteLine(point, chosenClosestCorner, prevNeighbour);
+                Vector3 nextNearestPoint = GetClosestPointOnFiniteLine(point, chosenClosestCorner, nextNeighbour);
 
-                var distanceToNextNearestPoint = Vector3.SqrMagnitude(nextNearestPoint - point);
+                float distanceToNextNearestPoint = Vector3.SqrMagnitude(nextNearestPoint - point);
 
-                var closestPoint = nextNearestPoint;
-                var closestSqrDistance = distanceToNextNearestPoint;
+                Vector3 closestPoint = nextNearestPoint;
+                float closestSqrDistance = distanceToNextNearestPoint;
 
-                var distanceToPrevNearestPoint = Vector3.SqrMagnitude(prevNearestPoint - point);
+                float distanceToPrevNearestPoint = Vector3.SqrMagnitude(prevNearestPoint - point);
 
                 if (distanceToPrevNearestPoint < closestSqrDistance)
                 {
@@ -354,12 +354,15 @@ namespace Ultraleap.PhysicalHands
 
         internal static bool IsBetween(this Vector3 a, Vector3 b, Vector3 c)
         {
-            var totalDist = SqrDist(b, c);
+            float totalDist = SqrDist(b, c);
             if (SqrDist(a, b) <= totalDist && SqrDist(a, c) <= totalDist)
             {
                 return true;
             }
-            else return false;
+            else
+            {
+                return false;
+            }
         }
     }
 }

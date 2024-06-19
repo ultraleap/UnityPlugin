@@ -11,11 +11,9 @@ using UnityEngine;
 
 namespace Ultraleap
 {
-
     [CustomEditor(typeof(AggregationProviderConfidenceInterpolation))]
     public class AggregationProviderConfidenceInterpolationEditor : CustomEditorBase<AggregationProviderConfidenceInterpolation>
     {
-
         protected override void OnEnable()
         {
             base.OnEnable();
@@ -42,7 +40,6 @@ namespace Ultraleap
         {
             EditorGUILayout.PropertyField(property, true);
 
-
             if (property.floatValue != 0)
             {
                 bool showWarning = false;
@@ -64,12 +61,9 @@ namespace Ultraleap
             }
         }
 
-
         public override void OnInspectorGUI()
         {
-
             base.OnInspectorGUI();
         }
-
     }
 }

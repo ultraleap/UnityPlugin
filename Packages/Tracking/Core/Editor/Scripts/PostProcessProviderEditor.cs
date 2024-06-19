@@ -6,11 +6,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Ultraleap;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEditor;
-using UnityEngine;
 
 namespace Ultraleap
 {
@@ -37,7 +33,7 @@ namespace Ultraleap
 
         private void drawNotificationsGUI()
         {
-            var provider = this.target;
+            PostProcessProvider provider = this.target;
 
             if (!provider.enabled)
             {

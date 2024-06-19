@@ -57,7 +57,7 @@ namespace Ultraleap.Attributes
             }
             else
             {
-                if ((isEqualTo != null) == (isNotEqualTo != null))
+                if (isEqualTo != null == (isNotEqualTo != null))
                 {
                     throw new ArgumentException("Must specify exactly one of 'equalTo' or 'notEqualTo'.");
                 }
@@ -84,9 +84,9 @@ namespace Ultraleap.Attributes
 #if UNITY_EDITOR
         public bool ShouldDisable(SerializedProperty property)
         {
-            foreach (var name in propertyNames)
+            foreach (string name in propertyNames)
             {
-                var prop = property.serializedObject.FindProperty(name);
+                SerializedProperty prop = property.serializedObject.FindProperty(name);
 
                 bool result = shouldDisable(prop);
                 if (isAndOperation)
@@ -124,15 +124,15 @@ namespace Ultraleap.Attributes
             }
             if (nullIsValid && property.propertyType == SerializedPropertyType.ObjectReference)
             {
-                return (property.objectReferenceValue == (UnityEngine.Object)testValue) == disableResult;
+                return property.objectReferenceValue == (UnityEngine.Object)testValue == disableResult;
             }
             else if (property.propertyType == SerializedPropertyType.Boolean)
             {
-                return (property.boolValue == (bool)testValue) == disableResult;
+                return property.boolValue == (bool)testValue == disableResult;
             }
             else if (property.propertyType == SerializedPropertyType.Enum)
             {
-                return (property.intValue == (int)testValue) == disableResult;
+                return property.intValue == (int)testValue == disableResult;
             }
             else
             {

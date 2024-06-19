@@ -6,7 +6,6 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Ultraleap;
 using UnityEngine;
 using UnityEngine.XR.Management;
 using UnityEngine.XR.OpenXR;
@@ -18,7 +17,7 @@ namespace Ultraleap.Tracking.OpenXR
     /// </summary>
     public class OpenXRUtility
     {
-        static HandTrackingFeature currentFeatureInstance;
+        private static HandTrackingFeature currentFeatureInstance;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Initialize()

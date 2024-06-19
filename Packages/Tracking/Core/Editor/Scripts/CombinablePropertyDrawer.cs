@@ -59,7 +59,7 @@ namespace Ultraleap.Attributes
         {
             getAttributes(property);
 
-            var topPanelDrawer = attributes.Select(item => item as ITopPanelDrawer)
+            ITopPanelDrawer topPanelDrawer = attributes.Select(item => item as ITopPanelDrawer)
               .Where(o => o != null).FirstOrDefault();
             if (topPanelDrawer != null)
             {
@@ -84,7 +84,7 @@ namespace Ultraleap.Attributes
             {
                 currentlyDrawing = property;
             }
-            else if(currentlyDrawing != property)
+            else if (currentlyDrawing != property)
             {
                 EditorGUI.PropertyField(position, property, label, true);
                 return;
@@ -121,7 +121,7 @@ namespace Ultraleap.Attributes
 
             IFullPropertyDrawer fullPropertyDrawer = null;
             ITopPanelDrawer topPanelDrawer = null;
-            foreach (var a in attributes)
+            foreach (CombinablePropertyAttribute a in attributes)
             {
                 if (fieldInfo != null)
                 {
@@ -167,12 +167,12 @@ namespace Ultraleap.Attributes
 
                 if (a is ISupportDragAndDrop)
                 {
-                    dragAndDropSupport = (a as ISupportDragAndDrop);
+                    dragAndDropSupport = a as ISupportDragAndDrop;
                 }
 
                 if (a is ITopPanelDrawer)
                 {
-                    topPanelDrawer = (a as ITopPanelDrawer);
+                    topPanelDrawer = a as ITopPanelDrawer;
                 }
             }
 
@@ -269,7 +269,7 @@ namespace Ultraleap.Attributes
 
             if (didChange || !property.hasMultipleDifferentValues)
             {
-                foreach (var a in attributes)
+                foreach (CombinablePropertyAttribute a in attributes)
                 {
                     if (a is IPropertyConstrainer)
                     {
@@ -280,7 +280,7 @@ namespace Ultraleap.Attributes
 
             if (didChange)
             {
-                foreach (var a in attributes)
+                foreach (CombinablePropertyAttribute a in attributes)
                 {
                     a.OnPropertyChanged(property);
                 }
@@ -293,7 +293,7 @@ namespace Ultraleap.Attributes
                                             ref Rect r, SerializedProperty property)
                               where T : class, IAdditiveDrawer
         {
-            foreach (var a in attributes)
+            foreach (CombinablePropertyAttribute a in attributes)
             {
                 if (a is T)
                 {

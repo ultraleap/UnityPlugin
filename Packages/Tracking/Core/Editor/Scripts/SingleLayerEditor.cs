@@ -50,7 +50,7 @@ namespace Ultraleap
                 }
             }
 
-            var tooltipAttribute = fieldInfo.GetCustomAttributes(typeof(TooltipAttribute), true).
+            TooltipAttribute tooltipAttribute = fieldInfo.GetCustomAttributes(typeof(TooltipAttribute), true).
                                              Cast<TooltipAttribute>().
                                              FirstOrDefault();
 

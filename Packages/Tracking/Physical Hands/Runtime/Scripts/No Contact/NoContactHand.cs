@@ -40,7 +40,7 @@ namespace Ultraleap.PhysicalHands
             GenerateHandObjects(typeof(NoContactBone));
             isHandPhysical = false;
 
-            foreach (var bone in bones)
+            foreach (ContactBone bone in bones)
             {
                 bone.boneCollider.isTrigger = true;
             }

@@ -6,8 +6,8 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Ultraleap.Attributes;
 using System.Collections.Generic;
+using Ultraleap.Attributes;
 using UnityEngine;
 
 namespace Ultraleap
@@ -238,7 +238,11 @@ namespace Ultraleap
         {
             get
             {
-                if (_sphereMat == null) return _sphereColor;
+                if (_sphereMat == null)
+                {
+                    return _sphereColor;
+                }
+
                 return _sphereMat.color;
             }
         }
@@ -281,7 +285,7 @@ namespace Ultraleap
             }
             if (_material != null && _backing_material != null && _sphereMat != null)
             {
-                if(_useCustomColors && (_sphereMat.color != _sphereColor || _backing_material.color != _cylinderColor))
+                if (_useCustomColors && (_sphereMat.color != _sphereColor || _backing_material.color != _cylinderColor))
                 {
                     _sphereMat.color = _sphereColor;
                     _backing_material.color = _cylinderColor;
@@ -361,7 +365,7 @@ namespace Ultraleap
             }
 
             //Update all joint spheres in the fingers
-            foreach (var finger in _hand.fingers)
+            foreach (Finger finger in _hand.fingers)
             {
                 for (int j = 0; j < 4; j++)
                 {
@@ -478,9 +482,9 @@ namespace Ultraleap
               _castShadows ? UnityEngine.Rendering.ShadowCastingMode.On : UnityEngine.Rendering.ShadowCastingMode.Off, true, gameObject.layer);
         }
 
-        void DrawArm()
+        private void DrawArm()
         {
-            var arm = _hand.Arm;
+            Arm arm = _hand.Arm;
 
             Vector3 right = arm.Basis.xBasis * arm.Width * 0.7f * 0.5f;
             Vector3 wrist = arm.WristPosition;
@@ -505,11 +509,11 @@ namespace Ultraleap
             drawCylinder(armFrontRight, armBackRight);
         }
 
-        void DrawUpperArm()
+        private void DrawUpperArm()
         {
             Vector3 shoulderPos = Camera.main.transform.TransformPoint(handedness == Chirality.Left ? -0.15f : 0.15f, -0.15f, -0.05f);
 
-            var arm = _hand.Arm;
+            Arm arm = _hand.Arm;
 
             Vector3 elbow = arm.ElbowPosition;
             Vector3 right = arm.Basis.xBasis * arm.Width * 0.7f * 0.5f;
@@ -572,7 +576,7 @@ namespace Ultraleap
 
         private int getFingerJointIndex(int fingerIndex, int jointIndex)
         {
-            return fingerIndex * 4 + jointIndex;
+            return (fingerIndex * 4) + jointIndex;
         }
 
         private Dictionary<int, Mesh> _meshMap = new Dictionary<int, Mesh>();
@@ -598,7 +602,7 @@ namespace Ultraleap
             Vector3 p1 = Vector3.forward * length;
             for (int i = 0; i < _cylinderResolution; i++)
             {
-                float angle = (Mathf.PI * 2.0f * i) / _cylinderResolution;
+                float angle = Mathf.PI * 2.0f * i / _cylinderResolution;
                 float dx = _cylinderRadius * Mathf.Cos(angle);
                 float dy = _cylinderRadius * Mathf.Sin(angle);
 

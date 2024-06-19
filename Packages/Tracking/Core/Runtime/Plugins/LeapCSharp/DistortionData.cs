@@ -117,7 +117,9 @@ namespace Ultraleap
                     Width == LeapInternal.LeapC.DistortionSize &&
                     Height == LeapInternal.LeapC.DistortionSize &&
                     Data.Length == Width * Height * 2)
+                {
                     return true;
+                }
 
                 return false;
             }
@@ -142,8 +144,8 @@ namespace Ultraleap
                 for (int y = 0; y < LeapInternal.LeapC.DistortionSize; y++)
                 {
                     // We change the data so that the *mapped* Y value is inverted 
-                    flipped[((x + y * LeapInternal.LeapC.DistortionSize) * 2)] = _originalData[((x + y * LeapInternal.LeapC.DistortionSize) * 2)];
-                    flipped[((x + y * LeapInternal.LeapC.DistortionSize) * 2) + 1] = (float)1.0 - _originalData[((x + y * LeapInternal.LeapC.DistortionSize) * 2) + 1];
+                    flipped[(x + (y * LeapInternal.LeapC.DistortionSize)) * 2] = _originalData[(x + (y * LeapInternal.LeapC.DistortionSize)) * 2];
+                    flipped[((x + (y * LeapInternal.LeapC.DistortionSize)) * 2) + 1] = (float)1.0 - _originalData[((x + (y * LeapInternal.LeapC.DistortionSize)) * 2) + 1];
                 }
             }
 

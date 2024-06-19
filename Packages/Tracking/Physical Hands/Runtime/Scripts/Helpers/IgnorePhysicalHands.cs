@@ -108,7 +108,7 @@ namespace Ultraleap.PhysicalHands
                     {
                         _grabHelperObject._ignorePhysicalHands = this;
 
-                        foreach (var hand in _grabHelperObject.GrabbableHands)
+                        foreach (ContactHand hand in _grabHelperObject.GrabbableHands)
                         {
                             AddToHands(hand);
                         }
@@ -132,7 +132,7 @@ namespace Ultraleap.PhysicalHands
         /// <summary>
         /// Clean up code, re-enables all collision and grabbing on this object and all children
         /// </summary>
-        void OnDisable()
+        private void OnDisable()
         {
             SetAllHandCollisions(forceEnable: true);
         }
@@ -222,7 +222,7 @@ namespace Ultraleap.PhysicalHands
                 bool disableOnParent = shouldDisableCollisionWithHand && _disableAllHandCollisions;
                 bool disableOnChild = shouldDisableCollisionWithHand && _disableCollisionOnChildren;
 
-                foreach (var objectCollider in GetComponentsInChildren<Collider>(true))
+                foreach (Collider objectCollider in GetComponentsInChildren<Collider>(true))
                 {
                     if ((disableOnParent && objectCollider.gameObject == gameObject) ||
                         (disableOnChild && objectCollider.gameObject != gameObject && !objectCollider.TryGetComponent<IgnorePhysicalHands>(out _)))
@@ -239,12 +239,12 @@ namespace Ultraleap.PhysicalHands
 
         private void IgnoreCollisionOnAllHandBones(ContactHand contactHand, Collider colliderToIgnore, bool collisionDisabled)
         {
-            foreach (var bone in contactHand.bones)
+            foreach (ContactBone bone in contactHand.bones)
             {
                 Physics.IgnoreCollision(bone.Collider, colliderToIgnore, collisionDisabled);
             }
 
-            foreach (var palmCollider in contactHand.palmBone.palmEdgeColliders)
+            foreach (CapsuleCollider palmCollider in contactHand.palmBone.palmEdgeColliders)
             {
                 Physics.IgnoreCollision(palmCollider, colliderToIgnore, collisionDisabled);
             }
@@ -268,7 +268,7 @@ namespace Ultraleap.PhysicalHands
         public bool IsGrabbingIgnoredForHand(ContactHand hand)
         {
             if (this.enabled &&
-                hand != null && 
+                hand != null &&
                 _disableAllGrabbing &&
                 ((int)HandToIgnoreGrabs == (int)hand.Handedness || HandToIgnoreGrabs == ChiralitySelection.BOTH))
             {

@@ -9,7 +9,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using UnityEngine;
 
@@ -342,7 +341,7 @@ namespace Ultraleap
                     };
                     if (_leapController.IsConnected)
                     {
-                        foreach (var device in _leapController.Devices)
+                        foreach (Device device in _leapController.Devices)
                         {
                             value(device);
                         }
@@ -390,7 +389,7 @@ namespace Ultraleap
                     else
                     {
                         _backingUntransformedEditTimeFrame = new Frame(_currentDevice.DeviceID);
-                    }  
+                    }
                 }
                 return _backingUntransformedEditTimeFrame;
             }
@@ -720,7 +719,7 @@ namespace Ultraleap
             }
         }
 
-        void HandleUpdateFrameInterpolationAndTransformation()
+        private void HandleUpdateFrameInterpolationAndTransformation()
         {
             if (_useInterpolation)
             {
@@ -842,26 +841,29 @@ namespace Ultraleap
         /// </summary>
         public TrackingOptimizationMode GetTrackingMode()
         {
-            if (_leapController == null) return _trackingOptimization;
+            if (_leapController == null)
+            {
+                return _trackingOptimization;
+            }
 
             Device deviceToGet = _multipleDeviceMode == MultipleDeviceMode.Disabled ? null : _currentDevice;
 
-            var screenTopPolicySet = _leapController.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP, deviceToGet);
-            var headMountedPolicySet = _leapController.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD, deviceToGet);
+            bool screenTopPolicySet = _leapController.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP, deviceToGet);
+            bool headMountedPolicySet = _leapController.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD, deviceToGet);
 
-            var desktopMode = !screenTopPolicySet && !headMountedPolicySet;
+            bool desktopMode = !screenTopPolicySet && !headMountedPolicySet;
             if (desktopMode)
             {
                 return TrackingOptimizationMode.Desktop;
             }
 
-            var headMountedMode = !screenTopPolicySet && headMountedPolicySet;
+            bool headMountedMode = !screenTopPolicySet && headMountedPolicySet;
             if (headMountedMode)
             {
                 return TrackingOptimizationMode.HMD;
             }
 
-            var screenTopMode = screenTopPolicySet && !headMountedPolicySet;
+            bool screenTopMode = screenTopPolicySet && !headMountedPolicySet;
             if (screenTopMode)
             {
                 return TrackingOptimizationMode.Screentop;
@@ -877,7 +879,7 @@ namespace Ultraleap
         protected virtual long CalculateInterpolationTime(bool endOfFrame = false)
         {
 #if UNITY_ANDROID && !UNITY_EDITOR
-      return _leapController.Now() - 16000;
+            return _leapController.Now() - 16000;
 #else
             if (_leapController != null)
             {
@@ -895,7 +897,10 @@ namespace Ultraleap
         /// </summary>
         protected virtual void initializeFlags()
         {
-            if (_preventInitializingTrackingMode) return;
+            if (_preventInitializingTrackingMode)
+            {
+                return;
+            }
 
             ChangeTrackingMode(_trackingOptimization);
         }
@@ -1011,8 +1016,15 @@ namespace Ultraleap
         /// </summary>
         private void updateDevice()
         {
-            if (_leapController == null) return;
-            if (SpecificSerialNumber == null || SpecificSerialNumber == "") return;
+            if (_leapController == null)
+            {
+                return;
+            }
+
+            if (SpecificSerialNumber == null || SpecificSerialNumber == "")
+            {
+                return;
+            }
 
             foreach (Device d in _leapController.Devices)
             {
@@ -1188,7 +1200,7 @@ namespace Ultraleap
             }
 
             LeapFOVInfo info = null;
-            foreach (var leapInfo in leapFOVInfos.SupportedDevices)
+            foreach (LeapFOVInfo leapInfo in leapFOVInfos.SupportedDevices)
             {
                 if (leapInfo.Name == deviceType)
                 {

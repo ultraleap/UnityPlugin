@@ -6,8 +6,8 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Ultraleap.Preview.HandRays;
 using System;
+using Ultraleap.Preview.HandRays;
 using UnityEngine;
 
 namespace Ultraleap.Preview.Locomotion

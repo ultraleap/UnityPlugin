@@ -80,7 +80,9 @@ namespace Ultraleap.Controllers
                 }
             }
             if (_xrController == null)
+            {
                 return false;
+            }
 
             return _xrController.IsControllerActive();
 #else

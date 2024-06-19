@@ -6,13 +6,13 @@ namespace Ultraleap
 
     public static class AndroidServiceBinder
     {
-        public static bool IsBound{ get; private set; }
+        public static bool IsBound { get; private set; }
 
-        static AndroidJavaObject _serviceBinder;
-        static AndroidJavaClass unityPlayer;
-        static AndroidJavaObject activity;
-        static AndroidJavaObject context;
-        static ServiceCallbacks serviceCallbacks;
+        private static AndroidJavaObject _serviceBinder;
+        private static AndroidJavaClass unityPlayer;
+        private static AndroidJavaObject activity;
+        private static AndroidJavaObject context;
+        private static ServiceCallbacks serviceCallbacks;
 
         public static AndroidJavaObject ServiceBinder => _serviceBinder;
 

@@ -7,8 +7,8 @@
  ******************************************************************************/
 
 using System.Collections.Generic;
-using UnityEngine;
 using Ultraleap.Attributes;
+using UnityEngine;
 
 namespace Ultraleap
 {
@@ -57,7 +57,7 @@ namespace Ultraleap
         {
             if (leapProvider == null)
             {
-                if(!Hands.TryGetProviderAndChiralityFromHandModel(gameObject, out leapProvider, out chirality) || leapProvider == null)
+                if (!Hands.TryGetProviderAndChiralityFromHandModel(gameObject, out leapProvider, out chirality) || leapProvider == null)
                 {
                     Debug.LogWarning("HandEnableDisable can not work as intended as no LeapProvider was associated with the component.", gameObject);
                     return;
@@ -70,7 +70,7 @@ namespace Ultraleap
             leapProvider.OnHandLost -= HandLost;
             leapProvider.OnHandLost += HandLost;
 
-            if(disableOnAwake)
+            if (disableOnAwake)
             {
                 gameObject.SetActive(false);
             }
@@ -78,7 +78,7 @@ namespace Ultraleap
 
         private void Start()
         {
-            if(!customFadeRenderers)
+            if (!customFadeRenderers)
             {
                 AutoPopulateFadeRenderers();
             }
@@ -126,7 +126,7 @@ namespace Ultraleap
                 if (fadeEndTime != 0)
                 {
                     // We have faded at some point. Reset the fade
-                    foreach (var _renderRef in renderersToFade)
+                    foreach (FadeRendererMaterialColorReferences _renderRef in renderersToFade)
                     {
                         for (int i = 0; i < _renderRef.colorParamNames.Length; i++)
                         {
@@ -163,7 +163,7 @@ namespace Ultraleap
 
         private void Update()
         {
-            if(fadingOut)
+            if (fadingOut)
             {
                 HandleFade(_fadeIn: false); // Handle the fade out
 
@@ -187,7 +187,7 @@ namespace Ultraleap
 
         private void HandleFade(bool _fadeIn = false)
         {
-            foreach (var _renderRef in renderersToFade)
+            foreach (FadeRendererMaterialColorReferences _renderRef in renderersToFade)
             {
                 for (int i = 0; i < _renderRef.colorParamNames.Length; i++)
                 {
@@ -211,7 +211,7 @@ namespace Ultraleap
 
         private void CacheFadeStartAlphas()
         {
-            foreach (var _renderRef in renderersToFade)
+            foreach (FadeRendererMaterialColorReferences _renderRef in renderersToFade)
             {
                 _renderRef.fadeStartAlphas = new float[_renderRef.colorParamNames.Length];
 
@@ -254,7 +254,7 @@ namespace Ultraleap
 
         private void PopulateFadeDefaultAlphas()
         {
-            foreach (var _renderRef in renderersToFade)
+            foreach (FadeRendererMaterialColorReferences _renderRef in renderersToFade)
             {
                 _renderRef.defaultAlphas = new float[_renderRef.colorParamNames.Length];
 

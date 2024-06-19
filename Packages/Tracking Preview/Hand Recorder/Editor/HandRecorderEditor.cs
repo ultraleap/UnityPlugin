@@ -42,7 +42,7 @@ namespace Ultraleap.Recording
 
             GUILayout.Space(10);
 
-            var buttonLabel = target.recording ? "STOP RECORDING" : "START RECORDING";
+            string buttonLabel = target.recording ? "STOP RECORDING" : "START RECORDING";
             if (GUILayout.Button(buttonLabel))
             {
                 if (target.recording)
@@ -66,19 +66,19 @@ namespace Ultraleap.Recording
                 duplicate.AddComponent<Animator>();
 
                 // Remove unnecessary component for a playback copy
-                var recorder = duplicate.GetComponent<HandRecorder>();
+                HandRecorder recorder = duplicate.GetComponent<HandRecorder>();
                 DestroyImmediate(recorder);
 
-                var handEnableDisables = duplicate.GetComponentsInChildren<HandEnableDisable>(true);
+                HandEnableDisable[] handEnableDisables = duplicate.GetComponentsInChildren<HandEnableDisable>(true);
 
-                foreach (var handEnableDisable in handEnableDisables)
+                foreach (HandEnableDisable handEnableDisable in handEnableDisables)
                 {
                     DestroyImmediate(handEnableDisable);
                 }
 
-                var handModelBases = duplicate.GetComponentsInChildren<HandModelBase>(true);
+                HandModelBase[] handModelBases = duplicate.GetComponentsInChildren<HandModelBase>(true);
 
-                foreach (var handModelBase in handModelBases)
+                foreach (HandModelBase handModelBase in handModelBases)
                 {
                     DestroyImmediate(handModelBase);
                 }

@@ -101,7 +101,7 @@ namespace Ultraleap
                 {
                     yield return new WaitForEndOfFrame();
                 }
-                
+
                 if (openXRLeapProvider != null && openXRLeapProvider.TrackingDataSource == TrackingSource.OPENXR_LEAP)
                 {
                     SelectTrackingSource(TrackingSourceType.OPEN_XR);
@@ -138,7 +138,7 @@ namespace Ultraleap
         /// Sets the tracking source by enabling and deleting respective Providers
         /// </summary>
         /// <param name="_source">A tracking source. Where possible, this should not be AUTOMATIC when this method is called</param>
-        void SelectTrackingSource(TrackingSourceType _source)
+        private void SelectTrackingSource(TrackingSourceType _source)
         {
             if (_source == TrackingSourceType.AUTOMATIC)
             {
@@ -181,7 +181,7 @@ namespace Ultraleap
         /// <summary>
         /// Directly pass the Frame data through to anyone that is listening to our own events
         /// </summary>
-        void HandleUpdateFrame(Frame _frame)
+        private void HandleUpdateFrame(Frame _frame)
         {
             DispatchUpdateFrameEvent(_frame);
         }
@@ -189,7 +189,7 @@ namespace Ultraleap
         /// <summary>
         /// Directly pass the Frame data through to anyone that is listening to our own events
         /// </summary>
-        void HandleFixedFrame(Frame _frame)
+        private void HandleFixedFrame(Frame _frame)
         {
             DispatchFixedFrameEvent(_frame);
         }

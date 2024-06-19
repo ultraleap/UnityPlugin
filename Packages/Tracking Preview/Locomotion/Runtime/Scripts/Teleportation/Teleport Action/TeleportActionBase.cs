@@ -6,9 +6,9 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Ultraleap.Preview.HandRays;
 using System;
 using System.Collections.Generic;
+using Ultraleap.Preview.HandRays;
 using UnityEngine;
 
 namespace Ultraleap.Preview.Locomotion
@@ -97,8 +97,16 @@ namespace Ultraleap.Preview.Locomotion
 
         public virtual void Start()
         {
-            if (Head == null) Head = Camera.main.transform;
-            if (Player == null) Player = Head.parent.gameObject == null ? Head.gameObject : Head.parent.gameObject;
+            if (Head == null)
+            {
+                Head = Camera.main.transform;
+            }
+
+            if (Player == null)
+            {
+                Player = Head.parent.gameObject == null ? Head.gameObject : Head.parent.gameObject;
+            }
+
             if (farFieldLayerManager == null)
             {
 #if UNITY_2021_3_18_OR_NEWER
@@ -167,7 +175,11 @@ namespace Ultraleap.Preview.Locomotion
         /// <param name="teleportAnchor">The teleport anchor to add</param>
         public void AddTeleportAnchor(TeleportAnchor teleportAnchor)
         {
-            if (teleportAnchor == null) return;
+            if (teleportAnchor == null)
+            {
+                return;
+            }
+
             if (_teleportAnchors == null)
             {
                 _teleportAnchors = new List<TeleportAnchor>();
@@ -320,7 +332,9 @@ namespace Ultraleap.Preview.Locomotion
             for (int i = 0; i < _teleportAnchors.Count; i++)
             {
                 if (selected && _teleportAnchors[i] == _lastTeleportedAnchor)
+                {
                     continue;
+                }
 
                 _teleportAnchors[i].gameObject.SetActive(movementType == TeleportActionMovementType.FIXED && selected);
             }

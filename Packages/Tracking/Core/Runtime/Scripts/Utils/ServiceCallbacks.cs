@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 #if UNITY_ANDROID
 public class ServiceCallbacks : AndroidJavaProxy
@@ -20,7 +18,7 @@ public class ServiceCallbacks : AndroidJavaProxy
         // a TIME_WAIT state on the Service TCP socket/address
 
 #if UNITY_2021_3_18_OR_NEWER
-        foreach (var provider in GameObject.FindObjectsByType<Ultraleap.LeapServiceProvider>(FindObjectsSortMode.None))
+        foreach (Ultraleap.LeapServiceProvider provider in GameObject.FindObjectsByType<Ultraleap.LeapServiceProvider>(FindObjectsSortMode.None))
         {
             provider.destroyController();
         }

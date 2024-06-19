@@ -26,10 +26,9 @@ namespace Ultraleap
             "\n\nNote: These should be children of the Tracked Object in the hierarchy")]
         public TrackingMarker[] markers;
 
-        LeapTransform trackerPosWorldSpace;
-
-        Vector3 targetPos;
-        Quaternion targetRot;
+        private LeapTransform trackerPosWorldSpace;
+        private Vector3 targetPos;
+        private Quaternion targetRot;
 
         private void Start()
         {
@@ -108,7 +107,7 @@ namespace Ultraleap
 
         #region Utilities
 
-        Vector3 GetMarkerWorldSpacePosition(Vector3 trackedMarkerPosition)
+        private Vector3 GetMarkerWorldSpacePosition(Vector3 trackedMarkerPosition)
         {
             // Apply the leapToUnityTransform Transform and then apply the trackerPosWorldSpace Transform
             trackedMarkerPosition = CopyFromLeapCExtensions.LeapToUnityTransform.TransformPoint(trackedMarkerPosition);
@@ -117,7 +116,7 @@ namespace Ultraleap
             return trackedMarkerPosition;
         }
 
-        Quaternion GetMarkerWorldSpaceRotation(Quaternion trackedMarkerRotation)
+        private Quaternion GetMarkerWorldSpaceRotation(Quaternion trackedMarkerRotation)
         {
             // Apply the leapToUnityTransform Transform and then apply the trackerPosWorldSpace Transform
             trackedMarkerRotation = CopyFromLeapCExtensions.LeapToUnityTransform.TransformQuaternion(trackedMarkerRotation);
@@ -126,6 +125,6 @@ namespace Ultraleap
             return trackedMarkerRotation;
         }
 
-        #endregion
+        #endregion Utilities
     }
 }

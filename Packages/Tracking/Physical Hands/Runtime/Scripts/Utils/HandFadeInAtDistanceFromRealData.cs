@@ -16,12 +16,11 @@ namespace Ultraleap.PhysicalHands
 
         [Tooltip("The name of the color property you woud like to fade on the hand shader")]
         public string shaderFadingColorName = "_Color";
+        private PhysicalHandsManager physManager;
+        private Renderer rendererToChange;
+        private HardContactHand hardContactHand;
 
-        PhysicalHandsManager physManager;
-        Renderer rendererToChange;
-        HardContactHand hardContactHand;
-
-        void Start()
+        private void Start()
         {
             FindContactHand();
 
@@ -40,7 +39,7 @@ namespace Ultraleap.PhysicalHands
             }
         }
 
-        void Update()
+        private void Update()
         {
             FindContactHand();
 
@@ -62,7 +61,7 @@ namespace Ultraleap.PhysicalHands
             }
         }
 
-        void FindContactHand()
+        private void FindContactHand()
         {
             if (hardContactHand != null)
             {

@@ -6,7 +6,6 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Ultraleap
@@ -131,7 +130,7 @@ namespace Ultraleap
                 return false;
             }
 
-            var _handModelBase = _handModelGameObject.GetComponent<HandModelBase>();
+            HandModelBase _handModelBase = _handModelGameObject.GetComponent<HandModelBase>();
 
             if (_handModelBase != null)
             {
@@ -249,7 +248,7 @@ namespace Ultraleap
         {
             Vector3 indexPosition = hand.fingers[(int)Finger.FingerType.INDEX].TipPosition;
             Vector3 thumbPosition = hand.fingers[(int)Finger.FingerType.THUMB].TipPosition;
-            return (2 * thumbPosition + indexPosition) * 0.333333F;
+            return ((2 * thumbPosition) + indexPosition) * 0.333333F;
         }
 
         /// <summary>
@@ -270,9 +269,9 @@ namespace Ultraleap
             float indexLength = hand.fingers[1].Length;
             Vector3 radialAxis = hand.RadialAxis();
             float thumbInfluence = Vector3.Dot((thumbTip - indexKnuckle).normalized, radialAxis).Map(0F, 1F, 0.5F, 0F);
-            Vector3 predictedPinchPoint = indexKnuckle + hand.PalmarAxis() * indexLength * 0.85F
-                                                       + hand.DistalAxis() * indexLength * 0.20F
-                                                       + radialAxis * indexLength * 0.20F;
+            Vector3 predictedPinchPoint = indexKnuckle + (hand.PalmarAxis() * indexLength * 0.85F)
+                                                       + (hand.DistalAxis() * indexLength * 0.20F)
+                                                       + (radialAxis * indexLength * 0.20F);
             predictedPinchPoint = Vector3.Lerp(predictedPinchPoint, thumbTip, thumbInfluence);
             predictedPinchPoint = Vector3.Lerp(predictedPinchPoint, indexTip, 0.15F);
 
@@ -292,9 +291,9 @@ namespace Ultraleap
             Vector3 indexKnuckle = hand.fingers[1].bones[1].PrevJoint;
             float indexLength = hand.fingers[1].Length;
             Vector3 radialAxis = hand.RadialAxis();
-            Vector3 stablePinchPoint = indexKnuckle + hand.PalmarAxis() * indexLength * 0.85F
-                                                       + hand.DistalAxis() * indexLength * 0.20F
-                                                       + radialAxis * indexLength * 0.20F;
+            Vector3 stablePinchPoint = indexKnuckle + (hand.PalmarAxis() * indexLength * 0.85F)
+                                                       + (hand.DistalAxis() * indexLength * 0.20F)
+                                                       + (radialAxis * indexLength * 0.20F);
             return stablePinchPoint;
         }
 
@@ -375,9 +374,9 @@ namespace Ultraleap
         {
             // Iterate through the fingers, skipping the thumb and accumulate the scale.
             float scale = 0.0f;
-            for (var i = 1; i < hand.fingers.Length; ++i)
+            for (int i = 1; i < hand.fingers.Length; ++i)
             {
-                scale += (hand.fingers[i].GetBone(Bone.BoneType.METACARPAL).Length / DefaultMetacarpalLengths[i]) / 4.0f;
+                scale += hand.fingers[i].GetBone(Bone.BoneType.METACARPAL).Length / DefaultMetacarpalLengths[i] / 4.0f;
             }
 
             return scale;
@@ -397,7 +396,7 @@ namespace Ultraleap
             float minDistanceSquared = float.MaxValue;
 
             // Iterate through the fingers, skipping the thumb.
-            for (var i = 1; i < hand.fingers.Length; ++i)
+            for (int i = 1; i < hand.fingers.Length; ++i)
             {
                 float distanceSquared = (hand.fingers[i].TipPosition - thumbTipPosition).sqrMagnitude;
                 minDistanceSquared = Mathf.Min(distanceSquared, minDistanceSquared);
@@ -420,11 +419,11 @@ namespace Ultraleap
         {
             // Get the farthest 2 segments of thumb and index finger, respectively, and compute distances.
             float minDistanceSquared = float.MaxValue;
-            for (var thumbBoneIndex = 2; thumbBoneIndex < hand.Thumb.bones.Length; ++thumbBoneIndex)
+            for (int thumbBoneIndex = 2; thumbBoneIndex < hand.Thumb.bones.Length; ++thumbBoneIndex)
             {
-                for (var indexBoneIndex = 2; indexBoneIndex < hand.Index.bones.Length; ++indexBoneIndex)
+                for (int indexBoneIndex = 2; indexBoneIndex < hand.Index.bones.Length; ++indexBoneIndex)
                 {
-                    var distanceSquared = CalculateBoneDistanceSquared(
+                    float distanceSquared = CalculateBoneDistanceSquared(
                         hand.Thumb.bones[thumbBoneIndex],
                         hand.Index.bones[indexBoneIndex]);
                     minDistanceSquared = Mathf.Min(distanceSquared, minDistanceSquared);
@@ -435,7 +434,7 @@ namespace Ultraleap
             return Mathf.Sqrt(minDistanceSquared);
         }
 
-        static float CalculateBoneDistanceSquared(Bone boneA, Bone boneB)
+        private static float CalculateBoneDistanceSquared(Bone boneA, Bone boneB)
         {
             // Denormalize directions to bone length.
             Vector3 boneAJoint = boneA.PrevJoint;
@@ -450,11 +449,11 @@ namespace Ultraleap
             float a = boneADirection.sqrMagnitude;
             float b = Vector3.Dot(boneADirection, boneBDirection);
             float c = boneBDirection.sqrMagnitude;
-            float det = b * b - a * c;
-            float t1 = Mathf.Clamp01((b * d2 - c * d1) / det);
-            float t2 = Mathf.Clamp01((a * d2 - b * d1) / det);
-            Vector3 pa = boneAJoint + t1 * boneADirection;
-            Vector3 pb = boneBJoint + t2 * boneBDirection;
+            float det = (b * b) - (a * c);
+            float t1 = Mathf.Clamp01(((b * d2) - (c * d1)) / det);
+            float t2 = Mathf.Clamp01(((a * d2) - (b * d1)) / det);
+            Vector3 pa = boneAJoint + (t1 * boneADirection);
+            Vector3 pb = boneBJoint + (t2 * boneBDirection);
             return (pa - pb).sqrMagnitude;
         }
 
@@ -489,7 +488,7 @@ namespace Ultraleap
             // Approximate shoulder position with magic values.
             Vector3 ProjectionOrigin = headTransform.position
                                         + (shoulderYaw * (new Vector3(0f, -0.13f, -0.1f)
-                                        + Vector3.left * 0.15f * (hand.IsLeft ? 1f : -1f)));
+                                        + (Vector3.left * 0.15f * (hand.IsLeft ? 1f : -1f))));
             // Compare against this
             //Vector3 ProjectionOrigin    = headTransform.position + shoulderYaw * 
             //                                new Vector3(0.15f * (hand.IsLeft ? -1f : 1f), -0.13f, 0.05f);
@@ -534,7 +533,7 @@ namespace Ultraleap
         /// </summary>
         public static void SetTransform(this Bone bone, Vector3 position, Quaternion rotation)
         {
-            bone.Transform(Vector3.zero, (rotation * Quaternion.Inverse(bone.Rotation)));
+            bone.Transform(Vector3.zero, rotation * Quaternion.Inverse(bone.Rotation));
             bone.Transform(position - bone.PrevJoint, Quaternion.identity);
         }
 
@@ -543,7 +542,7 @@ namespace Ultraleap
         /// </summary>
         public static void SetTipTransform(this Finger finger, Vector3 position, Quaternion rotation)
         {
-            finger.Transform(Vector3.zero, (rotation * Quaternion.Inverse(finger.bones[3].Rotation)));
+            finger.Transform(Vector3.zero, rotation * Quaternion.Inverse(finger.bones[3].Rotation));
             finger.Transform(position - finger.bones[3].NextJoint, Quaternion.identity);
         }
 
@@ -552,7 +551,7 @@ namespace Ultraleap
         /// </summary>
         public static void SetTransform(this Hand hand, Vector3 position, Quaternion rotation)
         {
-            hand.Transform(Vector3.zero, Quaternion.Slerp((rotation * Quaternion.Inverse(hand.Rotation)), Quaternion.identity, 0f));
+            hand.Transform(Vector3.zero, Quaternion.Slerp(rotation * Quaternion.Inverse(hand.Rotation), Quaternion.identity, 0f));
             hand.Transform(position - hand.PalmPosition, Quaternion.identity);
         }
 
@@ -596,7 +595,11 @@ namespace Ultraleap
             toFill.PalmWidth = palmWidth;
             toFill.IsLeft = isLeft;
             toFill.TimeVisible = timeVisible;
-            if (fingers != null) toFill.fingers = fingers;
+            if (fingers != null)
+            {
+                toFill.fingers = fingers;
+            }
+
             toFill.PalmPosition = palmPosition;
             toFill.StabilizedPalmPosition = stabilizedPalmPosition;
             toFill.PalmVelocity = palmVelocity;
@@ -659,10 +662,25 @@ namespace Ultraleap
             toFill.IsExtended = isExtended;
             toFill.Type = type;
 
-            if (metacarpal != null) toFill.bones[0] = metacarpal;
-            if (proximal != null) toFill.bones[1] = proximal;
-            if (intermediate != null) toFill.bones[2] = intermediate;
-            if (distal != null) toFill.bones[3] = distal;
+            if (metacarpal != null)
+            {
+                toFill.bones[0] = metacarpal;
+            }
+
+            if (proximal != null)
+            {
+                toFill.bones[1] = proximal;
+            }
+
+            if (intermediate != null)
+            {
+                toFill.bones[2] = intermediate;
+            }
+
+            if (distal != null)
+            {
+                toFill.bones[3] = distal;
+            }
         }
 
         /// <summary>
@@ -710,9 +728,9 @@ namespace Ultraleap
                 return null;
             }
 
-            foreach (var hand in frame.Hands)
+            foreach (Hand hand in frame.Hands)
             {
-                if (hand.IsLeft && whichHand == Chirality.Left || hand.IsRight && whichHand == Chirality.Right)
+                if ((hand.IsLeft && whichHand == Chirality.Left) || (hand.IsRight && whichHand == Chirality.Right))
                 {
                     return hand;
                 }

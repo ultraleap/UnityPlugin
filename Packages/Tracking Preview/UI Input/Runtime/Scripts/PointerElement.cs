@@ -120,11 +120,11 @@ namespace Ultraleap.InputModule
                     case InteractionCapability.Both:
                     case InteractionCapability.Direct:
 
-                        return (PointerStateTactile == PointerStates.OnCanvas ||
+                        return PointerStateTactile == PointerStates.OnCanvas ||
                             PointerStateTactile == PointerStates.OnElement ||
                             PointerStateTactile == PointerStates.NearCanvas ||
                             PointerStateTactile == PointerStates.TouchingCanvas ||
-                            PointerStateTactile == PointerStates.TouchingElement);
+                            PointerStateTactile == PointerStates.TouchingElement;
 
                     case InteractionCapability.Indirect:
                         return false;
@@ -163,11 +163,11 @@ namespace Ultraleap.InputModule
         /// </summary>
         private float DistanceOfTipToPointer(Hand hand)
         {
-            var tipPosition = hand.fingers[(int)Finger.FingerType.INDEX]
+            Vector3 tipPosition = hand.fingers[(int)Finger.FingerType.INDEX]
                 .GetBone(Bone.BoneType.DISTAL).NextJoint;
 
-            var pointerTransform = transform;
-            return -pointerTransform.transform.InverseTransformPoint(tipPosition).z * pointerTransform.transform.lossyScale.z - module.TactilePadding;
+            Transform pointerTransform = transform;
+            return (-pointerTransform.transform.InverseTransformPoint(tipPosition).z * pointerTransform.transform.lossyScale.z) - module.TactilePadding;
         }
 
         /// <summary>
@@ -208,14 +208,14 @@ namespace Ultraleap.InputModule
             switch (module?.InteractionMode)
             {
                 case InteractionCapability.Both:
-                    return (PrevTriggeringInteraction && (!IsTriggeringInteraction(hand) ||
-                        (PointerStateTactile == PointerStates.OffCanvas && PointerStateProjective == PointerStates.OffCanvas)));
+                    return PrevTriggeringInteraction && (!IsTriggeringInteraction(hand) ||
+                        (PointerStateTactile == PointerStates.OffCanvas && PointerStateProjective == PointerStates.OffCanvas));
 
                 case InteractionCapability.Direct:
-                    return (PrevTriggeringInteraction && (!IsTriggeringInteraction(hand) || PointerStateTactile == PointerStates.OffCanvas));
+                    return PrevTriggeringInteraction && (!IsTriggeringInteraction(hand) || PointerStateTactile == PointerStates.OffCanvas);
 
                 case InteractionCapability.Indirect:
-                    return (PrevTriggeringInteraction && (!IsTriggeringInteraction(hand) || PointerStateProjective == PointerStates.OffCanvas));
+                    return PrevTriggeringInteraction && (!IsTriggeringInteraction(hand) || PointerStateProjective == PointerStates.OffCanvas);
 
                 default:
                     break;
@@ -258,7 +258,7 @@ namespace Ultraleap.InputModule
                 if (IsTouchingOrNearlyTouchingCanvasOrElement())
                 {
                     // Is fingertip beyond the pointer - e.g. pushed past the button surface?
-                    var val = DistanceOfTipToPointer(hand) < 0f;
+                    bool val = DistanceOfTipToPointer(hand) < 0f;
                     return val;
                 }
             }
@@ -304,7 +304,7 @@ namespace Ultraleap.InputModule
         /// Is tactile interaction allowed and is the pointer tip distance within the tactile interaction distance
         /// </summary>
         private bool IsPermittedTactileInteraction(Hand hand)
-            => OnlyTactileInteractionEnabled || !OnlyProjectionInteractionEnabled && DistanceOfTipToPointer(hand) < module.ProjectiveToTactileTransitionDistance;
+            => OnlyTactileInteractionEnabled || (!OnlyProjectionInteractionEnabled && DistanceOfTipToPointer(hand) < module.ProjectiveToTactileTransitionDistance);
 
         internal void Process(Hand hand, IProjectionOriginProvider projectionOriginProvider)
         {
@@ -391,7 +391,7 @@ namespace Ultraleap.InputModule
             ProcessUnityEvents(hand);
         }
 
-        void CancelAllInput(Hand hand)
+        private void CancelAllInput(Hand hand)
         {
             PrevStateProjective = PointerStateProjective;
             PrevStateTactile = PointerStateTactile;
@@ -481,7 +481,7 @@ namespace Ultraleap.InputModule
         private void ProcessTactile(IProjectionOriginProvider projectionOriginProvider, Hand hand)
         {
             // Raycast from shoulder through tip of the index finger to the UI
-            var tipRaycastUsed = GetLookPointerEventData(
+            bool tipRaycastUsed = GetLookPointerEventData(
                 hand,
                 projectionOriginProvider.ProjectionOriginForHand(hand),
                 forceTipRaycast: true);
@@ -495,7 +495,7 @@ namespace Ultraleap.InputModule
         private void ProcessProjective(IProjectionOriginProvider projectionOriginProvider, Hand hand)
         {
             // If didn't hit anything near the fingertip, try doing it again, but through the knuckle this time
-            var tipRaycastUsed = GetLookPointerEventData(
+            bool tipRaycastUsed = GetLookPointerEventData(
                 hand,
                 projectionOriginProvider.ProjectionOriginForHand(hand),
                 forceTipRaycast: false);
@@ -570,13 +570,13 @@ namespace Ultraleap.InputModule
                         CurrentGameObject = CurrentGameObjectUnderPointer;
 
                         //See if this object, or one of its parents, has a pointerDownHandler
-                        var gameObjectJustPressed = ExecuteEvents.ExecuteHierarchy(CurrentGameObject, EventData,
+                        GameObject gameObjectJustPressed = ExecuteEvents.ExecuteHierarchy(CurrentGameObject, EventData,
                             ExecuteEvents.pointerDownHandler);
 
                         //If not, see if one has a pointerClickHandler!
                         if (gameObjectJustPressed == null)
                         {
-                            var gameObjectJustClicked = ExecuteEvents.ExecuteHierarchy(CurrentGameObject,
+                            GameObject gameObjectJustClicked = ExecuteEvents.ExecuteHierarchy(CurrentGameObject,
                                 EventData,
                                 ExecuteEvents.pointerClickHandler);
 
@@ -607,7 +607,7 @@ namespace Ultraleap.InputModule
 
                         if (EventData.pointerDrag)
                         {
-                            var dragHandler = EventData.pointerDrag.GetComponent<IDragHandler>();
+                            IDragHandler dragHandler = EventData.pointerDrag.GetComponent<IDragHandler>();
 
                             if (dragHandler != null)
                             {
@@ -669,7 +669,7 @@ namespace Ultraleap.InputModule
                 Vector2.Distance(EventData.position, DragStartPosition) * 100f >
                 EventSystem.current.pixelDragThreshold)
             {
-                var dragHandler = EventData.pointerDrag.GetComponent<IDragHandler>();
+                IDragHandler dragHandler = EventData.pointerDrag.GetComponent<IDragHandler>();
                 if (dragHandler != null && dragHandler is ScrollRect)
                 {
                     // Are we dragging on an element inside a scroll rect?
@@ -741,7 +741,7 @@ namespace Ultraleap.InputModule
         private bool GetLookPointerEventData(Hand hand, Vector3 origin, bool forceTipRaycast)
         {
             // Whether or not this will be a raycast through the finger tip
-            var tipRaycast = false;
+            bool tipRaycast = false;
 
             if (EventData == null)
             {
@@ -759,13 +759,13 @@ namespace Ultraleap.InputModule
             {
                 tipRaycast = true;
 
-                var farthest = 0f;
+                float farthest = 0f;
                 pointerPosition = hand.Index.TipPosition;
-                for (var i = 1; i < 3; i++)
+                for (int i = 1; i < 3; i++)
                 {
-                    var fingerDistance = Vector3.Distance(mainCamera.transform.position,
+                    float fingerDistance = Vector3.Distance(mainCamera.transform.position,
                         hand.fingers[i].TipPosition);
-                    var fingerExtension =
+                    float fingerExtension =
                         Mathf.Clamp01(Vector3.Dot(
                             hand.fingers[i].Direction,
                             leapDataProvider.CurrentFrame.Hands[0].Direction)) / 1.5f;
@@ -865,25 +865,25 @@ namespace Ultraleap.InputModule
                 return;
             }
 
-            var element = EventData.pointerCurrentRaycast.gameObject;
+            GameObject element = EventData.pointerCurrentRaycast.gameObject;
             if (element != null)
             {
-                var draggingPlane = EventData.pointerCurrentRaycast.gameObject.GetComponent<RectTransform>();
+                RectTransform draggingPlane = EventData.pointerCurrentRaycast.gameObject.GetComponent<RectTransform>();
 
                 if (RectTransformUtility.ScreenPointToWorldPointInRectangle(draggingPlane, pointData.position,
-                    pointData.enterEventCamera, out var globalLookPos))
+                    pointData.enterEventCamera, out Vector3 globalLookPos))
                 {
-                    var hoverer = ExecuteEvents.GetEventHandler<IPointerEnterHandler>(element);
+                    GameObject hoverer = ExecuteEvents.GetEventHandler<IPointerEnterHandler>(element);
                     if (hoverer)
                     {
-                        var componentInPlane = hoverer.transform.InverseTransformPoint(globalLookPos);
+                        Vector3 componentInPlane = hoverer.transform.InverseTransformPoint(globalLookPos);
                         componentInPlane = new Vector3(componentInPlane.x, componentInPlane.y, 0f);
                         transform.position = hoverer.transform.TransformPoint(componentInPlane);
                     }
                     else
                     {
                         //Amount the pointer floats above the Canvas
-                        transform.position = globalLookPos - transform.forward * 0.01f;
+                        transform.position = globalLookPos - (transform.forward * 0.01f);
                     }
 
                     transform.rotation = draggingPlane.rotation;
@@ -908,7 +908,7 @@ namespace Ultraleap.InputModule
                 }
             }
 
-            if (StateChangeActionMap.TryGetValue((prevState, pointerState), out var result))
+            if (StateChangeActionMap.TryGetValue((prevState, pointerState), out (string ActionName, Action<IInputModuleEventHandler, PointerElement> Action) result))
             {
                 result.Action.Invoke(module, this);
             }

@@ -10,7 +10,6 @@ namespace Ultraleap
 {
     using LeapInternal;
     using System;
-    using System.Runtime.InteropServices;
 
     /// <summary>
     /// An enumeration defining the types of Leap Motion events.

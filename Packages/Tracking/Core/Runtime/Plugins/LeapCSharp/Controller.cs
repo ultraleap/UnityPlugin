@@ -12,7 +12,6 @@ namespace Ultraleap
     using System;
     using System.Linq;
     using System.Threading;
-    using UnityEngine;
 
     /// <summary>
     /// The Controller class is your main interface to the Leap Motion Controller.
@@ -40,9 +39,9 @@ namespace Ultraleap
     public class Controller :
       IController
     {
-        Connection _connection;
-        bool _disposed = false;
-        string _serverNamespace = "Leap Service";
+        private Connection _connection;
+        private bool _disposed = false;
+        private string _serverNamespace = "Leap Service";
 
         /// <summary>
         /// The SynchronizationContext used for dispatching events.
@@ -73,7 +72,10 @@ namespace Ultraleap
             add
             {
                 if (_hasInitialized)
+                {
                     value(this, new LeapEventArgs(LeapEvent.EVENT_INIT));
+                }
+
                 _init += value;
             }
             remove { _init -= value; }
@@ -463,7 +465,9 @@ namespace Ultraleap
             _connection.EventContext = SynchronizationContext.Current;
 
             if (_connection.IsRunning)
+            {
                 _hasInitialized = true;
+            }
 
             _connection.LeapInit += OnInit;
             _connection.LeapConnection += OnConnect;
@@ -538,11 +542,20 @@ namespace Ultraleap
             LEAP_VERSION currentServiceVersion = connection.GetCurrentServiceVersion();
 
             // check that minServiceVersion is smaller or equal to the current service version
-            if (minServiceVersion.major < currentServiceVersion.major) return true;
+            if (minServiceVersion.major < currentServiceVersion.major)
+            {
+                return true;
+            }
             else if (minServiceVersion.major == currentServiceVersion.major)
             {
-                if (minServiceVersion.minor < currentServiceVersion.minor) return true;
-                else if (minServiceVersion.minor == currentServiceVersion.minor && minServiceVersion.patch <= currentServiceVersion.patch) return true;
+                if (minServiceVersion.minor < currentServiceVersion.minor)
+                {
+                    return true;
+                }
+                else if (minServiceVersion.minor == currentServiceVersion.minor && minServiceVersion.patch <= currentServiceVersion.patch)
+                {
+                    return true;
+                }
             }
             return false;
         }
@@ -1002,28 +1015,28 @@ namespace Ultraleap
             /// <summary>
             /// Receive background frames.
             /// </summary>
-            POLICY_BACKGROUND_FRAMES = (1 << 0),
+            POLICY_BACKGROUND_FRAMES = 1 << 0,
             /// <summary>
             /// Allow streaming images.
             /// </summary>
-            POLICY_IMAGES = (1 << 1),
+            POLICY_IMAGES = 1 << 1,
             /// <summary>
             /// Optimize the tracking for head-mounted device.
             /// </summary>
-            POLICY_OPTIMIZE_HMD = (1 << 2),
+            POLICY_OPTIMIZE_HMD = 1 << 2,
             /// <summary>
             /// Allow pausing and unpausing of the Leap Motion service.
             /// </summary>
-            POLICY_ALLOW_PAUSE_RESUME = (1 << 3),
+            POLICY_ALLOW_PAUSE_RESUME = 1 << 3,
             /// <summary>
             /// Allow streaming map point
             /// </summary>
-            POLICY_MAP_POINTS = (1 << 7),
+            POLICY_MAP_POINTS = 1 << 7,
             /// <summary>
             /// Optimize the tracking for screen-top device.
             /// @since 5.0.0
             /// </summary>
-            POLICY_OPTIMIZE_SCREENTOP = (1 << 8),
+            POLICY_OPTIMIZE_SCREENTOP = 1 << 8,
         }
 
         protected virtual void OnInit(object sender, LeapEventArgs eventArgs)

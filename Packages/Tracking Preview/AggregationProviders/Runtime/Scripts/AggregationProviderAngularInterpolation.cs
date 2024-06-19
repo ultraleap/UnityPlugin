@@ -6,9 +6,8 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Ultraleap.Encoding;
-using System.Collections;
 using System.Collections.Generic;
+using Ultraleap.Encoding;
 using UnityEngine;
 
 namespace Ultraleap
@@ -32,8 +31,7 @@ namespace Ultraleap
 
         public float maxInterpolationAngle = 60;
 
-        public Transform midpointDevices; //used to calculate relative angle and weight hands accordingly. Transform should face direction that bisects FOV of devices 
-
+        public Transform midpointDevices; //used to calculate relative angle and weight hands accordingly. Transform should face direction that bisects FOV of devices
 
         protected override Frame MergeFrames(Frame[] frames)
         {
@@ -45,26 +43,36 @@ namespace Ultraleap
 
         private Hand[] MergeHands(Frame[] frames)
         {
-            /* 
+            /*
              * This function returns one set of hands from multiple Leap Providers, weighing their influence using hands' positions relative to devices.
             */
 
-            if (frames.Length == 0) Debug.Log("frames has a length of 0");
+            if (frames.Length == 0)
+            {
+                Debug.Log("frames has a length of 0");
+            }
             //sort Left and Right hands (some values may be null since never know how many hands are visible, but we clean it up at the end)
             Hand[] LeftHands = new Hand[providers.Length];
             Hand[] RightHands = new Hand[providers.Length];
             Hand[] mergedHands;
             for (int i = 0; i < frames.Length; i++)
             {
-                if (frames[i].Hands == null) Debug.Log("hand is null in frame " + i);
+                if (frames[i].Hands == null)
+                {
+                    Debug.Log("hand is null in frame " + i);
+                }
                 //frame_timestamps = new List<long>();
                 //frame_timestamps.Add(providers[i].CurrentFrame.Timestamp);
                 foreach (Hand tempHand in frames[i].Hands)
                 {
                     if (tempHand.IsLeft)
+                    {
                         LeftHands[i] = tempHand;
+                    }
                     else
+                    {
                         RightHands[i] = tempHand;
+                    }
                 }
             }
 
@@ -73,7 +81,9 @@ namespace Ultraleap
             Hand confidentRight = AngularInterpolate(RightHands, ref cam2Alpha, ref rightAngle);
 
             //clean up and return hand arrays with only valid hands
+
             #region Clean hand arrays
+
             if (confidentLeft != null && confidentRight != null)
             {
                 mergedHands = new Hand[2];
@@ -88,11 +98,16 @@ namespace Ultraleap
             {
                 mergedHands = new Hand[1];
                 if (confidentLeft != null)
+                {
                     mergedHands[0] = confidentLeft;
+                }
                 else
+                {
                     mergedHands[0] = confidentRight;
+                }
             }
-            #endregion
+
+            #endregion Clean hand arrays
 
             return mergedHands;
         }
@@ -106,13 +121,11 @@ namespace Ultraleap
             return Mathf.Atan2(
                 Vector3.Dot(n, Vector3.Cross(v1, v2)),
                 Vector3.Dot(v1, v2)) * Mathf.Rad2Deg;
-
-
         }
 
         private Hand AngularInterpolate(Hand[] handList, ref float alpha, ref float angle)
         {
-            /* 
+            /*
              * Combines list of hands (of one chiarality) into one Ultraleap.Hand, by weighing the relative angle to the devices
             */
 
@@ -121,7 +134,9 @@ namespace Ultraleap
              * */
 
             //find average palm position since we don't exactly know which provider is closest to reality:
+
             #region PreProcess Raw Hand Data
+
             Hand tempHand = null;
             int numValidHands = 0;
             foreach (Hand hand in handList)
@@ -139,8 +154,6 @@ namespace Ultraleap
                         Vector3 tH = tempHand.PalmPosition;
                         tempHand.PalmPosition = new Vector3(aprxAvg(nH.x, tH.x), aprxAvg(nH.y, tH.y), aprxAvg(nH.z, tH.z));
                         //tempHand.PalmPosition = hand.PalmPosition;
-
-
                     }
                     numValidHands++;
                 }
@@ -150,11 +163,11 @@ namespace Ultraleap
             {
                 tempHandPalmPosition = tempHand.PalmPosition;
             }
-            #endregion
+
+            #endregion PreProcess Raw Hand Data
 
             if (numValidHands > 0)
             {
-
                 //calculate angle between midpoint between devices(i.e. providers):
                 Vector3 devicesMiddle = Vector3.zero;
                 Vector3 devicesAvgForward = Vector3.zero;
@@ -179,7 +192,7 @@ namespace Ultraleap
                 //Debug.Log(angle);
 
                 alpha = Mathf.Clamp(angle, -maxInterpolationAngle / 2, maxInterpolationAngle / 2);
-                alpha = ((alpha + (maxInterpolationAngle / 2)) / (maxInterpolationAngle)); //normalize to a 0-1 scale
+                alpha = (alpha + (maxInterpolationAngle / 2)) / maxInterpolationAngle; //normalize to a 0-1 scale
 
                 //Interpolate using alpha:
                 Hand interpolateHand = new Hand();
@@ -233,10 +246,10 @@ namespace Ultraleap
             Gizmos.DrawSphere(midDevicePointUp + midDevicePointPosition, 0.02f);
             Gizmos.DrawLine(midDevicePointPosition, midDevicePointUp);
 
-            var leftLimit = Quaternion.Euler(0, 0, -maxInterpolationAngle * 0.5f) * midDevicePointUp;
+            Vector3 leftLimit = Quaternion.Euler(0, 0, -maxInterpolationAngle * 0.5f) * midDevicePointUp;
             Gizmos.DrawLine(midDevicePointPosition, leftLimit);
 
-            var rightLimit = Quaternion.Euler(0, 0, maxInterpolationAngle * 0.5f) * midDevicePointUp;
+            Vector3 rightLimit = Quaternion.Euler(0, 0, maxInterpolationAngle * 0.5f) * midDevicePointUp;
             Gizmos.DrawLine(midDevicePointPosition, rightLimit);
         }
     }

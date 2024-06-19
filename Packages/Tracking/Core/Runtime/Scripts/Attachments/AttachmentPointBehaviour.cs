@@ -7,9 +7,6 @@
  ******************************************************************************/
 
 using Ultraleap.Attributes;
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Ultraleap.Attachments
@@ -37,7 +34,7 @@ namespace Ultraleap.Attachments
         [Disable]
         public AttachmentPointFlags attachmentPoint;
 
-        void OnValidate()
+        private void OnValidate()
         {
             if (!attachmentPoint.IsSinglePoint() && attachmentPoint != AttachmentPointFlags.None)
             {
@@ -46,7 +43,7 @@ namespace Ultraleap.Attachments
             }
         }
 
-        void OnDestroy()
+        private void OnDestroy()
         {
             if (attachmentHand != null)
             {
@@ -56,7 +53,11 @@ namespace Ultraleap.Attachments
 
         public static implicit operator AttachmentPointFlags(AttachmentPointBehaviour p)
         {
-            if (p == null) return AttachmentPointFlags.None;
+            if (p == null)
+            {
+                return AttachmentPointFlags.None;
+            }
+
             return p.attachmentPoint;
         }
 

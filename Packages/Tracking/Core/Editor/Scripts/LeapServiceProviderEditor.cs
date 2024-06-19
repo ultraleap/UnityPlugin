@@ -91,7 +91,7 @@ namespace Ultraleap
 
         private void frameOptimizationWarning(SerializedProperty property)
         {
-            var mode = (LeapServiceProvider.FrameOptimizationMode)property.intValue;
+            LeapServiceProvider.FrameOptimizationMode mode = (LeapServiceProvider.FrameOptimizationMode)property.intValue;
             string warningText;
 
             switch (mode)

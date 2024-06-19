@@ -85,7 +85,7 @@ namespace Ultraleap
                 // Attach / Detach Object
                 EditorGUILayout.BeginHorizontal();
 
-                var _anyTargetsCanAnchor = targets.Any(t => t.Anchor != null && !target.isAttached);
+                bool _anyTargetsCanAnchor = targets.Any(t => t.Anchor != null && !target.isAttached);
 
                 EditorGUI.BeginDisabledGroup(!_anyTargetsCanAnchor);
                 if (GUILayout.Button(new GUIContent("Attach Object" + (targets.Length > 1 ? "s" : ""),
@@ -93,7 +93,7 @@ namespace Ultraleap
                                                   + "currently at its anchor, it will begin move to it when play mode begins.")))
                 {
                     Undo.IncrementCurrentGroup();
-                    foreach (var _singleTarget in targets)
+                    foreach (AnchorableBehaviour _singleTarget in targets)
                     {
                         Undo.RecordObject(_singleTarget, "Try Attach Object");
                         _singleTarget.TryAttach(ignoreRange: true);
@@ -101,7 +101,7 @@ namespace Ultraleap
                 }
                 EditorGUI.EndDisabledGroup();
 
-                var _anyTargetsCanDetach = targets.Any(t => t.isAttached);
+                bool _anyTargetsCanDetach = targets.Any(t => t.isAttached);
 
                 EditorGUI.BeginDisabledGroup(!_anyTargetsCanDetach);
                 if (GUILayout.Button(new GUIContent("Detach Object" + (targets.Length > 1 ? "s" : ""),
@@ -109,7 +109,7 @@ namespace Ultraleap
                                                   + "until they are specifically told to attach to one.")))
                 {
                     Undo.IncrementCurrentGroup();
-                    foreach (var _singleTarget in targets)
+                    foreach (AnchorableBehaviour _singleTarget in targets)
                     {
                         Undo.RecordObject(_singleTarget, "Try Detach Object");
                         _singleTarget.Detach();
@@ -124,7 +124,7 @@ namespace Ultraleap
                 bool _anyTranslatedFromAnchor = false;
                 bool _anyRotatedFromAnchor = false;
 
-                foreach (var _singleTarget in targets)
+                foreach (AnchorableBehaviour _singleTarget in targets)
                 {
                     _anyTranslatedFromAnchor |= _singleTarget.Anchor != null && Vector3.Distance(_singleTarget.transform.position, _singleTarget.Anchor.transform.position) > 0.0001F;
                     _anyRotatedFromAnchor |= _singleTarget.Anchor != null && _singleTarget.anchorRotation
@@ -139,11 +139,14 @@ namespace Ultraleap
                                                       + "its anchor now, click this button.")))
                     {
                         Undo.IncrementCurrentGroup();
-                        foreach (var _singleTarget in targets)
+                        foreach (AnchorableBehaviour _singleTarget in targets)
                         {
                             Undo.RecordObject(_singleTarget.transform, "Move Target Transform to Anchor");
                             _singleTarget.transform.position = _singleTarget.Anchor.transform.position;
-                            if (_singleTarget.anchorRotation) _singleTarget.transform.rotation = _singleTarget.Anchor.transform.rotation;
+                            if (_singleTarget.anchorRotation)
+                            {
+                                _singleTarget.transform.rotation = _singleTarget.Anchor.transform.rotation;
+                            }
                         }
                     }
                 }

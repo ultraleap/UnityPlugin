@@ -59,7 +59,7 @@ namespace Ultraleap
         public static Vector3 GetHandRadialAxis(this XRHand hand)
         {
             Quaternion rotation = hand.rootPose.rotation;
-            float d = rotation.x * rotation.x + rotation.y * rotation.y + rotation.z * rotation.z + rotation.w * rotation.w;
+            float d = (rotation.x * rotation.x) + (rotation.y * rotation.y) + (rotation.z * rotation.z) + (rotation.w * rotation.w);
             float s = 2.0f / d;
             float ys = rotation.y * s, zs = rotation.z * s;
             float wy = rotation.w * ys, wz = rotation.w * zs;
@@ -81,7 +81,7 @@ namespace Ultraleap
         public static Vector3 GetHandDistalAxis(this XRHand hand)
         {
             Quaternion rotation = hand.rootPose.rotation;
-            float d = rotation.x * rotation.x + rotation.y * rotation.y + rotation.z * rotation.z + rotation.w * rotation.w;
+            float d = (rotation.x * rotation.x) + (rotation.y * rotation.y) + (rotation.z * rotation.z) + (rotation.w * rotation.w);
             float s = 2.0f / d;
             float xs = rotation.x * s, ys = rotation.y * s, zs = rotation.z * s;
             float wx = rotation.w * xs, wy = rotation.w * ys;
@@ -98,10 +98,13 @@ namespace Ultraleap
 
             // Get the thumb position.
             Vector3 thumbTip = Vector3.zero;
-            if (hand.GetJoint(XRHandJointID.ThumbTip).TryGetPose(out Pose thumbTipPose)) thumbTip = thumbTipPose.position;
+            if (hand.GetJoint(XRHandJointID.ThumbTip).TryGetPose(out Pose thumbTipPose))
+            {
+                thumbTip = thumbTipPose.position;
+            }
 
             // Compute the distance midpoints between the thumb and thejointToCompare.
-            if (hand.GetJoint(jointToCompare).TryGetPose(out var fingerTipPose))
+            if (hand.GetJoint(jointToCompare).TryGetPose(out Pose fingerTipPose))
             {
                 float distance = (fingerTipPose.position - thumbTip).magnitude;
 
@@ -118,10 +121,13 @@ namespace Ultraleap
         {
             // Get the thumb position.
             Vector3 thumbTip = Vector3.zero;
-            if (hand.GetJoint(XRHandJointID.ThumbTip).TryGetPose(out Pose thumbTipPose)) thumbTip = thumbTipPose.position;
+            if (hand.GetJoint(XRHandJointID.ThumbTip).TryGetPose(out Pose thumbTipPose))
+            {
+                thumbTip = thumbTipPose.position;
+            }
 
             // Compute the distance midpoints between the thumb and thejointToCompare.
-            if (hand.GetJoint(jointToCompare).TryGetPose(out var fingerTipPose))
+            if (hand.GetJoint(jointToCompare).TryGetPose(out Pose fingerTipPose))
             {
                 float distance = (fingerTipPose.position - thumbTip).magnitude;
                 return distance;
@@ -135,8 +141,16 @@ namespace Ultraleap
             Vector3 indexTip = Vector3.zero;
             Vector3 thumbTip = Vector3.zero;
 
-            if (hand.GetJoint(XRHandJointID.IndexDistal).TryGetPose(out Pose indexTipPose)) indexTip = indexTipPose.position;
-            if (hand.GetJoint(XRHandJointID.ThumbDistal).TryGetPose(out Pose thumbTipPose)) thumbTip = thumbTipPose.position;
+            if (hand.GetJoint(XRHandJointID.IndexDistal).TryGetPose(out Pose indexTipPose))
+            {
+                indexTip = indexTipPose.position;
+            }
+
+            if (hand.GetJoint(XRHandJointID.ThumbDistal).TryGetPose(out Pose thumbTipPose))
+            {
+                thumbTip = thumbTipPose.position;
+            }
+
             return Vector3.Lerp(indexTip, thumbTip, 0.75f);
         }
 
@@ -205,10 +219,10 @@ namespace Ultraleap
 
             // Magic numbers for default metacarpal lengths
             //{ 0, 0.06812f, 0.06460f, 0.05800f, 0.05369f }
-            scale += (GetMetacarpalLength(hand, 1) / 0.06812f) / 4.0f;
-            scale += (GetMetacarpalLength(hand, 2) / 0.06460f) / 4.0f;
-            scale += (GetMetacarpalLength(hand, 3) / 0.05800f) / 4.0f;
-            scale += (GetMetacarpalLength(hand, 4) / 0.05369f) / 4.0f;
+            scale += GetMetacarpalLength(hand, 1) / 0.06812f / 4.0f;
+            scale += GetMetacarpalLength(hand, 2) / 0.06460f / 4.0f;
+            scale += GetMetacarpalLength(hand, 3) / 0.05800f / 4.0f;
+            scale += GetMetacarpalLength(hand, 4) / 0.05369f / 4.0f;
 
             return scale;
         }

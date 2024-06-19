@@ -34,7 +34,7 @@ namespace Ultraleap.Tracking.OpenXR
         public void AddQueriesPackage(string packageName)
         {
             // Get the queries element, creating it if it doesn't exist.
-            var queries = _manifest.Root!.Element("queries");
+            XElement queries = _manifest.Root!.Element("queries");
             if (queries == null)
             {
                 queries = new XElement("queries");
@@ -54,7 +54,7 @@ namespace Ultraleap.Tracking.OpenXR
         public void AddQueriesIntentAction(string name)
         {
             // Get the queries element, creating it if it doesn't exist.
-            var queries = _manifest.Root!.Element("queries");
+            XElement queries = _manifest.Root!.Element("queries");
             if (queries == null)
             {
                 queries = new XElement("queries");
@@ -72,7 +72,7 @@ namespace Ultraleap.Tracking.OpenXR
         public void AddUsesPermission(string name)
         {
             // Check if the uses-feature is already there.
-            var feature = _manifest.Root!
+            XElement feature = _manifest.Root!
                 .Elements("uses-permission")
                 .FirstOrDefault(el => el.Attribute(_android + "name")?.Value == name);
 
@@ -89,7 +89,7 @@ namespace Ultraleap.Tracking.OpenXR
         public void AddUsesFeature(string name, bool required)
         {
             // Check if the uses-feature is already there.
-            var feature = _manifest.Root!
+            XElement feature = _manifest.Root!
                 .Elements("uses-feature")
                 .FirstOrDefault(el => el.Attribute(_android + "name")?.Value == name);
 
@@ -113,8 +113,8 @@ namespace Ultraleap.Tracking.OpenXR
         public void AddMetadata(string name, string value)
         {
             // Get the application element.
-            var application = _manifest.Root!.Element("application")!;
-            var metaData = application
+            XElement application = _manifest.Root!.Element("application")!;
+            XElement metaData = application
                 .Elements("meta-data")
                 .FirstOrDefault(el => el.Attribute(_android + "name")?.Value == name);
 

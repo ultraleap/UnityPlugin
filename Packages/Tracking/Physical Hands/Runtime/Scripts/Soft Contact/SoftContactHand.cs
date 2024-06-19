@@ -44,14 +44,14 @@ namespace Ultraleap.PhysicalHands
             isHandPhysical = false;
 
             ((SoftContactBone)palmBone).SetupBone();
-            var rbody = palmBone.gameObject.AddComponent<Rigidbody>();
+            Rigidbody rbody = palmBone.gameObject.AddComponent<Rigidbody>();
             rbody.useGravity = false;
             rbody.collisionDetectionMode = CollisionDetectionMode.Continuous;
 
             palmBone.rigid = rbody;
 
             // Set the colliders to ignore eachother
-            foreach (var bone in bones)
+            foreach (ContactBone bone in bones)
             {
                 ((SoftContactBone)bone).SetupBone();
                 Physics.IgnoreCollision(palmBone.palmCollider, bone.boneCollider);
@@ -60,7 +60,7 @@ namespace Ultraleap.PhysicalHands
                 rbody.useGravity = false;
                 rbody.collisionDetectionMode = CollisionDetectionMode.Continuous;
 
-                foreach (var bone2 in bones)
+                foreach (ContactBone bone2 in bones)
                 {
                     if (bone != bone2)
                     {

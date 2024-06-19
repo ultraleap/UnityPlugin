@@ -1,7 +1,7 @@
-using Ultraleap;
-using Ultraleap.Encoding;
 using System.Collections.Generic;
 using System.Linq;
+using Ultraleap;
+using Ultraleap.Encoding;
 using UnityEngine;
 
 /// <summary>
@@ -14,14 +14,14 @@ public class JointOcclusion : MonoBehaviour
     public CapsuleHand occlusionHandLeft;
     public CapsuleHand occlusionHandRight;
 
-    Camera cam;
-    Texture2D tex;
-    Rect regionToReadFrom;
-    Color[] occlusionSphereColorsLeft;
-    Color[] occlusionSphereColorsRight;
-    Mesh cubeMesh;
-    Material cubeMaterial;
-    string layerName;
+    private Camera cam;
+    private Texture2D tex;
+    private Rect regionToReadFrom;
+    private Color[] occlusionSphereColorsLeft;
+    private Color[] occlusionSphereColorsRight;
+    private Mesh cubeMesh;
+    private Material cubeMaterial;
+    private string layerName;
 
     /// <summary>
     /// this sets everything up, so that joint occlusion works (eg. rendering layers)
@@ -63,11 +63,8 @@ public class JointOcclusion : MonoBehaviour
         occlusionHandLeft.SphereColors = occlusionSphereColorsLeft;
         occlusionHandRight.SphereColors = occlusionSphereColorsRight;
 
-
-
         cubeMesh = createCubeMesh();
         cubeMaterial = new Material(Shader.Find("Standard"));
-
     }
 
     private Mesh createCubeMesh()
@@ -125,46 +122,44 @@ public class JointOcclusion : MonoBehaviour
         }
 
         // draw a cube where the palm is, so that joints cannot be seen 'through' the palm
-        // the following values are determined by experimenting with different cube sizes, positions and rotations and picking one 
+        // the following values are determined by experimenting with different cube sizes, positions and rotations and picking one
         // that fills out the palm of the capsule hand well.
         Vector3 posOffset = new Vector3(-0.03f, 0.005f, -0.045f);
         Quaternion rotOffset = Quaternion.Euler(-5.366f, 0, 0);
         Vector3 scale = new Vector3(0.1f, 0.01f, 0.13f);
-        Graphics.DrawMesh(cubeMesh, Matrix4x4.TRS(hand.PalmPosition + hand.Direction * posOffset.z + hand.PalmNormal * posOffset.y + Vector3.Cross(hand.Direction, hand.PalmNormal) * posOffset.x, hand.Rotation * rotOffset, scale), cubeMaterial, LayerMask.NameToLayer(layerName));
+        Graphics.DrawMesh(cubeMesh, Matrix4x4.TRS(hand.PalmPosition + (hand.Direction * posOffset.z) + (hand.PalmNormal * posOffset.y) + (Vector3.Cross(hand.Direction, hand.PalmNormal) * posOffset.x), hand.Rotation * rotOffset, scale), cubeMaterial, LayerMask.NameToLayer(layerName));
 
         RenderTexture.active = cam.targetTexture;
 
         tex.ReadPixels(regionToReadFrom, 0, 0);
         tex.Apply();
 
-
         // loop through all joints that are visible (all joints that are rendered on a capsule hand),
         // and save how many pixels of a joint can be seen (in pixelsSeenCount)
         // and how many pixels of a joint would be seen if the joint was not occluded at all (in optimalPixelsCount)
         int[] pixelsSeenCount = new int[confidences.Length];
         int[] optimalPixelsCount = new int[confidences.Length];
-        foreach (var finger in hand.fingers)
+        foreach (Finger finger in hand.fingers)
         {
             for (int j = 0; j < 4; j++)
             {
                 // as the capsule hands doesn't render metacarpal bones, the indexing of capsule hand colors is different
                 // from the indexing of the jointPositions on a VectorHand (which is used for confidence indexing)
-                int key = (int)finger.Type * 5 + j + 1;
-                int capsuleHandKey = (int)finger.Type * 4 + j;
+                int key = ((int)finger.Type * 5) + j + 1;
+                int capsuleHandKey = ((int)finger.Type * 4) + j;
 
                 float jointRadius = 0.008f;
 
-                // get the joint position from the given hand and use it to calculate the screen position of the joint's center and 
+                // get the joint position from the given hand and use it to calculate the screen position of the joint's center and
                 // a point on the outside border of the joint (both in pixel coordinates)
                 Vector3 jointPos = finger.GetBone((Ultraleap.Bone.BoneType)j).NextJoint;
                 Vector3 screenPosCenter = cam.WorldToScreenPoint(jointPos);
-                Vector3 screenPosSphereOutside = cam.WorldToScreenPoint(jointPos + cam.transform.right * jointRadius);
+                Vector3 screenPosSphereOutside = cam.WorldToScreenPoint(jointPos + (cam.transform.right * jointRadius));
 
                 // the sphere radius (in pixels) is given by the distance between the screenPosCenter and the screenPosOutside
                 float radius = new Vector2(screenPosSphereOutside.x - screenPosCenter.x, screenPosSphereOutside.y - screenPosCenter.y).magnitude;
 
                 optimalPixelsCount[key] = (int)(Mathf.PI * radius * radius);
-
 
                 // only count pixels around where the sphere is supposed to be (+5 pixel margin)
                 int margin = 5;
@@ -197,7 +192,7 @@ public class JointOcclusion : MonoBehaviour
         return confidences;
     }
 
-    float DistanceBetweenColors(Color color1, Color color2)
+    private float DistanceBetweenColors(Color color1, Color color2)
     {
         Color colorDifference = color1 - color2;
         Vector3 diffVetor = new Vector3(colorDifference.r, colorDifference.g, colorDifference.b);

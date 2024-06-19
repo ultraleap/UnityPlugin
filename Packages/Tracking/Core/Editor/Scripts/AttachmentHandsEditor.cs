@@ -6,8 +6,6 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using System.Collections;
-using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
@@ -39,7 +37,7 @@ namespace Ultraleap.Attachments
             EditorGUILayout.LabelField("Attachment Transforms", EditorStyles.boldLabel);
 
             // Determine whether the target object is a prefab. AttachmentPoints cannot be edited on prefabs.
-            var isTargetPrefab = Ultraleap.Utils.IsObjectPartOfPrefabAsset(target.gameObject);
+            bool isTargetPrefab = Ultraleap.Utils.IsObjectPartOfPrefabAsset(target.gameObject);
 
             if (isTargetPrefab)
             {
@@ -153,33 +151,49 @@ namespace Ultraleap.Attachments
         private const float TOGGLE_SIZE = 15.0F;
         private Rect makeToggleRect(Vector2 centerPos)
         {
-            return new Rect(centerPos.x - TOGGLE_SIZE / 2F, centerPos.y - TOGGLE_SIZE / 2F, TOGGLE_SIZE, TOGGLE_SIZE);
+            return new Rect(centerPos.x - (TOGGLE_SIZE / 2F), centerPos.y - (TOGGLE_SIZE / 2F), TOGGLE_SIZE, TOGGLE_SIZE);
         }
 
         private static bool wouldFlagDeletionDestroyData(AttachmentHands target, AttachmentPointFlags flag)
         {
-            if (target.attachmentHands == null) return false;
-
-            foreach (var attachmentHand in target.attachmentHands)
+            if (target.attachmentHands == null)
             {
-                var point = attachmentHand.GetBehaviourForPoint(flag);
+                return false;
+            }
 
-                if (point == null) return false;
+            foreach (AttachmentHand attachmentHand in target.attachmentHands)
+            {
+                AttachmentPointBehaviour point = attachmentHand.GetBehaviourForPoint(flag);
+
+                if (point == null)
+                {
+                    return false;
+                }
                 else
                 {
                     // Data will be destroyed if this AttachmentPointBehaviour's Transform contains any children
                     // that are not themselves AttachmentPointBehaviours.
-                    foreach (var child in point.transform.GetChildren())
+                    foreach (Transform child in point.transform.GetChildren())
                     {
-                        if (child.GetComponent<AttachmentPointBehaviour>() == null) return true;
+                        if (child.GetComponent<AttachmentPointBehaviour>() == null)
+                        {
+                            return true;
+                        }
                     }
 
                     // Data will be destroyed if this AttachmentPointBehaviour contains any components
                     // that aren't constructed automatically.
-                    foreach (var component in point.gameObject.GetComponents<Component>())
+                    foreach (Component component in point.gameObject.GetComponents<Component>())
                     {
-                        if (component is Transform) continue;
-                        if (component is AttachmentPointBehaviour) continue;
+                        if (component is Transform)
+                        {
+                            continue;
+                        }
+
+                        if (component is AttachmentPointBehaviour)
+                        {
+                            continue;
+                        }
 
                         return true;
                     }

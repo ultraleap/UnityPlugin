@@ -37,7 +37,7 @@ namespace Ultraleap.InputModule
         private PointerEventData pointerEvent;
 
         //Reset the Positions of the UI Elements on both Start and Quit
-        void Start()
+        private void Start()
         {
             if (ButtonFace != null)
             {
@@ -68,7 +68,7 @@ namespace Ultraleap.InputModule
             }
         }
 
-        void FixedUpdate()
+        private void FixedUpdate()
         {
             if (!physicsOccurred)
             {
@@ -78,7 +78,7 @@ namespace Ultraleap.InputModule
             }
         }
 
-        void Update()
+        private void Update()
         {
             pointerEvent.position = Camera.main.WorldToScreenPoint(ButtonFace.transform.position);
             if (physicsOccurred)

@@ -15,7 +15,7 @@ namespace Ultraleap.Attachments
     {
         public AttachmentHand attachmentHand;
 
-        void Update()
+        private void Update()
         {
             // Deactivation trigger
             if (!attachmentHand.isTracked && attachmentHand.gameObject.activeSelf)

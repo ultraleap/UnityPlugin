@@ -69,12 +69,14 @@ namespace Ultraleap
             bool created = false;
 
 #if UNITY_URP_AVAILABLE
-            var urpHands = CreatePrefab("Capsule Hands (URP) Variant");
+            GameObject urpHands = CreatePrefab("Capsule Hands (URP) Variant");
             created = urpHands == null ? false : true;
 #endif
 
             if (!created)
+            {
                 CreatePrefab("CapsuleHands");
+            }
         }
 
         [MenuItem("GameObject/Ultraleap/Hands/Low Poly Hands", false, 21),
@@ -84,15 +86,17 @@ namespace Ultraleap
             bool created = false;
 
 #if UNITY_URP_AVAILABLE
-            if(QualitySettings.renderPipeline != null) // Only use URP models when there is an active render pipeline
+            if (QualitySettings.renderPipeline != null) // Only use URP models when there is an active render pipeline
             {
-                var urpHands = CreatePrefab("LowPolyHandsWithArms (URP) Variant");
+                GameObject urpHands = CreatePrefab("LowPolyHandsWithArms (URP) Variant");
                 created = urpHands == null ? false : true;
             }
 #endif
 
             if (!created)
+            {
                 CreatePrefab("LowPolyHandsWithArms");
+            }
         }
 
         [MenuItem("GameObject/Ultraleap/Hands/Ghost Hands (with arms)", false, 22),
@@ -102,15 +106,17 @@ namespace Ultraleap
             bool created = false;
 
 #if UNITY_URP_AVAILABLE
-            if(QualitySettings.renderPipeline != null) // Only use URP models when there is an active render pipeline
+            if (QualitySettings.renderPipeline != null) // Only use URP models when there is an active render pipeline
             {
-                var urpHands = CreatePrefab("Ghost Hands (URP) Variant");
+                GameObject urpHands = CreatePrefab("Ghost Hands (URP) Variant");
                 created = urpHands == null ? false : true;
             }
 #endif
 
             if (!created)
+            {
                 CreatePrefab("GenericHand_Arm");
+            }
         }
 
         [MenuItem("GameObject/Ultraleap/Hands/Ghost Hands", false, 23),
@@ -120,15 +126,17 @@ namespace Ultraleap
             bool created = false;
 
 #if UNITY_URP_AVAILABLE
-            if(QualitySettings.renderPipeline != null) // Only use URP models when there is an active render pipeline
+            if (QualitySettings.renderPipeline != null) // Only use URP models when there is an active render pipeline
             {
-                var urpHands = CreatePrefab("Ghost Hands (URP) Variant");
+                GameObject urpHands = CreatePrefab("Ghost Hands (URP) Variant");
                 created = urpHands == null ? false : true;
             }
 #endif
 
             if (!created)
+            {
                 CreatePrefab("GhostHands");
+            }
         }
 
         [MenuItem("GameObject/Ultraleap/Hands/Outline Hands", false, 24),
@@ -138,15 +146,17 @@ namespace Ultraleap
             bool created = false;
 
 #if UNITY_URP_AVAILABLE
-            if(QualitySettings.renderPipeline != null) // Only use URP models when there is an active render pipeline
+            if (QualitySettings.renderPipeline != null) // Only use URP models when there is an active render pipeline
             {
-                var urpHands = CreatePrefab("Outline Hands (URP) Variant");
+                GameObject urpHands = CreatePrefab("Outline Hands (URP) Variant");
                 created = urpHands == null ? false : true;
             }
 #endif
 
             if (!created)
+            {
                 CreatePrefab("OutlineHands");
+            }
         }
 
         [MenuItem("GameObject/Ultraleap/Hands/Skeleton Hands", false, 25),
@@ -156,15 +166,17 @@ namespace Ultraleap
             bool created = false;
 
 #if UNITY_URP_AVAILABLE
-            if(QualitySettings.renderPipeline != null) // Only use URP models when there is an active render pipeline
+            if (QualitySettings.renderPipeline != null) // Only use URP models when there is an active render pipeline
             {
-                var urpHands = CreatePrefab("Skeleton Hands (URP) Variant");
+                GameObject urpHands = CreatePrefab("Skeleton Hands (URP) Variant");
                 created = urpHands == null ? false : true;
             }
 #endif
 
             if (!created)
+            {
                 CreatePrefab("SkeletonHands");
+            }
         }
 
         [MenuItem("GameObject/Ultraleap/Hands/Ghost Capsule Hands", false, 26),
@@ -174,15 +186,17 @@ namespace Ultraleap
             bool created = false;
 
 #if UNITY_URP_AVAILABLE
-            if(QualitySettings.renderPipeline != null) // Only use URP models when there is an active render pipeline
+            if (QualitySettings.renderPipeline != null) // Only use URP models when there is an active render pipeline
             {
-                var urpHands = CreatePrefab("Ghost Hands (URP) Variant");
+                GameObject urpHands = CreatePrefab("Ghost Hands (URP) Variant");
                 created = urpHands == null ? false : true;
             }
 #endif
 
             if (!created)
+            {
                 CreatePrefab("Ghost Capsule Hands");
+            }
         }
 
         [MenuItem("GameObject/Ultraleap/Hands/Attachment Hands", false, 27),
@@ -192,7 +206,7 @@ namespace Ultraleap
             CreatePrefab("Attachment Hands");
         }
 
-#endregion
+        #endregion
 
         #region Pose Detection
 
@@ -214,7 +228,7 @@ namespace Ultraleap
             GameObject physicalHandsManager = CreatePrefab("Physical Hands Manager");
             if (physicalHandsManager != null)
             {
-                var physHandsManager = physicalHandsManager.GetComponent<Ultraleap.PhysicalHands.PhysicalHandsManager>();
+                PhysicalHands.PhysicalHandsManager physHandsManager = physicalHandsManager.GetComponent<Ultraleap.PhysicalHands.PhysicalHandsManager>();
                 // Ensure that there is a contact parent at runtime
                 if (physHandsManager != null)
                 {
@@ -276,10 +290,10 @@ namespace Ultraleap
 
         public static GameObject CreatePrefab(string prefabName)
         {
-            var guids = AssetDatabase.FindAssets(prefabName);
+            string[] guids = AssetDatabase.FindAssets(prefabName);
 
             // look for exact matched first
-            foreach (var guid in guids)
+            foreach (string guid in guids)
             {
                 string assetPath = AssetDatabase.GUIDToAssetPath(guid);
 
@@ -302,7 +316,7 @@ namespace Ultraleap
             }
 
             // fallback to near-matches
-            foreach (var guid in guids)
+            foreach (string guid in guids)
             {
                 string assetPath = AssetDatabase.GUIDToAssetPath(guid);
                 GameObject newObject = (GameObject)AssetDatabase.LoadAssetAtPath(assetPath, typeof(GameObject));
@@ -316,7 +330,7 @@ namespace Ultraleap
             return null;
         }
 
-        static GameObject HandleObjectCreation(GameObject gameObject)
+        private static GameObject HandleObjectCreation(GameObject gameObject)
         {
             gameObject = PrefabUtility.InstantiatePrefab(gameObject) as GameObject;
 

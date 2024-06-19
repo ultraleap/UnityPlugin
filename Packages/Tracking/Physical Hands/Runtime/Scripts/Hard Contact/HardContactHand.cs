@@ -36,7 +36,11 @@ namespace Ultraleap.PhysicalHands
         {
             get
             {
-                if (!tracked || dataHand == null || palmBone == null || palmBone.transform == null) return -1;
+                if (!tracked || dataHand == null || palmBone == null || palmBone.transform == null)
+                {
+                    return -1;
+                }
+
                 return Vector3.Distance(palmBone.transform.position, dataHand.PalmPosition);
             }
         }
@@ -98,12 +102,12 @@ namespace Ultraleap.PhysicalHands
 
             ((HardContactBone)palmBone).SetupBoneBody();
             // Set the colliders to ignore eachother
-            foreach (var bone in bones)
+            foreach (ContactBone bone in bones)
             {
                 ((HardContactBone)bone).SetupBoneBody();
                 Physics.IgnoreCollision(palmBone.palmCollider, bone.boneCollider);
 
-                foreach (var bone2 in bones)
+                foreach (ContactBone bone2 in bones)
                 {
                     if (bone != bone2)
                     {
@@ -128,10 +132,10 @@ namespace Ultraleap.PhysicalHands
                     fingerStiffness[fingerIndex] = hardContactParent.boneStiffness;
                     for (int jointIndex = 0; jointIndex < FINGER_BONES; jointIndex++)
                     {
-                        Bone prevBone = dataHand.fingers[fingerIndex].GetBone((Bone.BoneType)(jointIndex));
+                        Bone prevBone = dataHand.fingers[fingerIndex].GetBone((Bone.BoneType)jointIndex);
                         Bone bone = dataHand.fingers[fingerIndex].GetBone((Bone.BoneType)(jointIndex + 1)); // +1 to skip first bone.
 
-                        int boneArrayIndex = fingerIndex * FINGER_BONES + jointIndex;
+                        int boneArrayIndex = (fingerIndex * FINGER_BONES) + jointIndex;
 
                         ((HardContactBone)bones[boneArrayIndex]).ResetBone(prevBone, bone);
                     }
@@ -185,7 +189,7 @@ namespace Ultraleap.PhysicalHands
 
                 for (int jointIndex = FINGER_BONES - 1; jointIndex >= 0; jointIndex--)
                 {
-                    int boneArrayIndex = fingerIndex * FINGER_BONES + jointIndex;
+                    int boneArrayIndex = (fingerIndex * FINGER_BONES) + jointIndex;
 
                     Bone bone = dataHand.fingers[fingerIndex].GetBone((Bone.BoneType)(jointIndex + 1));
 
@@ -296,7 +300,7 @@ namespace Ultraleap.PhysicalHands
             {
                 for (int jointIndex = 1; jointIndex < FINGER_BONES; jointIndex++)
                 {
-                    int boneArrayIndex = fingerIndex * FINGER_BONES + jointIndex;
+                    int boneArrayIndex = (fingerIndex * FINGER_BONES) + jointIndex;
 
                     // Skip finger if a overlapBone's contacting
                     if (bones[boneArrayIndex].IsBoneContacting)
@@ -379,7 +383,7 @@ namespace Ultraleap.PhysicalHands
             {
                 return Vector3.zero;
             }
-            PhysExts.ToWorldSpaceCapsule(bones[(FINGER_BONES * index) + FINGER_BONES - 1].boneCollider, out Vector3 outPos, out var outB, out var outRadius);
+            PhysExts.ToWorldSpaceCapsule(bones[(FINGER_BONES * index) + FINGER_BONES - 1].boneCollider, out Vector3 outPos, out Vector3 outB, out float outRadius);
             outPos += (outPos - outB).normalized * outRadius;
             return outPos;
         }

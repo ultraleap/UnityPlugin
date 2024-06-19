@@ -25,7 +25,7 @@ namespace Ultraleap.Preview.HandRays
         private bool _layersGenerated = false;
 
         // Start is called before the first frame update
-        void Awake()
+        private void Awake()
         {
             GenerateLayers();
             AssignLayers();

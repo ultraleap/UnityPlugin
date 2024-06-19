@@ -6,10 +6,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Ultraleap.Attributes;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -92,9 +89,12 @@ namespace Ultraleap.Attachments
         }
 
 #if UNITY_EDITOR
-        void OnValidate()
+        private void OnValidate()
         {
-            if (getIsPrefab()) return;
+            if (getIsPrefab())
+            {
+                return;
+            }
 
             reinitialize();
         }
@@ -113,10 +113,13 @@ namespace Ultraleap.Attachments
         }
 #endif
 
-        void Awake()
+        private void Awake()
         {
 #if UNITY_EDITOR
-            if (getIsPrefab()) return;
+            if (getIsPrefab())
+            {
+                return;
+            }
 #endif
 
             reinitialize();
@@ -134,7 +137,7 @@ namespace Ultraleap.Attachments
 #endif
         }
 
-        void Update()
+        private void Update()
         {
 #if UNITY_EDITOR
             if (Ultraleap.Utils.IsObjectPartOfPrefabAsset(this.gameObject))
@@ -151,7 +154,7 @@ namespace Ultraleap.Attachments
 
             for (int i = 0; i < _attachmentHands.Length; i++)
             {
-                var attachmentHand = attachmentHands[i];
+                AttachmentHand attachmentHand = attachmentHands[i];
 
                 if (attachmentHand == null || handAccessors == null)
                 {
@@ -159,10 +162,10 @@ namespace Ultraleap.Attachments
                     break;
                 }
 
-                var leapHand = handAccessors[i]();
+                Hand leapHand = handAccessors[i]();
                 attachmentHand.isTracked = leapHand != null;
 
-                foreach (var point in attachmentHand.points)
+                foreach (AttachmentPointBehaviour point in attachmentHand.points)
                 {
                     point.SetTransformUsingHand(leapHand);
                 }
@@ -207,14 +210,14 @@ namespace Ultraleap.Attachments
 #endif
 
             // If necessary, generate a left and right AttachmentHand.
-            if (_attachmentHands == null || _attachmentHands.Length == 0 || (_attachmentHands[0] == null || _attachmentHands[1] == null))
+            if (_attachmentHands == null || _attachmentHands.Length == 0 || _attachmentHands[0] == null || _attachmentHands[1] == null)
             {
                 _attachmentHands = new AttachmentHand[2];
 
                 // Try to use existing AttachmentHand objects first.
                 foreach (Transform child in this.transform.GetChildren())
                 {
-                    var attachmentHand = child.GetComponent<AttachmentHand>();
+                    AttachmentHand attachmentHand = child.GetComponent<AttachmentHand>();
                     if (attachmentHand != null)
                     {
                         _attachmentHands[attachmentHand.chirality == Chirality.Left ? 0 : 1] = attachmentHand;
@@ -241,7 +244,10 @@ namespace Ultraleap.Attachments
                     _attachmentHands[0].chirality = Chirality.Left;
                 }
                 _attachmentHands[0].gameObject.name = "Attachment Hand (Left)";
-                if (_attachmentHands[0].transform.parent != this.transform) _attachmentHands[0].transform.parent = this.transform;
+                if (_attachmentHands[0].transform.parent != this.transform)
+                {
+                    _attachmentHands[0].transform.parent = this.transform;
+                }
 
                 if (_attachmentHands[1] == null)
                 {
@@ -253,7 +259,10 @@ namespace Ultraleap.Attachments
                     _attachmentHands[1].chirality = Chirality.Right;
                 }
                 _attachmentHands[1].gameObject.name = "Attachment Hand (Right)";
-                if (_attachmentHands[1].transform.parent != this.transform) _attachmentHands[1].transform.parent = this.transform;
+                if (_attachmentHands[1].transform.parent != this.transform)
+                {
+                    _attachmentHands[1].transform.parent = this.transform;
+                }
 
                 // Organize left hand first in sibling order.
                 _attachmentHands[0].transform.SetSiblingIndex(0);
@@ -263,10 +272,16 @@ namespace Ultraleap.Attachments
 
         private void refreshAttachmentHandTransforms()
         {
-            if (this == null) return;
+            if (this == null)
+            {
+                return;
+            }
 
 #if UNITY_EDITOR
-            if (getIsPrefab()) return;
+            if (getIsPrefab())
+            {
+                return;
+            }
 #endif
 
             bool requiresReinitialization = false;
@@ -277,7 +292,7 @@ namespace Ultraleap.Attachments
             }
             else
             {
-                foreach (var hand in _attachmentHands)
+                foreach (AttachmentHand hand in _attachmentHands)
                 {
                     if (hand == null)
                     {

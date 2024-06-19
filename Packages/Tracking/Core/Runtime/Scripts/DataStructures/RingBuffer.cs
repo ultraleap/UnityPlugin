@@ -28,7 +28,10 @@ namespace Ultraleap
         {
             get
             {
-                if (lastIdx == -1) return 0;
+                if (lastIdx == -1)
+                {
+                    return 0;
+                }
 
                 int endIdx = (lastIdx + 1) % arr.Length;
 
@@ -144,7 +147,7 @@ namespace Ultraleap
 
         public override string ToString()
         {
-            var sb = new System.Text.StringBuilder();
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
             sb.Append("[RingBuffer: ");
             for (int i = 0; i < this.Count; i++)
             {

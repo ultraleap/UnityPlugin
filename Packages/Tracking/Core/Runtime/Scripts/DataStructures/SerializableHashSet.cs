@@ -85,7 +85,7 @@ namespace Ultraleap
             HashSet<T> takenValues = new HashSet<T>();
             for (int i = _values.Count; i-- != 0;)
             {
-                var value = _values[i];
+                T value = _values[i];
                 if (takenValues.Contains(value))
                 {
                     _values.RemoveAt(i);
@@ -101,7 +101,7 @@ namespace Ultraleap
         {
             Dictionary<T, int> info = new Dictionary<T, int>();
 
-            foreach (var value in _values)
+            foreach (T value in _values)
             {
                 if (value == null)
                 {
@@ -119,7 +119,7 @@ namespace Ultraleap
             }
 
             List<int> dups = new List<int>();
-            foreach (var value in _values)
+            foreach (T value in _values)
             {
                 if (value == null)
                 {
@@ -138,7 +138,7 @@ namespace Ultraleap
 
             if (_values != null)
             {
-                foreach (var value in _values)
+                foreach (T value in _values)
                 {
                     if (value != null)
                     {
@@ -176,7 +176,7 @@ namespace Ultraleap
             }
 
             //Add any values not accounted for
-            foreach (var value in _set)
+            foreach (T value in _set)
             {
                 if (isNull(value))
                 {

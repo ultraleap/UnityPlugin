@@ -197,7 +197,7 @@ namespace Ultraleap.PhysicalHands
 
             rotationDelta.ToAngleAxis(out float angleInDeg, out Vector3 rotationAxis);
 
-            Vector3 angularVelocity = (rotationAxis * angleInDeg * Mathf.Deg2Rad) / Time.fixedDeltaTime;
+            Vector3 angularVelocity = rotationAxis * angleInDeg * Mathf.Deg2Rad / Time.fixedDeltaTime;
 
             if (angularVelocity.IsValid())
             {
@@ -354,7 +354,7 @@ namespace Ultraleap.PhysicalHands
 
                 if (articulation.dofCount > 0)
                 {
-                    _displacementRotation = Mathf.Abs(articulation.xDrive.target - articulation.jointPosition[0] * Mathf.Rad2Deg);
+                    _displacementRotation = Mathf.Abs(articulation.xDrive.target - (articulation.jointPosition[0] * Mathf.Rad2Deg));
                 }
             }
 

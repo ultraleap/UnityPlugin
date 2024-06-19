@@ -6,10 +6,10 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Ultraleap.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Ultraleap.Attributes;
 using UnityEngine;
 
 namespace Ultraleap
@@ -62,7 +62,7 @@ namespace Ultraleap
 
                         if (_reactivateGravityOnDetach)
                         {
-                            if(_rigidbody)
+                            if (_rigidbody)
                             {
                                 _rigidbody.useGravity = true;
                             }
@@ -307,7 +307,7 @@ namespace Ultraleap
 
         protected List<Hand> _hoveringHands = new List<Hand>();
 
-        void OnValidate()
+        private void OnValidate()
         {
             if (_rigidbody == null)
             {
@@ -316,7 +316,7 @@ namespace Ultraleap
             refreshInspectorConveniences();
         }
 
-        void Awake()
+        private void Awake()
         {
             refreshInspectorConveniences();
 
@@ -346,7 +346,7 @@ namespace Ultraleap
 
         private bool _reactivateGravityOnDetach = false;
 
-        void Update()
+        private void Update()
         {
             updateAttractionToHand();
 
@@ -375,7 +375,7 @@ namespace Ultraleap
             updateAnchorPreference();
         }
 
-        void OnDisable()
+        private void OnDisable()
         {
             if (!this.enabled)
             {
@@ -386,7 +386,7 @@ namespace Ultraleap
             endAnchorPreference();
         }
 
-        void OnDestroy()
+        private void OnDestroy()
         {
             // Make sure we don't leave dangling anchor-preference state.
             endAnchorPreference();
@@ -462,7 +462,7 @@ namespace Ultraleap
                 float optimalScore = 0F;
                 Anchor testAnchor = null;
                 float testScore = 0F;
-                foreach (var anchor in GetNearbyValidAnchors())
+                foreach (Anchor anchor in GetNearbyValidAnchors())
                 {
                     testAnchor = anchor;
                     testScore = getAnchorScore(anchor);
@@ -509,9 +509,9 @@ namespace Ultraleap
             }
 
             _nearbyAnchorsBuffer.Clear();
-            foreach (var anchor in anchorsToCheck)
+            foreach (Anchor anchor in anchorsToCheck)
             {
-                if ((requireAnchorHasSpace && (!anchor.allowMultipleObjects && anchor.anchoredObjects.Count != 0))
+                if ((requireAnchorHasSpace && !anchor.allowMultipleObjects && anchor.anchoredObjects.Count != 0)
                     || (requireAnchorActiveAndEnabled && !anchor.isActiveAndEnabled))
                 {
                     continue;
@@ -553,7 +553,7 @@ namespace Ultraleap
 
             Anchor closestAnchor = null;
             float closestDistSqrd = float.PositiveInfinity;
-            foreach (var testAnchor in anchorsToCheck)
+            foreach (Anchor testAnchor in anchorsToCheck)
             {
                 if (requireAnchorHasSpace)
                 {
@@ -670,7 +670,7 @@ namespace Ultraleap
 
             float effMaxDistance = directedness.Map(0F, 1F, nonDirectedMaxDistance, maxDistance);
             Vector3 effPos = Ultraleap.Utils.Map(Mathf.Sqrt(Mathf.Sqrt(directedness)), 0f, 1f,
-                                       anchObjPos, (anchObjPos - anchObjVel.normalized * effMaxDistance * 0.30f));
+                                       anchObjPos, anchObjPos - (anchObjVel.normalized * effMaxDistance * 0.30f));
 
             float distanceSqrd = (anchorPos - effPos).sqrMagnitude;
             float distanceScore;
@@ -694,7 +694,7 @@ namespace Ultraleap
 
             // Support an "always-attach distance" within which only distanceScore matters
             float semiDistanceSqrd = (anchorPos - Vector3.Lerp(anchObjPos, effPos, 0.5f)).sqrMagnitude;
-            float useAlwaysAttachDistanceAmount = semiDistanceSqrd.Map(0f, Mathf.Max(0.0001f, (0.25f * alwaysAttachDistance * alwaysAttachDistance)),
+            float useAlwaysAttachDistanceAmount = semiDistanceSqrd.Map(0f, Mathf.Max(0.0001f, 0.25f * alwaysAttachDistance * alwaysAttachDistance),
                                                                        1f, 0f);
             angleScore = useAlwaysAttachDistanceAmount.Map(0f, 1f, angleScore, 1f);
 
@@ -716,7 +716,7 @@ namespace Ultraleap
             float reachTargetAmount = 0F;
             Vector3 towardsHand = Vector3.zero;
 
-            if(_hoveringHands.Count > 0)
+            if (_hoveringHands.Count > 0)
             {
                 Hand hoveringHand = _hoveringHands.Last();
                 Vector3 hoverTarget = hoveringHand.PalmPosition;
@@ -767,7 +767,7 @@ namespace Ultraleap
                     {
                         if (_hasTargetPositionLastUpdate)
                         {
-                            finalPosition += (targetPosition - _targetPositionLastUpdate);
+                            finalPosition += targetPosition - _targetPositionLastUpdate;
                         }
 
                         _targetPositionLastUpdate = targetPosition;
@@ -838,7 +838,7 @@ namespace Ultraleap
                     {
                         if (_hasTargetRotationLastUpdate)
                         {
-                            finalRotation = (Quaternion.Inverse(_targetRotationLastUpdate) * targetRotation) * finalRotation;
+                            finalRotation = Quaternion.Inverse(_targetRotationLastUpdate) * targetRotation * finalRotation;
                         }
 
                         _targetRotationLastUpdate = targetRotation;

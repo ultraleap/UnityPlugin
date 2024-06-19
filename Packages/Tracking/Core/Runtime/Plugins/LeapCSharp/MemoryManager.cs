@@ -9,7 +9,6 @@
 using AOT;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace LeapInternal
@@ -159,7 +158,7 @@ namespace LeapInternal
 
             public override int GetHashCode()
             {
-                return (int)type | (int)size << 4;
+                return (int)type | ((int)size << 4);
             }
 
             public bool Equals(PoolKey other)

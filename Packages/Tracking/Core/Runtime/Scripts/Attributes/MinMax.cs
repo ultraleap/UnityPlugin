@@ -52,7 +52,7 @@ namespace Ultraleap.Attributes
             float w = rect.width * PERCENT_NUM;
 
             Rect leftNum = new Rect(rect.x, rect.y, w, rect.height);
-            Rect slider = new Rect(rect.x + w + SPACING, rect.y, rect.width - 2 * w - SPACING * 2, rect.height);
+            Rect slider = new Rect(rect.x + w + SPACING, rect.y, rect.width - (2 * w) - (SPACING * 2), rect.height);
             Rect rightNum = new Rect(rect.x + rect.width - w, rect.y, w, rect.height);
 
             float newMin = EditorGUI.FloatField(leftNum, value.x);

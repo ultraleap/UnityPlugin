@@ -80,9 +80,13 @@ namespace Ultraleap.Recording
             if (toggleRecordingKey != KeyCode.None && Input.GetKeyDown(toggleRecordingKey))
             {
                 if (recording)
+                {
                     EndRecording();
+                }
                 else
+                {
                     StartRecording();
+                }
             }
         }
 
@@ -93,7 +97,7 @@ namespace Ultraleap.Recording
                 AutoSelectHandRoots();
             }
 
-            if(automaticallyGenerateAnimationClip)
+            if (automaticallyGenerateAnimationClip)
             {
                 MakeAnimaitonClipAsset();
             }
@@ -177,7 +181,7 @@ namespace Ultraleap.Recording
 
         public void EndRecording()
         {
-            var filterOptions = new CurveFilterOptions
+            CurveFilterOptions filterOptions = new CurveFilterOptions
             {
                 keyframeReduction = true,
                 positionError = 1f,
@@ -202,10 +206,14 @@ namespace Ultraleap.Recording
             int numHands = 0;
 
             if (leftHandBoneRoot != null)
+            {
                 numHands += 1;
+            }
 
             if (rightHandBoneRoot)
+            {
                 numHands += 1;
+            }
 
             string completionMessage;
 
@@ -238,10 +246,10 @@ namespace Ultraleap.Recording
 
         private void FilterClip(AnimationClip clip)
         {
-            foreach (var bind in AnimationUtility.GetCurveBindings(clip))
+            foreach (EditorCurveBinding bind in AnimationUtility.GetCurveBindings(clip))
             {
-                var curve = AnimationUtility.GetEditorCurve(clip, bind);
-                for (var i = 0; i < curve.keys.Length; ++i)
+                AnimationCurve curve = AnimationUtility.GetEditorCurve(clip, bind);
+                for (int i = 0; i < curve.keys.Length; ++i)
                 {
                     AnimationUtility.SetKeyLeftTangentMode(curve, i, AnimationUtility.TangentMode.ClampedAuto);
                     AnimationUtility.SetKeyRightTangentMode(curve, i, AnimationUtility.TangentMode.ClampedAuto);
@@ -258,12 +266,16 @@ namespace Ultraleap.Recording
 
             HandModelBase[] childHands = GetComponentsInChildren<HandModelBase>(true);
 
-            foreach (var hand in childHands)
+            foreach (HandModelBase hand in childHands)
             {
                 if (hand.Handedness == Chirality.Left)
+                {
                     leftHand = hand;
+                }
                 else
+                {
                     rightHand = hand;
+                }
             }
 
             switch (handsToRecord)

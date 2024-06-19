@@ -6,8 +6,8 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Ultraleap.PhysicalHands
 {
@@ -24,7 +24,7 @@ namespace Ultraleap.PhysicalHands
             public bool horizontalMax;
             public bool heightMin;
             public bool heightMax;
-            public bool IsRestricted { get { return (horizontalMin || horizontalMax || heightMin || heightMax); } }
+            public bool IsRestricted { get { return horizontalMin || horizontalMax || heightMin || heightMax; } }
         }
 
         /// <summary>
@@ -77,7 +77,7 @@ namespace Ultraleap.PhysicalHands
         private Vector3 _attachedObjectOffset;
         private Transform _transformHelper;
         private bool _moveGrabBallToPositionOnUngrasp = false;
-        
+
         private List<ContactHand> _grabbedHands = new List<ContactHand>();
         private const float LERP_POSITION_LIMIT = 0.001f;
         private const float LERP_ROTATION_LIMIT = 1;
@@ -140,7 +140,7 @@ namespace Ultraleap.PhysicalHands
             }
         }
 
-        void ConstrainGrabBallToArea()
+        private void ConstrainGrabBallToArea()
         {
             this.transform.position = Vector3.Lerp(this.transform.position, grabBallPose.position, Time.deltaTime * lerpSpeed);
 
@@ -277,7 +277,7 @@ namespace Ultraleap.PhysicalHands
         /// </summary>
         private Vector3 InverseTransformPointUnscaled(Transform transform, Vector3 position)
         {
-            var worldToLocalMatrix = Matrix4x4.TRS(transform.position, transform.rotation, Vector3.one).inverse;
+            Matrix4x4 worldToLocalMatrix = Matrix4x4.TRS(transform.position, transform.rotation, Vector3.one).inverse;
             return worldToLocalMatrix.MultiplyPoint3x4(position);
         }
 
@@ -314,14 +314,16 @@ namespace Ultraleap.PhysicalHands
         public void OnHandGrab(ContactHand hand)
         {
             IsGrabbed = true;
-            if(!_grabbedHands.Contains(hand))
+            if (!_grabbedHands.Contains(hand))
+            {
                 _grabbedHands.Add(hand);
+            }
         }
 
         public void OnHandGrabExit(ContactHand hand)
         {
             _grabbedHands.Remove(hand);
-            if(_grabbedHands.Count == 0)
+            if (_grabbedHands.Count == 0)
             {
                 IsGrabbed = false;
             }

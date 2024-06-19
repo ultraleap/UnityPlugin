@@ -20,7 +20,7 @@ namespace Ultraleap.PhysicalHands
         {
             // First parameter is the path in the Settings window.
             // Second parameter is the scope of this setting: it only appears in the Project Settings window.
-            var provider = new SettingsProvider("Project/Ultraleap/Physical Hands", SettingsScope.Project)
+            SettingsProvider provider = new SettingsProvider("Project/Ultraleap/Physical Hands", SettingsScope.Project)
             {
                 // Populate the search keywords to enable smart search filtering and label highlighting:
                 keywords = new HashSet<string>(new[] { "Number", "Sleep Threshold" })
@@ -99,7 +99,7 @@ namespace Ultraleap.PhysicalHands
 
         private static void DrawRecommended()
         {
-            foreach (var recommended in PhysicalHandsSettings.recommendedSettings)
+            foreach (KeyValuePair<string, PhysicalHandsSettings.RecommendedSetting> recommended in PhysicalHandsSettings.recommendedSettings)
             {
                 bool settingApplied = PhysicalHandsSettings.IsRecommendedSettingApplied(recommended.Key);
 

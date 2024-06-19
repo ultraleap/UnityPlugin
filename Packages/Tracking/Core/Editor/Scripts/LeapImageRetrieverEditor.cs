@@ -32,8 +32,8 @@ namespace Ultraleap
 
             if (Application.isPlaying)
             {
-                var data = target.TextureData;
-                var dataType = typeof(Object);
+                LeapImageRetriever.EyeTextureData data = target.TextureData;
+                System.Type dataType = typeof(Object);
 
                 EditorGUI.BeginDisabledGroup(true);
                 EditorGUILayout.ObjectField(_textureGUIContent, data.TextureData.CombinedTexture, dataType, true);

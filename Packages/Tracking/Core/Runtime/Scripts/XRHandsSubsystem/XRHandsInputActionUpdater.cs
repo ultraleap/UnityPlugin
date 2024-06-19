@@ -24,9 +24,8 @@ namespace Ultraleap.InputActions
         private static LeapHandState leftState = new LeapHandState(), rightState = new LeapHandState();
 
         private static InputDevice leftDevice, rightDevice;
-
-        static XRHandSubsystem currentSubsystem;
-        static UltraleapSettings ultraleapSettings;
+        private static XRHandSubsystem currentSubsystem;
+        private static UltraleapSettings ultraleapSettings;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Startup()
@@ -44,7 +43,7 @@ namespace Ultraleap.InputActions
             List<XRHandSubsystem> availableSubsystems = new List<XRHandSubsystem>();
             SubsystemManager.GetSubsystems(availableSubsystems);
 
-            foreach (var subsystem in availableSubsystems)
+            foreach (XRHandSubsystem subsystem in availableSubsystems)
             {
                 if (subsystem != null)
                 {
@@ -205,7 +204,7 @@ namespace Ultraleap.InputActions
         /// <summary>
         /// Set each of the default "Getters" to their relevant delegate. Delegates can be overridden via <LeapHandStateDelegates>
         /// </summary>
-        static void SetupDefaultStateGetters()
+        private static void SetupDefaultStateGetters()
         {
             // only set them up if they are already null
             leftHandStateDelegates.trackedDelegate ??= GetTrackedState;
@@ -233,22 +232,22 @@ namespace Ultraleap.InputActions
             rightHandStateDelegates.pokeDirectionDelegate ??= GetPokeDirection;
         }
 
-        static int GetTrackedState(XRHand hand)
+        private static int GetTrackedState(XRHand hand)
         {
             return (int)(UnityEngine.XR.InputTrackingState.Position | UnityEngine.XR.InputTrackingState.Rotation);
         }
 
-        static float GetSelecting(XRHand hand)
+        private static float GetSelecting(XRHand hand)
         {
             return hand.CalculateGrabStrength() > 0.8 ? 1 : 0;
         }
 
-        static float GetActvating(XRHand hand)
+        private static float GetActvating(XRHand hand)
         {
             return hand.CalculatePinchDistance() < 0.02f ? 1 : 0;
         }
 
-        static Vector3 GetPalmPosition(XRHand hand)
+        private static Vector3 GetPalmPosition(XRHand hand)
         {
             if (hand.GetJoint(XRHandJointID.Palm).TryGetPose(out Pose palmPose))
             {
@@ -258,7 +257,7 @@ namespace Ultraleap.InputActions
             return Vector3.zero;
         }
 
-        static Quaternion GetPalmDirection(XRHand hand)
+        private static Quaternion GetPalmDirection(XRHand hand)
         {
             if (hand.GetJoint(XRHandJointID.Palm).TryGetPose(out Pose palmPose))
             {
@@ -268,22 +267,22 @@ namespace Ultraleap.InputActions
             return Quaternion.identity;
         }
 
-        static Vector3 GetAimPosition(XRHand hand)
+        private static Vector3 GetAimPosition(XRHand hand)
         {
             return hand.GetStablePinchPosition();
         }
 
-        static Quaternion GetAimDirection(XRHand hand)
+        private static Quaternion GetAimDirection(XRHand hand)
         {
             return GetSimpleShoulderPinchDirection(hand).normalized;
         }
 
-        static Vector3 GetPinchPosition(XRHand hand)
+        private static Vector3 GetPinchPosition(XRHand hand)
         {
             return hand.GetStablePinchPosition();
         }
 
-        static Quaternion GetPinchDirection(XRHand hand)
+        private static Quaternion GetPinchDirection(XRHand hand)
         {
             if (hand.GetJoint(XRHandJointID.IndexProximal).TryGetPose(out Pose proximalPose))
             {
@@ -293,7 +292,7 @@ namespace Ultraleap.InputActions
             return Quaternion.identity;
         }
 
-        static Vector3 GetPokePosition(XRHand hand)
+        private static Vector3 GetPokePosition(XRHand hand)
         {
             if (hand.GetJoint(XRHandJointID.IndexTip).TryGetPose(out Pose indexTip))
             {
@@ -303,7 +302,7 @@ namespace Ultraleap.InputActions
             return Vector3.zero;
         }
 
-        static Quaternion GetPokeDirection(XRHand hand)
+        private static Quaternion GetPokeDirection(XRHand hand)
         {
             if (hand.GetJoint(XRHandJointID.IndexTip).TryGetPose(out Pose indexTip) && hand.GetJoint(XRHandJointID.IndexDistal).TryGetPose(out Pose indexDistal))
             {
@@ -316,13 +315,13 @@ namespace Ultraleap.InputActions
         /// <summary>
         /// Uses an assumed shoulder position relative to the main camera to determine a pinch direction
         /// </summary>
-        static Quaternion GetSimpleShoulderPinchDirection(XRHand hand)
+        private static Quaternion GetSimpleShoulderPinchDirection(XRHand hand)
         {
             // First get the shoulder position
             // Note: UNKNOWN as to why we require localposition here as the StablePinchPosition should be in world space by now
             Vector3 direction = Camera.main.transform.localPosition;
-            direction += (Vector3.down * 0.1f);
-            direction += (Vector3.right * (hand.handedness == Handedness.Left ? -0.1f : 0.1f));
+            direction += Vector3.down * 0.1f;
+            direction += Vector3.right * (hand.handedness == Handedness.Left ? -0.1f : 0.1f);
 
             // Use the shoulder position to determine an aim direction
             direction = hand.GetStablePinchPosition() - direction;

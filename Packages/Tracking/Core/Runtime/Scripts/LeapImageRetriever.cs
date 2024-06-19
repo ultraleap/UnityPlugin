@@ -191,9 +191,15 @@ namespace Ultraleap
                             case Device.DeviceType.TYPE_3DI:
                             case Device.DeviceType.TYPE_LMC2:
                                 for (int i = 0; i < image.Width; i++)
+                                {
                                     data[i] = 0x00;
+                                }
+
                                 for (int i = (int)image.NumBytes - image.Width; i < image.NumBytes; i++)
+                                {
                                     data[i] = 0x00;
+                                }
+
                                 break;
                         }
                     }
@@ -315,7 +321,7 @@ namespace Ultraleap
                     byte b0, b1, b2, b3;
                     encodeFloat(distortionData[i], out b0, out b1);
                     encodeFloat(distortionData[i + 1], out b2, out b3);
-                    colors[i / 2 + startIndex] = new Color32(b0, b1, b2, b3);
+                    colors[(i / 2) + startIndex] = new Color32(b0, b1, b2, b3);
                 }
             }
 
@@ -394,7 +400,7 @@ namespace Ultraleap
         }
 
 #if UNITY_EDITOR
-        void OnValidate()
+        private void OnValidate()
         {
             if (Application.isPlaying)
             {
@@ -470,7 +476,7 @@ namespace Ultraleap
 
         private void OnApplicationQuit()
         {
-            foreach (var device in _policiesSet)
+            foreach (KeyValuePair<Device, HashSet<LeapImageRetriever>> device in _policiesSet)
             {
                 device.Value.Clear();
             }
@@ -505,7 +511,7 @@ namespace Ultraleap
         {
             _eyeTextureData.HideDebugInfo(HideRigelDebug);
 
-            var xrProvider = _provider as LeapXRServiceProvider;
+            LeapXRServiceProvider xrProvider = _provider as LeapXRServiceProvider;
             if (xrProvider != null)
             {
                 if (xrProvider.mainCamera == null) { return; }
@@ -553,10 +559,10 @@ namespace Ultraleap
         private void OnCameraPreRender(Camera cam)
         {
             // set image policy if it is not set. This could happen when eg. another image retriever corresponding to the same device is disabled
-            var controller = _provider.GetLeapController();
+            Controller controller = _provider.GetLeapController();
             if (controller != null)
             {
-                var currentDevice = _provider.CurrentDevice;
+                Device currentDevice = _provider.CurrentDevice;
 
                 if (_provider.CurrentMultipleDeviceMode == LeapServiceProvider.MultipleDeviceMode.Disabled)
                 {
@@ -617,7 +623,7 @@ namespace Ultraleap
                 _serviceCoroutine = null;
             }
 
-            var controller = _provider.GetLeapController();
+            Controller controller = _provider.GetLeapController();
             if (controller != null)
             {
                 SetImagePolicySafely(false);
@@ -680,7 +686,7 @@ namespace Ultraleap
 
         private void onFrameReady(object sender, FrameEventArgs args)
         {
-            var controller = _provider.GetLeapController();
+            Controller controller = _provider.GetLeapController();
             if (controller != null)
             {
                 controller.FrameReady -= onFrameReady;
@@ -690,7 +696,7 @@ namespace Ultraleap
 
         private void onDisconnect(object sender, ConnectionLostEventArgs args)
         {
-            var controller = _provider.GetLeapController();
+            Controller controller = _provider.GetLeapController();
             if (controller != null)
             {
                 controller.FrameReady -= onFrameReady;
@@ -710,23 +716,26 @@ namespace Ultraleap
             Shader.SetGlobalFloat(GLOBAL_GAMMA_CORRECTION_EXPONENT_NAME, 1.0f / _gammaCorrection);
         }
 
-        void onDistortionChange(object sender, LeapEventArgs args)
+        private void onDistortionChange(object sender, LeapEventArgs args)
         {
             _eyeTextureData.MarkStale();
         }
 
         private bool HasPolicyBeenSet()
         {
-            foreach (var item in _policiesSet)
+            foreach (KeyValuePair<Device, HashSet<LeapImageRetriever>> item in _policiesSet)
             {
-                if (item.Key == _provider.CurrentDevice && item.Value != null && item.Value.Contains(this)) return true;
+                if (item.Key == _provider.CurrentDevice && item.Value != null && item.Value.Contains(this))
+                {
+                    return true;
+                }
             }
             return false;
         }
 
         private void SetImagePolicySafely(bool value)
         {
-            foreach (var item in _policiesSet)
+            foreach (KeyValuePair<Device, HashSet<LeapImageRetriever>> item in _policiesSet)
             {
                 if (item.Value != null)
                 {
@@ -754,13 +763,13 @@ namespace Ultraleap
                 }
             }
 
-            var controller = _provider.GetLeapController();
+            Controller controller = _provider.GetLeapController();
 
             bool recount = false;
 
             if (controller != null)
             {
-                foreach (var item in _policiesSet)
+                foreach (KeyValuePair<Device, HashSet<LeapImageRetriever>> item in _policiesSet)
                 {
                     switch (item.Value.Count)
                     {
@@ -773,7 +782,7 @@ namespace Ultraleap
 
                 if (devicesToClear.Count > 0)
                 {
-                    foreach (var device in devicesToClear)
+                    foreach (Device device in devicesToClear)
                     {
                         controller.ClearPolicy(Controller.PolicyFlag.POLICY_IMAGES, device);
                     }

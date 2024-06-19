@@ -7,8 +7,7 @@ namespace Ultraleap.PhysicalHands
     public class PhysicalHandsManagerEditor : CustomEditorBase<PhysicalHandsManager>
     {
         private readonly string[] contactModeNames = { "Hard Contact", "Soft Contact", "No Contact" };
-
-        bool layersExist = false;
+        private bool layersExist = false;
 
         protected override void OnEnable()
         {
@@ -66,7 +65,7 @@ namespace Ultraleap.PhysicalHands
             addPropertyToFoldout("onGrabExit", "Events");
         }
 
-        void WarningsSection()
+        private void WarningsSection()
         {
             if (!layersExist)
             {
@@ -80,7 +79,7 @@ namespace Ultraleap.PhysicalHands
             }
         }
 
-        bool CreateContactHandLayers()
+        private bool CreateContactHandLayers()
         {
             if (CreateLayer("PhysicalHands") && CreateLayer("PhysicalHandsReset"))
             {

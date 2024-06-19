@@ -230,7 +230,7 @@ namespace Ultraleap
 #endif
         }
 
-        void UpdateFrame(Frame frame)
+        private void UpdateFrame(Frame frame)
         {
             if (this == null)
             {
@@ -238,17 +238,17 @@ namespace Ultraleap
                 return;
             }
 
-            var hand = frame.GetHand(Handedness);
+            Hand hand = frame.GetHand(Handedness);
             UpdateBase(hand);
         }
 
-        void FixedUpdateFrame(Frame frame)
+        private void FixedUpdateFrame(Frame frame)
         {
-            var hand = frame.GetHand(Handedness);
+            Hand hand = frame.GetHand(Handedness);
             UpdateBase(hand);
         }
 
-        void UpdateBase(Hand hand)
+        private void UpdateBase(Hand hand)
         {
             SetLeapHand(hand);
 

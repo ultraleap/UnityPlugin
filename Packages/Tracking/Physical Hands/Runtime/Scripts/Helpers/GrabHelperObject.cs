@@ -9,7 +9,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.XR;
 
 namespace Ultraleap.PhysicalHands
 {
@@ -49,8 +48,8 @@ namespace Ultraleap.PhysicalHands
         // A dictionary of each hand, with an array[5] of lists that represents each bone in each finger that is contacting and capable of grabbing this object
         //private Dictionary<ContactHand, List<ContactBone>[]> _grabbableBones = new Dictionary<ContactHand, List<ContactBone>[]>();
 
-        List<ContactBone>[] _leftGrabbableBones = new List<ContactBone>[6]; // 6 to include the palm
-        List<ContactBone>[] _rightGrabbableBones = new List<ContactBone>[6]; // 6 to include the palm
+        private List<ContactBone>[] _leftGrabbableBones = new List<ContactBone>[6]; // 6 to include the palm
+        private List<ContactBone>[] _rightGrabbableBones = new List<ContactBone>[6]; // 6 to include the palm
 
 
         internal List<ContactHand> GrabbableHands => _grabbableHands;
@@ -270,7 +269,7 @@ namespace Ultraleap.PhysicalHands
 
         internal void ReleaseHelper()
         {
-            foreach (var item in _grabbableHands)
+            foreach (ContactHand item in _grabbableHands)
             {
                 SetBoneGrabbing(item, false);
             }
@@ -286,9 +285,9 @@ namespace Ultraleap.PhysicalHands
                 {
                     if (_grabbableHandsValues[i].isContacting)
                     {
-                        if(_physicalHandContacts != null)
+                        if (_physicalHandContacts != null)
                         {
-                            foreach(var contactEventReceiver in _physicalHandContacts)
+                            foreach (IPhysicalHandContact contactEventReceiver in _physicalHandContacts)
                             {
                                 contactEventReceiver.OnHandContactExit(_grabbableHands[i]);
                             }
@@ -299,7 +298,7 @@ namespace Ultraleap.PhysicalHands
 
                     if (_physicalHandHovers != null)
                     {
-                        foreach (var hoverEventReceiver in _physicalHandHovers)
+                        foreach (IPhysicalHandHover hoverEventReceiver in _physicalHandHovers)
                         {
                             hoverEventReceiver.OnHandHoverExit(_grabbableHands[i]);
                         }
@@ -312,7 +311,7 @@ namespace Ultraleap.PhysicalHands
             _grabbableHandsValues.Clear();
             _grabbableHands.Clear();
 
-            for(int i = 0; i < 6; i++)
+            for (int i = 0; i < 6; i++)
             {
                 _leftGrabbableBones[i].Clear();
                 _rightGrabbableBones[i].Clear();
@@ -354,7 +353,7 @@ namespace Ultraleap.PhysicalHands
 
                 if (_physicalHandHovers != null)
                 {
-                    foreach (var hoverEventReceiver in _physicalHandHovers)
+                    foreach (IPhysicalHandHover hoverEventReceiver in _physicalHandHovers)
                     {
                         hoverEventReceiver.OnHandHoverExit(hand);
                     }
@@ -419,7 +418,7 @@ namespace Ultraleap.PhysicalHands
 
         private void UpdateHands()
         {
-            for(int i = 0; i < 6; i++) // loop through the fingers
+            for (int i = 0; i < 6; i++) // loop through the fingers
             {
                 for (int j = 0; j < _leftGrabbableBones[i].Count; j++) // loop through the bones
                 {
@@ -457,7 +456,7 @@ namespace Ultraleap.PhysicalHands
 
         internal void HandlePrimaryHover(ContactHand hand)
         {
-            if(hand.Handedness == Chirality.Left)
+            if (hand.Handedness == Chirality.Left)
             {
                 isPrimaryHoveredLeft = true;
             }
@@ -468,7 +467,7 @@ namespace Ultraleap.PhysicalHands
 
             if (_rigid != null && _physicalHandPrimaryHovers != null)
             {
-                foreach (var primaryHoverEventReceiver in _physicalHandPrimaryHovers)
+                foreach (IPhysicalHandPrimaryHover primaryHoverEventReceiver in _physicalHandPrimaryHovers)
                 {
                     primaryHoverEventReceiver.OnHandPrimaryHover(hand);
                 }
@@ -488,7 +487,7 @@ namespace Ultraleap.PhysicalHands
 
             if (_physicalHandPrimaryHovers != null)
             {
-                foreach (var primaryHoverEventReceiver in _physicalHandPrimaryHovers)
+                foreach (IPhysicalHandPrimaryHover primaryHoverEventReceiver in _physicalHandPrimaryHovers)
                 {
                     primaryHoverEventReceiver.OnHandPrimaryHoverExit(hand);
                 }
@@ -501,7 +500,7 @@ namespace Ultraleap.PhysicalHands
             _grabbableHandsValues[handID].wasContacting = _grabbableHandsValues[handID].isContacting;
             _grabbableHandsValues[handID].isContacting = false;
 
-            foreach (var bone in _grabbableHands[handID].bones)
+            foreach (ContactBone bone in _grabbableHands[handID].bones)
             {
                 if (bone.GrabbableObjects.Contains(_rigid))
                 {
@@ -524,14 +523,14 @@ namespace Ultraleap.PhysicalHands
             }
         }
 
-        void UpdateContactAndHoverEvents(int handIndex)
+        private void UpdateContactAndHoverEvents(int handIndex)
         {
             // Fire the contacting event whether it changed or not
             if (_grabbableHandsValues[handIndex].isContacting)
             {
                 if (_physicalHandContacts != null)
                 {
-                    foreach (var contactEventReceiver in _physicalHandContacts)
+                    foreach (IPhysicalHandContact contactEventReceiver in _physicalHandContacts)
                     {
                         contactEventReceiver.OnHandContact(_grabbableHands[handIndex]);
                     }
@@ -544,7 +543,7 @@ namespace Ultraleap.PhysicalHands
                 // We stopped contacting, so fire the contact exit event
                 if (_physicalHandContacts != null)
                 {
-                    foreach (var contactEventReceiver in _physicalHandContacts)
+                    foreach (IPhysicalHandContact contactEventReceiver in _physicalHandContacts)
                     {
                         contactEventReceiver.OnHandContactExit(_grabbableHands[handIndex]);
                     }
@@ -556,7 +555,7 @@ namespace Ultraleap.PhysicalHands
             // Fire the hovering event
             if (_physicalHandHovers != null)
             {
-                foreach (var hoverEventReceiver in _physicalHandHovers)
+                foreach (IPhysicalHandHover hoverEventReceiver in _physicalHandHovers)
                 {
                     hoverEventReceiver.OnHandHover(_grabbableHands[handIndex]);
                 }
@@ -565,14 +564,14 @@ namespace Ultraleap.PhysicalHands
             _grabbableHands[handIndex].physicalHandsManager.OnHandHover(_grabbableHands[handIndex], _rigid);
         }
 
-        void UpdateGrabEvents()
+        private void UpdateGrabEvents()
         {
             // Send any active grabbing events
-            foreach (var hand in _grabbingHands)
+            foreach (ContactHand hand in _grabbingHands)
             {
                 if (_physicalHandGrabs != null)
                 {
-                    foreach (var grabEventReceiver in _physicalHandGrabs)
+                    foreach (IPhysicalHandGrab grabEventReceiver in _physicalHandGrabs)
                     {
                         grabEventReceiver.OnHandGrab(hand);
                     }
@@ -582,13 +581,13 @@ namespace Ultraleap.PhysicalHands
             }
 
             // Now look for if any grabs have been released
-            foreach (var prev in _grabbingHandsPrevious)
+            foreach (ContactHand prev in _grabbingHandsPrevious)
             {
                 if (!_grabbingHands.Contains(prev))
                 {
                     if (_physicalHandGrabs != null)
                     {
-                        foreach (var grabEventReceiver in _physicalHandGrabs)
+                        foreach (IPhysicalHandGrab grabEventReceiver in _physicalHandGrabs)
                         {
                             grabEventReceiver.OnHandGrabExit(prev);
                         }
@@ -610,7 +609,7 @@ namespace Ultraleap.PhysicalHands
         private void GrabbingCheck()
         {
             //Reset grab bools
-            foreach (var grabValue in _grabbableHandsValues)
+            foreach (GrabValues grabValue in _grabbableHandsValues)
             {
                 grabValue.handGrabbing = false;
             }
@@ -718,7 +717,7 @@ namespace Ultraleap.PhysicalHands
         private void CheckForBonesFacingEachOther()
         {
             // When hands are not Physical, we should skip this step to avoid unwanted grabs
-            foreach (var hand in _grabbableHands)
+            foreach (ContactHand hand in _grabbableHands)
             {
                 if (!hand.isHandPhysical)
                 {
@@ -747,7 +746,7 @@ namespace Ultraleap.PhysicalHands
 
                 foreach (ContactBone bone1 in _grabbableHands[handIndex].bones)
                 {
-                    if (bone1.GrabbableDirections.TryGetValue(_rigid, out var grabbableDirectionsB1))
+                    if (bone1.GrabbableDirections.TryGetValue(_rigid, out List<ContactBone.ClosestColliderDirection> grabbableDirectionsB1))
                     {
                         int bone2Index = 0;
 
@@ -760,13 +759,16 @@ namespace Ultraleap.PhysicalHands
                             }
 
                             // Don't compare against the same finger
-                            if (bone1.finger == bone2.finger) continue;
-
-                            if (bone2.GrabbableDirections.TryGetValue(_rigid, out var grabbableDirectionsB2))
+                            if (bone1.finger == bone2.finger)
                             {
-                                foreach (var directionPairB1 in grabbableDirectionsB1)
+                                continue;
+                            }
+
+                            if (bone2.GrabbableDirections.TryGetValue(_rigid, out List<ContactBone.ClosestColliderDirection> grabbableDirectionsB2))
+                            {
+                                foreach (ContactBone.ClosestColliderDirection directionPairB1 in grabbableDirectionsB1)
                                 {
-                                    foreach (var directionPairB2 in grabbableDirectionsB2)
+                                    foreach (ContactBone.ClosestColliderDirection directionPairB2 in grabbableDirectionsB2)
                                     {
                                         float dot = Vector3.Dot(directionPairB1.direction, directionPairB2.direction);
 
@@ -800,16 +802,24 @@ namespace Ultraleap.PhysicalHands
         private void RegisterGrabbingHand(ContactHand hand)
         {
             if (ignoreGrabTime > Time.time)
+            {
                 return;
+            }
 
             if (hand.ghosted)
+            {
                 return;
+            }
 
             if (IsGrabbingIgnored(hand))
+            {
                 return;
+            }
 
             if (_grabbingHands.Contains(hand))
+            {
                 return;
+            }
 
             _grabbingHands.Add(hand);
 
@@ -837,7 +847,7 @@ namespace Ultraleap.PhysicalHands
 
         internal void UnregisterGrabbingHand(Chirality handChirality)
         {
-            foreach (var grabHand in _grabbingHands)
+            foreach (ContactHand grabHand in _grabbingHands)
             {
                 if (grabHand?.Handedness == handChirality)
                 {
@@ -856,7 +866,7 @@ namespace Ultraleap.PhysicalHands
 
             if (_rigid != null && _physicalHandGrabs != null)
             {
-                foreach (var grabEventReceiver in _physicalHandGrabs)
+                foreach (IPhysicalHandGrab grabEventReceiver in _physicalHandGrabs)
                 {
                     grabEventReceiver.OnHandGrabExit(hand);
                 }
@@ -947,7 +957,7 @@ namespace Ultraleap.PhysicalHands
                     grabbableBones = _rightGrabbableBones;
                 }
 
-                foreach (var bone in hand.bones)
+                foreach (ContactBone bone in hand.bones)
                 {
                     for (int i = 0; i < 6; i++)
                     {
@@ -964,7 +974,7 @@ namespace Ultraleap.PhysicalHands
             }
             else
             {
-                foreach (var item in hand.bones)
+                foreach (ContactBone item in hand.bones)
                 {
                     item.RemoveGrabbing(_rigid);
                 }
@@ -974,7 +984,9 @@ namespace Ultraleap.PhysicalHands
         private bool DataHandIntersection(ContactHand hand)
         {
             if (!hand.isHandPhysical)
+            {
                 return false;
+            }
 
             bool thumb = false, otherFinger = false;
             bool earlyQuit;
@@ -995,14 +1007,16 @@ namespace Ultraleap.PhysicalHands
 
             for (int i = 0; i < grabbableBones.Length; i++)
             {
-                foreach (var bone in grabbableBones[i])
+                foreach (ContactBone bone in grabbableBones[i])
                 {
                     earlyQuit = false;
                     switch (bone.Finger)
                     {
                         case 0: // thumb
                             if (thumb)
+                            {
                                 continue;
+                            }
 
                             if (lHand.fingers[bone.Finger].bones[bone.Joint].IsBoneWithinObject(_colliders))
                             {
@@ -1093,8 +1107,8 @@ namespace Ultraleap.PhysicalHands
 
         private void PhysicsMovement(Vector3 solvedPosition, Quaternion solvedRotation)
         {
-            Vector3 solvedCenterOfMass = solvedRotation * _rigid.centerOfMass + solvedPosition;
-            Vector3 currCenterOfMass = _rigid.rotation * _rigid.centerOfMass + _rigid.position;
+            Vector3 solvedCenterOfMass = (solvedRotation * _rigid.centerOfMass) + solvedPosition;
+            Vector3 currCenterOfMass = (_rigid.rotation * _rigid.centerOfMass) + _rigid.position;
 
             Vector3 targetVelocity = ContactUtils.ToLinearVelocity(currCenterOfMass, solvedCenterOfMass, Time.fixedDeltaTime);
             Vector3 targetAngularVelocity = ContactUtils.ToAngularVelocity(_rigid.rotation, solvedRotation, Time.fixedDeltaTime);
@@ -1193,10 +1207,12 @@ namespace Ultraleap.PhysicalHands
             if (averageVelocity.magnitude > 0.5f)
             {
                 // Ignore collision after throwing so we don't knock the object
-                foreach (var hand in _grabbableHands)
+                foreach (ContactHand hand in _grabbableHands)
                 {
                     if (!IsContactIgnored(hand)) // Ensure we don't overwrite existing ignore settings
+                    {
                         hand.IgnoreCollision(_rigid, _colliders, 0.1f, 0.01f);
+                    }
                 }
 
                 // Ignore Grabbing after throwing

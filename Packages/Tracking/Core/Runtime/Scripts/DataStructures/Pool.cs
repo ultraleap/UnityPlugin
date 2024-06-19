@@ -72,7 +72,10 @@ namespace Ultraleap
 
         public static T Spawn()
         {
-            if (_pool == null) _pool = new Stack<T>();
+            if (_pool == null)
+            {
+                _pool = new Stack<T>();
+            }
 
             T value;
             if (_pool.Count > 0)

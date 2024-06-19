@@ -8,13 +8,12 @@
  */
 
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
-class LowPassFilter
+internal class LowPassFilter
 {
-    float y, a, s;
-    bool initialized;
+    private float y, a, s;
+    private bool initialized;
 
     public void setAlpha(float _alpha)
     {
@@ -37,7 +36,9 @@ class LowPassFilter
     {
         float result;
         if (initialized)
-            result = a * _value + (1.0f - a) * s;
+        {
+            result = (a * _value) + ((1.0f - a) * s);
+        }
         else
         {
             result = _value;
@@ -70,27 +71,27 @@ class LowPassFilter
 
 public class OneEuroFilter
 {
-    float freq;
-    float mincutoff;
-    float beta;
-    float dcutoff;
-    LowPassFilter x;
-    LowPassFilter dx;
-    float lasttime;
+    private float freq;
+    private float mincutoff;
+    private float beta;
+    private float dcutoff;
+    private LowPassFilter x;
+    private LowPassFilter dx;
+    private float lasttime;
 
     // currValue contains the latest value which have been succesfully filtered
     // prevValue contains the previous filtered value
     public float currValue { get; protected set; }
     public float prevValue { get; protected set; }
 
-    float alpha(float _cutoff)
+    private float alpha(float _cutoff)
     {
         float te = 1.0f / freq;
         float tau = 1.0f / (2.0f * Mathf.PI * _cutoff);
-        return 1.0f / (1.0f + tau / te);
+        return 1.0f / (1.0f + (tau / te));
     }
 
-    void setFrequency(float _f)
+    private void setFrequency(float _f)
     {
         if (_f <= 0.0f)
         {
@@ -100,7 +101,7 @@ public class OneEuroFilter
         freq = _f;
     }
 
-    void setMinCutoff(float _mc)
+    private void setMinCutoff(float _mc)
     {
         if (_mc <= 0.0f)
         {
@@ -110,12 +111,12 @@ public class OneEuroFilter
         mincutoff = _mc;
     }
 
-    void setBeta(float _b)
+    private void setBeta(float _b)
     {
         beta = _b;
     }
 
-    void setDerivateCutoff(float _dc)
+    private void setDerivateCutoff(float _dc)
     {
         if (_dc <= 0.0f)
         {
@@ -155,13 +156,16 @@ public class OneEuroFilter
 
         // update the sampling frequency based on timestamps
         if (lasttime != -1.0f && timestamp != -1.0f)
+        {
             freq = 1.0f / (timestamp - lasttime);
+        }
+
         lasttime = timestamp;
         // estimate the current variation per second 
         float dvalue = x.hasLastRawValue() ? (value - x.lastRawValue()) * freq : 0.0f; // FIXME: 0.0 or value? 
         float edvalue = dx.filterWithAlpha(dvalue, alpha(dcutoff));
         // use it to update the cutoff frequency
-        float cutoff = mincutoff + beta * Mathf.Abs(edvalue);
+        float cutoff = mincutoff + (beta * Mathf.Abs(edvalue));
         // filter the given value
         currValue = x.filterWithAlpha(value, alpha(cutoff));
 
@@ -174,9 +178,10 @@ public class OneEuroFilter
 public class OneEuroFilter<T> where T : struct
 {
     // containst the type of T
-    Type type;
+    private Type type;
+
     // the array of filters
-    OneEuroFilter[] oneEuroFilters;
+    private OneEuroFilter[] oneEuroFilters;
 
     // filter parameters
     public float freq { get; protected set; }
@@ -202,13 +207,17 @@ public class OneEuroFilter<T> where T : struct
         dcutoff = _dcutoff;
 
         if (type == typeof(Vector2))
+        {
             oneEuroFilters = new OneEuroFilter[2];
-
+        }
         else if (type == typeof(Vector3))
+        {
             oneEuroFilters = new OneEuroFilter[3];
-
+        }
         else if (type == typeof(Vector4) || type == typeof(Quaternion))
+        {
             oneEuroFilters = new OneEuroFilter[4];
+        }
         else
         {
             Debug.LogError(type + " is not a supported type");
@@ -216,7 +225,9 @@ public class OneEuroFilter<T> where T : struct
         }
 
         for (int i = 0; i < oneEuroFilters.Length; i++)
+        {
             oneEuroFilters[i] = new OneEuroFilter(freq, mincutoff, beta, dcutoff);
+        }
     }
 
     // updates the filter parameters
@@ -228,7 +239,9 @@ public class OneEuroFilter<T> where T : struct
         dcutoff = _dcutoff;
 
         for (int i = 0; i < oneEuroFilters.Length; i++)
+        {
             oneEuroFilters[i].UpdateParams(freq, mincutoff, beta, dcutoff);
+        }
     }
 
 
@@ -252,7 +265,9 @@ public class OneEuroFilter<T> where T : struct
             Vector2 input = (Vector2)Convert.ChangeType(_value, typeof(Vector2));
 
             for (int i = 0; i < oneEuroFilters.Length; i++)
+            {
                 output[i] = oneEuroFilters[i].Filter(input[i], timestamp);
+            }
 
             currValue = (T)Convert.ChangeType(output, typeof(T));
         }
@@ -263,7 +278,9 @@ public class OneEuroFilter<T> where T : struct
             Vector3 input = (Vector3)Convert.ChangeType(_value, typeof(Vector3));
 
             for (int i = 0; i < oneEuroFilters.Length; i++)
+            {
                 output[i] = oneEuroFilters[i].Filter(input[i], timestamp);
+            }
 
             currValue = (T)Convert.ChangeType(output, typeof(T));
         }
@@ -274,7 +291,9 @@ public class OneEuroFilter<T> where T : struct
             Vector4 input = (Vector4)Convert.ChangeType(_value, typeof(Vector4));
 
             for (int i = 0; i < oneEuroFilters.Length; i++)
+            {
                 output[i] = oneEuroFilters[i].Filter(input[i], timestamp);
+            }
 
             currValue = (T)Convert.ChangeType(output, typeof(T));
         }
@@ -295,7 +314,9 @@ public class OneEuroFilter<T> where T : struct
             }
 
             for (int i = 0; i < oneEuroFilters.Length; i++)
+            {
                 output[i] = oneEuroFilters[i].Filter(input[i], timestamp);
+            }
 
             currValue = (T)Convert.ChangeType(output, typeof(T));
         }

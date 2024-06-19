@@ -33,7 +33,7 @@ namespace Ultraleap
             }
 
 #if UNITY_ANDROID && !UNITY_EDITOR
-            if(AndroidServiceBinder.Bind())
+            if (AndroidServiceBinder.Bind())
             {
                 return true;
             }

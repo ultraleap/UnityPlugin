@@ -24,7 +24,7 @@ namespace Ultraleap
         /// Capture the values in UltraleapSettings and set up the setting of those hints when the first device is discovered
         /// </summary>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-        static void StartupHints()
+        private static void StartupHints()
         {
             currentHints = UltraleapSettings.Instance.startupHints.ToList();
 
@@ -116,7 +116,7 @@ namespace Ultraleap
             LogRequestedHints(hints, sourceName);
         }
 
-        static void LogRequestedHints(string[] hints, string sourceName)
+        private static void LogRequestedHints(string[] hints, string sourceName)
         {
             // Log the requeste hints
             string logString = sourceName + " Hand Tracking Hints have been requested:";
@@ -140,8 +140,9 @@ namespace Ultraleap
 
         #region LeapC Implementation
 
-        static Controller _leapController;
-        static Controller LeapController
+        private static Controller _leapController;
+
+        private static Controller LeapController
         {
             get
             {
@@ -183,7 +184,7 @@ namespace Ultraleap
         private static void RequestHintsOnAllDevices(string[] hints)
         {
             // Send the hint to all devices
-            foreach (var device in LeapController.Devices.ActiveDevices)
+            foreach (Device device in LeapController.Devices.ActiveDevices)
             {
                 LeapController.RequestHandTrackingHints(hints, device);
             }

@@ -207,7 +207,10 @@ namespace Ultraleap.Controllers
 
         public override void ProcessFrame(ref Frame inputFrame)
         {
-            if (!Application.isPlaying) return;
+            if (!Application.isPlaying)
+            {
+                return;
+            }
 
             ProcessHandData(Chirality.Left, ref inputFrame);
             ProcessHandData(Chirality.Right, ref inputFrame);

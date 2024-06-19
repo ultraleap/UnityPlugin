@@ -6,7 +6,6 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -17,7 +16,7 @@ namespace Ultraleap.HandsModule
     {
 
         //The minimum amount of Transforms required to be able to match Transforms back to a Leap data point
-        const int MINIMUM_TRANSFORMS = 3;
+        private const int MINIMUM_TRANSFORMS = 3;
 
         /// <summary>
         /// This function is used to search the child Transforms of the HandBinder script to automatically try and assign them for the user
@@ -33,10 +32,10 @@ namespace Ultraleap.HandsModule
 
             handBinder.ResetHand();
             //Get all children of the hand
-            var children = new List<Transform>();
+            List<Transform> children = new List<Transform>();
 
             //If the user has set the wrist, use that as the root to search for bones
-            var root = handBinder.transform;
+            Transform root = handBinder.transform;
             if (handBinder.BoundHand.wrist.boundTransform != null)
             {
                 root = handBinder.BoundHand.wrist.boundTransform;
@@ -45,13 +44,13 @@ namespace Ultraleap.HandsModule
             children.Add(root);
             children.AddRange(GetAllChildren(root));
 
-            var thumbBones = SortBones(SelectBones(children, BoneNameDefinitions.DefinitionThumb), false, true);
-            var indexBones = SortBones(SelectBones(children, BoneNameDefinitions.DefinitionIndex));
-            var middleBones = SortBones(SelectBones(children, BoneNameDefinitions.DefinitionMiddle));
-            var ringBones = SortBones(SelectBones(children, BoneNameDefinitions.DefinitionRing));
-            var pinkyBones = SortBones(SelectBones(children, BoneNameDefinitions.DefinitionPinky));
-            var wrist = SelectBones(children, BoneNameDefinitions.DefinitionWrist).FirstOrDefault();
-            var elbow = SelectBones(children, BoneNameDefinitions.DefinitionElbow).FirstOrDefault();
+            Transform[] thumbBones = SortBones(SelectBones(children, BoneNameDefinitions.DefinitionThumb), false, true);
+            Transform[] indexBones = SortBones(SelectBones(children, BoneNameDefinitions.DefinitionIndex));
+            Transform[] middleBones = SortBones(SelectBones(children, BoneNameDefinitions.DefinitionMiddle));
+            Transform[] ringBones = SortBones(SelectBones(children, BoneNameDefinitions.DefinitionRing));
+            Transform[] pinkyBones = SortBones(SelectBones(children, BoneNameDefinitions.DefinitionPinky));
+            Transform wrist = SelectBones(children, BoneNameDefinitions.DefinitionWrist).FirstOrDefault();
+            Transform elbow = SelectBones(children, BoneNameDefinitions.DefinitionElbow).FirstOrDefault();
 
             handBinder.BoundHand.fingers[0].boundBones = AssignTransformToBoundBone(thumbBones);
             handBinder.BoundHand.fingers[1].boundBones = AssignTransformToBoundBone(indexBones);
@@ -89,7 +88,7 @@ namespace Ultraleap.HandsModule
         }
 
         //Update all the bound bone bindings
-        static void UpdateBoundBones(HandBinder handBinder)
+        private static void UpdateBoundBones(HandBinder handBinder)
         {
             //Reset the hand back to its bound pose
             handBinder.ResetHand();
@@ -100,7 +99,7 @@ namespace Ultraleap.HandsModule
                 for (int BONEID = 0; BONEID < handBinder.BoundHand.fingers[FINGERID].boundBones.Length; BONEID++)
                 {
                     //Update the binding
-                    var BONE = handBinder.BoundHand.fingers[FINGERID].boundBones[BONEID];
+                    BoundBone BONE = handBinder.BoundHand.fingers[FINGERID].boundBones[BONEID];
                     handBinder.BoundHand.fingers[FINGERID].boundBones[BONEID] = AssignBoundBone(BONE.boundTransform);
                 }
             }
@@ -136,10 +135,10 @@ namespace Ultraleap.HandsModule
         /// <returns></returns>
         private static Transform[] SelectBones(List<Transform> children, string[] definitions)
         {
-            var bones = new List<Transform>();
+            List<Transform> bones = new List<Transform>();
             for (int definitionIndex = 0; definitionIndex < definitions.Length; definitionIndex++)
             {
-                foreach (var child in children)
+                foreach (Transform child in children)
                 {
                     //We have found all the bones we need
                     if (bones.Count == 4)
@@ -147,7 +146,7 @@ namespace Ultraleap.HandsModule
                         break;
                     }
 
-                    var definition = definitions[definitionIndex].ToUpper();
+                    string definition = definitions[definitionIndex].ToUpper();
 
                     if (child.name.ToUpper().Contains(definition))
                     {
@@ -207,7 +206,7 @@ namespace Ultraleap.HandsModule
                 }
             }
 
-            var boundObjects = new Transform[]
+            Transform[] boundObjects = new Transform[]
             {
                 meta,
                 proximal,
@@ -228,7 +227,7 @@ namespace Ultraleap.HandsModule
         /// <returns></returns>
         public static BoundBone[] AssignTransformToBoundBone(Transform[] boneTransform)
         {
-            var boundFingers = new BoundBone[]
+            BoundBone[] boundFingers = new BoundBone[]
                 {
                     AssignBoundBone(boneTransform[0]),
                     AssignBoundBone(boneTransform[1]),
@@ -241,7 +240,7 @@ namespace Ultraleap.HandsModule
 
         public static BoundBone AssignBoundBone(Transform transform)
         {
-            var newBone = new BoundBone();
+            BoundBone newBone = new BoundBone();
             if (transform != null)
             {
                 newBone.boundTransform = transform;
@@ -271,18 +270,18 @@ namespace Ultraleap.HandsModule
             {
 
                 // Calculate model's rotation
-                var forward = (middleBone.position - wrist.position);
-                var right = (indexBone.position - pinkyBone.position);
+                Vector3 forward = middleBone.position - wrist.position;
+                Vector3 right = indexBone.position - pinkyBone.position;
                 if (handBinder.Handedness == Chirality.Right)
                 {
                     right = -right;
                 }
-                var up = Vector3.Cross(forward, right);
+                Vector3 up = Vector3.Cross(forward, right);
 
                 Vector3.OrthoNormalize(ref up, ref forward, ref right);
-                var modelRotation = Quaternion.LookRotation(forward, up);
+                Quaternion modelRotation = Quaternion.LookRotation(forward, up);
 
-                var roundedRotationOffset = (Quaternion.Inverse(modelRotation) * wrist.transform.rotation).eulerAngles;
+                Vector3 roundedRotationOffset = (Quaternion.Inverse(modelRotation) * wrist.transform.rotation).eulerAngles;
                 roundedRotationOffset.x = Mathf.Round(roundedRotationOffset.x / 90) * 90;
                 roundedRotationOffset.y = Mathf.Round(roundedRotationOffset.y / 90) * 90;
                 roundedRotationOffset.z = Mathf.Round(roundedRotationOffset.z / 90) * 90;
@@ -304,19 +303,19 @@ namespace Ultraleap.HandsModule
 
         #region Calculate Hand Scale
 
-        static void CalculateHandSize(BoundHand boundHand)
+        private static void CalculateHandSize(BoundHand boundHand)
         {
-            var length = 0f;
+            float length = 0f;
 
             bool AddedWristToFirstBone = false;
 
-            var finger = boundHand.fingers[(int)Finger.FingerType.MIDDLE];
+            BoundFinger finger = boundHand.fingers[(int)Finger.FingerType.MIDDLE];
 
             // Loop through the bones and sum up their lengths
             for (int boneID = 0; boneID < finger.boundBones.Length - 1; boneID++)
             {
-                var bone = finger.boundBones[boneID];
-                var nextBone = finger.boundBones[boneID + 1];
+                BoundBone bone = finger.boundBones[boneID];
+                BoundBone nextBone = finger.boundBones[boneID + 1];
 
                 if (bone.boundTransform != null && nextBone.boundTransform != null)
                 {
@@ -326,7 +325,7 @@ namespace Ultraleap.HandsModule
                         AddedWristToFirstBone = true;
                     }
 
-                    var t = (bone.boundTransform.position - nextBone.boundTransform.position).magnitude;
+                    float t = (bone.boundTransform.position - nextBone.boundTransform.position).magnitude;
                     length += t;
                 }
             }
@@ -335,13 +334,13 @@ namespace Ultraleap.HandsModule
             boundHand.baseScale = length;
         }
 
-        static void CalculateFingerTipLengths(HandBinder handBinder)
+        private static void CalculateFingerTipLengths(HandBinder handBinder)
         {
             for (int i = 0; i < handBinder.BoundHand.fingers.Length; i++)
             {
-                var finger = handBinder.BoundHand.fingers[i];
-                var lastBone = finger.boundBones.LastOrDefault().boundTransform;
-                var previousBone = finger.boundBones[(int)Bone.BoneType.INTERMEDIATE].boundTransform;
+                BoundFinger finger = handBinder.BoundHand.fingers[i];
+                Transform lastBone = finger.boundBones.LastOrDefault().boundTransform;
+                Transform previousBone = finger.boundBones[(int)Bone.BoneType.INTERMEDIATE].boundTransform;
 
                 if (lastBone != null)
                 {

@@ -1,6 +1,6 @@
-using Ultraleap;
 using System.Collections.Generic;
 using System.Linq;
+using Ultraleap;
 using UnityEngine;
 
 public class HandPoseValidator : MonoBehaviour
@@ -25,8 +25,7 @@ public class HandPoseValidator : MonoBehaviour
     private Color[] rightCapsuleHandColours = new Color[32];
 
     public Transform validatorHandPrefab;
-
-    List<GameObject> lineRenderers = new List<GameObject>();
+    private List<GameObject> lineRenderers = new List<GameObject>();
 
     private void Start()
     {
@@ -46,7 +45,7 @@ public class HandPoseValidator : MonoBehaviour
             Transform instCapsuleHands = Instantiate(validatorHandPrefab);
             CapsuleHand[] capsuleHandScript = instCapsuleHands.GetComponentsInChildren<CapsuleHand>(true);
 
-            foreach (var capHand in capsuleHandScript)
+            foreach (CapsuleHand capHand in capsuleHandScript)
             {
                 capHand.leapProvider = leapProvider;
                 storedValidationHands.Add(capHand);
@@ -61,7 +60,7 @@ public class HandPoseValidator : MonoBehaviour
 
     private void Update()
     {
-        foreach (var hand in storedValidationHands)
+        foreach (CapsuleHand hand in storedValidationHands)
         {
             if (!hand.isActiveAndEnabled)
             {
@@ -73,7 +72,7 @@ public class HandPoseValidator : MonoBehaviour
         {
             validationHandsActivePrevFrame = validationHandsActive;
 
-            foreach (var lineRenderer in lineRenderers)
+            foreach (GameObject lineRenderer in lineRenderers)
             {
                 DestroyImmediate(lineRenderer);
             }
@@ -102,9 +101,9 @@ public class HandPoseValidator : MonoBehaviour
         {
             List<HandPoseDetector.ValidationData> validationData = poseDetector.GetValidationData();
 
-            foreach (var visHand in storedValidationHands)
+            foreach (CapsuleHand visHand in storedValidationHands)
             {
-                foreach (var data in validationData)
+                foreach (HandPoseDetector.ValidationData data in validationData)
                 {
                     if (data.withinThreshold)
                     {
@@ -161,13 +160,13 @@ public class HandPoseValidator : MonoBehaviour
             {
                 for (int i = 0; i < poseDetector.poseRules.Count; i++)
                 {
-                    var boneDirectionTarget = poseDetector.poseRules.ElementAt(i);
+                    HandPoseDetector.PoseRule boneDirectionTarget = poseDetector.poseRules.ElementAt(i);
 
                     if (boneDirectionTarget.enabled)
                     {
                         bool AtleastOneDirectionActive = false;
 
-                        foreach (var direction in boneDirectionTarget.directions)
+                        foreach (HandPoseDetector.RuleDirection direction in boneDirectionTarget.directions)
                         {
                             if (direction.enabled)
                             {
@@ -179,7 +178,7 @@ public class HandPoseValidator : MonoBehaviour
                         {
                             Color lineColor = Color.gray;
                             CapsuleHand capsuleHand = storedValidationHands.ElementAt(j);
-                            foreach (var directionForValidator in poseDetector.poseRulesForValidator)
+                            foreach (HandPoseDetector.PoseRuleCache directionForValidator in poseDetector.poseRulesForValidator)
                             {
                                 if (directionForValidator.chirality == capsuleHand.Handedness &&
                                     directionForValidator.poseRuleAndStatus.Item1.finger == boneDirectionTarget.finger)
@@ -197,13 +196,13 @@ public class HandPoseValidator : MonoBehaviour
 
                             if (lineRenderers.ElementAtOrDefault(lineRenderCount) == null)
                             {
-                                var lineRendChild = new GameObject();
+                                GameObject lineRendChild = new GameObject();
                                 lineRendChild.transform.SetParent(capsuleHand.gameObject.transform);
                                 lineRendChild.AddComponent<LineRenderer>();
                                 lineRenderers.Add(lineRendChild);
                             }
 
-                            var lineRend = lineRenderers.ElementAt(lineRenderCount).GetComponent<LineRenderer>();
+                            LineRenderer lineRend = lineRenderers.ElementAt(lineRenderCount).GetComponent<LineRenderer>();
 
                             if (lineRend)
                             {
@@ -223,7 +222,7 @@ public class HandPoseValidator : MonoBehaviour
 
                                         if (capsuleHand.GetLeapHand() != null)
                                         {
-                                            var directionBone = capsuleHand.GetLeapHand().fingers[fingNum].bones[boneNum];
+                                            Bone directionBone = capsuleHand.GetLeapHand().fingers[fingNum].bones[boneNum];
 
                                             if (directionBone.PrevJoint != null)
                                             {

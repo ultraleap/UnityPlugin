@@ -28,17 +28,17 @@ namespace Ultraleap
         /// </summary>
         public HashSet<AnchorableBehaviour> anchorableObjects { get { return _anchorableObjects; } }
 
-        void Awake()
+        private void Awake()
         {
-            foreach (var anchor in anchors)
+            foreach (Anchor anchor in anchors)
             {
                 Add(anchor);
             }
         }
 
-        void OnDestroy()
+        private void OnDestroy()
         {
-            foreach (var anchor in anchors)
+            foreach (Anchor anchor in anchors)
             {
                 anchor.groups.Remove(this);
             }

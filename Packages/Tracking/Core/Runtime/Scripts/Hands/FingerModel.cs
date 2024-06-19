@@ -91,7 +91,7 @@ namespace Ultraleap
             }
             if (bones[NUM_BONES - 1] && joints[NUM_JOINTS - 2])
             {
-                return 2f * bones[NUM_BONES - 1].position - joints[NUM_JOINTS - 2].position;
+                return (2f * bones[NUM_BONES - 1].position) - joints[NUM_JOINTS - 2].position;
             }
             return Vector3.zero;
         }
@@ -127,7 +127,7 @@ namespace Ultraleap
         {
             if (finger_ != null)
             {
-                Bone bone = finger_.GetBone((Bone.BoneType)(bone_type));
+                Bone bone = finger_.GetBone((Bone.BoneType)bone_type);
                 return bone.Center;
             }
             if (bones[bone_type])
@@ -170,13 +170,13 @@ namespace Ultraleap
         /** Returns the length of the finger bone.*/
         public float GetBoneLength(int bone_type)
         {
-            return finger_.GetBone((Bone.BoneType)(bone_type)).Length;
+            return finger_.GetBone((Bone.BoneType)bone_type).Length;
         }
 
         /** Returns the width of the finger bone.*/
         public float GetBoneWidth(int bone_type)
         {
-            return finger_.GetBone((Bone.BoneType)(bone_type)).Width;
+            return finger_.GetBone((Bone.BoneType)bone_type).Width;
         }
 
         /**

@@ -56,7 +56,7 @@ namespace Ultraleap
         /// </summary>
         public static bool HasMethod(this object objectToCheck, string methodName)
         {
-            var type = objectToCheck.GetType();
+            Type type = objectToCheck.GetType();
             return type.GetMethod(methodName) != null;
         }
 
@@ -86,7 +86,10 @@ namespace Ultraleap
         public static void Dispatch<T>(this EventHandler<T> handler,
                                     object sender, T eventArgs) where T : EventArgs
         {
-            if (handler != null) handler(sender, eventArgs);
+            if (handler != null)
+            {
+                handler(sender, eventArgs);
+            }
         }
 
         /// <summary>
@@ -107,7 +110,9 @@ namespace Ultraleap
                     context.Post(evt, eventArgs);
                 }
                 else
+                {
                     handler(sender, eventArgs);
+                }
             }
         }
     }

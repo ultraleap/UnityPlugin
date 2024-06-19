@@ -274,9 +274,9 @@ namespace Ultraleap
 
             if (leapProvider != null && leapProvider.CurrentFrame != null)
             {
-                foreach (var activePlayerHand in leapProvider.CurrentFrame.Hands)
+                foreach (Hand activePlayerHand in leapProvider.CurrentFrame.Hands)
                 {
-                    if ((checkBothHands || activePlayerHand.GetChirality() == chiralityToCheck))
+                    if (checkBothHands || activePlayerHand.GetChirality() == chiralityToCheck)
                     {
                         foreach (HandPoseScriptableObject pose in posesToDetect)
                         {
@@ -427,7 +427,7 @@ namespace Ultraleap
         private bool CheckPoseDirection(Hand playerHand)
         {
             bool allRulesPassed = true;
-            foreach (var rule in poseRules)
+            foreach (PoseRule rule in poseRules)
             {
                 bool directionMatchInRule = false;
                 if (rule.directions.Count <= 0) // If there are no directions for this rule, skip this rule
@@ -436,7 +436,7 @@ namespace Ultraleap
                     continue;
                 }
 
-                foreach (var direction in rule.directions)
+                foreach (RuleDirection direction in rule.directions)
                 {
                     if (direction.enabled == false)
                     {
@@ -544,15 +544,15 @@ namespace Ultraleap
 
         private Vector2 GetDegreeAngleDifferenceXY(Vector3 a, Vector3 b)
         {
-            var angleX = Mathf.DeltaAngle(a.x, b.x);
-            var angleY = Mathf.DeltaAngle(a.y, b.y);
+            float angleX = Mathf.DeltaAngle(a.x, b.x);
+            float angleY = Mathf.DeltaAngle(a.y, b.y);
 
             return new Vector2(angleX, angleY);
         }
 
         private bool GetIsFacingDirection(Vector3 boneDirection, Vector3 TargetDirectionDirection, float thresholdInDegrees)
         {
-            return (Vector3.Angle(boneDirection.normalized, TargetDirectionDirection.normalized) < thresholdInDegrees);
+            return Vector3.Angle(boneDirection.normalized, TargetDirectionDirection.normalized) < thresholdInDegrees;
         }
 
         private Vector2 GetBoneRotationThreshold(HandPoseScriptableObject pose, int fingerNum, int boneNum)

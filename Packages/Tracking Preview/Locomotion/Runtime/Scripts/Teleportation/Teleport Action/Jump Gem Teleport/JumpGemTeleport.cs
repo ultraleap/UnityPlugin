@@ -6,10 +6,10 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Ultraleap.Preview.HandRays;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Ultraleap.Preview.HandRays;
 using UnityEngine;
 
 namespace Ultraleap.Preview.Locomotion
@@ -75,7 +75,7 @@ namespace Ultraleap.Preview.Locomotion
         {
             bool anyPinched = _jumpGems.Any(x => x.IsPinched);
             _pinchedGem = null;
-            foreach (var jewel in _jumpGems)
+            foreach (JumpGem jewel in _jumpGems)
             {
                 if (anyPinched)
                 {
