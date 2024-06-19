@@ -8,6 +8,7 @@
 
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace Ultraleap.HandsModule.Examples
 {
@@ -45,12 +46,12 @@ namespace Ultraleap.HandsModule.Examples
                 return;
             }
 
-            if (Input.GetKeyUp(KeyCode.RightArrow))
+            if (Keyboard.current.rightArrowKey.wasPressedThisFrame)
             {
                 NextHandSet();
             }
 
-            if (Input.GetKeyUp(KeyCode.LeftArrow))
+            if (Keyboard.current.leftArrowKey.wasPressedThisFrame)
             {
                 PreviousHandSet();
             }
