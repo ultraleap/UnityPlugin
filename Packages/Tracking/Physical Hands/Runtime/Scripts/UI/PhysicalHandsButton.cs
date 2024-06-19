@@ -425,7 +425,7 @@ namespace Ultraleap.PhysicalHands
             // Update hand contact flags
             if (hand != null)
             {
-                if (!_contactedHands.TryAdd(hand, false));
+                if (!_contactedHands.TryAdd(hand, false))
                 {
                     _contactedHands[hand] = false;
                 }
