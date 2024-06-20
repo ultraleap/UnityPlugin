@@ -21,6 +21,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Issue with the method signature for LeapPixelToRectilinearEx
+- Duplicate meta aim hands when using XRHands Input
+- Editor stuck in infinite loop when no service running
+- Caching issue with LeapToUnityTransform which causes the hand to be flipped on the Z axis. 
 
 ## [6.15.0] - 19/04/24
 
