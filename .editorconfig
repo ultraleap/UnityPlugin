@@ -69,6 +69,10 @@ dotnet_code_quality_unused_parameters = all
 # Suppression preferences
 dotnet_remove_unnecessary_suppression_exclusions = none
 
+# New line preferences
+dotnet_style_allow_multiple_blank_lines_experimental = true
+dotnet_style_allow_statement_immediately_after_block_experimental = true
+
 #### C# Coding Conventions ####
 
 # var preferences
@@ -191,6 +195,10 @@ dotnet_naming_rule.interface_should_be_begins_with_i.severity = warning
 dotnet_naming_rule.interface_should_be_begins_with_i.symbols = interface
 dotnet_naming_rule.interface_should_be_begins_with_i.style = begins_with_i
 
+dotnet_naming_rule.event_should_be_pascal_case.severity = warning
+dotnet_naming_rule.event_should_be_pascal_case.symbols = event
+dotnet_naming_rule.event_should_be_pascal_case.style = pascal_case
+
 dotnet_naming_rule.types_should_be_pascal_case.severity = warning
 dotnet_naming_rule.types_should_be_pascal_case.symbols = types
 dotnet_naming_rule.types_should_be_pascal_case.style = pascal_case
@@ -210,10 +218,6 @@ dotnet_naming_rule.struct_should_be_pascal_case.style = pascal_case
 dotnet_naming_rule.class_should_be_pascal_case.severity = warning
 dotnet_naming_rule.class_should_be_pascal_case.symbols = class
 dotnet_naming_rule.class_should_be_pascal_case.style = pascal_case
-
-dotnet_naming_rule.event_should_be_pascal_case.severity = warning
-dotnet_naming_rule.event_should_be_pascal_case.symbols = event
-dotnet_naming_rule.event_should_be_pascal_case.style = pascal_case
 
 dotnet_naming_rule.method_should_be_pascal_case.severity = warning
 dotnet_naming_rule.method_should_be_pascal_case.symbols = method
@@ -242,6 +246,10 @@ dotnet_naming_rule.5e729aa869c94a6581e49b8a1f05990a_should_be_pascal_case.style 
 dotnet_naming_rule.localfield_should_be_localfield.severity = warning
 dotnet_naming_rule.localfield_should_be_localfield.symbols = localfield
 dotnet_naming_rule.localfield_should_be_localfield.style = localfield
+
+dotnet_naming_rule.local_field_should_be_localfield.severity = warning
+dotnet_naming_rule.local_field_should_be_localfield.symbols = local_field
+dotnet_naming_rule.local_field_should_be_localfield.style = localfield
 
 # Symbol specifications
 
@@ -298,8 +306,12 @@ dotnet_naming_symbols.5e729aa869c94a6581e49b8a1f05990a.applicable_accessibilitie
 dotnet_naming_symbols.5e729aa869c94a6581e49b8a1f05990a.required_modifiers = 
 
 dotnet_naming_symbols.localfield.applicable_kinds = field, parameter, type_parameter, local
-dotnet_naming_symbols.localfield.applicable_accessibilities = public, protected, private, internal, local
+dotnet_naming_symbols.localfield.applicable_accessibilities = public, internal, local
 dotnet_naming_symbols.localfield.required_modifiers = 
+
+dotnet_naming_symbols.local_field.applicable_kinds = field, parameter, type_parameter
+dotnet_naming_symbols.local_field.applicable_accessibilities = local
+dotnet_naming_symbols.local_field.required_modifiers = 
 
 # Naming styles
 
