@@ -94,6 +94,10 @@ namespace Ultraleap.PhysicalHands
 
         #endregion
 
+        public bool handHovering { get { return leftHandHovering || rightHandHovering; } }
+        public bool handContacting { get { return leftHandContacting || rightHandContacting; } }
+        public bool handGrabbing { get { return leftHandGrabbing || rightHandGrabbing; } }
+
         public bool leftHandHovering { get; private set; }
         public bool leftHandContacting { get; private set; }
         public bool leftHandGrabbing { get; private set; }
