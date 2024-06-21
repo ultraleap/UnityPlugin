@@ -7,15 +7,18 @@
  ******************************************************************************/
 
 #if UNITY_EDITOR
+
 using UnityEditor;
-using UnityEngine;
+
 #endif
+
+using UnityEngine;
 
 namespace Ultraleap.Attributes
 {
     public class IndentAttribute : CombinablePropertyAttribute, IBeforeLabelAdditiveDrawer
     {
-        float width = 20;
+        private float width = 20;
 
         public IndentAttribute()
         {
@@ -27,10 +30,13 @@ namespace Ultraleap.Attributes
             width = _width;
         }
 
+#if UNITY_EDITOR
+
         public void Draw(Rect _rect, SerializedProperty _property)
         {
-
         }
+
+#endif
 
         public float GetWidth()
         {
