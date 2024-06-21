@@ -115,10 +115,11 @@ namespace Ultraleap.PhysicalHands
 
         public void OnHandHover(ContactHand hand)
         {
-            onHover?.Invoke(hand);
 
             if (hand.Handedness == Chirality.Left)
             {
+                leftHandHovering = true;
+
                 if (!leftHandHovering)
                 {
                     onHoverEnter?.Invoke(hand);
@@ -126,10 +127,11 @@ namespace Ultraleap.PhysicalHands
                 }
 
                 onLeftHandHover?.Invoke(hand);
-                leftHandHovering = true;
             }
             else
             {
+                rightHandHovering = true;
+
                 if (!rightHandHovering)
                 {
                     onHoverEnter?.Invoke(hand);
@@ -137,14 +139,13 @@ namespace Ultraleap.PhysicalHands
                 }
 
                 onRightHandHover?.Invoke(hand);
-                rightHandHovering = true;
             }
+
+            onHover?.Invoke(hand);
         }
 
         public void OnHandHoverExit(ContactHand hand)
         {
-            onHoverExit?.Invoke(hand);
-
             if (hand.Handedness == Chirality.Left)
             {
                 leftHandHovering = false;
@@ -155,14 +156,16 @@ namespace Ultraleap.PhysicalHands
                 rightHandHovering = false;
                 onRightHandHoverExit?.Invoke(hand);
             }
+
+            onHoverExit?.Invoke(hand);
         }
 
         public void OnHandContact(ContactHand hand)
         {
-            onContact?.Invoke(hand);
-
             if (hand.Handedness == Chirality.Left)
             {
+                leftHandContacting = true;
+
                 if (!leftHandContacting)
                 {
                     onContactEnter?.Invoke(hand);
@@ -170,10 +173,11 @@ namespace Ultraleap.PhysicalHands
                 }
 
                 onLeftHandContact?.Invoke(hand);
-                leftHandContacting = true;
             }
             else
             {
+                rightHandContacting = true;
+
                 if (!rightHandContacting)
                 {
                     onContactEnter?.Invoke(hand);
@@ -181,14 +185,13 @@ namespace Ultraleap.PhysicalHands
                 }
 
                 onRightHandContact?.Invoke(hand);
-                rightHandContacting = true;
             }
+
+            onContact?.Invoke(hand);
         }
 
         public void OnHandContactExit(ContactHand hand)
         {
-            onContactExit?.Invoke(hand);
-
             if (hand.Handedness == Chirality.Left)
             {
                 leftHandContacting = false;
@@ -199,14 +202,16 @@ namespace Ultraleap.PhysicalHands
                 rightHandContacting = false;
                 onRightHandContactExit?.Invoke(hand);
             }
+
+            onContactExit?.Invoke(hand);
         }
 
         public void OnHandGrab(ContactHand hand)
         {
-            onGrab?.Invoke(hand);
-
             if (hand.Handedness == Chirality.Left)
             {
+                leftHandGrabbing = true;
+
                 if (!leftHandGrabbing)
                 {
                     onLeftHandGrabEnter?.Invoke(hand);
@@ -214,10 +219,11 @@ namespace Ultraleap.PhysicalHands
                 }
 
                 onLeftHandGrab?.Invoke(hand);
-                leftHandGrabbing = true;
             }
             else
             {
+                rightHandGrabbing = true;
+
                 if (!rightHandGrabbing)
                 {
                     onRightHandGrabEnter?.Invoke(hand);
@@ -225,14 +231,13 @@ namespace Ultraleap.PhysicalHands
                 }
 
                 onRightHandGrab?.Invoke(hand);
-                rightHandGrabbing = true;
             }
+
+            onGrab?.Invoke(hand);
         }
 
         public void OnHandGrabExit(ContactHand hand)
         {
-            onGrabExit?.Invoke(hand);
-
             if (hand.Handedness == Chirality.Left)
             {
                 leftHandGrabbing = false;
@@ -243,6 +248,8 @@ namespace Ultraleap.PhysicalHands
                 rightHandGrabbing = false;
                 onRightHandGrabExit?.Invoke(hand);
             }
+
+            onGrabExit?.Invoke(hand);
         }
     }
 }
