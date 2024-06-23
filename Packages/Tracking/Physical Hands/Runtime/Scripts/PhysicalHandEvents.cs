@@ -139,7 +139,7 @@ namespace Ultraleap.PhysicalHands
                 return;
             }
 
-            InvokeOnHandHoverExit(hand)
+            InvokeOnHandHoverExit(hand);
         }
 
         public void OnHandPrimaryHover(ContactHand hand)
