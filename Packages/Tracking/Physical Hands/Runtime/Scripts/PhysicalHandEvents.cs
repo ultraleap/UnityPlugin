@@ -16,8 +16,7 @@ namespace Ultraleap.PhysicalHands
     {
         [Header("Configuration")]
         [Tooltip("When ticked, the object will only register events when it is primary hovered. Only one object can be primary hovered at a time by either hand.")]
-        [SerializeField]
-        protected bool _usePrimaryHover = false;
+        public bool usePrimaryHover = false;
 
         #region UnityEvents
 
@@ -124,7 +123,7 @@ namespace Ultraleap.PhysicalHands
 
         public void OnHandHover(ContactHand hand)
         {
-            if (_usePrimaryHover)
+            if (usePrimaryHover)
             {
                 return;
             }
@@ -134,7 +133,7 @@ namespace Ultraleap.PhysicalHands
 
         public void OnHandHoverExit(ContactHand hand)
         {
-            if (_usePrimaryHover)
+            if (usePrimaryHover)
             {
                 return;
             }
@@ -158,7 +157,7 @@ namespace Ultraleap.PhysicalHands
             {
                 leftHandHovering = true;
                 //We shouldn't reach here if _usePrimaryHover is true & a non-primary hover has occurred
-                leftHandPrimaryHovering = _usePrimaryHover;
+                leftHandPrimaryHovering = usePrimaryHover;
 
                 if (!leftHandHovering)
                 {
@@ -172,7 +171,7 @@ namespace Ultraleap.PhysicalHands
             {
                 rightHandHovering = true;
                 //We shouldn't reach here if _usePrimaryHover is true & a non-primary hover has occurred
-                rightHandPrimaryHovering = _usePrimaryHover;
+                rightHandPrimaryHovering = usePrimaryHover;
 
                 if (!rightHandHovering)
                 {
@@ -206,7 +205,7 @@ namespace Ultraleap.PhysicalHands
         {
             if (hand.Handedness == Chirality.Left)
             {
-                if (_usePrimaryHover && !leftHandPrimaryHovering)
+                if (usePrimaryHover && !leftHandPrimaryHovering)
                 {
                     return;
                 }
@@ -223,7 +222,7 @@ namespace Ultraleap.PhysicalHands
             }
             else
             {
-                if (_usePrimaryHover && !rightHandPrimaryHovering)
+                if (usePrimaryHover && !rightHandPrimaryHovering)
                 {
                     return;
                 }
@@ -246,7 +245,7 @@ namespace Ultraleap.PhysicalHands
         {
             if (hand.Handedness == Chirality.Left)
             {
-                if (_usePrimaryHover && !leftHandPrimaryHovering)
+                if (usePrimaryHover && !leftHandPrimaryHovering)
                 {
                     return;
                 }
@@ -256,7 +255,7 @@ namespace Ultraleap.PhysicalHands
             }
             else
             {
-                if (_usePrimaryHover && !rightHandPrimaryHovering)
+                if (usePrimaryHover && !rightHandPrimaryHovering)
                 {
                     return;
                 }
@@ -272,7 +271,7 @@ namespace Ultraleap.PhysicalHands
         {
             if (hand.Handedness == Chirality.Left)
             {
-                if (_usePrimaryHover && !leftHandPrimaryHovering)
+                if (usePrimaryHover && !leftHandPrimaryHovering)
                 {
                     return;
                 }
@@ -289,7 +288,7 @@ namespace Ultraleap.PhysicalHands
             }
             else
             {
-                if (_usePrimaryHover && !rightHandPrimaryHovering)
+                if (usePrimaryHover && !rightHandPrimaryHovering)
                 {
                     return;
                 }
@@ -312,7 +311,7 @@ namespace Ultraleap.PhysicalHands
         {
             if (hand.Handedness == Chirality.Left)
             {
-                if (_usePrimaryHover && !leftHandPrimaryHovering)
+                if (usePrimaryHover && !leftHandPrimaryHovering)
                 {
                     return;
                 }
@@ -322,7 +321,7 @@ namespace Ultraleap.PhysicalHands
             }
             else
             {
-                if (_usePrimaryHover && !rightHandPrimaryHovering)
+                if (usePrimaryHover && !rightHandPrimaryHovering)
                 {
                     return;
                 }
