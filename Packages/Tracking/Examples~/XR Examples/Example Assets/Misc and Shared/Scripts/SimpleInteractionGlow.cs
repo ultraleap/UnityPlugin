@@ -39,13 +39,15 @@ namespace Ultraleap.Examples
         [Tooltip("This color only applies if the object is a PhysicalHandsButton or PhyaicalHandsSlider.")]
         public Color pressedColor = Color.white;
 
-        private Material[] _materials;
+        private List<Material> _materials;
 
         [SerializeField]
         private PhysicalHandsButton _physHandButton;
 
         [SerializeField]
         private Rend[] rends;
+
+        private List<SpriteRenderer> spriteRends;
 
         // Dictionary of contact types, Contact is first item, hover is second, grab is third
         private Dictionary<ContactHand, bool[]> _interactingHands = new Dictionary<ContactHand, bool[]>();
@@ -82,54 +84,83 @@ namespace Ultraleap.Examples
 
             if (rends.Length > 0)
             {
-                _materials = new Material[rends.Length];
-
                 for (int i = 0; i < rends.Length; i++)
                 {
-                    _materials[i] = rends[i].renderer.materials[rends[i].materialID];
+                    if (rends[i].renderer.GetType() == typeof(SpriteRenderer))
+                    {
+                        if (spriteRends == null)
+                        {
+                            spriteRends = new List<SpriteRenderer>();
+                        }
+                        spriteRends.Add((SpriteRenderer)rends[i].renderer);
+                    }
+                    else
+                    {
+                        if (_materials == null)
+                        {
+                            _materials = new List<Material>();
+                        }
+
+                        _materials.Add(rends[i].renderer.materials[rends[i].materialID]);
+                    }
                 }
             }
 
             _rigBody = GetComponent<Rigidbody>();
         }
 
+                
         void Update()
         {
+            if (_materials == null && spriteRends == null)
+            {
+                return;
+            }
+
+            // The target color for the Interaction object will be determined by various simple state checks.
+            Color targetColor = defaultColor;
+
+            if (usePrimaryHover && _isPrimaryHovered)
+            {
+                targetColor = primaryHoverColor;
+            }
+            else
+            {
+                if (_handHovering && useHover)
+                {
+                    float glow = PhysicalHandUtils.ClosestHandBoneDistance(_interactingHands.Keys.ToList(), _rigBody).Map(0F, 0.05F, 1F, 0.0F);
+
+                    targetColor = Color.Lerp(defaultColor, hoverColor, glow);
+                }
+            }
+
+            if (_handGrabbing)
+            {
+                targetColor = suspendedColor;
+            }
+
+            // We can also check the depressed-or-not-depressed state of Physical Hands Button objects
+            // and assign them a unique color in that case.
+            if (_physHandButton && _physHandButton.IsPressed)
+            {
+                targetColor = pressedColor;
+            }
+
             if (_materials != null)
             {
-                // The target color for the Interaction object will be determined by various simple state checks.
-                Color targetColor = defaultColor;
-
-                if (usePrimaryHover && _isPrimaryHovered)
-                {
-                    targetColor = primaryHoverColor;
-                }
-                else
-                {
-                    if (_handHovering && useHover)
-                    {
-                        float glow = PhysicalHandUtils.ClosestHandBoneDistance(_interactingHands.Keys.ToList(), _rigBody).Map(0F, 0.05F, 1F, 0.0F);
-
-                        targetColor = Color.Lerp(defaultColor, hoverColor, glow);
-                    }
-                }
-
-                if (_handGrabbing)
-                {
-                    targetColor = suspendedColor;
-                }
-
-                // We can also check the depressed-or-not-depressed state of Physical Hands Button objects
-                // and assign them a unique color in that case.
-                if (_physHandButton && _physHandButton.IsPressed)
-                {
-                    targetColor = pressedColor;
-                }
-
                 // Lerp actual material color to the target color.
-                for (int i = 0; i < _materials.Length; i++)
+                for (int i = 0; i < _materials.Count; i++)
                 {
                     _materials[i].color = Color.Lerp(_materials[i].color, targetColor, 30F * Time.deltaTime);
+                }
+            }
+
+            if (spriteRends != null)
+            {
+                // Lerp actual material color to the target color.
+                for (int i = 0; i < spriteRends.Count; i++)
+                {
+                    spriteRends[i].color = Color.Lerp(spriteRends[i].color, targetColor, 30F * Time.deltaTime);
                 }
             }
         }
