@@ -103,7 +103,6 @@ namespace Ultraleap.PhysicalHands
         public bool anyHandContacting { get { return leftHandContacting || rightHandContacting; } }
         public bool anyHandGrabbing { get { return leftHandGrabbing || rightHandGrabbing; } }
 
-
         public bool leftHandHovering { get; private set; }
         public bool leftHandPrimaryHovering { get; private set; }
         public bool leftHandContacting { get; private set; }
