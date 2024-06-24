@@ -28,6 +28,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ability to ignore collisions per hand separately from grabs
 - Primary hover functionality to physical hands
 - PhysicalHandsButton can now use primary hover functionality
+- Bools for if any hand is performing an action on an object to PhysicalHandEvents
+- Sprite Renderer support to simple interaction glow
 
 ### Changed
 - Improved XRHands support for Meta Aim Input Actions
