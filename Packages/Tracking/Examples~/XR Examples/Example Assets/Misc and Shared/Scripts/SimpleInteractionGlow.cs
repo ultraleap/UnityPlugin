@@ -157,7 +157,7 @@ namespace Ultraleap.Examples
 
             if (spriteRends != null)
             {
-                // Lerp actual material color to the target color.
+                // Lerp sprite color to the target color.
                 for (int i = 0; i < spriteRends.Count; i++)
                 {
                     spriteRends[i].color = Color.Lerp(spriteRends[i].color, targetColor, 30F * Time.deltaTime);
