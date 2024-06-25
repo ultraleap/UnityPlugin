@@ -158,6 +158,11 @@ namespace Ultraleap.PhysicalHands
             }
         }
 
+        public void SetWhichHandCanActivateButtonPresses(ChiralitySelection _chiralitySelection)
+        {
+            _whichHandCanPressButton = _chiralitySelection;
+        }
+
         /// <summary>
         /// Updates the editor values including button travel distance and button presets.
         /// </summary>
