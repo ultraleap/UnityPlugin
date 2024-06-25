@@ -10,6 +10,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -3574,4 +3575,19 @@ namespace Ultraleap
 
         #endregion
     }
+
+    #region TimeUtilities
+    public class UpdateStaticTime : MonoBehaviour
+    {
+        private void LateUpdate()
+        {
+            TimeStatic.realtimeSinceStartup = Time.realtimeSinceStartup;
+        }
+    }
+
+    public static class TimeStatic
+    {
+        public static float realtimeSinceStartup;
+    }
+    #endregion
 }

@@ -22,7 +22,8 @@ namespace LeapInternal
 
         public static void GetStatus()
         {
-            if (lastRequestTimestamp + requestInterval < Time.realtimeSinceStartup)
+
+            if (lastRequestTimestamp + requestInterval < Ultraleap.TimeStatic.realtimeSinceStartup)
             {
                 IntPtr statusPtr = new IntPtr();
                 LeapC.GetServerStatus(500, ref statusPtr);
@@ -35,7 +36,7 @@ namespace LeapInternal
                     LeapC.ReleaseServerStatus(ref lastStatus);
                 }
 
-                lastRequestTimestamp = Time.realtimeSinceStartup;
+                lastRequestTimestamp = Ultraleap.TimeStatic.realtimeSinceStartup;
             }
         }
 
