@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
 
-## [NEXT] - xx/xx/xx
+## [6.15.1] - 26/06/2024
 
 ### Tracking Client versions
 - Windows 	v6.0.0
