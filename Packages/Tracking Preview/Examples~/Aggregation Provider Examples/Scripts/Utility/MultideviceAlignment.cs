@@ -6,11 +6,10 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity.Interaction;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Leap.Unity
+namespace Ultraleap
 {
     /// <summary>
     /// Takes a sourceDevice and aligns a targetDevice to it by transforming the targetDevice 
@@ -53,8 +52,8 @@ namespace Leap.Unity
                         {
                             for (int k = 0; k < 4; k++)
                             {
-                                sourceHandPoints.Add(sourceHand.Fingers[j].bones[k].Center);
-                                targetHandPoints.Add(targetHand.Fingers[j].bones[k].Center);
+                                sourceHandPoints.Add(sourceHand.fingers[j].bones[k].Center);
+                                targetHandPoints.Add(targetHand.fingers[j].bones[k].Center);
                             }
                         }
 
@@ -81,8 +80,8 @@ namespace Leap.Unity
 
                         // transform the targetDevice.transform by the deviceToOriginDeviceMatrix
                         Matrix4x4 newTransform = deviceToOriginDeviceMatrix * targetDevice.transform.localToWorldMatrix;
-                        targetDevice.transform.position = newTransform.GetVector3();
-                        targetDevice.transform.rotation = newTransform.GetQuaternion();
+                        targetDevice.transform.position = newTransform.GetVector3Kabsch();
+                        targetDevice.transform.rotation = newTransform.GetQuaternionKabsch();
                         targetDevice.transform.localScale = Vector3.Scale(targetDevice.transform.localScale, deviceToOriginDeviceMatrix.lossyScale);
 
 

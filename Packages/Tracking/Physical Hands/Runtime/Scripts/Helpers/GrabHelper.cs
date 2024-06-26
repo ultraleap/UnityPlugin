@@ -9,7 +9,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Leap.Unity.PhysicalHands
+namespace Ultraleap.PhysicalHands
 {
     [RequireComponent(typeof(PhysicalHandsManager))]
     public class GrabHelper : MonoBehaviour
@@ -168,7 +168,7 @@ namespace Leap.Unity.PhysicalHands
                 hand.palmBone.transform.position + (-hand.palmBone.transform.up * Mathf.Lerp(0.025f, 0.07f, lerp)) + (hand.palmBone.transform.forward * Mathf.Lerp(0.06f, 0.02f, lerp)),
                 radiusAmount + physicalHandsManager.HoverDistance,
                 _colliderCache,
-                physicalHandsManager.InteractionMask);
+                physicalHandsManager.InteractionMask, QueryTriggerInteraction.Ignore);
 
             RemoveUnhoveredHandsFromGrabHelperObjects(nearbyObjectCount, hand);
 
@@ -205,7 +205,7 @@ namespace Leap.Unity.PhysicalHands
             {
                 _fingerStrengths.Add(hand, new float[5]);
             }
-            Leap.Hand lHand = hand.dataHand;
+            Ultraleap.Hand lHand = hand.dataHand;
             for (int i = 0; i < 5; i++)
             {
                 _fingerStrengths[hand][i] = lHand.GetFingerStrength(i);
@@ -214,6 +214,10 @@ namespace Leap.Unity.PhysicalHands
         #endregion
 
         #region Helper Updating
+
+        GrabHelperObject primaryHoverObjectLeft = null;
+        GrabHelperObject primaryHoverObjectRight = null;
+
         private void UpdateHelpers()
         {
             RemoveUnhoveredGrabHelperObjects();
@@ -221,6 +225,53 @@ namespace Leap.Unity.PhysicalHands
             foreach (var helper in _grabHelperObjects)
             {
                 helper.Value.UpdateHelper();
+            }
+
+            UpdatePrimaryHover();
+        }
+
+        private void UpdatePrimaryHover()
+        {
+            UpdatePrimaryHoverForHand(ref primaryHoverObjectLeft, _leftContactHand);
+            UpdatePrimaryHoverForHand(ref primaryHoverObjectRight, _rightContactHand);
+        }
+
+        void UpdatePrimaryHoverForHand(ref GrabHelperObject prevPrimaryHoverObject, ContactHand contactHand)
+        {
+            // If we are contacting or grabbing, we are still primary hovering the same object. break out
+            if (prevPrimaryHoverObject != null && contactHand.IsContacting &&
+                (prevPrimaryHoverObject.GrabState == GrabHelperObject.State.Contact ||
+                prevPrimaryHoverObject.GrabState == GrabHelperObject.State.Grab))
+            {
+                prevPrimaryHoverObject.HandlePrimaryHover(contactHand);
+                return;
+            }
+
+            float closestBoneDistance = float.MaxValue;
+            Rigidbody nearestObject = null;
+            for (int i = 0; i < 3; i++) // loop thumb, index & middle
+            {
+                ContactBone bone = contactHand.GetBone(i, 2); //get distal
+                if (bone.NearestObjectDistance < closestBoneDistance) // cache nearest rigidbody and distance
+                {
+                    closestBoneDistance = bone.NearestObjectDistance;
+                    nearestObject = bone.NearestObject;
+                }
+            }
+
+            if (nearestObject != null && TryGetGrabHelperObjectFromRigid(nearestObject, out GrabHelperObject helperObject)) // Find the nearest GrabHelperObject
+            {
+                if(prevPrimaryHoverObject != null && prevPrimaryHoverObject != helperObject) // Update events and states
+                {
+                    prevPrimaryHoverObject.HandlePrimaryHoverExit(contactHand);
+                }
+
+                helperObject.HandlePrimaryHover(contactHand);
+                prevPrimaryHoverObject = helperObject; // cache for next frame
+            }
+            else if(prevPrimaryHoverObject != null)
+            {
+                prevPrimaryHoverObject.HandlePrimaryHoverExit(contactHand);
             }
         }
 

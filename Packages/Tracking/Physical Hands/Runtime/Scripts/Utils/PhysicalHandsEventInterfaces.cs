@@ -6,7 +6,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-namespace Leap.Unity.PhysicalHands
+namespace Ultraleap.PhysicalHands
 {
     /// <summary>
     /// Reports the hover event, called when a grab helper is created for the hand.
@@ -35,5 +35,14 @@ namespace Leap.Unity.PhysicalHands
     {
         void OnHandGrab(ContactHand hand);
         void OnHandGrabExit(ContactHand hand);
+    }
+
+    /// <summary>
+    /// Reports the primary hover event when a grab helper starts or stops being the primary hover object.
+    /// </summary>
+    public interface IPhysicalHandPrimaryHover
+    {
+        void OnHandPrimaryHover(ContactHand hand);
+        void OnHandPrimaryHoverExit(ContactHand hand);
     }
 }

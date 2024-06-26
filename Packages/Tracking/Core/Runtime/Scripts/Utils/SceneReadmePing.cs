@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Leap.Unity.Readme
+namespace Ultraleap.Readme
 {
     // Used to send the user to the readme for this scene
     public class SceneReadmePing : MonoBehaviour

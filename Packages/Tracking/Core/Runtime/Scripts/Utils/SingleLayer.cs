@@ -8,7 +8,7 @@
 
 using System;
 
-namespace Leap.Unity
+namespace Ultraleap
 {
 
     /// <summary>

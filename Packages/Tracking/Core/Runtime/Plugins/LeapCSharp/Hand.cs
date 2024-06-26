@@ -7,7 +7,7 @@
  ******************************************************************************/
 using UnityEngine;
 
-namespace Leap
+namespace Ultraleap
 {
     using System;
     using System.Collections.Generic;
@@ -26,7 +26,6 @@ namespace Leap
     [Serializable]
     public class Hand : IEquatable<Hand>
     {
-
         /// <summary>
         /// Constructs a Hand object.
         /// 
@@ -38,12 +37,11 @@ namespace Leap
         public Hand()
         {
             Arm = new Arm();
-            Fingers = new List<Finger>(5);
-            Fingers.Add(new Finger());
-            Fingers.Add(new Finger());
-            Fingers.Add(new Finger());
-            Fingers.Add(new Finger());
-            Fingers.Add(new Finger());
+            fingers[0] = new Finger();
+            fingers[1] = new Finger();
+            fingers[2] = new Finger();
+            fingers[3] = new Finger();
+            fingers[4] = new Finger();
         }
 
         /// <summary>
@@ -63,7 +61,7 @@ namespace Leap
                     bool isLeft,
                     float timeVisible,
                     Arm arm,
-                    List<Finger> fingers,
+                    Finger[] fingers,
                     Vector3 palmPosition,
                     Vector3 stabilizedPalmPosition,
                     Vector3 palmVelocity,
@@ -82,7 +80,7 @@ namespace Leap
             IsLeft = isLeft;
             TimeVisible = timeVisible;
             Arm = arm;
-            Fingers = fingers;
+            this.fingers = fingers;
             PalmPosition = palmPosition;
             StabilizedPalmPosition = stabilizedPalmPosition;
             PalmVelocity = palmVelocity;
@@ -90,31 +88,6 @@ namespace Leap
             Rotation = palmOrientation;
             Direction = direction;
             WristPosition = wristPosition;
-        }
-
-        /// <summary>
-        /// The Finger object with the specified ID attached to this hand.
-        /// 
-        /// Use the Hand.Finger() function to retrieve a Finger object attached to
-        /// this hand using an ID value obtained from a previous frame.
-        /// 
-        /// Note that ID values persist across frames, but only until tracking of a
-        /// particular object is lost. If tracking of a hand is lost and subsequently
-        /// regained, the new Finger object representing that finger may have a
-        /// different ID than that representing the finger in an earlier frame.
-        /// 
-        /// @since 1.0
-        /// </summary>
-        public Finger Finger(int id)
-        {
-            for (int i = Fingers.Count; i-- != 0;)
-            {
-                if (Fingers[i].Id == id)
-                {
-                    return Fingers[i];
-                }
-            }
-            return null;
         }
 
         /// <summary>
@@ -162,7 +135,13 @@ namespace Leap
         /// this hand, given in order from thumb to pinky.  The list cannot be empty.
         /// @since 1.0
         /// </summary>
-        public List<Finger> Fingers;
+        public Finger[] fingers = new Finger[5];
+
+        public Finger Thumb => fingers[0];
+        public Finger Index => fingers[1];
+        public Finger Middle => fingers[2];
+        public Finger Ring => fingers[3];
+        public Finger Pinky => fingers[4];
 
         /// <summary>
         /// The center position of the palm.

@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Leap
+namespace Ultraleap
 {
     using System;
     public static class TransformExtensions
@@ -73,7 +73,7 @@ namespace Leap
 
             for (int i = 5; i-- != 0;)
             {
-                hand.Fingers[i].Transform(transform);
+                hand.fingers[i].Transform(transform);
             }
 
             return hand;

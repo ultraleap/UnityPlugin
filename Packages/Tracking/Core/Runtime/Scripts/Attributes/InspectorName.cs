@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Leap.Unity.Attributes
+namespace Ultraleap.Attributes
 {
 
     public class InspectorNameAttribute : CombinablePropertyAttribute, IFullPropertyDrawer

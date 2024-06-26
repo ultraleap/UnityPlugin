@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace Leap.Unity
+namespace Ultraleap
 {
 
     public class CustomPropertyDrawerBase : PropertyDrawer

@@ -11,8 +11,9 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.SceneManagement;
 
-namespace Leap
+namespace Ultraleap
 {
     /// <summary>
     /// This class captures information regarding use of the Ultraleap Unity Plugin
@@ -34,7 +35,8 @@ namespace Leap
         [System.Serializable]
         private struct Telemetry
         {
-            public string app_name;
+            public string app_title;
+            public string app_scene_name;
             public string app_type;
             public string engine_name;
             public string engine_version;
@@ -67,12 +69,13 @@ namespace Leap
             Analytics analytics = new Analytics();
             analytics.telemetry = new Telemetry();
 
-            analytics.telemetry.app_name = Application.productName;
+            analytics.telemetry.app_title = Application.productName;
+            analytics.telemetry.app_scene_name = GetAppSceneName();
             analytics.telemetry.app_type = GetAppType();
             analytics.telemetry.engine_name = "Unity";
             analytics.telemetry.engine_version = Application.unityVersion;
-            analytics.telemetry.plugin_version = Leap.Unity.UltraleapSettings.Instance.PluginVersion;
-            analytics.telemetry.installation_source = Leap.Unity.UltraleapSettings.Instance.PluginSource;
+            analytics.telemetry.plugin_version = Ultraleap.UltraleapSettings.Instance.PluginVersion;
+            analytics.telemetry.installation_source = Ultraleap.UltraleapSettings.Instance.PluginSource;
             analytics.telemetry.interaction_system = GetInteractionSystem();
             analytics.telemetry.render_pipeline = GetRenderPipeline();
 
@@ -89,6 +92,18 @@ namespace Leap
 #endif
 
             return appType;
+        }
+
+        static string GetAppSceneName()
+        {
+            string sceneMane = "Unknown";
+
+            if(SceneManager.GetActiveScene() != null)
+            {
+                sceneMane = SceneManager.GetActiveScene().name;
+            }
+
+            return sceneMane;
         }
 
         static string GetRenderPipeline()
@@ -124,12 +139,31 @@ namespace Leap
                 return "Interaction Engine";
             }
 
+            // XRI
+            if(GameObject.Find("Complete XR Origin Hands Set Up") ||
+                GameObject.Find("Complete XR Origin Set Up") ||
+                GameObject.Find("Poke Interactor"))
+            {
+                return "XRI";
+            }
+
             // XR Hands
-            if (Leap.Unity.UltraleapSettings.Instance.leapSubsystemEnabled ||
-                Leap.Unity.UltraleapSettings.Instance.updateLeapInputSystem ||
-                Leap.Unity.UltraleapSettings.Instance.updateMetaInputSystem)
+            if (Ultraleap.UltraleapSettings.Instance.leapSubsystemEnabled ||
+                Ultraleap.UltraleapSettings.Instance.updateLeapInputSystem ||
+                Ultraleap.UltraleapSettings.Instance.updateMetaInputSystem)
             {
                 return "UL XR Hands";
+            }
+
+            if(GameObject.Find("Hand Visualizer"))
+            {
+                return "XR Hands";
+            }
+
+            // MRTK
+            if(GameObject.Find("MRTK Interaction Manager"))
+            {
+                return "MRTK";
             }
 
             return "Unknown";

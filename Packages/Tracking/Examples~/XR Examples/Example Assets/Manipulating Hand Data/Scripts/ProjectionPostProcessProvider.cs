@@ -8,11 +8,10 @@
 
 using UnityEngine;
 
-namespace Leap.Unity.Examples
+namespace Ultraleap.Examples
 {
     public class ProjectionPostProcessProvider : PostProcessProvider
     {
-
         [Header("Projection")]
         public Transform headTransform;
 
@@ -52,6 +51,5 @@ namespace Leap.Unity.Examples
                                   hand.Rotation);
             }
         }
-
     }
 }

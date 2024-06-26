@@ -14,7 +14,7 @@ using System;
 using System.Reflection;
 using System.Collections.Generic;
 
-namespace Leap.Unity.Attributes
+namespace Ultraleap.Attributes
 {
 
     using UnityObject = UnityEngine.Object;

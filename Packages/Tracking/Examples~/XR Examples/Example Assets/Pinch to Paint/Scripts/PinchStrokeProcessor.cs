@@ -6,11 +6,11 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity.Attributes;
+using Ultraleap.Attributes;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Leap.Unity.Examples
+namespace Ultraleap.Examples
 {
     /// <summary>
     /// This manages Pinch Painting for one given hand. It needs a PaintCursor. 
@@ -100,7 +100,7 @@ namespace Leap.Unity.Examples
                 UpdateStroke();
             }
 
-            if ((!_paintCursor.IsTracked || !_paintCursor.pinchDetector.IsActive) && _strokeProcessor.IsActualizingStroke)
+            if ((!_paintCursor.IsTracked || !_paintCursor.pinchDetector.IsPinching) && _strokeProcessor.IsActualizingStroke)
             {
                 StopActualizingStroke();
             }

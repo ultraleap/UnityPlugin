@@ -6,7 +6,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-namespace Leap
+namespace Ultraleap
 {
     public static class CopyFromOtherExtensions
     {
@@ -62,7 +62,7 @@ namespace Leap
 
             for (int i = 5; i-- != 0;)
             {
-                hand.Fingers[i].CopyFrom(source.Fingers[i]);
+                hand.fingers[i].CopyFrom(source.fingers[i]);
             }
 
             return hand;

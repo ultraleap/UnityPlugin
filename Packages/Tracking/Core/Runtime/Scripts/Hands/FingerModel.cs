@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Leap.Unity
+namespace Ultraleap
 {
     /**
     * The base class for all fingers.
@@ -30,7 +30,7 @@ namespace Leap.Unity
         /** The number of joints in a finger. */
         public const int NUM_JOINTS = 3;
 
-        public Finger.FingerType fingerType = Finger.FingerType.TYPE_INDEX;
+        public Finger.FingerType fingerType = Finger.FingerType.INDEX;
 
         // Unity references
         /** Bones positioned and rotated by FingerModel. */
@@ -54,7 +54,7 @@ namespace Leap.Unity
             hand_ = hand;
             if (hand_ != null)
             {
-                finger_ = hand.Fingers[(int)fingerType];
+                finger_ = hand.fingers[(int)fingerType];
             }
         }
 
@@ -86,7 +86,7 @@ namespace Leap.Unity
         {
             if (finger_ != null)
             {
-                Vector3 local_tip = finger_.Bone(Bone.BoneType.TYPE_DISTAL).NextJoint;
+                Vector3 local_tip = finger_.GetBone(Bone.BoneType.DISTAL).NextJoint;
                 return local_tip;
             }
             if (bones[NUM_BONES - 1] && joints[NUM_JOINTS - 2])
@@ -105,7 +105,7 @@ namespace Leap.Unity
             }
             if (finger_ != null)
             {
-                Vector3 local_position = finger_.Bone((Bone.BoneType)joint).PrevJoint;
+                Vector3 local_position = finger_.GetBone((Bone.BoneType)joint).PrevJoint;
                 return local_position;
             }
             if (joints[joint])
@@ -127,7 +127,7 @@ namespace Leap.Unity
         {
             if (finger_ != null)
             {
-                Bone bone = finger_.Bone((Bone.BoneType)(bone_type));
+                Bone bone = finger_.GetBone((Bone.BoneType)(bone_type));
                 return bone.Center;
             }
             if (bones[bone_type])
@@ -157,7 +157,7 @@ namespace Leap.Unity
         {
             if (finger_ != null)
             {
-                Quaternion local_rotation = finger_.Bone((Bone.BoneType)bone_type).Rotation;
+                Quaternion local_rotation = finger_.GetBone((Bone.BoneType)bone_type).Rotation;
                 return local_rotation;
             }
             if (bones[bone_type])
@@ -170,13 +170,13 @@ namespace Leap.Unity
         /** Returns the length of the finger bone.*/
         public float GetBoneLength(int bone_type)
         {
-            return finger_.Bone((Bone.BoneType)(bone_type)).Length;
+            return finger_.GetBone((Bone.BoneType)(bone_type)).Length;
         }
 
         /** Returns the width of the finger bone.*/
         public float GetBoneWidth(int bone_type)
         {
-            return finger_.Bone((Bone.BoneType)(bone_type)).Width;
+            return finger_.GetBone((Bone.BoneType)(bone_type)).Width;
         }
 
         /**
@@ -191,8 +191,8 @@ namespace Leap.Unity
             Quaternion jointRotation = Quaternion.identity;
             if (finger_ != null)
             {
-                jointRotation = Quaternion.Inverse(finger_.Bone((Bone.BoneType)joint_type).Rotation)
-                  * finger_.Bone((Bone.BoneType)(joint_type + 1)).Rotation;
+                jointRotation = Quaternion.Inverse(finger_.GetBone((Bone.BoneType)joint_type).Rotation)
+                  * finger_.GetBone((Bone.BoneType)(joint_type + 1)).Rotation;
             }
             else if (bones[joint_type] && bones[joint_type + 1])
             {
@@ -222,8 +222,8 @@ namespace Leap.Unity
             Quaternion jointRotation = Quaternion.identity;
             if (finger_ != null)
             {
-                jointRotation = Quaternion.Inverse(finger_.Bone((Bone.BoneType)0).Rotation)
-                  * finger_.Bone((Bone.BoneType)1).Rotation;
+                jointRotation = Quaternion.Inverse(finger_.GetBone((Bone.BoneType)0).Rotation)
+                  * finger_.GetBone((Bone.BoneType)1).Rotation;
             }
             else if (bones[0] && bones[1])
             {
@@ -237,8 +237,8 @@ namespace Leap.Unity
                 fingerType = finger_.Type;
             }
 
-            if (fType == Finger.FingerType.TYPE_INDEX ||
-              fType == Finger.FingerType.TYPE_MIDDLE)
+            if (fType == Finger.FingerType.INDEX ||
+              fType == Finger.FingerType.MIDDLE)
             {
                 spreadAngle = jointRotation.eulerAngles.y;
                 if (spreadAngle > 180f)
@@ -247,9 +247,9 @@ namespace Leap.Unity
                 }
                 // NOTE: eulerAngles range is [0, 360) so spreadAngle <= -180f will not occur.
             }
-            if (fType == Finger.FingerType.TYPE_THUMB ||
-              fType == Finger.FingerType.TYPE_RING ||
-              fType == Finger.FingerType.TYPE_PINKY)
+            if (fType == Finger.FingerType.THUMB ||
+              fType == Finger.FingerType.RING ||
+              fType == Finger.FingerType.PINKY)
             {
                 spreadAngle = -jointRotation.eulerAngles.y;
                 if (spreadAngle <= -180f)

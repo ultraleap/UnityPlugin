@@ -8,7 +8,7 @@
 
 using System;
 
-namespace Leap
+namespace Ultraleap
 {
     /// <summary>
     /// The DistortionData class contains the distortion map for correcting the

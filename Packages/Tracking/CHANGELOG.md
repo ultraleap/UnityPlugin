@@ -6,6 +6,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
 
+## [NEXT] - xx/xx/xxxx
+
+### Tracking Client versions
+- Windows 	v6.0.0
+- MacOS 	v6.0.0
+- Android 	v6.0.0
+
+### Added
+- ImageRetriever allows more than 6 reconnections
+- New Pinch and Grab detection utilities
+- Option to fade hands on found/lost in HandEnableDisable component
+- OnHandFound and OnHandLost events to LeapProviders
+- LeftHandTracked and RightHandTracked access booleans to LeapProviders
+- PhysicalHandsButton with automatic setup
+- PhysicalHandsButtonToggle
+- PhysicalHandsAnchorable, including anchoring and un-anchoring based on grabs
+- PhysicalHandsSlider
+- TwoDimensionalPhysicalHandsSlider example
+- Ability to ignore collisions per hand separately from grabs
+- Primary hover functionality to physical hands
+- PhysicalHandsButton can now use primary hover functionality
+
+### Changed
+- XRLeapProviderManager renamed LEAP_DIRECT to ULTRALEAP
+- Accessors for Hand.Finger, Hand.Bone and Finger.Bone
+- Renamed BoneType enum entries to remove redundancies
+- Replaced use of PinchStrength for IsPinching with PinchDistance
+- PinchDistance is now measured in Metres not Millimetres
+- Removed old PhysicalHandsButton
+- Anchors no longer require Interaction Engine
+- Turntable and Pullcord example scene now uses Physical Hands
+- Physical Hands Playground uses new PhysicalHandsButtons and Toggles
+- Grab Ball uses Physical Hands rather than Interaction Engine
+- Physical Hands events are sent to all event interfaces attached to the interacted rigidbody
+- Hard Contact Parent settings access levels to public
+- Prefab Create Menu uses Physical Hands prefabs as opposed to Interaction Engine
+- Prefab Create Menu chooses URP hands where available
+- Shaders use _Color as the default color property name
+- Shaders all come under the Ultraleap folder
+- Deleted Interaction Engine
+- Leap and Leap.Unity namespaces are now Ultraleap
+
+### Fixed
+
+
+
 ## [6.15.1] - 26/06/2024
 
 ### Tracking Client versions
@@ -24,6 +70,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Duplicate meta aim hands when using XRHands Input
 - Editor stuck in infinite loop when no service running
 - Caching issue with LeapToUnityTransform which causes the hand to be flipped on the Z axis. 
+
 
 ## [6.15.0] - 19/04/24
 

@@ -7,7 +7,7 @@
  ******************************************************************************/
 using UnityEngine;
 
-namespace Leap
+namespace Ultraleap
 {
     using System;
 
@@ -34,7 +34,7 @@ namespace Leap
         /// </summary>
         public Bone()
         {
-            Type = BoneType.TYPE_INVALID;
+            Type = BoneType.UNKNOWN;
         }
 
         /// <summary>
@@ -185,11 +185,11 @@ namespace Leap
         /// </summary>
         public enum BoneType
         {
-            TYPE_INVALID = -1,
-            TYPE_METACARPAL = 0,
-            TYPE_PROXIMAL = 1,
-            TYPE_INTERMEDIATE = 2,
-            TYPE_DISTAL = 3
+            UNKNOWN = -1,
+            METACARPAL = 0,
+            PROXIMAL = 1,
+            INTERMEDIATE = 2,
+            DISTAL = 3
         }
     }
 }

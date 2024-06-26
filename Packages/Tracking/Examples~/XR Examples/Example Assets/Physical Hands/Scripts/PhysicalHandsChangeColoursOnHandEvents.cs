@@ -9,7 +9,7 @@
 using UnityEngine;
 
 
-namespace Leap.Unity.PhysicalHands.Examples
+namespace Ultraleap.PhysicalHands.Examples
 {
     public class PhysicalHandsChangeColoursOnHandEvents : MonoBehaviour
     {
@@ -41,10 +41,10 @@ namespace Leap.Unity.PhysicalHands.Examples
         {
             switch (hand.Handedness)
             {
-                case Leap.Unity.Chirality.Left:
+                case Ultraleap.Chirality.Left:
                     leftHover = true;
                     break;
-                case Leap.Unity.Chirality.Right:
+                case Ultraleap.Chirality.Right:
                     rightHover = true;
                     break;
             }
@@ -55,10 +55,10 @@ namespace Leap.Unity.PhysicalHands.Examples
         {
             switch (hand.Handedness)
             {
-                case Leap.Unity.Chirality.Left:
+                case Ultraleap.Chirality.Left:
                     leftHover = false;
                     break;
-                case Leap.Unity.Chirality.Right:
+                case Ultraleap.Chirality.Right:
                     rightHover = false;
                     break;
             }
@@ -69,10 +69,10 @@ namespace Leap.Unity.PhysicalHands.Examples
         {
             switch (hand.Handedness)
             {
-                case Leap.Unity.Chirality.Left:
+                case Ultraleap.Chirality.Left:
                     leftContact = true;
                     break;
-                case Leap.Unity.Chirality.Right:
+                case Ultraleap.Chirality.Right:
                     rightContact = true;
                     break;
             }
@@ -83,10 +83,10 @@ namespace Leap.Unity.PhysicalHands.Examples
         {
             switch (hand.Handedness)
             {
-                case Leap.Unity.Chirality.Left:
+                case Ultraleap.Chirality.Left:
                     leftContact = false;
                     break;
-                case Leap.Unity.Chirality.Right:
+                case Ultraleap.Chirality.Right:
                     rightContact = false;
                     break;
             }
@@ -97,10 +97,10 @@ namespace Leap.Unity.PhysicalHands.Examples
         {
             switch (hand.Handedness)
             {
-                case Leap.Unity.Chirality.Left:
+                case Ultraleap.Chirality.Left:
                     leftGrab = true;
                     break;
-                case Leap.Unity.Chirality.Right:
+                case Ultraleap.Chirality.Right:
                     rightGrab = true;
                     break;
             }
@@ -111,10 +111,10 @@ namespace Leap.Unity.PhysicalHands.Examples
         {
             switch (hand.Handedness)
             {
-                case Leap.Unity.Chirality.Left:
+                case Ultraleap.Chirality.Left:
                     leftGrab = false;
                     break;
-                case Leap.Unity.Chirality.Right:
+                case Ultraleap.Chirality.Right:
                     rightGrab = false;
                     break;
             }

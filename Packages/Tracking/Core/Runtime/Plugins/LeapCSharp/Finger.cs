@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Leap
+namespace Ultraleap
 {
     using System;
     /// <summary>
@@ -28,6 +28,11 @@ namespace Leap
         /// @since 3.0
         /// </summary>
         public Bone[] bones = new Bone[4];
+
+        public Bone Metacarpal => bones[0];
+        public Bone Proximal => bones[1];
+        public Bone Intermediate => bones[2];
+        public Bone Distal => bones[3];
 
         /// <summary>
         /// Constructs a finger.
@@ -80,15 +85,6 @@ namespace Leap
             Length = length;
             IsExtended = isExtended;
             TimeVisible = timeVisible;
-        }
-
-        /// <summary>
-        /// The bone at a given bone index on this finger.
-        /// @since 2.0
-        /// </summary>
-        public Bone Bone(Bone.BoneType boneIx)
-        {
-            return bones[(int)boneIx];
         }
 
         /// <summary>
@@ -178,12 +174,12 @@ namespace Leap
         /// </summary>
         public enum FingerType
         {
-            TYPE_THUMB = 0,
-            TYPE_INDEX = 1,
-            TYPE_MIDDLE = 2,
-            TYPE_RING = 3,
-            TYPE_PINKY = 4,
-            TYPE_UNKNOWN = -1
+            THUMB = 0,
+            INDEX = 1,
+            MIDDLE = 2,
+            RING = 3,
+            PINKY = 4,
+            UNKNOWN = -1
         }
     }
 }

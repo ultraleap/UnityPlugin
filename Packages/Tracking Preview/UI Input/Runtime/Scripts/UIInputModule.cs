@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace Leap.Unity.InputModule
+namespace Ultraleap.InputModule
 {
     /// <summary>
     /// An InputModule that supports the use of Leap Motion tracking data for manipulating Unity UI controls.

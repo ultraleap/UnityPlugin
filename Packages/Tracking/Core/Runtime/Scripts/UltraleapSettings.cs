@@ -8,12 +8,14 @@
 
 using System.Collections.Generic;
 using UnityEngine;
+using System;
+
 #if UNITY_EDITOR
 using UnityEditor;
 using System.IO;
 #endif
 
-namespace Leap.Unity
+namespace Ultraleap
 {
 #if UNITY_EDITOR
     [CustomEditor(typeof(UltraleapSettings))]
@@ -249,14 +251,24 @@ namespace Leap.Unity
 
         static string GetPluginVersion()
         {
+            string version = "Unknown";
+
             if (Utils.IsPackageAvailable("com.ultraleap.tracking", out var packageInfo)) // Check the package exists so we can use package manage wizardry
             {
-                return packageInfo.version;
+                version = packageInfo.version;
             }
             else // We are not using package manager :( we need to look for version number elsewhere
             {
-                return FindPluginVersionInAssets();
+                version = FindPluginVersionInAssets();
             }
+
+            // Parse through system.version to improve formatting standardisation
+            if(Version.TryParse(version, out var ver))
+            {
+                version = ver.ToString();
+            }
+
+            return version;
         }
 
         static string GetPluginSource()
@@ -274,10 +286,15 @@ namespace Leap.Unity
                     return "UPM " + packageInfo.source;
                 }
             }
-            else // We are not using package manager :( we need to look for version number elsewhere
+            else
             {
-                return "Unity Package";
+                if(FindPluginVersionInAssets() != "")
+                {
+                    return "Unity Package";
+                }
             }
+
+            return "Unknown";
         }
 
         [MenuItem("Ultraleap/Open Ultraleap Settings", false, 50)]
@@ -308,6 +325,12 @@ namespace Leap.Unity
         private static void OpenDiscord()
         {
             Application.OpenURL("https://discord.com/invite/3VCndThqxS");
+        }
+
+        [MenuItem("Ultraleap/Updating/6.X to 7.X/Update Existing Pose Recordings", false, 200)]
+        private static void UpdateExistingPoseRecordings()
+        {
+            ReplaceUseOfFingersInPoseScriptableObjects();
         }
 #endif
 
@@ -374,6 +397,24 @@ namespace Leap.Unity
             }
 
             return pluginVersionFromAssets;
+        }
+
+
+        private static void ReplaceUseOfFingersInPoseScriptableObjects()
+        {
+            HandPoseScriptableObject[] _handPoseSOs = Resources.FindObjectsOfTypeAll(typeof(HandPoseScriptableObject)) as HandPoseScriptableObject[];
+
+            foreach (var _handPoseSO in _handPoseSOs)
+            {
+                var _path = AssetDatabase.GetAssetPath(_handPoseSO);
+                var _text = File.ReadAllText(_path);
+                _text = _text.Replace("Fingers", "fingers");
+                File.WriteAllText(_path, _text);
+
+                EditorUtility.SetDirty(_handPoseSO);
+                AssetDatabase.Refresh();
+            }
+
         }
 #endif
     }

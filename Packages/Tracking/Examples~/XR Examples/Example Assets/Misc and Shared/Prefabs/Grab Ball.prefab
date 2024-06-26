@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3891926265964585190}
-  - component: {fileID: 3891926265964585191}
   m_Layer: 0
   m_Name: Grab Ball Mesh Visuals
   m_TagString: Untagged
@@ -27,31 +26,13 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3891926267083191132}
   - {fileID: 3891926266741417617}
   m_Father: {fileID: 3891926267328605169}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3891926265964585191
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3891926265964585189}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3b4adda463371ef49bcad1c61e52ae8b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  grabBall: {fileID: 3891926267328605170}
-  defaultMesh: {fileID: 3891926267083191133}
-  ghostedMesh: {fileID: 3891926266741417618}
-  distanceToScaleGrabBall: 0.1
-  expandedScale: {x: 1, y: 1, z: 1}
-  minimisedScale: {x: 0.5, y: 0.5, z: 0.5}
-  lerpTime: 6
 --- !u!1 &3891926266741417616
 GameObject:
   m_ObjectHideFlags: 0
@@ -80,6 +61,7 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0.0000011920929, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 3891926265964585190}
   m_RootOrder: 1
@@ -103,6 +85,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
@@ -161,6 +144,7 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 3891926265964585190}
   m_RootOrder: 0
@@ -184,6 +168,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
@@ -225,9 +210,8 @@ GameObject:
   - component: {fileID: 3891926267328605169}
   - component: {fileID: 3891926267328605181}
   - component: {fileID: 3891926267328605180}
-  - component: {fileID: 3891926267328605171}
-  - component: {fileID: 3891926267328605170}
-  - component: {fileID: 7736706413067419542}
+  - component: {fileID: 1696508168}
+  - component: {fileID: 1696508169}
   m_Layer: 0
   m_Name: Grab Ball
   m_TagString: Untagged
@@ -245,6 +229,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0.8, z: 0.3}
   m_LocalScale: {x: 0.05, y: 0.05, z: 0.05}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3891926265964585190}
   m_Father: {fileID: 0}
@@ -279,7 +264,7 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &3891926267328605171
+--- !u!114 &1696508168
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -288,29 +273,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 3891926267328605168}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
+  m_Script: {fileID: 11500000, guid: 4b02e2f8ae628ac4f9faca951fe12db4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _manager: {fileID: 0}
-  _ignoreHoverMode: 0
-  _isIgnoringAllHoverState: 0
-  _ignorePrimaryHover: 0
-  _ignoreContact: 0
-  _ignoreGraspingMode: 0
-  _ignoreGrasping: 0
-  _contactForceMode: 0
-  _allowMultiGrasp: 0
-  _moveObjectWhenGrasped: 1
-  graspedMovementType: 0
-  _overrideInteractionLayer: 0
-  _interactionLayer:
-    layerIndex: 0
-  _overrideNoContactLayer: 0
-  _noContactLayer:
-    layerIndex: 0
-  _eventTable:
-    _entries: []
---- !u!114 &3891926267328605170
+  useHover: 1
+  usePrimaryHover: 0
+  defaultColor: {r: 0.10980393, g: 0.64705884, b: 0.21176472, a: 1}
+  suspendedColor: {r: 1, g: 0, b: 0, a: 1}
+  hoverColor: {r: 0.06666667, g: 0.25882354, b: 1, a: 1}
+  primaryHoverColor: {r: 0.62624454, g: 0, b: 1, a: 1}
+  pressedColor: {r: 1, g: 1, b: 1, a: 1}
+  rends:
+  - materialID: 0
+    renderer: {fileID: 0}
+--- !u!114 &1696508169
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -325,7 +301,6 @@ MonoBehaviour:
   grabBallPose:
     position: {x: 0, y: 0, z: 0}
     rotation: {x: 0, y: 0, z: 0, w: 0}
-  grabBallInteractionBehaviour: {fileID: 3891926267328605171}
   attachedObject: {fileID: 0}
   lerpSpeed: 10
   useAttachedObjectsXRotation: 1
@@ -336,25 +311,5 @@ MonoBehaviour:
   maxHeightFromHead: 0.3
   minHeightFromHead: -0.65
   drawGrabBallRestrictionGizmos: 1
---- !u!114 &7736706413067419542
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3891926267328605168}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4b02e2f8ae628ac4f9faca951fe12db4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  useHover: 0
-  usePrimaryHover: 1
-  defaultColor: {r: 0, g: 0.9215687, b: 0.5215686, a: 1}
-  suspendedColor: {r: 1, g: 0, b: 0, a: 1}
-  hoverColor: {r: 0.65882355, g: 0.18431373, b: 0.93725497, a: 1}
-  primaryHoverColor: {r: 1, g: 0.5529412, b: 0, a: 1}
-  pressedColor: {r: 0.65882355, g: 0.18431373, b: 0.93725497, a: 1}
-  rends:
-  - materialID: 0
-    renderer: {fileID: 3891926267083191133}
+  continuouslyRestrictGrabBallDistanceFromHead: 1
+  IsGrabbed: 0

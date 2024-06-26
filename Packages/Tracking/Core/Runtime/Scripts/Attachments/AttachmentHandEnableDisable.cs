@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Leap.Unity.Attachments
+namespace Ultraleap.Attachments
 {
 
     public class AttachmentHandEnableDisable : MonoBehaviour

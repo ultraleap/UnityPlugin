@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Leap.Unity.Preview.Locomotion
+namespace Ultraleap.Preview.Locomotion
 {
     /// <summary>
     /// PinchToTeleport allows you to point with a hand ray interactor and pinch with your hand to teleport where you're pointing to
@@ -23,7 +23,7 @@ namespace Leap.Unity.Preview.Locomotion
         private IsFacingObject _isFacingObject;
 
         [SerializeField]
-        private LightweightPinchDetector _pinchDetector;
+        private PinchDetector _pinchDetector;
 
         [Tooltip("The chirality which will be used for pinch to teleport. This will update the chirality in the pinch detector and hand ray.")]
         public Chirality chirality;
@@ -56,18 +56,18 @@ namespace Leap.Unity.Preview.Locomotion
 
         protected void OnEnable()
         {
-            _pinchDetector.OnPinch += OnPinch;
-            _pinchDetector.OnPinching += OnPinching;
-            _pinchDetector.OnUnpinch += OnUnpinch;
+            _pinchDetector.onActionStart += OnPinch;
+            _pinchDetector.onAction += OnPinching;
+            _pinchDetector.onActionEnd += OnUnpinch;
 
             UpdateChirality();
         }
 
         private void OnDisable()
         {
-            _pinchDetector.OnPinch -= OnPinch;
-            _pinchDetector.OnPinching -= OnPinching;
-            _pinchDetector.OnUnpinch -= OnUnpinch;
+            _pinchDetector.onActionStart -= OnPinch;
+            _pinchDetector.onAction -= OnPinching;
+            _pinchDetector.onActionEnd -= OnUnpinch;
         }
 
         private void UpdateChirality()
@@ -104,7 +104,7 @@ namespace Leap.Unity.Preview.Locomotion
             bool isFacingObjectValue = _isFacingObject.ValueThisFrame;
             if (!IsSelected)
             {
-                if (!isFacingObjectValue && handRayInteractor.handRay.HandRayEnabled && !_pinchDetector.IsPinching)
+                if (!isFacingObjectValue && handRayInteractor.handRay.HandRayEnabled && !_pinchDetector.IsDoingAction)
                 {
                     SelectTeleport(true);
                 }
@@ -194,7 +194,7 @@ namespace Leap.Unity.Preview.Locomotion
 
             if (_pinchDetector == null)
             {
-                _pinchDetector = GetComponentInChildren<LightweightPinchDetector>(true);
+                _pinchDetector = GetComponentInChildren<PinchDetector>(true);
             }
         }
     }

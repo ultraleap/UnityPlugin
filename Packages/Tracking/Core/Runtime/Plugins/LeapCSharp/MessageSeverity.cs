@@ -6,7 +6,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-namespace Leap
+namespace Ultraleap
 {
     /// <summary>
     /// Reports whether the message is for

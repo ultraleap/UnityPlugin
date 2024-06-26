@@ -13,7 +13,7 @@ using System.IO;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-namespace Leap.Unity
+namespace Ultraleap
 {
     public static class Utils
     {
@@ -89,7 +89,7 @@ namespace Leap.Unity
         {
             for (int i = 0; i < list.Count; i++)
             {
-                Leap.Unity.Utils.Swap(list, i, UnityEngine.Random.Range(i, list.Count));
+                Ultraleap.Utils.Swap(list, i, UnityEngine.Random.Range(i, list.Count));
             }
         }
 
@@ -850,14 +850,14 @@ namespace Leap.Unity
 
         public static bool IsBetween(this float f, float f0, float f1)
         {
-            if (f0 > f1) Leap.Unity.Utils.Swap(ref f0, ref f1);
+            if (f0 > f1) Ultraleap.Utils.Swap(ref f0, ref f1);
 
             return f0 <= f && f <= f1;
         }
 
         public static bool IsBetween(this double d, double d0, double d1)
         {
-            if (d0 > d1) Leap.Unity.Utils.Swap(ref d0, ref d1);
+            if (d0 > d1) Ultraleap.Utils.Swap(ref d0, ref d1);
 
             return d0 <= d && d <= d1;
         }
@@ -1198,6 +1198,111 @@ namespace Leap.Unity
 #endif
         }
 
+        /// <summary>
+        /// Try to get all components of type from the provided Component's GameObject
+        /// </summary>
+        public static bool TryGetComponents<T>(this Component source, out T[] components)
+        {
+            if(source.TryGetComponent<T>(out _))
+            {
+                components = source.GetComponents<T>();
+                return true;
+            }
+
+            components = default;
+            return false;
+        }
+
+        /// <summary>
+        /// Try to get the given component of type from the provided Component's Parent
+        /// </summary>
+        public static bool TryGetComponentInParent<T>(this Component source, out T component)
+        {
+            if(source.transform.parent != null)
+            {
+                return source.transform.parent.TryGetComponent(out component);
+            }
+
+            component = default;
+            return false;
+        }
+
+        /// <summary>
+        /// Try to get the given components of type from the provided Component's Parent
+        /// </summary>
+        public static bool TryGetComponentsInParent<T>(this Component source, out T[] components)
+        {
+            if (source.transform.parent != null)
+            {
+                return source.transform.parent.TryGetComponents(out components);
+            }
+
+            components = default;
+            return false;
+        }
+
+        /// <summary>
+        /// Try to get the given component of type from the provided Component's self or children
+        /// </summary>
+        public static bool TryGetComponentInChildren<T>(this Component source, out T component, bool includeSelf = true, bool includeInactive = false)
+        {
+            if(!source.gameObject.activeInHierarchy && !includeInactive) // No children can be active either
+            {
+                component = default;
+                return false;
+            }
+
+            if(includeSelf && source.TryGetComponent(out component))
+            {
+                return true;
+            }
+            else
+            {
+                foreach(Transform child in source.transform)
+                {
+                    component = child.GetComponentInChildren<T>(includeInactive);
+
+                    if(component != null)
+                    {
+                        return true;
+                    }
+                }
+            }    
+
+            component = default;
+            return false;
+        }
+
+        /// <summary>
+        /// Try to get the given component of type from the provided Component's self or children
+        /// </summary>
+        public static bool TryGetComponentsInChildren<T>(this Component source, out T[] components, bool includeSelf = true, bool includeInactive = false)
+        {
+            if(includeSelf)
+            {
+                components = source.GetComponentsInChildren<T>(includeInactive);
+                return components != null;
+            }
+            else
+            {
+                List<T> componentList = new List<T>();
+
+                foreach (Transform child in source.transform)
+                {
+                    componentList.AddRange(child.GetComponentsInChildren<T>(includeInactive));
+                }
+
+                if(componentList.Count > 0)
+                {
+                    components = componentList.ToArray();
+                    return true;
+                }
+            }
+
+            components = default;
+            return false;
+        }
+
         #endregion
 
         #region Transform Utils
@@ -1308,11 +1413,11 @@ namespace Leap.Unity
             return null;
         }
 
-        /// <summary> Returns the first child whose name includes the 'withName' argument string. Optionally pass caseSensitive: false to ignore case. Children are scanned deeply using Leap.Unity.Utils.GetAllChildren. If no such child exists, returns null. </summary>
+        /// <summary> Returns the first child whose name includes the 'withName' argument string. Optionally pass caseSensitive: false to ignore case. Children are scanned deeply using Ultraleap.Utils.GetAllChildren. If no such child exists, returns null. </summary>
         public static Transform FindChild(this Transform t, string withName,
           bool caseSensitive = true)
         {
-            var children = Leap.Unity.Utils.Require(ref _b_findChildBuffer);
+            var children = Ultraleap.Utils.Require(ref _b_findChildBuffer);
             children.Clear();
             t.GetAllChildren(children);
             if (!caseSensitive) { withName = withName.ToLower(); }
@@ -1723,7 +1828,7 @@ namespace Leap.Unity
         /// Fills the provided bytes buffer starting at the offset with a compressed form
         /// of the argument quaternion. The offset is also shifted by 4 bytes.
         /// 
-        /// Use Leap.Unity.Utils.DecompressBytesToQuat to decode this representation. This encoding ONLY
+        /// Use Ultraleap.Utils.DecompressBytesToQuat to decode this representation. This encoding ONLY
         /// works with normalized Quaternions, taking advantage of the fact that their
         /// components sum to 1 to only encode three of Quaternion components. As a result,
         /// this method encodes a Quaternion as a single unsigned integer (4 bytes).
@@ -1803,10 +1908,10 @@ namespace Leap.Unity
 
         /// <summary>
         /// Reads 4 bytes from the argument bytes array (starting at the provided offset) and
-        /// returns a Quaternion as encoded by the Leap.Unity.Utils.CompressedQuatToBytes function. Also
+        /// returns a Quaternion as encoded by the Ultraleap.Utils.CompressedQuatToBytes function. Also
         /// increments the provided offset by 4.
         /// 
-        /// See the Leap.Unity.Utils.CompressedQuatToBytes documentation for more details on the
+        /// See the Ultraleap.Utils.CompressedQuatToBytes documentation for more details on the
         /// byte representation this method expects.
         /// 
         /// Sources:

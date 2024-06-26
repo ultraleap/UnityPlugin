@@ -6,17 +6,15 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity;
+using Ultraleap;
 
 using System.Linq;
 using UnityEngine;
 
-namespace Leap.Examples
+namespace Ultraleap.Examples
 {
-
     public class InertiaPostProcessProvider : PostProcessProvider
     {
-
         [Header("Inertia")]
 
         [Tooltip("Higher stiffness will keep the bouncy hand closer to the tracked hand data.")]
@@ -75,7 +73,6 @@ namespace Leap.Examples
                 processHand(leftHand, ref _leftPose, ref _previousLeftPose, ref _leftAge);
                 processHand(rightHand, ref _rightPose, ref _previousRightPose, ref _rightAge);
             }
-
         }
 
         private void processHand(Hand hand,

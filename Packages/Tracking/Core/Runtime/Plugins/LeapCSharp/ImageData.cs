@@ -8,7 +8,7 @@
 
 namespace LeapInternal
 {
-    using Leap;
+    using Ultraleap;
     using System;
 
     public class ImageData

@@ -14,7 +14,7 @@ using UnityEditor.Animations;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace Leap.Unity.Recording
+namespace Ultraleap.Recording
 {
     public class HandRecorder : MonoBehaviour
     {

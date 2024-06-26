@@ -84,7 +84,7 @@ Material:
     - _useLighting: 1
     - _useOutline: 1
     m_Colors:
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 1.4980392, g: 1.4980392, b: 1.4980392, a: 0.039215688}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _FresnelColor: {r: 22.408676, g: 22.408676, b: 22.408676, a: 0.09803922}
     - _MainColor: {r: 1.4980392, g: 1.4980392, b: 1.4980392, a: 0.039215688}

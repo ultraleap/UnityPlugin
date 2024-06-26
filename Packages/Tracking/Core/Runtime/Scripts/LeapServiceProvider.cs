@@ -13,7 +13,7 @@ using System.ComponentModel;
 using System.Linq;
 using UnityEngine;
 
-namespace Leap.Unity
+namespace Ultraleap
 {
     using Attributes;
 

@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Leap.Unity
+namespace Ultraleap
 {
     /**
      * A HandModel that draws lines for the bones in the hand and its fingers.
@@ -96,10 +96,10 @@ namespace Leap.Unity
 
             for (int f = 0; f < 5; f++)
             { //Fingers
-                Finger finger = hand.Fingers[f];
+                Finger finger = hand.fingers[f];
                 for (int i = 0; i < 4; ++i)
                 {
-                    Bone bone = finger.Bone((Bone.BoneType)i);
+                    Bone bone = finger.GetBone((Bone.BoneType)i);
                     Debug.DrawLine(bone.PrevJoint, bone.PrevJoint + bone.Direction * bone.Length, colors[i]);
                     if (VisualizeBasis)
                         DrawBasis(bone.PrevJoint, bone.Basis, .01f);

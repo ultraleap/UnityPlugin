@@ -6,15 +6,15 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity.Attributes;
+using Ultraleap.Attributes;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Leap.Unity
+namespace Ultraleap
 {
     /// <summary>
     /// The CapsuleHand is a basic Leap hand model that generates a set of spheres and 
-    /// cylinders to render hands using Leap hand data.
+    /// cylinders to render hands using Ultraleap hand data.
     /// It is constructed dynamically rather than using pre-existing geometry which
     /// allows hand visuals to scale to the size of the users hand and 
     /// is a reliable way to visualize the raw tracking data.
@@ -45,7 +45,7 @@ namespace Leap.Unity
 
         private const int TOTAL_JOINT_COUNT = 4 * 5;
         private const float CYLINDER_MESH_RESOLUTION = 0.1f; //in centimeters, meshes within this resolution will be re-used
-        private const int PINKY_BASE_INDEX = (int)Finger.FingerType.TYPE_PINKY * 4;
+        private const int PINKY_BASE_INDEX = (int)Finger.FingerType.PINKY * 4;
 
         private static int _leftColorIndex = 0;
         private static int _rightColorIndex = 0;
@@ -130,7 +130,7 @@ namespace Leap.Unity
                 if (_sphereColors == null)
                 {
                     _sphereColors = new Color[32];
-                    Leap.Unity.Utils.Fill(_sphereColors, SphereColour);
+                    Ultraleap.Utils.Fill(_sphereColors, SphereColour);
                 }
                 return _sphereColors;
             }
@@ -361,7 +361,7 @@ namespace Leap.Unity
             }
 
             //Update all joint spheres in the fingers
-            foreach (var finger in _hand.Fingers)
+            foreach (var finger in _hand.fingers)
             {
                 for (int j = 0; j < 4; j++)
                 {
@@ -369,14 +369,14 @@ namespace Leap.Unity
 
 
                     Vector3 position;
-                    if (finger.Type == Finger.FingerType.TYPE_THUMB && j == 0)
+                    if (finger.Type == Finger.FingerType.THUMB && j == 0)
                     {
                         // Hand the base of the thumb differently, and move it to the base of the index metacarpal.
-                        position = _hand.GetIndex().Bone((Bone.BoneType)j).PrevJoint;
+                        position = _hand.Index.GetBone((Bone.BoneType)j).PrevJoint;
                     }
                     else
                     {
-                        position = finger.Bone((Bone.BoneType)j).NextJoint;
+                        position = finger.GetBone((Bone.BoneType)j).NextJoint;
                     }
 
                     _spherePositions[key] = position;
@@ -438,8 +438,8 @@ namespace Leap.Unity
 
             if (_showPinkyMetacarpal)
             {
-                Vector3 pinkyMetacarpal = _hand.GetPinky().Bone(Bone.BoneType.TYPE_METACARPAL).PrevJoint;
-                Vector3 indexMetacarpal = _hand.GetIndex().Bone(Bone.BoneType.TYPE_METACARPAL).PrevJoint;
+                Vector3 pinkyMetacarpal = _hand.Pinky.GetBone(Bone.BoneType.METACARPAL).PrevJoint;
+                Vector3 indexMetacarpal = _hand.Index.GetBone(Bone.BoneType.METACARPAL).PrevJoint;
 
                 drawSphere(pinkyMetacarpal);
                 drawCylinder(pinkyMetacarpal, indexMetacarpal);

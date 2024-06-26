@@ -10,7 +10,7 @@ using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
 
-namespace Leap.Unity.InputModule
+namespace Ultraleap.InputModule
 {
 
     [CustomEditor(typeof(CompressibleUI))]
