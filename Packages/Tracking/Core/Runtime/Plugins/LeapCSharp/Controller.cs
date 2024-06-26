@@ -863,6 +863,26 @@ namespace Leap
             _connection.GetInterpolatedFrameFromTime(toFill, time, sourceTime, device);
         }
 
+        public UnityEngine.Matrix4x4 LeapExtrinsicCameraMatrix(Image.CameraType camera, Device device)
+        {
+            return _connection.LeapExtrinsicCameraMatrix(camera, device);
+        }
+
+        public UnityEngine.Vector3 RectilinearToPixel(Image.CameraType camera, UnityEngine.Vector3 ray)
+        {
+            return _connection.RectilinearToPixel(camera, ray);
+        }
+
+        public UnityEngine.Vector3 RectilinearToPixelEx(Image.CameraType camera, UnityEngine.Vector3 ray, Device device)
+        {
+            return _connection.RectilinearToPixelEx(device.Handle, camera, ray);
+        }
+
+        public UnityEngine.Vector3 PixelToRectilinearEx(Image.CameraType camera, UnityEngine.Vector3 pixel, Device device)
+        {
+            return _connection.PixelToRectilinearEx(device.Handle, camera, pixel);
+        }
+
         /// <summary>
         /// Returns a timestamp value as close as possible to the current time.
         /// Values are in microseconds, as with all the other timestamp values.

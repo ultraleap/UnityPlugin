@@ -14,9 +14,6 @@ namespace LeapInternal
     {
         public static readonly float MM_TO_M = 1e-3f;
 
-        public static bool leapToUnityTransformSet = false;
-        private static LeapTransform leapToUnityTransform;
-
         /**
          * Provides a static LeapTransform that converts from Leap units and coordinates to Unity
          */
@@ -24,12 +21,8 @@ namespace LeapInternal
         {
             get
             {
-                if (!leapToUnityTransformSet)
-                {
-                    leapToUnityTransform = new LeapTransform(Vector3.zero, Quaternion.identity, new Vector3(MM_TO_M, MM_TO_M, MM_TO_M));
-                    leapToUnityTransform.MirrorZ();
-                    leapToUnityTransformSet = true;
-                }
+                LeapTransform leapToUnityTransform = new LeapTransform(Vector3.zero, Quaternion.identity, new Vector3(MM_TO_M, MM_TO_M, MM_TO_M));
+                leapToUnityTransform.MirrorZ();
 
                 return leapToUnityTransform;
             }

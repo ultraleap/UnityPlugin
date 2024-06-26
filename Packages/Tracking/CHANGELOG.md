@@ -6,6 +6,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
 
+## [6.15.1] - 26/06/2024
+
+### Tracking Client versions
+- Windows 	v6.0.0
+- MacOS 	v6.0.0
+- Android 	v6.0.0
+
+### Added
+- Support for reading the camera matrix
+
+### Changed
+- Improved XRHands support for Meta Aim Input Actions
+
+### Fixed
+- Issue with the method signature for LeapPixelToRectilinearEx
+- Duplicate meta aim hands when using XRHands Input
+- Editor stuck in infinite loop when no service running
+- Caching issue with LeapToUnityTransform which causes the hand to be flipped on the Z axis. 
+
 ## [6.15.0] - 19/04/24
 
 ### Tracking Client versions
@@ -64,7 +83,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - OpenXR API Layer Service query intent was missing sometimes, preventing API layers functioning correctly
 - OpenXR checks minSdkVersion rather than targetSdkVersion for query intents
 - (Physical Hands) PhysHands Settings are not localized when using decimals
-
 
 ## [6.14.0] - 24/01/24
 

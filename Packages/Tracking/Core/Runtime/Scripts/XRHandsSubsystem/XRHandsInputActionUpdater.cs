@@ -70,9 +70,16 @@ namespace Leap.Unity.InputActions
             // Create meta hands if required
             if (ultraleapSettings.updateMetaInputSystem)
             {
-                MetaAimHand.left = MetaAimHand.CreateHand(UnityEngine.XR.InputDeviceCharacteristics.Left);
-                MetaAimHand.right = MetaAimHand.CreateHand(UnityEngine.XR.InputDeviceCharacteristics.Right);
+                if (MetaAimHand.left == null)
+                {
+                    MetaAimHand.left = MetaAimHand.CreateHand(UnityEngine.XR.InputDeviceCharacteristics.Left);
+                }
+                if (MetaAimHand.right == null)
+                {
+                    MetaAimHand.right = MetaAimHand.CreateHand(UnityEngine.XR.InputDeviceCharacteristics.Right);
+                }
             }
+
 
             SetupDefaultStateGetters();
 
@@ -192,7 +199,15 @@ namespace Leap.Unity.InputActions
                 InputSystem.QueueDeltaStateEvent(metaAimHand.trackingState, UnityEngine.XR.InputTrackingState.Position | UnityEngine.XR.InputTrackingState.Rotation);
                 InputSystem.QueueDeltaStateEvent(metaAimHand.isTracked, true);
 
-                InputSystem.QueueDeltaStateEvent(metaAimHand.indexPressed, state.activating > 0.5f ? true : false);
+                InputSystem.QueueDeltaStateEvent(metaAimHand.indexPressed, hand.CalculatePinchDistance(XRHandJointID.IndexTip) < 0.02f ? true : false);
+                InputSystem.QueueDeltaStateEvent(metaAimHand.middlePressed, hand.CalculatePinchDistance(XRHandJointID.MiddleTip) < 0.02f ? true : false);
+                InputSystem.QueueDeltaStateEvent(metaAimHand.ringPressed, hand.CalculatePinchDistance(XRHandJointID.RingTip) < 0.02f ? true : false);
+                InputSystem.QueueDeltaStateEvent(metaAimHand.littlePressed, hand.CalculatePinchDistance(XRHandJointID.LittleTip) < 0.02f ? true : false);
+
+                InputSystem.QueueDeltaStateEvent(metaAimHand.pinchStrengthIndex, hand.CalculatePinchStrength(XRHandJointID.IndexTip));
+                InputSystem.QueueDeltaStateEvent(metaAimHand.pinchStrengthMiddle, hand.CalculatePinchStrength(XRHandJointID.MiddleTip));
+                InputSystem.QueueDeltaStateEvent(metaAimHand.pinchStrengthRing, hand.CalculatePinchStrength(XRHandJointID.RingTip));
+                InputSystem.QueueDeltaStateEvent(metaAimHand.pinchStrengthLittle, hand.CalculatePinchStrength(XRHandJointID.LittleTip));
 
                 InputSystem.QueueDeltaStateEvent(metaAimHand.devicePosition, state.aimPosition);
                 InputSystem.QueueDeltaStateEvent(metaAimHand.deviceRotation, state.aimDirection);
@@ -239,12 +254,12 @@ namespace Leap.Unity.InputActions
 
         static float GetSelecting(XRHand hand)
         {
-            return CalculateGrabStrength(hand) > 0.8 ? 1 : 0;
+            return hand.CalculateGrabStrength() > 0.8 ? 1 : 0;
         }
 
         static float GetActvating(XRHand hand)
         {
-            return CalculatePinchStrength(hand, CalculateHandScale(hand)) > 0.8 ? 1 : 0;
+            return hand.CalculatePinchDistance() < 0.02f ? 1 : 0;
         }
 
         static Vector3 GetPalmPosition(XRHand hand)
@@ -269,7 +284,7 @@ namespace Leap.Unity.InputActions
 
         static Vector3 GetAimPosition(XRHand hand)
         {
-            return GetStablePinchPosition(hand);
+            return hand.GetStablePinchPosition();
         }
 
         static Quaternion GetAimDirection(XRHand hand)
@@ -279,14 +294,14 @@ namespace Leap.Unity.InputActions
 
         static Vector3 GetPinchPosition(XRHand hand)
         {
-            return GetStablePinchPosition(hand);
+            return hand.GetStablePinchPosition();
         }
 
         static Quaternion GetPinchDirection(XRHand hand)
         {
             if (hand.GetJoint(XRHandJointID.IndexProximal).TryGetPose(out Pose proximalPose))
             {
-                return Quaternion.LookRotation(GetStablePinchPosition(hand) - proximalPose.position).normalized;
+                return Quaternion.LookRotation(hand.GetStablePinchPosition() - proximalPose.position).normalized;
             }
 
             return Quaternion.identity;
@@ -324,7 +339,7 @@ namespace Leap.Unity.InputActions
             direction += (Vector3.right * (hand.handedness == Handedness.Left ? -0.1f : 0.1f));
 
             // Use the shoulder position to determine an aim direction
-            direction = GetStablePinchPosition(hand) - direction;
+            direction = hand.GetStablePinchPosition() - direction;
 
             return Quaternion.LookRotation(direction);
         }
@@ -337,8 +352,15 @@ namespace Leap.Unity.InputActions
         {
             if (ultraleapSettings.updateMetaInputSystem)
             {
-                MetaAimHand.CreateHand(UnityEngine.XR.InputDeviceCharacteristics.Left);
-                MetaAimHand.CreateHand(UnityEngine.XR.InputDeviceCharacteristics.Right);
+                if (MetaAimHand.left == null)
+                {
+                    MetaAimHand.CreateHand(UnityEngine.XR.InputDeviceCharacteristics.Left);
+                }
+
+                if (MetaAimHand.right == null)
+                {
+                    MetaAimHand.CreateHand(UnityEngine.XR.InputDeviceCharacteristics.Right);
+                }
             }
 
             if (ultraleapSettings.updateLeapInputSystem)
@@ -431,215 +453,6 @@ namespace Leap.Unity.InputActions
 
         public static LeapHandStateDelegates leftHandStateDelegates;
         public static LeapHandStateDelegates rightHandStateDelegates;
-
-        #endregion
-
-        #region Hand utils
-
-        static float CalculateGrabStrength(XRHand hand)
-        {
-            // magic numbers so it approximately lines up with the leap results
-            const float bendZero = 0.25f;
-            const float bendOne = 0.85f;
-
-            // Find the minimum bend angle for the non-thumb fingers.
-            float minBend = float.MaxValue;
-
-            Vector3 handRadialAxis = GetHandRadialAxis(hand);
-            Vector3 handDistalAxis = GetHandDistalAxis(hand);
-
-            minBend = Mathf.Min(GetFingerStrength(hand.GetJoint(XRHandJointID.IndexIntermediate), handRadialAxis, handDistalAxis), minBend);
-            minBend = Mathf.Min(GetFingerStrength(hand.GetJoint(XRHandJointID.MiddleIntermediate), handRadialAxis, handDistalAxis), minBend);
-            minBend = Mathf.Min(GetFingerStrength(hand.GetJoint(XRHandJointID.RingIntermediate), handRadialAxis, handDistalAxis), minBend);
-            minBend = Mathf.Min(GetFingerStrength(hand.GetJoint(XRHandJointID.LittleIntermediate), handRadialAxis, handDistalAxis), minBend);
-
-            // Return the grab strength.
-            return Mathf.Clamp01((minBend - bendZero) / (bendOne - bendZero));
-        }
-
-        static float GetFingerStrength(XRHandJoint midJoint, Vector3 radialAxis, Vector3 distalAxis)
-        {
-            if (midJoint.id == XRHandJointID.ThumbProximal)
-            {
-                return Vector3.Dot(FingerDirection(midJoint), -radialAxis).Map(-1, 1, 0, 1);
-            }
-
-            return Vector3.Dot(FingerDirection(midJoint), -distalAxis).Map(-1, 1, 0, 1);
-        }
-
-        static Vector3 FingerDirection(XRHandJoint midJoint)
-        {
-            if (midJoint.TryGetPose(out Pose midJointPose))
-            {
-                return midJointPose.forward;
-            }
-            else
-            {
-                return Vector3.zero;
-            }
-        }
-
-        static Vector3 GetHandRadialAxis(XRHand hand)
-        {
-            Quaternion rotation = hand.rootPose.rotation;
-            float d = rotation.x * rotation.x + rotation.y * rotation.y + rotation.z * rotation.z + rotation.w * rotation.w;
-            float s = 2.0f / d;
-            float ys = rotation.y * s, zs = rotation.z * s;
-            float wy = rotation.w * ys, wz = rotation.w * zs;
-            float xy = rotation.x * ys, xz = rotation.x * zs;
-            float yy = rotation.y * ys, zz = rotation.z * zs;
-
-            Vector3 xBasis = new Vector3(1.0f - (yy + zz), xy + wz, xz - wy);
-
-            if (hand.handedness == Handedness.Left)
-            {
-                return xBasis;
-            }
-            else
-            {
-                return -xBasis;
-            }
-        }
-
-        static Vector3 GetHandDistalAxis(XRHand hand)
-        {
-            Quaternion rotation = hand.rootPose.rotation;
-            float d = rotation.x * rotation.x + rotation.y * rotation.y + rotation.z * rotation.z + rotation.w * rotation.w;
-            float s = 2.0f / d;
-            float xs = rotation.x * s, ys = rotation.y * s, zs = rotation.z * s;
-            float wx = rotation.w * xs, wy = rotation.w * ys;
-            float xx = rotation.x * xs, xz = rotation.x * zs;
-            float yy = rotation.y * ys, yz = rotation.y * zs;
-
-            Vector3 zBasis = new Vector3(xz + wy, yz - wx, 1.0f - (xx + yy));
-            return zBasis;
-        }
-
-        static float CalculatePinchStrength(XRHand hand, float handScale)
-        {
-            // Get the thumb position.
-            Vector3 thumbTip = Vector3.zero;
-            if (hand.GetJoint(XRHandJointID.ThumbTip).TryGetPose(out Pose thumbTipPose)) thumbTip = thumbTipPose.position;
-
-            // Compute the distance midpoints between the thumb and the each finger and find the smallest.
-            float minDistanceSquared = float.MaxValue;
-
-            // Iterate through the fingers, skipping the thumb.
-            for (var i = 1; i < 5; ++i)
-            {
-                Pose fingerTipPose;
-                Vector3 fingerTip = Vector3.zero;
-
-                switch (i)
-                {
-                    case 1:
-                        if (hand.GetJoint(XRHandJointID.IndexTip).TryGetPose(out fingerTipPose)) fingerTip = fingerTipPose.position;
-                        break;
-                    case 2:
-                        if (hand.GetJoint(XRHandJointID.MiddleTip).TryGetPose(out fingerTipPose)) fingerTip = fingerTipPose.position;
-                        break;
-                    case 3:
-                        if (hand.GetJoint(XRHandJointID.RingTip).TryGetPose(out fingerTipPose)) fingerTip = fingerTipPose.position;
-                        break;
-                    case 4:
-                        if (hand.GetJoint(XRHandJointID.LittleTip).TryGetPose(out fingerTipPose)) fingerTip = fingerTipPose.position;
-                        break;
-                    default:
-                        break;
-                }
-
-                float distanceSquared = (fingerTip - thumbTip).sqrMagnitude;
-                minDistanceSquared = Mathf.Min(distanceSquared, minDistanceSquared);
-            }
-
-            // Compute the pinch strength. Magic values taken from existing LeapC implementation (scaled to metres)
-            float distanceZero = 0.0600f * handScale;
-            float distanceOne = 0.0220f * handScale;
-            return Mathf.Clamp01((Mathf.Sqrt(minDistanceSquared) - distanceZero) / (distanceOne - distanceZero));
-        }
-
-        static Vector3 GetStablePinchPosition(XRHand hand)
-        {
-            Vector3 indexTip = Vector3.zero;
-            Vector3 thumbTip = Vector3.zero;
-
-            if (hand.GetJoint(XRHandJointID.IndexDistal).TryGetPose(out Pose indexTipPose)) indexTip = indexTipPose.position;
-            if (hand.GetJoint(XRHandJointID.ThumbDistal).TryGetPose(out Pose thumbTipPose)) thumbTip = thumbTipPose.position;
-            return Vector3.Lerp(indexTip, thumbTip, 0.75f);
-        }
-
-        static float GetMetacarpalLength(XRHand hand, int fingerIndex)
-        {
-            float length = 0;
-
-            Pose metacarpal = new Pose();
-            Pose proximal = new Pose();
-
-            bool positionsValid = false;
-
-            switch (fingerIndex)
-            {
-                case 0:
-                    if (hand.GetJoint(XRHandJointID.ThumbProximal).TryGetPose(out proximal) &&
-                        hand.GetJoint(XRHandJointID.ThumbMetacarpal).TryGetPose(out metacarpal))
-                    {
-                        positionsValid = true;
-                    }
-                    break;
-                case 1:
-                    if (hand.GetJoint(XRHandJointID.IndexProximal).TryGetPose(out proximal) &&
-                        hand.GetJoint(XRHandJointID.IndexMetacarpal).TryGetPose(out metacarpal))
-                    {
-                        positionsValid = true;
-                    }
-                    break;
-                case 2:
-                    if (hand.GetJoint(XRHandJointID.MiddleProximal).TryGetPose(out proximal) &&
-                        hand.GetJoint(XRHandJointID.MiddleMetacarpal).TryGetPose(out metacarpal))
-                    {
-                        positionsValid = true;
-                    }
-                    break;
-                case 3:
-                    if (hand.GetJoint(XRHandJointID.RingProximal).TryGetPose(out proximal) &&
-                        hand.GetJoint(XRHandJointID.RingMetacarpal).TryGetPose(out metacarpal))
-                    {
-                        positionsValid = true;
-                    }
-                    break;
-                case 4:
-                    if (hand.GetJoint(XRHandJointID.LittleProximal).TryGetPose(out proximal) &&
-                        hand.GetJoint(XRHandJointID.LittleMetacarpal).TryGetPose(out metacarpal))
-                    {
-                        positionsValid = true;
-                    }
-                    break;
-                default:
-                    break;
-            }
-
-            if (positionsValid)
-            {
-                length += (metacarpal.position - proximal.position).magnitude;
-            }
-
-            return length;
-        }
-
-        static float CalculateHandScale(XRHand hand)
-        {
-            // Iterate through the fingers, skipping the thumb and accumulate the scale.
-            float scale = 0.0f;
-
-            // Magic numbers for default metacarpal lengths
-            //{ 0, 0.06812f, 0.06460f, 0.05800f, 0.05369f }
-            scale += (GetMetacarpalLength(hand, 1) / 0.06812f) / 4.0f;
-            scale += (GetMetacarpalLength(hand, 2) / 0.06460f) / 4.0f;
-            scale += (GetMetacarpalLength(hand, 3) / 0.05800f) / 4.0f;
-            scale += (GetMetacarpalLength(hand, 4) / 0.05369f) / 4.0f;
-
-            return scale;
-        }
 
         #endregion
     }
