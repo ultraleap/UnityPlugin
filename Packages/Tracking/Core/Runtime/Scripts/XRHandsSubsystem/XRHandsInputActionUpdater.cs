@@ -66,6 +66,19 @@ namespace Ultraleap.InputActions
 
             currentSubsystem.updatedHands -= UpdateHands;
             currentSubsystem.updatedHands += UpdateHands;
+          
+            // Create meta hands if required
+            if (ultraleapSettings.updateMetaInputSystem)
+            {
+                if (MetaAimHand.left == null)
+                {
+                    MetaAimHand.left = MetaAimHand.CreateHand(UnityEngine.XR.InputDeviceCharacteristics.Left);
+                }
+                if (MetaAimHand.right == null)
+                {
+                    MetaAimHand.right = MetaAimHand.CreateHand(UnityEngine.XR.InputDeviceCharacteristics.Right);
+                }
+            }
 
             SetupDefaultStateGetters();
 

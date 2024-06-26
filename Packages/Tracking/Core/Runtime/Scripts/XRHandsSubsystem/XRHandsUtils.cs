@@ -6,6 +6,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
+
 using UnityEngine;
 using UnityEngine.XR.Hands;
 

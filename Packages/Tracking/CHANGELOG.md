@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
 
-## [NEXT] - xx/xx/xx
+## [NEXT] - xx/xx/xxxx
 
 ### Tracking Client versions
 - Windows 	v6.0.0
@@ -14,7 +14,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Android 	v6.0.0
 
 ### Added
-- Support for reading the camera matrix
 - ImageRetriever allows more than 6 reconnections
 - New Pinch and Grab detection utilities
 - Option to fade hands on found/lost in HandEnableDisable component
@@ -30,7 +29,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - PhysicalHandsButton can now use primary hover functionality
 
 ### Changed
-- Improved XRHands support for Meta Aim Input Actions
 - XRLeapProviderManager renamed LEAP_DIRECT to ULTRALEAP
 - Accessors for Hand.Finger, Hand.Bone and Finger.Bone
 - Renamed BoneType enum entries to remove redundancies
@@ -51,10 +49,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Leap and Leap.Unity namespaces are now Ultraleap
 
 ### Fixed
+
+
+
+## [6.15.1] - 26/06/2024
+
+### Tracking Client versions
+- Windows 	v6.0.0
+- MacOS 	v6.0.0
+- Android 	v6.0.0
+
+### Added
+- Support for reading the camera matrix
+
+### Changed
+- Improved XRHands support for Meta Aim Input Actions
+
+### Fixed
 - Issue with the method signature for LeapPixelToRectilinearEx
 - Duplicate meta aim hands when using XRHands Input
-- A caching issue with LeapToUnityTransform
-- Editor stuck in unending loop when no service running
+- Editor stuck in infinite loop when no service running
+- Caching issue with LeapToUnityTransform which causes the hand to be flipped on the Z axis. 
+
 
 ## [6.15.0] - 19/04/24
 
