@@ -17,6 +17,8 @@ namespace Ultraleap.Attributes
     {
         float width = 20;
 
+
+#if UNITY_EDITOR
         public IndentAttribute()
         {
             width = 20;
@@ -36,5 +38,7 @@ namespace Ultraleap.Attributes
         {
             return width;
         }
+
+#endif
     }
 }
