@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Ultraleap.Examples
+namespace Leap.Examples
 {
     public class SpawnObjectAtPosition : MonoBehaviour
     {

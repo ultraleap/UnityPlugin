@@ -9,7 +9,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Ultraleap.Preview.HandRays
+namespace Leap.Preview.HandRays
 {
     /// <summary>
     /// Takes in a ray direction and casts it out in a parabolic curve

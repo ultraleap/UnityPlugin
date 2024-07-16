@@ -9,7 +9,7 @@
 using System;
 using UnityEngine;
 
-namespace Ultraleap.Preview.HandRays
+namespace Leap.Preview.HandRays
 {
     /// <summary>
     /// Calculates a far field hand ray based on the wrist, shoulder and pinch position.

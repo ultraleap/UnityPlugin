@@ -13,7 +13,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace Ultraleap
+namespace Leap
 {
     [CustomEditor(typeof(LeapServiceProvider))]
     public class LeapServiceProviderEditor : CustomEditorBase<LeapServiceProvider>

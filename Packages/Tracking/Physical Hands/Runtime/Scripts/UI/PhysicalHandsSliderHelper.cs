@@ -10,7 +10,7 @@ using System;
 using UnityEngine;
 
 
-namespace Ultraleap.PhysicalHands
+namespace Leap.PhysicalHands
 {
     /// <summary>
     /// This class is purely to get events from the slideable object.

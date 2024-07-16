@@ -12,7 +12,7 @@ using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
 
-namespace Ultraleap
+namespace Leap
 {
     [CustomPropertyDrawer(typeof(SerializableHashSetBase), useForChildren: true)]
     public class SerializableHashSetEditor : PropertyDrawer

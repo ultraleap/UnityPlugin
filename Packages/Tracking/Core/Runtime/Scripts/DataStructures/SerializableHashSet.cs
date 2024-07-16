@@ -12,7 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Ultraleap
+namespace Leap
 {
     public abstract class SerializableHashSetBase { }
 

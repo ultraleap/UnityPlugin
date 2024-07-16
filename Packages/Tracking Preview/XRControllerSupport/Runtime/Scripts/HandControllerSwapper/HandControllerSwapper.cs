@@ -9,7 +9,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Ultraleap.Controllers
+namespace Leap.Controllers
 {
     /// <summary>
     /// HandControllerSwapper is used to swap between controller input and hand input.

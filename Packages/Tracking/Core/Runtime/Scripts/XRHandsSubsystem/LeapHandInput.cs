@@ -15,7 +15,7 @@ using UnityEngine.InputSystem.Layouts;
 using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.InputSystem.Utilities;
 
-namespace Ultraleap.InputActions
+namespace Leap.InputActions
 {
     /// <summary>
     /// The structure used to pass hand data to InputDevices

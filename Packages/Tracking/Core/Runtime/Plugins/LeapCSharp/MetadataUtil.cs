@@ -13,7 +13,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 
-namespace Ultraleap
+namespace Leap
 {
     /// <summary>
     /// This class captures information regarding use of the Ultraleap Unity Plugin
@@ -74,8 +74,8 @@ namespace Ultraleap
             analytics.telemetry.app_type = GetAppType();
             analytics.telemetry.engine_name = "Unity";
             analytics.telemetry.engine_version = Application.unityVersion;
-            analytics.telemetry.plugin_version = Ultraleap.UltraleapSettings.Instance.PluginVersion;
-            analytics.telemetry.installation_source = Ultraleap.UltraleapSettings.Instance.PluginSource;
+            analytics.telemetry.plugin_version =  Leap.UltraleapSettings.Instance.PluginVersion;
+            analytics.telemetry.installation_source =  Leap.UltraleapSettings.Instance.PluginSource;
             analytics.telemetry.interaction_system = GetInteractionSystem();
             analytics.telemetry.render_pipeline = GetRenderPipeline();
 
@@ -148,9 +148,9 @@ namespace Ultraleap
             }
 
             // XR Hands
-            if (Ultraleap.UltraleapSettings.Instance.leapSubsystemEnabled ||
-                Ultraleap.UltraleapSettings.Instance.updateLeapInputSystem ||
-                Ultraleap.UltraleapSettings.Instance.updateMetaInputSystem)
+            if ( Leap.UltraleapSettings.Instance.leapSubsystemEnabled ||
+                 Leap.UltraleapSettings.Instance.updateLeapInputSystem ||
+                 Leap.UltraleapSettings.Instance.updateMetaInputSystem)
             {
                 return "UL XR Hands";
             }

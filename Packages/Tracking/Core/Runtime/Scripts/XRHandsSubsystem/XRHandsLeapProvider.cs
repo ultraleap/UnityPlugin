@@ -6,7 +6,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Ultraleap.Encoding;
+using Leap.Encoding;
 
 using System;
 using System.Collections.Generic;
@@ -16,10 +16,10 @@ using UnityEngine.SpatialTracking;
 using UnityEngine.XR.Hands;
 using UnityEngine.XR.Hands.Processing;
 
-namespace Ultraleap
+namespace Leap
 {
     /// <summary>
-    /// A LeapProvider that converts XRHands Subsystem data to a Ultraleap.Frame for use in features that use Ultraleap.Frame and LeapProviders as a data source.
+    /// A LeapProvider that converts XRHands Subsystem data to a  Leap.Frame for use in features that use  Leap.Frame and LeapProviders as a data source.
     /// </summary>
     public class XRHandsLeapProvider : LeapProvider
     {

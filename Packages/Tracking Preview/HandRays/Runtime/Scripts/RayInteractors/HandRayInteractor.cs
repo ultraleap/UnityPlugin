@@ -9,7 +9,7 @@
 using System;
 using UnityEngine;
 
-namespace Ultraleap.Preview.HandRays
+namespace Leap.Preview.HandRays
 {
     /// <summary>
     /// Abstract base class for HandRay Interactors

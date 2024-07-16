@@ -1,7 +1,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace Ultraleap.PhysicalHands
+namespace Leap.PhysicalHands
 {
     [CustomEditor(typeof(PhysicalHandsButtonToggle), true)]
     [CanEditMultipleObjects]

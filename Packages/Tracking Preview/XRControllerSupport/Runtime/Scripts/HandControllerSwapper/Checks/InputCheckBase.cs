@@ -11,7 +11,7 @@ using UnityEngine;
 using UnityEngine.InputSystem.XR;
 #endif
 
-namespace Ultraleap.Controllers
+namespace Leap.Controllers
 {
     /// <summary>
     /// InputCheckBase is the base class for all InputChecks.

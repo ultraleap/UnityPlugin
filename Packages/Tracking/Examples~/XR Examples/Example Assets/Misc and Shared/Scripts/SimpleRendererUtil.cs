@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Ultraleap.Examples
+namespace Leap.Examples
 {
     [RequireComponent(typeof(Renderer))]
     public class SimpleRendererUtil : MonoBehaviour

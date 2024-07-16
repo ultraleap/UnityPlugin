@@ -9,7 +9,7 @@
 using System.Collections;
 using UnityEngine;
 
-namespace Ultraleap.PhysicalHands
+namespace Leap.PhysicalHands
 {
     /// <summary>
     /// Class for toggling a button using physical hands.

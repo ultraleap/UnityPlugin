@@ -10,7 +10,7 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Ultraleap.InputModule
+namespace Leap.InputModule
 {
     [RequireComponent(typeof(SpriteRenderer))]
     public class UIInputCursor : MonoBehaviour

@@ -11,9 +11,9 @@ using System.Linq;
 
 using UnityEngine;
 
-using Ultraleap.PhysicalHands;
+using Leap.PhysicalHands;
 
-namespace Ultraleap.Examples
+namespace Leap.Examples
 {
     /// <summary>
     /// This simple script changes the color of an object as

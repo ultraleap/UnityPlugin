@@ -5,7 +5,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace Ultraleap.PhysicalHands
+namespace Leap.PhysicalHands
 {
     [InitializeOnLoad]
     internal class PhysicalHandsSettingsProvider

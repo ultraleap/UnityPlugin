@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Ultraleap.Preview.HandRays
+namespace Leap.Preview.HandRays
 {
     /// <summary>
     /// Assigns the correct layer to far field objects

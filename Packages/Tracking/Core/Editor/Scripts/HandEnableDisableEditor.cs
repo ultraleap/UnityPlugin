@@ -8,7 +8,7 @@
 
 using UnityEditor;
 
-namespace Ultraleap
+namespace Leap
 {
     [CanEditMultipleObjects]
     [CustomEditor(typeof(HandEnableDisable))]

@@ -6,15 +6,15 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Ultraleap.Attributes;
+using Leap.Attributes;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Ultraleap
+namespace Leap
 {
     /// <summary>
     /// The CapsuleHand is a basic Leap hand model that generates a set of spheres and 
-    /// cylinders to render hands using Ultraleap hand data.
+    /// cylinders to render hands using Leap hand data.
     /// It is constructed dynamically rather than using pre-existing geometry which
     /// allows hand visuals to scale to the size of the users hand and 
     /// is a reliable way to visualize the raw tracking data.
@@ -130,7 +130,7 @@ namespace Ultraleap
                 if (_sphereColors == null)
                 {
                     _sphereColors = new Color[32];
-                    Ultraleap.Utils.Fill(_sphereColors, SphereColour);
+                     Leap.Utils.Fill(_sphereColors, SphereColour);
                 }
                 return _sphereColors;
             }

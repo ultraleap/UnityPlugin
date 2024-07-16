@@ -9,7 +9,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-namespace Ultraleap.PhysicalHands
+namespace Leap.PhysicalHands
 {
     /// <summary>
     /// A representation of an object with an attached object which can be restricted relative to the users head
@@ -296,18 +296,18 @@ namespace Ultraleap.PhysicalHands
                 Vector3 centerPosition = _head.position;
                 centerPosition.y = Mathf.Clamp(this.transform.position.y, _head.position.y + minHeightFromHead, _head.position.y + maxHeightFromHead);
 
-                Ultraleap.Utils.DrawCircle(centerPosition, normal, maxHorizontalDistanceFromHead, grabBallRestrictionStatus.horizontalMax ? Color.green : Color.gray);
+                 Leap.Utils.DrawCircle(centerPosition, normal, maxHorizontalDistanceFromHead, grabBallRestrictionStatus.horizontalMax ? Color.green : Color.gray);
 
                 //Draw Horizontal Min Restriction
-                Ultraleap.Utils.DrawCircle(centerPosition, normal, minHorizontalDistanceFromHead, grabBallRestrictionStatus.horizontalMin ? Color.green : Color.gray);
+                 Leap.Utils.DrawCircle(centerPosition, normal, minHorizontalDistanceFromHead, grabBallRestrictionStatus.horizontalMin ? Color.green : Color.gray);
 
                 //Draw Height Max Restriction
                 centerPosition.y = _head.position.y + maxHeightFromHead;
-                Ultraleap.Utils.DrawCircle(centerPosition, normal, maxHorizontalDistanceFromHead, grabBallRestrictionStatus.heightMax ? Color.green : Color.gray);
+                 Leap.Utils.DrawCircle(centerPosition, normal, maxHorizontalDistanceFromHead, grabBallRestrictionStatus.heightMax ? Color.green : Color.gray);
 
                 //Draw Height Min Restriction
                 centerPosition.y = _head.position.y + minHeightFromHead;
-                Ultraleap.Utils.DrawCircle(centerPosition, normal, maxHorizontalDistanceFromHead, grabBallRestrictionStatus.heightMin ? Color.green : Color.gray);
+                 Leap.Utils.DrawCircle(centerPosition, normal, maxHorizontalDistanceFromHead, grabBallRestrictionStatus.heightMin ? Color.green : Color.gray);
             }
         }
 

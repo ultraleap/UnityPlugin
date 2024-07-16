@@ -1,6 +1,6 @@
 
-using Ultraleap;
-using Ultraleap.InputModule;
+using Leap;
+using Leap.InputModule;
 using UnityEditor;
 using UnityEngine;
 

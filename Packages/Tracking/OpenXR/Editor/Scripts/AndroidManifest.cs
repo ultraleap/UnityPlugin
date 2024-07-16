@@ -2,7 +2,7 @@ using JetBrains.Annotations;
 using System.Linq;
 using System.Xml.Linq;
 
-namespace Ultraleap.Tracking.OpenXR
+namespace Leap.Tracking.OpenXR
 {
     public class AndroidManifest
     {

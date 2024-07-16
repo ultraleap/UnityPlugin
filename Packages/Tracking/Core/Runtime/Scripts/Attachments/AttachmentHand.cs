@@ -6,7 +6,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Ultraleap.Attributes;
+using Leap.Attributes;
 using System;
 using System.Linq;
 #if UNITY_EDITOR
@@ -14,7 +14,7 @@ using UnityEditor;
 #endif
 using UnityEngine;
 
-namespace Ultraleap.Attachments
+namespace Leap.Attachments
 {
 
     /// <summary>

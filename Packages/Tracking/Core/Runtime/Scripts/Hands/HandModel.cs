@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Ultraleap
+namespace Leap
 {
     /// <summary>
     /// The base class for all hand models, both graphics and physics.

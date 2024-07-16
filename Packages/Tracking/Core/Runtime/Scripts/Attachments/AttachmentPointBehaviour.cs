@@ -6,18 +6,18 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Ultraleap.Attributes;
+using Leap.Attributes;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Ultraleap.Attachments
+namespace Leap.Attachments
 {
     /// <summary>
     /// Simple container class for storing a reference to the attachment point this
     /// transform corresponds to within an AttachmentHand. Also contains mappings from
-    /// a single AttachmentPointFlags flag constant to the relevant bone on a Ultraleap.Hand;
+    /// a single AttachmentPointFlags flag constant to the relevant bone on a  Leap.Hand;
     /// these mappings can be accessed statically via GetLeapHandPointData().
     /// 
     /// Can also be used to refer to a single AttachmentPointFlags flag constant (implicit conversion).
@@ -60,7 +60,7 @@ namespace Ultraleap.Attachments
             return p.attachmentPoint;
         }
 
-        public void SetTransformUsingHand(Ultraleap.Hand hand)
+        public void SetTransformUsingHand( Leap.Hand hand)
         {
             if (hand == null)
             {
@@ -76,7 +76,7 @@ namespace Ultraleap.Attachments
             this.transform.rotation = rotation;
         }
 
-        public static void GetLeapHandPointData(Ultraleap.Hand hand, AttachmentPointFlags singlePoint, out Vector3 position, out Quaternion rotation)
+        public static void GetLeapHandPointData( Leap.Hand hand, AttachmentPointFlags singlePoint, out Vector3 position, out Quaternion rotation)
         {
             position = Vector3.zero;
             rotation = Quaternion.identity;

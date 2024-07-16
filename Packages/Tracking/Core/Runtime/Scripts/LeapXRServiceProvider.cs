@@ -6,12 +6,12 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Ultraleap.Attributes;
+using Leap.Attributes;
 using System;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace Ultraleap
+namespace Leap
 {
     /// <summary>
     /// The LeapXRServiceProvider expands on the standard LeapServiceProvider to

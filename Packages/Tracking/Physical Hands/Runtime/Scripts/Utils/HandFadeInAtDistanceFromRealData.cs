@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Ultraleap.PhysicalHands
+namespace Leap.PhysicalHands
 {
     public class HandFadeInAtDistanceFromRealData : MonoBehaviour
     {
@@ -47,7 +47,7 @@ namespace Ultraleap.PhysicalHands
             if (hardContactHand != null && rendererToChange != null)
             {
                 Vector4 currentColor = rendererToChange.material.GetVector(shaderFadingColorName);
-                float mappedData = Ultraleap.Utils.Map01(hardContactHand.DistanceFromDataHand, 0, hardContactHand.hardContactParent.teleportDistance);
+                float mappedData =  Leap.Utils.Map01(hardContactHand.DistanceFromDataHand, 0, hardContactHand.hardContactParent.teleportDistance);
                 currentColor[3] = Mathf.Clamp01(mappedData) + 0.05f;
                 rendererToChange.material.SetVector(shaderFadingColorName, currentColor);
 

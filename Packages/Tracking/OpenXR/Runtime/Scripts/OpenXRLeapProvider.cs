@@ -1,14 +1,14 @@
-using Ultraleap;
-using Ultraleap.Encoding;
+using Leap;
+using Leap.Encoding;
 using System;
 using System.Collections.Generic;
 
 using UnityEngine;
 
-using Bone = Ultraleap.Bone;
-using Hand = Ultraleap.Hand;
+using Bone =  Leap.Bone;
+using Hand =  Leap.Hand;
 
-namespace Ultraleap.Tracking.OpenXR
+namespace Leap.Tracking.OpenXR
 {
     public class OpenXRLeapProvider : LeapProvider
     {

@@ -6,13 +6,13 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Ultraleap.Encoding;
+using Leap.Encoding;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Ultraleap
+namespace Leap
 {
     /// <summary>
     /// possible structure to implement our own aggregation code,
@@ -252,7 +252,7 @@ namespace Ultraleap
             }
 
             // joints
-            Ultraleap.Utils.Fill(mergedJointPositions, Vector3.zero);
+             Leap.Utils.Fill(mergedJointPositions, Vector3.zero);
             List<VectorHand> vectorHands = new List<VectorHand>();
             foreach (Hand hand in hands)
             {
@@ -644,7 +644,7 @@ namespace Ultraleap
 
             public void ClearAllPositions()
             {
-                Ultraleap.Utils.Fill(positions, Vector3.zero);
+                 Leap.Utils.Fill(positions, Vector3.zero);
             }
 
             public void AddPosition(Vector3 position, float time)
@@ -788,7 +788,7 @@ namespace Ultraleap
                 }
                 else
                 {
-                    Ultraleap.Utils.Fill(averageConfidences, 0);
+                     Leap.Utils.Fill(averageConfidences, 0);
                 }
 
                 for (int i = 0; i < averageConfidences.Length; i++)

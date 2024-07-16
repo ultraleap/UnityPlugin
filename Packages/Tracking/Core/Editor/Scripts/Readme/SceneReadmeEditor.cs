@@ -2,7 +2,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 
-namespace Ultraleap.Readme
+namespace Leap.Readme
 {
     [CustomEditor(typeof(SceneReadme))]
     [InitializeOnLoad]

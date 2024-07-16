@@ -12,7 +12,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace Ultraleap
+namespace Leap
 {
 
     [CustomPropertyDrawer(typeof(SingleLayer))]

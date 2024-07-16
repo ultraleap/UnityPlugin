@@ -1,5 +1,5 @@
-using Ultraleap;
-using Ultraleap.Controllers;
+using Leap;
+using Leap.Controllers;
 using System;
 using System.Collections;
 using System.Collections.Generic;

@@ -10,7 +10,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace Ultraleap.Examples.Preview
+namespace Leap.Examples.Preview
 {
     /// <summary>
     /// A script to display GUI displaying a URL in the Game window during editor

@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEditor;
 #endif
 
-namespace Ultraleap
+namespace Leap
 {
     public class HandPoseRecorder : MonoBehaviour
     {

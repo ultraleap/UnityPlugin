@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Ultraleap.PhysicalHands
+namespace Leap.PhysicalHands
 {
     public class HardContactHand : ContactHand
     {

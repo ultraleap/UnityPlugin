@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Ultraleap.Controllers
+namespace Leap.Controllers
 {
     /// <summary>
     /// DistanceBetweenInputs checks to see if the distance between inputs (i.e. distance between hands and controllers)

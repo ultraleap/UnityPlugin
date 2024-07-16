@@ -10,7 +10,7 @@
 using UnityEngine;
 using UnityEngine.XR.Hands;
 
-namespace Ultraleap
+namespace Leap
 {
     public static class XRHandsUtils
     {

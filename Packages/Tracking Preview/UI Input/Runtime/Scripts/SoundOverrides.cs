@@ -10,7 +10,7 @@ using System;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace Ultraleap.InputModule
+namespace Leap.InputModule
 {
     public class SoundOverrides : MonoBehaviour
     {

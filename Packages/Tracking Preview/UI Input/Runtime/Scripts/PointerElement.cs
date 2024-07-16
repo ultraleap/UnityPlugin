@@ -12,7 +12,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace Ultraleap.InputModule
+namespace Leap.InputModule
 {
     /// <summary>
     /// Representation of a pointer that can be controlled by the LeapInputModule

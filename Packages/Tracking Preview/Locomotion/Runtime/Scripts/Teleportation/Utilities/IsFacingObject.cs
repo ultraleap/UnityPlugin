@@ -6,12 +6,12 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Ultraleap.PhysicalHands;
-using Ultraleap.Preview.HandRays;
+using Leap.PhysicalHands;
+using Leap.Preview.HandRays;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Ultraleap.Preview.Locomotion
+namespace Leap.Preview.Locomotion
 {
     /// <summary>
     /// Small script that detects whether the user is facing an object this frame.

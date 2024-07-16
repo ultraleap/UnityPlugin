@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Ultraleap.HandsModule
+namespace Leap.HandsModule
 {
     /// <summary>
     /// This script makes it easy to swap between two hand meshes. 

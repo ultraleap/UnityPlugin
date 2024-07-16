@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Ultraleap.Controllers
+namespace Leap.Controllers
 {
     /// <summary>
     /// DistanceFromHead checks to see if the distance of the InputMethodType is less than or equal to the actionThreshold

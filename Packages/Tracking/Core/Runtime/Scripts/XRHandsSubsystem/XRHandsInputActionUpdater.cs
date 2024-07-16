@@ -13,7 +13,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Layouts;
 using UnityEngine.XR.Hands;
 
-namespace Ultraleap.InputActions
+namespace Leap.InputActions
 {
     /// <summary>
     /// Updates Ultraleap Input Actions with the latest available hand data

@@ -1,5 +1,5 @@
-using Ultraleap;
-using Ultraleap.InputModule;
+using Leap;
+using Leap.InputModule;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;

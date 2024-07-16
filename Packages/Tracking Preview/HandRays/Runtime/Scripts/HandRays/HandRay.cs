@@ -8,7 +8,7 @@
 using System;
 using UnityEngine;
 
-namespace Ultraleap.Preview.HandRays
+namespace Leap.Preview.HandRays
 {
     /// <summary>
     /// a HandRayDirection holds data about the hand and the corresponding ray.

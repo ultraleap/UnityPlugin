@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Ultraleap.HandsModule
+namespace Leap.HandsModule
 {
     /// <summary>
     /// The HandBinder allows you to use your own hand models so that they follow the leap tracking data.

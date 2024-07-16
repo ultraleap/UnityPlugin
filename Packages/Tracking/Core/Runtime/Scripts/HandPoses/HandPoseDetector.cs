@@ -5,7 +5,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace Ultraleap
+namespace Leap
 {
     public class HandPoseDetector : MonoBehaviour
     {

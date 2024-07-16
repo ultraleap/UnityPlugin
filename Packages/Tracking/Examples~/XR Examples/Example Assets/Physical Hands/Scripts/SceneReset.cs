@@ -9,7 +9,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace Ultraleap.PhysicalHands.Examples
+namespace Leap.PhysicalHands.Examples
 {
     /// <summary>
     /// This class is very specific for the Ultraleap demo scene and should not be used in your own scenes

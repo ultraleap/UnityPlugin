@@ -11,7 +11,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace Ultraleap.HandsModule
+namespace Leap.HandsModule
 {
     [CanEditMultipleObjects]
     [CustomEditor(typeof(HandBinder))]
@@ -484,7 +484,7 @@ namespace Ultraleap.HandsModule
                         var indexCheck = (int)Bone.BoneType.METACARPAL;
 
                         //The hand binder does not use the METACARPAL bone for the thumb so draw a line to the proximal instead 
-                        if ((Ultraleap.Finger.FingerType)i == Finger.FingerType.THUMB)
+                        if (( Leap.Finger.FingerType)i == Finger.FingerType.THUMB)
                         {
                             indexCheck = (int)Bone.BoneType.PROXIMAL;
                         }
@@ -586,7 +586,7 @@ namespace Ultraleap.HandsModule
         /// </summary>
         /// <param name="bone"></param>
         /// <param name="size"></param>
-        private void DrawLeapBoneBasis(Ultraleap.Bone bone, float size)
+        private void DrawLeapBoneBasis( Leap.Bone bone, float size)
         {
             Vector3 middle, y, x, z;
 
@@ -961,7 +961,7 @@ namespace Ultraleap.HandsModule
 
                 //Draw the hand texture
                 var handTextureRect = new Rect(midPoint, middleYOffset, handTexture.width, handTexture.height);
-                if (handedness == Ultraleap.Chirality.Left)
+                if (handedness ==  Leap.Chirality.Left)
                 {
                     handTextureRect.x -= handTexture.width / 2;
                 }
@@ -985,7 +985,7 @@ namespace Ultraleap.HandsModule
 
                     var pointRect = new Rect(midPoint, middleYOffset, handTexture.width, handTexture.height);
 
-                    if (handedness == Ultraleap.Chirality.Left)
+                    if (handedness ==  Leap.Chirality.Left)
                     {
                         pointRect.center -= handPoints[boneID];
                     }

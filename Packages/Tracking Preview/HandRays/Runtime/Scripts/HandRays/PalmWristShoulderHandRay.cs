@@ -8,7 +8,7 @@
  ******************************************************************************/
 using UnityEngine;
 
-namespace Ultraleap.Preview.HandRays
+namespace Leap.Preview.HandRays
 {
     /// <summary>
     /// Casts a ray out from a position between a wrist offset and the shoulder, through the palm.

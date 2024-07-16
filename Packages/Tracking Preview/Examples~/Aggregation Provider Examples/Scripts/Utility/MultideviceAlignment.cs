@@ -9,7 +9,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Ultraleap
+namespace Leap
 {
     /// <summary>
     /// Takes a sourceDevice and aligns a targetDevice to it by transforming the targetDevice 

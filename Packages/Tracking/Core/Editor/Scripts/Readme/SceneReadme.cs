@@ -2,7 +2,7 @@ using System;
 using UnityEditor;
 using UnityEngine;
 
-namespace Ultraleap.Readme
+namespace Leap.Readme
 {
     [CreateAssetMenu(fileName = "Readme", menuName = "ScriptableObjects/Readme", order = 5)]
     public class SceneReadme : ScriptableObject

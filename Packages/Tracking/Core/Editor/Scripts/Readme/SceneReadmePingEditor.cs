@@ -1,6 +1,6 @@
 using UnityEditor;
 
-namespace Ultraleap.Readme
+namespace Leap.Readme
 {
     [CustomEditor(typeof(SceneReadmePing))]
     public class SceneReadmePingEditor : Editor

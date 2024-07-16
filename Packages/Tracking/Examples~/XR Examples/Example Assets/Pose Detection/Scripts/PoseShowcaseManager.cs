@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-namespace Ultraleap.Examples
+namespace Leap.Examples
 {
     public class PoseShowcaseManager : MonoBehaviour
     {

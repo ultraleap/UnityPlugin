@@ -14,7 +14,7 @@ using UnityEngine;
 using UnityEngine.XR.Hands;
 using UnityEngine.XR.Hands.ProviderImplementation;
 
-namespace Ultraleap
+namespace Leap
 {
     public class LeapXRHandProvider : XRHandSubsystemProvider
     {

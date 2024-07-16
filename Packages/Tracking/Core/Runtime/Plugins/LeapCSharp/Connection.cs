@@ -8,7 +8,7 @@
 
 namespace LeapInternal
 {
-    using Ultraleap;
+    using Leap;
     using System;
     using System.Collections.Generic;
     using System.Runtime.InteropServices;

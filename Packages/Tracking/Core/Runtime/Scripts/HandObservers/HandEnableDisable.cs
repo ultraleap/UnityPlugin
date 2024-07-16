@@ -8,9 +8,9 @@
 
 using System.Collections.Generic;
 using UnityEngine;
-using Ultraleap.Attributes;
+using Leap.Attributes;
 
-namespace Ultraleap
+namespace Leap
 {
     /// <summary>
     /// A component to be attached to a HandModelBase to handle starting and ending of

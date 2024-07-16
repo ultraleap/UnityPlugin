@@ -12,7 +12,7 @@ using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
-namespace Ultraleap.Attributes
+namespace Leap.Attributes
 {
     [CustomPropertyDrawer(typeof(CombinablePropertyAttribute), true)]
     public class CombinablePropertyDrawer : PropertyDrawer

@@ -6,7 +6,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 #endif
 
-namespace Ultraleap.PhysicalHands
+namespace Leap.PhysicalHands
 {
 #if UNITY_EDITOR
     [InitializeOnLoad]
@@ -68,7 +68,7 @@ namespace Ultraleap.PhysicalHands
             GUILayout.Space(imgHeight);
             GUILayout.Space(10);
 
-            EditorGUILayout.LabelField("You are using Ultraleap Physical Hands but do not have the recommended physics settings for: \n \n" +
+            EditorGUILayout.LabelField("You are using Leap Physical Hands but do not have the recommended physics settings for: \n \n" +
                 "- Reducing physics issues \n" +
                 "- Improving interaction capabilities \n \n" +
                 "Would you like to open the settings panel?.", EditorStyles.wordWrappedLabel);
