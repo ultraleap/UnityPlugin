@@ -46,7 +46,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Shaders use _Color as the default color property name
 - Shaders all come under the Ultraleap folder
 - Deleted Interaction Engine
-- Leap and Leap.Unity namespaces are now Ultraleap
+- Leap and Leap.Unity namespaces are now Leap
 
 ### Fixed
 
