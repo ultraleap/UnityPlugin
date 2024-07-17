@@ -6,7 +6,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-namespace Ultraleap.PhysicalHands
+namespace Leap.PhysicalHands
 {
     public class NoContactParent : ContactParent
     {

@@ -6,12 +6,12 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Ultraleap.PhysicalHands;
+using Leap.PhysicalHands;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
-namespace Ultraleap.Examples
+namespace Leap.Examples
 {
     public class KeyboardManager : MonoBehaviour
     {

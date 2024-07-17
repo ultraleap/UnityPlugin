@@ -6,10 +6,10 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Ultraleap.PhysicalHands;
+using Leap.PhysicalHands;
 using UnityEngine;
 
-namespace Ultraleap.Examples
+namespace Leap.Examples
 {
     /// <summary>
     /// Displays a GrabBalls current state by representing restricted areas with a ghostedMesh and scaling the defaultMesh when close to interaction.

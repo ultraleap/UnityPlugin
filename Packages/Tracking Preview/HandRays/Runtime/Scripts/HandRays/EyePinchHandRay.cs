@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Ultraleap.Preview.HandRays
+namespace Leap.Preview.HandRays
 {
     /// <summary>
     /// Calculates a far field hand ray that goes from the eye through the pinch position.

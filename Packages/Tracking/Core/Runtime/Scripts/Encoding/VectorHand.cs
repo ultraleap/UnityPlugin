@@ -9,7 +9,7 @@
 using System;
 using UnityEngine;
 
-namespace Ultraleap.Encoding
+namespace Leap.Encoding
 {
     /// <summary>
     /// An interface that signifies this class can interpolate
@@ -302,7 +302,7 @@ namespace Ultraleap.Encoding
                                BitConverterNonAlloc.ToInt16(bytes, ref offset))
                              / 4096f;
             }
-            palmRot = Ultraleap.Utils.DecompressBytesToQuat(bytes, ref offset);
+            palmRot =  Leap.Utils.DecompressBytesToQuat(bytes, ref offset);
 
             // Palm-local bone joint positions.
             for (int i = 0; i < NUM_JOINT_POSITIONS; i++)
@@ -350,7 +350,7 @@ namespace Ultraleap.Encoding
             }
 
             // Palm rotation.
-            Ultraleap.Utils.CompressQuatToBytes(palmRot, bytesToFill, ref offset);
+             Leap.Utils.CompressQuatToBytes(palmRot, bytesToFill, ref offset);
 
             // Joint positions.
             for (int j = 0; j < NUM_JOINT_POSITIONS; j++)

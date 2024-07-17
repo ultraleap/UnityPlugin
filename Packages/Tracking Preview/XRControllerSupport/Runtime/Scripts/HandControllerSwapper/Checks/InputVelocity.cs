@@ -13,7 +13,7 @@ using System.Collections.Generic;
 using UnityEngine.InputSystem;
 #endif
 
-namespace Ultraleap.Controllers
+namespace Leap.Controllers
 {
     /// <summary>
     /// InputVelocity checks to see if the velocity of the InputMethodType is less than the actionThreshold

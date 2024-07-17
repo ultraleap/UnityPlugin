@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Ultraleap.PhysicalHands
+namespace Leap.PhysicalHands
 {
     public class HardContactBone : ContactBone
     {
@@ -584,7 +584,7 @@ namespace Ultraleap.PhysicalHands
             return Mathf.Atan2(Vector3.Dot(v, right), Vector3.Dot(v, forward)) * Mathf.Rad2Deg;
         }
 
-        private void InterpolateKnucklePosition(Bone knuckleBone, Ultraleap.Hand leapHand, float deltaTime)
+        private void InterpolateKnucklePosition(Bone knuckleBone,  Leap.Hand leapHand, float deltaTime)
         {
             if (IsBoneContacting)
             {

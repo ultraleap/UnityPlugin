@@ -11,7 +11,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace Ultraleap
+namespace Leap
 {
 
     public class EnumEventTableEditor

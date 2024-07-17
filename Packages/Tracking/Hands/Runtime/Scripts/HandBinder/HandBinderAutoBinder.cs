@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Ultraleap.HandsModule
+namespace Leap.HandsModule
 {
     public static class HandBinderAutoBinder
     {

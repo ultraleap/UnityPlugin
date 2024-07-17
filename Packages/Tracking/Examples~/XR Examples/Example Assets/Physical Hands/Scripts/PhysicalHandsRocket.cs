@@ -9,7 +9,7 @@
 using System.Collections;
 using UnityEngine;
 
-namespace Ultraleap.PhysicalHands.Examples
+namespace Leap.PhysicalHands.Examples
 {
     public class PhysicalHandsRocket : MonoBehaviour
     {

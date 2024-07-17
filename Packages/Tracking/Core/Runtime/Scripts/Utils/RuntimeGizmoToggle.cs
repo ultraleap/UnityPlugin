@@ -9,7 +9,7 @@
 using System.Collections;
 using UnityEngine;
 
-namespace Ultraleap.RuntimeGizmos
+namespace Leap.RuntimeGizmos
 {
 
     /// <summary>

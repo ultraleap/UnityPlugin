@@ -9,7 +9,7 @@
 using System;
 using UnityEngine;
 
-namespace Ultraleap
+namespace Leap
 {
     /// <summary>
     /// A lightweight Grab Detector, that calculates a grab value based on the grab strength of the hand.

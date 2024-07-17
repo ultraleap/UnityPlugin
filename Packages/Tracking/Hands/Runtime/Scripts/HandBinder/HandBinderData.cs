@@ -9,7 +9,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Ultraleap.HandsModule
+namespace Leap.HandsModule
 {
     /// <summary>
     /// A data structure to define all the fingers in a hand, the wrist and elbow

@@ -10,7 +10,7 @@ using System;
 using UnityEngine;
 
 /** HandModelBase defines abstract methods as a template for building Leap hand models*/
-namespace Ultraleap
+namespace Leap
 {
     using Attributes;
 

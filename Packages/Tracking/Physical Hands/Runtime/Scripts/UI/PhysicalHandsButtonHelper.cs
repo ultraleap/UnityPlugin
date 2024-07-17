@@ -12,7 +12,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-namespace Ultraleap.PhysicalHands
+namespace Leap.PhysicalHands
 {
     public class PhysicalHandsButtonHelper : MonoBehaviour, IPhysicalHandContact, IPhysicalHandHover, IPhysicalHandPrimaryHover
     {

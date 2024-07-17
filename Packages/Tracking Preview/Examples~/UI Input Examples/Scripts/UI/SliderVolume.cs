@@ -9,7 +9,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Ultraleap.InputModule
+namespace Leap.InputModule
 {
     public class SliderVolume : MonoBehaviour
     {

@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Ultraleap.Examples
+namespace Leap.Examples
 {
     /// <summary>
     /// Generates a toroid mesh with a low-resolution (square) minor cross-section.

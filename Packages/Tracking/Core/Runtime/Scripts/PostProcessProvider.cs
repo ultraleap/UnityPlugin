@@ -6,10 +6,10 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Ultraleap.Attributes;
+using Leap.Attributes;
 using UnityEngine;
 
-namespace Ultraleap
+namespace Leap
 {
 
     public abstract class PostProcessProvider : LeapProvider

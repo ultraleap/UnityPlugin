@@ -13,7 +13,7 @@ using UnityEngine;
 using Unity.XR.CoreUtils;
 #endif
 
-namespace Ultraleap.Examples
+namespace Leap.Examples
 {
     public class XRSceneHeadOrigin : MonoBehaviour
     {

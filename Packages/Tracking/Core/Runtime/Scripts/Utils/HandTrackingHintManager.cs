@@ -12,7 +12,7 @@ using System.Linq;
 
 using UnityEngine;
 
-namespace Ultraleap
+namespace Leap
 {
     public static class HandTrackingHintManager
     {

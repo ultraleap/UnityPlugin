@@ -1,6 +1,6 @@
 using UnityEditor;
 
-namespace Ultraleap.PhysicalHands
+namespace Leap.PhysicalHands
 {
     [CustomEditor(typeof(PhysicalHandEvents))]
     public class PhysicalHandEventsEditor : CustomEditorBase<PhysicalHandEvents>

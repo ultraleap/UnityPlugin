@@ -6,11 +6,11 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Ultraleap.Attributes;
+using Leap.Attributes;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Ultraleap.Examples
+namespace Leap.Examples
 {
     /// <summary>
     /// This deals with rotating the turntable whenever any fingertips are intersecting with it.
@@ -114,7 +114,7 @@ namespace Ultraleap.Examples
 
         private void Update()
         {
-            Ultraleap.Utils.Swap(ref _currTipPoints, ref _prevTipPoints);
+            Leap.Utils.Swap(ref _currTipPoints, ref _prevTipPoints);
 
             _currTipPoints.Clear();
             foreach (var hand in _provider.CurrentFrame.Hands)

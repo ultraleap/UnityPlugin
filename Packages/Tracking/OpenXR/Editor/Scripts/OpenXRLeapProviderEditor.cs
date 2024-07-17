@@ -1,8 +1,8 @@
-using Ultraleap;
+using Leap;
 using UnityEditor;
 using UnityEngine;
 
-namespace Ultraleap.Tracking.OpenXR
+namespace Leap.Tracking.OpenXR
 {
     [CustomEditor(typeof(OpenXRLeapProvider))]
     public class OpenXRLeapProviderEditor : CustomEditorBase

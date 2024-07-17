@@ -6,7 +6,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-namespace Ultraleap.InputModule
+namespace Leap.InputModule
 {
     /// <summary>
     /// Enumeration of states that the pointer can be in

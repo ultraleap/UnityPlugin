@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace Ultraleap
+namespace Leap
 {
     [CustomEditor(typeof(CapsuleHand), editorForChildClasses: true), CanEditMultipleObjects]
     public class CapsuleHandEditor : CustomEditorBase<CapsuleHand>

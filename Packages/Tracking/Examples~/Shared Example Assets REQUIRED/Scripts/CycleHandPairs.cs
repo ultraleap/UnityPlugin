@@ -9,7 +9,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Ultraleap.HandsModule.Examples
+namespace Leap.HandsModule.Examples
 {
     public class CycleHandPairs : MonoBehaviour
     {

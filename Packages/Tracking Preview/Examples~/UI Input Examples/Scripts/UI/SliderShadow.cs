@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Ultraleap.InputModule
+namespace Leap.InputModule
 {
     public class SliderShadow : MonoBehaviour
     {

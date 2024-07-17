@@ -6,7 +6,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Ultraleap;
+using Leap;
 
 using UnityEngine;
 using UnityEngine.Rendering;

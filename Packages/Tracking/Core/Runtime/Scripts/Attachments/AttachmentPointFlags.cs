@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Ultraleap.Attachments
+namespace Leap.Attachments
 {
 
     /// <summary>

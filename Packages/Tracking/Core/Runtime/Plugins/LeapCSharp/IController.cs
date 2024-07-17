@@ -8,7 +8,7 @@
 
 using System;
 
-namespace Ultraleap
+namespace Leap
 {
     public interface IController :
       IDisposable

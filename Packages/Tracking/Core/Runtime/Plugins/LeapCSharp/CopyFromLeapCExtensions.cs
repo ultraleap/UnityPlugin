@@ -8,7 +8,7 @@
 
 namespace LeapInternal
 {
-    using Ultraleap;
+    using Leap;
     using UnityEngine;
     public static class CopyFromLeapCExtensions
     {
@@ -85,11 +85,11 @@ namespace LeapInternal
             hand.Direction = leapHand.palm.direction.ToVector3();
             hand.WristPosition = hand.Arm.NextJoint;
 
-            hand.fingers[0].CopyFrom(leapHand.thumb, Ultraleap.Finger.FingerType.THUMB, hand.Id, hand.TimeVisible);
-            hand.fingers[1].CopyFrom(leapHand.index, Ultraleap.Finger.FingerType.INDEX, hand.Id, hand.TimeVisible);
-            hand.fingers[2].CopyFrom(leapHand.middle, Ultraleap.Finger.FingerType.MIDDLE, hand.Id, hand.TimeVisible);
-            hand.fingers[3].CopyFrom(leapHand.ring, Ultraleap.Finger.FingerType.RING, hand.Id, hand.TimeVisible);
-            hand.fingers[4].CopyFrom(leapHand.pinky, Ultraleap.Finger.FingerType.PINKY, hand.Id, hand.TimeVisible);
+            hand.fingers[0].CopyFrom(leapHand.thumb,  Leap.Finger.FingerType.THUMB, hand.Id, hand.TimeVisible);
+            hand.fingers[1].CopyFrom(leapHand.index,  Leap.Finger.FingerType.INDEX, hand.Id, hand.TimeVisible);
+            hand.fingers[2].CopyFrom(leapHand.middle,  Leap.Finger.FingerType.MIDDLE, hand.Id, hand.TimeVisible);
+            hand.fingers[3].CopyFrom(leapHand.ring,  Leap.Finger.FingerType.RING, hand.Id, hand.TimeVisible);
+            hand.fingers[4].CopyFrom(leapHand.pinky,  Leap.Finger.FingerType.PINKY, hand.Id, hand.TimeVisible);
 
             hand.TransformToUnityUnits();
 
@@ -116,10 +116,10 @@ namespace LeapInternal
             Bone intermediate = finger.bones[2];
             Bone distal = finger.bones[3];
 
-            metacarpal.CopyFrom(leapBone.metacarpal, Ultraleap.Bone.BoneType.METACARPAL);
-            proximal.CopyFrom(leapBone.proximal, Ultraleap.Bone.BoneType.PROXIMAL);
-            intermediate.CopyFrom(leapBone.intermediate, Ultraleap.Bone.BoneType.INTERMEDIATE);
-            distal.CopyFrom(leapBone.distal, Ultraleap.Bone.BoneType.DISTAL);
+            metacarpal.CopyFrom(leapBone.metacarpal,  Leap.Bone.BoneType.METACARPAL);
+            proximal.CopyFrom(leapBone.proximal,  Leap.Bone.BoneType.PROXIMAL);
+            intermediate.CopyFrom(leapBone.intermediate,  Leap.Bone.BoneType.INTERMEDIATE);
+            distal.CopyFrom(leapBone.distal,  Leap.Bone.BoneType.DISTAL);
 
             finger.TipPosition = distal.NextJoint;
             finger.Direction = intermediate.Direction;

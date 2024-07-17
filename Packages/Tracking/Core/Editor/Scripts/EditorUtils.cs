@@ -17,7 +17,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 
-namespace Ultraleap
+namespace Leap
 {
     using UnityObject = UnityEngine.Object;
 

@@ -6,13 +6,13 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Ultraleap;
-using Ultraleap.HandsModule;
+using Leap;
+using Leap.HandsModule;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Ultraleap.HandsModule
+namespace Leap.HandsModule
 {
     /// <summary>
     /// A post process provider that allows hand visuals to generate leap hands that can be used to distort tracking data to visuals

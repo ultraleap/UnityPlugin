@@ -9,7 +9,7 @@
 using System;
 using UnityEngine;
 
-namespace Ultraleap
+namespace Leap
 {
     /// <summary>
     /// A lightweight Pinch Detector, that calculates a pinch value based on the distance between the 

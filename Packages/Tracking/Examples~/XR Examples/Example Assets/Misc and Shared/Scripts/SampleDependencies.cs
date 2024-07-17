@@ -10,7 +10,7 @@
 
 using UnityEditor;
 
-namespace Ultraleap.Examples
+namespace Leap.Examples
 {
     public static class XRSampleDependencyImporter
     {

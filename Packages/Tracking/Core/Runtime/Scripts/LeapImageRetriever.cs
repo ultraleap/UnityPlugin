@@ -15,7 +15,7 @@ using UnityEngine.Serialization;
 
 using Image = LeapInternal.Image;
 
-namespace Ultraleap
+namespace Leap
 {
     /// <summary>
     /// Acquires images from a LeapServiceProvider and uploads image data as shader global

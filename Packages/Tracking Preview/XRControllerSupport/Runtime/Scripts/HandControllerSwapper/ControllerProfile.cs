@@ -8,7 +8,7 @@
 
 using System.Collections.Generic;
 
-namespace Ultraleap.Controllers
+namespace Leap.Controllers
 {
 
     /// <summary>

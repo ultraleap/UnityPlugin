@@ -14,7 +14,7 @@ using UnityEngine;
 using UnityEngine.XR.Management;
 #endif
 
-namespace Ultraleap
+namespace Leap
 {
     /// <summary>
     /// XRLeapProviderManager offers a single access point while selecting the most suitable Hand Tracking Data source
@@ -152,7 +152,7 @@ namespace Ultraleap
 
                 if (openXRLeapProvider != null && openXRLeapProvider.TrackingDataSource == TrackingSource.OPENXR_LEAP)
                 {
-                    Debug.Log("Using Ultraleap OpenXR for Hand Tracking");
+                    Debug.Log("using Leap OpenXR for Hand Tracking");
                 }
                 else
                 {

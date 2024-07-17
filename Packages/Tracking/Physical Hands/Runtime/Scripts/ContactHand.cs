@@ -9,7 +9,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Ultraleap.PhysicalHands
+namespace Leap.PhysicalHands
 {
     public abstract class ContactHand : MonoBehaviour
     {
@@ -188,7 +188,7 @@ namespace Ultraleap.PhysicalHands
                 return;
             }
 
-            Ultraleap.Hand leapHand = TestHandFactory.MakeTestHand(isLeft: Handedness == Chirality.Left ? true : false, pose: TestHandFactory.TestHandPose.HeadMountedB);
+             Leap.Hand leapHand = TestHandFactory.MakeTestHand(isLeft: Handedness == Chirality.Left ? true : false, pose: TestHandFactory.TestHandPose.HeadMountedB);
             palmBone = new GameObject($"{(Handedness == Chirality.Left ? "Left" : "Right")} Palm", boneType, typeof(BoxCollider), typeof(CapsuleCollider), typeof(CapsuleCollider), typeof(CapsuleCollider)).GetComponent<ContactBone>();
 
             palmBone.gameObject.layer = contactParent.physicalHandsManager.HandsResetLayer;

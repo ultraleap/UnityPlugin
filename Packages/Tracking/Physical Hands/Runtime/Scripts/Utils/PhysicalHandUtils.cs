@@ -1,10 +1,10 @@
-using Ultraleap.PhysicalHands;
+using Leap.PhysicalHands;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static Ultraleap.PhysicalHands.ContactBone;
+using static  Leap.PhysicalHands.ContactBone;
 
-namespace Ultraleap.PhysicalHands
+namespace Leap.PhysicalHands
 {
     public static class PhysicalHandUtils
     {

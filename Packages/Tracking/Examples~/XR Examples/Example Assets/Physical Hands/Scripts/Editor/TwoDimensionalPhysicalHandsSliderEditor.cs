@@ -10,7 +10,7 @@ using UnityEngine;
 using UnityEditor;
 using System.Linq;
 
-namespace Ultraleap.PhysicalHandsExamples
+namespace Leap.PhysicalHandsExamples
 {
     [CustomEditor(typeof(TwoDimensionalPhysicalHandsSlider))]
     public class TwoDimensionalPhysicalHandsSliderEditor : CustomEditorBase<TwoDimensionalPhysicalHandsSlider>

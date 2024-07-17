@@ -5,7 +5,7 @@ using UnityEditor.Build.Reporting;
 using UnityEditor.XR.OpenXR.Features;
 using UnityEngine.XR.OpenXR;
 
-namespace Ultraleap.Tracking.OpenXR
+namespace Leap.Tracking.OpenXR
 {
     public partial class HandTrackingFeatureBuildHooks : OpenXRFeatureBuildHooks
     {

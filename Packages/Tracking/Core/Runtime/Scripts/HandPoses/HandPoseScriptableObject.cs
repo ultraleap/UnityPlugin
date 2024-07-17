@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEditor;
 #endif
 
-namespace Ultraleap
+namespace Leap
 {
 #if UNITY_EDITOR
     public class NamedListAttribute : PropertyAttribute

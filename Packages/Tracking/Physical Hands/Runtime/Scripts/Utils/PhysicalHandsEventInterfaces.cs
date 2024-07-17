@@ -6,7 +6,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-namespace Ultraleap.PhysicalHands
+namespace Leap.PhysicalHands
 {
     /// <summary>
     /// Reports the hover event, called when a grab helper is created for the hand.

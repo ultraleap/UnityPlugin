@@ -10,7 +10,7 @@
 using UnityEditor;
 #endif
 
-namespace Ultraleap.Attributes
+namespace Leap.Attributes
 {
 
     public class DisableAttribute : CombinablePropertyAttribute, IPropertyDisabler

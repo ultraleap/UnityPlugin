@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Ultraleap
+namespace Leap
 {
     using System;
     /// <summary>

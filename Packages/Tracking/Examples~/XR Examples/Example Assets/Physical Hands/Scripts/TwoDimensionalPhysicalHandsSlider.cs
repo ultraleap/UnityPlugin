@@ -6,15 +6,15 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Ultraleap.Attributes;
+using Leap.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
-using Ultraleap.PhysicalHands;
+using Leap.PhysicalHands;
 
-namespace Ultraleap.PhysicalHandsExamples
+namespace Leap.PhysicalHandsExamples
 {
     [RequireComponent(typeof(Rigidbody))]
     public class TwoDimensionalPhysicalHandsSlider : MonoBehaviour

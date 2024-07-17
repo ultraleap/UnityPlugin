@@ -9,7 +9,7 @@
 using System.Collections;
 using UnityEngine;
 
-namespace Ultraleap.Examples
+namespace Leap.Examples
 {
     /// <summary>
     /// This creates a circle and dashes with line renderers.

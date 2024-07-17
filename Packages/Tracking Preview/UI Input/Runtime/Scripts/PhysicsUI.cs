@@ -9,7 +9,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace Ultraleap.InputModule
+namespace Leap.InputModule
 {
 
     /// <summary>

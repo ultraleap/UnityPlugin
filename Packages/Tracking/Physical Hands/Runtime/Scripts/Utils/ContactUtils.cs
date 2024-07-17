@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Ultraleap.PhysicalHands
+namespace Leap.PhysicalHands
 {
     public static class ContactUtils
     {
@@ -194,7 +194,7 @@ namespace Ultraleap.PhysicalHands
         /// <param name="colliders">An array of colliders representing the object to check</param>
         /// <param name="boneWidth">Optional width of the bone - if not passed, will default to 0</param>
         /// <returns></returns>
-        internal static bool IsBoneWithinObject(this Ultraleap.Bone bone, Collider[] colliders, float boneWidth = 0)
+        internal static bool IsBoneWithinObject(this  Leap.Bone bone, Collider[] colliders, float boneWidth = 0)
         {
             for (int i = 0; i < colliders.Length; i++)
             {

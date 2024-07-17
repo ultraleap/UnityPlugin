@@ -6,13 +6,13 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Ultraleap.Attributes;
+using Leap.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Ultraleap
+namespace Leap
 {
     /// <summary>
     /// AnchorableBehaviours mix well with InteractionBehaviours you'd like to be able to
@@ -669,7 +669,7 @@ namespace Ultraleap
             float directedness = anchObjVel.magnitude.Map(0.20F, 1F, 0F, 1F);
 
             float effMaxDistance = directedness.Map(0F, 1F, nonDirectedMaxDistance, maxDistance);
-            Vector3 effPos = Ultraleap.Utils.Map(Mathf.Sqrt(Mathf.Sqrt(directedness)), 0f, 1f,
+            Vector3 effPos =  Leap.Utils.Map(Mathf.Sqrt(Mathf.Sqrt(directedness)), 0f, 1f,
                                        anchObjPos, (anchObjPos - anchObjVel.normalized * effMaxDistance * 0.30f));
 
             float distanceSqrd = (anchorPos - effPos).sqrMagnitude;

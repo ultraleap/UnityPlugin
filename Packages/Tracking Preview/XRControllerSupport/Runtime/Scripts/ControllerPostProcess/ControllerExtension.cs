@@ -9,7 +9,7 @@
 #if ENABLE_INPUT_SYSTEM
 
 using UnityEngine.InputSystem;
-namespace Ultraleap.Controllers
+namespace Leap.Controllers
 {
     public static class ControllerExtension
     {

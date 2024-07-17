@@ -1,6 +1,6 @@
 using UnityEditor;
 
-namespace Ultraleap.Preview.HandRays
+namespace Leap.Preview.HandRays
 {
     [CustomEditor(typeof(InferredBodyPositions))]
     public class InferredBodyPositionsEditor : CustomEditorBase<InferredBodyPositions>

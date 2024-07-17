@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Ultraleap.Controllers
+namespace Leap.Controllers
 {
     /// <summary>
     /// IsFacingDown checks to see if the angle between the InputMethodType and the floor 

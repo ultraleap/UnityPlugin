@@ -1,5 +1,5 @@
 #if UNITY_EDITOR
-using Ultraleap;
+using Leap;
 
 using System.Collections.Generic;
 
@@ -8,7 +8,7 @@ using UnityEditor.PackageManager.UI;
 
 using UnityEngine;
 
-namespace Ultraleap.Examples
+namespace Leap.Examples
 {
     public static class SampleDependencyImporter
     {
