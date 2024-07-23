@@ -53,6 +53,43 @@ namespace Leap
     }
 
     /// <summary>
+    /// Provides access to the raw leap frame data
+    /// </summary>
+    public class RawFrameEventArgs : LeapEventArgs
+    {
+        public bool IsTrackingLeftHand { get; set; }
+        public LEAP_HAND LeftHand { get; set; }
+
+        public bool IsTrackingRightHand { get; set; }
+        public LEAP_HAND RightHand { get; set; }
+
+        public RawFrameEventArgs(LEAP_TRACKING_EVENT trackingMsg) : base(LeapEvent.EVENT_FRAME)
+        {
+            IsTrackingLeftHand = false;
+            IsTrackingRightHand = false;
+
+            for (int i = (int)trackingMsg.nHands; i-- != 0;)
+            {
+                LEAP_HAND hand;
+                StructMarshal<LEAP_HAND>.ArrayElementToStruct(trackingMsg.pHands, i, out hand);
+
+                switch (hand.type)
+                {
+                    case eLeapHandType.eLeapHandType_Left:
+                        LeftHand = hand;
+                        IsTrackingLeftHand = true;
+                        break;
+
+                    case eLeapHandType.eLeapHandType_Right:
+                        RightHand = hand;
+                        IsTrackingRightHand = true;
+                        break;
+                }
+            }
+        }
+    }
+
+    /// <summary>
     /// Dispatched when a tracking frame is ready.
     ///
     /// Provides the Frame object as an argument.
