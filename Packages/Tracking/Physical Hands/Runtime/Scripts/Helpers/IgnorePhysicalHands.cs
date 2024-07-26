@@ -268,7 +268,7 @@ namespace Leap.PhysicalHands
         public bool IsGrabbingIgnoredForHand(ContactHand hand)
         {
             if (this.enabled &&
-                hand != null && 
+                hand != null &&
                 _disableAllGrabbing &&
                 ((int)HandToIgnoreGrabs == (int)hand.Handedness || HandToIgnoreGrabs == ChiralitySelection.BOTH))
             {

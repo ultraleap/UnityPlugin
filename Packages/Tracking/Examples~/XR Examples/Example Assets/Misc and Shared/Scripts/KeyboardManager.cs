@@ -8,8 +8,8 @@
 
 using Leap.PhysicalHands;
 using System.Collections.Generic;
-using UnityEngine;
 using TMPro;
+using UnityEngine;
 
 namespace Leap.Examples
 {

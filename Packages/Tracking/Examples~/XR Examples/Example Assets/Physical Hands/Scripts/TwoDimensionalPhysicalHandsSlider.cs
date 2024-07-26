@@ -7,12 +7,12 @@
  ******************************************************************************/
 
 using Leap.Attributes;
+using Leap.PhysicalHands;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
-using Leap.PhysicalHands;
 
 namespace Leap.PhysicalHandsExamples
 {
@@ -359,7 +359,7 @@ namespace Leap.PhysicalHandsExamples
             _configurableJoints.ElementAt(0).zMotion = ConfigurableJointMotion.Free;
             _configurableJoints.ElementAt(1).zMotion = ConfigurableJointMotion.Limited;
         }
-        
+
         #endregion
         #endregion
 

@@ -6,8 +6,8 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using UnityEngine;
 using UnityEditor;
+using UnityEngine;
 
 namespace Leap.PhysicalHands
 {
@@ -20,7 +20,7 @@ namespace Leap.PhysicalHands
         {
             EditorUtils.DrawScriptField((MonoBehaviour)target);
 
-            if(target._slideableObject != null && target._slideableObject.transform.localRotation != Quaternion.identity)
+            if (target._slideableObject != null && target._slideableObject.transform.localRotation != Quaternion.identity)
             {
                 EditorGUILayout.HelpBox("Warning! Slideable object cannot be rotated. This will cause unexpected behaviour. \n " +
                     "Please rotate the slider instead, leaving slideable object rotation 0,0,0", MessageType.Warning);

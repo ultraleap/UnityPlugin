@@ -1150,11 +1150,11 @@ namespace LeapInternal
           IntPtr hDevice, eLeapPerspectiveType camera, LEAP_VECTOR rectilinear);
 
         [DllImport("LeapC", EntryPoint = "LeapExtrinsicCameraMatrix")]
-        public static extern eLeapRS LeapExtrinsicCameraMatrix(IntPtr hConnection, eLeapPerspectiveType camera, 
+        public static extern eLeapRS LeapExtrinsicCameraMatrix(IntPtr hConnection, eLeapPerspectiveType camera,
             [MarshalAs(UnmanagedType.LPArray, SizeConst = 16)] float[] extrinsicMatrix);
 
         [DllImport("LeapC", EntryPoint = "LeapExtrinsicCameraMatrixEx")]
-        public static extern eLeapRS LeapExtrinsicCameraMatrixEx(IntPtr hConnection, IntPtr hDevice, eLeapPerspectiveType camera, 
+        public static extern eLeapRS LeapExtrinsicCameraMatrixEx(IntPtr hConnection, IntPtr hDevice, eLeapPerspectiveType camera,
             [MarshalAs(UnmanagedType.LPArray, SizeConst = 16)] float[] extrinsicMatrix);
 
         [DllImport("LeapC", EntryPoint = "LeapCloseDevice")]

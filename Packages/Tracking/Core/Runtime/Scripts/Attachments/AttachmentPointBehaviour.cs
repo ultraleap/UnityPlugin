@@ -60,7 +60,7 @@ namespace Leap.Attachments
             return p.attachmentPoint;
         }
 
-        public void SetTransformUsingHand( Leap.Hand hand)
+        public void SetTransformUsingHand(Leap.Hand hand)
         {
             if (hand == null)
             {
@@ -76,7 +76,7 @@ namespace Leap.Attachments
             this.transform.rotation = rotation;
         }
 
-        public static void GetLeapHandPointData( Leap.Hand hand, AttachmentPointFlags singlePoint, out Vector3 position, out Quaternion rotation)
+        public static void GetLeapHandPointData(Leap.Hand hand, AttachmentPointFlags singlePoint, out Vector3 position, out Quaternion rotation)
         {
             position = Vector3.zero;
             rotation = Quaternion.identity;

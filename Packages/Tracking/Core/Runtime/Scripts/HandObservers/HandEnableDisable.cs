@@ -6,9 +6,9 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
+using Leap.Attributes;
 using System.Collections.Generic;
 using UnityEngine;
-using Leap.Attributes;
 
 namespace Leap
 {
@@ -57,7 +57,7 @@ namespace Leap
         {
             if (leapProvider == null)
             {
-                if(!Hands.TryGetProviderAndChiralityFromHandModel(gameObject, out leapProvider, out chirality) || leapProvider == null)
+                if (!Hands.TryGetProviderAndChiralityFromHandModel(gameObject, out leapProvider, out chirality) || leapProvider == null)
                 {
                     Debug.LogWarning("HandEnableDisable can not work as intended as no LeapProvider was associated with the component.", gameObject);
                     return;
@@ -70,7 +70,7 @@ namespace Leap
             leapProvider.OnHandLost -= HandLost;
             leapProvider.OnHandLost += HandLost;
 
-            if(disableOnAwake)
+            if (disableOnAwake)
             {
                 gameObject.SetActive(false);
             }
@@ -78,7 +78,7 @@ namespace Leap
 
         private void Start()
         {
-            if(!customFadeRenderers)
+            if (!customFadeRenderers)
             {
                 AutoPopulateFadeRenderers();
             }
@@ -163,7 +163,7 @@ namespace Leap
 
         private void Update()
         {
-            if(fadingOut)
+            if (fadingOut)
             {
                 HandleFade(_fadeIn: false); // Handle the fade out
 

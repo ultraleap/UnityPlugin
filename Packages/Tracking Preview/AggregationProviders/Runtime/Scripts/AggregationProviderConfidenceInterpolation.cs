@@ -252,7 +252,7 @@ namespace Leap
             }
 
             // joints
-             Leap.Utils.Fill(mergedJointPositions, Vector3.zero);
+            Leap.Utils.Fill(mergedJointPositions, Vector3.zero);
             List<VectorHand> vectorHands = new List<VectorHand>();
             foreach (Hand hand in hands)
             {
@@ -644,7 +644,7 @@ namespace Leap
 
             public void ClearAllPositions()
             {
-                 Leap.Utils.Fill(positions, Vector3.zero);
+                Leap.Utils.Fill(positions, Vector3.zero);
             }
 
             public void AddPosition(Vector3 position, float time)
@@ -788,7 +788,7 @@ namespace Leap
                 }
                 else
                 {
-                     Leap.Utils.Fill(averageConfidences, 0);
+                    Leap.Utils.Fill(averageConfidences, 0);
                 }
 
                 for (int i = 0; i < averageConfidences.Length; i++)

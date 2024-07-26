@@ -48,7 +48,7 @@ namespace Leap
         // Revert to original ignorehand state if there was one
         void OnDetached()
         {
-            if(_ignorePhysicalHands != null)
+            if (_ignorePhysicalHands != null)
             {
                 _ignorePhysicalHands.HandToIgnoreGrabs = originalIgnoreHandsGrab;
                 _ignorePhysicalHands.HandToIgnoreCollisions = originalIgnoreHandsCollisions;
@@ -84,7 +84,7 @@ namespace Leap
                 rightHandGrabbing = false;
             }
 
-            if(!leftHandGrabbing && !rightHandGrabbing && TryAnchorNearestOnGraspEnd)
+            if (!leftHandGrabbing && !rightHandGrabbing && TryAnchorNearestOnGraspEnd)
             {
                 // Neither hand is grabbing. Object has been dropped
                 TryAttachToNearestAnchor();
