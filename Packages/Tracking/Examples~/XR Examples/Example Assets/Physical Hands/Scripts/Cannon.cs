@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-namespace Leap.Unity.Examples
+namespace Leap.Examples
 {
     public class Cannon : MonoBehaviour
     {

@@ -42,7 +42,7 @@ MonoBehaviour:
   serializedHand:
     FrameId: 0
     Id: 43
-    Fingers:
+    fingers:
     - bones:
       - PrevJoint: {x: -0.096767254, y: 1.017718, z: 0.29203522}
         NextJoint: {x: -0.096767254, y: 1.017718, z: 0.29203522}
@@ -279,7 +279,7 @@ MonoBehaviour:
   mirroredHand:
     FrameId: 0
     Id: 43
-    Fingers:
+    fingers:
     - bones:
       - PrevJoint: {x: 0.096767254, y: 1.017718, z: 0.29203522}
         NextJoint: {x: 0.096767254, y: 1.017718, z: 0.29203522}

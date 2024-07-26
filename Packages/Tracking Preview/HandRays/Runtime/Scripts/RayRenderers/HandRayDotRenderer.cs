@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Leap.Unity.Preview.HandRays
+namespace Leap.Preview.HandRays
 {
     public class HandRayDotRenderer : HandRayRenderer
     {

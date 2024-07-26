@@ -9,10 +9,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-
-namespace Leap.Unity.Examples
+namespace Leap.Examples
 {
-
     /// <summary>
     /// Renderer for a PinchStrokeProcessor that renders thick ribbons.
     /// It neeeds a mesh filter and a mesh renderer

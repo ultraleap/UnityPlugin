@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Leap.Unity.PhysicalHands
+namespace Leap.PhysicalHands
 {
     public class HardContactBone : ContactBone
     {
@@ -35,7 +35,7 @@ namespace Leap.Unity.PhysicalHands
         #region Setup
         internal void SetupBoneBody()
         {
-            Collider.material = ((HardContactParent)contactHand.contactParent).PhysicsMaterial;
+            Collider.material = ((HardContactParent)contactHand.contactParent).physicsMaterial;
             articulation = gameObject.AddComponent<ArticulationBody>();
 
             if (isPalm)
@@ -584,7 +584,7 @@ namespace Leap.Unity.PhysicalHands
             return Mathf.Atan2(Vector3.Dot(v, right), Vector3.Dot(v, forward)) * Mathf.Rad2Deg;
         }
 
-        private void InterpolateKnucklePosition(Bone knuckleBone, Leap.Hand leapHand, float deltaTime)
+        private void InterpolateKnucklePosition(Bone knuckleBone,  Leap.Hand leapHand, float deltaTime)
         {
             if (IsBoneContacting)
             {

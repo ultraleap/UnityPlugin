@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Leap.Unity
+namespace Leap
 {
     /// <summary>
     /// Time-step independent exponential smoothing.

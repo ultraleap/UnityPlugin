@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Leap.Unity.PhysicalHands
+namespace Leap.PhysicalHands
 {
     public static class PhysExts
     {

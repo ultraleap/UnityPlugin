@@ -1,0 +1,20 @@
+{
+    "name": "Ultraleap.PhysicalHandsExamples.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:db4e617c04f44c144bc19216a63dd19b",
+        "GUID:5d2bbb4763a30e54ebe3c25d112247b1",
+        "GUID:255374aa873d04544b059e6127260800"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

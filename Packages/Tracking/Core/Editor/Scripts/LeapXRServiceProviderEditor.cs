@@ -8,7 +8,7 @@
 
 using UnityEditor;
 using UnityEngine;
-namespace Leap.Unity
+namespace Leap
 {
 
     [CustomEditor(typeof(LeapXRServiceProvider))]

@@ -6,12 +6,12 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity.Encoding;
+using Leap.Encoding;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Leap.Unity
+namespace Leap
 {
     using Attributes;
 
@@ -268,8 +268,8 @@ namespace Leap.Unity
         {
             // reset all frames in framesToCombineLists, if they haven't been used this unity frame
             // This can happen, if one of the providers doesn't dispatch an update event
-            Leap.Unity.Utils.Fill(updateFramesToCombine, null);
-            Leap.Unity.Utils.Fill(fixedUpdateFramesToCombine, null);
+             Leap.Utils.Fill(updateFramesToCombine, null);
+             Leap.Utils.Fill(fixedUpdateFramesToCombine, null);
         }
 
 
@@ -292,7 +292,7 @@ namespace Leap.Unity
             _transformedUpdateFrame = MergeFrames(updateFramesToCombine);
 
             // reset all the update frames received from providers to null again
-            Leap.Unity.Utils.Fill(updateFramesToCombine, null);
+             Leap.Utils.Fill(updateFramesToCombine, null);
 
 #if UNITY_EDITOR
             if (UnityEditor.EditorApplication.isCompiling)
@@ -322,7 +322,7 @@ namespace Leap.Unity
             _transformedFixedFrame = MergeFrames(fixedUpdateFramesToCombine);
 
             // reset all the fixed update frames received from providers to null again
-            Leap.Unity.Utils.Fill(fixedUpdateFramesToCombine, null);
+             Leap.Utils.Fill(fixedUpdateFramesToCombine, null);
 
             if (_frameOptimization == FrameOptimizationMode.ReuseUpdateForPhysics)
             {

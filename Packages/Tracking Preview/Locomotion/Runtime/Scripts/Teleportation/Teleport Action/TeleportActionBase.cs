@@ -6,12 +6,12 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity.Preview.HandRays;
+using Leap.Preview.HandRays;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Leap.Unity.Preview.Locomotion
+namespace Leap.Preview.Locomotion
 {
     /// <summary>
     /// Base class for all teleport actions.

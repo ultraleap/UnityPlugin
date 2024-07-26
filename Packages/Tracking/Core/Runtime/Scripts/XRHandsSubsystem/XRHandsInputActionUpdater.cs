@@ -13,7 +13,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Layouts;
 using UnityEngine.XR.Hands;
 
-namespace Leap.Unity.InputActions
+namespace Leap.InputActions
 {
     /// <summary>
     /// Updates Ultraleap Input Actions with the latest available hand data
@@ -66,7 +66,7 @@ namespace Leap.Unity.InputActions
 
             currentSubsystem.updatedHands -= UpdateHands;
             currentSubsystem.updatedHands += UpdateHands;
-
+          
             // Create meta hands if required
             if (ultraleapSettings.updateMetaInputSystem)
             {
@@ -79,7 +79,6 @@ namespace Leap.Unity.InputActions
                     MetaAimHand.right = MetaAimHand.CreateHand(UnityEngine.XR.InputDeviceCharacteristics.Right);
                 }
             }
-
 
             SetupDefaultStateGetters();
 

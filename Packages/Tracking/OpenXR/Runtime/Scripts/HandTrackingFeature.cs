@@ -11,7 +11,7 @@ using UnityEditor;
 using UnityEditor.XR.OpenXR.Features;
 #endif
 
-namespace Ultraleap.Tracking.OpenXR
+namespace Leap.Tracking.OpenXR
 {
     /// <summary>
     /// Enables OpenXR hand-tracking support via the <see href="https://www.khronos.org/registry/OpenXR/specs/1.0/html/xrspec.html#XR_EXT_hand_tracking">XR_EXT_hand_tracking</see> OpenXR extension.

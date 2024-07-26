@@ -1,5 +1,5 @@
 #if UNITY_EDITOR
-using Leap.Unity;
+using Leap;
 
 using System.Collections.Generic;
 

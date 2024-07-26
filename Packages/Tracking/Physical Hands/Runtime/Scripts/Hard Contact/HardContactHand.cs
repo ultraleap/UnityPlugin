@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Leap.Unity.PhysicalHands
+namespace Leap.PhysicalHands
 {
     public class HardContactHand : ContactHand
     {
@@ -128,8 +128,8 @@ namespace Leap.Unity.PhysicalHands
                     fingerStiffness[fingerIndex] = hardContactParent.boneStiffness;
                     for (int jointIndex = 0; jointIndex < FINGER_BONES; jointIndex++)
                     {
-                        Bone prevBone = dataHand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex));
-                        Bone bone = dataHand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex + 1)); // +1 to skip first bone.
+                        Bone prevBone = dataHand.fingers[fingerIndex].GetBone((Bone.BoneType)(jointIndex));
+                        Bone bone = dataHand.fingers[fingerIndex].GetBone((Bone.BoneType)(jointIndex + 1)); // +1 to skip first bone.
 
                         int boneArrayIndex = fingerIndex * FINGER_BONES + jointIndex;
 
@@ -187,7 +187,7 @@ namespace Leap.Unity.PhysicalHands
                 {
                     int boneArrayIndex = fingerIndex * FINGER_BONES + jointIndex;
 
-                    Bone bone = dataHand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex + 1));
+                    Bone bone = dataHand.fingers[fingerIndex].GetBone((Bone.BoneType)(jointIndex + 1));
 
                     ((HardContactBone)bones[boneArrayIndex]).UpdateBoneDisplacement(bone);
                     _overallFingerDisplacement += ((HardContactBone)bones[boneArrayIndex]).DisplacementAmount;
@@ -331,15 +331,15 @@ namespace Leap.Unity.PhysicalHands
             float r;
             if (!_justGhosted)
             {
-                for (int i = 0; i < modifiedHand.Fingers.Count; i++)
+                for (int i = 0; i < modifiedHand.fingers.Length; i++)
                 {
-                    Bone b = modifiedHand.Fingers[i].bones[0];
+                    Bone b = modifiedHand.fingers[i].bones[0];
                     PhysExts.ToWorldSpaceCapsule(bones[boneInd].boneCollider, out posA, out posB, out r);
                     b.NextJoint = posB;
 
-                    for (int j = 1; j < modifiedHand.Fingers[i].bones.Length; j++)
+                    for (int j = 1; j < modifiedHand.fingers[i].bones.Length; j++)
                     {
-                        b = modifiedHand.Fingers[i].bones[j];
+                        b = modifiedHand.fingers[i].bones[j];
                         PhysExts.ToWorldSpaceCapsule(bones[boneInd].boneCollider, out posA, out posB, out r);
 
                         b.PrevJoint = posB;
@@ -352,7 +352,7 @@ namespace Leap.Unity.PhysicalHands
                         boneInd++;
                     }
 
-                    modifiedHand.Fingers[i].TipPosition = GetTipPosition(i);
+                    modifiedHand.fingers[i].TipPosition = GetTipPosition(i);
                 }
             }
 

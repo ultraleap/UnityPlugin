@@ -68,12 +68,12 @@ namespace LeapInternal
             hand.FrameId = frameId;
             hand.Id = (int)leapHand.id;
 
-            hand.Arm.CopyFrom(leapHand.arm, Bone.BoneType.TYPE_INVALID);
+            hand.Arm.CopyFrom(leapHand.arm, Bone.BoneType.UNKNOWN);
 
             hand.Confidence = leapHand.confidence;
             hand.GrabStrength = leapHand.grab_strength;
             hand.PinchStrength = leapHand.pinch_strength;
-            hand.PinchDistance = leapHand.pinch_distance;
+            hand.PinchDistance = leapHand.pinch_distance * MM_TO_M; // This is not converted to M when scaling the hand, so we should convert it here
             hand.PalmWidth = leapHand.palm.width;
             hand.IsLeft = leapHand.type == eLeapHandType.eLeapHandType_Left;
             hand.TimeVisible = (float)(leapHand.visible_time * 1e-6);
@@ -85,11 +85,11 @@ namespace LeapInternal
             hand.Direction = leapHand.palm.direction.ToVector3();
             hand.WristPosition = hand.Arm.NextJoint;
 
-            hand.Fingers[0].CopyFrom(leapHand.thumb, Leap.Finger.FingerType.TYPE_THUMB, hand.Id, hand.TimeVisible);
-            hand.Fingers[1].CopyFrom(leapHand.index, Leap.Finger.FingerType.TYPE_INDEX, hand.Id, hand.TimeVisible);
-            hand.Fingers[2].CopyFrom(leapHand.middle, Leap.Finger.FingerType.TYPE_MIDDLE, hand.Id, hand.TimeVisible);
-            hand.Fingers[3].CopyFrom(leapHand.ring, Leap.Finger.FingerType.TYPE_RING, hand.Id, hand.TimeVisible);
-            hand.Fingers[4].CopyFrom(leapHand.pinky, Leap.Finger.FingerType.TYPE_PINKY, hand.Id, hand.TimeVisible);
+            hand.fingers[0].CopyFrom(leapHand.thumb,  Leap.Finger.FingerType.THUMB, hand.Id, hand.TimeVisible);
+            hand.fingers[1].CopyFrom(leapHand.index,  Leap.Finger.FingerType.INDEX, hand.Id, hand.TimeVisible);
+            hand.fingers[2].CopyFrom(leapHand.middle,  Leap.Finger.FingerType.MIDDLE, hand.Id, hand.TimeVisible);
+            hand.fingers[3].CopyFrom(leapHand.ring,  Leap.Finger.FingerType.RING, hand.Id, hand.TimeVisible);
+            hand.fingers[4].CopyFrom(leapHand.pinky,  Leap.Finger.FingerType.PINKY, hand.Id, hand.TimeVisible);
 
             hand.TransformToUnityUnits();
 
@@ -116,10 +116,10 @@ namespace LeapInternal
             Bone intermediate = finger.bones[2];
             Bone distal = finger.bones[3];
 
-            metacarpal.CopyFrom(leapBone.metacarpal, Leap.Bone.BoneType.TYPE_METACARPAL);
-            proximal.CopyFrom(leapBone.proximal, Leap.Bone.BoneType.TYPE_PROXIMAL);
-            intermediate.CopyFrom(leapBone.intermediate, Leap.Bone.BoneType.TYPE_INTERMEDIATE);
-            distal.CopyFrom(leapBone.distal, Leap.Bone.BoneType.TYPE_DISTAL);
+            metacarpal.CopyFrom(leapBone.metacarpal,  Leap.Bone.BoneType.METACARPAL);
+            proximal.CopyFrom(leapBone.proximal,  Leap.Bone.BoneType.PROXIMAL);
+            intermediate.CopyFrom(leapBone.intermediate,  Leap.Bone.BoneType.INTERMEDIATE);
+            distal.CopyFrom(leapBone.distal,  Leap.Bone.BoneType.DISTAL);
 
             finger.TipPosition = distal.NextJoint;
             finger.Direction = intermediate.Direction;

@@ -12,7 +12,7 @@ using System.Collections.Generic;
 using UnityEngine.InputSystem;
 #endif
 
-namespace Leap.Unity.Controllers
+namespace Leap.Controllers
 {
     /// <summary>
     /// HasButtonBeenPressed checks to see if a button has been pressed on a controller, if the inputMethodType

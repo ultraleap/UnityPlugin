@@ -6,12 +6,12 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity;
+using Leap;
 using UnityEngine;
 using UnityEngine.XR.Management;
 using UnityEngine.XR.OpenXR;
 
-namespace Ultraleap.Tracking.OpenXR
+namespace Leap.Tracking.OpenXR
 {
     /// <summary>
     /// A utility to pass data to the core plugin through one central entry point

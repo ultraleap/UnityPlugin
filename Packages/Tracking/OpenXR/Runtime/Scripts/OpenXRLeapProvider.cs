@@ -1,15 +1,14 @@
 using Leap;
-using Leap.Unity;
-using Leap.Unity.Encoding;
+using Leap.Encoding;
 using System;
 using System.Collections.Generic;
 
 using UnityEngine;
 
-using Bone = Leap.Bone;
-using Hand = Leap.Hand;
+using Bone =  Leap.Bone;
+using Hand =  Leap.Hand;
 
-namespace Ultraleap.Tracking.OpenXR
+namespace Leap.Tracking.OpenXR
 {
     public class OpenXRLeapProvider : LeapProvider
     {
@@ -222,7 +221,7 @@ namespace Ultraleap.Tracking.OpenXR
                     }
 
                     // Populate the finger bone information
-                    var bone = hand.Fingers[fingerIndex].bones[boneIndex];
+                    var bone = hand.fingers[fingerIndex].bones[boneIndex];
                     bone.Fill(
                         prevJoint.Pose.position,
                         nextJoint.Pose.position,
@@ -234,12 +233,12 @@ namespace Ultraleap.Tracking.OpenXR
                         prevJoint.Pose.rotation);
                     fingerWidth = Mathf.Max(fingerWidth, bone.Width);
 
-                    if (bone.Type == Bone.BoneType.TYPE_INTERMEDIATE)
+                    if (bone.Type == Bone.BoneType.INTERMEDIATE)
                     {
                         xrIntermediateIndex = xrPrevIndex;
                     }
 
-                    if (bone.Type == Bone.BoneType.TYPE_DISTAL)
+                    if (bone.Type == Bone.BoneType.DISTAL)
                     {
                         xrTipIndex = xrNextIndex;
                     }
@@ -252,7 +251,7 @@ namespace Ultraleap.Tracking.OpenXR
                 }
 
                 // Populate the higher - level finger data.
-                hand.Fingers[fingerIndex].Fill(
+                hand.fingers[fingerIndex].Fill(
                     _frameId,
                     (handTracker == HandTracker.Left ? 0 : 1),
                     fingerIndex,

@@ -12,7 +12,7 @@ using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
-namespace Leap.Unity.Attributes
+namespace Leap.Attributes
 {
     [CustomPropertyDrawer(typeof(CombinablePropertyAttribute), true)]
     public class CombinablePropertyDrawer : PropertyDrawer
@@ -75,12 +75,30 @@ namespace Leap.Unity.Attributes
             return false;
         }
 
+        // Nasty temporary cache of current Property to avoid double drawing PropertyFields when they have multiple Attributes asociated to them
+        private static SerializedProperty currentlyDrawing;
+
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
+            if (currentlyDrawing == null)
+            {
+                currentlyDrawing = property;
+            }
+            else if(currentlyDrawing != property)
+            {
+                EditorGUI.PropertyField(position, property, label, true);
+                return;
+            }
+
             getAttributes(property);
 
             CombinablePropertyDrawer.OnGUI(this.attributes, this.fieldInfo, position,
               property, label);
+
+            if (currentlyDrawing == property)
+            {
+                currentlyDrawing = null;
+            }
         }
 
         public static void OnGUI(List<CombinablePropertyAttribute> attributes,

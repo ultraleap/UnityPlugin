@@ -9,7 +9,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace Leap.Unity.PhysicalHands.Examples
+namespace Leap.PhysicalHands.Examples
 {
     /// <summary>
     /// This class is very specific for the Ultraleap demo scene and should not be used in your own scenes
@@ -49,6 +49,7 @@ namespace Leap.Unity.PhysicalHands.Examples
         private void Start()
         {
             SceneActiveContactModeChanged((int)SceneContactMode.HardContact);
+            HardContactButton.GetComponent<PhysicalHandsButtonToggle>().SetTogglePressed();
         }
 
         /// <summary>

@@ -149,12 +149,12 @@ namespace Leap
 
         private static Hand makeLeapSpaceTestHand(int frameId, int handId, bool isLeft)
         {
-            List<Finger> fingers = new List<Finger>(5);
-            fingers.Add(makeThumb(frameId, handId, isLeft));
-            fingers.Add(makeIndexFinger(frameId, handId, isLeft));
-            fingers.Add(makeMiddleFinger(frameId, handId, isLeft));
-            fingers.Add(makeRingFinger(frameId, handId, isLeft));
-            fingers.Add(makePinky(frameId, handId, isLeft));
+            Finger[] fingers = new Finger[5];
+            fingers[0] = makeThumb(frameId, handId, isLeft);
+            fingers[1] = makeIndexFinger(frameId, handId, isLeft);
+            fingers[2] = makeMiddleFinger(frameId, handId, isLeft);
+            fingers[3] = makeRingFinger(frameId, handId, isLeft);
+            fingers[4] = makePinky(frameId, handId, isLeft);
 
             Vector3 armWrist = new Vector3(-7.05809944059f, 4.0f, 50.0f);
             Vector3 elbow = armWrist + 250f * Vector3.forward;
@@ -212,7 +212,7 @@ namespace Leap
             Vector3 forward = new Vector3(0.636329113772f, -0.5f, -0.899787143982f);
             Vector3 up = new Vector3(0.804793943718f, 0.447213915513f, 0.390264553767f);
             float[] jointLengths = { 0.0f, 46.22f, 31.57f, 21.67f };
-            return makeFinger(Finger.FingerType.TYPE_THUMB, position, forward, up, jointLengths, frameId, handId, handId + 0, isLeft);
+            return makeFinger(Finger.FingerType.THUMB, position, forward, up, jointLengths, frameId, handId, handId + 0, isLeft);
         }
 
         private static Finger makeIndexFinger(int frameId, int handId, bool isLeft)
@@ -221,7 +221,7 @@ namespace Leap
             Vector3 forward = new Vector3(0.166044313785f, -0.14834045293f, -0.974897120667f);
             Vector3 up = new Vector3(0.0249066470677f, 0.988936352868f, -0.1462345681f);
             float[] jointLengths = { 68.12f, 39.78f, 22.38f, 15.82f };
-            return makeFinger(Finger.FingerType.TYPE_INDEX, position, forward, up, jointLengths, frameId, handId, handId + 1, isLeft);
+            return makeFinger(Finger.FingerType.INDEX, position, forward, up, jointLengths, frameId, handId, handId + 1, isLeft);
         }
 
         private static Finger makeMiddleFinger(int frameId, int handId, bool isLeft)
@@ -230,7 +230,7 @@ namespace Leap
             Vector3 forward = new Vector3(0.0295207858556f, -0.148340452932f, -0.988495641481f);
             Vector3 up = new Vector3(-0.145765270107f, 0.977715980076f, -0.151075968756f);
             float[] jointLengths = { 64.60f, 44.63f, 26.33f, 17.40f };
-            return makeFinger(Finger.FingerType.TYPE_MIDDLE, position, forward, up, jointLengths, frameId, handId, handId + 2, isLeft);
+            return makeFinger(Finger.FingerType.MIDDLE, position, forward, up, jointLengths, frameId, handId, handId + 2, isLeft);
         }
 
         private static Finger makeRingFinger(int frameId, int handId, bool isLeft)
@@ -239,7 +239,7 @@ namespace Leap
             Vector3 forward = new Vector3(-0.121317937368f, -0.148340347175f, -0.981466810174f);
             Vector3 up = new Vector3(-0.216910468316f, 0.968834928679f, -0.119619102602f);
             float[] jointLengths = { 58.00f, 41.37f, 25.65f, 17.30f };
-            return makeFinger(Finger.FingerType.TYPE_RING, position, forward, up, jointLengths, frameId, handId, handId + 3, isLeft);
+            return makeFinger(Finger.FingerType.RING, position, forward, up, jointLengths, frameId, handId, handId + 3, isLeft);
         }
 
         private static Finger makePinky(int frameId, int handId, bool isLeft)
@@ -248,7 +248,7 @@ namespace Leap
             Vector3 forward = new Vector3(-0.259328923438f, -0.105851224797f, -0.959970847306f);
             Vector3 up = new Vector3(-0.353350220937f, 0.935459475557f, -0.00769356576168f);
             float[] jointLengths = { 53.69f, 32.74f, 18.11f, 15.96f };
-            return makeFinger(Finger.FingerType.TYPE_PINKY, position, forward, up, jointLengths, frameId, handId, handId + 4, isLeft);
+            return makeFinger(Finger.FingerType.PINKY, position, forward, up, jointLengths, frameId, handId, handId + 4, isLeft);
         }
 
 
@@ -261,19 +261,19 @@ namespace Leap
 
             Bone[] bones = new Bone[5];
             float proximalDistance = -jointLengths[0];
-            Bone metacarpal = makeBone(Bone.BoneType.TYPE_METACARPAL, position + forward * proximalDistance, jointLengths[0], 8f, forward, up, isLeft);
+            Bone metacarpal = makeBone(Bone.BoneType.METACARPAL, position + forward * proximalDistance, jointLengths[0], 8f, forward, up, isLeft);
             proximalDistance += jointLengths[0];
             bones[0] = metacarpal;
 
-            Bone proximal = makeBone(Bone.BoneType.TYPE_PROXIMAL, position + forward * proximalDistance, jointLengths[1], 8f, forward, up, isLeft);
+            Bone proximal = makeBone(Bone.BoneType.PROXIMAL, position + forward * proximalDistance, jointLengths[1], 8f, forward, up, isLeft);
             proximalDistance += jointLengths[1];
             bones[1] = proximal;
 
-            Bone intermediate = makeBone(Bone.BoneType.TYPE_INTERMEDIATE, position + forward * proximalDistance, jointLengths[2], 8f, forward, up, isLeft);
+            Bone intermediate = makeBone(Bone.BoneType.INTERMEDIATE, position + forward * proximalDistance, jointLengths[2], 8f, forward, up, isLeft);
             proximalDistance += jointLengths[2];
             bones[2] = intermediate;
 
-            Bone distal = makeBone(Bone.BoneType.TYPE_DISTAL, position + forward * proximalDistance, jointLengths[3], 8f, forward, up, isLeft);
+            Bone distal = makeBone(Bone.BoneType.DISTAL, position + forward * proximalDistance, jointLengths[3], 8f, forward, up, isLeft);
             bones[3] = distal;
 
             return new Finger(frameId,
