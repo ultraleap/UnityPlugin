@@ -130,7 +130,7 @@ namespace Leap
                 if (_sphereColors == null)
                 {
                     _sphereColors = new Color[32];
-                     Leap.Utils.Fill(_sphereColors, SphereColour);
+                    Leap.Utils.Fill(_sphereColors, SphereColour);
                 }
                 return _sphereColors;
             }

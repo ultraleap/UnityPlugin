@@ -6,9 +6,9 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using UnityEngine;
-using UnityEditor;
 using System.Linq;
+using UnityEditor;
+using UnityEngine;
 
 namespace Leap.PhysicalHandsExamples
 {
@@ -116,7 +116,7 @@ namespace Leap.PhysicalHandsExamples
             EditorGUILayout.LabelField("" + enumName.ElementAt(0) + " Axis:");
             result.x = EditorGUILayout.Slider(
                 serializedObject.FindProperty(property).vector2Value.x,
-                0,1
+                0, 1
             );
             EditorGUILayout.EndHorizontal();
 
@@ -125,7 +125,7 @@ namespace Leap.PhysicalHandsExamples
             EditorGUILayout.LabelField("" + enumName.ElementAt(1) + " Axis:");
             result.y = EditorGUILayout.Slider(
                 serializedObject.FindProperty(property).vector2Value.y,
-                0,1
+                0, 1
             );
             EditorGUIUtility.labelWidth = 0;
             EditorGUILayout.EndHorizontal();

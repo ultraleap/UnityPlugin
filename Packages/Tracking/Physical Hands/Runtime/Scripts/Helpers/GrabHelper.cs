@@ -205,7 +205,7 @@ namespace Leap.PhysicalHands
             {
                 _fingerStrengths.Add(hand, new float[5]);
             }
-             Leap.Hand lHand = hand.dataHand;
+            Leap.Hand lHand = hand.dataHand;
             for (int i = 0; i < 5; i++)
             {
                 _fingerStrengths[hand][i] = lHand.GetFingerStrength(i);
@@ -261,7 +261,7 @@ namespace Leap.PhysicalHands
 
             if (nearestObject != null && TryGetGrabHelperObjectFromRigid(nearestObject, out GrabHelperObject helperObject)) // Find the nearest GrabHelperObject
             {
-                if(prevPrimaryHoverObject != null && prevPrimaryHoverObject != helperObject) // Update events and states
+                if (prevPrimaryHoverObject != null && prevPrimaryHoverObject != helperObject) // Update events and states
                 {
                     prevPrimaryHoverObject.HandlePrimaryHoverExit(contactHand);
                 }
@@ -269,7 +269,7 @@ namespace Leap.PhysicalHands
                 helperObject.HandlePrimaryHover(contactHand);
                 prevPrimaryHoverObject = helperObject; // cache for next frame
             }
-            else if(prevPrimaryHoverObject != null)
+            else if (prevPrimaryHoverObject != null)
             {
                 prevPrimaryHoverObject.HandlePrimaryHoverExit(contactHand);
             }

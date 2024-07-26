@@ -55,7 +55,7 @@ namespace Leap
                 cameraToFace = Camera.main;
             }
 
-            if(cameraToFace == null)
+            if (cameraToFace == null)
             {
                 return;
             }

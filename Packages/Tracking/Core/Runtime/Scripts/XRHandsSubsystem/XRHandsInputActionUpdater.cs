@@ -66,7 +66,7 @@ namespace Leap.InputActions
 
             currentSubsystem.updatedHands -= UpdateHands;
             currentSubsystem.updatedHands += UpdateHands;
-          
+
             // Create meta hands if required
             if (ultraleapSettings.updateMetaInputSystem)
             {

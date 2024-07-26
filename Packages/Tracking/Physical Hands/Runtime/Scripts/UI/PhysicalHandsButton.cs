@@ -14,7 +14,7 @@ using UnityEngine.Events;
 namespace Leap.PhysicalHands
 {
     [RequireComponent(typeof(Rigidbody))]
-    public class PhysicalHandsButton: MonoBehaviour
+    public class PhysicalHandsButton : MonoBehaviour
     {
         [SerializeField]
         private bool _automaticTravelDistance = true;
@@ -32,7 +32,7 @@ namespace Leap.PhysicalHands
         private float _buttonTravelDistance = 0.01f;
         [SerializeField]
         protected float _buttonTravelOffset = 0;
-        [SerializeField] 
+        [SerializeField]
         protected bool _canBePressedByObjects = false;
         [SerializeField]
         protected GameObject _pressableObject;
@@ -58,7 +58,7 @@ namespace Leap.PhysicalHands
         protected Rigidbody _pressableObjectRB = null;
         protected ConfigurableJoint _configurableJoint;
 
-        
+
         /// <summary>
         /// Some presets for how the button should act. 
         /// Try them out and work out what feels best for your specific button. 
@@ -301,7 +301,7 @@ namespace Leap.PhysicalHands
             }
 
             // Target position is set high as we hit the limit first, this means that the button is always trying to push agains the limit
-            _configurableJoint.targetPosition = new Vector3(0, -(_buttonTravelDistance * 2), 0); 
+            _configurableJoint.targetPosition = new Vector3(0, -(_buttonTravelDistance * 2), 0);
 
             // Connect the button to the parent object with a spring joint
             _configurableJoint.connectedBody = _rigidbody;
@@ -325,7 +325,7 @@ namespace Leap.PhysicalHands
             // Adjust anchor position for button travel distance
             _configurableJoint.anchor = Vector3.zero;
             _configurableJoint.autoConfigureConnectedAnchor = false;
-            _configurableJoint.connectedAnchor = new Vector3(0, _buttonTravelOffset + (_buttonTravelDistanceLocal / 2) ,0);
+            _configurableJoint.connectedAnchor = new Vector3(0, _buttonTravelOffset + (_buttonTravelDistanceLocal / 2), 0);
 
             // Set linear limit for button travel
             _configurableJoint.linearLimit = new SoftJointLimit
@@ -495,11 +495,11 @@ namespace Leap.PhysicalHands
 
         private void OnHandPrimaryHoverPO(ContactHand hand)
         {
-            if(hand.Handedness == Chirality.Right)
+            if (hand.Handedness == Chirality.Right)
             {
                 _rightHandPrimaryHovered = true;
             }
-            else if(hand.Handedness == Chirality.Left)
+            else if (hand.Handedness == Chirality.Left)
             {
                 _leftHandPrimaryHovered = true;
             }

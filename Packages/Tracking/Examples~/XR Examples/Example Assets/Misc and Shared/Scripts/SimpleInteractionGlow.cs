@@ -6,12 +6,10 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
+using Leap.PhysicalHands;
 using System.Collections.Generic;
 using System.Linq;
-
 using UnityEngine;
-
-using Leap.PhysicalHands;
 
 namespace Leap.Examples
 {

@@ -84,7 +84,7 @@ namespace Leap.Attributes
             {
                 currentlyDrawing = property;
             }
-            else if(currentlyDrawing != property)
+            else if (currentlyDrawing != property)
             {
                 EditorGUI.PropertyField(position, property, label, true);
                 return;

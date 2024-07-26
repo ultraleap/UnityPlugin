@@ -6,10 +6,10 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
+using Leap.Attachments;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using Leap.Attachments;
 
 namespace Leap
 {
@@ -245,7 +245,7 @@ namespace Leap
                 {
                     continue;
                 }
-                 Leap.Utils.DrawCircle(pos, dir, radius, AnchorGizmoColor, quality: 24, depthTest: true);
+                Leap.Utils.DrawCircle(pos, dir, radius, AnchorGizmoColor, quality: 24, depthTest: true);
             }
         }
 
@@ -257,7 +257,7 @@ namespace Leap
             for (int i = 0; i < numCircles; i++)
             {
                 float curTheta = (dTheta * i) + halfTheta;
-                 Leap.Utils.DrawCircle(pos + poleDir * Mathf.Cos(curTheta * Mathf.Deg2Rad) * radius, poleDir, Mathf.Sin(curTheta * Mathf.Deg2Rad) * radius, AnchorGizmoColor, quality: 16, depthTest: true);
+                Leap.Utils.DrawCircle(pos + poleDir * Mathf.Cos(curTheta * Mathf.Deg2Rad) * radius, poleDir, Mathf.Sin(curTheta * Mathf.Deg2Rad) * radius, AnchorGizmoColor, quality: 16, depthTest: true);
             }
         }
 

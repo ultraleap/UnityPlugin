@@ -74,8 +74,8 @@ namespace Leap
             analytics.telemetry.app_type = GetAppType();
             analytics.telemetry.engine_name = "Unity";
             analytics.telemetry.engine_version = Application.unityVersion;
-            analytics.telemetry.plugin_version =  Leap.UltraleapSettings.Instance.PluginVersion;
-            analytics.telemetry.installation_source =  Leap.UltraleapSettings.Instance.PluginSource;
+            analytics.telemetry.plugin_version = Leap.UltraleapSettings.Instance.PluginVersion;
+            analytics.telemetry.installation_source = Leap.UltraleapSettings.Instance.PluginSource;
             analytics.telemetry.interaction_system = GetInteractionSystem();
             analytics.telemetry.render_pipeline = GetRenderPipeline();
 
@@ -98,7 +98,7 @@ namespace Leap
         {
             string sceneMane = "Unknown";
 
-            if(SceneManager.GetActiveScene() != null)
+            if (SceneManager.GetActiveScene() != null)
             {
                 sceneMane = SceneManager.GetActiveScene().name;
             }
@@ -140,7 +140,7 @@ namespace Leap
             }
 
             // XRI
-            if(GameObject.Find("Complete XR Origin Hands Set Up") ||
+            if (GameObject.Find("Complete XR Origin Hands Set Up") ||
                 GameObject.Find("Complete XR Origin Set Up") ||
                 GameObject.Find("Poke Interactor"))
             {
@@ -148,20 +148,20 @@ namespace Leap
             }
 
             // XR Hands
-            if ( Leap.UltraleapSettings.Instance.leapSubsystemEnabled ||
+            if (Leap.UltraleapSettings.Instance.leapSubsystemEnabled ||
                  Leap.UltraleapSettings.Instance.updateLeapInputSystem ||
                  Leap.UltraleapSettings.Instance.updateMetaInputSystem)
             {
                 return "UL XR Hands";
             }
 
-            if(GameObject.Find("Hand Visualizer"))
+            if (GameObject.Find("Hand Visualizer"))
             {
                 return "XR Hands";
             }
 
             // MRTK
-            if(GameObject.Find("MRTK Interaction Manager"))
+            if (GameObject.Find("MRTK Interaction Manager"))
             {
                 return "MRTK";
             }

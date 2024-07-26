@@ -23,7 +23,7 @@ public class VisualizeJointConfidence : MonoBehaviour
         if (hand.GetLeapHand() == null) return;
 
         Color[] colors = hand.SphereColors;
-         Leap.Utils.Fill(colors, hand.SphereColour);
+        Leap.Utils.Fill(colors, hand.SphereColour);
 
         float[] confidences = aggregationProvider.CalculateJointConfidence(provider_idx, hand.GetLeapHand());
 

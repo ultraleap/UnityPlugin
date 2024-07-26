@@ -15,7 +15,7 @@ namespace Leap
 
     [CanEditMultipleObjects]
     [CustomEditor(typeof(PhysicalHandsAnchorable))]
-    public class PhysicalHandsAnchorableEditor :  Leap.AnchorableBehaviourEditor
+    public class PhysicalHandsAnchorableEditor : Leap.AnchorableBehaviourEditor
     {
 
         protected override void OnEnable()

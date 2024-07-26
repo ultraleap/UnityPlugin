@@ -6,8 +6,8 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using UnityEngine;
 using Leap.PhysicalHands;
+using UnityEngine;
 
 namespace Leap.Examples
 {

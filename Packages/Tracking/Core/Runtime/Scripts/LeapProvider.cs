@@ -147,7 +147,7 @@ namespace Leap
     public static class LeapProviderExtensions
     {
 
-        public static  Leap.Hand MakeTestHand(this LeapProvider provider, bool isLeft)
+        public static Leap.Hand MakeTestHand(this LeapProvider provider, bool isLeft)
         {
             return TestHandFactory.MakeTestHand(isLeft, provider.editTimePose)
                                   .Transform(new LeapTransform(provider.transform));

@@ -6,8 +6,8 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using UnityEngine;
 using UnityEditor;
+using UnityEngine;
 
 namespace Leap.PhysicalHands
 {
@@ -44,7 +44,7 @@ namespace Leap.PhysicalHands
             EditorGUILayout.Space(5);
 
             EditorGUILayout.PropertyField(serializedObject.FindProperty("_automaticTravelDistance"), new GUIContent("Use Automatic Travel Distance", "Travel distance will be calculated automaticall based on how far the pressable object is from this object"));
-            
+
             if (!serializedObject.FindProperty("_automaticTravelDistance").boolValue)
             {
                 EditorGUI.indentLevel = 1;

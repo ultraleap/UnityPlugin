@@ -2,7 +2,7 @@ using Leap.PhysicalHands;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static  Leap.PhysicalHands.ContactBone;
+using static Leap.PhysicalHands.ContactBone;
 
 namespace Leap.PhysicalHands
 {
