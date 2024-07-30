@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
 
+## [NEXT]
+
+### Fixed
+- GrabHelper handles null ContactHand objects more gracefully
+
+
 ## [7.0.0] - 22/07/2024
 
 ### Tracking Client versions
