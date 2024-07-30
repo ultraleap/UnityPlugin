@@ -107,8 +107,9 @@ check-formatting:
 # Unity Builds
 # -----------------------------------------------------------------------------
 #
-# This job will trigger various apps to build using the plugin commit that started this pipeline.
+# This job will trigger Unity 2021/2022 test apps to build using the plugin commit that started this pipeline.
 # A failure in a build likely represents a breaking plugin change and should be addressed, but will not fail the whole pipeline.
+# The resulting builds will contain every sample scene, and should be used for manual testing.
 #
 unity-builds:
   stage: test
@@ -117,7 +118,7 @@ unity-builds:
   rules:
     - when: manual
   trigger:
-    project: xr/rad/triggers/unityplugin-tests
+    project: xr/integrations/unity/unityplugin-tests
     branch: main
   variables:
     PLUGIN_COMMIT_BRANCH: $CI_COMMIT_BRANCH
