@@ -25,8 +25,8 @@ namespace Leap.PhysicalHands
                 "\n\nWarning: Hard Contact hands can jitter when moving a kinematic object")]
         public bool useNonKinematicMovementOnly = true;
 
-        private ContactHand _leftContactHand { get { return physicalHandsManager.ContactParent.LeftHand; } }
-        private ContactHand _rightContactHand { get { return physicalHandsManager.ContactParent.RightHand; } }
+        private ContactHand _leftContactHand { get { return physicalHandsManager?.ContactParent?.LeftHand; } }
+        private ContactHand _rightContactHand { get { return physicalHandsManager?.ContactParent?.RightHand; } }
 
         private Collider[] _colliderCache = new Collider[128];
 
@@ -54,6 +54,11 @@ namespace Leap.PhysicalHands
 
         private void OnEnable()
         {
+            if (physicalHandsManager == null)
+            {
+                physicalHandsManager = GetComponent<PhysicalHandsManager>();
+            }
+
             if (physicalHandsManager != null)
             {
                 physicalHandsManager.OnPrePhysicsUpdate -= OnPrePhysicsUpdate;
@@ -114,12 +119,12 @@ namespace Leap.PhysicalHands
         #region Hand Updating
         private void UpdateHandHeuristics()
         {
-            if (_leftContactHand.tracked)
+            if (_leftContactHand != null && _leftContactHand.tracked)
             {
                 UpdateFingerStrengthValues(_leftContactHand);
             }
 
-            if (_rightContactHand.tracked)
+            if (_rightContactHand != null && _rightContactHand.tracked)
             {
                 UpdateFingerStrengthValues(_rightContactHand);
             }
@@ -238,6 +243,9 @@ namespace Leap.PhysicalHands
 
         void UpdatePrimaryHoverForHand(ref GrabHelperObject prevPrimaryHoverObject, ContactHand contactHand)
         {
+            if (contactHand == null)
+                return;
+
             // If we are contacting or grabbing, we are still primary hovering the same object. break out
             if (prevPrimaryHoverObject != null && contactHand.IsContacting &&
                 (prevPrimaryHoverObject.GrabState == GrabHelperObject.State.Contact ||
