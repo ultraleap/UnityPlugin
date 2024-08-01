@@ -9,16 +9,24 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Leap.Unity.PhysicalHands
+namespace Leap.PhysicalHands
 {
     [RequireComponent(typeof(PhysicalHandsManager))]
     public class GrabHelper : MonoBehaviour
     {
+        public static GrabHelper Instance;
+
         [SerializeField]
         private PhysicalHandsManager physicalHandsManager;
 
-        private ContactHand _leftContactHand { get { return physicalHandsManager.ContactParent.LeftHand; } }
-        private ContactHand _rightContactHand { get { return physicalHandsManager.ContactParent.RightHand; } }
+        [Tooltip("Should kinematic objects be changed to non-kinematic for movement?" +
+                "\n\nIf true, rigidbodies will be changed to non-kinematic when grabbed, and returned to kinematic when released" +
+                "\n\nIf false, kinematic objects will be positioned through kinematic methods" +
+                "\n\nWarning: Hard Contact hands can jitter when moving a kinematic object")]
+        public bool useNonKinematicMovementOnly = true;
+
+        private ContactHand _leftContactHand { get { return physicalHandsManager?.ContactParent?.LeftHand; } }
+        private ContactHand _rightContactHand { get { return physicalHandsManager?.ContactParent?.RightHand; } }
 
         private Collider[] _colliderCache = new Collider[128];
 
@@ -34,8 +42,23 @@ namespace Leap.Unity.PhysicalHands
 
         #endregion
 
+        private void Awake()
+        {
+            if (Instance != null)
+            {
+                Debug.LogWarning("Having multiple GrabHelpers at once is not supported");
+            }
+
+            Instance = this;
+        }
+
         private void OnEnable()
         {
+            if (physicalHandsManager == null)
+            {
+                physicalHandsManager = GetComponent<PhysicalHandsManager>();
+            }
+
             if (physicalHandsManager != null)
             {
                 physicalHandsManager.OnPrePhysicsUpdate -= OnPrePhysicsUpdate;
@@ -96,12 +119,12 @@ namespace Leap.Unity.PhysicalHands
         #region Hand Updating
         private void UpdateHandHeuristics()
         {
-            if (_leftContactHand.tracked)
+            if (_leftContactHand != null && _leftContactHand.tracked)
             {
                 UpdateFingerStrengthValues(_leftContactHand);
             }
 
-            if (_rightContactHand.tracked)
+            if (_rightContactHand != null && _rightContactHand.tracked)
             {
                 UpdateFingerStrengthValues(_rightContactHand);
             }
@@ -150,7 +173,7 @@ namespace Leap.Unity.PhysicalHands
                 hand.palmBone.transform.position + (-hand.palmBone.transform.up * Mathf.Lerp(0.025f, 0.07f, lerp)) + (hand.palmBone.transform.forward * Mathf.Lerp(0.06f, 0.02f, lerp)),
                 radiusAmount + physicalHandsManager.HoverDistance,
                 _colliderCache,
-                physicalHandsManager.InteractionMask);
+                physicalHandsManager.InteractionMask, QueryTriggerInteraction.Ignore);
 
             RemoveUnhoveredHandsFromGrabHelperObjects(nearbyObjectCount, hand);
 
@@ -196,6 +219,10 @@ namespace Leap.Unity.PhysicalHands
         #endregion
 
         #region Helper Updating
+
+        GrabHelperObject primaryHoverObjectLeft = null;
+        GrabHelperObject primaryHoverObjectRight = null;
+
         private void UpdateHelpers()
         {
             RemoveUnhoveredGrabHelperObjects();
@@ -203,6 +230,56 @@ namespace Leap.Unity.PhysicalHands
             foreach (var helper in _grabHelperObjects)
             {
                 helper.Value.UpdateHelper();
+            }
+
+            UpdatePrimaryHover();
+        }
+
+        private void UpdatePrimaryHover()
+        {
+            UpdatePrimaryHoverForHand(ref primaryHoverObjectLeft, _leftContactHand);
+            UpdatePrimaryHoverForHand(ref primaryHoverObjectRight, _rightContactHand);
+        }
+
+        void UpdatePrimaryHoverForHand(ref GrabHelperObject prevPrimaryHoverObject, ContactHand contactHand)
+        {
+            if (contactHand == null)
+                return;
+
+            // If we are contacting or grabbing, we are still primary hovering the same object. break out
+            if (prevPrimaryHoverObject != null && contactHand.IsContacting &&
+                (prevPrimaryHoverObject.GrabState == GrabHelperObject.State.Contact ||
+                prevPrimaryHoverObject.GrabState == GrabHelperObject.State.Grab))
+            {
+                prevPrimaryHoverObject.HandlePrimaryHover(contactHand);
+                return;
+            }
+
+            float closestBoneDistance = float.MaxValue;
+            Rigidbody nearestObject = null;
+            for (int i = 0; i < 3; i++) // loop thumb, index & middle
+            {
+                ContactBone bone = contactHand.GetBone(i, 2); //get distal
+                if (bone.NearestObjectDistance < closestBoneDistance) // cache nearest rigidbody and distance
+                {
+                    closestBoneDistance = bone.NearestObjectDistance;
+                    nearestObject = bone.NearestObject;
+                }
+            }
+
+            if (nearestObject != null && TryGetGrabHelperObjectFromRigid(nearestObject, out GrabHelperObject helperObject)) // Find the nearest GrabHelperObject
+            {
+                if (prevPrimaryHoverObject != null && prevPrimaryHoverObject != helperObject) // Update events and states
+                {
+                    prevPrimaryHoverObject.HandlePrimaryHoverExit(contactHand);
+                }
+
+                helperObject.HandlePrimaryHover(contactHand);
+                prevPrimaryHoverObject = helperObject; // cache for next frame
+            }
+            else if (prevPrimaryHoverObject != null)
+            {
+                prevPrimaryHoverObject.HandlePrimaryHoverExit(contactHand);
             }
         }
 
@@ -276,6 +353,16 @@ namespace Leap.Unity.PhysicalHands
                     _grabHelperObjects[rigid].ReleaseHelper();
                     _grabHelperObjects.Remove(rigid);
                 }
+
+                foreach (var bone in _leftContactHand.bones)
+                {
+                    bone.RemoveGrabbing(rigid);
+                }
+                foreach (var bone in _rightContactHand.bones)
+                {
+                    bone.RemoveGrabbing(rigid);
+                }
+
                 return true;
             }
             return false;
@@ -315,19 +402,37 @@ namespace Leap.Unity.PhysicalHands
         #endregion
 
         #region Object Information
-        public bool IsObjectGrabbing(Rigidbody rigid, out ContactHand hand)
+        /// <summary>
+        /// Find out if the given rigidbody is being grabbed and by which hand
+        /// </summary>
+        /// <param name="rigid">Rigidbody to check</param>
+        /// <param name="hand">Contact Hand that is grabbing, null if no hand is grabbing</param>
+        /// <returns>True if this object is being grabbed</returns>
+        public bool IsObjectGrabbed(Rigidbody rigid, out ContactHand hand)
         {
             hand = null;
             if (_grabHelperObjects.TryGetValue(rigid, out GrabHelperObject helper))
             {
-                if (helper.GrabState == GrabHelperObject.State.Grab && helper.GrabbingHands.Count > 0)
+                if (helper.currentGrabbingHand != null)
                 {
-                    hand = helper.GrabbingHands[helper.GrabbingHands.Count - 1];
+                    hand = helper.currentGrabbingHand;
                     return true;
                 }
             }
             return false;
         }
+
+        /// <summary>
+        /// Populate helperObject with the GrabHelperObject associated with the provided Rigidbody if there is one.
+        /// </summary>
+        /// <param name="rigid">The Rigidbody to find the associated GrabHelperObject</param>
+        /// <param name="helperObject">A GrabHelperObject to be populated if one is available</param>
+        /// <returns>True if there is a GrabHelperObject associated with the provided Rigidbody</returns>
+        public bool TryGetGrabHelperObjectFromRigid(Rigidbody rigid, out GrabHelperObject helperObject)
+        {
+            return _grabHelperObjects.TryGetValue(rigid, out helperObject);
+        }
+
         #endregion
 
         private void OnValidate()

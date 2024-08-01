@@ -6,12 +6,12 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity.Preview.HandRays;
+using Leap.Preview.HandRays;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Leap.Unity.Preview.Locomotion
+namespace Leap.Preview.Locomotion
 {
     /// <summary>
     /// Base class for all teleport actions.
@@ -101,7 +101,11 @@ namespace Leap.Unity.Preview.Locomotion
             if (Player == null) Player = Head.parent.gameObject == null ? Head.gameObject : Head.parent.gameObject;
             if (farFieldLayerManager == null)
             {
+#if UNITY_2021_3_18_OR_NEWER
                 farFieldLayerManager = FindAnyObjectByType<FarFieldLayerManager>();
+#else
+                farFieldLayerManager = FindObjectOfType<FarFieldLayerManager>();
+#endif
             }
 
             if (handRayInteractor != null)
@@ -111,7 +115,11 @@ namespace Leap.Unity.Preview.Locomotion
 
             if (findTeleportAnchorsOnStart)
             {
+#if UNITY_2021_3_18_OR_NEWER
                 _teleportAnchors = new List<TeleportAnchor>(FindObjectsByType<TeleportAnchor>(FindObjectsInactive.Include, FindObjectsSortMode.None));
+#else
+                _teleportAnchors = new List<TeleportAnchor>(FindObjectsOfType<TeleportAnchor>(true));
+#endif
             }
 
             if (freeTeleportAnchor.TryGetComponent(out MeshCollider anchorCollider))
@@ -145,7 +153,11 @@ namespace Leap.Unity.Preview.Locomotion
 
             if (farFieldLayerManager == null)
             {
+#if UNITY_2021_3_18_OR_NEWER
                 farFieldLayerManager = FindAnyObjectByType<FarFieldLayerManager>();
+#else
+                farFieldLayerManager = FindObjectOfType<FarFieldLayerManager>();
+#endif
             }
         }
 

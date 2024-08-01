@@ -6,7 +6,7 @@ using UnityEditor;
 
 using UnityEngine;
 
-namespace Leap.Unity.PhysicalHands
+namespace Leap.PhysicalHands
 {
     [Serializable]
     internal class PhysicalHandsSettings
@@ -67,7 +67,7 @@ namespace Leap.Unity.PhysicalHands
                     new RecommendedSetting()
                     {
                         property = _physicsManager.FindProperty(ID_SLEEP_THRESHOLD),
-                        recommended = "0.001",
+                        recommended = 0.001f.ToString(),
                         description = "Increases the realism of your physics objects e.g. allows objects to correctly rest"
                     }
                 },
@@ -85,7 +85,7 @@ namespace Leap.Unity.PhysicalHands
                     new RecommendedSetting()
                     {
                         property = _physicsManager.FindProperty(ID_DEFAULT_CONTACT_OFFSET),
-                        recommended = "0.001",
+                        recommended = 0.001f.ToString(),
                         description = "Distance used by physics sim to generate collision contacts. "
                     }
                 },
@@ -181,6 +181,7 @@ namespace Leap.Unity.PhysicalHands
                         impactsPerformance = true
                     }
                 },
+#if UNITY_2021
                 {
                     ID_SOLVER_TYPE,
                     new RecommendedSetting()
@@ -191,12 +192,13 @@ namespace Leap.Unity.PhysicalHands
                         impactsPerformance = true
                     }
                 },
+#endif
                 {
                     ID_FIXED_TIMESTEP,
                     new RecommendedSetting()
                     {
                         property = _timeManager.FindProperty(ID_FIXED_TIMESTEP),
-                        recommended = "0.011111",
+                        recommended = 0.011111f.ToString(),
                         description = "Makes your app physics run smoother.",
                         impactsPerformance = true
                     }

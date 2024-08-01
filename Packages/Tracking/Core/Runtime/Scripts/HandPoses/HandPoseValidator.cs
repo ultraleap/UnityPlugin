@@ -1,4 +1,4 @@
-using Leap.Unity;
+using Leap;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -32,7 +32,11 @@ public class HandPoseValidator : MonoBehaviour
     {
         if (poseDetector == null)
         {
+#if UNITY_2021_3_18_OR_NEWER
             poseDetector = FindAnyObjectByType<HandPoseDetector>();
+#else
+            poseDetector = FindObjectOfType<HandPoseDetector>();
+#endif
         }
 
         poseDetector.EnablePoseCaching();
@@ -90,8 +94,8 @@ public class HandPoseValidator : MonoBehaviour
 
         if (colourCapsuleHand != null)
         {
-            Leap.Unity.Utils.Fill(leftCapsuleHandColours, Color.grey);
-            Leap.Unity.Utils.Fill(rightCapsuleHandColours, Color.grey);
+            Leap.Utils.Fill(leftCapsuleHandColours, Color.grey);
+            Leap.Utils.Fill(rightCapsuleHandColours, Color.grey);
         }
 
         if (storedValidationHands.Count > 0)
@@ -211,15 +215,15 @@ public class HandPoseValidator : MonoBehaviour
                                 if (capsuleHand != null && capsuleHand.enabled)
                                 {
                                     if ((int)boneDirectionTarget.finger != 5 &&
-                                        boneDirectionTarget.finger != (int)Leap.Finger.FingerType.TYPE_UNKNOWN &&
-                                        boneDirectionTarget.bone != (int)Leap.Bone.BoneType.TYPE_INVALID)
+                                        boneDirectionTarget.finger != (int)Leap.Finger.FingerType.UNKNOWN &&
+                                        boneDirectionTarget.bone != (int)Leap.Bone.BoneType.UNKNOWN)
                                     {
                                         int fingNum = (int)boneDirectionTarget.finger;
                                         int boneNum = (int)boneDirectionTarget.bone;
 
                                         if (capsuleHand.GetLeapHand() != null)
                                         {
-                                            var directionBone = capsuleHand.GetLeapHand().Fingers[fingNum].bones[boneNum];
+                                            var directionBone = capsuleHand.GetLeapHand().fingers[fingNum].bones[boneNum];
 
                                             if (directionBone.PrevJoint != null)
                                             {

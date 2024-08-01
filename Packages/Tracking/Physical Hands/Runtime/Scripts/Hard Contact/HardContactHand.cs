@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Leap.Unity.PhysicalHands
+namespace Leap.PhysicalHands
 {
     public class HardContactHand : ContactHand
     {
@@ -128,8 +128,8 @@ namespace Leap.Unity.PhysicalHands
                     fingerStiffness[fingerIndex] = hardContactParent.boneStiffness;
                     for (int jointIndex = 0; jointIndex < FINGER_BONES; jointIndex++)
                     {
-                        Bone prevBone = dataHand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex));
-                        Bone bone = dataHand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex + 1)); // +1 to skip first bone.
+                        Bone prevBone = dataHand.fingers[fingerIndex].GetBone((Bone.BoneType)(jointIndex));
+                        Bone bone = dataHand.fingers[fingerIndex].GetBone((Bone.BoneType)(jointIndex + 1)); // +1 to skip first bone.
 
                         int boneArrayIndex = fingerIndex * FINGER_BONES + jointIndex;
 
@@ -187,7 +187,7 @@ namespace Leap.Unity.PhysicalHands
                 {
                     int boneArrayIndex = fingerIndex * FINGER_BONES + jointIndex;
 
-                    Bone bone = dataHand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex + 1));
+                    Bone bone = dataHand.fingers[fingerIndex].GetBone((Bone.BoneType)(jointIndex + 1));
 
                     ((HardContactBone)bones[boneArrayIndex]).UpdateBoneDisplacement(bone);
                     _overallFingerDisplacement += ((HardContactBone)bones[boneArrayIndex]).DisplacementAmount;
@@ -204,9 +204,9 @@ namespace Leap.Unity.PhysicalHands
                     contactingFingers++;
                 }
 
-                if (!hasFingerGrasped)
+                if (!contacting || hasFingerGrasped)
                 {
-                    fingerStiffness[fingerIndex] = hardContactParent.boneStiffness;
+                    fingerStiffness[fingerIndex] = Mathf.Lerp(fingerStiffness[fingerIndex], hardContactParent.boneStiffness, Time.fixedDeltaTime * 5);
                 }
             }
 
@@ -219,7 +219,7 @@ namespace Leap.Unity.PhysicalHands
             {
                 _contactFingerDisplacement = _overallFingerDisplacement * contactingFingers;
 
-                if (_displacementGrabCooldown > 0)
+                if (_displacementGrabCooldownCurrent > 0)
                 {
                     _displacementGrabCooldownCurrent -= Time.fixedDeltaTime;
 
@@ -321,6 +321,8 @@ namespace Leap.Unity.PhysicalHands
         /// </summary>
         protected override void ProcessOutputHand(ref Hand modifiedHand)
         {
+            modifiedHand.CopyFrom(dataHand);
+
             modifiedHand.SetTransform(palmBone.transform.position, palmBone.transform.rotation);
 
             int boneInd = 0;
@@ -329,15 +331,15 @@ namespace Leap.Unity.PhysicalHands
             float r;
             if (!_justGhosted)
             {
-                for (int i = 0; i < modifiedHand.Fingers.Count; i++)
+                for (int i = 0; i < modifiedHand.fingers.Length; i++)
                 {
-                    Bone b = modifiedHand.Fingers[i].bones[0];
+                    Bone b = modifiedHand.fingers[i].bones[0];
                     PhysExts.ToWorldSpaceCapsule(bones[boneInd].boneCollider, out posA, out posB, out r);
                     b.NextJoint = posB;
 
-                    for (int j = 1; j < modifiedHand.Fingers[i].bones.Length; j++)
+                    for (int j = 1; j < modifiedHand.fingers[i].bones.Length; j++)
                     {
-                        b = modifiedHand.Fingers[i].bones[j];
+                        b = modifiedHand.fingers[i].bones[j];
                         PhysExts.ToWorldSpaceCapsule(bones[boneInd].boneCollider, out posA, out posB, out r);
 
                         b.PrevJoint = posB;
@@ -350,33 +352,25 @@ namespace Leap.Unity.PhysicalHands
                         boneInd++;
                     }
 
-                    modifiedHand.Fingers[i].TipPosition = GetTipPosition(i);
+                    modifiedHand.fingers[i].TipPosition = GetTipPosition(i);
                 }
             }
 
             modifiedHand.WristPosition = palmBone.transform.position - (palmBone.transform.rotation * Quaternion.Inverse(dataHand.Rotation) * (dataHand.PalmPosition - dataHand.WristPosition));
 
-            Vector3 direction = dataHand.Arm.Direction;
-
-            modifiedHand.Arm.PrevJoint = modifiedHand.WristPosition + (-dataHand.Arm.Length * direction);
+            modifiedHand.Arm.PrevJoint = modifiedHand.WristPosition + (-dataHand.Arm.Length * dataHand.Arm.Direction);
             modifiedHand.Arm.NextJoint = modifiedHand.WristPosition;
             modifiedHand.Arm.Center = (modifiedHand.Arm.PrevJoint + modifiedHand.Arm.NextJoint) / 2f;
             modifiedHand.Arm.Length = Vector3.Distance(modifiedHand.Arm.PrevJoint, modifiedHand.Arm.NextJoint);
             modifiedHand.Arm.Direction = (modifiedHand.WristPosition - modifiedHand.Arm.PrevJoint).normalized;
             modifiedHand.Arm.Rotation = Quaternion.LookRotation(modifiedHand.Arm.Direction, -dataHand.PalmNormal);
-            modifiedHand.Arm.Width = dataHand.Arm.Width;
 
             // Add the radius of one of the palm edges to the box collider to get the correct width
             modifiedHand.PalmWidth = palmBone.palmCollider.size.y + palmBone.palmEdgeColliders[1].radius;
-            modifiedHand.Confidence = dataHand.Confidence;
-            modifiedHand.Direction = dataHand.Direction;
-            modifiedHand.FrameId = dataHand.FrameId;
-            modifiedHand.Id = dataHand.Id;
             modifiedHand.GrabStrength = Hands.CalculateGrabStrength(ref modifiedHand);
             modifiedHand.PinchStrength = Hands.CalculatePinchStrength(ref modifiedHand);
             modifiedHand.PinchDistance = Hands.CalculatePinchDistance(ref modifiedHand);
             modifiedHand.PalmVelocity = (palmBone.transform.position - _oldContactPosition) / Time.fixedDeltaTime;
-            modifiedHand.TimeVisible = dataHand.TimeVisible;
         }
 
         private Vector3 GetTipPosition(int index)

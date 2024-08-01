@@ -5,11 +5,12 @@ using UnityEditor.Build.Reporting;
 using UnityEditor.XR.OpenXR.Features;
 using UnityEngine.XR.OpenXR;
 
-namespace Ultraleap.Tracking.OpenXR
+namespace Leap.Tracking.OpenXR
 {
     public partial class HandTrackingFeatureBuildHooks : OpenXRFeatureBuildHooks
     {
         private const string OpenXRPackageRuntimeService = "org.khronos.openxr.OpenXRRuntimeService";
+        private const string OpenXRPackageApiLayerService = "org.khronos.openxr.OpenXRApiLayerService";
 
         private const string MetaHandTrackingFeature = "oculus.software.handtracking";
         private const string MetaHandTrackingPermission = "com.oculus.permission.HAND_TRACKING";
@@ -27,10 +28,12 @@ namespace Ultraleap.Tracking.OpenXR
             var manifest = new AndroidManifest(GetAndroidManifestPath(path));
             var feature = OpenXRSettings.ActiveBuildTargetInstance.GetFeature<HandTrackingFeature>();
 
-            if (PlayerSettings.Android.minSdkVersion >= AndroidSdkVersions.AndroidApiLevel30)
+            if (PlayerSettings.Android.targetSdkVersion >= AndroidSdkVersions.AndroidApiLevel30)
             {
-                // Intent query is required for OpenXR to work correctly.
+                // These intent queries are required for OpenXR runtimes and API layers to operate correctly, not all
+                // loaders correctly include them so add them if they are missing to ensure applications work correctly.
                 manifest.AddQueriesIntentAction(OpenXRPackageRuntimeService);
+                manifest.AddQueriesIntentAction(OpenXRPackageApiLayerService);
             }
 
             if (feature.metaPermissions)

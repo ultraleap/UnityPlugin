@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace Leap.Unity.Attachments
+namespace Leap.Attachments
 {
 
     [CustomEditor(typeof(AttachmentHands))]
@@ -39,7 +39,7 @@ namespace Leap.Unity.Attachments
             EditorGUILayout.LabelField("Attachment Transforms", EditorStyles.boldLabel);
 
             // Determine whether the target object is a prefab. AttachmentPoints cannot be edited on prefabs.
-            var isTargetPrefab = Leap.Unity.Utils.IsObjectPartOfPrefabAsset(target.gameObject);
+            var isTargetPrefab = Leap.Utils.IsObjectPartOfPrefabAsset(target.gameObject);
 
             if (isTargetPrefab)
             {
@@ -109,7 +109,7 @@ namespace Leap.Unity.Attachments
             {
                 if (EditorUtility.DisplayDialog("Delete all attachments?",
                                                    "Doing so will destroy all child GameObjects of " + target.gameObject.name + ".",
-                                                   "Delete", "Cancel"))
+                                                   "Delete", "Cancel", DialogOptOutDecisionType.ForThisMachine, "UL attachment hands popup"))
                 {
                     target.attachmentPoints = AttachmentPointFlags.None;
                     GUIUtility.ExitGUI();
@@ -142,7 +142,7 @@ namespace Leap.Unity.Attachments
                                                    "Deleting the " + flag + " attachment point will destroy "
                                                  + "its GameObject and any of its non-Attachment-Point children, "
                                                  + "and will remove any components attached to it.",
-                                                   "Delete " + flag + " Attachment Point", "Cancel"))
+                                                   "Delete " + flag + " Attachment Point", "Cancel", DialogOptOutDecisionType.ForThisMachine, "UL attachment hands popup"))
                 {
                     target.attachmentPoints = attachmentPoints & (~flag); // Set flag bit to 0.
                     GUIUtility.ExitGUI();

@@ -9,7 +9,7 @@
 using System;
 using UnityEngine;
 
-namespace Leap.Unity.Encoding
+namespace Leap.Encoding
 {
     /// <summary>
     /// An interface that signifies this class can interpolate
@@ -135,12 +135,12 @@ namespace Leap.Unity.Encoding
             for (int i = 0; i < 5; i++)
             {
                 Vector3 baseMetacarpal = ToLocal(
-                  fromHand.Fingers[i].bones[0].PrevJoint, palmPos, palmRot);
+                  fromHand.fingers[i].bones[0].PrevJoint, palmPos, palmRot);
                 jointPositions[boneIdx++] = baseMetacarpal;
                 for (int j = 0; j < 4; j++)
                 {
                     Vector3 joint = ToLocal(
-                      fromHand.Fingers[i].bones[j].NextJoint, palmPos, palmRot);
+                      fromHand.fingers[i].bones[j].NextJoint, palmPos, palmRot);
                     jointPositions[boneIdx++] = joint;
                 }
             }
@@ -206,7 +206,7 @@ namespace Leap.Unity.Encoding
                       type: (Bone.BoneType)jointIdx,
                       rotation: boneRot);
                 }
-                intoHand.Fingers[fingerIdx].Fill(
+                intoHand.fingers[fingerIdx].Fill(
                   frameId: -1,
                   handId: (isLeft ? 0 : 1),
                   fingerId: fingerIdx,
@@ -302,7 +302,7 @@ namespace Leap.Unity.Encoding
                                BitConverterNonAlloc.ToInt16(bytes, ref offset))
                              / 4096f;
             }
-            palmRot = Leap.Unity.Utils.DecompressBytesToQuat(bytes, ref offset);
+            palmRot = Leap.Utils.DecompressBytesToQuat(bytes, ref offset);
 
             // Palm-local bone joint positions.
             for (int i = 0; i < NUM_JOINT_POSITIONS; i++)
@@ -350,7 +350,7 @@ namespace Leap.Unity.Encoding
             }
 
             // Palm rotation.
-            Leap.Unity.Utils.CompressQuatToBytes(palmRot, bytesToFill, ref offset);
+            Leap.Utils.CompressQuatToBytes(palmRot, bytesToFill, ref offset);
 
             // Joint positions.
             for (int j = 0; j < NUM_JOINT_POSITIONS; j++)
@@ -545,7 +545,7 @@ namespace Leap.Unity.Encoding
         /// </summary>
         public static Bone GetBone(this Hand hand, int boneIdx)
         {
-            return hand.Fingers[boneIdx / 4].bones[boneIdx % 4];
+            return hand.fingers[boneIdx / 4].bones[boneIdx % 4];
         }
 
         /// <summary>

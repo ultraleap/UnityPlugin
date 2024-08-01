@@ -6,13 +6,12 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity.Interaction;
-using Leap.Unity.PhysicalHands;
-using Leap.Unity.Preview.HandRays;
+using Leap.PhysicalHands;
+using Leap.Preview.HandRays;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Leap.Unity.Preview.Locomotion
+namespace Leap.Preview.Locomotion
 {
     /// <summary>
     /// Small script that detects whether the user is facing an object this frame.
@@ -56,41 +55,39 @@ namespace Leap.Unity.Preview.Locomotion
         private void SetLayerMask()
         {
             _layerMask = -1;
-            InteractionManager interactionManager = FindAnyObjectByType<InteractionManager>();
 
-            // Ignore any interaction objects 
-            if (interactionManager != null)
+#if UNITY_2021_3_18_OR_NEWER
+            PhysicalHandsManager _physicalHandsManager = FindAnyObjectByType<PhysicalHandsManager>();
+#else
+            PhysicalHandsManager physicalHandsManager = FindObjectOfType<PhysicalHandsManager>();
+#endif
+            if (_physicalHandsManager != null)
             {
-                // Ignore the user's hands - they are likely to be in front of the head, as it's the most common interaction zone
-                _layerMask ^= interactionManager.contactBoneLayer.layerMask;
-                // Ignore any grasped objects 
-                _layerMask ^= interactionManager.interactionNoContactLayer.layerMask;
+                _layerMask ^= _physicalHandsManager.HandsLayer.layerMask;
+                _layerMask ^= _physicalHandsManager.HandsResetLayer.layerMask;
             }
 
-            PhysicalHandsManager physicalHandsManager = FindAnyObjectByType<PhysicalHandsManager>();
-            if (physicalHandsManager != null)
+#if UNITY_2021_3_18_OR_NEWER
+            FarFieldLayerManager _farFieldLayerManager = FindAnyObjectByType<FarFieldLayerManager>();
+#else
+            FarFieldLayerManager farFieldLayerManager = FindObjectOfType<FarFieldLayerManager>();
+#endif
+            if (_farFieldLayerManager != null)
             {
-                _layerMask ^= physicalHandsManager.HandsLayer.layerMask;
-                _layerMask ^= physicalHandsManager.HandsResetLayer.layerMask;
+                _layerMask ^= _farFieldLayerManager.FarFieldObjectLayer.layerMask;
+                _layerMask ^= _farFieldLayerManager.FloorLayer.layerMask;
             }
 
-            FarFieldLayerManager farFieldLayerManager = FindAnyObjectByType<FarFieldLayerManager>();
-            if (farFieldLayerManager != null)
+            foreach (var _layers in _layersToIgnore)
             {
-                _layerMask ^= farFieldLayerManager.FarFieldObjectLayer.layerMask;
-                _layerMask ^= farFieldLayerManager.FloorLayer.layerMask;
-            }
-
-            foreach (var layers in _layersToIgnore)
-            {
-                _layerMask ^= layers.layerMask;
+                _layerMask ^= _layers.layerMask;
             }
         }
 
         private void CheckIfFacingObject()
         {
-            Transform head = Camera.main.transform;
-            _valueThisFrame = Physics.SphereCast(new Ray(head.position, head.forward), _sphereCastRadius, out RaycastHit hit, _sphereCastMaxLength, _layerMask);
+            Transform _head = Camera.main.transform;
+            _valueThisFrame = Physics.SphereCast(new Ray(_head.position, _head.forward), _sphereCastRadius, out RaycastHit _hit, _sphereCastMaxLength, _layerMask);
         }
     }
 }

@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Leap.Unity.HandsModule
+namespace Leap.HandsModule
 {
     public static class HandBinderAutoBinder
     {
@@ -32,8 +32,6 @@ namespace Leap.Unity.HandsModule
             }
 
             handBinder.ResetHand();
-            BoneNameDefinitions boneDefinitions = new BoneNameDefinitions();
-
             //Get all children of the hand
             var children = new List<Transform>();
 
@@ -47,13 +45,13 @@ namespace Leap.Unity.HandsModule
             children.Add(root);
             children.AddRange(GetAllChildren(root));
 
-            var thumbBones = SortBones(SelectBones(children, boneDefinitions.DefinitionThumb), false, true);
-            var indexBones = SortBones(SelectBones(children, boneDefinitions.DefinitionIndex));
-            var middleBones = SortBones(SelectBones(children, boneDefinitions.DefinitionMiddle));
-            var ringBones = SortBones(SelectBones(children, boneDefinitions.DefinitionRing));
-            var pinkyBones = SortBones(SelectBones(children, boneDefinitions.DefinitionPinky));
-            var wrist = SelectBones(children, boneDefinitions.DefinitionWrist).FirstOrDefault();
-            var elbow = SelectBones(children, boneDefinitions.DefinitionElbow).FirstOrDefault();
+            var thumbBones = SortBones(SelectBones(children, BoneNameDefinitions.DefinitionThumb), false, true);
+            var indexBones = SortBones(SelectBones(children, BoneNameDefinitions.DefinitionIndex));
+            var middleBones = SortBones(SelectBones(children, BoneNameDefinitions.DefinitionMiddle));
+            var ringBones = SortBones(SelectBones(children, BoneNameDefinitions.DefinitionRing));
+            var pinkyBones = SortBones(SelectBones(children, BoneNameDefinitions.DefinitionPinky));
+            var wrist = SelectBones(children, BoneNameDefinitions.DefinitionWrist).FirstOrDefault();
+            var elbow = SelectBones(children, BoneNameDefinitions.DefinitionElbow).FirstOrDefault();
 
             handBinder.BoundHand.fingers[0].boundBones = AssignTransformToBoundBone(thumbBones);
             handBinder.BoundHand.fingers[1].boundBones = AssignTransformToBoundBone(indexBones);
@@ -263,9 +261,9 @@ namespace Leap.Unity.HandsModule
         public static void EstimateWristRotationOffset(HandBinder handBinder)
         {
 
-            Transform indexBone = handBinder.BoundHand.fingers[(int)Finger.FingerType.TYPE_INDEX].boundBones[(int)Bone.BoneType.TYPE_PROXIMAL].boundTransform;
-            Transform middleBone = handBinder.BoundHand.fingers[(int)Finger.FingerType.TYPE_MIDDLE].boundBones[(int)Bone.BoneType.TYPE_PROXIMAL].boundTransform;
-            Transform pinkyBone = handBinder.BoundHand.fingers[(int)Finger.FingerType.TYPE_PINKY].boundBones[(int)Bone.BoneType.TYPE_PROXIMAL].boundTransform;
+            Transform indexBone = handBinder.BoundHand.fingers[(int)Finger.FingerType.INDEX].boundBones[(int)Bone.BoneType.PROXIMAL].boundTransform;
+            Transform middleBone = handBinder.BoundHand.fingers[(int)Finger.FingerType.MIDDLE].boundBones[(int)Bone.BoneType.PROXIMAL].boundTransform;
+            Transform pinkyBone = handBinder.BoundHand.fingers[(int)Finger.FingerType.PINKY].boundBones[(int)Bone.BoneType.PROXIMAL].boundTransform;
 
             Transform wrist = handBinder.BoundHand.wrist.boundTransform;
 
@@ -312,7 +310,7 @@ namespace Leap.Unity.HandsModule
 
             bool AddedWristToFirstBone = false;
 
-            var finger = boundHand.fingers[(int)Finger.FingerType.TYPE_MIDDLE];
+            var finger = boundHand.fingers[(int)Finger.FingerType.MIDDLE];
 
             // Loop through the bones and sum up their lengths
             for (int boneID = 0; boneID < finger.boundBones.Length - 1; boneID++)
@@ -343,7 +341,7 @@ namespace Leap.Unity.HandsModule
             {
                 var finger = handBinder.BoundHand.fingers[i];
                 var lastBone = finger.boundBones.LastOrDefault().boundTransform;
-                var previousBone = finger.boundBones[(int)Bone.BoneType.TYPE_INTERMEDIATE].boundTransform;
+                var previousBone = finger.boundBones[(int)Bone.BoneType.INTERMEDIATE].boundTransform;
 
                 if (lastBone != null)
                 {

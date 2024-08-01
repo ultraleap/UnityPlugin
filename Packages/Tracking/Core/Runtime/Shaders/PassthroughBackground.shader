@@ -1,4 +1,4 @@
-﻿Shader "LeapMotion/Passthrough/Background" {
+﻿Shader "Ultraleap/Passthrough/Background" {
 	Properties
 	{
 		[Toggle] _MirrorImageHorizontally ("MirrorImageHorizontally", Float) = 0

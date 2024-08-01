@@ -1,6 +1,6 @@
+
 using Leap;
-using Leap.Unity;
-using Leap.Unity.InputModule;
+using Leap.InputModule;
 using UnityEditor;
 using UnityEngine;
 

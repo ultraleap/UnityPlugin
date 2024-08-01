@@ -1,5 +1,5 @@
-using Leap.Unity;
-using Leap.Unity.Controllers;
+using Leap;
+using Leap.Controllers;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -20,7 +20,11 @@ public class ControllerModelEnableDisable : MonoBehaviour
     {
         if (controllerPostProcess == null)
         {
+#if UNITY_2021_3_18_OR_NEWER
             controllerPostProcess = FindAnyObjectByType<ControllerPostProcess>();
+#else
+            controllerPostProcess = FindObjectOfType<ControllerPostProcess>();
+#endif
         }
         controllerPostProcess.OnHandInputTypeChange += OnHandInputTypeChange;
 

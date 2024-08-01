@@ -6,13 +6,13 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity.Preview.HandRays;
+using Leap.Preview.HandRays;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Leap.Unity.Preview.Locomotion
+namespace Leap.Preview.Locomotion
 {
     /// <summary>
     /// This teleport method snaps a ray to a "gem" object within your scene when said gem is activated (e.g. through a pinch).
@@ -48,7 +48,11 @@ namespace Leap.Unity.Preview.Locomotion
 
         private void Awake()
         {
+#if UNITY_2021_3_18_OR_NEWER
             _jumpGems = FindObjectsByType<JumpGem>(FindObjectsInactive.Include, FindObjectsSortMode.None).ToList();
+#else
+            _jumpGems = FindObjectsOfType<JumpGem>(true).ToList();
+#endif
             for (int i = 0; i < _jumpGems.Count; i++)
             {
                 int j = i;

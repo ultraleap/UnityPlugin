@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Leap.Unity.PhysicalHands
+namespace Leap.PhysicalHands
 {
     public abstract class ContactParent : MonoBehaviour
     {
@@ -22,6 +22,16 @@ namespace Leap.Unity.PhysicalHands
 
         private void Start()
         {
+            Initialize();
+        }
+
+        internal void Initialize()
+        {
+            if (!Application.isPlaying)
+            {
+                return;
+            }
+
             physicalHandsManager = GetComponentInParent<PhysicalHandsManager>();
 
             if (physicalHandsManager != null)

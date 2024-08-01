@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Leap.Unity.Preview.HandRays
+namespace Leap.Preview.HandRays
 {
     /// <summary>
     /// Infers neck and shoulder positions using real world head data.
@@ -165,7 +165,11 @@ namespace Leap.Unity.Preview.HandRays
 
         private void Start()
         {
+#if UNITY_2021_3_18_OR_NEWER
             LeapXRServiceProvider leapXRServiceProvider = FindAnyObjectByType<LeapXRServiceProvider>();
+#else
+            LeapXRServiceProvider leapXRServiceProvider = FindObjectOfType<LeapXRServiceProvider>();
+#endif
             if (leapXRServiceProvider != null)
             {
                 Head = leapXRServiceProvider.mainCamera.transform;

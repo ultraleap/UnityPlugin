@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace Leap.Unity.InputModule
+namespace Leap.InputModule
 {
     /// <summary>
     /// An InputModule that supports the use of Leap Motion tracking data for manipulating Unity UI controls.
@@ -129,7 +129,7 @@ namespace Leap.Unity.InputModule
             //Find and apply LSP/Camera if not already
             if (leapDataProvider == null)
             {
-                leapDataProvider = GameObject.FindAnyObjectByType<LeapProvider>();
+                leapDataProvider = Hands.Provider;
                 if (leapDataProvider == null || !leapDataProvider.isActiveAndEnabled)
                 {
                     Debug.LogError("Failed to find active LeapProvider", leapDataProvider);

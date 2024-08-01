@@ -2,7 +2,7 @@
 using UnityEditor;
 using UnityEditor.PackageManager;
 
-namespace Ultraleap.Tracking.OpenXR
+namespace Leap.Tracking.OpenXR
 {
     [InitializeOnLoad]
     public class RemoveDuplicateOpenXRPackage

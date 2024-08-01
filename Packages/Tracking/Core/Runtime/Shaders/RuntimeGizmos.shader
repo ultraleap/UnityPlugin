@@ -1,4 +1,4 @@
-﻿Shader "Hidden/Runtime Gizmos" {
+﻿Shader "Ultraleap/Runtime Gizmos" {
 	Properties{
 	  _Color("Color", Color) = (1,1,1,1)
 	}

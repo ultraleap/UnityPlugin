@@ -1,6 +1,6 @@
 using UnityEditor;
 
-namespace Leap.Unity.Preview.HandRays
+namespace Leap.Preview.HandRays
 
 {
     [CustomEditor(typeof(WristShoulderHandRay))]

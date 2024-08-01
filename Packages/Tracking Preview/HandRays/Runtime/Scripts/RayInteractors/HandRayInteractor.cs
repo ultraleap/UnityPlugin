@@ -9,7 +9,7 @@
 using System;
 using UnityEngine;
 
-namespace Leap.Unity.Preview.HandRays
+namespace Leap.Preview.HandRays
 {
     /// <summary>
     /// Abstract base class for HandRay Interactors
@@ -47,7 +47,11 @@ namespace Leap.Unity.Preview.HandRays
         {
             if (farFieldLayerManager == null)
             {
+#if UNITY_2021_3_18_OR_NEWER
                 farFieldLayerManager = FindAnyObjectByType<FarFieldLayerManager>();
+#else
+                farFieldLayerManager = FindObjectOfType<FarFieldLayerManager>();
+#endif
             }
 
             layerMask |= farFieldLayerManager.FarFieldObjectLayer.layerMask;
@@ -61,7 +65,11 @@ namespace Leap.Unity.Preview.HandRays
         {
             if (farFieldLayerManager == null)
             {
+#if UNITY_2021_3_18_OR_NEWER
                 farFieldLayerManager = FindAnyObjectByType<FarFieldLayerManager>();
+#else
+                farFieldLayerManager = FindObjectOfType<FarFieldLayerManager>();
+#endif
             }
         }
 
@@ -69,7 +77,12 @@ namespace Leap.Unity.Preview.HandRays
         {
             if (_handRay == null)
             {
+#if UNITY_2021_3_18_OR_NEWER
                 _handRay = FindAnyObjectByType<WristShoulderHandRay>();
+#else
+                _handRay = FindObjectOfType<WristShoulderHandRay>();
+#endif
+
                 if (_handRay == null)
                 {
                     Debug.LogWarning("HandRayInteractor needs a HandRay");

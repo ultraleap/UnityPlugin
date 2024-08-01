@@ -13,7 +13,7 @@ using System.ComponentModel;
 using System.Linq;
 using UnityEngine;
 
-namespace Leap.Unity
+namespace Leap
 {
     using Attributes;
 
@@ -87,8 +87,7 @@ namespace Leap.Unity
             Automatic,
             LeapMotionController2,
         }
-        [Tooltip("Displays a representation of the traking device")]
-        [SerializeField]
+        [Space, Tooltip("Displays a representation of the traking device"), SerializeField]
         protected InteractionVolumeVisualization _interactionVolumeVisualization = InteractionVolumeVisualization.Automatic;
 
         /// <summary>
@@ -96,14 +95,11 @@ namespace Leap.Unity
         /// </summary>
         public InteractionVolumeVisualization SelectedInteractionVolumeVisualization => _interactionVolumeVisualization;
 
-        [Tooltip("Displays a visualization of the Field Of View of the chosen device as a Gizmo")]
-        [SerializeField]
+        [Tooltip("Displays a visualization of the Field Of View of the chosen device as a Gizmo"), SerializeField]
         protected bool FOV_Visualization = false;
-        [Tooltip("Displays the optimal FOV for tracking")]
-        [SerializeField]
+        [Tooltip("Displays the optimal FOV for tracking"), SerializeField]
         protected bool OptimalFOV_Visualization = true;
-        [Tooltip("Displays the maximum FOV for tracking")]
-        [SerializeField]
+        [Tooltip("Displays the maximum FOV for tracking"), SerializeField]
         protected bool MaxFOV_Visualization = true;
 
         [SerializeField, HideInInspector]
@@ -140,7 +136,7 @@ namespace Leap.Unity
             + "ReuseUpdateForPhysics - Android users should choose Reuse Update for Physics.\n"
             + "ReusePhysicsForUpdate - Provides the option to reinterpolate the hand data for the physics timestep, improving the movement of objects being "
             + "manipulated by hands when using the interaction engine. Enabling this incurs a small time penalty (fraction of a ms).")]
-        [SerializeField]
+        [SerializeField, Space]
         protected FrameOptimizationMode _frameOptimization = FrameOptimizationMode.None;
 
         /// <summary>
@@ -182,7 +178,7 @@ namespace Leap.Unity
         [Tooltip("When set to 'Default', provider will receive data from the first connected device. \n" +
             "When set to `Specific`, provider will receive data from the device specified by 'Specific Serial Number'.")]
         [EditTimeOnly]
-        [SerializeField]
+        [SerializeField, Space]
         protected MultipleDeviceMode _multipleDeviceMode = MultipleDeviceMode.Disabled;
 
         public MultipleDeviceMode CurrentMultipleDeviceMode
@@ -192,7 +188,7 @@ namespace Leap.Unity
 
         [Tooltip("When Multiple Device Mode is set to `Specific`, the provider will " +
           "receive data from only the devices that contain this in their serial number.")]
-        [SerializeField]
+        [Space, SerializeField]
         protected string _specificSerialNumber = "";
 
         /// <summary>
@@ -207,7 +203,10 @@ namespace Leap.Unity
             set
             {
                 _specificSerialNumber = value;
-                if (_multipleDeviceMode != MultipleDeviceMode.Specific) Debug.Log("You are trying to set a Specific Serial Number while Multiple Device Mode is not set to 'Specific'. Please change the Multiple Device Mode to 'Specific'");
+                if (_multipleDeviceMode != MultipleDeviceMode.Specific)
+                {
+                    Debug.Log("You are trying to set a Specific Serial Number while Multiple Device Mode is not set to 'Specific'. Please change the Multiple Device Mode to 'Specific'");
+                }
                 else if (_currentDevice == null || _currentDevice.SerialNumber != _specificSerialNumber)
                 {
                     updateDevice();
@@ -226,7 +225,12 @@ namespace Leap.Unity
             {
                 if (_currentDevice == null && _multipleDeviceMode == MultipleDeviceMode.Disabled)
                 {
-                    _currentDevice = GetLeapController().Devices.ActiveDevices.FirstOrDefault();
+                    Device firstDevice = GetLeapController().Devices.ActiveDevices.FirstOrDefault();
+
+                    if (firstDevice != null)
+                    {
+                        connectToNewDevice(firstDevice);
+                    }
                 }
                 return _currentDevice;
             }
@@ -525,6 +529,16 @@ namespace Leap.Unity
             }
         }
 
+        /// <summary>
+        /// The world space position of the Tracking Camera Origin that was
+        /// last used to position the hands in world space
+        /// </summary>
+        public LeapTransform DeviceOriginWorldSpace
+        {
+            get;
+            protected set;
+        }
+
         #endregion
 
         #region Android Support
@@ -575,10 +589,7 @@ namespace Leap.Unity
 
             if (_currentDevice == null)
             {
-                _transformedUpdateFrame = new Frame();
-                _transformedFixedFrame = new Frame();
-                _untransformedUpdateFrame = new Frame();
-                _untransformedFixedFrame = new Frame();
+                ClearCurrentFrames();
             }
             else
             {
@@ -678,6 +689,17 @@ namespace Leap.Unity
         }
 
         /// <summary>
+        /// Clear the current frames. Used when devices are lost.
+        /// </summary>
+        protected void ClearCurrentFrames()
+        {
+            _transformedUpdateFrame = new Frame();
+            _transformedFixedFrame = new Frame();
+            _untransformedUpdateFrame = new Frame();
+            _untransformedFixedFrame = new Frame();
+        }
+
+        /// <summary>
         /// Calculates the physics extrapolation time depending on the PhysicsExtrapolationMode.
         /// </summary>
         /// <returns>A float that can be used to compensate for latency when ensuring that our 
@@ -732,13 +754,11 @@ namespace Leap.Unity
         /// </summary>
         public Controller GetLeapController()
         {
-#if UNITY_EDITOR
             // Null check to deal with hot reloading.
             if (!_isDestroyed && _leapController == null)
             {
                 createController();
             }
-#endif
 
             return _leapController;
         }
@@ -783,26 +803,36 @@ namespace Leap.Unity
         public void ChangeTrackingMode(TrackingOptimizationMode trackingMode)
         {
             _trackingOptimization = trackingMode;
-            StartCoroutine(ChangeTrackingMode_Coroutine(trackingMode));
+
+            if (_leapController != null && _leapController.IsConnected)
+            {
+                SetTrackingMode(trackingMode);
+            }
+            else
+            {
+                StartCoroutine(ChangeTrackingMode_Coroutine(trackingMode));
+            }
         }
 
         private IEnumerator ChangeTrackingMode_Coroutine(TrackingOptimizationMode trackingMode)
         {
             yield return new WaitWhile(() => _leapController == null || !_leapController.IsConnected);
+            SetTrackingMode(trackingMode);
+        }
 
-            Device deviceToChange = _multipleDeviceMode == MultipleDeviceMode.Disabled ? null : _currentDevice;
-
+        private void SetTrackingMode(TrackingOptimizationMode trackingMode)
+        {
             switch (trackingMode)
             {
                 case TrackingOptimizationMode.Desktop:
-                    _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP, deviceToChange);
-                    _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD, deviceToChange);
+                    _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP, CurrentDevice);
+                    _leapController.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD, CurrentDevice);
                     break;
                 case TrackingOptimizationMode.Screentop:
-                    _leapController.SetAndClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP, Controller.PolicyFlag.POLICY_OPTIMIZE_HMD, deviceToChange);
+                    _leapController.SetAndClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP, Controller.PolicyFlag.POLICY_OPTIMIZE_HMD, CurrentDevice);
                     break;
                 case TrackingOptimizationMode.HMD:
-                    _leapController.SetAndClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD, Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP, deviceToChange);
+                    _leapController.SetAndClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD, Controller.PolicyFlag.POLICY_OPTIMIZE_SCREENTOP, CurrentDevice);
                     break;
             }
         }
@@ -881,9 +911,14 @@ namespace Leap.Unity
                 return;
             }
 
-            string serialNumber = _multipleDeviceMode != MultipleDeviceMode.Disabled ? SpecificSerialNumber : "";
-
-            _leapController = new Controller(serialNumber.GetHashCode(), _serverNameSpace, _multipleDeviceMode != MultipleDeviceMode.Disabled);
+            if (_multipleDeviceMode == MultipleDeviceMode.Disabled)
+            {
+                _leapController = new Controller(0, _serverNameSpace);
+            }
+            else
+            {
+                _leapController = new Controller(SpecificSerialNumber.GetHashCode(), _serverNameSpace);
+            }
 
             _leapController.Device += (s, e) =>
             {
@@ -897,28 +932,30 @@ namespace Leap.Unity
             {
                 if (e.Device == _currentDevice)
                 {
+                    _leapController.UnsubscribeFromDeviceEvents(_currentDevice);
                     _currentDevice = null;
+                    ClearCurrentFrames();
                 }
             };
 
             _onDeviceSafe += (d) =>
-           {
-               if (_multipleDeviceMode == MultipleDeviceMode.Specific)
-               {
-                   if (SpecificSerialNumber != null && SpecificSerialNumber != "" && d.SerialNumber.Contains(SpecificSerialNumber) && _leapController != null)
-                   {
-                       connectToNewDevice(d);
-                   }
-               }
-               else if (_multipleDeviceMode == MultipleDeviceMode.Disabled)
-               {
-                   _currentDevice = d;
-               }
-               else
-               {
-                   throw new NotImplementedException($"{nameof(MultipleDeviceMode)} case not implemented");
-               }
-           };
+            {
+                if (_multipleDeviceMode == MultipleDeviceMode.Specific)
+                {
+                    if (SpecificSerialNumber != null && SpecificSerialNumber != "" && d.SerialNumber.Contains(SpecificSerialNumber))
+                    {
+                        connectToNewDevice(d, true);
+                    }
+                }
+                else if (_multipleDeviceMode == MultipleDeviceMode.Disabled)
+                {
+                    connectToNewDevice(d);
+                }
+                else
+                {
+                    throw new NotImplementedException($"{nameof(MultipleDeviceMode)} case not implemented");
+                }
+            };
 
 
             if (_leapController.IsConnected)
@@ -939,7 +976,7 @@ namespace Leap.Unity
         /// <param name="d"></param>
         /// <returns>true if connection was successfull, false if there is no leapController set up correctly 
         /// or application is not playing or already connected to Device d</returns>
-        private bool connectToNewDevice(Device d)
+        private bool connectToNewDevice(Device d, bool notify = false)
         {
             if (_leapController == null || !Application.isPlaying || _currentDevice == d)
             {
@@ -951,7 +988,11 @@ namespace Leap.Unity
                 _leapController.UnsubscribeFromDeviceEvents(_currentDevice);
             }
 
-            Debug.Log($"Connecting to Device with Serial: {d.SerialNumber} and ID {d.DeviceID}");
+            if (notify)
+            {
+                Debug.Log($"Connecting to Device with Serial: {d.SerialNumber} and ID {d.DeviceID}");
+            }
+
             _leapController.SubscribeToDeviceEvents(d);
             _currentDevice = d;
 
@@ -977,7 +1018,7 @@ namespace Leap.Unity
             {
                 if (d.SerialNumber.Contains(SpecificSerialNumber))
                 {
-                    connectToNewDevice(d);
+                    connectToNewDevice(d, true);
                     return;
                 }
             }
@@ -1045,6 +1086,9 @@ namespace Leap.Unity
         protected virtual void transformFrame(Frame source, Frame dest)
         {
             dest.CopyFrom(source).Transform(new LeapTransform(transform));
+
+            // Take the transform that we apply to the frame that moves it to world space, and allow it to be available externally
+            DeviceOriginWorldSpace = new LeapTransform(transform);
         }
 
         private TrackingSource CheckLeapServiceAvailable()
@@ -1054,21 +1098,9 @@ namespace Leap.Unity
                 return _trackingSource;
             }
 
-#if UNITY_ANDROID && !UNITY_EDITOR
-            if(AndroidServiceBinder.Bind())
+            if (HandTrackingSourceUtility.LeapCTrackingAvailable)
             {
                 _trackingSource = TrackingSource.LEAPC;
-                return _trackingSource;
-            }
-#endif
-
-            if (LeapInternal.Connection.IsConnectionAvailable(_serverNameSpace))
-            {
-                _trackingSource = TrackingSource.LEAPC;
-            }
-            else
-            {
-                _trackingSource = TrackingSource.NONE;
             }
 
             return _trackingSource;
@@ -1123,59 +1155,24 @@ namespace Leap.Unity
 
         private void DetectConnectedDevice(Transform targetTransform)
         {
-            if (GetLeapController() != null && GetLeapController().Devices?.Count >= 1)
+            string deviceName = "";
+
+            if (_multipleDeviceMode == MultipleDeviceMode.Disabled)
             {
-                Device currentDevice = _currentDevice;
-                if (currentDevice == null || (_multipleDeviceMode == LeapServiceProvider.MultipleDeviceMode.Specific && currentDevice.SerialNumber != _specificSerialNumber))
-                {
-                    foreach (Device d in GetLeapController().Devices)
-                    {
-                        if (d.SerialNumber.Contains(_specificSerialNumber))
-                        {
-                            currentDevice = d;
-                            break;
-                        }
-                    }
-                }
-
-                if (currentDevice == null && _multipleDeviceMode == MultipleDeviceMode.Disabled)
-                {
-                    currentDevice = GetLeapController().Devices[0];
-                }
-
-                if (currentDevice == null || (_multipleDeviceMode == LeapServiceProvider.MultipleDeviceMode.Specific && currentDevice.SerialNumber != _specificSerialNumber))
-                {
-                    return;
-                }
-
-                Device.DeviceType deviceType = currentDevice.Type;
-                if (deviceType == Device.DeviceType.TYPE_RIGEL || deviceType == Device.DeviceType.TYPE_SIR170)
-                {
-                    DrawTrackingDevice(targetTransform, "Stereo IR 170");
-                    return;
-                }
-                else if (deviceType == Device.DeviceType.TYPE_3DI)
-                {
-                    DrawTrackingDevice(targetTransform, "3Di");
-                    return;
-                }
-                else if (deviceType == Device.DeviceType.TYPE_PERIPHERAL)
-                {
-                    DrawTrackingDevice(targetTransform, "Leap Motion Controller");
-                    return;
-                }
-                else if (deviceType == Device.DeviceType.TYPE_LMC2)
-                {
-                    DrawTrackingDevice(targetTransform, "Leap Motion Controller 2");
-                }
+                deviceName = LeapInternal.ServerStatus.GetDeviceType("");
+            }
+            else
+            {
+                deviceName = LeapInternal.ServerStatus.GetDeviceType(_specificSerialNumber);
             }
 
-            // if no devices connected, no serial number selected or the connected device type isn't matching one of the above,
-            // delete any device model that is currently displayed
-            if (targetTransform.Find("DeviceModel") != null)
+            // adjust to readable name
+            if (deviceName == "SIR170")
             {
-                GameObject.DestroyImmediate(targetTransform.Find("DeviceModel").gameObject);
+                deviceName = "Stereo IR 170";
             }
+
+            DrawTrackingDevice(targetTransform, deviceName);
         }
 
 
@@ -1211,7 +1208,6 @@ namespace Leap.Unity
             }
             else
             {
-                Debug.LogError("Tried to load invalid device type: " + deviceType);
                 return;
             }
 
