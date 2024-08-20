@@ -24,9 +24,6 @@ namespace Leap.InputModule
 
         public event Action<PointerElement, Hand> OnPointerStateChanged;
 
-        private Camera mainCamera;
-        private LeapProvider leapDataProvider;
-
         [SerializeField] private EventSystem eventSystem;
         [SerializeField] private UIInputModule module;
         [SerializeField] private UIInputCursor cursor;
@@ -153,9 +150,6 @@ namespace Leap.InputModule
         private void Start()
         {
             EventData = new PointerEventData(eventSystem);
-
-            leapDataProvider = module.LeapDataProvider;
-            mainCamera = module.MainCamera;
         }
 
         /// <summary>
@@ -763,12 +757,12 @@ namespace Leap.InputModule
                 pointerPosition = hand.Index.TipPosition;
                 for (var i = 1; i < 3; i++)
                 {
-                    var fingerDistance = Vector3.Distance(mainCamera.transform.position,
+                    var fingerDistance = Vector3.Distance(module.MainCamera.transform.position,
                         hand.fingers[i].TipPosition);
                     var fingerExtension =
                         Mathf.Clamp01(Vector3.Dot(
                             hand.fingers[i].Direction,
-                            leapDataProvider.CurrentFrame.Hands[0].Direction)) / 1.5f;
+                            module.LeapDataProvider.CurrentFrame.Hands[0].Direction)) / 1.5f;
 
                     if (fingerDistance > farthest && fingerExtension > 0.5f)
                     {
@@ -780,11 +774,11 @@ namespace Leap.InputModule
             else
             {
                 //Raycast through the knuckle of the finger
-                pointerPosition = mainCamera.transform.position - origin + hand.fingers[(int)Finger.FingerType.INDEX].GetBone(Bone.BoneType.METACARPAL).Center;
+                pointerPosition = module.MainCamera.transform.position - origin + hand.fingers[(int)Finger.FingerType.INDEX].GetBone(Bone.BoneType.METACARPAL).Center;
             }
 
             //Set the Raycast Direction and Delta
-            EventData.position = mainCamera.WorldToScreenPoint(pointerPosition);
+            EventData.position = module.MainCamera.WorldToScreenPoint(pointerPosition);
             EventData.delta = EventData.position - PrevScreenPosition;
             EventData.scrollDelta = Vector2.zero;
 
