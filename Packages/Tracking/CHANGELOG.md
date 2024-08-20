@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - GrabHelper handles null ContactHand objects more gracefully
+- Disabled incorrect version check for multiple device mode
+- Fixed instance where setting CapsuleHand colour through code would report a nullref
+- Fixed references to LeapProvider and Camera in PointerElement to prevent nullrefs when changing either in the main UIInputModule
 
 
 ## [7.0.0] - 22/07/2024
