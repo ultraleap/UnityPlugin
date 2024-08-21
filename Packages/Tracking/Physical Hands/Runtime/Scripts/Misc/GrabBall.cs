@@ -107,7 +107,7 @@ namespace Leap.PhysicalHands
             UpdateAttachedObjectTargetPose(false);
         }
 
-        private void Update()
+        private void FixedUpdate()
         {
             if (IsGrabbed)
             {
@@ -116,7 +116,7 @@ namespace Leap.PhysicalHands
             }
             else if (_moveGrabBallToPositionOnUngrasp)
             {
-                this.transform.position = Vector3.Lerp(this.transform.position, grabBallPose.position, Time.deltaTime * lerpSpeed);
+                this.transform.position = Vector3.Lerp(this.transform.position, grabBallPose.position, Time.fixedDeltaTime * lerpSpeed);
 
                 if (Vector3.Distance(this.transform.position, grabBallPose.position) < LERP_POSITION_LIMIT)
                 {
@@ -135,7 +135,7 @@ namespace Leap.PhysicalHands
             else
             {
                 UpdateAttachedObjectTargetPose();
-                Pose attachedObjectPose = attachedObject.ToPose().Lerp(_attachedObjectTargetPose, Time.deltaTime * lerpSpeed);
+                Pose attachedObjectPose = attachedObject.ToPose().Lerp(_attachedObjectTargetPose, Time.fixedDeltaTime * lerpSpeed);
                 attachedObject.SetPose(attachedObjectPose);
             }
         }
