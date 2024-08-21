@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [NEXT]
 
+### Changed
+- PostProcessProvider now defaults to UpdateAndFixedUpdate updating to better support PhysicalHandsManager out of the box
+
 ### Fixed
 - GrabHelper handles null ContactHand objects more gracefully
 - Disabled incorrect version check for multiple device mode
