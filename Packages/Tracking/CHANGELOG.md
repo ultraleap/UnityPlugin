@@ -8,9 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [NEXT]
 
+### Added
+- Added option to fade UIInputCursor sprite out based on specified interaction distance range
+- Added range to customise the distance at which the UIInputCursor scales when using direct input
+
 ### Changed
 - PostProcessProvider now defaults to UpdateAndFixedUpdate updating to better support PhysicalHandsManager out of the box
 - Service providers using a specific serial will now connect to the exact given serial, rather than first closest
+- UI PointerElement now only uses specified finger rather than the calculated closest to canvas (defaults to INDEX)
+- Reduced the default UIInputCursor minimum sprite scale
 
 ### Fixed
 - Service providers using a specific serial will now correctly handle device reconnections
