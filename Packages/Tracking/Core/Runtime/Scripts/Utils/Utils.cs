@@ -2993,9 +2993,6 @@ namespace Leap
         /// </summary>
         public static void AddTrackedPoseDriverToCamera(this Camera mainCamera)
         {
-#if !XR_MANAGEMENT_AVAILABLE && !INPUT_SYSTEM_AVAILABLE
-            return;
-#endif
             bool trackedPoseDriverExists = false;
 
 #if XR_MANAGEMENT_AVAILABLE
