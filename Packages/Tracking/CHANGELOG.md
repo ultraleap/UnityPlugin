@@ -10,14 +10,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - PostProcessProvider now defaults to UpdateAndFixedUpdate updating to better support PhysicalHandsManager out of the box
+- Service providers using a specific serial will now connect to the exact given serial, rather than first closest
 
 ### Fixed
+- Service providers using a specific serial will now correctly handle device reconnections
 - GrabHelper handles null ContactHand objects more gracefully
 - Disabled incorrect version check for multiple device mode
 - Fixed instance where setting CapsuleHand colour through code would report a nullref
 - Fixed references to LeapProvider and Camera in PointerElement to prevent nullrefs when changing either in the main UIInputModule
 - Fixed GrabBall for new physical setup
 - Correctly unassign/re-assign LeapProvider events in PhysicalHandsManager if reference changed at runtime
+- Fixed an unreachable code warning if XR_MANAGEMENT and INPUT_SYSTEM are not AVAILABLE
 
 
 ## [7.0.0] - 22/07/2024
