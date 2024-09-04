@@ -31,6 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed the default float height for UIInputCursor
 - Increased timeout and retry delay in ServerStatus to reduce GetServerStatus fails
 - Fixed an instance where ServerStatus would report a nullref if the devices array fails to populate
+- Fixed MRTK integration (updated finger/bone methods for new 7.0.0 implementation)
 
 
 ## [7.0.0] - 22/07/2024
