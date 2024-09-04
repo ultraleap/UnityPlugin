@@ -18,17 +18,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - UI PointerElement now only uses specified finger rather than the calculated closest to canvas (defaults to INDEX)
 - Reduced the default UIInputCursor minimum sprite scale
 - UIInputEventSystem prefab now defaults to Direct interaction mode
+- Modified version check logic for readability
 
 ### Fixed
 - Service providers using a specific serial will now correctly handle device reconnections
 - GrabHelper handles null ContactHand objects more gracefully
-- Disabled incorrect version check for multiple device mode
 - Fixed instance where setting CapsuleHand colour through code would report a nullref
 - Fixed references to LeapProvider and Camera in PointerElement to prevent nullrefs when changing either in the main UIInputModule
 - Fixed GrabBall for new physical setup
 - Correctly unassign/re-assign LeapProvider events in PhysicalHandsManager if reference changed at runtime
 - Fixed an unreachable code warning if XR_MANAGEMENT and INPUT_SYSTEM are not AVAILABLE
 - Fixed the default float height for UIInputCursor
+- Increased timeout and retry delay in ServerStatus to reduce GetServerStatus fails
+- Fixed an instance where ServerStatus would report a nullref if the devices array fails to populate
 
 
 ## [7.0.0] - 22/07/2024
