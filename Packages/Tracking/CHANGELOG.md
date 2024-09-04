@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Service providers using a specific serial will now connect to the exact given serial, rather than first closest
 - UI PointerElement now only uses specified finger rather than the calculated closest to canvas (defaults to INDEX)
 - Reduced the default UIInputCursor minimum sprite scale
+- UIInputEventSystem prefab now defaults to Direct interaction mode
 
 ### Fixed
 - Service providers using a specific serial will now correctly handle device reconnections

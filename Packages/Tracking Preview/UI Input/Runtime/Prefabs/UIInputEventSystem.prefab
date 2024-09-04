@@ -276,7 +276,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_SendPointerHoverToParent: 1
-  interactionMode: 0
+  interactionMode: 1
   showDirectPointerCursor: 1
   mainCamera: {fileID: 0}
   leapDataProvider: {fileID: 0}
