@@ -858,8 +858,7 @@ namespace Leap.InputModule
                     }
                     else
                     {
-                        //Amount the pointer floats above the Canvas
-                        transform.position = globalLookPos - transform.forward * 0.01f;
+                        transform.position = globalLookPos;
                     }
 
                     transform.rotation = draggingPlane.rotation;

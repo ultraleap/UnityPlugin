@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed GrabBall for new physical setup
 - Correctly unassign/re-assign LeapProvider events in PhysicalHandsManager if reference changed at runtime
 - Fixed an unreachable code warning if XR_MANAGEMENT and INPUT_SYSTEM are not AVAILABLE
+- Fixed the default float height for UIInputCursor
 
 
 ## [7.0.0] - 22/07/2024
