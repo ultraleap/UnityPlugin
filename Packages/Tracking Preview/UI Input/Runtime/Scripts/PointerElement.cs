@@ -746,17 +746,17 @@ namespace Leap.InputModule
             //We're always going to assume we're "Left Clicking", for the benefit of uGUI
             EventData.button = PointerEventData.InputButton.Left;
 
-            //If we're in "Touching Mode", Raycast through the fingers
+            //If we're in "Touching Mode", Raycast through the finger
             Vector3 pointerPosition;
             if (IsTouchingOrNearlyTouchingCanvasOrElement() || forceTipRaycast)
             {
                 tipRaycast = true;
-                pointerPosition = hand.fingers[(int)Finger.FingerType.INDEX].TipPosition;
+                pointerPosition = hand.fingers[(int)finger].TipPosition;
             }
             else
             {
                 //Raycast through the knuckle of the finger
-                pointerPosition = module.MainCamera.transform.position - origin + hand.fingers[(int)Finger.FingerType.INDEX].GetBone(Bone.BoneType.METACARPAL).Center;
+                pointerPosition = module.MainCamera.transform.position - origin + hand.fingers[(int)finger].GetBone(Bone.BoneType.METACARPAL).Center;
             }
 
             //Set the Raycast Direction and Delta
