@@ -32,12 +32,24 @@ namespace Leap.PhysicalHands
                 {
                     GetOrCreateBestInputProvider(out _inputProvider);
                 }
-
                 return _inputProvider;
             }
             set
             {
+                if (_inputProvider != null)
+                {
+                    _inputProvider.OnUpdateFrame -= ProcessFrame;
+                    _inputProvider.OnFixedFrame -= ProcessFrame;
+                }
+
                 _inputProvider = value;
+
+                if (_inputProvider != null)
+                {
+                    _inputProvider.OnUpdateFrame += ProcessFrame;
+                    _inputProvider.OnFixedFrame += ProcessFrame;
+                    StartCoroutine(PostFixedUpdate());
+                }
             }
         }
 
@@ -182,15 +194,7 @@ namespace Leap.PhysicalHands
 
         private void OnEnable()
         {
-            if (InputProvider != null)
-            {
-                InputProvider.OnUpdateFrame -= ProcessFrame;
-                InputProvider.OnUpdateFrame += ProcessFrame;
-                InputProvider.OnFixedFrame -= ProcessFrame;
-                InputProvider.OnFixedFrame += ProcessFrame;
-
-                StartCoroutine(PostFixedUpdate());
-            }
+            InputProvider = _inputProvider;
         }
 
         private void OnDisable()

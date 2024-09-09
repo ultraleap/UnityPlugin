@@ -264,8 +264,11 @@ namespace Leap
             _useCustomColors = true;
             _sphereColor = sphere;
             _cylinderColor = cylinder;
-            _sphereMat.color = _sphereColor;
-            _backing_material.color = _cylinderColor;
+
+            if (_sphereMat != null)
+                _sphereMat.color = _sphereColor;
+            if (_backing_material != null)
+                _backing_material.color = _cylinderColor;
         }
 
 #if UNITY_EDITOR

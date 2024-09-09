@@ -24,14 +24,12 @@ namespace Leap.InputModule
 
         public event Action<PointerElement, Hand> OnPointerStateChanged;
 
-        private Camera mainCamera;
-        private LeapProvider leapDataProvider;
-
         [SerializeField] private EventSystem eventSystem;
         [SerializeField] private UIInputModule module;
         [SerializeField] private UIInputCursor cursor;
         [SerializeField] private bool forceDisable = false;
         [SerializeField] private bool disableWhenOffCanvas = true;
+        [SerializeField] private Finger.FingerType finger = Finger.FingerType.INDEX;
 
         public Chirality Chirality { get; private set; }
 
@@ -153,19 +151,14 @@ namespace Leap.InputModule
         private void Start()
         {
             EventData = new PointerEventData(eventSystem);
-
-            leapDataProvider = module.LeapDataProvider;
-            mainCamera = module.MainCamera;
         }
 
         /// <summary>
-        /// The z position of the index finger tip to the Pointer
+        /// The z position of the finger tip to the Pointer
         /// </summary>
-        private float DistanceOfTipToPointer(Hand hand)
+        public float DistanceOfTipToPointer(Hand hand)
         {
-            var tipPosition = hand.fingers[(int)Finger.FingerType.INDEX]
-                .GetBone(Bone.BoneType.DISTAL).NextJoint;
-
+            var tipPosition = hand.fingers[(int)finger].GetBone(Bone.BoneType.DISTAL).NextJoint;
             var pointerTransform = transform;
             return -pointerTransform.transform.InverseTransformPoint(tipPosition).z * pointerTransform.transform.lossyScale.z - module.TactilePadding;
         }
@@ -480,7 +473,7 @@ namespace Leap.InputModule
 
         private void ProcessTactile(IProjectionOriginProvider projectionOriginProvider, Hand hand)
         {
-            // Raycast from shoulder through tip of the index finger to the UI
+            // Raycast from shoulder through tip of the finger to the UI
             var tipRaycastUsed = GetLookPointerEventData(
                 hand,
                 projectionOriginProvider.ProjectionOriginForHand(hand),
@@ -753,38 +746,21 @@ namespace Leap.InputModule
             //We're always going to assume we're "Left Clicking", for the benefit of uGUI
             EventData.button = PointerEventData.InputButton.Left;
 
-            //If we're in "Touching Mode", Raycast through the fingers
+            //If we're in "Touching Mode", Raycast through the finger
             Vector3 pointerPosition;
             if (IsTouchingOrNearlyTouchingCanvasOrElement() || forceTipRaycast)
             {
                 tipRaycast = true;
-
-                var farthest = 0f;
-                pointerPosition = hand.Index.TipPosition;
-                for (var i = 1; i < 3; i++)
-                {
-                    var fingerDistance = Vector3.Distance(mainCamera.transform.position,
-                        hand.fingers[i].TipPosition);
-                    var fingerExtension =
-                        Mathf.Clamp01(Vector3.Dot(
-                            hand.fingers[i].Direction,
-                            leapDataProvider.CurrentFrame.Hands[0].Direction)) / 1.5f;
-
-                    if (fingerDistance > farthest && fingerExtension > 0.5f)
-                    {
-                        farthest = fingerDistance;
-                        pointerPosition = hand.fingers[i].TipPosition;
-                    }
-                }
+                pointerPosition = hand.fingers[(int)finger].TipPosition;
             }
             else
             {
                 //Raycast through the knuckle of the finger
-                pointerPosition = mainCamera.transform.position - origin + hand.fingers[(int)Finger.FingerType.INDEX].GetBone(Bone.BoneType.METACARPAL).Center;
+                pointerPosition = module.MainCamera.transform.position - origin + hand.fingers[(int)finger].GetBone(Bone.BoneType.METACARPAL).Center;
             }
 
             //Set the Raycast Direction and Delta
-            EventData.position = mainCamera.WorldToScreenPoint(pointerPosition);
+            EventData.position = module.MainCamera.WorldToScreenPoint(pointerPosition);
             EventData.delta = EventData.position - PrevScreenPosition;
             EventData.scrollDelta = Vector2.zero;
 
@@ -882,8 +858,7 @@ namespace Leap.InputModule
                     }
                     else
                     {
-                        //Amount the pointer floats above the Canvas
-                        transform.position = globalLookPos - transform.forward * 0.01f;
+                        transform.position = globalLookPos;
                     }
 
                     transform.rotation = draggingPlane.rotation;
