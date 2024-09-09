@@ -6,7 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
 
-## [NEXT]
+## [7.1.0] - 04/09/2024
+
+### Tracking Client versions
+- Windows 	v6.1.0
+- MacOS 	v6.0.0
+- Android 	v6.0.0
 
 ### Added
 - Added option to fade UIInputCursor sprite out based on specified interaction distance range
