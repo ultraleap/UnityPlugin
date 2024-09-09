@@ -286,9 +286,9 @@ namespace Leap.PhysicalHands
                 {
                     if (_grabbableHandsValues[i].isContacting)
                     {
-                        if(_physicalHandContacts != null)
+                        if (_physicalHandContacts != null)
                         {
-                            foreach(var contactEventReceiver in _physicalHandContacts)
+                            foreach (var contactEventReceiver in _physicalHandContacts)
                             {
                                 contactEventReceiver.OnHandContactExit(_grabbableHands[i]);
                             }
@@ -312,7 +312,7 @@ namespace Leap.PhysicalHands
             _grabbableHandsValues.Clear();
             _grabbableHands.Clear();
 
-            for(int i = 0; i < 6; i++)
+            for (int i = 0; i < 6; i++)
             {
                 _leftGrabbableBones[i].Clear();
                 _rightGrabbableBones[i].Clear();
@@ -419,7 +419,7 @@ namespace Leap.PhysicalHands
 
         private void UpdateHands()
         {
-            for(int i = 0; i < 6; i++) // loop through the fingers
+            for (int i = 0; i < 6; i++) // loop through the fingers
             {
                 for (int j = 0; j < _leftGrabbableBones[i].Count; j++) // loop through the bones
                 {
@@ -457,7 +457,7 @@ namespace Leap.PhysicalHands
 
         internal void HandlePrimaryHover(ContactHand hand)
         {
-            if(hand.Handedness == Chirality.Left)
+            if (hand.Handedness == Chirality.Left)
             {
                 isPrimaryHoveredLeft = true;
             }
@@ -979,7 +979,7 @@ namespace Leap.PhysicalHands
             bool thumb = false, otherFinger = false;
             bool earlyQuit;
 
-             Leap.Hand lHand = hand.dataHand;
+            Leap.Hand lHand = hand.dataHand;
 
             if (lHand == null)
             {

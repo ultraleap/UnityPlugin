@@ -94,8 +94,8 @@ public class HandPoseValidator : MonoBehaviour
 
         if (colourCapsuleHand != null)
         {
-             Leap.Utils.Fill(leftCapsuleHandColours, Color.grey);
-             Leap.Utils.Fill(rightCapsuleHandColours, Color.grey);
+            Leap.Utils.Fill(leftCapsuleHandColours, Color.grey);
+            Leap.Utils.Fill(rightCapsuleHandColours, Color.grey);
         }
 
         if (storedValidationHands.Count > 0)
@@ -215,8 +215,8 @@ public class HandPoseValidator : MonoBehaviour
                                 if (capsuleHand != null && capsuleHand.enabled)
                                 {
                                     if ((int)boneDirectionTarget.finger != 5 &&
-                                        boneDirectionTarget.finger != (int) Leap.Finger.FingerType.UNKNOWN &&
-                                        boneDirectionTarget.bone != (int) Leap.Bone.BoneType.UNKNOWN)
+                                        boneDirectionTarget.finger != (int)Leap.Finger.FingerType.UNKNOWN &&
+                                        boneDirectionTarget.bone != (int)Leap.Bone.BoneType.UNKNOWN)
                                     {
                                         int fingNum = (int)boneDirectionTarget.finger;
                                         int boneNum = (int)boneDirectionTarget.bone;

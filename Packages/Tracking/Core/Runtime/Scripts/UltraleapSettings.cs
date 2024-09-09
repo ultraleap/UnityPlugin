@@ -6,9 +6,9 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
+using System;
 using System.Collections.Generic;
 using UnityEngine;
-using System;
 
 #if UNITY_EDITOR
 using UnityEditor;

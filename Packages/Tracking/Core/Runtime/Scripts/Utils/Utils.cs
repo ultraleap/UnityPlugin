@@ -89,7 +89,7 @@ namespace Leap
         {
             for (int i = 0; i < list.Count; i++)
             {
-                 Leap.Utils.Swap(list, i, UnityEngine.Random.Range(i, list.Count));
+                Leap.Utils.Swap(list, i, UnityEngine.Random.Range(i, list.Count));
             }
         }
 
@@ -850,14 +850,14 @@ namespace Leap
 
         public static bool IsBetween(this float f, float f0, float f1)
         {
-            if (f0 > f1)  Leap.Utils.Swap(ref f0, ref f1);
+            if (f0 > f1) Leap.Utils.Swap(ref f0, ref f1);
 
             return f0 <= f && f <= f1;
         }
 
         public static bool IsBetween(this double d, double d0, double d1)
         {
-            if (d0 > d1)  Leap.Utils.Swap(ref d0, ref d1);
+            if (d0 > d1) Leap.Utils.Swap(ref d0, ref d1);
 
             return d0 <= d && d <= d1;
         }
@@ -1203,7 +1203,7 @@ namespace Leap
         /// </summary>
         public static bool TryGetComponents<T>(this Component source, out T[] components)
         {
-            if(source.TryGetComponent<T>(out _))
+            if (source.TryGetComponent<T>(out _))
             {
                 components = source.GetComponents<T>();
                 return true;
@@ -1218,7 +1218,7 @@ namespace Leap
         /// </summary>
         public static bool TryGetComponentInParent<T>(this Component source, out T component)
         {
-            if(source.transform.parent != null)
+            if (source.transform.parent != null)
             {
                 return source.transform.parent.TryGetComponent(out component);
             }
@@ -1246,28 +1246,28 @@ namespace Leap
         /// </summary>
         public static bool TryGetComponentInChildren<T>(this Component source, out T component, bool includeSelf = true, bool includeInactive = false)
         {
-            if(!source.gameObject.activeInHierarchy && !includeInactive) // No children can be active either
+            if (!source.gameObject.activeInHierarchy && !includeInactive) // No children can be active either
             {
                 component = default;
                 return false;
             }
 
-            if(includeSelf && source.TryGetComponent(out component))
+            if (includeSelf && source.TryGetComponent(out component))
             {
                 return true;
             }
             else
             {
-                foreach(Transform child in source.transform)
+                foreach (Transform child in source.transform)
                 {
                     component = child.GetComponentInChildren<T>(includeInactive);
 
-                    if(component != null)
+                    if (component != null)
                     {
                         return true;
                     }
                 }
-            }    
+            }
 
             component = default;
             return false;
@@ -1278,7 +1278,7 @@ namespace Leap
         /// </summary>
         public static bool TryGetComponentsInChildren<T>(this Component source, out T[] components, bool includeSelf = true, bool includeInactive = false)
         {
-            if(includeSelf)
+            if (includeSelf)
             {
                 components = source.GetComponentsInChildren<T>(includeInactive);
                 return components != null;
@@ -1292,7 +1292,7 @@ namespace Leap
                     componentList.AddRange(child.GetComponentsInChildren<T>(includeInactive));
                 }
 
-                if(componentList.Count > 0)
+                if (componentList.Count > 0)
                 {
                     components = componentList.ToArray();
                     return true;
@@ -1417,7 +1417,7 @@ namespace Leap
         public static Transform FindChild(this Transform t, string withName,
           bool caseSensitive = true)
         {
-            var children =  Leap.Utils.Require(ref _b_findChildBuffer);
+            var children = Leap.Utils.Require(ref _b_findChildBuffer);
             children.Clear();
             t.GetAllChildren(children);
             if (!caseSensitive) { withName = withName.ToLower(); }
@@ -2993,9 +2993,6 @@ namespace Leap
         /// </summary>
         public static void AddTrackedPoseDriverToCamera(this Camera mainCamera)
         {
-#if !XR_MANAGEMENT_AVAILABLE && !INPUT_SYSTEM_AVAILABLE
-            return;
-#endif
             bool trackedPoseDriverExists = false;
 
 #if XR_MANAGEMENT_AVAILABLE

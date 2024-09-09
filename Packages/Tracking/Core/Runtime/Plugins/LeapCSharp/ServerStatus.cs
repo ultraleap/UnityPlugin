@@ -9,12 +9,13 @@
 namespace LeapInternal
 {
     using System;
+    using System.Linq.Expressions;
     using System.Runtime.InteropServices;
     using UnityEngine;
 
     public static class ServerStatus
     {
-        const double requestInterval = 1.0f;
+        const double requestInterval = 5.0f;
         static double lastRequestTimestamp;
 
         static LeapC.LEAP_SERVER_STATUS lastStatus;
@@ -25,7 +26,7 @@ namespace LeapInternal
             if (lastRequestTimestamp + requestInterval < Time.realtimeSinceStartup)
             {
                 IntPtr statusPtr = new IntPtr();
-                LeapC.GetServerStatus(500, ref statusPtr);
+                LeapC.GetServerStatus(1500, ref statusPtr);
 
                 if (statusPtr != IntPtr.Zero)
                 {
@@ -48,36 +49,37 @@ namespace LeapInternal
                 string[] versions = lastStatus.version.Split('v')[1].Split('-')[0].Split('.');
                 LEAP_VERSION curVersion = new LEAP_VERSION { major = int.Parse(versions[0]), minor = int.Parse(versions[1]), patch = int.Parse(versions[2]) };
 
-                if (_requiredVersion.major < curVersion.major)
-                {
+                if (curVersion.major > _requiredVersion.major)
                     return true;
-                }
-                else if (_requiredVersion.major == curVersion.major)
-                {
-                    if (_requiredVersion.minor < curVersion.minor)
-                    {
-                        return true;
-                    }
-                    else if (_requiredVersion.minor == curVersion.minor && _requiredVersion.patch <= curVersion.patch)
-                    {
-                        return true;
-                    }
-                }
+                if (curVersion.major < _requiredVersion.major)
+                    return false;
+
+                if (curVersion.minor > _requiredVersion.minor)
+                    return true;
+                if (curVersion.minor < _requiredVersion.minor)
+                    return false;
+
+                if (curVersion.patch >= _requiredVersion.patch)
+                    return true;
+
                 return false;
             }
 
-            return false;
+            return true;
         }
 
         public static string[] GetSerialNumbers()
         {
             GetStatus();
 
-            string[] serials = new string[lastDevices.Length];
-
-            for (int i = 0; i < lastDevices.Length; i++)
+            string[] serials = new string[0];
+            if (lastDevices != null)
             {
-                serials[i] = lastDevices[i].serial;
+                serials = new string[lastDevices.Length];
+                for (int i = 0; i < lastDevices.Length; i++)
+                {
+                    serials[i] = lastDevices[i].serial;
+                }
             }
 
             return serials;

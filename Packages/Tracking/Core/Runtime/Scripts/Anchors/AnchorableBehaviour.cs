@@ -62,7 +62,7 @@ namespace Leap
 
                         if (_reactivateGravityOnDetach)
                         {
-                            if(_rigidbody)
+                            if (_rigidbody)
                             {
                                 _rigidbody.useGravity = true;
                             }
@@ -669,7 +669,7 @@ namespace Leap
             float directedness = anchObjVel.magnitude.Map(0.20F, 1F, 0F, 1F);
 
             float effMaxDistance = directedness.Map(0F, 1F, nonDirectedMaxDistance, maxDistance);
-            Vector3 effPos =  Leap.Utils.Map(Mathf.Sqrt(Mathf.Sqrt(directedness)), 0f, 1f,
+            Vector3 effPos = Leap.Utils.Map(Mathf.Sqrt(Mathf.Sqrt(directedness)), 0f, 1f,
                                        anchObjPos, (anchObjPos - anchObjVel.normalized * effMaxDistance * 0.30f));
 
             float distanceSqrd = (anchorPos - effPos).sqrMagnitude;
@@ -716,7 +716,7 @@ namespace Leap
             float reachTargetAmount = 0F;
             Vector3 towardsHand = Vector3.zero;
 
-            if(_hoveringHands.Count > 0)
+            if (_hoveringHands.Count > 0)
             {
                 Hand hoveringHand = _hoveringHands.Last();
                 Vector3 hoverTarget = hoveringHand.PalmPosition;

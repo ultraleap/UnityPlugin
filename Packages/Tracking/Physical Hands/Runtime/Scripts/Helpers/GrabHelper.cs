@@ -25,8 +25,8 @@ namespace Leap.PhysicalHands
                 "\n\nWarning: Hard Contact hands can jitter when moving a kinematic object")]
         public bool useNonKinematicMovementOnly = true;
 
-        private ContactHand _leftContactHand { get { return physicalHandsManager.ContactParent.LeftHand; } }
-        private ContactHand _rightContactHand { get { return physicalHandsManager.ContactParent.RightHand; } }
+        private ContactHand _leftContactHand { get { return physicalHandsManager?.ContactParent?.LeftHand; } }
+        private ContactHand _rightContactHand { get { return physicalHandsManager?.ContactParent?.RightHand; } }
 
         private Collider[] _colliderCache = new Collider[128];
 
@@ -54,6 +54,11 @@ namespace Leap.PhysicalHands
 
         private void OnEnable()
         {
+            if (physicalHandsManager == null)
+            {
+                physicalHandsManager = GetComponent<PhysicalHandsManager>();
+            }
+
             if (physicalHandsManager != null)
             {
                 physicalHandsManager.OnPrePhysicsUpdate -= OnPrePhysicsUpdate;
@@ -114,12 +119,12 @@ namespace Leap.PhysicalHands
         #region Hand Updating
         private void UpdateHandHeuristics()
         {
-            if (_leftContactHand.tracked)
+            if (_leftContactHand != null && _leftContactHand.tracked)
             {
                 UpdateFingerStrengthValues(_leftContactHand);
             }
 
-            if (_rightContactHand.tracked)
+            if (_rightContactHand != null && _rightContactHand.tracked)
             {
                 UpdateFingerStrengthValues(_rightContactHand);
             }
@@ -205,7 +210,7 @@ namespace Leap.PhysicalHands
             {
                 _fingerStrengths.Add(hand, new float[5]);
             }
-             Leap.Hand lHand = hand.dataHand;
+            Leap.Hand lHand = hand.dataHand;
             for (int i = 0; i < 5; i++)
             {
                 _fingerStrengths[hand][i] = lHand.GetFingerStrength(i);
@@ -238,6 +243,9 @@ namespace Leap.PhysicalHands
 
         void UpdatePrimaryHoverForHand(ref GrabHelperObject prevPrimaryHoverObject, ContactHand contactHand)
         {
+            if (contactHand == null)
+                return;
+
             // If we are contacting or grabbing, we are still primary hovering the same object. break out
             if (prevPrimaryHoverObject != null && contactHand.IsContacting &&
                 (prevPrimaryHoverObject.GrabState == GrabHelperObject.State.Contact ||
@@ -261,7 +269,7 @@ namespace Leap.PhysicalHands
 
             if (nearestObject != null && TryGetGrabHelperObjectFromRigid(nearestObject, out GrabHelperObject helperObject)) // Find the nearest GrabHelperObject
             {
-                if(prevPrimaryHoverObject != null && prevPrimaryHoverObject != helperObject) // Update events and states
+                if (prevPrimaryHoverObject != null && prevPrimaryHoverObject != helperObject) // Update events and states
                 {
                     prevPrimaryHoverObject.HandlePrimaryHoverExit(contactHand);
                 }
@@ -269,7 +277,7 @@ namespace Leap.PhysicalHands
                 helperObject.HandlePrimaryHover(contactHand);
                 prevPrimaryHoverObject = helperObject; // cache for next frame
             }
-            else if(prevPrimaryHoverObject != null)
+            else if (prevPrimaryHoverObject != null)
             {
                 prevPrimaryHoverObject.HandlePrimaryHoverExit(contactHand);
             }

@@ -6,8 +6,8 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Leap.PhysicalHands
 {
@@ -77,7 +77,7 @@ namespace Leap.PhysicalHands
         private Vector3 _attachedObjectOffset;
         private Transform _transformHelper;
         private bool _moveGrabBallToPositionOnUngrasp = false;
-        
+
         private List<ContactHand> _grabbedHands = new List<ContactHand>();
         private const float LERP_POSITION_LIMIT = 0.001f;
         private const float LERP_ROTATION_LIMIT = 1;
@@ -107,7 +107,7 @@ namespace Leap.PhysicalHands
             UpdateAttachedObjectTargetPose(false);
         }
 
-        private void Update()
+        private void FixedUpdate()
         {
             if (IsGrabbed)
             {
@@ -116,7 +116,7 @@ namespace Leap.PhysicalHands
             }
             else if (_moveGrabBallToPositionOnUngrasp)
             {
-                this.transform.position = Vector3.Lerp(this.transform.position, grabBallPose.position, Time.deltaTime * lerpSpeed);
+                this.transform.position = Vector3.Lerp(this.transform.position, grabBallPose.position, Time.fixedDeltaTime * lerpSpeed);
 
                 if (Vector3.Distance(this.transform.position, grabBallPose.position) < LERP_POSITION_LIMIT)
                 {
@@ -135,7 +135,7 @@ namespace Leap.PhysicalHands
             else
             {
                 UpdateAttachedObjectTargetPose();
-                Pose attachedObjectPose = attachedObject.ToPose().Lerp(_attachedObjectTargetPose, Time.deltaTime * lerpSpeed);
+                Pose attachedObjectPose = attachedObject.ToPose().Lerp(_attachedObjectTargetPose, Time.fixedDeltaTime * lerpSpeed);
                 attachedObject.SetPose(attachedObjectPose);
             }
         }
@@ -296,32 +296,32 @@ namespace Leap.PhysicalHands
                 Vector3 centerPosition = _head.position;
                 centerPosition.y = Mathf.Clamp(this.transform.position.y, _head.position.y + minHeightFromHead, _head.position.y + maxHeightFromHead);
 
-                 Leap.Utils.DrawCircle(centerPosition, normal, maxHorizontalDistanceFromHead, grabBallRestrictionStatus.horizontalMax ? Color.green : Color.gray);
+                Leap.Utils.DrawCircle(centerPosition, normal, maxHorizontalDistanceFromHead, grabBallRestrictionStatus.horizontalMax ? Color.green : Color.gray);
 
                 //Draw Horizontal Min Restriction
-                 Leap.Utils.DrawCircle(centerPosition, normal, minHorizontalDistanceFromHead, grabBallRestrictionStatus.horizontalMin ? Color.green : Color.gray);
+                Leap.Utils.DrawCircle(centerPosition, normal, minHorizontalDistanceFromHead, grabBallRestrictionStatus.horizontalMin ? Color.green : Color.gray);
 
                 //Draw Height Max Restriction
                 centerPosition.y = _head.position.y + maxHeightFromHead;
-                 Leap.Utils.DrawCircle(centerPosition, normal, maxHorizontalDistanceFromHead, grabBallRestrictionStatus.heightMax ? Color.green : Color.gray);
+                Leap.Utils.DrawCircle(centerPosition, normal, maxHorizontalDistanceFromHead, grabBallRestrictionStatus.heightMax ? Color.green : Color.gray);
 
                 //Draw Height Min Restriction
                 centerPosition.y = _head.position.y + minHeightFromHead;
-                 Leap.Utils.DrawCircle(centerPosition, normal, maxHorizontalDistanceFromHead, grabBallRestrictionStatus.heightMin ? Color.green : Color.gray);
+                Leap.Utils.DrawCircle(centerPosition, normal, maxHorizontalDistanceFromHead, grabBallRestrictionStatus.heightMin ? Color.green : Color.gray);
             }
         }
 
         public void OnHandGrab(ContactHand hand)
         {
             IsGrabbed = true;
-            if(!_grabbedHands.Contains(hand))
+            if (!_grabbedHands.Contains(hand))
                 _grabbedHands.Add(hand);
         }
 
         public void OnHandGrabExit(ContactHand hand)
         {
             _grabbedHands.Remove(hand);
-            if(_grabbedHands.Count == 0)
+            if (_grabbedHands.Count == 0)
             {
                 IsGrabbed = false;
             }

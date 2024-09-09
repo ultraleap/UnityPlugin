@@ -5,8 +5,8 @@ using System.Collections.Generic;
 
 using UnityEngine;
 
-using Bone =  Leap.Bone;
-using Hand =  Leap.Hand;
+using Bone = Leap.Bone;
+using Hand = Leap.Hand;
 
 namespace Leap.Tracking.OpenXR
 {

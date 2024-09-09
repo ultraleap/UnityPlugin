@@ -88,7 +88,7 @@ namespace Leap.PhysicalHands
 
         private void OnDisable()
         {
-            if(_connectedButton != null)
+            if (_connectedButton != null)
             {
                 _connectedButton.OnButtonPressed?.RemoveListener(ButtonPressed);
                 _connectedButton.OnButtonUnPressed?.RemoveListener(ButtonUnPressed);
@@ -118,7 +118,7 @@ namespace Leap.PhysicalHands
             // Account for joints being a little weird when rotating parent rigidbodies.
             // Set the rotation to the initial rotation of the sliding object when it gets too far away. 
             // Note. This will stop the slideable object from being rotated at all at runtime
-            if(Quaternion.Angle(_slideableObject.transform.localRotation, _initialRotation) > 0.5f)
+            if (Quaternion.Angle(_slideableObject.transform.localRotation, _initialRotation) > 0.5f)
             {
                 _slideableObject.transform.localRotation = _initialRotation;
             }
@@ -131,14 +131,14 @@ namespace Leap.PhysicalHands
                     if (Mathf.Abs(_slideableObject.transform.localPosition.y - _initialPosition.y) > 0.01)
                     {
                         _slideableObject.transform.localPosition = new Vector3(
-                            _slideableObject.transform.localPosition.x, 
-                            _initialPosition.y, 
+                            _slideableObject.transform.localPosition.x,
+                            _initialPosition.y,
                             _slideableObject.transform.localPosition.z);
                     }
                     if (Mathf.Abs(_slideableObject.transform.localPosition.z - _initialPosition.z) > 0.01)
                     {
-                        _slideableObject.transform.localPosition = new Vector3(_slideableObject.transform.localPosition.x, 
-                            _slideableObject.transform.localPosition.y, 
+                        _slideableObject.transform.localPosition = new Vector3(_slideableObject.transform.localPosition.x,
+                            _slideableObject.transform.localPosition.y,
                             _initialPosition.z);
                     }
                     break;
@@ -146,15 +146,15 @@ namespace Leap.PhysicalHands
                     if (Mathf.Abs(_slideableObject.transform.localPosition.y - _initialPosition.y) > 0.01)
                     {
                         _slideableObject.transform.localPosition = new Vector3(
-                            _slideableObject.transform.localPosition.x, 
-                            _initialPosition.y, 
+                            _slideableObject.transform.localPosition.x,
+                            _initialPosition.y,
                             _slideableObject.transform.localPosition.z);
                     }
                     if (Mathf.Abs(_slideableObject.transform.localPosition.x - _initialPosition.x) > 0.01)
                     {
                         _slideableObject.transform.localPosition = new Vector3(
-                            _initialPosition.z, 
-                            _slideableObject.transform.localPosition.y, 
+                            _initialPosition.z,
+                            _slideableObject.transform.localPosition.y,
                             _slideableObject.transform.localPosition.z);
                     }
                     break;
@@ -176,7 +176,7 @@ namespace Leap.PhysicalHands
                 this.enabled = false;
                 return;
             }
-            if( _slideableObject.transform.localRotation != Quaternion.identity )
+            if (_slideableObject.transform.localRotation != Quaternion.identity)
             {
                 Debug.LogWarning("Warning! Slideable object cannot be rotated. This will cause unexpected behaviour. \n " +
                     "Please rotate the slider instead, leaving slideable object rotation 0,0,0", _slideableObject);
@@ -226,7 +226,7 @@ namespace Leap.PhysicalHands
                 slideHelper = _slideableObject.AddComponent<PhysicalHandsSliderHelper>();
             }
 
-            switch(_sliderDirection)
+            switch (_sliderDirection)
             {
                 case SliderDirection.X:
                     _slideableObject.transform.localPosition = new Vector3(0, _slideableObject.transform.localPosition.y, _slideableObject.transform.localPosition.z);
@@ -330,10 +330,10 @@ namespace Leap.PhysicalHands
             switch (_sliderDirection)
             {
                 case SliderDirection.X:
-                    xOffset = _configurableJoint.anchor.x -_localSliderTravelDistanceHalf;
+                    xOffset = _configurableJoint.anchor.x - _localSliderTravelDistanceHalf;
                     break;
                 case SliderDirection.Z:
-                    zOffset = _configurableJoint.anchor.z -_localSliderTravelDistanceHalf;
+                    zOffset = _configurableJoint.anchor.z - _localSliderTravelDistanceHalf;
                     break;
             }
 
@@ -364,7 +364,7 @@ namespace Leap.PhysicalHands
         /// <param name="joint">The configurable joint to set up.</
         private void SetUpConfigurableJoint(ConfigurableJoint joint)
         {
-            if(joint == null)
+            if (joint == null)
             {
                 return;
             }
@@ -394,7 +394,7 @@ namespace Leap.PhysicalHands
         /// </summary>
         private void SetUpSlider()
         {
-            if(_slideableObject == null)
+            if (_slideableObject == null)
             {
                 Debug.LogWarning("There is no slideable object. Please add one to use the slider.", this.gameObject);
                 return;
@@ -417,10 +417,10 @@ namespace Leap.PhysicalHands
             switch (_sliderDirection)
             {
                 case SliderDirection.X:
-                _configurableJoint.xMotion = ConfigurableJointMotion.Limited;
+                    _configurableJoint.xMotion = ConfigurableJointMotion.Limited;
                     break;
                 case SliderDirection.Z:
-                _configurableJoint.zMotion = ConfigurableJointMotion.Limited;
+                    _configurableJoint.zMotion = ConfigurableJointMotion.Limited;
                     break;
             }
         }
@@ -615,7 +615,7 @@ namespace Leap.PhysicalHands
 
         private void OnDrawGizmosSelected()
         {
-            if(_slideableObject == null)
+            if (_slideableObject == null)
             {
                 return;
             }

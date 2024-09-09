@@ -192,7 +192,7 @@ namespace Leap
             CreatePrefab("Attachment Hands");
         }
 
-#endregion
+        #endregion
 
         #region Pose Detection
 
@@ -214,7 +214,7 @@ namespace Leap
             GameObject physicalHandsManager = CreatePrefab("Physical Hands Manager");
             if (physicalHandsManager != null)
             {
-                var physHandsManager = physicalHandsManager.GetComponent< Leap.PhysicalHands.PhysicalHandsManager>();
+                var physHandsManager = physicalHandsManager.GetComponent<Leap.PhysicalHands.PhysicalHandsManager>();
                 // Ensure that there is a contact parent at runtime
                 if (physHandsManager != null)
                 {

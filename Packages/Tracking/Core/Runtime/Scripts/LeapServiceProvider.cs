@@ -205,12 +205,10 @@ namespace Leap
                 _specificSerialNumber = value;
                 if (_multipleDeviceMode != MultipleDeviceMode.Specific)
                 {
-                    Debug.Log("You are trying to set a Specific Serial Number while Multiple Device Mode is not set to 'Specific'. Please change the Multiple Device Mode to 'Specific'");
+                    Debug.LogWarning("You are trying to set a Specific Serial Number while Multiple Device Mode is not set to 'Specific'. Please change the Multiple Device Mode to 'Specific'");
+                    return;
                 }
-                else if (_currentDevice == null || _currentDevice.SerialNumber != _specificSerialNumber)
-                {
-                    updateDevice();
-                }
+                setSpecificSerialDevice();
             }
         }
 
@@ -619,11 +617,7 @@ namespace Leap
                 return;
             }
 
-            // if the serial number has changed since the last update(), update the device
-            if (_multipleDeviceMode == MultipleDeviceMode.Specific && (_currentDevice == null || _currentDevice.SerialNumber != SpecificSerialNumber))
-            {
-                updateDevice();
-            }
+            setSpecificSerialDevice();
 
             HandleUpdateFrameInterpolationAndTransformation();
             DispatchUpdateFrameEvent(_transformedUpdateFrame);
@@ -940,20 +934,19 @@ namespace Leap
 
             _onDeviceSafe += (d) =>
             {
-                if (_multipleDeviceMode == MultipleDeviceMode.Specific)
+                switch (_multipleDeviceMode)
                 {
-                    if (SpecificSerialNumber != null && SpecificSerialNumber != "" && d.SerialNumber.Contains(SpecificSerialNumber))
-                    {
-                        connectToNewDevice(d, true);
-                    }
-                }
-                else if (_multipleDeviceMode == MultipleDeviceMode.Disabled)
-                {
-                    connectToNewDevice(d);
-                }
-                else
-                {
-                    throw new NotImplementedException($"{nameof(MultipleDeviceMode)} case not implemented");
+                    case MultipleDeviceMode.Specific:
+                        if (d.SerialNumber == SpecificSerialNumber)
+                        {
+                            connectToNewDevice(d, true);
+                        }
+                        break;
+                    case MultipleDeviceMode.Disabled:
+                        connectToNewDevice(d);
+                        break;
+                    default:
+                        throw new NotImplementedException($"{nameof(MultipleDeviceMode)} case not implemented");
                 }
             };
 
@@ -1005,23 +998,18 @@ namespace Leap
         }
 
         /// <summary>
-        /// update the connected device. This should be called when the serial number has been changed and 
-        /// the currently connected device isn't the right one anymore.
-        /// searches for a device with matching serial number (same as SpecificSerialNumber) and connects to the first on it finds.
+        /// If using Specific MultipleDeviceMode, this will ensure the active Device has the correct SerialNumber.
         /// </summary>
-        private void updateDevice()
+        private void setSpecificSerialDevice()
         {
             if (_leapController == null) return;
-            if (SpecificSerialNumber == null || SpecificSerialNumber == "") return;
+            if (_multipleDeviceMode != MultipleDeviceMode.Specific) return;
+            if (_currentDevice != null && _currentDevice.SerialNumber == _specificSerialNumber) return;
 
-            foreach (Device d in _leapController.Devices)
-            {
-                if (d.SerialNumber.Contains(SpecificSerialNumber))
-                {
-                    connectToNewDevice(d, true);
-                    return;
-                }
-            }
+            Device d = _leapController.Devices.FirstOrDefault(o => o.SerialNumber == SpecificSerialNumber);
+            if (d == null) return;
+
+            connectToNewDevice(d, true);
         }
 
         /// <summary>
@@ -1030,13 +1018,12 @@ namespace Leap
         /// </summary>
     	public void destroyController()
         {
-            if (_leapController != null)
-            {
-                _leapController.UnsubscribeFromAllDevices();
-                _leapController.StopConnection();
-                _leapController.Dispose();
-                _leapController = null;
-            }
+            if (_leapController == null) return;
+
+            _leapController.UnsubscribeFromAllDevices();
+            _leapController.StopConnection();
+            _leapController.Dispose();
+            _leapController = null;
         }
 
         private int _framesSinceServiceConnectionChecked = 0;

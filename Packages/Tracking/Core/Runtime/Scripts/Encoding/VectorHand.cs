@@ -302,7 +302,7 @@ namespace Leap.Encoding
                                BitConverterNonAlloc.ToInt16(bytes, ref offset))
                              / 4096f;
             }
-            palmRot =  Leap.Utils.DecompressBytesToQuat(bytes, ref offset);
+            palmRot = Leap.Utils.DecompressBytesToQuat(bytes, ref offset);
 
             // Palm-local bone joint positions.
             for (int i = 0; i < NUM_JOINT_POSITIONS; i++)
@@ -350,7 +350,7 @@ namespace Leap.Encoding
             }
 
             // Palm rotation.
-             Leap.Utils.CompressQuatToBytes(palmRot, bytesToFill, ref offset);
+            Leap.Utils.CompressQuatToBytes(palmRot, bytesToFill, ref offset);
 
             // Joint positions.
             for (int j = 0; j < NUM_JOINT_POSITIONS; j++)
