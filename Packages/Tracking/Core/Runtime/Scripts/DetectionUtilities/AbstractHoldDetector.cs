@@ -23,10 +23,6 @@ namespace Leap.Unity
         /** Implementations must implement this method. */
         protected abstract void ensureUpToDate();
 
-        [SerializeField]
-        protected HandModelBase _handModel;
-        public HandModelBase HandModel { get { return _handModel; } set { _handModel = value; } }
-
         /**
         * Whether the Transform of the object containing this Detector script
         * is transformed by the Position and Rotation of the hand when IsHolding is true.
@@ -65,15 +61,6 @@ namespace Leap.Unity
             if (GetComponent<HandModelBase>() != null && ControlsTransform == true)
             {
                 Debug.LogWarning("Detector should not be control the HandModelBase's transform. Either attach it to its own transform or set ControlsTransform to false.");
-            }
-            if (_handModel == null)
-            {
-                _handModel = GetComponentInParent<HandModelBase>();
-                if (_handModel == null)
-                {
-                    Debug.LogWarning("The HandModel field of Detector was unassigned and the detector has been disabled.");
-                    enabled = false;
-                }
             }
         }
 

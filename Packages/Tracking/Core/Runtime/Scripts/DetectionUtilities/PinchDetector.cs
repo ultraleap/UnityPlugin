@@ -73,9 +73,9 @@ namespace Leap.Unity
 
             _didChange = false;
 
-            Hand hand = _handModel.GetLeapHand();
+            Hand hand = Hands.Right;
 
-            if (hand == null || !_handModel.IsTracked)
+            if (hand == null)
             {
                 changeState(false);
                 return;
@@ -115,40 +115,5 @@ namespace Leap.Unity
                 transform.rotation = _rotation;
             }
         }
-
-#if UNITY_EDITOR
-        protected override void OnDrawGizmos()
-        {
-            if (ShowGizmos && _handModel != null && _handModel.IsTracked)
-            {
-                Color centerColor = Color.clear;
-                Vector3 centerPosition = Vector3.zero;
-                Quaternion circleRotation = Quaternion.identity;
-                if (IsHolding)
-                {
-                    centerColor = Color.green;
-                    centerPosition = Position;
-                    circleRotation = Rotation;
-                }
-                else
-                {
-                    Hand hand = _handModel.GetLeapHand();
-                    if (hand != null)
-                    {
-                        Finger thumb = hand.Fingers[0];
-                        Finger index = hand.Fingers[1];
-                        centerColor = Color.red;
-                        centerPosition = (thumb.Bone(Bone.BoneType.TYPE_DISTAL).NextJoint + index.Bone(Bone.BoneType.TYPE_DISTAL).NextJoint) / 2;
-                        circleRotation = hand.Basis.rotation;
-                    }
-                }
-                Vector3 axis;
-                float angle;
-                circleRotation.ToAngleAxis(out angle, out axis);
-                Leap.Unity.Utils.DrawCircle(centerPosition, axis, ActivateDistance / 2, centerColor);
-                Leap.Unity.Utils.DrawCircle(centerPosition, axis, DeactivateDistance / 2, Color.blue);
-            }
-        }
-#endif
     }
 }
