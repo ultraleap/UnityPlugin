@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using Unity.Collections;
 
 using UnityEngine;
+using UnityEngine.Scripting;
 using UnityEngine.XR.Hands;
 using UnityEngine.XR.Hands.ProviderImplementation;
 
@@ -36,6 +37,11 @@ namespace Leap.Unity
             {
                 trackingProvider = value;
             }
+        }
+		
+		[Preserve]
+        public LeapXRHandProvider()
+        {
         }
 
         public override void Start()
