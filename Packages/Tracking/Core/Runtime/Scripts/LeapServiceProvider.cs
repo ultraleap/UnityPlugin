@@ -291,8 +291,7 @@ namespace Leap
 
         [Tooltip("The IP address on which the Tracking service listens to. This is configured on the service with 'ip_address' in the 'leap_server_config' session of 'ServerConfig.json'")]
         [SerializeField]
-        [EditTimeOnly]
-        protected string _serviceIP = "127.0.0.1";
+        public string _serviceIP = "127.0.0.1";
 
         [Tooltip("The port on which the Tracking service listens to. This is configured on the service with 'port' in the 'leap_server_config' session of 'ServerConfig.json'")]
         [SerializeField]
