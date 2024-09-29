@@ -223,13 +223,21 @@ namespace Leap.PhysicalHands
 
                 if (IsPalm)
                 {
-                    // Do palm logic
-                    colliderPos = ContactUtils.ClosestPointEstimationFromRectangle(_palmColCenter, _palmColRotation, _palmExtentsReduced.xz(), collider);
-                    bonePos = ContactUtils.ClosestPointToRectangleFace(_palmPoints, _palmPlane.ClosestPointOnPlane(colliderTransformPosition));
-                    midPoint = colliderPos + (bonePos + ((bonePos - colliderPos).normalized * width) - colliderPos) / 2f;
+                    if (collider is BoxCollider || collider is SphereCollider || collider is CapsuleCollider || (collider is MeshCollider meshCollider && meshCollider.convex))
+                    {
+                        // Do palm logic
+                        colliderPos = ContactUtils.ClosestPointEstimationFromRectangle(_palmColCenter, _palmColRotation, _palmExtentsReduced.xz(), collider);
+                        bonePos = ContactUtils.ClosestPointToRectangleFace(_palmPoints, _palmPlane.ClosestPointOnPlane(colliderTransformPosition));
+                        midPoint = colliderPos + (bonePos + ((bonePos - colliderPos).normalized * width) - colliderPos) / 2f;
 
-                    colliderPos = collider.ClosestPoint(midPoint);
-                    bonePos = ContactUtils.ClosestPointToRectangleFace(_palmPoints, _palmPlane.ClosestPointOnPlane(midPoint));
+                        colliderPos = collider.ClosestPoint(midPoint);
+                        bonePos = ContactUtils.ClosestPointToRectangleFace(_palmPoints, _palmPlane.ClosestPointOnPlane(midPoint));
+                    }
+                    else
+                    {
+                        // Skip processing for non-convex MeshCollider
+                        continue;
+                    }
                 }
                 else
                 {
@@ -238,14 +246,22 @@ namespace Leap.PhysicalHands
                     float lineLength = lineDir.magnitude;
                     lineDir.Normalize();
 
-                    colliderPos = collider.ClosestPoint((boneTransformPosition + tipPosition) * 0.5f);
-                    // Do joint logic
-                    bonePos = ContactUtils.GetClosestPointOnFiniteLine(colliderTransformPosition, boneTransformPosition, lineDir, lineLength);
-                    // We need to extrude the line to get the bone's edge
-                    midPoint = colliderPos + (bonePos + ((bonePos - colliderPos).normalized * width) - colliderPos) / 2f;
+                    if (collider is BoxCollider || collider is SphereCollider || collider is CapsuleCollider || (collider is MeshCollider meshCollider && meshCollider.convex))
+                    {
+                        colliderPos = collider.ClosestPoint((boneTransformPosition + tipPosition) * 0.5f);
+                        // Do joint logic
+                        bonePos = ContactUtils.GetClosestPointOnFiniteLine(colliderTransformPosition, boneTransformPosition, lineDir, lineLength);
+                        // We need to extrude the line to get the bone's edge
+                        midPoint = colliderPos + (bonePos + ((bonePos - colliderPos).normalized * width) - colliderPos) / 2f;
 
-                    colliderPos = collider.ClosestPoint(midPoint);
-                    bonePos = ContactUtils.GetClosestPointOnFiniteLine(midPoint, boneTransformPosition, lineDir, lineLength);
+                        colliderPos = collider.ClosestPoint(midPoint);
+                        bonePos = ContactUtils.GetClosestPointOnFiniteLine(midPoint, boneTransformPosition, lineDir, lineLength);
+                    }
+                    else
+                    {
+                        // Skip processing for non-convex MeshCollider
+                        continue;
+                    }
                 }
 
                 distance = Vector3.Distance(colliderPos, bonePos);
