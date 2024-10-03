@@ -10,6 +10,7 @@ using System;
 using UnityEditor;
 using UnityEditor.XR.OpenXR.Features;
 using UnityEditor.Build.Reporting;
+using UnityEngine.XR.OpenXR.Features.MetaQuestSupport;
 #endif
 
 namespace Leap.Tracking.OpenXR.ApiLayer
@@ -45,6 +46,17 @@ namespace Leap.Tracking.OpenXR.ApiLayer
                 checkPredicate = () => Version.Parse(OpenXRRuntime.apiVersion) >= new Version(1, 0, 25),
                 fixItAutomatic = false,
             });
+            
+            // Ensure that the Legacy "Meta Quest Support" OpenXR feature is not enabled.
+            rules.Add(new ValidationRule(this)
+            {
+                message = "Embedded layer is not supported with legacy Meta Quest Support OpenXR feature",
+                error = true,
+                checkPredicate = () => !OpenXRSettings.ActiveBuildTargetInstance.GetFeature<MetaQuestFeature>().enabled,
+                fixItAutomatic = true,
+                fixIt = () => OpenXRSettings.ActiveBuildTargetInstance.GetFeature<MetaQuestFeature>().enabled = false,
+                fixItMessage = "Disabled legacy Meta Quest Support OpenXR feature"
+            });
         }
 #endif
     }
@@ -76,7 +88,7 @@ namespace Leap.Tracking.OpenXR.ApiLayer
         /// Removes an AAR from the project and the associated Gradle build script
         /// </summary>
         /// <param name="path">The project path</param>
-        /// <param name="aarName">The name of the AAR library with out the `.aar` extension</param>
+        /// <param name="aarName">The name of the AAR library without the `.aar` extension</param>
         private void RemoveAAR(string path, string aarName)
         {
             // Delete the AAR from the project before Gradle is run.
