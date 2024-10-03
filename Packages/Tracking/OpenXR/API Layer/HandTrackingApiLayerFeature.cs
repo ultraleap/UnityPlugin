@@ -12,15 +12,15 @@ using UnityEditor.XR.OpenXR.Features;
 using UnityEditor.Build.Reporting;
 #endif
 
-namespace Ultraleap.Tracking.OpenXR.ApiLayer
+namespace Leap.Tracking.OpenXR.ApiLayer
 {
     /// <summary>
     /// Embeddable Ultraleap OpenXR API Layer.
     /// </summary>
 #if UNITY_EDITOR
     [OpenXRFeature(FeatureId = FeatureId,
-        Version = "1.0.0",
-        UiName = "Ultraleap Hand Tracking API Layer",
+        Version = "1.7.2",
+        UiName = "Ultraleap OpenXR API Layer (Embedded)",
         Company = "Ultraleap",
         Desc = "Embeddable API layer for Ultraleap Hand Tracking",
         Category = FeatureCategory.Feature,

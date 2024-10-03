@@ -1,8 +1,9 @@
-using Ultraleap.Tracking.OpenXR.ApiLayer;
+using JetBrains.Annotations;
+using Leap.Tracking.OpenXR.ApiLayer;
 using UnityEditor;
 using UnityEditor.XR.OpenXR.Features;
 
-namespace Ultraleap.Tracking.OpenXR
+namespace Leap.Tracking.OpenXR
 {
     [OpenXRFeatureSet(
         FeatureIds = new string[]
@@ -21,6 +22,6 @@ namespace Ultraleap.Tracking.OpenXR
     )]
     public class UltraleapFeatureSet
     {
-        public const string FeatureSetId = "com.ultraleap.tracking.openxr.featureset.handtracking";
+        [PublicAPI] public const string FeatureSetId = "com.ultraleap.tracking.openxr.featureset.handtracking";
     }
 }
