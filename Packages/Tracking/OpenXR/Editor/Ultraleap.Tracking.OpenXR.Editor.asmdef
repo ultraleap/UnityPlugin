@@ -1,6 +1,6 @@
 {
     "name": "Ultraleap.Tracking.OpenXR.Editor",
-    "rootNamespace": "Ultraleap.Tracking.OpenXR",
+    "rootNamespace": "Leap.Tracking.OpenXR",
     "references": [
         "GUID:4847341ff46394e83bb78fbd0652937e",
         "GUID:96aa6ba065960476598f8f643e7252b6",
@@ -10,7 +10,8 @@
         "GUID:343deaaf83e0cee4ca978e7df0b80d21",
         "GUID:2bafac87e7f4b9b418d9448d219b01ab",
         "GUID:0acc523941302664db1f4e527237feb3",
-        "GUID:27619889b8ba8c24980f49ee34dbb44a"
+        "GUID:27619889b8ba8c24980f49ee34dbb44a",
+        "GUID:e81fa8def7d1fab46902540cb82dd934"
     ],
     "includePlatforms": [
         "Editor"
