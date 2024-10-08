@@ -52,9 +52,17 @@ namespace Leap.Tracking.OpenXR.ApiLayer
             {
                 message = "Embedded layer is not supported with legacy Meta Quest Support OpenXR feature",
                 error = true,
-                checkPredicate = () => !OpenXRSettings.ActiveBuildTargetInstance.GetFeature<MetaQuestFeature>().enabled,
+                checkPredicate = () => {
+                    var quest = OpenXRSettings.ActiveBuildTargetInstance.GetFeature<MetaQuestFeature>();
+                    if (quest == null)
+                        return true;
+                    return !quest.enabled; },
                 fixItAutomatic = true,
-                fixIt = () => OpenXRSettings.ActiveBuildTargetInstance.GetFeature<MetaQuestFeature>().enabled = false,
+                fixIt = () => {
+                    var quest = OpenXRSettings.ActiveBuildTargetInstance.GetFeature<MetaQuestFeature>();
+                    if(quest != null)
+                        quest.enabled = false;
+                },
                 fixItMessage = "Disabled legacy Meta Quest Support OpenXR feature"
             });
         }
