@@ -380,6 +380,11 @@ namespace Leap
                     else
                     {
                         position = finger.GetBone((Bone.BoneType)j).NextJoint;
+                        if (j == 3)
+                        {
+                            // Fingertips need to be adjusted back by a radii to account for sphere drawing.
+                            position -= finger.GetBone((Bone.BoneType)j).Direction * _jointRadius;
+                        }
                     }
 
                     _spherePositions[key] = position;
