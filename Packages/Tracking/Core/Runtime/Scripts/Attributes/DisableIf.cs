@@ -12,7 +12,7 @@ using UnityEditor;
 #endif
 using System;
 
-namespace Leap.Unity.Attributes
+namespace Leap.Attributes
 {
 
     /// <summary>

@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Leap.Unity.InputModule
+namespace Leap.InputModule
 {
     /// <summary>
     /// Provides the location of the projection origin for raycasting

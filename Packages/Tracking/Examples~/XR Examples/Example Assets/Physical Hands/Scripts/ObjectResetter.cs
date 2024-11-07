@@ -10,7 +10,7 @@ using UnityEngine;
 using UnityEngine.Events;
 
 
-namespace Leap.Unity.Examples
+namespace Leap.Examples
 {
     public class ObjectResetter : MonoBehaviour
     {

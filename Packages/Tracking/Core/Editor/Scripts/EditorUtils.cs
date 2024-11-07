@@ -17,7 +17,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 
-namespace Leap.Unity
+namespace Leap
 {
     using UnityObject = UnityEngine.Object;
 
@@ -139,6 +139,14 @@ namespace Leap.Unity
                 default:
                     return string.Empty;
             }
+        }
+
+        public static void DrawScriptField(MonoBehaviour target)
+        {
+            EditorGUI.BeginDisabledGroup(true);
+            EditorGUILayout.ObjectField("Script", MonoScript.FromMonoBehaviour(target), target.GetType(), false);
+            EditorGUI.EndDisabledGroup();
+            EditorGUILayout.Space();
         }
     }
 }

@@ -11,27 +11,27 @@ using UnityEngine;
 using UnityEditor;
 #endif
 
-namespace Leap.Unity.Attributes
+namespace Leap.Attributes
 {
 
     public class UnitsAttribute : CombinablePropertyAttribute, IAfterFieldAdditiveDrawer
     {
         public readonly string unitsName;
 
-        public UnitsAttribute(string unitsName)
+        public UnitsAttribute(string _unitsName)
         {
-            this.unitsName = unitsName;
+            this.unitsName = _unitsName;
         }
 
 #if UNITY_EDITOR
         public float GetWidth()
         {
-            return EditorStyles.label.CalcSize(new GUIContent(unitsName)).x;
+            return EditorStyles.label.CalcSize(new GUIContent(unitsName)).x + 5; // Give it a small 5 unit buffer
         }
 
-        public void Draw(Rect rect, SerializedProperty property)
+        public void Draw(Rect _rect, SerializedProperty _property)
         {
-            GUI.Label(rect, unitsName);
+            GUI.Label(_rect, unitsName);
         }
 #endif
     }

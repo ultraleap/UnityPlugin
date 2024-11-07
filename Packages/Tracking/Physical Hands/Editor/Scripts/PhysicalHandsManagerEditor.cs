@@ -1,7 +1,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace Leap.Unity.PhysicalHands
+namespace Leap.PhysicalHands
 {
     [CustomEditor(typeof(PhysicalHandsManager))]
     public class PhysicalHandsManagerEditor : CustomEditorBase<PhysicalHandsManager>

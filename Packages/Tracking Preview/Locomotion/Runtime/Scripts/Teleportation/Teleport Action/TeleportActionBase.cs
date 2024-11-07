@@ -6,12 +6,12 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity.Preview.HandRays;
+using Leap.Preview.HandRays;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Leap.Unity.Preview.Locomotion
+namespace Leap.Preview.Locomotion
 {
     /// <summary>
     /// Base class for all teleport actions.
@@ -311,16 +311,7 @@ namespace Leap.Unity.Preview.Locomotion
 
         protected void SelectTeleport(bool selected = true)
         {
-            if (selected && !IsSelected)
-            {
-                OnTeleportSelected?.Invoke(true);
-            }
-            else if (!selected && IsSelected)
-            {
-                OnTeleportSelected?.Invoke(false);
-            }
-
-
+            bool wasSelected = IsSelected;
             _isSelected = selected;
             if (handRayRenderer != null)
             {
@@ -350,6 +341,15 @@ namespace Leap.Unity.Preview.Locomotion
             else
             {
                 freeTeleportAnchor.gameObject.SetActive(!(movementType == TeleportActionMovementType.FIXED));
+            }
+
+            if (selected && !wasSelected)
+            {
+                OnTeleportSelected?.Invoke(true);
+            }
+            else if (!selected && wasSelected)
+            {
+                OnTeleportSelected?.Invoke(false);
             }
         }
 

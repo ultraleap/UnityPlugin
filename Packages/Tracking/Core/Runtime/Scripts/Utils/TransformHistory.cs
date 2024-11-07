@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Leap.Unity
+namespace Leap
 {
     /// <summary>
     /// Implements a resample-able transform history.

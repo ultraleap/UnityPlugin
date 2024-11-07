@@ -8,7 +8,7 @@
 
 using UnityEditor;
 using UnityEngine;
-namespace Leap.Unity
+namespace Leap
 {
 
     [CustomEditor(typeof(LeapXRServiceProvider))]
@@ -63,6 +63,14 @@ namespace Leap.Unity
                            .enumValueIndex == 2;
             },
                                       "_deviceOrigin");
+
+            specifyConditionalDrawing(() =>
+            {
+                return serializedObject
+                         .FindProperty("_deviceOffsetMode")
+                           .enumValueIndex != 2;
+            },
+                          "_positionDeviceRelativeToMainCamera");
 
             addPropertyToFoldout("_deviceOffsetMode", "Advanced Options");
             addPropertyToFoldout("_temporalWarpingMode", "Advanced Options");

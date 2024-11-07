@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Leap.Unity.PhysicalHands
+namespace Leap.PhysicalHands
 {
     public static class ContactUtils
     {
@@ -18,15 +18,15 @@ namespace Leap.Unity.PhysicalHands
 
         internal static Vector3 CalculateAverageKnucklePosition(this Hand hand)
         {
-            return (hand.Fingers[1].bones[0].NextJoint +
-                hand.Fingers[2].bones[0].NextJoint +
-                hand.Fingers[3].bones[0].NextJoint +
-                hand.Fingers[4].bones[0].NextJoint) / 4;
+            return (hand.fingers[1].bones[0].NextJoint +
+                hand.fingers[2].bones[0].NextJoint +
+                hand.fingers[3].bones[0].NextJoint +
+                hand.fingers[4].bones[0].NextJoint) / 4;
         }
 
         internal static Vector3 CalculatePalmSize(Hand hand)
         {
-            return new Vector3(hand.PalmWidth, hand.Fingers[2].Bone(0).Width, Vector3.Distance(CalculateAverageKnucklePosition(hand), hand.WristPosition));
+            return new Vector3(hand.PalmWidth, hand.fingers[2].GetBone(0).Width, Vector3.Distance(CalculateAverageKnucklePosition(hand), hand.WristPosition));
         }
 
         internal static void SetupPalmCollider(BoxCollider collider, CapsuleCollider[] palmEdges, Hand hand, PhysicMaterial material = null)
@@ -103,8 +103,8 @@ namespace Leap.Unity.PhysicalHands
         internal static void SetupBoneCollider(CapsuleCollider collider, Bone bone, PhysicMaterial material = null)
         {
             collider.direction = 2;
-            if(bone.Width <= 0) { bone.Width = 0.01f; }
-            if(bone.Length <= 0) { bone.Length = 0.01f; }
+            if (bone.Width <= 0) { bone.Width = 0.01f; }
+            if (bone.Length <= 0) { bone.Length = 0.01f; }
             collider.radius = bone.Width * 0.5f;
             collider.height = bone.Length + bone.Width;
             collider.center = new Vector3(0f, 0f, bone.Length / 2f);
@@ -204,8 +204,8 @@ namespace Leap.Unity.PhysicalHands
                 }
                 if (colliders[i].IsSphereWithinCollider(bone.NextJoint, boneWidth)
                     || colliders[i].IsSphereWithinCollider(bone.Center, boneWidth)
-                    || colliders[i].IsSphereWithinCollider(Vector3.Lerp(bone.Center, bone.NextJoint, 0.5f), boneWidth)
-                    || colliders[i].IsSphereWithinCollider(Vector3.Lerp(bone.Center, bone.PrevJoint, 0.5f), boneWidth)
+                    || colliders[i].IsSphereWithinCollider((bone.Center + bone.NextJoint) * 0.5f, boneWidth)
+                    || colliders[i].IsSphereWithinCollider((bone.Center + bone.PrevJoint) * 0.5f, boneWidth)
                     )
                 {
                     return true;
@@ -219,16 +219,28 @@ namespace Leap.Unity.PhysicalHands
             Vector3 lineDir = lineEnd - lineStart;
             float lineLength = lineDir.magnitude;
             lineDir.Normalize();
-            float projectLength = Mathf.Clamp(Vector3.Dot(point - lineStart, lineDir), 0f, lineLength);
-            return lineStart + lineDir * projectLength;
+
+            return GetClosestPointOnFiniteLine(point, lineStart, lineDir, lineLength);
+        }
+
+        internal static Vector3 GetClosestPointOnFiniteLine(Vector3 point, Vector3 lineStart, Vector3 lineDirNormalized, float lineLength)
+        {
+            float projectLength = Mathf.Clamp(Vector3.Dot(point - lineStart, lineDirNormalized), 0f, lineLength);
+            return lineStart + lineDirNormalized * projectLength;
         }
 
         internal static Vector3 GetClosestPointOnLine(Vector3 point, Vector3 lineStart, Vector3 lineEnd)
         {
             Vector3 lineDir = lineEnd - lineStart;
             lineDir.Normalize();
-            float dot = Vector3.Dot(point - lineStart, lineDir);
-            return lineStart + lineDir * dot;
+
+            return GetClosestPointOnLine(point, lineStart, lineEnd, lineDir);
+        }
+
+        internal static Vector3 GetClosestPointOnLine(Vector3 point, Vector3 lineStart, Vector3 lineEnd, Vector3 lineDirNormalized)
+        {
+            float dot = Vector3.Dot(point - lineStart, lineDirNormalized);
+            return lineStart + lineDirNormalized * dot;
         }
 
         /// <summary>
@@ -303,38 +315,32 @@ namespace Leap.Unity.PhysicalHands
 
             // 2_ get the distance to the 2 neighbour points of the face's closest point.
             // if we have a smaller distance to the 2 neighbour points than the distance between the chosen point and the neighbour point: we are inside the face.
-            var chosenPoint = face[chosenIndex];
+            var chosenClosestCorner = face[chosenIndex];
 
             var nextNeighbour = face[(chosenIndex + 1) % face.Length];
             var prevNeighbour = face[(-1 + chosenIndex + face.Length) % (face.Length)];
 
             // We are inside of the face.
-            if (GetClosestPointOnLine(point, nextNeighbour, chosenPoint).IsBetween(chosenPoint, nextNeighbour) &&
-                GetClosestPointOnLine(point, prevNeighbour, chosenPoint).IsBetween(chosenPoint, prevNeighbour))
+            if (GetClosestPointOnLine(point, nextNeighbour, chosenClosestCorner).IsBetween(chosenClosestCorner, nextNeighbour) &&
+                GetClosestPointOnLine(point, prevNeighbour, chosenClosestCorner).IsBetween(chosenClosestCorner, prevNeighbour))
             {
                 return point;
             }
             else // we are outside the face! That means the closest point is necessarily on the lines defined by the 4 corners points of the face.
             {
-                var closestSqrDistance = float.MaxValue;
-                var closestPoint = Vector3.zero;
-                for (var i = 0; i < face.Length; i++)
-                {
-                    var prevNearestPoint = GetClosestPointOnFiniteLine(point, face[i], face[(-1 + chosenIndex + face.Length) % (face.Length)]);
-                    var nextNearestPoint = GetClosestPointOnFiniteLine(point, face[i], face[(chosenIndex + 1) % face.Length]);
+                var prevNearestPoint = GetClosestPointOnFiniteLine(point, chosenClosestCorner, prevNeighbour);
+                var nextNearestPoint = GetClosestPointOnFiniteLine(point, chosenClosestCorner, nextNeighbour);
 
-                    var distanceToNextNearestPoint = Vector3.SqrMagnitude(nextNearestPoint - point);
-                    if (distanceToNextNearestPoint < closestSqrDistance)
-                    {
-                        closestPoint = nextNearestPoint;
-                        closestSqrDistance = distanceToNextNearestPoint;
-                    }
-                    var distanceToPrevNearestPoint = Vector3.SqrMagnitude(prevNearestPoint - point);
-                    if (distanceToPrevNearestPoint < closestSqrDistance)
-                    {
-                        closestPoint = prevNearestPoint;
-                        closestSqrDistance = distanceToPrevNearestPoint;
-                    }
+                var distanceToNextNearestPoint = Vector3.SqrMagnitude(nextNearestPoint - point);
+
+                var closestPoint = nextNearestPoint;
+                var closestSqrDistance = distanceToNextNearestPoint;
+
+                var distanceToPrevNearestPoint = Vector3.SqrMagnitude(prevNearestPoint - point);
+
+                if (distanceToPrevNearestPoint < closestSqrDistance)
+                {
+                    closestPoint = prevNearestPoint;
                 }
 
                 return closestPoint;

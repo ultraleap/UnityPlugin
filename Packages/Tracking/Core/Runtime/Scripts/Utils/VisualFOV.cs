@@ -9,7 +9,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Leap.Unity
+namespace Leap
 {
     /// <summary>
     /// Class to generate meshes that can be used for field of view visualization.

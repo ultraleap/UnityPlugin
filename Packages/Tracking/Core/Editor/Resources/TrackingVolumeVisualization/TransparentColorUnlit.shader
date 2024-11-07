@@ -1,4 +1,4 @@
-Shader "Unlit/TransparentColorUnlit"
+Shader "Ultraleap/TransparentColorUnlit"
 {
     Properties
     {

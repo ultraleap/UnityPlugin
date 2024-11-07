@@ -1,4 +1,4 @@
-Shader "FlatColor"{
+Shader "Ultraleap/FlatColor"{
 	Properties
 	{
 		_Color("Color", Color) = (1.0,1.0,1.0,1.0)

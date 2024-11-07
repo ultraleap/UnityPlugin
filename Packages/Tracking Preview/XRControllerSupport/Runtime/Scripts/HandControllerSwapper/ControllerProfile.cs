@@ -8,7 +8,7 @@
 
 using System.Collections.Generic;
 
-namespace Leap.Unity.Controllers
+namespace Leap.Controllers
 {
 
     /// <summary>

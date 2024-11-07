@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2022.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -9,12 +9,13 @@
 namespace LeapInternal
 {
     using System;
+    using System.Linq.Expressions;
     using System.Runtime.InteropServices;
     using UnityEngine;
 
     public static class ServerStatus
     {
-        const double requestInterval = 1.0f;
+        const double requestInterval = 5.0f;
         static double lastRequestTimestamp;
 
         static LeapC.LEAP_SERVER_STATUS lastStatus;
@@ -25,12 +26,16 @@ namespace LeapInternal
             if (lastRequestTimestamp + requestInterval < Time.realtimeSinceStartup)
             {
                 IntPtr statusPtr = new IntPtr();
-                LeapC.GetServerStatus(1000, ref statusPtr);
+                LeapC.GetServerStatus(1500, ref statusPtr);
 
-                lastStatus = Marshal.PtrToStructure<LeapC.LEAP_SERVER_STATUS>(statusPtr);
+                if (statusPtr != IntPtr.Zero)
+                {
+                    lastStatus = Marshal.PtrToStructure<LeapC.LEAP_SERVER_STATUS>(statusPtr);
 
-                MarshalUnmananagedArray2Struct(lastStatus.devices, (int)lastStatus.device_count, out lastDevices);
-                LeapC.ReleaseServerStatus(ref lastStatus);
+                    MarshalUnmananagedArray2Struct(lastStatus.devices, (int)lastStatus.device_count, out lastDevices);
+                    LeapC.ReleaseServerStatus(ref lastStatus);
+                }
+
                 lastRequestTimestamp = Time.realtimeSinceStartup;
             }
         }
@@ -44,36 +49,37 @@ namespace LeapInternal
                 string[] versions = lastStatus.version.Split('v')[1].Split('-')[0].Split('.');
                 LEAP_VERSION curVersion = new LEAP_VERSION { major = int.Parse(versions[0]), minor = int.Parse(versions[1]), patch = int.Parse(versions[2]) };
 
-                if (_requiredVersion.major < curVersion.major)
-                {
+                if (curVersion.major > _requiredVersion.major)
                     return true;
-                }
-                else if (_requiredVersion.major == curVersion.major)
-                {
-                    if (_requiredVersion.minor < curVersion.minor)
-                    {
-                        return true;
-                    }
-                    else if (_requiredVersion.minor == curVersion.minor && _requiredVersion.patch <= curVersion.patch)
-                    {
-                        return true;
-                    }
-                }
+                if (curVersion.major < _requiredVersion.major)
+                    return false;
+
+                if (curVersion.minor > _requiredVersion.minor)
+                    return true;
+                if (curVersion.minor < _requiredVersion.minor)
+                    return false;
+
+                if (curVersion.patch >= _requiredVersion.patch)
+                    return true;
+
                 return false;
             }
 
-            return false;
+            return true;
         }
 
         public static string[] GetSerialNumbers()
         {
             GetStatus();
 
-            string[] serials = new string[lastDevices.Length];
-
-            for(int i = 0; i < lastDevices.Length; i++)
+            string[] serials = new string[0];
+            if (lastDevices != null)
             {
-                serials[i] = lastDevices[i].serial;
+                serials = new string[lastDevices.Length];
+                for (int i = 0; i < lastDevices.Length; i++)
+                {
+                    serials[i] = lastDevices[i].serial;
+                }
             }
 
             return serials;
@@ -82,12 +88,12 @@ namespace LeapInternal
         public static string GetDeviceType(string _serial)
         {
             GetStatus();
-            
-            if(lastDevices != null)
+
+            if (lastDevices != null)
             {
                 for (int i = 0; i < lastDevices.Length; i++)
                 {
-                    if(_serial == "" || _serial == lastDevices[i].serial)
+                    if (_serial == "" || _serial == lastDevices[i].serial)
                     {
                         return lastDevices[i].type;
                     }
@@ -97,7 +103,7 @@ namespace LeapInternal
             return "";
         }
 
-        public static void MarshalUnmananagedArray2Struct<T>(IntPtr unmanagedArray, int length, out T[] mangagedArray)
+        static void MarshalUnmananagedArray2Struct<T>(IntPtr unmanagedArray, int length, out T[] mangagedArray)
         {
             var size = Marshal.SizeOf(typeof(T));
             mangagedArray = new T[length];

@@ -3,9 +3,7 @@
 #define LOGGING_RENDER_COLOURS
 
 using Leap;
-using Leap.Unity;
-using Leap.Unity.Encoding;
-using System.Collections;
+using Leap.Encoding;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -195,7 +193,7 @@ public class JointOcclusion : MonoBehaviour
 
         if (hand == null)
         {
-            return Leap.Unity.Utils.Fill(confidences, 0);
+            return Leap.Utils.Fill(confidences, 0);
         }
 
         // draw a cube where the palm is, so that joints cannot be seen 'through' the palm
@@ -217,8 +215,7 @@ public class JointOcclusion : MonoBehaviour
         int[] pixelsSeenCount = new int[confidences.Length];
         int[] optimalPixelsCount = new int[confidences.Length];
         Color[] majorColours = new Color[occlusionSphereColorsLeft.Length];
-
-        foreach (var finger in hand.Fingers)
+        foreach (var finger in hand.fingers)
         {
             for (int j = 0; j < 4; j++)
             {
@@ -231,7 +228,7 @@ public class JointOcclusion : MonoBehaviour
 
                 // get the joint position from the given hand and use it to calculate the screen position of the joint's center and 
                 // a point on the outside border of the joint (both in pixel coordinates)
-                Vector3 jointPos = finger.Bone((Leap.Bone.BoneType)j).NextJoint;
+                Vector3 jointPos = finger.GetBone((Leap.Bone.BoneType)j).NextJoint;
                 Vector3 screenPosCenter = cam.WorldToScreenPoint(jointPos);
                 Vector3 screenPosSphereOutside = cam.WorldToScreenPoint(jointPos + cam.transform.right * jointRadius);
 

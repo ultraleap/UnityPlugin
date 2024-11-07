@@ -35,6 +35,7 @@ variables:
   OUTPUT_NAME: "$CI_PROJECT_TITLE"
 
 stages:
+  - gather
   - test
   - build
 
@@ -106,8 +107,9 @@ check-formatting:
 # Unity Builds
 # -----------------------------------------------------------------------------
 #
-# This job will trigger various apps to build using the plugin commit that started this pipeline.
+# This job will trigger Unity 2021/2022 test apps to build using the plugin commit that started this pipeline.
 # A failure in a build likely represents a breaking plugin change and should be addressed, but will not fail the whole pipeline.
+# The resulting builds will contain every sample scene, and should be used for manual testing.
 #
 unity-builds:
   stage: test
@@ -116,7 +118,7 @@ unity-builds:
   rules:
     - when: manual
   trigger:
-    project: xr/rad/triggers/unityplugin-tests
+    project: xr/integrations/unity/unityplugin-tests
     branch: main
   variables:
     PLUGIN_COMMIT_BRANCH: $CI_COMMIT_BRANCH
@@ -131,7 +133,12 @@ unity-builds:
 #
 generate-api-docs:
   extends: .base
-  stage: build
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "develop"
+      when: always
+    - when: manual
+  stage: gather
   needs: []
   variables:
 
@@ -148,9 +155,7 @@ generate-api-docs:
     name: "$ARTIFACTS_NAME-api-docs"
     paths:
       - "$ARTIFACTS_PATH/"
-
     when: always
-    expire_in: never
 
 # -----------------------------------------------------------------------------
 # Libtrack Dependency
@@ -161,9 +166,13 @@ generate-api-docs:
 #
 dependencies-libtrack:
   extends: .base
-  stage: build
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "develop"
+      when: always
+    - when: manual
+  stage: gather
   needs: []
-
   variables:
     # XR group variables:
     #  - LIBTRACK_ACCESS_TOKEN
@@ -227,12 +236,13 @@ dependencies-libtrack:
 #
 export-unitypackages:
   extends: .base
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "develop"
+      when: always
+    - when: manual
   stage: build
-
-  needs:
-   - job: dependencies-libtrack
-     artifacts: true
-
+  needs: []
   variables:
   
     # Path to UnityPlugin within a unity project
@@ -251,17 +261,7 @@ export-unitypackages:
     PACKAGE_IMPORT_PATH_Tracking_Preview:       "$UNITYPLUGIN_ASSETS_PATH/Tracking Preview"
     UNITYPACKAGE_OUTPUT_PATH_Tracking_Preview:  "$UNITYPACKAGES_OUTPUT_PATH/Ultraleap Tracking Preview.unitypackage"
 
-    LEAPC_SOURCE_PATH: "$ARTIFACTS_PATH/Windows/LeapC.dll"
-    LEAPC_DESTINATION_PATH: "$PLUGIN_LIBS_PATH/x86_64/LeapC.dll"
-
   script:
-
-    # We only replace libtrack dependencies if there is an upstream branch ref or we are explicitly using the latest stable artifacts.
-    # Upstream branch ref takes precedence, see the libtrack dependencies job.
-    - $REPLACE_LIBTRACK_DEPENDENCIES = "$UPSTREAM_UPSTREAM_BRANCH_REF" -or "$USE_LIBTRACK_STABLE"
-
-    #  Copy libs from libtrack dependencies, overwritting anything already there
-    - if ($REPLACE_LIBTRACK_DEPENDENCIES) { Copy-Item "$LEAPC_SOURCE_PATH" -Destination "$LEAPC_DESTINATION_PATH" -Force }
 
     - New-Item -Path "$UNITYPACKAGES_OUTPUT_PATH" -ItemType Directory -Force
 
@@ -295,37 +295,4 @@ export-unitypackages:
     paths:
       - "$ARTIFACTS_PATH/"
 
-    when: always
-
-# -----------------------------------------------------------------------------
-# Consolidate artifacts
-# -----------------------------------------------------------------------------
-#
-# Bundles other artifacts into a single download
-#
-consolidate:
-  extends: .base
-  stage: build
-
-  needs:
-    - job: check-formatting
-      artifacts: true
-      optional: true
-    - job: generate-api-docs
-      artifacts: true
-      optional: true
-    - job: dependencies-libtrack
-      artifacts: true
-    - job: export-unitypackages
-      artifacts: true
-
-  script:
-    - echo "Consolidating artifacts"
-
-  artifacts:
-    name: "$ARTIFACTS_NAME-consolidated"
-    paths:
-      - "$ARTIFACTS_PATH/"
-
-    when: always
-    expire_in: 2 weeks
+    when: on_success

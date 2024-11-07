@@ -9,7 +9,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Leap.Unity.PhysicalHands.Examples
+namespace Leap.PhysicalHands.Examples
 {
     public class PhysicalHandsHandMenu : MonoBehaviour
     {

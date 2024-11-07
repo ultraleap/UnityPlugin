@@ -12,7 +12,7 @@ using UnityEditor;
 #endif
 using System.Collections.Generic;
 
-namespace Leap.Unity.Attributes
+namespace Leap.Attributes
 {
 
     public class MinMax : CombinablePropertyAttribute, IFullPropertyDrawer

@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Leap.Unity.Preview.HandRays
+namespace Leap.Preview.HandRays
 {
     /// <summary>
     /// Infers neck and shoulder positions using real world head data.

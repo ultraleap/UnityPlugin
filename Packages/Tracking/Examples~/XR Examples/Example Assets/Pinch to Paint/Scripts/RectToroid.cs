@@ -8,16 +8,14 @@
 
 using UnityEngine;
 
-namespace Leap.Unity.Examples
+namespace Leap.Examples
 {
-
     /// <summary>
     /// Generates a toroid mesh with a low-resolution (square) minor cross-section.
     /// </summary>
     [RequireComponent(typeof(MeshFilter))]
     public class RectToroid : MonoBehaviour
     {
-
         [SerializeField]
         private float _radius = 1F;
         [SerializeField]
