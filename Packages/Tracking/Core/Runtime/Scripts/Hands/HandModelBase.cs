@@ -10,7 +10,7 @@ using System;
 using UnityEngine;
 
 /** HandModelBase defines abstract methods as a template for building Leap hand models*/
-namespace Leap.Unity
+namespace Leap
 {
     using Attributes;
 
@@ -149,7 +149,10 @@ namespace Leap.Unity
 
         public LeapProvider leapProvider
         {
-            get { return _leapProvider; }
+            get
+            {
+                return _leapProvider;
+            }
             set
             {
                 if (_leapProvider != null && Application.isPlaying)

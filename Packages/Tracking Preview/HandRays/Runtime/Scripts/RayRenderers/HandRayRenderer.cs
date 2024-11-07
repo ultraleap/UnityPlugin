@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Leap.Unity.Preview.HandRays
+namespace Leap.Preview.HandRays
 {
     /// <summary>
     /// Renders a line based on a handRayInteractor's data

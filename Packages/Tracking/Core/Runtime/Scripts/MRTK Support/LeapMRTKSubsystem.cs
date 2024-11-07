@@ -138,53 +138,53 @@ namespace Leap.Unity.MRTK
                     case TrackedHandJoint.Wrist:
                         return new Pose(hand.WristPosition, hand.Arm.Rotation);
                     case TrackedHandJoint.ThumbMetacarpal:
-                        return new Pose(hand.GetThumb().Bone(Leap.Bone.BoneType.TYPE_PROXIMAL).PrevJoint, hand.GetThumb().Bone(Leap.Bone.BoneType.TYPE_PROXIMAL).Rotation);
+                        return new Pose(hand.fingers[(int)Finger.FingerType.THUMB].bones[(int)Bone.BoneType.PROXIMAL].PrevJoint, hand.fingers[(int)Finger.FingerType.THUMB].bones[(int)Bone.BoneType.PROXIMAL].Rotation);
                     case TrackedHandJoint.ThumbProximal:
-                        return new Pose(hand.GetThumb().Bone(Leap.Bone.BoneType.TYPE_INTERMEDIATE).PrevJoint, hand.GetThumb().Bone(Leap.Bone.BoneType.TYPE_INTERMEDIATE).Rotation);
+                        return new Pose(hand.fingers[(int)Finger.FingerType.THUMB].bones[(int)Bone.BoneType.INTERMEDIATE].PrevJoint, hand.fingers[(int)Finger.FingerType.THUMB].bones[(int)Bone.BoneType.INTERMEDIATE].Rotation);
                     case TrackedHandJoint.ThumbDistal:
-                        return new Pose(hand.GetThumb().Bone(Leap.Bone.BoneType.TYPE_DISTAL).PrevJoint, hand.GetThumb().Bone(Leap.Bone.BoneType.TYPE_DISTAL).Rotation);
+                        return new Pose(hand.fingers[(int)Finger.FingerType.THUMB].bones[(int)Bone.BoneType.DISTAL].PrevJoint, hand.fingers[(int)Finger.FingerType.THUMB].bones[(int)Bone.BoneType.DISTAL].Rotation);
                     case TrackedHandJoint.ThumbTip:
-                        return new Pose(hand.GetThumb().Bone(Leap.Bone.BoneType.TYPE_DISTAL).NextJoint, hand.GetThumb().Bone(Leap.Bone.BoneType.TYPE_DISTAL).Rotation);
+                        return new Pose(hand.fingers[(int)Finger.FingerType.THUMB].bones[(int)Bone.BoneType.DISTAL].NextJoint, hand.fingers[(int)Finger.FingerType.THUMB].bones[(int)Bone.BoneType.DISTAL].Rotation);
                     case TrackedHandJoint.IndexMetacarpal:
-                        return new Pose(hand.GetIndex().Bone(Leap.Bone.BoneType.TYPE_METACARPAL).PrevJoint, hand.GetIndex().Bone(Leap.Bone.BoneType.TYPE_METACARPAL).Rotation);
+                        return new Pose(hand.fingers[(int)Finger.FingerType.INDEX].bones[(int)Bone.BoneType.METACARPAL].PrevJoint, hand.fingers[(int)Finger.FingerType.INDEX].bones[(int)Bone.BoneType.METACARPAL].Rotation);
                     case TrackedHandJoint.IndexProximal:
-                        return new Pose(hand.GetIndex().Bone(Leap.Bone.BoneType.TYPE_PROXIMAL).PrevJoint, hand.GetIndex().Bone(Leap.Bone.BoneType.TYPE_PROXIMAL).Rotation);
+                        return new Pose(hand.fingers[(int)Finger.FingerType.INDEX].bones[(int)Bone.BoneType.PROXIMAL].PrevJoint, hand.fingers[(int)Finger.FingerType.INDEX].bones[(int)Bone.BoneType.PROXIMAL].Rotation);
                     case TrackedHandJoint.IndexIntermediate:
-                        return new Pose(hand.GetIndex().Bone(Leap.Bone.BoneType.TYPE_INTERMEDIATE).PrevJoint, hand.GetIndex().Bone(Leap.Bone.BoneType.TYPE_INTERMEDIATE).Rotation);
+                        return new Pose(hand.fingers[(int)Finger.FingerType.INDEX].bones[(int)Bone.BoneType.INTERMEDIATE].PrevJoint, hand.fingers[(int)Finger.FingerType.INDEX].bones[(int)Bone.BoneType.INTERMEDIATE].Rotation);
                     case TrackedHandJoint.IndexDistal:
-                        return new Pose(hand.GetIndex().Bone(Leap.Bone.BoneType.TYPE_DISTAL).PrevJoint, hand.GetIndex().Bone(Leap.Bone.BoneType.TYPE_DISTAL).Rotation);
+                        return new Pose(hand.fingers[(int)Finger.FingerType.INDEX].bones[(int)Bone.BoneType.DISTAL].PrevJoint, hand.fingers[(int)Finger.FingerType.INDEX].bones[(int)Bone.BoneType.DISTAL].Rotation);
                     case TrackedHandJoint.IndexTip:
-                        return new Pose(hand.GetIndex().Bone(Leap.Bone.BoneType.TYPE_DISTAL).NextJoint, hand.GetIndex().Bone(Leap.Bone.BoneType.TYPE_DISTAL).Rotation);
+                        return new Pose(hand.fingers[(int)Finger.FingerType.INDEX].bones[(int)Bone.BoneType.DISTAL].NextJoint, hand.fingers[(int)Finger.FingerType.INDEX].bones[(int)Bone.BoneType.DISTAL].Rotation);
                     case TrackedHandJoint.MiddleMetacarpal:
-                        return new Pose(hand.GetMiddle().Bone(Leap.Bone.BoneType.TYPE_METACARPAL).PrevJoint, hand.GetMiddle().Bone(Leap.Bone.BoneType.TYPE_METACARPAL).Rotation);
+                        return new Pose(hand.fingers[(int)Finger.FingerType.MIDDLE].bones[(int)Bone.BoneType.METACARPAL].PrevJoint, hand.fingers[(int)Finger.FingerType.MIDDLE].bones[(int)Bone.BoneType.METACARPAL].Rotation);
                     case TrackedHandJoint.MiddleProximal:
-                        return new Pose(hand.GetMiddle().Bone(Leap.Bone.BoneType.TYPE_PROXIMAL).PrevJoint, hand.GetMiddle().Bone(Leap.Bone.BoneType.TYPE_PROXIMAL).Rotation);
+                        return new Pose(hand.fingers[(int)Finger.FingerType.MIDDLE].bones[(int)Bone.BoneType.PROXIMAL].PrevJoint, hand.fingers[(int)Finger.FingerType.MIDDLE].bones[(int)Bone.BoneType.PROXIMAL].Rotation);
                     case TrackedHandJoint.MiddleIntermediate:
-                        return new Pose(hand.GetMiddle().Bone(Leap.Bone.BoneType.TYPE_INTERMEDIATE).PrevJoint, hand.GetMiddle().Bone(Leap.Bone.BoneType.TYPE_INTERMEDIATE).Rotation);
+                        return new Pose(hand.fingers[(int)Finger.FingerType.MIDDLE].bones[(int)Bone.BoneType.INTERMEDIATE].PrevJoint, hand.fingers[(int)Finger.FingerType.MIDDLE].bones[(int)Bone.BoneType.INTERMEDIATE].Rotation);
                     case TrackedHandJoint.MiddleDistal:
-                        return new Pose(hand.GetMiddle().Bone(Leap.Bone.BoneType.TYPE_DISTAL).PrevJoint, hand.GetMiddle().Bone(Leap.Bone.BoneType.TYPE_DISTAL).Rotation);
+                        return new Pose(hand.fingers[(int)Finger.FingerType.MIDDLE].bones[(int)Bone.BoneType.DISTAL].PrevJoint, hand.fingers[(int)Finger.FingerType.MIDDLE].bones[(int)Bone.BoneType.DISTAL].Rotation);
                     case TrackedHandJoint.MiddleTip:
-                        return new Pose(hand.GetMiddle().Bone(Leap.Bone.BoneType.TYPE_DISTAL).NextJoint, hand.GetMiddle().Bone(Leap.Bone.BoneType.TYPE_DISTAL).Rotation);
+                        return new Pose(hand.fingers[(int)Finger.FingerType.MIDDLE].bones[(int)Bone.BoneType.DISTAL].NextJoint, hand.fingers[(int)Finger.FingerType.MIDDLE].bones[(int)Bone.BoneType.DISTAL].Rotation);
                     case TrackedHandJoint.RingMetacarpal:
-                        return new Pose(hand.GetRing().Bone(Leap.Bone.BoneType.TYPE_METACARPAL).PrevJoint, hand.GetRing().Bone(Leap.Bone.BoneType.TYPE_METACARPAL).Rotation);
+                        return new Pose(hand.fingers[(int)Finger.FingerType.RING].bones[(int)Bone.BoneType.METACARPAL].PrevJoint, hand.fingers[(int)Finger.FingerType.RING].bones[(int)Bone.BoneType.METACARPAL].Rotation);
                     case TrackedHandJoint.RingProximal:
-                        return new Pose(hand.GetRing().Bone(Leap.Bone.BoneType.TYPE_PROXIMAL).PrevJoint, hand.GetRing().Bone(Leap.Bone.BoneType.TYPE_PROXIMAL).Rotation);
+                        return new Pose(hand.fingers[(int)Finger.FingerType.RING].bones[(int)Bone.BoneType.PROXIMAL].PrevJoint, hand.fingers[(int)Finger.FingerType.RING].bones[(int)Bone.BoneType.PROXIMAL].Rotation);
                     case TrackedHandJoint.RingIntermediate:
-                        return new Pose(hand.GetRing().Bone(Leap.Bone.BoneType.TYPE_INTERMEDIATE).PrevJoint, hand.GetRing().Bone(Leap.Bone.BoneType.TYPE_INTERMEDIATE).Rotation);
+                        return new Pose(hand.fingers[(int)Finger.FingerType.RING].bones[(int)Bone.BoneType.INTERMEDIATE].PrevJoint, hand.fingers[(int)Finger.FingerType.RING].bones[(int)Bone.BoneType.INTERMEDIATE].Rotation);
                     case TrackedHandJoint.RingDistal:
-                        return new Pose(hand.GetRing().Bone(Leap.Bone.BoneType.TYPE_DISTAL).PrevJoint, hand.GetRing().Bone(Leap.Bone.BoneType.TYPE_DISTAL).Rotation);
+                        return new Pose(hand.fingers[(int)Finger.FingerType.RING].bones[(int)Bone.BoneType.DISTAL].PrevJoint, hand.fingers[(int)Finger.FingerType.RING].bones[(int)Bone.BoneType.DISTAL].Rotation);
                     case TrackedHandJoint.RingTip:
-                        return new Pose(hand.GetRing().Bone(Leap.Bone.BoneType.TYPE_DISTAL).NextJoint, hand.GetRing().Bone(Leap.Bone.BoneType.TYPE_DISTAL).Rotation);
+                        return new Pose(hand.fingers[(int)Finger.FingerType.RING].bones[(int)Bone.BoneType.DISTAL].NextJoint, hand.fingers[(int)Finger.FingerType.RING].bones[(int)Bone.BoneType.DISTAL].Rotation);
                     case TrackedHandJoint.LittleMetacarpal:
-                        return new Pose(hand.GetPinky().Bone(Leap.Bone.BoneType.TYPE_METACARPAL).PrevJoint, hand.GetPinky().Bone(Leap.Bone.BoneType.TYPE_METACARPAL).Rotation);
+                        return new Pose(hand.fingers[(int)Finger.FingerType.PINKY].bones[(int)Bone.BoneType.METACARPAL].PrevJoint, hand.fingers[(int)Finger.FingerType.PINKY].bones[(int)Bone.BoneType.METACARPAL].Rotation);
                     case TrackedHandJoint.LittleProximal:
-                        return new Pose(hand.GetPinky().Bone(Leap.Bone.BoneType.TYPE_PROXIMAL).PrevJoint, hand.GetPinky().Bone(Leap.Bone.BoneType.TYPE_PROXIMAL).Rotation);
+                        return new Pose(hand.fingers[(int)Finger.FingerType.PINKY].bones[(int)Bone.BoneType.PROXIMAL].PrevJoint, hand.fingers[(int)Finger.FingerType.PINKY].bones[(int)Bone.BoneType.PROXIMAL].Rotation);
                     case TrackedHandJoint.LittleIntermediate:
-                        return new Pose(hand.GetPinky().Bone(Leap.Bone.BoneType.TYPE_INTERMEDIATE).PrevJoint, hand.GetPinky().Bone(Leap.Bone.BoneType.TYPE_INTERMEDIATE).Rotation);
+                        return new Pose(hand.fingers[(int)Finger.FingerType.PINKY].bones[(int)Bone.BoneType.INTERMEDIATE].PrevJoint, hand.fingers[(int)Finger.FingerType.PINKY].bones[(int)Bone.BoneType.INTERMEDIATE].Rotation);
                     case TrackedHandJoint.LittleDistal:
-                        return new Pose(hand.GetPinky().Bone(Leap.Bone.BoneType.TYPE_DISTAL).PrevJoint, hand.GetPinky().Bone(Leap.Bone.BoneType.TYPE_DISTAL).Rotation);
+                        return new Pose(hand.fingers[(int)Finger.FingerType.PINKY].bones[(int)Bone.BoneType.DISTAL].PrevJoint, hand.fingers[(int)Finger.FingerType.PINKY].bones[(int)Bone.BoneType.DISTAL].Rotation);
                     case TrackedHandJoint.LittleTip:
-                        return new Pose(hand.GetPinky().Bone(Leap.Bone.BoneType.TYPE_DISTAL).NextJoint, hand.GetPinky().Bone(Leap.Bone.BoneType.TYPE_DISTAL).Rotation);
+                        return new Pose(hand.fingers[(int)Finger.FingerType.PINKY].bones[(int)Bone.BoneType.DISTAL].NextJoint, hand.fingers[(int)Finger.FingerType.PINKY].bones[(int)Bone.BoneType.DISTAL].Rotation);
                 }
 
                 return new Pose(hand.PalmPosition, hand.Rotation);
@@ -231,7 +231,7 @@ namespace Leap.Unity.MRTK
                     return;
                 }
 
-                LeapServiceProvider leapProvider = GameObject.FindAnyObjectByType< LeapServiceProvider>();
+                LeapServiceProvider leapProvider = GameObject.FindAnyObjectByType<LeapServiceProvider>();
 
                 // If there is no leap provider in the scene
                 if (leapProvider == null)
@@ -242,7 +242,7 @@ namespace Leap.Unity.MRTK
                     GameObject leapProviderGO = new GameObject("LeapXRServiceProvider");
                     LeapXRServiceProvider leapXRServiceProvider = leapProviderGO.AddComponent<LeapXRServiceProvider>();
                     leapXRServiceProvider.PositionDeviceRelativeToMainCamera = true;
-                    leapProvider = (LeapProvider)leapXRServiceProvider;
+                    leapProvider = (LeapServiceProvider)leapXRServiceProvider;
                     GameObject.DontDestroyOnLoad(leapProviderGO);
                 }
                 else

@@ -1,6 +1,5 @@
 using Leap;
-using Leap.Unity;
-using Leap.Unity.InputModule;
+using Leap.InputModule;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;

@@ -6,14 +6,135 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
 
-## [NEXT] - xx/xx/xx
-
-### Tracking Client versions
-- Windows 	v5.17.1
-- MacOS 	v5.17.1
-- Android 	v5.17.1
+## [NEXT]
 
 ### Added
+
+### Changed
+
+### Fixed
+- DeviceID now correctly set on the Frame object, fixing issue particularly with multiple devices / recording playback
+- Fixed issue with LeapXRHandProvider not working on Quest devices when using XRI/XR Hands and Ultraleap tracking in direct (non OpenXR) mode, due to default constructor being optimized away.
+
+## [7.1.0] - 04/09/2024
+
+### Tracking Client versions
+- Windows 	v6.1.0
+- MacOS 	v6.0.0
+- Android 	v6.0.0
+
+### Added
+- Added option to fade UIInputCursor sprite out based on specified interaction distance range
+- Added range to customise the distance at which the UIInputCursor scales when using direct input
+
+### Changed
+- PostProcessProvider now defaults to UpdateAndFixedUpdate updating to better support PhysicalHandsManager out of the box
+- Service providers using a specific serial will now connect to the exact given serial, rather than first closest
+- UI PointerElement now only uses specified finger rather than the calculated closest to canvas (defaults to INDEX)
+- Reduced the default UIInputCursor minimum sprite scale
+- UIInputEventSystem prefab now defaults to Direct interaction mode
+- Modified version check logic for readability
+
+### Fixed
+- Service providers using a specific serial will now correctly handle device reconnections
+- GrabHelper handles null ContactHand objects more gracefully
+- Fixed instance where setting CapsuleHand colour through code would report a nullref
+- Fixed references to LeapProvider and Camera in PointerElement to prevent nullrefs when changing either in the main UIInputModule
+- Fixed GrabBall for new physical setup
+- Correctly unassign/re-assign LeapProvider events in PhysicalHandsManager if reference changed at runtime
+- Fixed an unreachable code warning if XR_MANAGEMENT and INPUT_SYSTEM are not AVAILABLE
+- Fixed the default float height for UIInputCursor
+- Increased timeout and retry delay in ServerStatus to reduce GetServerStatus fails
+- Fixed an instance where ServerStatus would report a nullref if the devices array fails to populate
+- Fixed MRTK integration (updated finger/bone methods for new 7.0.0 implementation)
+
+
+## [7.0.0] - 22/07/2024
+
+### Tracking Client versions
+- Windows 	v6.0.0
+- MacOS 	v6.0.0
+- Android 	v6.0.0
+
+### Added
+- ImageRetriever allows more than 6 reconnections
+- New Pinch and Grab detection utilities
+- Option to fade hands on found/lost in HandEnableDisable component
+- OnHandFound and OnHandLost events to LeapProviders
+- LeftHandTracked and RightHandTracked access booleans to LeapProviders
+- PhysicalHandsButton with automatic setup
+- PhysicalHandsButtonToggle
+- PhysicalHandsAnchorable, including anchoring and un-anchoring based on grabs
+- PhysicalHandsSlider
+- TwoDimensionalPhysicalHandsSlider example
+- Ability to ignore collisions per hand separately from grabs
+- Primary hover functionality to physical hands
+- PhysicalHandsButton can now use primary hover functionality
+
+### Changed
+- XRLeapProviderManager renamed LEAP_DIRECT to ULTRALEAP
+- Accessors for Hand.Finger, Hand.Bone and Finger.Bone
+- Renamed BoneType enum entries to remove redundancies
+- Replaced use of PinchStrength for IsPinching with PinchDistance
+- PinchDistance is now measured in Metres not Millimetres
+- Removed old PhysicalHandsButton
+- Anchors no longer require Interaction Engine
+- Turntable and Pullcord example scene now uses Physical Hands
+- Physical Hands Playground uses new PhysicalHandsButtons and Toggles
+- Grab Ball uses Physical Hands rather than Interaction Engine
+- Physical Hands events are sent to all event interfaces attached to the interacted rigidbody
+- Hard Contact Parent settings access levels to public
+- Prefab Create Menu uses Physical Hands prefabs as opposed to Interaction Engine
+- Prefab Create Menu chooses URP hands where available
+- Shaders use _Color as the default color property name
+- Shaders all come under the Ultraleap folder
+- Deleted Interaction Engine
+- Leap and Leap.Unity namespaces are now Leap
+
+### Fixed
+
+
+
+## [6.15.1] - 26/06/2024
+
+### Tracking Client versions
+- Windows 	v6.0.0
+- MacOS 	v6.0.0
+- Android 	v6.0.0
+
+### Added
+- Support for reading the camera matrix
+
+### Changed
+- Improved XRHands support for Meta Aim Input Actions
+
+### Fixed
+- Issue with the method signature for LeapPixelToRectilinearEx
+- Duplicate meta aim hands when using XRHands Input
+- Editor stuck in infinite loop when no service running
+- Caching issue with LeapToUnityTransform which causes the hand to be flipped on the Z axis. 
+
+
+## [6.15.0] - 19/04/24
+
+### Tracking Client versions
+- Windows 	v6.0.0
+- MacOS 	v6.0.0
+- Android 	v6.0.0
+
+### Added
+- LeapServiceProvider accessor for world space position of the Tracking Camera
+- LeapXRServiceProvider accessor for world space position of the Tracking Camera
+- LeapServiceProvider accessor for world space position of the Tracking Camera
+- LeapXRServiceProvider accessor for world space position of the Tracking Camera
+- (Physical Hands) Ability to ignore collisions on single object or all children
+- (Physical Hands) Added toggle to GrabHelper to allow kinematic object movement
+- (Physical Hands) Ignore Physical hands component can now choose which hand(s) it should be applied to
+- (Physical Hands) Edit time representation of hands via Physical Hands Manager
+- (Attachment Hands) Do not show warning again this session when deleting attachment points
+- (Optional) Metadata capture to help improve the Plugin
+- (Physical Hands) Ability to create IgnorePhysicalHands at runtime
+- (Fiducial Marker Tracking) Fiducial Marker Tracking support using AprilTag
 
 ### Changed
 - (Config) Additional uses of Config marked as Obsolete
@@ -21,11 +142,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Example content to be split by XR, Tabletop and URP Examples
 - Combined example content to be part of the main Ultraleap Tracking .unitypackage when importing via .unitypackage
 - Added fog and gradient sky for all XR example scenes
+- (Hand Rays) Exposed dot product used to test if the hand is facing camera
+- (Hinting) Added support for startup setting of Hand Tracking Hints via the Ultraleap Settings window
+- (Hinting) Added support for runtime changing of Hand Tracking Hints via static HandTrackingHintManager
+- (Hinting) Added support for setting OpenXR Hand Tracking Hints via the OpenXR HandTrackingFeature
+- Access of Physical Hands extensions
+- Added public accessors to various Physical Hands utilities
+- Unified use of TrackedPoseDrivers across XR LeapProviders
 
 ### Fixed
 - Errors in Editor when using pre-2023.3.18 LTS due to FindObjectByType issue
 - (Physical Hands) Objects are sticky when they ignore collision with hard contact hands
-- DeviceID now correctly set on the Frame object, fixing issue particularly with multiple devices / recording playback
+- (Physical Hands) Ability to toggle ignore Physical hands options from the inspector at runtime.
+- (Locomotion) IsPinching wouldn't fire when between Activate and Deactivate values in LightweightPinchDetector
+- (Physical Hands) Soft contact button difficult to press in physical hands playground scene when not using UI layer
+- (Physical Hands) Disabled Ignore Physical hands components still affecting grab and collision at runtime
+- (Physical Hands) Button Prefab uses mesh from example assets
+- (Physical Hands) Button gets stuck down if disabled after pressing
+- (UI Input Preview) Null UIInput events cause unnecessary error logs
+- Memory increase when repeatedly opening scenes with LeapServiceProviders
+- ThreadAbort when changing scenes in editor that use multidevice or display the tracking device gizmo
+- (LeapServiceProvider) OnDeviceChanged event is not raised when multidevice mode is disabled
+- (LeapXRServiceProvider) LeapXRServiceProvider wrongly uses transform relative to camera when offset mode set to transform
+- (Hand Binder) incorrect upperArm name definition for elbow joint
+- (Physical Hands) Soft Contact NAN collider error when using OpenXR tracking on Android devices
+- (Physical Hands) Hand stuck in pose, unable to grab if object is disabled while grabbing
+- (Physical Hands) Errors when destroying objects that are grabbed
+- (Physical Hands) Errors when adding Physical Hands Manager prefab for the first time
+- Use of Device Transforms does not apply rotations
+- OpenXR API Layer Service query intent was missing sometimes, preventing API layers functioning correctly
+- OpenXR checks minSdkVersion rather than targetSdkVersion for query intents
+- (Physical Hands) PhysHands Settings are not localized when using decimals
 
 ## [6.14.0] - 24/01/24
 

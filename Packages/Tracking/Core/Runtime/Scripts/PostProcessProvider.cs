@@ -6,10 +6,10 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using Leap.Unity.Attributes;
+using Leap.Attributes;
 using UnityEngine;
 
-namespace Leap.Unity
+namespace Leap
 {
 
     public abstract class PostProcessProvider : LeapProvider
@@ -48,7 +48,7 @@ namespace Leap.Unity
         [Tooltip("Whether this post-processing provider should process data received from " +
           "Update frames, FixedUpdate frames, or both. Processing both kinds of " +
           "frames is only recommended if your post-process is stateless.")]
-        public DataUpdateMode dataUpdateMode = DataUpdateMode.UpdateOnly;
+        public DataUpdateMode dataUpdateMode = DataUpdateMode.UpdateAndFixedUpdate;
 
         /// <summary> Override this as true to have your PostProcessProvider handle
         /// its own Dispatch timing. For example, you can dispatch an Update frame

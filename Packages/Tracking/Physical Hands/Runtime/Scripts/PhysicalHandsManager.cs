@@ -12,7 +12,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace Leap.Unity.PhysicalHands
+namespace Leap.PhysicalHands
 {
     public class PhysicalHandsManager : LeapProvider
     {
@@ -32,12 +32,24 @@ namespace Leap.Unity.PhysicalHands
                 {
                     GetOrCreateBestInputProvider(out _inputProvider);
                 }
-
                 return _inputProvider;
             }
             set
             {
+                if (_inputProvider != null)
+                {
+                    _inputProvider.OnUpdateFrame -= ProcessFrame;
+                    _inputProvider.OnFixedFrame -= ProcessFrame;
+                }
+
                 _inputProvider = value;
+
+                if (_inputProvider != null)
+                {
+                    _inputProvider.OnUpdateFrame += ProcessFrame;
+                    _inputProvider.OnFixedFrame += ProcessFrame;
+                    StartCoroutine(PostFixedUpdate());
+                }
             }
         }
 
@@ -76,10 +88,32 @@ namespace Leap.Unity.PhysicalHands
         #region Layers
         // Layers
         // Hand Layers
-        public SingleLayer HandsLayer => _handsLayer;
+        public SingleLayer HandsLayer
+        {
+            get
+            {
+                if (_handsLayer == -1)
+                {
+                    _layersGenerated = false;
+                    GenerateLayers();
+                }
+                return _handsLayer;
+            }
+        }
         private SingleLayer _handsLayer = -1;
 
-        public SingleLayer HandsResetLayer => _handsResetLayer;
+        public SingleLayer HandsResetLayer
+        {
+            get
+            {
+                if (_handsResetLayer == -1)
+                {
+                    _layersGenerated = false;
+                    GenerateLayers();
+                }
+                return _handsResetLayer;
+            }
+        }
         private SingleLayer _handsResetLayer = -1;
 
         private bool _layersGenerated = false;
@@ -104,9 +138,33 @@ namespace Leap.Unity.PhysicalHands
 
         private Frame _modifiedFrame = new Frame();
 
-        public override Frame CurrentFrame => _modifiedFrame;
+        public override Frame CurrentFrame
+        {
+            get
+            {
+#if UNITY_EDITOR
+                if (!Application.isPlaying && _inputProvider != null)
+                {
+                    return _inputProvider.CurrentFrame;
+                }
+#endif
+                return _modifiedFrame;
+            }
+        }
 
-        public override Frame CurrentFixedFrame => _modifiedFrame;
+        public override Frame CurrentFixedFrame
+        {
+            get
+            {
+#if UNITY_EDITOR
+                if (!Application.isPlaying && _inputProvider != null)
+                {
+                    return _inputProvider.CurrentFrame;
+                }
+#endif
+                return _modifiedFrame;
+            }
+        }
 
         /// <summary>
         /// Happens in the execution order just before any hands are changed or updated
@@ -117,6 +175,11 @@ namespace Leap.Unity.PhysicalHands
         /// Called when the contact mode has been changed, but before the mode change has completed
         /// </summary>
         public Action OnContactModeChanged;
+
+        #region Quick Accessors
+        public ContactHand LeftHand { get { return ContactParent?.LeftHand; } }
+        public ContactHand RightHand { get { return ContactParent?.RightHand; } }
+        #endregion
 
         private void Awake()
         {
@@ -131,15 +194,7 @@ namespace Leap.Unity.PhysicalHands
 
         private void OnEnable()
         {
-            if (InputProvider != null)
-            {
-                InputProvider.OnUpdateFrame -= ProcessFrame;
-                InputProvider.OnUpdateFrame += ProcessFrame;
-                InputProvider.OnFixedFrame -= ProcessFrame;
-                InputProvider.OnFixedFrame += ProcessFrame;
-
-                StartCoroutine(PostFixedUpdate());
-            }
+            InputProvider = _inputProvider;
         }
 
         private void OnDisable()
@@ -183,7 +238,7 @@ namespace Leap.Unity.PhysicalHands
 
         internal void HandsInitiated()
         {
-            OnHandsInitialized?.Invoke();
+            OnHandsInitialized?.Invoke(ContactParent);
         }
 
         private void ProcessFrame(Frame inputFrame)
@@ -271,11 +326,13 @@ namespace Leap.Unity.PhysicalHands
                     break;
             }
 
+
             if (transform != null) // catches some edit-time issues
             {
                 newContactParent.transform.parent = transform;
             }
 
+            _contactParent.Initialize();
             OnContactModeChanged?.Invoke();
         }
 
@@ -380,7 +437,7 @@ namespace Leap.Unity.PhysicalHands
         public UnityEvent<ContactHand, Rigidbody> onGrab;
         public UnityEvent<ContactHand, Rigidbody> onGrabExit;
 
-        internal static Action OnHandsInitialized;
+        internal static Action<ContactParent> OnHandsInitialized;
 
         internal void OnHandHover(ContactHand contacthand, Rigidbody rbody)
         {

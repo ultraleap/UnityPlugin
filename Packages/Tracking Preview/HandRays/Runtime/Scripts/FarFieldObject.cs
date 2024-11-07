@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace Leap.Unity.Preview.HandRays
+namespace Leap.Preview.HandRays
 {
     /// <summary>
     /// A base object to be inherited by Far Field Objects as a way to identify objects

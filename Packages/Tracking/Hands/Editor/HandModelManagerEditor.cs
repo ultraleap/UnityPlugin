@@ -1,7 +1,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace Leap.Unity.HandsModule
+namespace Leap.HandsModule
 {
     [CustomEditor(typeof(HandModelManager))]
     public class HandModelManagerEditor : Editor
