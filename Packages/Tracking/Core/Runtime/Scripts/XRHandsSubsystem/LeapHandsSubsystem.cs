@@ -42,6 +42,7 @@ namespace Leap
         [Preserve]
         public LeapXRHandProvider()
         {
+ 
         }
 
         public override void Start()
@@ -90,6 +91,46 @@ namespace Leap
             handJointsInLayout[XRHandJointID.LittleDistal.ToIndex()] = true;
             handJointsInLayout[XRHandJointID.LittleTip.ToIndex()] = true;
         }
+
+#if XR_XRHAND_ENABLED_1_5
+        public override bool canSurfaceCommonPoseData {  get => true; }
+
+        public override bool TryGetAimPose(Handedness handedness, out Pose aimPose)
+        {
+            return base.TryGetAimPose(handedness, out aimPose);
+        }
+
+        public override bool TryGetAimActivateValue(Handedness handedness, out float aimActivateValue)
+        {
+            return base.TryGetAimActivateValue(handedness, out aimActivateValue);
+        }
+
+        public override bool TryGetGraspValue(Handedness handedness, out float graspValue)
+        {
+            return base.TryGetGraspValue(handedness, out graspValue);
+        }
+
+        public override bool TryGetGripPose(Handedness handedness, out Pose gripPose)
+        {
+            return base.TryGetGripPose(handedness, out gripPose);
+        }
+
+        public override bool TryGetPokePose(Handedness handedness, out Pose pokePose)
+        {
+            return base.TryGetPokePose(handedness, out pokePose);
+        }
+
+        public override bool TryGetPinchPose(Handedness handedness, out Pose pinchPose)
+        {
+            return base.TryGetPinchPose(handedness, out pinchPose);
+        }
+
+        public override bool TryGetPinchValue(Handedness handedness, out float pinchValue)
+        {
+            return base.TryGetPinchValue(handedness, out pinchValue);
+        }
+
+#endif 
 
         public override XRHandSubsystem.UpdateSuccessFlags TryUpdateHands(
             XRHandSubsystem.UpdateType updateType,
@@ -265,7 +306,16 @@ namespace Leap
             {
                 id = "UL XR Hands",
                 providerType = typeof(LeapXRHandProvider),
-                subsystemTypeOverride = typeof(LeapHandsSubsystem)
+                subsystemTypeOverride = typeof(LeapHandsSubsystem),
+#if XR_XRHAND_ENABLED_1_5
+                supportsAimPose = true,
+                supportsAimActivateValue = true,
+                supportsGraspValue = true,
+                supportsGripPose = true,
+                supportsPinchPose = true,
+                supportsPinchValue = true,
+                supportsPokePose = true
+#endif
             };
 
             XRHandSubsystemDescriptor.Register(handsSubsystemCinfo);

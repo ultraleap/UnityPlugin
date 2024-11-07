@@ -9,6 +9,7 @@
 using Leap.Attributes;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace Leap
 {
@@ -21,6 +22,7 @@ namespace Leap
     /// </summary>
     public class CapsuleHand : HandModelBase
     {
+        public const string MESH_GAMEOBJECT_TAG = "Capsule Hand Mesh";
         public enum CapsuleHandPreset
         {
             Default,
@@ -113,13 +115,18 @@ namespace Leap
         private Vector3[] _spherePositions;
         private Matrix4x4[] _sphereMatrices = new Matrix4x4[64],
                             _cylinderMatrices = new Matrix4x4[64];
+        private Vector3[] _cylinderLossyScale = new Vector3[64];
         private int _curSphereIndex = 0, _curCylinderIndex = 0;
         private Color _backingDefault = Color.white;
 
         private MaterialPropertyBlock _materialPropertyBlock;
         private Color[] _sphereColors;
 
-        private float currentLossyScaleX;
+        private float _currentLossyScaleX;
+        private GameObject _meshParent;
+
+        [SerializeField]
+        private bool _renderAsMesh = true;
 
         [HideInInspector]
         public bool SetIndividualSphereColors = false;
@@ -342,9 +349,222 @@ namespace Leap
         /// Called once per frame when the LeapProvider calls the event OnUpdateFrame.
         /// Updates all joint sphere positions and draws the spheres and cylinders of the hand.
         /// </summary>
+        public void UpdateHandAsMesh()
+        {
+            _currentLossyScaleX = transform.lossyScale.x;
+
+            _curSphereIndex = 0;
+            _curCylinderIndex = 0;
+
+            if (_spherePositions == null || _spherePositions.Length != TOTAL_JOINT_COUNT)
+            {
+                _spherePositions = new Vector3[TOTAL_JOINT_COUNT];
+            }
+
+            if (_material != null && (_backing_material == null || !_backing_material.enableInstancing))
+            {
+                _backing_material = new Material(_material);
+                _backing_material.hideFlags = HideFlags.DontSaveInEditor;
+                _backing_material.enableInstancing = true;
+                _sphereMat = new Material(_backing_material);
+                _sphereMat.hideFlags = HideFlags.DontSaveInEditor;
+            }
+
+            //Update all joint spheres in the fingers
+            foreach (var finger in _hand.fingers)
+            {
+                for (int j = 0; j < 4; j++)
+                {
+                    int key = getFingerJointIndex((int)finger.Type, j);
+
+
+                    Vector3 position;
+                    if (finger.Type == Finger.FingerType.THUMB && j == 0)
+                    {
+                        // Hand the base of the thumb differently, and move it to the base of the index metacarpal.
+                        position = _hand.Index.GetBone((Bone.BoneType)j).PrevJoint;
+                    }
+                    else
+                    {
+                        position = finger.GetBone((Bone.BoneType)j).NextJoint;
+                    }
+
+                    _spherePositions[key] = position;
+                    drawSphere(position);
+                }
+            }
+
+            //If we want to show the arm, do the calculations and display the meshes
+            if (_showArm)
+            {
+                DrawArm();
+            }
+
+            if (_showUpperArm)
+            {
+                DrawUpperArm();
+            }
+
+            //Draw cylinders between finger joints
+            for (int i = 0; i < 5; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    int keyA = getFingerJointIndex(i, j);
+                    int keyB = getFingerJointIndex(i, j + 1);
+
+                    drawCylinder(_spherePositions[keyA], _spherePositions[keyB]);
+                }
+            }
+
+            // Draw cylinder between thumb and index finger
+            if (_joinThumbProximal)
+            {
+                int keyA = getFingerJointIndex(0, 0);
+                int keyB = getFingerJointIndex(1, 0);
+
+                drawCylinder(_spherePositions[keyA], _spherePositions[keyB]);
+            }
+
+            if (_joinFingerProximals)
+            {
+                //Draw cylinders between finger knuckles
+                for (int i = 1; i < 4; i++)
+                {
+                    int keyA = getFingerJointIndex(i, 0);
+                    int keyB = getFingerJointIndex(i + 1, 0);
+
+                    drawCylinder(_spherePositions[keyA], _spherePositions[keyB]);
+                }
+            }
+
+            if (_showPalmJoint)
+            {
+                //Now we just have a few more spheres for the hands
+                //PalmPos, WristPos, and the virtual palm drawn from the metacarpals.
+                Vector3 palmPosition = _hand.PalmPosition;
+                drawSphere(palmPosition, _palmRadius);
+            }
+
+            if (_showPinkyMetacarpal)
+            {
+                Vector3 pinkyMetacarpal = _hand.Pinky.GetBone(Bone.BoneType.METACARPAL).PrevJoint;
+                Vector3 indexMetacarpal = _hand.Index.GetBone(Bone.BoneType.METACARPAL).PrevJoint;
+
+                drawSphere(pinkyMetacarpal);
+                drawCylinder(pinkyMetacarpal, indexMetacarpal);
+                drawCylinder(pinkyMetacarpal, PINKY_BASE_INDEX);
+            }
+
+            // Draw Cylinders
+#if UNITY_EDITOR
+            _cylinderMesh = getCylinderMesh(1f);
+#else
+            if (_cylinderMesh == null) { _cylinderMesh = getCylinderMesh(1f); }
+#endif
+
+            if (!_renderAsMesh)
+            {
+                if (SetIndividualSphereColors)
+                {
+                    if (_materialPropertyBlock == null)
+                    {
+                        _materialPropertyBlock = new MaterialPropertyBlock();
+                    }
+
+                    for (int i = 0; i < _sphereMatrices.Length && i < _curSphereIndex; i++)
+                    {
+                        _materialPropertyBlock.SetColor("_Color", SphereColors[i]);
+
+                        Graphics.DrawMeshInstanced(_sphereMesh, 0, _sphereMat, new Matrix4x4[] { _sphereMatrices[i] }, 1, _materialPropertyBlock,
+                          _castShadows ? UnityEngine.Rendering.ShadowCastingMode.On : UnityEngine.Rendering.ShadowCastingMode.Off, true, gameObject.layer);
+                    }
+                }
+                else
+                {
+                    Graphics.DrawMeshInstanced(_sphereMesh, 0, _sphereMat, _sphereMatrices, _curSphereIndex, null,
+                       _castShadows ? UnityEngine.Rendering.ShadowCastingMode.On : UnityEngine.Rendering.ShadowCastingMode.Off, true, gameObject.layer);
+                }
+
+
+                Graphics.DrawMeshInstanced(_cylinderMesh, 0, _backing_material, _cylinderMatrices, _curCylinderIndex, null,
+                  _castShadows ? UnityEngine.Rendering.ShadowCastingMode.On : UnityEngine.Rendering.ShadowCastingMode.Off, true, gameObject.layer);
+            }
+            else
+            {
+                if (Application.isPlaying)
+                {
+                    if (_meshParent == null)
+                    {
+                        _meshParent = new GameObject("Mesh");
+                        _meshParent.tag = CapsuleHand.MESH_GAMEOBJECT_TAG;
+                        _meshParent.transform.parent = transform;
+                    }
+                    else
+                    {
+                        foreach (Transform child in transform)
+                        {
+                            Destroy(child.gameObject);
+                        }
+                    }
+
+                    GameObject sphereMeshParentGO = new GameObject($"SphereParent");
+                    sphereMeshParentGO.transform.parent = transform;    
+
+                    for (int i = 0; i < _sphereMatrices.Length; i++)
+                    {
+                        
+
+                        if (_sphereMatrices[i].ValidTRS())
+                        {
+                            GameObject sphereMeshGO = new GameObject($"Capsule{i}");
+
+                            Mesh meshClone = Instantiate(_sphereMesh);
+                            var mf = sphereMeshGO.AddComponent<MeshFilter>();
+                            mf.mesh = meshClone;
+
+                            var mr = sphereMeshGO.AddComponent<MeshRenderer>();
+                            mr.material = _sphereMat;
+                            sphereMeshGO.transform.parent = sphereMeshParentGO.transform;
+                            sphereMeshGO.transform.SetPose(_sphereMatrices[i].GetPose());
+                            sphereMeshGO.transform.SetLossyScale(_sphereMatrices[i].lossyScale);
+                        }
+                    }
+
+                    GameObject cylinderMeshParentGO = new GameObject($"CylinderParent");
+                    cylinderMeshParentGO.transform.parent = transform;
+
+                    for (int i = 0; i < _cylinderMatrices.Length; i++)
+                    {
+                        if (_cylinderMatrices[i].ValidTRS())
+                        {
+                            GameObject cylinderMeshGO = new GameObject($"Cylinder{i}");
+
+                            Mesh meshClone = Instantiate(_cylinderMesh);
+                            var mf = cylinderMeshGO.AddComponent<MeshFilter>();
+                            mf.mesh = meshClone;
+
+                            var mr = cylinderMeshGO.AddComponent<MeshRenderer>();
+                            mr.material = _backing_material;
+                            cylinderMeshGO.transform.parent = cylinderMeshParentGO.transform;
+                            cylinderMeshGO.transform.SetPose(_cylinderMatrices[i].GetPose());
+                            cylinderMeshGO.transform.SetLossyScale(_cylinderLossyScale[i]);
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Called once per frame when the LeapProvider calls the event OnUpdateFrame.
+        /// Updates all joint sphere positions and draws the spheres and cylinders of the hand.
+        /// </summary>
         public override void UpdateHand()
         {
-            currentLossyScaleX = transform.lossyScale.x;
+            UpdateHandAsMesh();
+            return;
+
+            _currentLossyScaleX = transform.lossyScale.x;
 
             _curSphereIndex = 0;
             _curCylinderIndex = 0;
@@ -542,7 +762,8 @@ namespace Leap
 
             //multiply radius by 2 because the default unity sphere has a radius of 0.5 meters at scale 1.
             _sphereMatrices[_curSphereIndex++] = Matrix4x4.TRS(position,
-              Quaternion.identity, Vector3.one * radius * 2.0f * currentLossyScaleX);
+              Quaternion.identity, Vector3.one * radius * 2.0f * _currentLossyScaleX);
+
         }
 
         private void drawCylinder(Vector3 a, Vector3 b)
@@ -553,8 +774,10 @@ namespace Leap
 
             if ((a - b).magnitude > 0.001f)
             {
-                _cylinderMatrices[_curCylinderIndex++] = Matrix4x4.TRS(a,
-                  Quaternion.LookRotation(b - a), new Vector3(currentLossyScaleX, currentLossyScaleX, length));
+                _cylinderMatrices[_curCylinderIndex] = Matrix4x4.TRS(a,
+                  Quaternion.LookRotation(b - a), new Vector3(_currentLossyScaleX, _currentLossyScaleX, length));
+
+                _cylinderLossyScale[_curCylinderIndex++] = new Vector3(_currentLossyScaleX, _currentLossyScaleX, length);
             }
         }
 

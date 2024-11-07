@@ -88,6 +88,11 @@ namespace Leap
             {
                 SerializedProperty leapSubsystemEnabledProperty = settings.FindProperty("leapSubsystemEnabled");
                 leapSubsystemEnabledProperty.boolValue = EditorGUILayout.ToggleLeft("Enable Leap XRHands Subsystem", leapSubsystemEnabledProperty.boolValue);
+
+                if (leapSubsystemEnabledProperty.boolValue)
+                {
+                    EditorGUILayout.HelpBox("XRHands version 1.5.0 or later is strongly recommended for fully subsystem functionality", MessageType.Warning);
+                }
             }
 
             EditorGUILayout.Space(30);
@@ -398,7 +403,6 @@ namespace Leap
 
             return pluginVersionFromAssets;
         }
-
 
         private static void ReplaceUseOfFingersInPoseScriptableObjects()
         {

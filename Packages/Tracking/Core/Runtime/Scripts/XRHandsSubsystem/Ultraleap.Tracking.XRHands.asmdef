@@ -2,7 +2,6 @@
     "name": "Ultraleap.Tracking.XRHands",
     "rootNamespace": "",
     "references": [
-        "GUID:2ee0542102ac1084e8d9a910885c1e81",
         "GUID:ba171b3dd2a51234ab864770f99741a5",
         "GUID:e40ba710768534012815d3193fa296cb",
         "GUID:ce522b6ed64c8be4c989a1d26d0e3275",
@@ -16,14 +15,14 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [
-        "XR_XRHAND_ENABLED",
+        "XR_XRHAND_ENABLED_1_5",
         "INPUT_SYSTEM"
     ],
     "versionDefines": [
         {
             "name": "com.unity.xr.hands",
-            "expression": "1.2.1",
-            "define": "XR_XRHAND_ENABLED"
+            "expression": "1.5.0",
+            "define": "XR_XRHAND_ENABLED_1_5"
         },
         {
             "name": "com.unity.inputsystem",
