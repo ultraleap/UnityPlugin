@@ -98,7 +98,7 @@ namespace Leap.PhysicalHands
 
         private bool wasKinematic;
         private bool usedGravity;
-        private float oldDrag;
+        private float oldDrag, oldMass;
         private float oldAngularDrag;
 
         internal IgnorePhysicalHands _ignorePhysicalHands;
@@ -212,6 +212,7 @@ namespace Leap.PhysicalHands
             wasKinematic = _rigid.isKinematic;
             usedGravity = _rigid.useGravity;
             oldDrag = _rigid.drag;
+            oldMass = _rigid.mass;
             oldAngularDrag = _rigid.angularDrag;
             _rigid.TryGetComponents<IPhysicalHandGrab>(out _physicalHandGrabs);
             _rigid.TryGetComponents<IPhysicalHandHover>(out _physicalHandHovers);
@@ -237,6 +238,7 @@ namespace Leap.PhysicalHands
                 _rigid.useGravity = false;
                 _rigid.drag = 0f;
                 _rigid.angularDrag = 0f;
+                _rigid.mass = 1f;
             }
         }
 
@@ -248,6 +250,7 @@ namespace Leap.PhysicalHands
                 _rigid.useGravity = usedGravity;
                 _rigid.drag = oldDrag;
                 _rigid.angularDrag = oldAngularDrag;
+                _rigid.mass = oldMass;
             }
         }
 
@@ -367,6 +370,7 @@ namespace Leap.PhysicalHands
         internal void ReleaseObject()
         {
             GrabState = State.Hover;
+            _rigid.mass = oldMass;
 
             HandleReleasedRigidbody();
             ThrowingOnRelease();

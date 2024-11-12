@@ -218,6 +218,12 @@ namespace Leap.PhysicalHands
             {
                 collider = colliderCache[i];
 
+                if(collider is MeshCollider && (collider is MeshCollider meshCollider && !meshCollider.convex))
+                {
+                    // Can't process non-solid/concave collider
+                    continue;
+                }
+
                 Vector3 colliderTransformPosition = collider.transform.position;
                 Vector3 boneTransformPosition = transform.position;
 

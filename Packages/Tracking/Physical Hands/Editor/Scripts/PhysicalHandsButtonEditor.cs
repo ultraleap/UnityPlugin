@@ -21,6 +21,8 @@ namespace Leap.PhysicalHands
         {
             EditorUtils.DrawScriptField((MonoBehaviour)target);
 
+            WarningsSection();
+
             EditorGUILayout.PropertyField(serializedObject.FindProperty("_pressableObject"), new GUIContent("Pressable Object", "The GameObject representing the button that can be pressed."));
 
             EditorGUILayout.Space(5);
@@ -87,6 +89,26 @@ namespace Leap.PhysicalHands
 
             serializedObject.ApplyModifiedProperties();
             target.UpdateInspectorValues();
+        }
+
+        private void WarningsSection()
+        {
+            var physicalHandsManager = GameObject.FindFirstObjectByType<PhysicalHandsManager>(FindObjectsInactive.Include);
+            if (physicalHandsManager == null)
+            {
+                EditorGUILayout.HelpBox($"There is no Physical Hands Manager in your scene.\nThis button will not work correctly.", MessageType.Warning);
+                EditorGUILayout.Space(5);
+            }
+            else if(GameObject.FindFirstObjectByType<GrabHelper>(FindObjectsInactive.Include) == null)
+            {
+                EditorGUILayout.HelpBox($"There is no Grab Helper on your Physical Hands Manager.\nThis button will not work correctly.", MessageType.Warning);
+                if(GUILayout.Button("Add Grab Helper"))
+                {
+                    physicalHandsManager.gameObject.AddComponent<GrabHelper>();
+                }
+                EditorGUILayout.Space(5);
+            }
+
         }
     }
 }
