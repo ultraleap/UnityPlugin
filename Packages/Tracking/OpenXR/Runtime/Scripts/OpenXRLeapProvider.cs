@@ -239,15 +239,24 @@ namespace Ultraleap.Tracking.OpenXR
                             (_joints[(int)HandJoint.Palm].Pose.rotation * PalmOffset[hand.IsLeft ? 0 : 1].rotation) * ThumbMetacarpalRotationOffset[hand.IsLeft ? 0 : 1]);
                         continue;
                     }
+					
+					var prevJointPosition = prevJoint.Pose.position;
+                    var nextJointPosition = nextJoint.Pose.position;
+
+                    // Adjust the fingertip positions forward by a radius to match LeapC data.
+                    if (boneIndex == 3)
+                    {
+                        nextJointPosition += prevJoint.Pose.forward * nextJoint.Radius;
+                    }
 
                     // Populate the finger bone information
                     var bone = hand.Fingers[fingerIndex].bones[boneIndex];
                     bone.Fill(
-                        prevJoint.Pose.position,
-                        nextJoint.Pose.position,
-                        ((prevJoint.Pose.position + nextJoint.Pose.position) / 2f),
+                        prevJointPosition,
+                        nextJointPosition,
+                        ((prevJointPosition + nextJointPosition) / 2f),
                         prevJoint.Pose.forward,
-                        (prevJoint.Pose.position - nextJoint.Pose.position).magnitude,
+                        (prevJointPosition - nextJointPosition).magnitude,
                         prevJoint.Radius * 2f,
                         (Bone.BoneType)boneIndex,
                         prevJoint.Pose.rotation);
