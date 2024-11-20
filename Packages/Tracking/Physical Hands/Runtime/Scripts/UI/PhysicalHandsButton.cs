@@ -57,6 +57,7 @@ namespace Leap.PhysicalHands
         protected bool _isButtonPressed = false;
         protected Rigidbody _pressableObjectRB = null;
         protected ConfigurableJoint _configurableJoint;
+        protected IgnorePhysicalHands _pressableIgnore = null;
 
 
         /// <summary>
@@ -269,6 +270,14 @@ namespace Leap.PhysicalHands
             {
                 _buttonHelper = _pressableObject.AddComponent<PhysicalHandsButtonHelper>();
             }
+
+            if(!_pressableObject.TryGetComponent<IgnorePhysicalHands>(out _pressableIgnore))
+            {
+                _pressableIgnore = _pressableObject.AddComponent<IgnorePhysicalHands>();
+            }
+
+            _pressableIgnore.DisableAllGrabbing = true;
+            _pressableIgnore.DisableAllHandCollisions = false;
 
             // Subscribe to events from the button helper
             _buttonHelper._onHandContact -= OnHandContactPO;
