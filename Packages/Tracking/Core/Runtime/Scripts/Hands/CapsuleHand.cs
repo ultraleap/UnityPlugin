@@ -73,6 +73,9 @@ namespace Leap
         [SerializeField]
         private bool _joinThumbProximal = true;
 
+        [Space, SerializeField, Tooltip("If enabled, this will back-offset the fingertip spheres to better represent actual tips.")]
+        private bool _offsetTipSphere = false;
+
         [Space, SerializeField]
         private bool _castShadows = true;
 
@@ -370,7 +373,6 @@ namespace Leap
                 {
                     int key = getFingerJointIndex((int)finger.Type, j);
 
-
                     Vector3 position;
                     if (finger.Type == Finger.FingerType.THUMB && j == 0)
                     {
@@ -380,7 +382,7 @@ namespace Leap
                     else
                     {
                         position = finger.GetBone((Bone.BoneType)j).NextJoint;
-                        if (j == 3)
+                        if (j == 3 && _offsetTipSphere)
                         {
                             // Fingertips need to be adjusted back by a radii to account for sphere drawing.
                             position -= finger.GetBone((Bone.BoneType)j).Direction * _jointRadius;
