@@ -120,6 +120,7 @@ namespace LeapInternal
         public EventHandler<DeviceFailureEventArgs> LeapDeviceFailure;
         public EventHandler<PolicyEventArgs> LeapPolicyChange;
         public EventHandler<FrameEventArgs> LeapFrame;
+        public EventHandler<RawFrameEventArgs> LeapRawFrameData;
         public EventHandler<InternalFrameEventArgs> LeapInternalFrame;
         public EventHandler<LogEventArgs> LeapLogEvent;
         [Obsolete("Config is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
@@ -413,6 +414,11 @@ namespace LeapInternal
         {
             Frames.Put(ref trackingMsg);
 
+            if (LeapRawFrameData != null)
+            {
+                LeapRawFrameData.DispatchOnContext(this, EventContext, new RawFrameEventArgs(trackingMsg));
+            }
+
             if (LeapFrame != null)
             {
                 LeapFrame.DispatchOnContext(this, EventContext, new FrameEventArgs(new Frame(deviceID).CopyFrom(ref trackingMsg)));
@@ -443,8 +449,6 @@ namespace LeapInternal
             return size;
         }
 
-
-
         public void GetInterpolatedFrame(Frame toFill, Int64 time, Device device = null)
         {
             UInt64 size = GetInterpolatedFrameSize(time, device);
@@ -466,6 +470,11 @@ namespace LeapInternal
                 LEAP_TRACKING_EVENT tracking_evt;
                 StructMarshal<LEAP_TRACKING_EVENT>.PtrToStruct(trackingBuffer, out tracking_evt);
                 toFill.CopyFrom(ref tracking_evt);
+
+                if (device != null)
+                {
+                    toFill.DeviceID = device.DeviceID;
+                }
             }
             Marshal.FreeHGlobal(trackingBuffer);
         }
@@ -492,6 +501,11 @@ namespace LeapInternal
                 LEAP_TRACKING_EVENT tracking_evt;
                 StructMarshal<LEAP_TRACKING_EVENT>.PtrToStruct(trackingBuffer, out tracking_evt);
                 toFill.CopyFrom(ref tracking_evt);
+
+                if (device != null)
+                {
+                    toFill.DeviceID = device.DeviceID;
+                }
             }
             Marshal.FreeHGlobal(trackingBuffer);
         }

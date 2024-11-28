@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Adjusted OpenXR fingertip data to match LeapC more closely
 
 ### Fixed
+- DeviceID now correctly set on the Frame object, fixing issue particularly with multiple devices / recording playback
 - Fixed issue with LeapXRHandProvider not working on Quest devices when using XRI/XR Hands and Ultraleap tracking in direct (non OpenXR) mode, due to default constructor being optimized away.
 
 ## [7.1.0] - 04/09/2024
