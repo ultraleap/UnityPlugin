@@ -333,14 +333,137 @@ namespace Leap.InputActions
         {
             // First get the shoulder position
             // Note: UNKNOWN as to why we require localposition here as the StablePinchPosition should be in world space by now
-            Vector3 direction = Camera.main.transform.localPosition;
-            direction += (Vector3.down * 0.1f);
-            direction += (Vector3.right * (hand.handedness == Handedness.Left ? -0.1f : 0.1f));
+            Vector3 rayStartPoint = Camera.main.transform.localPosition;
+            rayStartPoint += (Vector3.down * 0.1f);
+
+            float directionMagnitude = hand.handedness == Handedness.Left ? -0.1f : 0.1f;
+            if (Application.platform == RuntimePlatform.Android)
+            {
+                // Needs reversing on Meta Quest (tested on Quest 3)
+                if (SystemInfo.deviceModel == "Oculus Quest")
+                {
+                    directionMagnitude = hand.handedness == Handedness.Right ? -0.1f : 0.1f;
+                }
+            }
+
+            rayStartPoint += Vector3.right * directionMagnitude;
+
+            // Re-apply camera Y height
+            //Vector3 rayTargetPoint = GetRayTargetPoint_PositionLerp(hand);
+            //Vector3 rayTargetPoint = GetRayTargetPoint_FingerDirection(hand);
+            Vector3 rayTargetPoint = GetRayTargetPoint_PalmRotationLerp(hand);
+
+            //Debug.Log($"({stablePinchPos.x}, {stablePinchPos.y}) -> ({rayPinchPoint.x}, {rayPinchPoint.y})");
+            Debug.DrawLine(rayStartPoint, hand.GetStablePinchPosition(), Color.red);
+            Debug.DrawLine(rayStartPoint, rayTargetPoint, Color.green);
 
             // Use the shoulder position to determine an aim direction
-            direction = hand.GetStablePinchPosition() - direction;
+            rayStartPoint = rayTargetPoint - rayStartPoint;
 
-            return Quaternion.LookRotation(direction);
+            return Quaternion.LookRotation(rayStartPoint);
+        }
+
+        static Vector3 GetRayTargetPoint_PalmRotationLerp(XRHand hand)
+        {
+            Pose palmPose;
+            hand.GetJoint(XRHandJointID.Palm).TryGetPose(out palmPose);
+
+            Vector3 rayTargetPoint = palmPose.position;
+
+            // Remove Y height of camera to center numbers around zero origin
+            rayTargetPoint.y -= Camera.main.transform.localPosition.y;
+            float debugOriginalX = rayTargetPoint.x;
+            float debugOriginalY = rayTargetPoint.y;
+
+            //TODO: joint Pose values are in world space, so needs to be done in Camera local space??
+
+            // --- Hand left/right rotation = move point in the X
+            float xAddition = 0f;
+            /*float yRotation = palmPose.rotation.eulerAngles.y;
+            float origYRot = yRotation;
+            yRotation -= Camera.main.transform.rotation.eulerAngles.y;
+            Debug.Log($"{origYRot} -> {yRotation}");
+            //if (yRotation > 180f) yRotation -= 360f;
+            xAddition = MapClamp(-45f, 45f, -0.3f, 0.3f, yRotation);*/
+
+            // --- Hand up/down rotation = move point in the Y
+            float xRotation = palmPose.rotation.eulerAngles.x;
+            if (xRotation > 180f) xRotation -= 360f;
+            float yAddition = MapClamp(45f, -45f, -0.3f, 0.3f, xRotation);
+
+            rayTargetPoint.x += xAddition;
+            rayTargetPoint.y += yAddition;
+
+            //Debug.Log($"X angle: {xRotation}, yAddition: {yAddition}, original vs target Y: {debugOriginalY} / {rayTargetPoint.y}");
+            //Debug.Log($"Y angle: {yRotation}, xAddition: {xAddition}, original vs target X: {debugOriginalX} / {rayTargetPoint.x}");
+
+            // Re-apply camera Y height
+            rayTargetPoint.y += Camera.main.transform.localPosition.y;
+
+            return rayTargetPoint;
+        }
+
+        static Vector3 GetRayTargetPoint_FingerDirection(XRHand hand)
+        {
+            Pose targetPose;
+            hand.GetJoint(XRHandJointID.IndexProximal).TryGetPose(out targetPose);
+            //targetPose = hand.rootPose;
+
+            //Pose pose = new Pose(Vector3.zero, Quaternion.identity);
+            //targetPose = targetPose.GetTransformedBy(pose);
+
+            //Debug.DrawRay(targetPose.position, targetPose.position + (targetPose.right * 0.1f), Color.red);
+            //Debug.DrawRay(targetPose.position, targetPose.position + (targetPose.up * 0.1f), Color.green);
+            //Debug.DrawRay(targetPose.position, targetPose.position + (targetPose.forward * 0.1f), Color.blue);
+            //Debug.Log(palmPose.forward.ToString());
+
+            //Vector3 targetDirection = (palmPose.position - wristPose.position).normalized;
+            Vector3 targetDirection = targetPose.forward;
+            Vector3 rayTargetPoint = targetPose.position + (targetDirection * 0.5f);
+
+            return rayTargetPoint;
+        }
+
+        static Vector3 GetRayTargetPoint_PositionLerp(XRHand hand)
+        {
+            Vector3 rayTargetPoint;
+
+            // Allow expanded ray movement based on direction of pinch
+            var stablePinchPos = hand.GetStablePinchPosition();
+            // Remove Y height of camera to center numbers around zero origin
+            stablePinchPos.y -= Camera.main.transform.localPosition.y;
+
+            float xPinchAddition;
+            if (hand.handedness == Handedness.Left)
+            {
+                xPinchAddition = Map(-0.2f, 0f, -0.08f, 0.08f, stablePinchPos.x);
+            }
+            else
+            {
+                xPinchAddition = Map(0f, 0.2f, -0.08f, 0.08f, stablePinchPos.x);
+            }
+
+            float yPinchAddition = Map(-0.2f, 0.0f, -0.08f, 0.08f, stablePinchPos.y);
+
+            rayTargetPoint = stablePinchPos;
+            rayTargetPoint.x += xPinchAddition;
+            rayTargetPoint.y += yPinchAddition;
+
+            // Re-apply camera Y height
+            rayTargetPoint.y += Camera.main.transform.localPosition.y;
+
+            return rayTargetPoint;
+        }
+
+        static float Map(float from1, float from2, float to1, float to2, float value)
+        {
+            return to1 + (value - from1) * ( to2 - to1) / (from2 - from1);
+        }
+
+        static float MapClamp(float from1, float from2, float to1, float to2, float value)
+        {
+            float outValue = Map(from1, from2, to1, to2, value);
+            return Mathf.Clamp(outValue, to1, to2);
         }
 
         #endregion
