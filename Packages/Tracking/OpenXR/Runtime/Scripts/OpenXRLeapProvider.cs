@@ -224,12 +224,6 @@ namespace Ultraleap.Tracking.OpenXR
 					var prevJointPosition = prevJoint.Pose.position;
                     var nextJointPosition = nextJoint.Pose.position;
 
-                    // Adjust the fingertip positions forward by a radius to match LeapC data.
-                    if (boneIndex == 3)
-                    {
-                        nextJointPosition += prevJoint.Pose.forward * nextJoint.Radius;
-                    }
-
                     // Populate the finger bone information
                     var bone = hand.Fingers[fingerIndex].bones[boneIndex];
                     bone.Fill(
