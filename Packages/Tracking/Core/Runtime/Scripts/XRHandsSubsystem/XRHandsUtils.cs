@@ -214,5 +214,131 @@ namespace Leap
             return scale;
         }
 
+        /// <summary>
+        /// The transform of the hand.
+        /// 
+        /// Note, in version prior to 3.1, the Basis was a Matrix object.
+        /// @since 3.1
+        /// </summary>
+        public static LeapTransform GetBasis(this XRHand hand)
+        {
+            LeapTransform basis = new LeapTransform();
+            Pose palmPose;
+            if (hand.GetJoint(XRHandJointID.Palm).TryGetPose(out palmPose))
+            {
+                basis.translation = palmPose.position;
+                basis.rotation = hand.rootPose.rotation; // ???
+            }
+
+            return basis;
+        }
+
+        /// <summary>
+        /// Returns the direction the Hand's palm is facing. For the other two palm-basis
+        /// directions, see RadialAxis and DistalAxis.
+        /// 
+        /// The direction out of the back of the hand would be called the dorsal axis.
+        /// </summary>
+        public static Vector3 PalmarAxis(this XRHand hand)
+        {
+            Pose palmPose;
+            if (hand.GetJoint(XRHandJointID.Palm).TryGetPose(out palmPose))
+            {
+                return palmPose.up; //?
+            }
+
+            return Vector3.zero;
+        }
+
+        /// <summary>
+        /// Returns the the direction towards the thumb that is perpendicular to the palmar
+        /// and distal axes. Left and right hands will return opposing directions.
+        /// 
+        /// The direction away from the thumb would be called the ulnar axis.
+        /// </summary>
+        public static Vector3 RadialAxis(this XRHand hand)
+        {
+            if (hand.handedness == Handedness.Right)
+            {
+                return -hand.GetBasis().xBasis;
+            }
+            else
+            {
+                return hand.GetBasis().xBasis;
+            }
+        }
+
+        /// <summary>
+        /// Returns the direction towards the fingers that is perpendicular to the palmar
+        /// and radial axes.
+        /// 
+        /// The direction towards the wrist would be called the proximal axis.
+        /// </summary>
+        public static Vector3 DistalAxis(this XRHand hand)
+        {
+            return hand.GetBasis().zBasis;
+        }
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // From HandUtils
+
+        /// <summary>
+        /// Returns a decent approximation of where the hand is pinching, or where it will pinch,
+        /// even if the index and thumb tips are far apart.
+        /// 
+        /// In general, this will be more stable than GetPinchPosition().
+        /// </summary>
+        public static Vector3 GetPredictedPinchPosition(this XRHand hand)
+        {
+            Pose indexTipPose, thumbTipPose, indexKnucklePose;
+
+            if (hand.GetJoint(XRHandJointID.IndexTip).TryGetPose(out indexTipPose))
+            {
+                hand.GetJoint(XRHandJointID.ThumbTip).TryGetPose(out thumbTipPose);
+                hand.GetJoint(XRHandJointID.ThumbTip).TryGetPose(out indexKnucklePose);
+
+                Vector3 indexTip = indexTipPose.position;
+                Vector3 thumbTip = thumbTipPose.position;
+                Vector3 indexKnuckle = indexKnucklePose.position;
+
+                // The predicted pinch point is a rigid point in hand-space linearly offset by the
+                // index finger knuckle position, scaled by the index finger's length, and lightly
+                // influenced by the actual thumb and index tip positions.
+                float indexLength = GetIndexFingerLength(hand);
+                Vector3 radialAxis = hand.RadialAxis();
+                float thumbInfluence = Vector3.Dot((thumbTip - indexKnuckle).normalized, radialAxis).Map(0F, 1F, 0.5F, 0F);
+                Vector3 predictedPinchPoint = indexKnuckle + hand.PalmarAxis() * indexLength * 0.85F
+                                                           + hand.DistalAxis() * indexLength * 0.20F
+                                                           + radialAxis * indexLength * 0.20F;
+                predictedPinchPoint = Vector3.Lerp(predictedPinchPoint, thumbTip, thumbInfluence);
+                predictedPinchPoint = Vector3.Lerp(predictedPinchPoint, indexTip, 0.15F);
+
+                return predictedPinchPoint;
+            }
+
+            return Vector3.zero;
+        }
+
+        internal static float GetIndexFingerLength(XRHand hand)
+        {
+            float indexFingerLength = 0;
+
+            Pose tipPose, distalPose, intermediatePose, proximalPose;
+
+            if (hand.GetJoint(XRHandJointID.IndexTip).TryGetPose(out tipPose))
+            {
+                hand.GetJoint(XRHandJointID.IndexDistal).TryGetPose(out distalPose);
+                hand.GetJoint(XRHandJointID.IndexIntermediate).TryGetPose(out intermediatePose);
+                hand.GetJoint(XRHandJointID.IndexProximal).TryGetPose(out proximalPose);
+
+                indexFingerLength = (tipPose.position - distalPose.position).magnitude +
+                    (distalPose.position - intermediatePose.position).magnitude +
+                    (intermediatePose.position - proximalPose.position).magnitude;
+            }
+
+            return indexFingerLength;
+        }
+
+
     }
 }
