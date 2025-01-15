@@ -290,6 +290,9 @@ namespace Leap
         [SerializeField, Min(1), Tooltip("The interval in frames between service connection attempts.")]
         public int _reconnectionInterval = RECONNECTION_INTERVAL;
 
+        [SerializeField, Tooltip("Check this to enable fiducial markers (warning: may degrade tracking performance)")]
+        public bool _trackFiducialMarkers = false;
+
         #endregion
 
         #region Internal Settings & Memory
@@ -907,11 +910,11 @@ namespace Leap
 
             if (_multipleDeviceMode == MultipleDeviceMode.Disabled)
             {
-                _leapController = new Controller(0, _serverNameSpace);
+                _leapController = new Controller(0, _serverNameSpace, true, _trackFiducialMarkers);
             }
             else
             {
-                _leapController = new Controller(SpecificSerialNumber.GetHashCode(), _serverNameSpace);
+                _leapController = new Controller(SpecificSerialNumber.GetHashCode(), _serverNameSpace, true, _trackFiducialMarkers);
             }
 
             _leapController.Device += (s, e) =>

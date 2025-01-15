@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Added a warning to Physical Buttons when no Physical Hands Manager is in the scene
 - Added a checkbox to enable offsetting fingertip capsules in CapsuleHand
+- Added a checkbox to enable fiducial marker tracking within the LeapC service
 
 ### Changed
 - Non-convex MeshColliders are skipped when processing Physical Hands
@@ -18,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Fixed issue with LeapXRHandProvider not working on Quest devices when using XRI/XR Hands and Ultraleap tracking in direct (non OpenXR) mode, due to default constructor being optimized away.
+- Multi device mode will no longer be requested on Connection if arg is set to false
 
 ## [7.1.0] - 04/09/2024
 

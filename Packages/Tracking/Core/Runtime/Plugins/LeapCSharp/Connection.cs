@@ -174,11 +174,15 @@ namespace LeapInternal
 
         private LEAP_ALLOCATOR _pLeapAllocator = new LEAP_ALLOCATOR();
 
-        public void Start(string serverNamespace = "Leap Service", bool multiDeviceAware = true)
+        public void Start(string serverNamespace = "Leap Service", bool multiDeviceAware = true, bool enableFiducialMarkers = false)
         {
             LEAP_CONNECTION_CONFIG config = new LEAP_CONNECTION_CONFIG();
             config.server_namespace = Marshal.StringToHGlobalAnsi(serverNamespace);
-            config.flags = (uint)eLeapConnectionFlag.eLeapConnectionFlag_MultipleDevicesAware;
+            config.flags = 0;
+            if (multiDeviceAware)
+                config.flags |= (uint)eLeapConnectionFlag.eLeapConnectionFlag_MultipleDevicesAware;
+            if (enableFiducialMarkers)
+                config.flags |= (uint)eLeapConnectionFlag.eLeapConnectionFlag_FiducialTracking;
             config.size = (uint)Marshal.SizeOf(config);
             Start(config);
         }
