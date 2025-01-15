@@ -28,8 +28,10 @@ namespace Leap
 
         LeapTransform trackerPosWorldSpace;
 
-        Vector3 targetPos;
-        Quaternion targetRot;
+        public Vector3 TargetPos { get { return targetPos; } }
+        public Quaternion TargetRot { get { return targetRot; } }
+        private Vector3 targetPos;
+        private Quaternion targetRot;
 
         private void Start()
         {
