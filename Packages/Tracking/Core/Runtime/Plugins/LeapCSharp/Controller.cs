@@ -43,6 +43,8 @@ namespace Leap
         Connection _connection;
         bool _disposed = false;
         string _serverNamespace = "Leap Service";
+        bool _supportsMultipleDevices = true;
+        bool _supportsFiducialMarkers = false;
 
         /// <summary>
         /// The SynchronizationContext used for dispatching events.
@@ -457,7 +459,7 @@ namespace Leap
         /// Otherwise, a new connection is created.
         /// @since 3.0
         /// </summary>
-        public Controller(int connectionKey, string serverNamespace = "Leap Service", bool supportsMultipleDevices = true)
+        public Controller(int connectionKey, string serverNamespace = "Leap Service", bool supportsMultipleDevices = true, bool supportsFiducialMarkers = false)
         {
             _connection = Connection.GetConnection(new Connection.Key(connectionKey, serverNamespace));
             _connection.EventContext = SynchronizationContext.Current;
@@ -470,6 +472,8 @@ namespace Leap
             _connection.LeapConnectionLost += OnDisconnect;
 
             _serverNamespace = serverNamespace;
+            _supportsMultipleDevices = supportsMultipleDevices;
+            _supportsFiducialMarkers = supportsFiducialMarkers;
 
             StartConnection();
         }
@@ -485,7 +489,7 @@ namespace Leap
         /// </summary>
         public void StartConnection()
         {
-            _connection.Start(_serverNamespace);
+            _connection.Start(_serverNamespace, _supportsMultipleDevices, _supportsFiducialMarkers);
         }
 
         /// <summary>
