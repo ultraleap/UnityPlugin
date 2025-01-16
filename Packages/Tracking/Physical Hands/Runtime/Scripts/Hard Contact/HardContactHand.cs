@@ -152,7 +152,11 @@ namespace Leap.PhysicalHands
 
         internal override void PostFixedUpdateHandLogic()
         {
+#if UNITY_6000_0_OR_NEWER
+            _velocity = ((HardContactBone)palmBone).articulation.linearVelocity;
+#else
             _velocity = ((HardContactBone)palmBone).articulation.velocity;
+#endif 
             _angularVelocity = ((HardContactBone)palmBone).articulation.angularVelocity;
             CalculateDisplacementsAndLimits();
         }

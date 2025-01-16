@@ -445,7 +445,12 @@ namespace Leap
 
 #if UNITY_2019_3_OR_NEWER
             //SRP require subscribing to RenderPipelineManagers
+
+#if UNITY_6000_0_OR_NEWER 
+            if (UnityEngine.Rendering.GraphicsSettings.defaultRenderPipeline != null)
+#else
             if (UnityEngine.Rendering.GraphicsSettings.renderPipelineAsset != null)
+#endif 
             {
                 UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering -= onBeginRendering;
                 UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering += onBeginRendering;
@@ -461,7 +466,11 @@ namespace Leap
 
 #if UNITY_2019_3_OR_NEWER
             //SRP require subscribing to RenderPipelineManagers
+#if UNITY_6000_0_OR_NEWER
+            if (UnityEngine.Rendering.GraphicsSettings.defaultRenderPipeline != null)
+#else
             if (UnityEngine.Rendering.GraphicsSettings.renderPipelineAsset != null)
+#endif 
             {
                 UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering -= onBeginRendering;
             }
@@ -494,7 +503,11 @@ namespace Leap
 
 #if UNITY_2019_3_OR_NEWER
             //SRP require subscribing to RenderPipelineManagers
+#if UNITY_6000_0_OR_NEWER 
+            if (UnityEngine.Rendering.GraphicsSettings.defaultRenderPipeline != null)
+#else
             if (UnityEngine.Rendering.GraphicsSettings.renderPipelineAsset != null)
+#endif 
             {
                 UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering -= onBeginRendering;
             }
