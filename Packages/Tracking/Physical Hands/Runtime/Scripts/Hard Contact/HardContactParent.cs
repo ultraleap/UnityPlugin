@@ -12,7 +12,11 @@ namespace Leap.PhysicalHands
 {
     public class HardContactParent : ContactParent
     {
+#if UNITY_6000_0_OR_NEWER
+        public PhysicsMaterial physicsMaterial;
+#else
         public PhysicMaterial physicsMaterial;
+#endif 
 
         #region Settings
         public float maxPalmVelocity = 300f;
@@ -37,15 +41,22 @@ namespace Leap.PhysicalHands
             GenerateHandsObjects(typeof(HardContactHand));
         }
 
+#if UNITY_6000_0_OR_NEWER
+        private static PhysicsMaterial CreateHandPhysicsMaterial()
+        {
+            PhysicsMaterial material = new PhysicsMaterial("HandPhysics");
+            material.frictionCombine = PhysicsMaterialCombine.Average;
+            material.bounceCombine = PhysicsMaterialCombine.Minimum;
+#else
         private static PhysicMaterial CreateHandPhysicsMaterial()
         {
             PhysicMaterial material = new PhysicMaterial("HandPhysics");
-
-            material.dynamicFriction = 1f;
-            material.staticFriction = 1f;
             material.frictionCombine = PhysicMaterialCombine.Average;
             material.bounceCombine = PhysicMaterialCombine.Minimum;
-
+#endif
+            material.dynamicFriction = 1f;
+            material.staticFriction = 1f;
+           
             return material;
         }
     }

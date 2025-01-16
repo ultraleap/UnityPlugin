@@ -275,12 +275,20 @@ namespace Leap.PhysicalHands
 
             if (palmBone.rigid != null)
             {
+#if UNITY_6000_0_OR_NEWER
+                _velocity = palmBone.rigid.linearVelocity;
+#else
                 _velocity = palmBone.rigid.velocity;
+#endif 
                 _angularVelocity = palmBone.rigid.angularVelocity;
             }
             else if (palmBone.articulation != null)
             {
+#if UNITY_6000_0_OR_NEWER
+                _velocity = palmBone.articulation.linearVelocity;
+#else
                 _velocity = palmBone.articulation.velocity;
+#endif 
                 _angularVelocity = palmBone.articulation.angularVelocity;
             }
         }

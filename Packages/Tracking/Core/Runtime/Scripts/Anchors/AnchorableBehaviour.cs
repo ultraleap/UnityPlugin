@@ -644,7 +644,12 @@ namespace Leap
         private float getAnchorScore(Anchor anchor)
         {
             Vector3 pos = _rigidbody == null ? transform.position : _rigidbody.position;
+
+#if UNITY_6000_0_OR_NEWER
+            Vector3 velocity = _rigidbody == null ? Vector3.zero : _rigidbody.linearVelocity;
+#else
             Vector3 velocity = _rigidbody == null ? Vector3.zero : _rigidbody.velocity;
+#endif 
 
             return GetAnchorScore(pos,
                                   velocity,
