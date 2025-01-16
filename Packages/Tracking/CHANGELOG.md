@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Fixed issue with LeapXRHandProvider not working on Quest devices when using XRI/XR Hands and Ultraleap tracking in direct (non OpenXR) mode, due to default constructor being optimized away.
 - Multi device mode will no longer be requested on Connection if arg is set to false
+- Fixed issue with Unity 6 triggering warnings for scripts that need to be upgraded due to Unity 6 API changes. 
 
 ## [7.1.0] - 04/09/2024
 
