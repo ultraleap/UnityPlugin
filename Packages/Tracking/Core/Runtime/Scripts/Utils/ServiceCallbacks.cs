@@ -20,7 +20,7 @@ public class ServiceCallbacks : AndroidJavaProxy
         // a TIME_WAIT state on the Service TCP socket/address
 
 #if UNITY_2021_3_18_OR_NEWER
-        foreach (var provider in GameObject.FindObjectsByType< Leap.LeapServiceProvider>(FindObjectsSortMode.None))
+        foreach (var provider in GameObject.FindObjectsByType<Leap.LeapServiceProvider>(FindObjectsSortMode.None))
         {
             provider.destroyController();
         }

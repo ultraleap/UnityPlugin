@@ -6,6 +6,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -70,6 +71,9 @@ namespace Leap.Attributes
             return EditorGUI.GetPropertyHeight(property, includeChildren: true);
         }
 
+#if UNITY_6000_0_OR_NEWER
+        [Obsolete("CanCacheInspectorGUI has been deprecated and is no longer used.", false)]
+#endif
         public override bool CanCacheInspectorGUI(SerializedProperty property)
         {
             return false;
