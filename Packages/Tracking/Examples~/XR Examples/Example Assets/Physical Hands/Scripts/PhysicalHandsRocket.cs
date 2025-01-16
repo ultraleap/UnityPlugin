@@ -63,7 +63,11 @@ namespace Leap.PhysicalHands.Examples
                 _particleSystem.Play();
             }
 
+#if UNITY_6000_0_OR_NEWER
+            _rigidbody.angularDamping = 20;
+#else
             _rigidbody.angularDrag = 20;
+#endif
             _rigidbody.useGravity = true;
             float timePassed = 0;
             while (timePassed < burnTime)

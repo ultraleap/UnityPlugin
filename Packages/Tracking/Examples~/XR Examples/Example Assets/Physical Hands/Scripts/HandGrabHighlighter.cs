@@ -51,7 +51,11 @@ namespace Leap.PhysicalHands.Examples
 
             if (automaticEvents)
             {
+#if UNITY_6000_0_OR_NEWER
+                PhysicalHandsManager physManager = FindFirstObjectByType<PhysicalHandsManager>();
+#else
                 PhysicalHandsManager physManager = FindObjectOfType<PhysicalHandsManager>();
+#endif
 
                 if (physManager != null)
                 {
