@@ -24,6 +24,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed issue with Unity 6 triggering warnings for scripts that need to be upgraded due to Unity 6 API changes
 - Fixed a broken meta file in Physical Hands XR Examples
 
+  ### Known issues
+- The Unity editor will become slow or unresposive with a scene containing a Leap Provider (XR), which has had the multiple device mode enabled and if the tracking service is not running
+
 ## [7.1.0] - 04/09/2024
 
 ### Tracking Client versions
