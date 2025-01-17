@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
 
-## [NEXT]
+## [7.2.0] - 17/01/2025
 
 ### Added
 - Added a warning to Physical Buttons when no Physical Hands Manager is in the scene
@@ -25,7 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed a broken meta file in Physical Hands XR Examples
 
   ### Known issues
-- The Unity editor will become slow or unresposive with a scene containing a Leap Provider (XR), which has had the multiple device mode enabled and if the tracking service is not running
+- The Unity editor will become slow or unresponsive with a scene containing a Leap Provider (XR), which has had the multiple device mode enabled and if the tracking service is not running
 
 ## [7.1.0] - 04/09/2024
 
