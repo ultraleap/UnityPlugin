@@ -173,11 +173,8 @@ namespace Leap.Preview.Locomotion
             {
                 leapProvider = Hands.Provider;
             }
-#if UNITY_2021_3_18_OR_NEWER
             _jumpGemTeleport = FindAnyObjectByType<JumpGemTeleport>(FindObjectsInactive.Include);
-#else
-            _jumpGemTeleport = FindObjectOfType<JumpGemTeleport>(true);
-#endif
+
             if (_audioSource == null)
             {
                 _audioSource = GetComponentInChildren<AudioSource>(true);

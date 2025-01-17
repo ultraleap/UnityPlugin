@@ -165,11 +165,7 @@ namespace Leap.Preview.HandRays
 
         private void Start()
         {
-#if UNITY_2021_3_18_OR_NEWER
             LeapXRServiceProvider leapXRServiceProvider = FindAnyObjectByType<LeapXRServiceProvider>();
-#else
-            LeapXRServiceProvider leapXRServiceProvider = FindObjectOfType<LeapXRServiceProvider>();
-#endif
             if (leapXRServiceProvider != null)
             {
                 Head = leapXRServiceProvider.mainCamera.transform;
