@@ -24,7 +24,6 @@ namespace LeapInternal
 
         public static void GetStatus()
         {
-            Debug.Log(lastStatus.version);
             if (isCheckingStatus)
                 return;
 
