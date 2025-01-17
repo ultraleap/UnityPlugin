@@ -103,7 +103,11 @@ namespace Leap.Examples
         {
             // If the velocity of the object while grasped is too large, exit workstation mode.
             if (workstationState == WorkstationState.Open
-                && (_rigidbody.velocity.magnitude > MAX_SPEED_AS_WORKSTATION))
+#if UNITY_6000_0_OR_NEWER
+                && _rigidbody.linearVelocity.magnitude > MAX_SPEED_AS_WORKSTATION)
+#else
+                && _rigidbody.velocity.magnitude > MAX_SPEED_AS_WORKSTATION)
+#endif
             {
                 DeactivateWorkstation();
             }
