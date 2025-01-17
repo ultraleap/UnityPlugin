@@ -11,32 +11,54 @@ namespace LeapInternal
     using System;
     using System.Linq.Expressions;
     using System.Runtime.InteropServices;
+    using System.Threading;
     using UnityEngine;
 
     public static class ServerStatus
     {
-        const double requestInterval = 5.0f;
-        static double lastRequestTimestamp;
-
         static LeapC.LEAP_SERVER_STATUS lastStatus;
         static LeapC.LEAP_SERVER_STATUS_DEVICE[] lastDevices;
 
+        static readonly object lockObject = new object();
+        static bool isCheckingStatus = false;
+
         public static void GetStatus()
         {
-            if (lastRequestTimestamp + requestInterval < Time.realtimeSinceStartup)
+            Debug.Log(lastStatus.version);
+            if (isCheckingStatus)
+                return;
+
+            Thread thread = new Thread(() =>
             {
-                IntPtr statusPtr = new IntPtr();
-                LeapC.GetServerStatus(1500, ref statusPtr);
-
-                if (statusPtr != IntPtr.Zero)
+                isCheckingStatus = true;
+                while (true)
                 {
-                    lastStatus = Marshal.PtrToStructure<LeapC.LEAP_SERVER_STATUS>(statusPtr);
+                    UpdateStatus();
+                    Thread.Sleep(10000);
+                }
+            });
+            thread.IsBackground = true;
+            thread.Start();
+        }
 
-                    MarshalUnmananagedArray2Struct(lastStatus.devices, (int)lastStatus.device_count, out lastDevices);
-                    LeapC.ReleaseServerStatus(ref lastStatus);
+        private static void UpdateStatus()
+        {
+            IntPtr statusPtr = new IntPtr();
+            LeapC.GetServerStatus(1500, ref statusPtr);
+
+            if (statusPtr != IntPtr.Zero)
+            {
+                var status = Marshal.PtrToStructure<LeapC.LEAP_SERVER_STATUS>(statusPtr);
+                LeapC.LEAP_SERVER_STATUS_DEVICE[] devices;
+                MarshalUnmananagedArray2Struct(status.devices, (int)status.device_count, out devices);
+
+                lock (lockObject)
+                {
+                    lastStatus = status;
+                    lastDevices = devices;
                 }
 
-                lastRequestTimestamp = Time.realtimeSinceStartup;
+                LeapC.ReleaseServerStatus(ref status);
             }
         }
 
