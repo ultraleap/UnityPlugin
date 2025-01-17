@@ -191,7 +191,11 @@ namespace Leap.PhysicalHands
             delta = delta / Time.fixedDeltaTime;
             delta = delta * hardContactHand.contactForceModifier;
 
+#if UNITY_6000_0_OR_NEWER 
+            articulation.linearVelocity = delta;
+#else
             articulation.velocity = delta;
+#endif 
 
             Quaternion rotationDelta = Quaternion.Normalize(Quaternion.Slerp(Quaternion.identity, hand.Rotation * Quaternion.Inverse(transform.rotation), hardContactHand.contactForceModifier));
 

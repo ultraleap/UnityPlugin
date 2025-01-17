@@ -32,11 +32,7 @@ public class HandPoseValidator : MonoBehaviour
     {
         if (poseDetector == null)
         {
-#if UNITY_2021_3_18_OR_NEWER
             poseDetector = FindAnyObjectByType<HandPoseDetector>();
-#else
-            poseDetector = FindObjectOfType<HandPoseDetector>();
-#endif
         }
 
         poseDetector.EnablePoseCaching();

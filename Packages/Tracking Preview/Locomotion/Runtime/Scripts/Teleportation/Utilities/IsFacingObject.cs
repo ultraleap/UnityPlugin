@@ -55,23 +55,15 @@ namespace Leap.Preview.Locomotion
         private void SetLayerMask()
         {
             _layerMask = -1;
-
-#if UNITY_2021_3_18_OR_NEWER
+            
             PhysicalHandsManager _physicalHandsManager = FindAnyObjectByType<PhysicalHandsManager>();
-#else
-            PhysicalHandsManager physicalHandsManager = FindObjectOfType<PhysicalHandsManager>();
-#endif
             if (_physicalHandsManager != null)
             {
                 _layerMask ^= _physicalHandsManager.HandsLayer.layerMask;
                 _layerMask ^= _physicalHandsManager.HandsResetLayer.layerMask;
             }
-
-#if UNITY_2021_3_18_OR_NEWER
+            
             FarFieldLayerManager _farFieldLayerManager = FindAnyObjectByType<FarFieldLayerManager>();
-#else
-            FarFieldLayerManager farFieldLayerManager = FindObjectOfType<FarFieldLayerManager>();
-#endif
             if (_farFieldLayerManager != null)
             {
                 _layerMask ^= _farFieldLayerManager.FarFieldObjectLayer.layerMask;

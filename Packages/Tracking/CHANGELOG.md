@@ -16,10 +16,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Non-convex MeshColliders are skipped when processing Physical Hands
 - Adjusted OpenXR fingertip data to match LeapC more closely
+- Removed old conditional support for Unity 2021.3.18 since 2022 is the oldest LTS version we support
 
 ### Fixed
-- Fixed issue with LeapXRHandProvider not working on Quest devices when using XRI/XR Hands and Ultraleap tracking in direct (non OpenXR) mode, due to default constructor being optimized away.
+- Fixed issue with LeapXRHandProvider not working on Quest devices when using XRI/XR Hands and Ultraleap tracking in direct (non OpenXR) mode, due to default constructor being optimized away
 - Multi device mode will no longer be requested on Connection if arg is set to false
+- Fixed issue with Unity 6 triggering warnings for scripts that need to be upgraded due to Unity 6 API changes
+- Fixed a broken meta file in Physical Hands XR Examples
+
+  ### Known issues
+- The Unity editor will become slow or unresposive with a scene containing a Leap Provider (XR), which has had the multiple device mode enabled and if the tracking service is not running
 
 ## [7.1.0] - 04/09/2024
 

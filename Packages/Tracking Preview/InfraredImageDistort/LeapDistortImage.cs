@@ -53,7 +53,11 @@ public class LeapDistortImage : MonoBehaviour
     // Start is called before the first frame update
     void OnEnable()
     {
+#if UNITY_6000_0_OR_NEWER
+        if (GraphicsSettings.defaultRenderPipeline != null)
+#else
         if (GraphicsSettings.renderPipelineAsset != null)
+#endif 
         {
             RenderPipelineManager.beginCameraRendering -= onBeginRendering;
             RenderPipelineManager.beginCameraRendering += onBeginRendering;
@@ -67,7 +71,11 @@ public class LeapDistortImage : MonoBehaviour
 
     private void OnDisable()
     {
+#if UNITY_6000_0_OR_NEWER
+        if (GraphicsSettings.defaultRenderPipeline != null)
+#else
         if (GraphicsSettings.renderPipelineAsset != null)
+#endif 
         {
             RenderPipelineManager.beginCameraRendering -= onBeginRendering;
         }

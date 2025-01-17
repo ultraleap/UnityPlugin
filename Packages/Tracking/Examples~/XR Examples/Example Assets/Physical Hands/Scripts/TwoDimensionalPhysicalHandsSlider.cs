@@ -255,7 +255,11 @@ namespace Leap.PhysicalHandsExamples
 
 
             // Reset velocity to zero and update the position of the slider object
+#if UNITY_6000_0_OR_NEWER
+            _slideableObjectRigidbody.linearVelocity = Vector3.zero;
+#else
             _slideableObjectRigidbody.velocity = Vector3.zero;
+#endif
             _slideableObjectRigidbody.transform.localPosition = slidePos;
             // Calculate the slider value based on the change in position
 
@@ -378,7 +382,11 @@ namespace Leap.PhysicalHandsExamples
             slidePos.z = Utils.Map(twoDimValue.y, 0, 1, 0, _localTwoDimSliderTravelDistanceHalf.y * 2) + _sliderZZeroPos;
 
             // Reset velocity to zero and update the position of the slider object
+#if UNITY_6000_0_OR_NEWER
+            _slideableObjectRigidbody.linearVelocity = Vector3.zero;
+#else
             _slideableObjectRigidbody.velocity = Vector3.zero;
+#endif
             _slideableObjectRigidbody.transform.localPosition = slidePos;
         }
 

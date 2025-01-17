@@ -74,7 +74,11 @@ namespace Leap.InputModule
             {
                 physicsOccurred = true;
                 body.position = PhysicsPosition;
+#if UNITY_6000_0_OR_NEWER
+                body.linearVelocity = PhysicsVelocity;
+#else
                 body.velocity = PhysicsVelocity;
+#endif
             }
         }
 
@@ -90,7 +94,11 @@ namespace Leap.InputModule
                 Vector3 newWorldPhysicsPosition = transform.TransformPoint(localPhysicsPosition);
                 PhysicsPosition = newWorldPhysicsPosition;
 
+#if UNITY_6000_0_OR_NEWER
+                Vector3 localPhysicsVelocity = transform.InverseTransformDirection(body.linearVelocity);
+#else
                 Vector3 localPhysicsVelocity = transform.InverseTransformDirection(body.velocity);
+#endif 
                 localPhysicsVelocity = new Vector3(0f, 0f, localPhysicsVelocity.z);
                 Vector3 newWorldPhysicsVelocity = transform.TransformDirection(localPhysicsVelocity);
                 PhysicsVelocity = newWorldPhysicsVelocity;
