@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Multi device mode will no longer be requested on Connection if arg is set to false
 - Fixed issue with Unity 6 triggering warnings for scripts that need to be upgraded due to Unity 6 API changes
 - Fixed a broken meta file in Physical Hands XR Examples
+- Fixed a frequent editor freeze that would occur when the Leap service is stopped/uninstalled 
 
   ### Known issues
 - The Unity editor will become slow or unresposive with a scene containing a Leap Provider (XR), which has had the multiple device mode enabled and if the tracking service is not running
