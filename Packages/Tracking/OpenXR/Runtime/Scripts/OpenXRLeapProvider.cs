@@ -220,23 +220,14 @@ namespace Leap.Tracking.OpenXR
                         continue;
                     }
 
-                    var prevJointPosition = prevJoint.Pose.position;
-                    var nextJointPosition = nextJoint.Pose.position;
-                    
-                    // Adjust the fingertip positions forward by a radius to match LeapC data.
-                    if (boneIndex == 3)
-                    {
-                        nextJointPosition += prevJoint.Pose.forward * nextJoint.Radius;
-                    }
-
                     // Populate the finger bone information
                     var bone = hand.fingers[fingerIndex].bones[boneIndex];
                     bone.Fill(
-                        prevJointPosition,
-                        nextJointPosition,
-                        ((prevJointPosition + nextJointPosition) / 2f),
+                        prevJoint.Pose.position,
+                        nextJoint.Pose.position,
+                        ((prevJoint.Pose.position + nextJoint.Pose.position) / 2f),
                         prevJoint.Pose.forward,
-                        (prevJointPosition - nextJointPosition).magnitude,
+                        (prevJoint.Pose.position - nextJoint.Pose.position).magnitude,
                         prevJoint.Radius * 1.5f, // 1.5 to convert from joint radius to bone width (joints bigger than bones)
                         (Bone.BoneType)boneIndex,
                         prevJoint.Pose.rotation);
