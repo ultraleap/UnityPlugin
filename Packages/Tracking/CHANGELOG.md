@@ -23,6 +23,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed a broken meta file in Physical Hands XR Examples
 - Fixed a frequent editor freeze that would occur when the Leap service is stopped/uninstalled 
 
+### Known Issues
+ - Multiple issues present in the Pose Recorder Scene - grab ball does not work, pose record button falls through panel and flies away, NullReferenceException raised by SimpleInteractionGlow script
+ - Pull chord in Turntable and Pullchord scene gets stuck in pulled state with the grab ball juddering
+
+
 ## [7.1.0] - 04/09/2024
 
 ### Tracking Client versions
