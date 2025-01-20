@@ -10,12 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Added a warning to Physical Buttons when no Physical Hands Manager is in the scene
-- Added a checkbox to enable offsetting fingertip capsules in CapsuleHand
 - Added a checkbox to enable fiducial marker tracking within the LeapC service
 
 ### Changed
 - Non-convex MeshColliders are skipped when processing Physical Hands
-- Adjusted OpenXR fingertip data to match LeapC more closely
 - Removed old conditional support for Unity 2021.3.18 since 2022 is the oldest LTS version we support
 
 ### Fixed
