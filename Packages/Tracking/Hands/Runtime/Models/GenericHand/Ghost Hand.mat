@@ -9,6 +9,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: Ghost Hand
   m_Shader: {fileID: 4800000, guid: c5b35a4c19d643f4f87637cdd8587b98, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords:
   - _USEFRESNEL_ON
@@ -20,6 +22,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -91,3 +94,4 @@ Material:
     - _MainColor: {r: 2.670157, g: 2.670157, b: 2.670157, a: 0.105882354}
     - _OutlineColor: {r: 0, g: 0, b: 0, a: 1}
   m_BuildTextureStacks: []
+  m_AllowLocking: 1

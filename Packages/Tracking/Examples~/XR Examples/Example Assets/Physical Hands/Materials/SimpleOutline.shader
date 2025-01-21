@@ -6,26 +6,13 @@ Shader "Ultraleap/Simple Outline"
         _Outline("Outline width", Range(0,0.2)) = 0.005
     }
 
-    CGINCLUDE
-    
-    #include "UnityCG.cginc"   // for & UNITY_VERTEX_OUTPUT_STEREO UnityObjectToWorldNormal() 
-
-    fixed4 _Color;
-    float _Outline;
-
-    struct v2f
-    {
-        float4 pos : POSITION;
-        UNITY_VERTEX_OUTPUT_STEREO
-    };
-
-    ENDCG
-
     SubShader
     {
         Tags
         {
-            "Queue" = "Transparent" "RenderType" = "Transparent"
+            "RenderPipeline" = "UniversalPipeline"
+            "Queue" = "Transparent"
+            "RenderType" = "Transparent"
         }
 
         ZWrite On
@@ -33,37 +20,69 @@ Shader "Ultraleap/Simple Outline"
 
         Pass
         {
+            Tags
+            {
+                "LightMode" = "SRPDefaultUnlit"
+            }
+
             Cull Back
-            Blend Zero One
+            ColorMask 0
         }
 
         Pass
         {
+            Tags
+            {
+                "LightMode" = "UniversalForward"
+            }
+
             Cull Front
 
-            CGPROGRAM
-            #pragma vertex vert
-            #pragma fragment frag
+            HLSLPROGRAM
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
-            v2f vert(appdata_base v)
+            #pragma multi_compile_instancing
+
+            #pragma vertex Vert
+            #pragma fragment Frag
+
+            CBUFFER_START(UnityPerMaterial)
+                half4 _Color;
+                float _Outline;
+            CBUFFER_END
+
+            struct Attributes
             {
-                v2f o;
+                float4 positionOS : POSITION;
+                float4 normalOS : NORMAL;
+
+                UNITY_VERTEX_INPUT_INSTANCE_ID
+            };
+
+            struct Varyings
+            {
+                float4 positionCS : SV_POSITION;
+
+                UNITY_VERTEX_OUTPUT_STEREO
+            };
+
+            Varyings Vert(Attributes v)
+            {
+                Varyings o;
                 UNITY_SETUP_INSTANCE_ID(v);
-                UNITY_INITIALIZE_OUTPUT(v2f, o);
                 UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
-                o.pos = UnityObjectToClipPos(v.vertex);
-                float3 norm = mul((float3x3)UNITY_MATRIX_IT_MV, v.normal);
-                float2 offset = TransformViewToProjection(norm.xy);
-                o.pos.xy = o.pos.xy + offset * _Outline;
+                o.positionCS = TransformObjectToHClip(v.positionOS + v.normalOS* _Outline);
                 return o;
             }
 
-            half4 frag(v2f i) :COLOR
+            half4 Frag(Varyings i) : SV_Target
             {
+                UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i)
+
                 return _Color;
             }
-            ENDCG
+            ENDHLSL
         }
     }
 }

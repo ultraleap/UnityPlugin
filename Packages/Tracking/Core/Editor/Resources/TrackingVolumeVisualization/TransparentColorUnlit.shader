@@ -4,47 +4,49 @@ Shader "Ultraleap/TransparentColorUnlit"
     {
         _Color ("Color", Color) = (1,1,1,1)
     }
+
     SubShader
     {
-        Tags {"Queue" = "Transparent" "IgnoreProjector" = "True" "RenderType" = "Transparent"}
-        LOD 100
+        Tags
+        {
+            "RenderPipeline" = "UniversalPipeline"
+            "Queue" = "Transparent"
+            "RenderType" = "Transparent"
+            "IgnoreProjector" = "True"
+        }
 
         ZWrite Off
         Blend SrcAlpha OneMinusSrcAlpha
 
         Pass
         {
-            CGPROGRAM
+            Tags
+            {
+                "LightMode" = "SRPDefaultUnlit"
+            }
+
+            HLSLPROGRAM
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+
             #pragma vertex vert
             #pragma fragment frag
 
-            #include "UnityCG.cginc"
+            CBUFFER_START(UnityPerMaterial)
+            float4 _Color;
+            CBUFFER_END
 
-            struct appdata
+            float4 vert(float4 positionOS : POSITION) : SV_POSITION
             {
-                float4 vertex : POSITION;
-            };
-
-            struct v2f
-            {
-                float4 vertex : SV_POSITION;
-            };
-
-
-            v2f vert (appdata v)
-            {
-                v2f o;
-                o.vertex = UnityObjectToClipPos(v.vertex);
-                return o;
+                return TransformObjectToHClip(positionOS);
             }
 
-            fixed4 _Color;
-
-            fixed4 frag (v2f i) : SV_Target
+            half4 frag() : SV_Target
             {
                 return _Color;
             }
-            ENDCG
+            ENDHLSL
         }
     }
+
+    Fallback Off
 }
