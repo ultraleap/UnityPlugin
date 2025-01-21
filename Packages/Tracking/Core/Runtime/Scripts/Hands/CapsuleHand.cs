@@ -370,7 +370,6 @@ namespace Leap
                 {
                     int key = getFingerJointIndex((int)finger.Type, j);
 
-
                     Vector3 position;
                     if (finger.Type == Finger.FingerType.THUMB && j == 0)
                     {

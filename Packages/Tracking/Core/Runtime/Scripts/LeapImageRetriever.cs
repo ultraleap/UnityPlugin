@@ -443,14 +443,16 @@ namespace Leap
             Camera.onPreRender -= OnCameraPreRender;
             Camera.onPreRender += OnCameraPreRender;
 
-#if UNITY_2019_3_OR_NEWER
             //SRP require subscribing to RenderPipelineManagers
+#if UNITY_6000_0_OR_NEWER 
+            if (UnityEngine.Rendering.GraphicsSettings.defaultRenderPipeline != null)
+#else
             if (UnityEngine.Rendering.GraphicsSettings.renderPipelineAsset != null)
+#endif 
             {
                 UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering -= onBeginRendering;
                 UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering += onBeginRendering;
             }
-#endif
         }
 
         private void OnDisable()
@@ -458,14 +460,16 @@ namespace Leap
             unsubscribeFromService();
 
             Camera.onPreRender -= OnCameraPreRender;
-
-#if UNITY_2019_3_OR_NEWER
+            
             //SRP require subscribing to RenderPipelineManagers
+#if UNITY_6000_0_OR_NEWER
+            if (UnityEngine.Rendering.GraphicsSettings.defaultRenderPipeline != null)
+#else
             if (UnityEngine.Rendering.GraphicsSettings.renderPipelineAsset != null)
+#endif 
             {
                 UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering -= onBeginRendering;
             }
-#endif
         }
 
         private void OnApplicationQuit()
@@ -491,14 +495,16 @@ namespace Leap
             }
 
             Camera.onPreRender -= OnCameraPreRender;
-
-#if UNITY_2019_3_OR_NEWER
+            
             //SRP require subscribing to RenderPipelineManagers
+#if UNITY_6000_0_OR_NEWER 
+            if (UnityEngine.Rendering.GraphicsSettings.defaultRenderPipeline != null)
+#else
             if (UnityEngine.Rendering.GraphicsSettings.renderPipelineAsset != null)
+#endif 
             {
                 UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering -= onBeginRendering;
             }
-#endif
         }
 
         private void LateUpdate()
@@ -592,12 +598,10 @@ namespace Leap
             }
         }
 
-#if UNITY_2019_3_OR_NEWER
         private void onBeginRendering(UnityEngine.Rendering.ScriptableRenderContext scriptableRenderContext, Camera camera)
         {
             OnCameraPreRender(camera);
         }
-#endif
 
         private void subscribeToService()
         {

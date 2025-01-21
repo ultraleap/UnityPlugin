@@ -18,6 +18,10 @@ namespace LeapInternal
         /// Allows subscription to multiple devices
         /// </summary>
         eLeapConnectionFlag_MultipleDevicesAware = 0x00000001,
+        /// <summary>
+        /// Enables fiducial marker tracking (warning: may degrade tracking performance)
+        /// </summary>
+        eLeapConnectionFlag_FiducialTracking = 0x00000002,
     };
 
     public enum eLeapConnectionStatus : uint

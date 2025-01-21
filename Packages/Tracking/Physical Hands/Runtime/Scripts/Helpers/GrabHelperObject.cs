@@ -98,7 +98,7 @@ namespace Leap.PhysicalHands
 
         private bool wasKinematic;
         private bool usedGravity;
-        private float oldDrag;
+        private float oldDrag, oldMass;
         private float oldAngularDrag;
 
         internal IgnorePhysicalHands _ignorePhysicalHands;
@@ -211,8 +211,14 @@ namespace Leap.PhysicalHands
 
             wasKinematic = _rigid.isKinematic;
             usedGravity = _rigid.useGravity;
+#if UNITY_6000_0_OR_NEWER
+            oldDrag = _rigid.linearDamping;
+            oldAngularDrag = _rigid.angularDamping;
+#else
             oldDrag = _rigid.drag;
             oldAngularDrag = _rigid.angularDrag;
+#endif 
+            oldMass = _rigid.mass;
             _rigid.TryGetComponents<IPhysicalHandGrab>(out _physicalHandGrabs);
             _rigid.TryGetComponents<IPhysicalHandHover>(out _physicalHandHovers);
             _rigid.TryGetComponents<IPhysicalHandPrimaryHover>(out _physicalHandPrimaryHovers);
@@ -235,8 +241,15 @@ namespace Leap.PhysicalHands
                 }
 
                 _rigid.useGravity = false;
+
+#if UNITY_6000_0_OR_NEWER
+                _rigid.linearDamping = 0f;
+                _rigid.angularDamping = 0f;
+#else
                 _rigid.drag = 0f;
                 _rigid.angularDrag = 0f;
+#endif 
+                _rigid.mass = 1f;
             }
         }
 
@@ -246,8 +259,15 @@ namespace Leap.PhysicalHands
             {
                 _rigid.isKinematic = wasKinematic;
                 _rigid.useGravity = usedGravity;
+
+#if UNITY_6000_0_OR_NEWER
+                _rigid.linearDamping = oldDrag;
+                _rigid.angularDamping = oldAngularDrag;
+#else
                 _rigid.drag = oldDrag;
                 _rigid.angularDrag = oldAngularDrag;
+#endif 
+                _rigid.mass = oldMass;
             }
         }
 
@@ -367,6 +387,7 @@ namespace Leap.PhysicalHands
         internal void ReleaseObject()
         {
             GrabState = State.Hover;
+            _rigid.mass = oldMass;
 
             HandleReleasedRigidbody();
             ThrowingOnRelease();
@@ -1107,7 +1128,11 @@ namespace Leap.PhysicalHands
                 targetVelocity *= targetPercent;
             }
 
+#if UNITY_6000_0_OR_NEWER
+            _rigid.linearVelocity = targetVelocity;
+#else
             _rigid.velocity = targetVelocity;
+#endif 
             if (targetAngularVelocity.IsValid())
             {
                 _rigid.angularVelocity = targetAngularVelocity;
@@ -1142,8 +1167,11 @@ namespace Leap.PhysicalHands
 
         private void TrackThrowingVelocities()
         {
-            _velocityQueue.Enqueue(new VelocitySample(_rigid.velocity,
-                                                      Time.time + VELOCITY_HISTORY_LENGTH));
+#if UNITY_6000_0_OR_NEWER
+            _velocityQueue.Enqueue(new VelocitySample(_rigid.linearVelocity, Time.time + VELOCITY_HISTORY_LENGTH));
+#else
+            _velocityQueue.Enqueue(new VelocitySample(_rigid.velocity, Time.time + VELOCITY_HISTORY_LENGTH));
+#endif 
 
             while (true)
             {
@@ -1203,11 +1231,19 @@ namespace Leap.PhysicalHands
                 ignoreGrabTime = Time.time + THOWN_GRAB_COOLDOWNTIME;
 
                 // Set the new velocty. Allow physics to solve for rotational change
+#if UNITY_6000_0_OR_NEWER
+                _rigid.linearVelocity = averageVelocity;
+#else
                 _rigid.velocity = averageVelocity;
+#endif
             }
             else
             {
+#if UNITY_6000_0_OR_NEWER
+                _rigid.linearVelocity = Vector3.zero;
+#else
                 _rigid.velocity = Vector3.zero;
+#endif 
                 _rigid.angularVelocity = Vector3.zero;
             }
         }

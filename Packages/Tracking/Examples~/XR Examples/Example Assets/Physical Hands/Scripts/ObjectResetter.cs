@@ -55,7 +55,11 @@ namespace Leap.Examples
                 {
                     for (int i = 0; i < rbs.Length; i++)
                     {
+#if UNITY_6000_0_OR_NEWER
+                        rbs[i].linearVelocity = Vector3.zero;
+#else
                         rbs[i].velocity = Vector3.zero;
+#endif
                         rbs[i].angularVelocity = Vector3.zero;
                         rbs[i].MovePosition(rbPositions[i]);
                         rbs[i].MoveRotation(rbRotations[i]);

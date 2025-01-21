@@ -329,7 +329,11 @@ namespace Leap
                 mainCamera.AddTrackedPoseDriverToCamera();
             }
 
+#if UNITY_6000_0_OR_NEWER
+            if (GraphicsSettings.defaultRenderPipeline != null)
+#else
             if (GraphicsSettings.renderPipelineAsset != null)
+#endif            
             {
                 RenderPipelineManager.beginCameraRendering -= onBeginRendering;
                 RenderPipelineManager.beginCameraRendering += onBeginRendering;
@@ -356,7 +360,11 @@ namespace Leap
         {
             resetShaderTransforms();
 
+#if UNITY_6000_0_OR_NEWER
+            if (GraphicsSettings.defaultRenderPipeline != null)
+#else
             if (GraphicsSettings.renderPipelineAsset != null)
+#endif
             {
                 RenderPipelineManager.beginCameraRendering -= onBeginRendering;
             }

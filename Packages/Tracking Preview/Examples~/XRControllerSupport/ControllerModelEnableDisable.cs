@@ -20,11 +20,7 @@ public class ControllerModelEnableDisable : MonoBehaviour
     {
         if (controllerPostProcess == null)
         {
-#if UNITY_2021_3_18_OR_NEWER
             controllerPostProcess = FindAnyObjectByType<ControllerPostProcess>();
-#else
-            controllerPostProcess = FindObjectOfType<ControllerPostProcess>();
-#endif
         }
         controllerPostProcess.OnHandInputTypeChange += OnHandInputTypeChange;
 

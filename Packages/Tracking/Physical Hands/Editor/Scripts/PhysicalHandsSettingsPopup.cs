@@ -39,7 +39,11 @@ namespace Leap.PhysicalHands
 
         private static void ShowPopupIfRequired()
         {
-            if (GameObject.FindObjectOfType<PhysicalHandsManager>() != null
+#if UNITY_6000_0_OR_NEWER
+            if (Object.FindFirstObjectByType<PhysicalHandsManager>() != null
+#else
+            if (Object.FindObjectOfType<PhysicalHandsManager>() != null
+#endif
                 && UltraleapSettings.Instance.showPhysicalHandsPhysicsSettingsWarning == true
                 && !PhysicalHandsSettings.AllSettingsApplied())
             {

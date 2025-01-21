@@ -36,7 +36,11 @@ namespace Leap
             // Ensure the LeapServiceProvider exists for us to position the device in world space
             if (leapServiceProvider == null)
             {
+#if UNITY_6000_0_OR_NEWER
+                leapServiceProvider = FindFirstObjectByType<LeapServiceProvider>();
+#else
                 leapServiceProvider = FindObjectOfType<LeapServiceProvider>();
+#endif
             }
 
             // Listen to events for the new marker poses

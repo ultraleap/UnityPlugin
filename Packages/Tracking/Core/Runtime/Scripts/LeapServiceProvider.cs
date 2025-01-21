@@ -290,6 +290,27 @@ namespace Leap
         [SerializeField, Min(1), Tooltip("The interval in frames between service connection attempts.")]
         public int _reconnectionInterval = RECONNECTION_INTERVAL;
 
+
+        /// <summary>
+        /// Check this option to enable AprilTag fiducial marker tracking within the Ultraleap service.
+        /// Be aware that fiducial markers may degrade runtime performance, and are not recommended for use on mobile platforms.
+        /// 
+        /// Fiducial configuration is available within: %ProgramData%/Ultraleap/HandTracker/hand_tracker_config.json.
+        /// You are required to set the fiducial family and size:
+        ///   "fiducial_tracker": {
+        ///     "family": "xxx",     <-- This is the family of fiducials you're using (e.g. Tag25h9). You can use any ID from within the family.
+        ///     "size": 0.0          <-- This is the width of your printed fiducial. Ensure this value is correct to prevent incorrect transforms.
+        ///   }
+        /// You can also specify a few other options within the "fiducial_tracker" object, the most impactful for performance being:
+        ///  - "frequency" -> A value of 3 indicates that the detector is run every third frame, 1 every frame, etc (default: 3)
+        ///  - "decimate" -> Trades detection distance for performance (default: 2.0)
+        /// Outside the "fiducial_marker" object, you can also specify "full_res_fiducials", which decreases performance but boosts range.
+        /// 
+        /// Check out TrackingMarkerObject to see how to subscribe to fiducial events and retrieve their transforms!
+        /// </summary>
+        [SerializeField, Tooltip("Check this to enable fiducial markers (warning: may degrade tracking performance)")]
+        public bool _trackFiducialMarkers = false;
+
         #endregion
 
         #region Internal Settings & Memory
@@ -907,11 +928,11 @@ namespace Leap
 
             if (_multipleDeviceMode == MultipleDeviceMode.Disabled)
             {
-                _leapController = new Controller(0, _serverNameSpace);
+                _leapController = new Controller(0, _serverNameSpace, true, _trackFiducialMarkers);
             }
             else
             {
-                _leapController = new Controller(SpecificSerialNumber.GetHashCode(), _serverNameSpace);
+                _leapController = new Controller(SpecificSerialNumber.GetHashCode(), _serverNameSpace, true, _trackFiducialMarkers);
             }
 
             _leapController.Device += (s, e) =>

@@ -6,6 +6,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
 
+## [7.2.0] - 17/01/2025
+
+### Added
+- Added a warning to Physical Buttons when no Physical Hands Manager is in the scene
+- Added a checkbox to enable fiducial marker tracking within the LeapC service
+
+### Changed
+- Non-convex MeshColliders are skipped when processing Physical Hands
+- Removed old conditional support for Unity 2021.3.18 since 2022 is the oldest LTS version we support
+
+### Fixed
+- Fixed issue with LeapXRHandProvider not working on Quest devices when using XRI/XR Hands and Ultraleap tracking in direct (non OpenXR) mode, due to default constructor being optimized away
+- Multi device mode will no longer be requested on Connection if arg is set to false
+- Fixed issue with Unity 6 triggering warnings for scripts that need to be upgraded due to Unity 6 API changes
+- Fixed a broken meta file in Physical Hands XR Examples
+- Fixed a frequent editor freeze that would occur when the Leap service is stopped/uninstalled 
+
+### Known Issues
+ - Multiple issues present in the Pose Recorder Scene - grab ball does not work, pose record button falls through panel and flies away, NullReferenceException raised by SimpleInteractionGlow script
+ - Pull chord in Turntable and Pullchord scene gets stuck in pulled state with the grab ball juddering
+
+
 ## [7.1.0] - 04/09/2024
 
 ### Tracking Client versions
