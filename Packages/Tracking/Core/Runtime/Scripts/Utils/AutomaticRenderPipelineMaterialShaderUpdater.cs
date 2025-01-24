@@ -202,7 +202,7 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
                 {
                     return true;
                 }
-                else if (!shaderMapping.UseUniversalRenderPipelineShaderName && material.shader != shaderMapping.UniversalRenderPipelineShader)
+                else if (!shaderMapping.UseUniversalRenderPipelineShaderName && material.shader == shaderMapping.UniversalRenderPipelineShader)
                 {
                     return true;
                 }
@@ -210,11 +210,11 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
             }
             else if (IsUniveralRenderPipeline)
             {
-                if (shaderMapping.UseBuiltInRenderPipelineShaderName && shaderMapping.BuiltInRenderPipelineShaderName != null)
+                if (shaderMapping.UseBuiltInRenderPipelineShaderName && shaderMapping.BuiltInRenderPipelineShaderName == material.shader.name)
                 {
                     return true;
                 }
-                else if (!shaderMapping.UseBuiltInRenderPipelineShaderName && material.shader != shaderMapping.BuiltInRenderPipelineShader)
+                else if (!shaderMapping.UseBuiltInRenderPipelineShaderName && material.shader == shaderMapping.BuiltInRenderPipelineShader)
                 {
                     return true;
                 }
@@ -271,7 +271,7 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
             try
             {
                 state.colour = material.GetColor("_Color");
-                state.mainTexture = material.mainTexture;
+                state.mainTexture = material.GetTexture("_Albedo");
             }
             catch (Exception e)
             {
