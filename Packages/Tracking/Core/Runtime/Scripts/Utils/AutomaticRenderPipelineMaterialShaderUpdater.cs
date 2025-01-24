@@ -151,39 +151,73 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
 
         foreach (ShaderMapping shaderMapping in shaderMap)
         {
-            if (IsBuiltInRenderPipeline)
+            if (CurrentMaterialShaderIsAMappingMatch(material, shaderMapping))
             {
-                if (shaderMapping.UseBuiltInRenderPipelineShaderName && shaderMapping.BuiltInRenderPipelineShaderName != material.shader.name)
+
+                if (IsBuiltInRenderPipeline)
                 {
-                    shaderMatch = Shader.Find(shaderMapping.BuiltInRenderPipelineShaderName);
-                    shaderMappingMatch = shaderMapping;
-                    break;
+                    if (shaderMapping.UseBuiltInRenderPipelineShaderName && shaderMapping.BuiltInRenderPipelineShaderName != null)
+                    {
+                        shaderMatch = Shader.Find(shaderMapping.BuiltInRenderPipelineShaderName);
+                        shaderMappingMatch = shaderMapping;
+                        break;
+                    }
+                    else if (!shaderMapping.UseBuiltInRenderPipelineShaderName && material.shader != shaderMapping.BuiltInRenderPipelineShader)
+                    {
+                        shaderMatch = shaderMapping.BuiltInRenderPipelineShader;
+                        shaderMappingMatch = shaderMapping;
+                        break;
+                    }
                 }
-                else if (!shaderMapping.UseBuiltInRenderPipelineShaderName && material.shader != shaderMapping.BuiltInRenderPipelineShader)
+                else if (IsUniveralRenderPipeline)
                 {
-                    shaderMatch = shaderMapping.BuiltInRenderPipelineShader;
-                    shaderMappingMatch = shaderMapping;
-                    break;
-                }
-            }
-            else if (IsUniveralRenderPipeline)
-            {
-                if (shaderMapping.UseUniversalRenderPipelineShaderName && shaderMapping.UniversalRenderPipelineShaderName != material.shader.name)
-                {
-                    shaderMatch = Shader.Find(shaderMapping.BuiltInRenderPipelineShaderName);
-                    shaderMappingMatch = shaderMapping;
-                    break;
-                }
-                else if (!shaderMapping.UseUniversalRenderPipelineShaderName && material.shader != shaderMapping.UniversalRenderPipelineShader)
-                {
-                    shaderMatch = shaderMapping.UniversalRenderPipelineShader;
-                    shaderMappingMatch = shaderMapping;
-                    break;
+                    if (shaderMapping.UseUniversalRenderPipelineShaderName && shaderMapping.UniversalRenderPipelineShaderName != material.shader.name)
+                    {
+                        shaderMatch = Shader.Find(shaderMapping.UniversalRenderPipelineShaderName);
+                        shaderMappingMatch = shaderMapping;
+                        break;
+                    }
+                    else if (!shaderMapping.UseUniversalRenderPipelineShaderName && material.shader != shaderMapping.UniversalRenderPipelineShader)
+                    {
+                        shaderMatch = shaderMapping.UniversalRenderPipelineShader;
+                        shaderMappingMatch = shaderMapping;
+                        break;
+                    }
                 }
             }
         }
 
         return (shaderMatch, shaderMappingMatch);
+
+        // Does the current map entry match the shader that needs to be converted?
+        bool CurrentMaterialShaderIsAMappingMatch(Material material, ShaderMapping shaderMapping)
+        {
+            if (IsBuiltInRenderPipeline)
+            {
+                if (shaderMapping.UseUniversalRenderPipelineShaderName && shaderMapping.UniversalRenderPipelineShaderName == material.shader.name)
+                {
+                    return true;
+                }
+                else if (!shaderMapping.UseUniversalRenderPipelineShaderName && material.shader != shaderMapping.UniversalRenderPipelineShader)
+                {
+                    return true;
+                }
+                    
+            }
+            else if (IsUniveralRenderPipeline)
+            {
+                if (shaderMapping.UseBuiltInRenderPipelineShaderName && shaderMapping.BuiltInRenderPipelineShaderName != null)
+                {
+                    return true;
+                }
+                else if (!shaderMapping.UseBuiltInRenderPipelineShaderName && material.shader != shaderMapping.BuiltInRenderPipelineShader)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
 
     private bool MaterialShaderMatchesActiveRenderPipeline(Material material)
@@ -242,7 +276,7 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
 #if NET_4_6 || NET_UNITY_4_8
     public static void OnAfterConversionToURPLit(dynamic state, Material material)
     {
-        if (material != null && state != null && state.Count() > 0)
+        if (material != null && state != null)
         {
             try
             { 
