@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
@@ -35,14 +36,23 @@ static class RenderPipelineValidation
 }
 #endif
 
-[CreateAssetMenu(fileName = "AutomaticRenderPipelineMaterialShaderUpdater", menuName = "Ultraleap/AutomaticRenderPipelineMaterialShaderUpdater", order = 0)]
+[CreateAssetMenu(fileName = "Automatic Render Pipeline Material Shader Updater", menuName = "Ultraleap/AutomaticRenderPipelineMaterialShaderUpdater", order = 0)]
 public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
 { 
     [SerializeField]
     [Tooltip("List of comparable shaders and their associated render pipeline")]
     List<ShaderMapping> shaderMap = new List<ShaderMapping>()
     {
-        new ShaderMapping() { UseBuiltInRenderPipelineShaderName = true, BuiltInRenderPipelineShaderName = "Standard", UseUniversalRenderPipelineShaderName = true, UniversalRenderPipelineShaderName = "Universal Render Pipeline/Lit"}
+        new ShaderMapping() { 
+            UseBuiltInRenderPipelineShaderName = true, 
+            BuiltInRenderPipelineShaderName = "Standard", 
+            OnBeforeConversionToBiRP = OnBeforeConversionFromToBiRPStandard, 
+            OnAfterConversionToBiRP = OnAfterConversionToBiRPStandard,
+
+            UseUniversalRenderPipelineShaderName = true, 
+            UniversalRenderPipelineShaderName = "Universal Render Pipeline/Lit",
+            OnBeforeConversionToURP = OnBeforeConversionToURPLit,
+            OnAfterConversionToURP = OnAfterConversionToURPLit}
     };
 
     [SerializeField]
@@ -106,31 +116,75 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
 
     private void UpdateMaterialShader(Material material)
     {
-        Shader targetShader = GetShaderForPipeline(material);
-        if (material.shader != targetShader && targetShader != null)
+        var shaderMatch = GetShaderForPipeline(material);
+        if (material.shader != shaderMatch.shader && shaderMatch.shader != null)
         {
-            material.shader = targetShader;
+            ExpandoObject state = null;
+
+            if (IsBuiltInRenderPipeline)
+            {
+                state = shaderMatch.mapping.OnBeforeConversionToBiRP(material, shaderMatch.shader);
+            }
+            else if (IsUniveralRenderPipeline)
+            {
+                state = shaderMatch.mapping.OnBeforeConversionToURP(material, shaderMatch.shader);
+            }
+
+            material.shader = shaderMatch.shader;
+
+            if (IsBuiltInRenderPipeline)
+            {
+                shaderMatch.mapping.OnAfterConversionToBiRP(state, material);
+            }
+            else if (IsUniveralRenderPipeline)
+            {
+                shaderMatch.mapping.OnAfterConversionToURP(state, material);
+            }
+
             MarkMaterialModified(material);
         }
     }
 
-    private Shader GetShaderForPipeline(Material material)
+    private (Shader shader, ShaderMapping mapping) GetShaderForPipeline(Material material)
     {
         Shader shaderMatch = null;
+        ShaderMapping shaderMappingMatch = null;
 
         foreach (ShaderMapping shaderMapping in shaderMap)
         {
             if (IsBuiltInRenderPipeline)
             {
-                shaderMatch = Shader.Find(shaderMapping.BuiltInRenderPipelineShaderName);
+                if (shaderMapping.UseBuiltInRenderPipelineShaderName && shaderMapping.BuiltInRenderPipelineShaderName == material.shader.name)
+                {
+                    shaderMatch = Shader.Find(shaderMapping.BuiltInRenderPipelineShaderName);
+                    shaderMappingMatch = shaderMapping;
+                    break;
+                }
+                else if (!shaderMapping.UseBuiltInRenderPipelineShaderName && material.shader == shaderMapping.BuiltInRenderPipelineShader)
+                {
+                    shaderMatch = shaderMapping.BuiltInRenderPipelineShader;
+                    shaderMappingMatch = shaderMapping;
+                    break;
+                }
             }
             else if (IsUniveralRenderPipeline)
             {
-                shaderMatch = Shader.Find(shaderMapping.UniversalRenderPipelineShaderName);
+                if (shaderMapping.UseUniversalRenderPipelineShaderName && shaderMapping.UniversalRenderPipelineShaderName == material.shader.name)
+                {
+                    shaderMatch = Shader.Find(shaderMapping.BuiltInRenderPipelineShaderName);
+                    shaderMappingMatch = shaderMapping;
+                    break;
+                }
+                else if (!shaderMapping.UseUniversalRenderPipelineShaderName && material.shader == shaderMapping.UniversalRenderPipelineShader)
+                {
+                    shaderMatch = shaderMapping.UniversalRenderPipelineShader;
+                    shaderMappingMatch = shaderMapping;
+                    break;
+                }
             }
         }
 
-        return shaderMatch;
+        return (shaderMatch, shaderMappingMatch);
     }
 
     private bool MaterialShaderMatchesActiveRenderPipeline(Material material)
@@ -170,6 +224,45 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
         return ultraleapMaterialsCache;
     }
 
+    public static ExpandoObject OnBeforeConversionToURPLit(Material material, Shader urpShader)
+    {
+        dynamic state = new ExpandoObject();  
+
+        if (material.shader != null)
+        {
+            state.colour = material.GetColor("_Color");
+        }
+
+        return state;
+    }
+
+    public static void OnAfterConversionToURPLit(dynamic state, Material material)
+    {
+        if (material != null && state != null && state.Count() > 0)
+        {
+            try
+            { 
+                material.SetColor("_Color", state.colour);
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+            }
+        }
+    }
+
+    public static ExpandoObject OnBeforeConversionFromToBiRPStandard(Material material, Shader urpShader)
+    {
+        // Do nothing
+        return null;
+    }
+
+    public static void OnAfterConversionToBiRPStandard(ExpandoObject state, Material material)
+    {
+        // Do nothing
+    }
+
+
     static void MarkMaterialModified(Material material)
     {
 #if UNITY_EDITOR
@@ -184,10 +277,14 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
         public bool UseBuiltInRenderPipelineShaderName = true;
         public string BuiltInRenderPipelineShaderName = "Standard";
         public Shader BuiltInRenderPipelineShader = null;
+        public Func<Material, Shader, ExpandoObject> OnBeforeConversionToBiRP; // State, material, new shader
+        public Action<ExpandoObject, Material> OnAfterConversionToBiRP;        // Carried over state, updated material
 
         public bool UseUniversalRenderPipelineShaderName = true;
         public string UniversalRenderPipelineShaderName = "Universal Render Pipeline/Lit";
         public Shader UniversalRenderPipelineShader = null;
+        public Func<Material, Shader, ExpandoObject> OnBeforeConversionToURP; // State, material, new shader
+        public Action<ExpandoObject, Material> OnAfterConversionToURP;        // Carried over state, updated material
     }
 
 
@@ -273,7 +370,7 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
     }
 
     /// <summary>
-    /// Custom editor MaterialPipelineHandler
+    /// Custom editor AutomaticRenderPipelineMaterialShaderUpdater
     /// </summary>
     [CustomEditor(typeof(AutomaticRenderPipelineMaterialShaderUpdater)), CanEditMultipleObjects]
     public class AutomaticRenderPipelineMaterialShaderUpdaterEditor : Editor
