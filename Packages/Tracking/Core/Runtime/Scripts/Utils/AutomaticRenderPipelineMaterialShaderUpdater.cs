@@ -263,7 +263,16 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
         {
 #if NET_4_6 || NET_UNITY_4_8
             dynamic state = new ExpandoObject();
-            state.colour = material.GetColor("_Color");
+
+            try
+            {
+                state.colour = material.GetColor("_Color");
+                state.mainTexture = material.mainTexture;
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+            } 
             return state;
 #else
 
@@ -280,7 +289,8 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
         {
             try
             { 
-                material.SetColor("_Color", state.colour);
+                //material.SetColor("_Color", state.colour);
+                material.SetTexture("_MainTex", state.mainTexture);
             }
             catch (Exception e)
             {
