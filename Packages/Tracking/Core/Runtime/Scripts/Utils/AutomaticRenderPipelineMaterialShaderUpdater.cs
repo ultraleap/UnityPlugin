@@ -4,13 +4,6 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
-using static PlasticGui.WorkspaceWindow.Merge.MergeInProgress;
-
-
-// Build a map of BiRP shader <-> URP shader
-// Check for render pipeline change
-// If different then upgrade
-// Keep manual upgrade
 
 #if UNITY_EDITOR
 [InitializeOnLoad]
@@ -72,7 +65,8 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
     {
         get
         {
-            return GraphicsSettings.currentRenderPipeline.name == "UniveralRenderPipeline";
+            return GraphicsSettings.currentRenderPipeline.name.Contains("URP") ||
+                GraphicsSettings.currentRenderPipeline.name == "UniveralRenderPipeline";
         }
     }
 
@@ -218,6 +212,9 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
             SerializedProperty UseURPShaderNameProperty = property.FindPropertyRelative("UseUniversalRenderPipelineShaderName");
             SerializedProperty URPShaderNameProperty = property.FindPropertyRelative("UniversalRenderPipelineShaderName");
             SerializedProperty URPShaderProperty = property.FindPropertyRelative("UniversalRenderPipelineShader");
+
+            // Draw Material without the header.
+            position.height = singleLineHeight;
 
             // Built in render pipeline section
             EditorGUI.LabelField(position, "Built-In Render Pipeline Shader", EditorStyles.boldLabel);
