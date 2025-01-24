@@ -113,7 +113,7 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
     private void UpdateMaterialShader(Material material)
     {
         Shader targetShader = GetShaderForPipeline(material);
-        if (material.shader != targetShader)
+        if (material.shader != targetShader && targetShader != null)
         {
             material.shader = targetShader;
             MarkMaterialModified(material);
