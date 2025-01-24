@@ -271,7 +271,7 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
             try
             {
                 state.colour = material.GetColor("_Color");
-                state.mainTexture = material.GetTexture("_Albedo");
+                
             }
             catch (Exception e)
             {
@@ -293,8 +293,11 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
         {
             try
             { 
-                //material.SetColor("_Color", state.colour);
-                material.SetTexture("_MainTex", state.mainTexture);
+                material.SetColor("_Color", state.colour);
+                var texture = new Texture2D(1, 1);
+                texture.SetPixel(0,0,state.colour); 
+                material.SetTexture("_BaseMap", texture);
+                material.SetTexture("_MainTex", texture);
             }
             catch (Exception e)
             {
