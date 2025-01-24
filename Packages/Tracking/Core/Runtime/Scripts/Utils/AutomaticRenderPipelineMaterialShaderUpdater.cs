@@ -75,8 +75,7 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
     {
         get
         {
-            return GraphicsSettings.currentRenderPipeline.name.Contains("URP") ||
-                GraphicsSettings.currentRenderPipeline.name == "UniveralRenderPipeline";
+            return GraphicsSettings.currentRenderPipeline != null; // Will need to change this when we support HDRP
         }
     }
 
@@ -154,13 +153,13 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
         {
             if (IsBuiltInRenderPipeline)
             {
-                if (shaderMapping.UseBuiltInRenderPipelineShaderName && shaderMapping.BuiltInRenderPipelineShaderName == material.shader.name)
+                if (shaderMapping.UseBuiltInRenderPipelineShaderName && shaderMapping.BuiltInRenderPipelineShaderName != material.shader.name)
                 {
                     shaderMatch = Shader.Find(shaderMapping.BuiltInRenderPipelineShaderName);
                     shaderMappingMatch = shaderMapping;
                     break;
                 }
-                else if (!shaderMapping.UseBuiltInRenderPipelineShaderName && material.shader == shaderMapping.BuiltInRenderPipelineShader)
+                else if (!shaderMapping.UseBuiltInRenderPipelineShaderName && material.shader != shaderMapping.BuiltInRenderPipelineShader)
                 {
                     shaderMatch = shaderMapping.BuiltInRenderPipelineShader;
                     shaderMappingMatch = shaderMapping;
@@ -169,13 +168,13 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
             }
             else if (IsUniveralRenderPipeline)
             {
-                if (shaderMapping.UseUniversalRenderPipelineShaderName && shaderMapping.UniversalRenderPipelineShaderName == material.shader.name)
+                if (shaderMapping.UseUniversalRenderPipelineShaderName && shaderMapping.UniversalRenderPipelineShaderName != material.shader.name)
                 {
                     shaderMatch = Shader.Find(shaderMapping.BuiltInRenderPipelineShaderName);
                     shaderMappingMatch = shaderMapping;
                     break;
                 }
-                else if (!shaderMapping.UseUniversalRenderPipelineShaderName && material.shader == shaderMapping.UniversalRenderPipelineShader)
+                else if (!shaderMapping.UseUniversalRenderPipelineShaderName && material.shader != shaderMapping.UniversalRenderPipelineShader)
                 {
                     shaderMatch = shaderMapping.UniversalRenderPipelineShader;
                     shaderMappingMatch = shaderMapping;
@@ -226,15 +225,36 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
 
     public static ExpandoObject OnBeforeConversionToURPLit(Material material, Shader urpShader)
     {
-        dynamic state = new ExpandoObject();  
-
         if (material.shader != null)
         {
+#if NET_4_6 || NET_UNITY_4_8
+            dynamic state = new ExpandoObject();
             state.colour = material.GetColor("_Color");
+            return state;
+#else
+
+#endif
         }
 
-        return state;
+        return new ExpandoObject();
     }
+
+#if NET_4_6 || NET_UNITY_4_8
+    public static void OnAfterConversionToURPLit(dynamic state, Material material)
+    {
+        if (material != null && state != null && state.Count() > 0)
+        {
+            try
+            { 
+                material.SetColor("_Color", state.colour);
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+            }
+        }
+    }
+#else
 
     public static void OnAfterConversionToURPLit(dynamic state, Material material)
     {
@@ -250,6 +270,7 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
             }
         }
     }
+#endif
 
     public static ExpandoObject OnBeforeConversionFromToBiRPStandard(Material material, Shader urpShader)
     {
