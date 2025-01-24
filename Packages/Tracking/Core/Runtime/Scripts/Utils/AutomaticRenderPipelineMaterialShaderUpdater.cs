@@ -116,7 +116,7 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
     private void UpdateMaterialShader(Material material)
     {
         var shaderMatch = GetShaderForPipeline(material);
-        if (material.shader != shaderMatch.shader && shaderMatch.shader != null)
+        if (shaderMatch.foundMatch && material.shader != shaderMatch.shader && shaderMatch.shader != null)
         {
             ExpandoObject state = null;
 
@@ -144,28 +144,30 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
         }
     }
 
-    private (Shader shader, ShaderMapping mapping) GetShaderForPipeline(Material material)
+    private (bool foundMatch, Shader shader, ShaderMapping mapping) GetShaderForPipeline(Material material)
     {
         Shader shaderMatch = null;
         ShaderMapping shaderMappingMatch = null;
+        bool foundMatch = false;    
 
         foreach (ShaderMapping shaderMapping in shaderMap)
         {
             if (CurrentMaterialShaderIsAMappingMatch(material, shaderMapping))
             {
-
                 if (IsBuiltInRenderPipeline)
                 {
                     if (shaderMapping.UseBuiltInRenderPipelineShaderName && shaderMapping.BuiltInRenderPipelineShaderName != null)
                     {
                         shaderMatch = Shader.Find(shaderMapping.BuiltInRenderPipelineShaderName);
                         shaderMappingMatch = shaderMapping;
+                        foundMatch = true;
                         break;
                     }
                     else if (!shaderMapping.UseBuiltInRenderPipelineShaderName && material.shader != shaderMapping.BuiltInRenderPipelineShader)
                     {
                         shaderMatch = shaderMapping.BuiltInRenderPipelineShader;
                         shaderMappingMatch = shaderMapping;
+                        foundMatch = true;
                         break;
                     }
                 }
@@ -175,19 +177,21 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
                     {
                         shaderMatch = Shader.Find(shaderMapping.UniversalRenderPipelineShaderName);
                         shaderMappingMatch = shaderMapping;
+                        foundMatch = true;
                         break;
                     }
                     else if (!shaderMapping.UseUniversalRenderPipelineShaderName && material.shader != shaderMapping.UniversalRenderPipelineShader)
                     {
                         shaderMatch = shaderMapping.UniversalRenderPipelineShader;
                         shaderMappingMatch = shaderMapping;
+                        foundMatch = true;
                         break;
                     }
                 }
             }
         }
 
-        return (shaderMatch, shaderMappingMatch);
+        return (foundMatch, shaderMatch, shaderMappingMatch);
 
         // Does the current map entry match the shader that needs to be converted?
         bool CurrentMaterialShaderIsAMappingMatch(Material material, ShaderMapping shaderMapping)
