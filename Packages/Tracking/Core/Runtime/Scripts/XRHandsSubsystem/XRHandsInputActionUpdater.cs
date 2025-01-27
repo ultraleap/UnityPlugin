@@ -363,20 +363,25 @@ namespace Leap.InputActions
 
         public static Vector3 GetWristOffsetPosition(XRHand hand)
         {
-            Vector3 localWristPosition = pinchWristOffset;
-            if (hand.handedness == Handedness.Right)
+            if (transformHelper != null)
             {
-                localWristPosition.x = -localWristPosition.x;
+                Vector3 localWristPosition = pinchWristOffset;
+                if (hand.handedness == Handedness.Right)
+                {
+                    localWristPosition.x = -localWristPosition.x;
+                }
+
+                Pose wristPose;
+                if (hand.GetJoint(XRHandJointID.Wrist).TryGetPose(out wristPose))
+                {
+                    transformHelper.transform.position = wristPose.position;
+                    transformHelper.transform.rotation = wristPose.rotation;
+                }
+
+                return transformHelper.TransformPoint(localWristPosition);
             }
 
-            Pose wristPose;
-            if (hand.GetJoint(XRHandJointID.Wrist).TryGetPose(out wristPose))
-            {
-                transformHelper.transform.position = wristPose.position;
-                transformHelper.transform.rotation = wristPose.rotation;
-            }
-
-            return transformHelper.TransformPoint(localWristPosition);
+            return Vector3.zero;
         }
 
         /// <summary>
@@ -866,17 +871,22 @@ namespace Leap.InputActions
 
         private static Vector3 GetShoulderPosAtRotation(bool isLeft, Quaternion neckRotation)
         {
-            transformHelper.position = NeckPosition;
-            transformHelper.rotation = neckRotation;
-
-            Vector3 shoulderNeckOffset = new Vector3
+            if (transformHelper != null)
             {
-                x = isLeft ? -shoulderOffset : shoulderOffset,
-                y = 0,
-                z = 0
-            };
+                transformHelper.position = NeckPosition;
+                transformHelper.rotation = neckRotation;
 
-            return transformHelper.TransformPoint(shoulderNeckOffset);
+                Vector3 shoulderNeckOffset = new Vector3
+                {
+                    x = isLeft ? -shoulderOffset : shoulderOffset,
+                    y = 0,
+                    z = 0
+                };
+
+                return transformHelper.TransformPoint(shoulderNeckOffset);
+            }
+
+            return Vector3.zero;    
         }
         private static void UpdateHipPositions()
         {
