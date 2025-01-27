@@ -335,14 +335,20 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
                         //material.SetShaderPassEnabled("ShadowCaster", true);
                         break;
                     case StandardShaderBlendMode.Cutout:
+                        material.SetFloat("_Blend", 0);
+                        material.SetFloat("_Surface", 1);
                         material.SetOverrideTag("RenderType", "Transparent");
                         material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
                         break;
                     case StandardShaderBlendMode.Fade:
+                        material.SetFloat("_Blend", 0);
+                        material.SetFloat("_Surface", 1);
                         material.SetOverrideTag("RenderType", "Transparent");
                         material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
                         break;
                     case StandardShaderBlendMode.Transparent:
+                        material.SetFloat("_Blend", 0);
+                        material.SetFloat("_Surface", 1);
                         material.SetOverrideTag("RenderType", "Transparent");
                         material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
                         break;
