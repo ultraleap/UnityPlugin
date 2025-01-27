@@ -36,6 +36,15 @@ static class RenderPipelineValidation
 }
 #endif
 
+public enum StandardShaderBlendMode
+{
+    Opaque,
+    Cutout,
+    Fade,        // Old school alpha-blending mode, fresnel does not affect amount of transparency
+    Transparent // Physically plausible transparency mode, implemented as alpha pre-multiply
+}
+
+
 [CreateAssetMenu(fileName = "Automatic Render Pipeline Material Shader Updater", menuName = "Ultraleap/AutomaticRenderPipelineMaterialShaderUpdater", order = 0)]
 public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
 { 
@@ -270,8 +279,19 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
 
             try
             {
+                // Colour data
                 state.colour = material.GetColor("_Color");
-                
+
+                // Blend mode data
+                state.blendMode = material.GetFloat("_Mode");
+
+                state.SrcBlend = material.GetInt("_SrcBlend");
+                state.DstBlend = material.GetInt("_DstBlend");
+                state.ZWrite = material.GetInt("_ZWrite");
+                state.IsAlphatestOn = material.IsKeywordEnabled("_ALPHATEST_ON");
+                state.IsAplhaBlendOn = material.IsKeywordEnabled("_ALPHABLEND_ON");
+                state.IsAplhaPremultiplyOn = material.IsKeywordEnabled("_ALPHAPREMULTIPLY_ON");
+                state.RenderQueue = material.renderQueue;
             }
             catch (Exception e)
             {
@@ -294,9 +314,42 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
             try
             { 
                 //material.SetColor("_Color", state.colour);
-                var texture = new Texture2D(1, 1);
-                texture.SetPixel(0,0,state.colour); 
-                material.SetColor("_BaseColor", state.colour);   
+                //var texture = new Texture2D(1, 1);
+                //texture.SetPixel(0,0,state.colour); 
+
+                // Convert the colour channel
+                material.SetColor("_BaseColor", state.colour);
+
+                //Need to convert the blend mode / transparency, this is more complex
+                StandardShaderBlendMode blendMode = (StandardShaderBlendMode) (int) state.blendMode;
+
+                switch (blendMode)
+                {
+                    case StandardShaderBlendMode.Opaque:
+                        material.SetOverrideTag("RenderType", "");
+                        //material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
+                        //material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.Zero);
+                        //material.SetInt("_ZWrite", 1);
+                        //material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
+                        material.renderQueue = -1;
+                        //material.SetShaderPassEnabled("ShadowCaster", true);
+                        break;
+                    case StandardShaderBlendMode.Cutout:
+                        material.SetOverrideTag("RenderType", "Transparent");
+                        material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+                        break;
+                    case StandardShaderBlendMode.Fade:
+                        material.SetOverrideTag("RenderType", "Transparent");
+                        material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+                        break;
+                    case StandardShaderBlendMode.Transparent:
+                        material.SetOverrideTag("RenderType", "Transparent");
+                        material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+                        break;
+                    default:
+                        break;
+                }
+
                 //material.SetTexture("_BaseMap", texture);
                 //material.SetTexture("_MainTex", texture);
             }
@@ -306,6 +359,8 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
             }
         }
     }
+
+
 #else
 
     public static void OnAfterConversionToURPLit(dynamic state, Material material)
@@ -333,6 +388,16 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
     public static void OnAfterConversionToBiRPStandard(ExpandoObject state, Material material)
     {
         // Do nothing
+        // Supporting transparent mode
+        //Material m = new Material(Shader.Find("Standard"));
+        //m.SetFloat("_Mode", 2);
+        //m.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+        //m.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+        //m.SetInt("_ZWrite", 0);
+        //m.DisableKeyword("_ALPHATEST_ON");
+        //m.EnableKeyword("_ALPHABLEND_ON");
+        //m.DisableKeyword("_ALPHAPREMULTIPLY_ON");
+        //m.renderQueue = 3000;
     }
 
 
@@ -343,6 +408,107 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
 #endif
     }
 
+
+    public class DisplayController : MonoBehaviour
+    {
+        public enum SurfaceType
+        {
+            Opaque,
+            Transparent
+        }
+
+        public enum BlendMode
+        {
+            Alpha,
+            Premultiply,
+            Additive,
+            Multiply
+        }
+
+        public Material wallMaterial;
+
+
+        public void ChangeWallTransparency(bool transparent)
+        {
+            if (transparent)
+            {
+                wallMaterial.SetFloat("_Surface", (float)SurfaceType.Transparent);
+                wallMaterial.SetFloat("_Blend", (float)BlendMode.Alpha);
+            }
+            else
+            {
+                wallMaterial.SetFloat("_Surface", (float)SurfaceType.Opaque);
+            }
+            SetupMaterialBlendMode(wallMaterial);
+        }
+
+        void SetupMaterialBlendMode(Material material)
+        {
+            if (material == null)
+                throw new ArgumentNullException("material");
+
+            bool alphaClip = material.GetFloat("_AlphaClip") == 1;
+            if (alphaClip)
+                material.EnableKeyword("_ALPHATEST_ON");
+            else
+                material.DisableKeyword("_ALPHATEST_ON");
+
+            SurfaceType surfaceType = (SurfaceType)material.GetFloat("_Surface");
+            if (surfaceType == 0)
+            {
+                material.SetOverrideTag("RenderType", "");
+                material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
+                material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.Zero);
+                material.SetInt("_ZWrite", 1);
+                material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
+                material.renderQueue = -1;
+                material.SetShaderPassEnabled("ShadowCaster", true);
+            }
+            else
+            {
+                BlendMode blendMode = (BlendMode)material.GetFloat("_Blend");
+                switch (blendMode)
+                {
+                    case BlendMode.Alpha:
+                        material.SetOverrideTag("RenderType", "Transparent");
+                        material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+                        material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+                        material.SetInt("_ZWrite", 0);
+                        material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
+                        material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+                        material.SetShaderPassEnabled("ShadowCaster", false);
+                        break;
+                    case BlendMode.Premultiply:
+                        material.SetOverrideTag("RenderType", "Transparent");
+                        material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
+                        material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+                        material.SetInt("_ZWrite", 0);
+                        material.EnableKeyword("_ALPHAPREMULTIPLY_ON");
+                        material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+                        material.SetShaderPassEnabled("ShadowCaster", false);
+                        break;
+                    case BlendMode.Additive:
+                        material.SetOverrideTag("RenderType", "Transparent");
+                        material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
+                        material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.One);
+                        material.SetInt("_ZWrite", 0);
+                        material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
+                        material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+                        material.SetShaderPassEnabled("ShadowCaster", false);
+                        break;
+                    case BlendMode.Multiply:
+                        material.SetOverrideTag("RenderType", "Transparent");
+                        material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.DstColor);
+                        material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.Zero);
+                        material.SetInt("_ZWrite", 0);
+                        material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
+                        material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+                        material.SetShaderPassEnabled("ShadowCaster", false);
+                        break;
+                }
+            }
+        }
+    }
 
     [System.Serializable]
     public class ShaderMapping
