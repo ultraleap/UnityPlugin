@@ -294,7 +294,7 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
             {
                 // Colour data
                 state.colour = material.GetColor("_Color");
-                state.smoothness = material.GetFloat("_Smoothness");
+                state.smoothness = material.GetFloat("_Glossiness"); // _Glossiness maps to smoothness, which is used in the editor
                
                 if (material.mainTexture != null)
                 {
