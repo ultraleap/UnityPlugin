@@ -61,7 +61,20 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
             UseUniversalRenderPipelineShaderName = true, 
             UniversalRenderPipelineShaderName = "Universal Render Pipeline/Lit",
             OnBeforeConversionToURP = OnBeforeConversionToURPLit,
-            OnAfterConversionToURP = OnAfterConversionToURPLit}
+            OnAfterConversionToURP = OnAfterConversionToURPLit},
+
+        new ShaderMapping()
+        {
+            UseBuiltInRenderPipelineShaderName = true,
+            BuiltInRenderPipelineShaderName = "Leagacy Shaders/Diffuse",
+            //OnBeforeConversionToBiRP = OnBeforeConversionFromToBiRPStandard,
+            //OnAfterConversionToBiRP = OnAfterConversionToBiRPStandard,
+
+            UseUniversalRenderPipelineShaderName = true,
+            UniversalRenderPipelineShaderName = "Universal Render Pipeline/Simple Lit",
+            //OnBeforeConversionToURP = OnBeforeConversionToURPLit,
+            //OnAfterConversionToURP = OnAfterConversionToURPLit}
+        }
     };
 
     [SerializeField]
@@ -352,6 +365,13 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
                         material.SetFloat("_Surface", 1);
                         material.SetOverrideTag("RenderType", "Transparent");
                         material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+
+                        if (material.name == "Glass")
+                        {
+                            // Make the Physical Hands Glass Material more see-through and reflective to match the BiRP appearance more closely
+                            material.SetFloat("_Smoothness", 1.0f);
+                            material.SetFloat("_Metallic", 0.1f);
+                        }
                         break;
 
                     default:
