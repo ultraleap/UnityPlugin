@@ -294,7 +294,7 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
             {
                 // Colour data
                 state.colour = material.GetColor("_Color");
-
+                state.smoothness = material.GetFloat("_Smoothness");
                
                 if (material.mainTexture != null)
                 {
@@ -345,6 +345,8 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
                 {
                     material.mainTexture = state.mainTexture;
                 }
+
+                material.SetFloat("_Smoothness", state.smoothness); 
 
                 // Texture not required, at least for our plugin materials:
                 // material.SetColor("_Color", state.colour);
