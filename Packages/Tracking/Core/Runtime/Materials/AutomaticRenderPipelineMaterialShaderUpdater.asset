@@ -19,4 +19,10 @@ MonoBehaviour:
     UseUniversalRenderPipelineShaderName: 1
     UniversalRenderPipelineShaderName: Universal Render Pipeline/Lit
     UniversalRenderPipelineShader: {fileID: 0}
+  - UseBuiltInRenderPipelineShaderName: 1
+    BuiltInRenderPipelineShaderName: Legacy Shaders/Diffuse
+    BuiltInRenderPipelineShader: {fileID: 0}
+    UseUniversalRenderPipelineShaderName: 1
+    UniversalRenderPipelineShaderName: Universal Render Pipeline/Simple Lit
+    UniversalRenderPipelineShader: {fileID: 0}
   autoRefreshMaterialShaders: 1
