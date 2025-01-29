@@ -142,22 +142,22 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
         {
             ExpandoObject state = null;
 
-            if (IsBuiltInRenderPipeline)
+            if (IsBuiltInRenderPipeline && shaderMatch.mapping.OnBeforeConversionToBiRP != null)
             {
                 state = shaderMatch.mapping.OnBeforeConversionToBiRP(material, shaderMatch.shader);
             }
-            else if (IsUniveralRenderPipeline)
+            else if (IsUniveralRenderPipeline && shaderMatch.mapping.OnBeforeConversionToURP != null)
             {
                 state = shaderMatch.mapping.OnBeforeConversionToURP(material, shaderMatch.shader);
             }
 
             material.shader = shaderMatch.shader;
 
-            if (IsBuiltInRenderPipeline)
+            if (IsBuiltInRenderPipeline && shaderMatch.mapping.OnAfterConversionToBiRP != null)
             {
                 shaderMatch.mapping.OnAfterConversionToBiRP(state, material);
             }
-            else if (IsUniveralRenderPipeline)
+            else if (IsUniveralRenderPipeline && shaderMatch.mapping.OnAfterConversionToURP != null)
             {
                 shaderMatch.mapping.OnAfterConversionToURP(state, material);
             }
