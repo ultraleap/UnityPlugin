@@ -295,6 +295,17 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
                 // Colour data
                 state.colour = material.GetColor("_Color");
 
+               
+                if (material.mainTexture != null)
+                {
+                    state.hasTexture = true;
+                    state.mainTexture = material.mainTexture;    
+                }
+                else
+                {
+                    state.hasTexture = false;   
+                }
+
                 // Blend mode data
                 state.blendMode = material.GetFloat("_Mode");
 
@@ -329,6 +340,11 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
             { 
                 // Convert the colour channel
                 material.SetColor("_BaseColor", state.colour);
+
+                if (state.hasTexture)
+                {
+                    material.mainTexture = state.mainTexture;
+                }
 
                 // Texture not required, at least for our plugin materials:
                 // material.SetColor("_Color", state.colour);
