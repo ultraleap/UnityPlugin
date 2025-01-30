@@ -181,7 +181,7 @@
                 UNITY_SETUP_INSTANCE_ID(i);
                 UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
-                o.positionCS = TransformObjectToHClip(i.positionOS + normalize(i.normalOS) * _Outline);
+                o.positionCS = TransformObjectToHClip(i.positionOS.xyz + normalize(i.normalOS) * _Outline);
                 o.uv = i.uv;
                 return o;
             }
