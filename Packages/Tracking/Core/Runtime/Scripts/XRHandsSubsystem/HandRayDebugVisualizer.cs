@@ -173,7 +173,7 @@ public class HandRayDebugVisualizer : MonoBehaviour
 
                 }
 
-                if (drawConnectionBetweenElbowAndWrist)
+                if (drawConnectionBetweenElbowAndWrist && hand.isTracked)
                 {
                     Pose wristPose;
 

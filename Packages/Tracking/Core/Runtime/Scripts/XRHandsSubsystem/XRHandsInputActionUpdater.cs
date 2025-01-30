@@ -363,7 +363,7 @@ namespace Leap.InputActions
 
         public static Vector3 GetWristOffsetPosition(XRHand hand)
         {
-            if (transformHelper != null)
+            if (transformHelper != null && hand.isTracked)
             {
                 Vector3 localWristPosition = pinchWristOffset;
                 if (hand.handedness == Handedness.Right)

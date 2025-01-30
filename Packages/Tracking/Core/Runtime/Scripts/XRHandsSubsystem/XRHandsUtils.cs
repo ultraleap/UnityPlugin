@@ -133,11 +133,26 @@ namespace Leap
 
         public static Vector3 GetStablePinchPosition(this XRHand hand)
         {
+            if (hand.handedness == Handedness.Right)
+            {
+                Vector3 wrist = Vector3.zero;
+                if (hand.GetJoint(XRHandJointID.Wrist).TryGetPose(out Pose wristPose))
+                {
+                    wrist = wristPose.position - new Vector3(0.05f, 0, 0);
+                }
+                return wrist;
+            }
+
+            //TODO: theres something weird going on with the right hand affecting the left hand position. need to figure out where that's coming from
+
             Vector3 indexTip = Vector3.zero;
             Vector3 thumbTip = Vector3.zero;
 
-            if (hand.GetJoint(XRHandJointID.IndexDistal).TryGetPose(out Pose indexTipPose)) indexTip = indexTipPose.position;
-            if (hand.GetJoint(XRHandJointID.ThumbDistal).TryGetPose(out Pose thumbTipPose)) thumbTip = thumbTipPose.position;
+            if (hand.isTracked)
+            {
+                if (hand.GetJoint(XRHandJointID.IndexDistal).TryGetPose(out Pose indexTipPose)) indexTip = indexTipPose.position;
+                if (hand.GetJoint(XRHandJointID.ThumbDistal).TryGetPose(out Pose thumbTipPose)) thumbTip = thumbTipPose.position;
+            }
             return Vector3.Lerp(indexTip, thumbTip, 0.75f);
         }
 
