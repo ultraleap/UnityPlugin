@@ -15,10 +15,9 @@ namespace Leap.Attributes
 {
     public class IndentAttribute : CombinablePropertyAttribute, IBeforeLabelAdditiveDrawer
     {
-        float width = 20;
-
-
 #if UNITY_EDITOR
+        private float width;
+
         public IndentAttribute()
         {
             width = 20;
@@ -38,7 +37,6 @@ namespace Leap.Attributes
         {
             return width;
         }
-
 #endif
     }
 }

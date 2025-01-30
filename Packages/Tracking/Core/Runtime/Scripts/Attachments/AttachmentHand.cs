@@ -136,15 +136,14 @@ namespace Leap.Attachments
             initializeAttachmentPointFlagConstants();
         }
 
-#if !UNITY_EDITOR
-#endif
+#if UNITY_EDITOR
         private bool _isBeingDestroyed = false;
-#if !UNITY_EDITOR
-#endif
+
         void OnDestroy()
         {
             _isBeingDestroyed = true;
         }
+#endif
 
         /// <summary>
         /// Returns the AttachmentPointBehaviour child object of this AttachmentHand given a
