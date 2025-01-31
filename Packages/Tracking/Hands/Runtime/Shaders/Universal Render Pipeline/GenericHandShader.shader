@@ -40,9 +40,9 @@
     SubShader
     {
         PackageRequirements
-+       {
-+           "com.unity.render-pipelines.universal"
-+       }
+        {
+            "com.unity.render-pipelines.universal"
+        }
 
         Tags
         {
