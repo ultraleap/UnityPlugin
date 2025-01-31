@@ -135,12 +135,21 @@ namespace Leap
         {
             if (hand.handedness == Handedness.Right)
             {
-                Vector3 wrist = Vector3.zero;
+                Vector3 finalPosition = Vector3.zero;
                 if (hand.GetJoint(XRHandJointID.Wrist).TryGetPose(out Pose wristPose))
                 {
-                    wrist = wristPose.position - new Vector3(0.05f, 0, 0);
+                    Vector3 wristPosition = wristPose.position;
+                    wristPosition = wristPosition - new Vector3(0.025f, 0.0f, 0.05f);
+                    float heightOffset = Camera.main.transform.position.y - wristPosition.y;
+                    heightOffset = heightOffset - 0.2f;
+                    if (heightOffset < 0.0f) heightOffset = 0.0f;
+                    //wristPosition = wristPosition + new Vector3(0.0f, heightOffset, 0.0f);
+                    if (hand.GetJoint(XRHandJointID.MiddleIntermediate).TryGetPose(out Pose middlePose))
+                    {
+                        finalPosition = wristPosition + (middlePose.forward * 0.05f);
+                    }
                 }
-                return wrist;
+                return finalPosition;
             }
 
             //TODO: theres something weird going on with the right hand affecting the left hand position. need to figure out where that's coming from
