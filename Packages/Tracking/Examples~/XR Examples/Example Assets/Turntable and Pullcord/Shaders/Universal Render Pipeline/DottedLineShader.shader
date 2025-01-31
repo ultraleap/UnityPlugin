@@ -8,6 +8,11 @@
     }
     SubShader
     {
+        PackageRequirements
++       {
++           "com.unity.render-pipelines.universal"
++       }
+
         Tags
         {
             "RenderType" = "Transparent"

@@ -7,6 +7,11 @@ Shader "Ultraleap/Universal Render Pipeline/TransparentColorUnlit"
 
     SubShader
     {
+        PackageRequirements 
+        {
+            "com.unity.render-pipelines.universal"
+        }
+
         Tags
         {
             "RenderPipeline" = "UniversalPipeline"

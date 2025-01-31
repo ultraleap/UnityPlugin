@@ -10,6 +10,11 @@ Shader "Ultraleap/Universal Render Pipeline/Gradient Skybox"
 
     SubShader
     {
+        PackageRequirements 
+        {
+            "com.unity.render-pipelines.universal"
+        }
+
         Tags
         {
             "RenderPipeline" = "UniversalPipeline"
