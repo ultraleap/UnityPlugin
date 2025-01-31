@@ -25,4 +25,42 @@ MonoBehaviour:
     UseUniversalRenderPipelineShaderName: 1
     UniversalRenderPipelineShaderName: Universal Render Pipeline/Simple Lit
     UniversalRenderPipelineShader: {fileID: 0}
+  - UseBuiltInRenderPipelineShaderName: 1
+    BuiltInRenderPipelineShaderName: Ultraleap/TransparentColorUnlit
+    BuiltInRenderPipelineShader: {fileID: 0}
+    UseUniversalRenderPipelineShaderName: 1
+    UniversalRenderPipelineShaderName: Ultraleap/Universal Render Pipeline/TransparentColorUnlit
+    UniversalRenderPipelineShader: {fileID: 0}
+  - UseBuiltInRenderPipelineShaderName: 1
+    BuiltInRenderPipelineShaderName: Ultraleap/Gradient Skybox
+    BuiltInRenderPipelineShader: {fileID: 0}
+    UseUniversalRenderPipelineShaderName: 1
+    UniversalRenderPipelineShaderName: Ultraleap/Universal Render Pipeline/Gradient
+      Skybox
+    UniversalRenderPipelineShader: {fileID: 0}
+  - UseBuiltInRenderPipelineShaderName: 1
+    BuiltInRenderPipelineShaderName: Ultraleap/Simple Outline
+    BuiltInRenderPipelineShader: {fileID: 0}
+    UseUniversalRenderPipelineShaderName: 1
+    UniversalRenderPipelineShaderName: Ultraleap/Universal Render Pipeline/Simple
+      Outline
+    UniversalRenderPipelineShader: {fileID: 0}
+  - UseBuiltInRenderPipelineShaderName: 1
+    BuiltInRenderPipelineShaderName: Ultraleap/DottedLineShader
+    BuiltInRenderPipelineShader: {fileID: 0}
+    UseUniversalRenderPipelineShaderName: 1
+    UniversalRenderPipelineShaderName: Ultraleap/Universal Render Pipeline/DottedLineShader
+    UniversalRenderPipelineShader: {fileID: 0}
+  - UseBuiltInRenderPipelineShaderName: 1
+    BuiltInRenderPipelineShaderName: Ultraleap/GenericHandShader
+    BuiltInRenderPipelineShader: {fileID: 0}
+    UseUniversalRenderPipelineShaderName: 1
+    UniversalRenderPipelineShaderName: Ultraleap/Universal Render Pipeline/GenericHandShader
+    UniversalRenderPipelineShader: {fileID: 0}
+  - UseBuiltInRenderPipelineShaderName: 1
+    BuiltInRenderPipelineShaderName: Ultraleap/LegacyHandShader
+    BuiltInRenderPipelineShader: {fileID: 0}
+    UseUniversalRenderPipelineShaderName: 1
+    UniversalRenderPipelineShaderName: Ultraleap/Universal Render Pipeline/GenericHandShader
+    UniversalRenderPipelineShader: {fileID: 0}
   autoRefreshMaterialShaders: 1

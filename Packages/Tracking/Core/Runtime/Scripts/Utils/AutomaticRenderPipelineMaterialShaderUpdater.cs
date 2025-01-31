@@ -74,7 +74,63 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
             UniversalRenderPipelineShaderName = "Universal Render Pipeline/Simple Lit",
             //OnBeforeConversionToURP = OnBeforeConversionToURPLit,
             //OnAfterConversionToURP = OnAfterConversionToURPLit}
-        }
+        },
+
+        new ShaderMapping()
+        {
+            UseBuiltInRenderPipelineShaderName = true,
+            BuiltInRenderPipelineShaderName = "Ultraleap/TransparentColorUnlit",
+
+            UseUniversalRenderPipelineShaderName = true,
+            UniversalRenderPipelineShaderName = "Ultraleap/Universal Render Pipeline/TransparentColorUnlit",
+        },
+
+        new ShaderMapping()
+        {
+            UseBuiltInRenderPipelineShaderName = true,
+            BuiltInRenderPipelineShaderName = "Ultraleap/Gradient Skybox",
+
+            UseUniversalRenderPipelineShaderName = true,
+            UniversalRenderPipelineShaderName = "Ultraleap/Universal Render Pipeline/Gradient Skybox",
+        },
+
+        new ShaderMapping()
+        {
+            UseBuiltInRenderPipelineShaderName = true,
+            BuiltInRenderPipelineShaderName = "Ultraleap/Simple Outline",
+
+            UseUniversalRenderPipelineShaderName = true,
+            UniversalRenderPipelineShaderName = "Ultraleap/Universal Render Pipeline/Simple Outline",
+        },
+
+        new ShaderMapping()
+        {
+            UseBuiltInRenderPipelineShaderName = true,
+            BuiltInRenderPipelineShaderName = "Ultraleap/DottedLineShader",
+
+            UseUniversalRenderPipelineShaderName = true,
+            UniversalRenderPipelineShaderName = "Ultraleap/Universal Render Pipeline/DottedLineShader",
+        },
+
+        new ShaderMapping()
+        {
+            UseBuiltInRenderPipelineShaderName = true,
+            BuiltInRenderPipelineShaderName = "Ultraleap/GenericHandShader",
+
+            UseUniversalRenderPipelineShaderName = true,
+            UniversalRenderPipelineShaderName = "Ultraleap/Universal Render Pipeline/GenericHandShader",
+        },
+
+        new ShaderMapping()
+        {
+            UseBuiltInRenderPipelineShaderName = true,
+            BuiltInRenderPipelineShaderName = "Ultraleap/LegacyHandShader",
+
+            UseUniversalRenderPipelineShaderName = true,
+            UniversalRenderPipelineShaderName = "Ultraleap/Universal Render Pipeline/GenericHandShader"
+        },
+
+
     };
 
     [SerializeField]
