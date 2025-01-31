@@ -64,3 +64,5 @@ MonoBehaviour:
     UniversalRenderPipelineShaderName: Ultraleap/Universal Render Pipeline/GenericHandShader
     UniversalRenderPipelineShader: {fileID: 0}
   autoRefreshMaterialShaders: 1
+  promptUserToConfirmConversion: 1
+  userHasBeenPrompted: 0
