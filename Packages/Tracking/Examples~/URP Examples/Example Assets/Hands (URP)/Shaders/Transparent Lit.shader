@@ -16,6 +16,11 @@ Shader "Ultraleap/URP/Transparent Lit"
     }
     SubShader
     {
+        PackageRequirements 
+        {
+            "com.unity.render-pipelines.universal"
+        }
+
         Tags
         { 
             "RenderPipeline" = "UniversalPipeline" 
@@ -36,7 +41,7 @@ Shader "Ultraleap/URP/Transparent Lit"
         }
 
         Pass
-        {
+        {            
             Tags
             { 
               "Lightmode" = "UniversalForward" 

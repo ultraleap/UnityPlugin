@@ -8,6 +8,11 @@ Shader "Ultraleap/Universal Render Pipeline/Simple Outline"
 
     SubShader
     {
+        PackageRequirements 
+        {
+            "com.unity.render-pipelines.universal"
+        }
+
         Tags
         {
             "RenderPipeline" = "UniversalPipeline"
