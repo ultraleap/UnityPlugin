@@ -129,13 +129,18 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
             UseUniversalRenderPipelineShaderName = true,
             UniversalRenderPipelineShaderName = "Ultraleap/Universal Render Pipeline/GenericHandShader"
         },
-
-
     };
 
     [SerializeField]
     [Tooltip("If true, all shaders in materials for the Ultraleap packages and samples will be refreshed automatically when the editor opens and when this scriptable object instance is enabled.")]
     bool autoRefreshMaterialShaders = true;
+
+    [SerializeField]
+    [Tooltip("If true, the user will be prompted to confirm the conversion, even if automatic is on. This is to prevent unwanted upgrades")]
+    bool promptUserToConfirmConversion = true;
+
+    [SerializeField]
+    bool userHasBeenPrompted = false; // Save state
 
     private readonly List<string> ultraleapPathIdentifiers = new List<string>() { "Ultraleap Tracking", "Ultraleap Tracking Preview", "com.ultraleap.tracking", "com.ultraleap.tracking.preview" };
 
@@ -165,22 +170,64 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
 
         AutoRefreshMaterialShadersForPipeline();
     }
-#endif
 
     public void AutoRefreshMaterialShadersForPipeline()
     {
         if (autoRefreshMaterialShaders)
         {
-            UpdatePipelineShaders();
+            bool goAhead = false;
+
+            if (!userHasBeenPrompted && promptUserToConfirmConversion)
+            {
+                if (UnityEditorInternal.InternalEditorUtility.isHumanControllingUs)
+                {
+                    int option = EditorUtility.DisplayDialogComplex("Convert Ultraleap Plugin Materials",
+                        "Do you want to convert the Ultraleap materials to the current render pipeline?",
+                        "Convert",
+                        "Cancel",
+                        "Don't Convert");
+
+                    switch (option)
+                    {
+                        case 0:
+                            goAhead = true;
+                            break;
+
+                        case 1:
+                            goAhead = false;
+                            break;
+
+                        case 2:
+                            goAhead = false;
+                            break;
+
+                        default:
+                            goAhead = false;
+                            break;
+                    }
+
+                    userHasBeenPrompted = true;
+                }
+            }
+            else if (!userHasBeenPrompted)
+            {
+                goAhead = true;
+            }
+
+            if (goAhead)
+            {
+                UpdatePipelineShaders();
+            }
         }
     }
+
+#endif
 
     /// <summary>
     /// Applies the appropriate shader to the materials based on the current render pipeline.
     /// </summary>
     public void UpdatePipelineShaders()
     {
-        return; 
         var materials = GetUltraleapMaterialsInPackagesAndAssets(false);
 
         foreach (Material material in materials)
@@ -194,6 +241,10 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
 
     private void UpdateMaterialShader(Material material)
     {
+        // A potential improvement for conversion might be to use the render pipeline converter API discussed here:
+        // NB that will only work on non custom shaders.
+        // https://docs.unity3d.com/Packages/com.unity.render-pipelines.universal@15.0/manual/features/rp-converter.html
+
         var shaderMatch = GetShaderForPipeline(material);
         if (shaderMatch.foundMatch && material.shader != shaderMatch.shader && shaderMatch.shader != null)
         {
@@ -495,107 +546,6 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
 #endif
     }
 
-    //public class DisplayController : MonoBehaviour
-    //{
-    //    public enum SurfaceType
-    //    {
-    //        Opaque,
-    //        Transparent
-    //    }
-
-    //    public enum BlendMode
-    //    {
-    //        Alpha,
-    //        Premultiply,
-    //        Additive,
-    //        Multiply
-    //    }
-
-    //    public Material wallMaterial;
-
-
-    //    public void ChangeWallTransparency(bool transparent)
-    //    {
-    //        if (transparent)
-    //        {
-    //            wallMaterial.SetFloat("_Surface", (float)SurfaceType.Transparent);
-    //            wallMaterial.SetFloat("_Blend", (float)BlendMode.Alpha);
-    //        }
-    //        else
-    //        {
-    //            wallMaterial.SetFloat("_Surface", (float)SurfaceType.Opaque);
-    //        }
-    //        SetupMaterialBlendMode(wallMaterial);
-    //    }
-
-    //    void SetupMaterialBlendMode(Material material)
-    //    {
-    //        if (material == null)
-    //            throw new ArgumentNullException("material");
-
-    //        bool alphaClip = material.GetFloat("_AlphaClip") == 1;
-    //        if (alphaClip)
-    //            material.EnableKeyword("_ALPHATEST_ON");
-    //        else
-    //            material.DisableKeyword("_ALPHATEST_ON");
-
-    //        SurfaceType surfaceType = (SurfaceType)material.GetFloat("_Surface");
-    //        if (surfaceType == 0)
-    //        {
-    //            material.SetOverrideTag("RenderType", "");
-    //            material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
-    //            material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.Zero);
-    //            material.SetInt("_ZWrite", 1);
-    //            material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
-    //            material.renderQueue = -1;
-    //            material.SetShaderPassEnabled("ShadowCaster", true);
-    //        }
-    //        else
-    //        {
-    //            BlendMode blendMode = (BlendMode)material.GetFloat("_Blend");
-    //            switch (blendMode)
-    //            {
-    //                case BlendMode.Alpha:
-    //                    material.SetOverrideTag("RenderType", "Transparent");
-    //                    material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
-    //                    material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
-    //                    material.SetInt("_ZWrite", 0);
-    //                    material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
-    //                    material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
-    //                    material.SetShaderPassEnabled("ShadowCaster", false);
-    //                    break;
-    //                case BlendMode.Premultiply:
-    //                    material.SetOverrideTag("RenderType", "Transparent");
-    //                    material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
-    //                    material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
-    //                    material.SetInt("_ZWrite", 0);
-    //                    material.EnableKeyword("_ALPHAPREMULTIPLY_ON");
-    //                    material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
-    //                    material.SetShaderPassEnabled("ShadowCaster", false);
-    //                    break;
-    //                case BlendMode.Additive:
-    //                    material.SetOverrideTag("RenderType", "Transparent");
-    //                    material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
-    //                    material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.One);
-    //                    material.SetInt("_ZWrite", 0);
-    //                    material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
-    //                    material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
-    //                    material.SetShaderPassEnabled("ShadowCaster", false);
-    //                    break;
-    //                case BlendMode.Multiply:
-    //                    material.SetOverrideTag("RenderType", "Transparent");
-    //                    material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.DstColor);
-    //                    material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.Zero);
-    //                    material.SetInt("_ZWrite", 0);
-    //                    material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
-    //                    material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
-    //                    material.SetShaderPassEnabled("ShadowCaster", false);
-    //                    break;
-    //            }
-    //        }
-    //    }
-    //}
-
     [System.Serializable]
     public class ShaderMapping
     {
@@ -704,7 +654,7 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
         {
             base.OnInspectorGUI();
             // Draw the "Refresh Shaders" button
-            if (GUILayout.Button("Refresh Shaders"))
+            if (GUILayout.Button("Force Material Update for Render Pipeline"))
             {
                 foreach (var t in targets)
                 {
