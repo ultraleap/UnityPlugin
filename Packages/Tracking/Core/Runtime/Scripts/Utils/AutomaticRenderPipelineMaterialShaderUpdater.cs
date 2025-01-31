@@ -124,6 +124,7 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
     /// </summary>
     public void UpdatePipelineShaders()
     {
+        return; 
         var materials = GetUltraleapMaterialsInPackagesAndAssets(false);
 
         foreach (Material material in materials)
@@ -403,13 +404,14 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
         }
     }
 #else
-    public static void OnAfterConversionToURPLit(dynamic state, Material material)
+
+    public static void OnAfterConversionToURPLit(ExpandoObject state, Material material)
     {
         if (material != null && state != null && state.Count() > 0)
         {
             try
             { 
-                material.SetColor("_Color", state.colour);
+                //material.SetColor("_Color", state.colour);
             }
             catch (Exception e)
             {
