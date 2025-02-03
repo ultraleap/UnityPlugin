@@ -128,18 +128,17 @@ namespace Leap.InputActions
         {
             if (Application.isPlaying)
             {
-                UpdateStateWithLeapHand(rightDevice, subsystem.rightHand, ref rightState);
-                UpdateStateWithLeapHand(leftDevice, subsystem.leftHand, ref leftState);
-
                 UpdateBodyPositions();
-                CalculateRay(subsystem.rightHand);
+
+                UpdateStateWithLeapHand(rightDevice, subsystem.rightHand, subsystem.leftHand, ref rightState);
+                UpdateStateWithLeapHand(leftDevice, subsystem.leftHand, subsystem.rightHand, ref leftState);
             }
         }
 
         /// <summary>
         /// Handles updating the inputDevice with chosen data from the hand using the cached handState structure as a base
         /// </summary>
-        private static void UpdateStateWithLeapHand(InputDevice inputDevice, XRHand hand, ref LeapHandState handState)
+        private static void UpdateStateWithLeapHand(InputDevice inputDevice, XRHand hand, XRHand otherhand, ref LeapHandState handState)
         {
             if (hand.isTracked)
             {
@@ -165,6 +164,8 @@ namespace Leap.InputActions
             {
                 SendMetaAimStateUpdate(handState, hand);
             }
+
+            CalculateRay(otherhand); //my mind is boggled as to why this is the other hand, but it works so \_(-_-)_/
         }
 
         /// <summary>
