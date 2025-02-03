@@ -6,8 +6,14 @@ Shader "Ultraleap/Simple Outline"
         _Outline("Outline width", Range(0,0.2)) = 0.005
     }
 
+    // Universal Render Pipeline
     SubShader
     {
+        PackageRequirements
+        {
+            "com.unity.render-pipelines.universal"
+        }
+
         Tags
         {
             "RenderPipeline" = "UniversalPipeline"
@@ -72,7 +78,7 @@ Shader "Ultraleap/Simple Outline"
                 UNITY_SETUP_INSTANCE_ID(v);
                 UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
-                o.positionCS = TransformObjectToHClip(v.positionOS + v.normalOS* _Outline);
+                o.positionCS = TransformObjectToHClip(v.positionOS + v.normalOS * _Outline);
                 return o;
             }
 
@@ -83,6 +89,67 @@ Shader "Ultraleap/Simple Outline"
                 return _Color;
             }
             ENDHLSL
+        }
+    }
+
+    // Built-in Render Pipeline
+    SubShader
+    {
+        Tags
+        {
+            "Queue" = "Transparent"
+            "RenderType" = "Transparent"
+        }
+
+        ZWrite On
+        Blend SrcAlpha OneMinusSrcAlpha
+
+        Pass
+        {
+            Cull Back
+            Blend Zero One
+        }
+
+        Pass
+        {
+            Cull Front
+
+            CGPROGRAM
+            #pragma vertex vert
+            #pragma fragment frag
+
+            #include "UnityCG.cginc"   // for & UNITY_VERTEX_OUTPUT_STEREO UnityObjectToWorldNormal()
+
+            fixed4 _Color;
+            float _Outline;
+
+            struct v2f
+            {
+                float4 pos : POSITION;
+                UNITY_VERTEX_OUTPUT_STEREO
+            };
+
+            v2f vert(appdata_base v)
+            {
+                v2f o;
+                UNITY_SETUP_INSTANCE_ID(v);
+                UNITY_INITIALIZE_OUTPUT(v2f, o);
+                UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
+
+                o.pos = UnityObjectToClipPos(v.vertex);
+                float3 norm = mul((float3x3)UNITY_MATRIX_IT_MV, v.normal);
+                float2 offset = TransformViewToProjection(norm.xy);
+                o.pos.xy = o.pos.xy + offset * _Outline;
+                return o;
+            }
+
+            half4 frag(v2f i) : SV_Target
+            {
+                UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i)
+
+                return _Color;
+            }
+            ENDCG
         }
     }
 }
