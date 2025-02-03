@@ -101,11 +101,27 @@
             {
                 float4 positionCS : SV_Position;
                 float2 uv : TEXCOORD0;
+
+                #if _USELIGHTING_ON || _USEFRESNEL_ON
                 float3 normalWS : TEXCOORD1;
+                #endif
+
+                #if _USEFRESNEL_ON
                 float3 viewDirectionWS : TEXCOORD2;
+                #endif
+
+                #if _USELIGHTING_ON
+                half3 vertexSH : COLOR0;
+                #endif
 
                 UNITY_VERTEX_OUTPUT_STEREO
             };
+
+            // This is the fresnel function that ShaderGraph uses.
+            float Unity_FresnelEffect_float(float3 Normal, float3 ViewDir, float Power)
+            {
+                return pow((1.0 - saturate(dot(normalize(Normal), normalize(ViewDir)))), Power);
+            }
 
             Varyings Vert(Attributes i)
             {
@@ -115,29 +131,42 @@
 
                 o.positionCS = TransformObjectToHClip(i.positionOS.xyz);
                 o.uv = i.uv;
+
+                #if _USELIGHTING_ON || _USEFRESNEL_ON
                 o.normalWS = TransformObjectToWorldNormal(i.normalOS);
-                o.viewDirectionWS = normalize(GetWorldSpaceViewDir(TransformObjectToWorld(i.positionOS.xyz)));
-                return o;
-            }
-
-            float4 Frag(Varyings i) : SV_Target
-            {
-                UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
-
-                half4 color = _Color * SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv);
-
-                // Use alpha pre-multiplication
-                color.rgb *= color.a;
-
-                #if _USELIGHTING_ON
-                Light mainLight = GetMainLight();
-                half3 lambertTerm = LightingLambert(mainLight.color, mainLight.direction, i.normalWS);
-                color.rgb *= lambertTerm.rgb * _LightIntensity;
                 #endif
 
                 #if _USEFRESNEL_ON
-                float fresnel = pow(1.0 - saturate(dot(i.normalWS, i.viewDirectionWS)), _FresnelPower);
-                color.rgb += _FresnelColor.rgb * fresnel * _FresnelColor.a;
+                o.viewDirectionWS = normalize(GetWorldSpaceViewDir(TransformObjectToWorld(i.positionOS.xyz)));
+                #endif
+
+                #if _USELIGHTING_ON
+                o.vertexSH = SampleSHVertex(o.normalWS);
+                #endif
+
+                return o;
+            }
+
+            half4 Frag(Varyings i) : SV_Target
+            {
+                UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
+
+                float4 color = _Color * SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv);
+
+                #if _USELIGHTING_ON || _USEFRESNEL_ON
+                float3 normalWS = normalize(i.normalWS);
+                #endif
+
+                #if _USELIGHTING_ON
+                Light mainLight = GetMainLight();
+                half3 lambertian = LightingLambert(mainLight.color, mainLight.direction, normalWS);
+                half3 ambient = SampleSHPixel(i.vertexSH, normalWS);
+                color.rgb *= saturate(lambertian + ambient) * _LightIntensity;
+                #endif
+
+                #if _USEFRESNEL_ON
+                float fresnel = Unity_FresnelEffect_float(normalWS, normalize(i.viewDirectionWS), _FresnelPower);
+                color.rgb *= _FresnelColor.rgb * fresnel * _FresnelColor.a;
                 #endif
 
                 return color;
@@ -326,9 +355,9 @@
                 o.uv = v.texcoord;
 
                 #if _USEOUTLINE_ON
-                    float3 norm = mul((float3x3)UNITY_MATRIX_IT_MV, v.normal);
-                    float2 offset = TransformViewToProjection(norm.xy);
-                    o.pos.xy += offset * _Outline;
+                float3 norm = mul((float3x3)UNITY_MATRIX_IT_MV, v.normal);
+                float2 offset = TransformViewToProjection(norm.xy);
+                o.pos.xy += offset * _Outline;
                 #endif
 
                 return o;
@@ -367,9 +396,9 @@
                 half3 worldNormal = UnityObjectToWorldNormal(v.normal);
 
                 #if _USELIGHTING_ON
-                    half nl = max(0, dot(worldNormal, _WorldSpaceLightPos0.xyz));
-                    o.diff = nl * _LightColor0;
-                    o.diff.rgb += ShadeSH9(half4(worldNormal, 1));
+                half nl = max(0, dot(worldNormal, _WorldSpaceLightPos0.xyz));
+                o.diff = nl * _LightColor0;
+                o.diff.rgb += ShadeSH9(half4(worldNormal, 1));
                 #endif
 
                 o.worldNormal = worldNormal;
@@ -384,18 +413,17 @@
                 return pow((1.0 - saturate(dot(normalize(Normal), normalize(ViewDir)))), Power);
             }
 
-            half4 frag(v2f i) :COLOR
+            half4 frag(v2f i) : SV_Target
             {
-                fixed4 col = tex2D(_MainTex, i.uv);
-                col *= _Color;
+                fixed4 col = _Color * tex2D(_MainTex, i.uv);
 
                 #if _USELIGHTING_ON
-                    col.rgb *= (i.diff * _LightIntensity);
+                col.rgb *= (i.diff * _LightIntensity);
                 #endif
 
                 #if _USEFRESNEL_ON
-                    col.rgb *= _FresnelColor * Unity_FresnelEffect_float(i.worldNormal, i.viewDir, _FresnelPower) *
-                        _FresnelColor.a;
+                col.rgb *= _FresnelColor * Unity_FresnelEffect_float(i.worldNormal, i.viewDir, _FresnelPower) *
+                    _FresnelColor.a;
                 #endif
 
                 return col;
