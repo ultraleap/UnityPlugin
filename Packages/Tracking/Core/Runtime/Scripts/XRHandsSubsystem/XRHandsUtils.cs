@@ -133,36 +133,35 @@ namespace Leap
 
         public static Vector3 GetStablePinchPosition(this XRHand hand)
         {
-            if (hand.handedness == Handedness.Right)
+            Vector3 finalPosition = Vector3.zero;
+            if (hand.isTracked)
             {
-                Vector3 finalPosition = Vector3.zero;
                 if (hand.GetJoint(XRHandJointID.Wrist).TryGetPose(out Pose wristPose))
                 {
+                    //We base our final aiming position on the wrist to remove any offsets while doing the pinch
                     Vector3 wristPosition = wristPose.position;
-                    wristPosition = wristPosition - new Vector3(0.025f, 0.0f, 0.05f);
+
+                    //Shift the wrist position to make it a more natural aiming position
+                    wristPosition.z -= 0.05f;
+                    if (hand.handedness == Handedness.Right)
+                        wristPosition.x -= 0.025f;
+                    else
+                        wristPosition.x += 0.025f;
+
+                    //Also shift the wrist position to make it feel nice if you're doing gorilla hand or relaxed pose
                     float heightOffset = Camera.main.transform.position.y - wristPosition.y;
                     heightOffset = heightOffset - 0.2f;
                     if (heightOffset < 0.0f) heightOffset = 0.0f;
                     //wristPosition = wristPosition + new Vector3(0.0f, heightOffset, 0.0f);
+
+                    //Allow the final position to be the modified wrist position offset by the expressiveness of the hand (todo: do we also want to do this more if the hand is further down?)
                     if (hand.GetJoint(XRHandJointID.MiddleIntermediate).TryGetPose(out Pose middlePose))
                     {
                         finalPosition = wristPosition + (middlePose.forward * 0.05f);
                     }
                 }
-                return finalPosition;
             }
-
-            //TODO: theres something weird going on with the right hand affecting the left hand position. need to figure out where that's coming from
-
-            Vector3 indexTip = Vector3.zero;
-            Vector3 thumbTip = Vector3.zero;
-
-            if (hand.isTracked)
-            {
-                if (hand.GetJoint(XRHandJointID.IndexDistal).TryGetPose(out Pose indexTipPose)) indexTip = indexTipPose.position;
-                if (hand.GetJoint(XRHandJointID.ThumbDistal).TryGetPose(out Pose thumbTipPose)) thumbTip = thumbTipPose.position;
-            }
-            return Vector3.Lerp(indexTip, thumbTip, 0.75f);
+            return finalPosition;
         }
 
         public static float GetMetacarpalLength(this XRHand hand, int fingerIndex)
