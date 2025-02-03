@@ -133,30 +133,30 @@ namespace Leap
 
         public static Vector3 GetStablePinchPosition(this XRHand hand)
         {
-            Vector3 finalPosition = Vector3.zero;
+            Vector3 pos = Vector3.zero;
             if (hand.isTracked)
             {
                 if (hand.GetJoint(XRHandJointID.Wrist).TryGetPose(out Pose wristPose))
                 {
                     //Base our final aiming position on the wrist to remove any offsets while doing the pinch
-                    Vector3 wristPosition = wristPose.position;
+                    pos = wristPose.position;
 
                     //Shift the wrist position to make it a more natural centered aiming position
-                    wristPosition.z -= 0.05f;
+                    pos.z -= 0.05f;
                     if (hand.handedness == Handedness.Right)
-                        wristPosition.x -= 0.025f;
+                        pos.x -= 0.025f;
                     else
-                        wristPosition.x += 0.025f;
+                        pos.x += 0.025f;
 
                     //Offset the wrist position by the expressiveness of the hand, gathered via the middle metacarpal
                     if (hand.GetJoint(XRHandJointID.MiddleMetacarpal).TryGetPose(out Pose middlePose))
-                        finalPosition = wristPosition + (middlePose.forward * 0.05f);
+                        pos += (middlePose.forward * 0.075f);
 
                     //Shift the final height in relation to the camera to allow relaxed/gorilla aiming
-                    finalPosition.y += (Camera.main.transform.position.y - wristPosition.y - 0.33f) / 2.0f;
+                    pos.y += (Camera.main.transform.position.y - pos.y - 0.33f) / 2.0f;
                 }
             }
-            return finalPosition;
+            return pos;
         }
 
         public static float GetMetacarpalLength(this XRHand hand, int fingerIndex)
