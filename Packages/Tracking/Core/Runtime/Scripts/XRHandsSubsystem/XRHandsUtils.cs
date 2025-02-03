@@ -138,27 +138,22 @@ namespace Leap
             {
                 if (hand.GetJoint(XRHandJointID.Wrist).TryGetPose(out Pose wristPose))
                 {
-                    //We base our final aiming position on the wrist to remove any offsets while doing the pinch
+                    //Base our final aiming position on the wrist to remove any offsets while doing the pinch
                     Vector3 wristPosition = wristPose.position;
 
-                    //Shift the wrist position to make it a more natural aiming position
+                    //Shift the wrist position to make it a more natural centered aiming position
                     wristPosition.z -= 0.05f;
                     if (hand.handedness == Handedness.Right)
                         wristPosition.x -= 0.025f;
                     else
                         wristPosition.x += 0.025f;
 
-                    //Also shift the wrist position to make it feel nice if you're doing gorilla hand or relaxed pose
-                    float heightOffset = Camera.main.transform.position.y - wristPosition.y;
-                    heightOffset = heightOffset - 0.2f;
-                    if (heightOffset < 0.0f) heightOffset = 0.0f;
-                    //wristPosition = wristPosition + new Vector3(0.0f, heightOffset, 0.0f);
-
-                    //Allow the final position to be the modified wrist position offset by the expressiveness of the hand (todo: do we also want to do this more if the hand is further down?)
-                    if (hand.GetJoint(XRHandJointID.MiddleIntermediate).TryGetPose(out Pose middlePose))
-                    {
+                    //Offset the wrist position by the expressiveness of the hand, gathered via the middle metacarpal
+                    if (hand.GetJoint(XRHandJointID.MiddleMetacarpal).TryGetPose(out Pose middlePose))
                         finalPosition = wristPosition + (middlePose.forward * 0.05f);
-                    }
+
+                    //Shift the final height in relation to the camera to allow relaxed/gorilla aiming
+                    finalPosition.y += (Camera.main.transform.position.y - wristPosition.y - 0.33f) / 2.0f;
                 }
             }
             return finalPosition;
