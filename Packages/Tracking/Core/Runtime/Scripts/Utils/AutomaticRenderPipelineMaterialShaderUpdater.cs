@@ -60,6 +60,7 @@ public class ShaderState
 }
 
 [CreateAssetMenu(fileName = "Automatic Render Pipeline Material Shader Updater", menuName = "Ultraleap/AutomaticRenderPipelineMaterialShaderUpdater", order = 0)]
+[Serializable]
 public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
 { 
     [SerializeField]
@@ -220,6 +221,12 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
                     }
 
                     userHasBeenPrompted = true;
+
+                    // Save this change ...
+                    EditorUtility.SetDirty(this);
+                    AssetDatabase.SaveAssets();
+                    AssetDatabase.Refresh();
+
                 }
             }
             else if (!promptUserToConfirmConversion)
