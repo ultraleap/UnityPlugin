@@ -1,3 +1,4 @@
+using Leap;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
@@ -131,16 +132,13 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
         },
     };
 
-    [SerializeField]
-    [Tooltip("If true, all shaders in materials for the Ultraleap packages and samples will be refreshed automatically when the editor opens and when this scriptable object instance is enabled.")]
-    bool autoRefreshMaterialShaders = true;
 
     [SerializeField]
     [Tooltip("If true, the user will be prompted to confirm the conversion, even if automatic is on. This is to prevent unwanted upgrades")]
     bool promptUserToConfirmConversion = true;
 
     [SerializeField]
-    bool userHasBeenPrompted = false; // Save state
+    bool userHasBeenPrompted = false; 
 
     private readonly List<string> ultraleapPathIdentifiers = new List<string>() { "Ultraleap Tracking", "Ultraleap Tracking Preview", "com.ultraleap.tracking", "com.ultraleap.tracking.preview" };
 
@@ -173,7 +171,8 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
 
     public void AutoRefreshMaterialShadersForPipeline()
     {
-        if (autoRefreshMaterialShaders)
+        if (UltraleapSettings.AutomaticallyUpgradeMaterialsToCurrentRenderPipeline && 
+            FoundPluginMaterialsThatDontMatchCurrentRenderPipeline())
         {
             bool goAhead = false;
 
@@ -182,7 +181,8 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
                 if (UnityEditorInternal.InternalEditorUtility.isHumanControllingUs)
                 {
                     int option = EditorUtility.DisplayDialogComplex("Convert Ultraleap Plugin Materials",
-                        "Do you want to convert the Ultraleap materials to the current render pipeline?",
+                        "Materials have been detected in the Ultraleap plugin that don't match the current project's chosen render pipeline." +
+                        "Would you like to convert these materials to the current render pipeline?",
                         "Convert",
                         "Cancel",
                         "Don't Convert");
@@ -209,7 +209,7 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
                     userHasBeenPrompted = true;
                 }
             }
-            else if (!userHasBeenPrompted)
+            else if (!promptUserToConfirmConversion)
             {
                 goAhead = true;
             }
@@ -221,6 +221,21 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
         }
     }
 
+    private bool FoundPluginMaterialsThatDontMatchCurrentRenderPipeline()
+    {
+        var materials = GetUltraleapMaterialsInPackagesAndAssets(false);
+
+        foreach (Material material in materials)
+        {
+            if (!MaterialShaderMatchesActiveRenderPipeline(material)) // TODO Screen out intended URP shaders
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 #endif
 
     /// <summary>
@@ -229,14 +244,25 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
     public void UpdatePipelineShaders()
     {
         var materials = GetUltraleapMaterialsInPackagesAndAssets(false);
+        int count = 0;
 
         foreach (Material material in materials)
         {
             if (!MaterialShaderMatchesActiveRenderPipeline(material))
             {
                 UpdateMaterialShader(material);
+                count++;    
             }
         }
+
+
+#if UNITY_EDITOR
+        if (UnityEditorInternal.InternalEditorUtility.isHumanControllingUs)
+        {
+            EditorUtility.DisplayDialog("Material Upgrade Status", $"Upgraded {count} materials to the current render pipeline", "OK");
+        }
+#endif
+
     }
 
     private void UpdateMaterialShader(Material material)
@@ -526,6 +552,7 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
             }
         }
     }
+
 #endif
 
     public static ExpandoObject OnBeforeConversionFromToBiRPStandard(Material material, Shader urpShader)
