@@ -60,6 +60,7 @@ namespace Leap
                     InputActionsSection(settings);
                     HintingSection(settings);
                     NotificationSection(settings);
+                    RenderPipelineSupportSection(settings); 
                     ResetSection(settings);
 
                     settings.ApplyModifiedProperties();
@@ -156,6 +157,23 @@ namespace Leap
             settings.ApplyModifiedProperties();
         }
 
+
+        private static void RenderPipelineSupportSection(SerializedObject settings)
+        {
+            EditorGUILayout.LabelField("Render Pipeline Support", EditorStyles.boldLabel);
+            EditorGUILayout.Space(5);
+
+            using (new EditorGUI.IndentLevelScope())
+            {
+                // Enable automatic upgrades
+                UltraleapSettings.AutomaticallyUpgradeMaterialsToCurrentRenderPipeline = EditorGUILayout.ToggleLeft("Automatically attempt to upgrade Ultraleap plugin materials to the active render pipeline", UltraleapSettings.AutomaticallyUpgradeMaterialsToCurrentRenderPipeline);
+            }
+
+            EditorGUILayout.Space(30);
+
+            settings.ApplyModifiedProperties();
+        }
+
         private static void ResetSection(SerializedObject settings)
         {
             EditorGUILayout.BeginHorizontal();
@@ -177,6 +195,10 @@ namespace Leap
 
     public class UltraleapSettings : ScriptableObject
     {
+        private static readonly bool defaultValueForAutomaticallyUpgradingMaterialsForActiveRenderPipeline = true;
+
+        private static readonly string automaticallyUpgradeMaterialsToCurrentRenderPipelineEnvironmentVariableName = "ULTRALEAP_UNITY_PLUGIN_AUTOMATICALLY_UPGRADE_MATERIALS_TO_CURRENT_RENDER_PIPELINE";
+       
         static UltraleapSettings instance;
         public static UltraleapSettings Instance
         {
@@ -208,6 +230,28 @@ namespace Leap
 
         [HideInInspector, SerializeField]
         public bool showPhysicalHandsPhysicsSettingsWarning = true;
+
+        [HideInInspector]
+        public static bool AutomaticallyUpgradeMaterialsToCurrentRenderPipeline
+        {
+            get
+            {
+                string readValue = System.Environment.GetEnvironmentVariable(automaticallyUpgradeMaterialsToCurrentRenderPipelineEnvironmentVariableName, EnvironmentVariableTarget.User);
+
+                if (string.IsNullOrEmpty(readValue))
+                {
+                    AutomaticallyUpgradeMaterialsToCurrentRenderPipeline = defaultValueForAutomaticallyUpgradingMaterialsForActiveRenderPipeline;
+                    return defaultValueForAutomaticallyUpgradingMaterialsForActiveRenderPipeline;
+                }
+
+                return Convert.ToBoolean(readValue);
+            }
+
+            set
+            {
+                System.Environment.SetEnvironmentVariable(automaticallyUpgradeMaterialsToCurrentRenderPipelineEnvironmentVariableName, Convert.ToString(value), EnvironmentVariableTarget.User);
+            }
+        }
 
         [HideInInspector, SerializeField]
         public string pluginVersion = "Unknown";
@@ -245,6 +289,8 @@ namespace Leap
 
             showAndroidBuildArchitectureWarning = true;
             showPhysicalHandsPhysicsSettingsWarning = true;
+
+            AutomaticallyUpgradeMaterialsToCurrentRenderPipeline = defaultValueForAutomaticallyUpgradingMaterialsForActiveRenderPipeline;
         }
 
 #if UNITY_EDITOR
