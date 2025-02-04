@@ -227,7 +227,7 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
 
         foreach (Material material in materials)
         {
-            if (!MaterialShaderMatchesActiveRenderPipeline(material)) // TODO Screen out intended URP shaders
+            if (!MaterialShaderMatchesActiveRenderPipeline(material)) 
             {
                 return true;
             }
