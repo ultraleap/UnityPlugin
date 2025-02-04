@@ -45,6 +45,19 @@ public enum StandardShaderBlendMode
     Transparent // Physically plausible transparency mode, implemented as alpha pre-multiply
 }
 
+/// <summary>
+/// <see langword="class"> used to capture shader state information </see>
+/// </summary>
+public class ShaderState
+{
+    public Color Colour;
+    public float Smoothness;
+
+    public bool HasMainTexture;
+    public Texture MainTexture;
+
+    public float BlendMode;
+}
 
 [CreateAssetMenu(fileName = "Automatic Render Pipeline Material Shader Updater", menuName = "Ultraleap/AutomaticRenderPipelineMaterialShaderUpdater", order = 0)]
 public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
@@ -274,7 +287,7 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
         var shaderMatch = GetShaderForPipeline(material);
         if (shaderMatch.foundMatch && material.shader != shaderMatch.shader && shaderMatch.shader != null)
         {
-            ExpandoObject state = null;
+            ShaderState state = null;
 
             if (IsBuiltInRenderPipeline && shaderMatch.mapping.OnBeforeConversionToBiRP != null)
             {
@@ -417,31 +430,30 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
         return ultraleapMaterialsCache;
     }
 
-    public static ExpandoObject OnBeforeConversionToURPLit(Material material, Shader urpShader)
+    public static ShaderState OnBeforeConversionToURPLit(Material material, Shader urpShader)
     {
         if (material.shader != null)
         {
-#if NET_4_6 || NET_UNITY_4_8
-            dynamic state = new ExpandoObject();
+            ShaderState state = new ShaderState();
 
             try
             {
                 // Colour data
-                state.colour = material.GetColor("_Color");
-                state.smoothness = material.GetFloat("_Glossiness"); // _Glossiness maps to smoothness, which is used in the editor
+                state.Colour = material.GetColor("_Color");
+                state.Smoothness = material.GetFloat("_Glossiness"); // _Glossiness maps to smoothness, which is used in the editor
                
                 if (material.mainTexture != null)
                 {
-                    state.hasTexture = true;
-                    state.mainTexture = material.mainTexture;    
+                    state.HasMainTexture = true;
+                    state.MainTexture = material.mainTexture;    
                 }
                 else
                 {
-                    state.hasTexture = false;   
+                    state.HasMainTexture = false;   
                 }
 
                 // Blend mode data
-                state.blendMode = material.GetFloat("_Mode");
+                state.BlendMode = material.GetFloat("_Mode");
 
                 // These values for transparency / opaque appear common beteween render pipelines and don't appear to need converting:
                 // state.SrcBlend = material.GetInt("_SrcBlend");
@@ -455,32 +467,28 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
             {
                 Debug.LogException(e);
             } 
-            return state;
-#else
 
-#endif
+            return state;
         }
 
-        return new ExpandoObject();
+        return null;
     }
 
-#if NET_4_6 || NET_UNITY_4_8
-
-    public static void OnAfterConversionToURPLit(dynamic state, Material material)
+    public static void OnAfterConversionToURPLit(ShaderState state, Material material)
     {
         if (material != null && state != null)
         {
             try
             { 
                 // Convert the colour channel
-                material.SetColor("_BaseColor", state.colour);
+                material.SetColor("_BaseColor", state.Colour);
 
-                if (state.hasTexture)
+                if (state.HasMainTexture)
                 {
-                    material.mainTexture = state.mainTexture;
+                    material.mainTexture = state.MainTexture;
                 }
 
-                material.SetFloat("_Smoothness", state.smoothness); 
+                material.SetFloat("_Smoothness", state.Smoothness); 
 
                 // Texture not required, at least for our plugin materials:
                 // material.SetColor("_Color", state.colour);
@@ -489,7 +497,7 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
 
                 // Several parameter relate to the blend mode / transparency of a meterial,
                 // but appear common to BiRP and URP (see OnBeforeConversionToURPLit).
-                StandardShaderBlendMode blendMode = (StandardShaderBlendMode) (int) state.blendMode;
+                StandardShaderBlendMode blendMode = (StandardShaderBlendMode) (int) state.BlendMode;
 
                 switch (blendMode)
                 {
@@ -536,32 +544,14 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
             }
         }
     }
-#else
 
-    public static void OnAfterConversionToURPLit(ExpandoObject state, Material material)
-    {
-        if (material != null && state != null && state.Count() > 0)
-        {
-            try
-            { 
-                //material.SetColor("_Color", state.colour);
-            }
-            catch (Exception e)
-            {
-                Debug.LogException(e);
-            }
-        }
-    }
-
-#endif
-
-    public static ExpandoObject OnBeforeConversionFromToBiRPStandard(Material material, Shader urpShader)
+    public static ShaderState OnBeforeConversionFromToBiRPStandard(Material material, Shader urpShader)
     {
         // Do nothing
         return null;
     }
 
-    public static void OnAfterConversionToBiRPStandard(ExpandoObject state, Material material)
+    public static void OnAfterConversionToBiRPStandard(ShaderState state, Material material)
     {
         // Do nothing
     }
@@ -579,14 +569,14 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
         public bool UseBuiltInRenderPipelineShaderName = true;
         public string BuiltInRenderPipelineShaderName = "Standard";
         public Shader BuiltInRenderPipelineShader = null;
-        public Func<Material, Shader, ExpandoObject> OnBeforeConversionToBiRP; // State, material, new shader
-        public Action<ExpandoObject, Material> OnAfterConversionToBiRP;        // Carried over state, updated material
+        public Func<Material, Shader, ShaderState> OnBeforeConversionToBiRP; // State, material, new shader
+        public Action<ShaderState, Material> OnAfterConversionToBiRP;        // Carried over state, updated material
 
         public bool UseUniversalRenderPipelineShaderName = true;
         public string UniversalRenderPipelineShaderName = "Universal Render Pipeline/Lit";
         public Shader UniversalRenderPipelineShader = null;
-        public Func<Material, Shader, ExpandoObject> OnBeforeConversionToURP; // State, material, new shader
-        public Action<ExpandoObject, Material> OnAfterConversionToURP;        // Carried over state, updated material
+        public Func<Material, Shader, ShaderState> OnBeforeConversionToURP; // State, material, new shader
+        public Action<ShaderState, Material> OnAfterConversionToURP;        // Carried over state, updated material
     }
 
 
