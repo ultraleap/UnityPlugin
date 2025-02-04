@@ -98,15 +98,17 @@ namespace Leap.PhysicalHands
                         description = "Automatically update transform positions and rotations in the physics sim. If enabled, may cause jitter on rigidbodies when grabbed."
                     }
                 },
+#if !UNITY_6000_0_OR_NEWER
                 {
                     ID_CONTACTS_GENERATION,
                     new RecommendedSetting()
                     {
                         property = _physicsManager.FindProperty(ID_CONTACTS_GENERATION),
                         recommended = "Persistent Contact Manifold",
-                        description = "Recommended default by unity for?generating contacts every physics frame."
+                        description = "Recommended default by unity for generating contacts every physics frame."
                     }
                 },
+#endif
                 {
                     ID_GRAVITY,
                     new RecommendedSetting()
