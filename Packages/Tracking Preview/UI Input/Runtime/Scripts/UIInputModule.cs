@@ -123,6 +123,7 @@ namespace Leap.InputModule
 #if ENABLE_INPUT_SYSTEM && !ENABLE_LEGACY_INPUT_MANAGER
             //We must have legacy input enabled, or be using an older Unity version
             enabled = false;
+            Debug.LogError("Ultraleap UIInputModule requires the legacy input sustem. Please enable legacy input in the Player Settings.");
             return;
 #endif
 
