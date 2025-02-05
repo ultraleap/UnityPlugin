@@ -51,6 +51,27 @@
             float _Outline;
             float4 _OutlineColor;
         CBUFFER_END
+
+        struct MyAttributes
+        {
+            float4 positionOS : POSITION;
+            float3 normalOS : NORMAL;
+            float2 uv : TEXCOORD0;
+
+            UNITY_VERTEX_INPUT_INSTANCE_ID
+        };
+
+        struct MyVaryings
+        {
+            float4 positionCS : SV_Position;
+            float2 uv : TEXCOORD0;
+            float3 normalWS : TEXCOORD1;
+            float3 viewDirectionWS : TEXCOORD2;
+            half3 vertexSH : COLOR0;
+
+            UNITY_VERTEX_OUTPUT_STEREO
+        };
+
         ENDHLSL
 
         ZWrite On
@@ -67,6 +88,14 @@
             Cull Off
             ZWrite On
             ColorMask 0
+
+            HLSLPROGRAM
+            #pragma multi_compile_instancing
+            #pragma vertex DepthOnlyVertex
+            #pragma fragment DepthOnlyFragment
+
+            #include "Packages/com.unity.render-pipelines.universal/Shaders/DepthOnlyPass.hlsl"
+            ENDHLSL
         }
 
         Pass
@@ -88,44 +117,15 @@
             #pragma vertex Vert
             #pragma fragment Frag
 
-            struct Attributes
-            {
-                float4 positionOS : POSITION;
-                float3 normalOS : NORMAL;
-                float2 uv : TEXCOORD0;
-
-                UNITY_VERTEX_INPUT_INSTANCE_ID
-            };
-
-            struct Varyings
-            {
-                float4 positionCS : SV_Position;
-                float2 uv : TEXCOORD0;
-
-                #if _USELIGHTING_ON || _USEFRESNEL_ON
-                float3 normalWS : TEXCOORD1;
-                #endif
-
-                #if _USEFRESNEL_ON
-                float3 viewDirectionWS : TEXCOORD2;
-                #endif
-
-                #if _USELIGHTING_ON
-                half3 vertexSH : COLOR0;
-                #endif
-
-                UNITY_VERTEX_OUTPUT_STEREO
-            };
-
             // This is the fresnel function that ShaderGraph uses.
             float Unity_FresnelEffect_float(float3 Normal, float3 ViewDir, float Power)
             {
                 return pow((1.0 - saturate(dot(normalize(Normal), normalize(ViewDir)))), Power);
             }
 
-            Varyings Vert(Attributes i)
+            MyVaryings Vert(MyAttributes i)
             {
-                Varyings o;
+                MyVaryings o = (MyVaryings)0;
                 UNITY_SETUP_INSTANCE_ID(i);
                 UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
@@ -147,7 +147,7 @@
                 return o;
             }
 
-            half4 Frag(Varyings i) : SV_Target
+            half4 Frag(MyVaryings i) : SV_Target
             {
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
@@ -192,56 +192,33 @@
             #pragma vertex Vert
             #pragma fragment Frag
 
-            #if _USEOUTLINE_ON
-            struct Attributes
+            MyVaryings Vert(MyAttributes i)
             {
-                float4 positionOS : POSITION;
-                float3 normalOS : NORMAL;
-                float2 uv : TEXCOORD0;
-
-                UNITY_VERTEX_INPUT_INSTANCE_ID
-            };
-
-            struct Varyings
-            {
-                float4 positionCS : SV_POSITION;
-                float2 uv : TEXCOORD0;
-
-                UNITY_VERTEX_OUTPUT_STEREO
-            };
-
-            Varyings Vert(Attributes i)
-            {
-                Varyings o;
+                MyVaryings o = (MyVaryings)0;
                 UNITY_SETUP_INSTANCE_ID(i);
                 UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
+                #if _USEOUTLINE_ON
                 o.positionCS = TransformObjectToHClip(i.positionOS.xyz + normalize(i.normalOS) * _Outline);
+                #else
+                o.positionCS = TransformObjectToHClip(i.positionOS.xyz);
+                #endif
                 o.uv = i.uv;
                 return o;
             }
 
-            half4 Frag(Varyings i) : SV_Target
+            half4 Frag(MyVaryings i) : SV_Target
             {
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
+                #if _USEOUTLINE_ON
                 // Fade the outline to match the rest of the hand by sampling the hand texture.
                 half alpha = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv).a;
                 return half4(_OutlineColor.xyz, alpha);
-            }
-            #else
-
-            float4 Vert(float4 positionOS : POSITION) : SV_POSITION
-            {
-                return positionOS;
-            }
-
-            half4 Frag() : SV_Target
-            {
+                #else
                 return 0;
+                #endif
             }
-
-            #endif
             ENDHLSL
         }
 
@@ -382,7 +359,9 @@
             #pragma vertex vert
             #pragma fragment frag
 
+            #if _USELIGHTING_ON
             #include "UnityLightingCommon.cginc" // for _LightColor0
+            #endif
 
             v2f vert(appdata_base v)
             {
