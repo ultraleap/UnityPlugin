@@ -51,27 +51,6 @@
             float _Outline;
             float4 _OutlineColor;
         CBUFFER_END
-
-        struct MyAttributes
-        {
-            float4 positionOS : POSITION;
-            float3 normalOS : NORMAL;
-            float2 uv : TEXCOORD0;
-
-            UNITY_VERTEX_INPUT_INSTANCE_ID
-        };
-
-        struct MyVaryings
-        {
-            float4 positionCS : SV_Position;
-            float2 uv : TEXCOORD0;
-            float3 normalWS : TEXCOORD1;
-            float3 viewDirectionWS : TEXCOORD2;
-            half3 vertexSH : COLOR0;
-
-            UNITY_VERTEX_OUTPUT_STEREO
-        };
-
         ENDHLSL
 
         ZWrite On
@@ -117,15 +96,35 @@
             #pragma vertex Vert
             #pragma fragment Frag
 
+            struct Attributes
+            {
+                float4 positionOS : POSITION;
+                float3 normalOS : NORMAL;
+                float2 uv : TEXCOORD0;
+
+                UNITY_VERTEX_INPUT_INSTANCE_ID
+            };
+
+            struct Varyings
+            {
+                float4 positionCS : SV_Position;
+                float2 uv : TEXCOORD0;
+                float3 normalWS : TEXCOORD1;
+                float3 viewDirectionWS : TEXCOORD2;
+                half3 vertexSH : COLOR0;
+
+                UNITY_VERTEX_OUTPUT_STEREO
+            };
+
             // This is the fresnel function that ShaderGraph uses.
             float Unity_FresnelEffect_float(float3 Normal, float3 ViewDir, float Power)
             {
                 return pow((1.0 - saturate(dot(normalize(Normal), normalize(ViewDir)))), Power);
             }
 
-            MyVaryings Vert(MyAttributes i)
+            Varyings Vert(Attributes i)
             {
-                MyVaryings o = (MyVaryings)0;
+                Varyings o = (Varyings)0;
                 UNITY_SETUP_INSTANCE_ID(i);
                 UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
@@ -147,7 +146,7 @@
                 return o;
             }
 
-            half4 Frag(MyVaryings i) : SV_Target
+            half4 Frag(Varyings i) : SV_Target
             {
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
@@ -192,9 +191,26 @@
             #pragma vertex Vert
             #pragma fragment Frag
 
-            MyVaryings Vert(MyAttributes i)
+            struct Attributes
             {
-                MyVaryings o = (MyVaryings)0;
+                float4 positionOS : POSITION;
+                float3 normalOS : NORMAL;
+                float2 uv : TEXCOORD0;
+
+                UNITY_VERTEX_INPUT_INSTANCE_ID
+            };
+
+            struct Varyings
+            {
+                float4 positionCS : SV_Position;
+                float2 uv : TEXCOORD0;
+
+                UNITY_VERTEX_OUTPUT_STEREO
+            };
+
+            Varyings Vert(Attributes i)
+            {
+                Varyings o = (Varyings)0;
                 UNITY_SETUP_INSTANCE_ID(i);
                 UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
@@ -207,7 +223,7 @@
                 return o;
             }
 
-            half4 Frag(MyVaryings i) : SV_Target
+            half4 Frag(Varyings i) : SV_Target
             {
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
