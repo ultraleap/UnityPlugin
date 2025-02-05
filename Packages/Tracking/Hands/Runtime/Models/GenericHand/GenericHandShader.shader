@@ -165,7 +165,7 @@
                 #endif
 
                 #if _USEFRESNEL_ON
-                float fresnel = Unity_FresnelEffect_float(normalWS, normalize(i.viewDirectionWS), _FresnelPower);
+                float fresnel = Unity_FresnelEffect_float(normalWS, i.viewDirectionWS, _FresnelPower);
                 color.rgb *= _FresnelColor.rgb * fresnel * _FresnelColor.a;
                 #endif
 
