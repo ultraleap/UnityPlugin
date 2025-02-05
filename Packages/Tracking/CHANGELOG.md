@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
 
+## [NEXT]
+
+### Changed
+- Updated all custom shaders to support the Universal Render Pipeline concurrently with the Built-in Render Pipeline
+
 ## [7.2.0] - 17/01/2025
 
 ### Added
