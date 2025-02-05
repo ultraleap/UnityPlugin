@@ -14,22 +14,32 @@ Shader "Ultraleap/URP/Transparent Lit"
         _FresnelColor("Fresnel Color", Color) = (1,1,1,1)
         _FresnelIntensity("Fresnel Intensity", Range(0, 10)) = 0
     }
+
+    // Universal Render Pipeline
     SubShader
     {
+        PackageRequirements
+        {
+            "com.unity.render-pipelines.universal"
+        }
+
         Tags
-        { 
-            "RenderPipeline" = "UniversalPipeline" 
-            "IgnoreProjector" = "True" 
-            "Queue" = "Transparent" 
+        {
+            "RenderPipeline" = "UniversalPipeline"
+            "IgnoreProjector" = "True"
+            "Queue" = "Transparent"
             "RenderType" = "Transparent"
         }
 
-        LOD 100
         Blend SrcAlpha OneMinusSrcAlpha
 
-        // This cuts out transparency overlapping from this object
         Pass
         {
+            Tags
+            {
+                "LightMode" = "SRPDefaultUnlit"
+            }
+
             ZWrite On
             Blend Zero One
             Cull Back
@@ -38,8 +48,8 @@ Shader "Ultraleap/URP/Transparent Lit"
         Pass
         {
             Tags
-            { 
-              "Lightmode" = "UniversalForward" 
+            {
+                "LightMode" = "UniversalForward"
             }
 
             Cull Back
@@ -48,9 +58,9 @@ Shader "Ultraleap/URP/Transparent Lit"
             #pragma vertex vert
             #pragma fragment frag
 
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"            
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 
-            struct appdata
+            struct Attributes
             {
                 float4 vertex : POSITION;
                 float2 uv : TEXCOORD0;
@@ -59,7 +69,7 @@ Shader "Ultraleap/URP/Transparent Lit"
                 UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
-            struct v2f
+            struct Varyings
             {
                 float4 vertex : SV_POSITION;
                 float2 uv : TEXCOORD0;
@@ -69,16 +79,17 @@ Shader "Ultraleap/URP/Transparent Lit"
                 DECLARE_LIGHTMAP_OR_SH(lightmapUV, vertexSH, 4);
                 UNITY_VERTEX_OUTPUT_STEREO
             };
+
             CBUFFER_START(UnityPerMaterial)
-            sampler2D _MainTex;
-            float4 _MainTex_ST;
+                sampler2D _MainTex;
+                float4 _MainTex_ST;
 
-            float4 _Color;
-            float _Smoothness, _Metallic;
+                float4 _Color;
+                float _Smoothness, _Metallic;
 
-            float _useFresnel;
-            float4 _FresnelColor;
-            float _FresnelIntensity;
+                float _useFresnel;
+                float4 _FresnelColor;
+                float _FresnelIntensity;
             CBUFFER_END
 
             float Unity_FresnelEffect_float(float3 Normal, float3 ViewDir, float Power)
@@ -86,9 +97,9 @@ Shader "Ultraleap/URP/Transparent Lit"
                 return pow((1.0 - saturate(dot(normalize(Normal), normalize(ViewDir)))), Power);
             }
 
-            v2f vert (appdata v)
+            Varyings vert(Attributes v)
             {
-                v2f o;
+                Varyings o;
                 UNITY_SETUP_INSTANCE_ID(v);
                 UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
@@ -98,20 +109,20 @@ Shader "Ultraleap/URP/Transparent Lit"
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
                 o.vertex = TransformWorldToHClip(o.positionWS);
 
-                OUTPUT_LIGHTMAP_UV( v.texcoord1, unity_LightmapST, o.lightmapUV );
-                OUTPUT_SH(o.normalWS.xyz, o.vertexSH );
+                OUTPUT_LIGHTMAP_UV(v.texcoord1, unity_LightmapST, o.lightmapUV);
+                OUTPUT_SH(o.normalWS.xyz, o.vertexSH);
 
                 return o;
             }
 
-            half4 frag (v2f i) : SV_Target
+            half4 frag(Varyings i) : SV_Target
             {
                 half4 mainTex = tex2D(_MainTex, i.uv);
                 InputData inputdata = (InputData)0;
                 inputdata.positionWS = i.positionWS;
                 inputdata.normalWS = normalize(i.normalWS);
                 inputdata.viewDirectionWS = i.viewDir;
-                inputdata.bakedGI = SAMPLE_GI( i.lightmapUV, i.vertexSH, inputdata.normalWS );
+                inputdata.bakedGI = SAMPLE_GI(i.lightmapUV, i.vertexSH, inputdata.normalWS);
 
                 SurfaceData surfacedata;
                 surfacedata.albedo = mainTex * _Color;
@@ -127,8 +138,8 @@ Shader "Ultraleap/URP/Transparent Lit"
 
                 if (_useFresnel)
                 {
-                    float3 fresnelColor = _FresnelColor * 
-                          Unity_FresnelEffect_float(i.normalWS, i.viewDir, _FresnelIntensity) * _FresnelColor.a;
+                    float3 fresnelColor = _FresnelColor *
+                        Unity_FresnelEffect_float(i.normalWS, i.viewDir, _FresnelIntensity) * _FresnelColor.a;
                     surfacedata.emission = fresnelColor;
                 }
 
