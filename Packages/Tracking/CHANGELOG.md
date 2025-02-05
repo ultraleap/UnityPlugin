@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [NEXT]
 
+<<<<<<< HEAD
 ### Added
 - Added support to upgrade the plugin's Built In Render Pipeline materials (and as a result the example scenes) to the Universal Render Pipeline. This can be set to automatically prompt when the materials don't match the current render pipeline. It does not support downgrading.
 
@@ -15,10 +16,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed warning suggesting use of both input systems for OpenXR + Ultraleap compatibility now the new input system is fully supported
 - Updated all custom shaders to support the Universal Render Pipeline concurrently with the Built-in Render Pipeline
 - Updated Copyright year to 2025
+=======
+### Changed
+- Removed warning suggesting use of both input systems for OpenXR + Ultraleap compatibility now the new input system is fully supported
+>>>>>>> ce423d5b0 (Update changelog with new input system support)
 
 ### Fixed
 - Fixed some warnings around runtime variables that were only used in editor mode
 - Fixed an issue with Physical Hands and Unity 6 due to the physics Contact Generation setting being removed
+<<<<<<< HEAD
 - (UI Input Preview) Added explicit missing dependancy on the "Unity UI" package
 - Support either input system for all interactions, fixing HandRecorder and CycleHandPairs
 
@@ -27,6 +33,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Turntable and pullchord scene only works (i.e. the pullchord works) if the physical hands physics settings are used
 - Clicks on UI elements using indirect interaction do not appear to work with the UI Input example
 - The RuntimeGizmoManager and associated RuntimeGizmo.shader shader are not URP compatible and would require breaking changes to support URP; These remain as BiRP only
+=======
+- Support either input system for all interactions, fixing HandRecorder and CycleHandPairs
+>>>>>>> ce423d5b0 (Update changelog with new input system support)
 
 ## [7.2.0] - 17/01/2025
 
