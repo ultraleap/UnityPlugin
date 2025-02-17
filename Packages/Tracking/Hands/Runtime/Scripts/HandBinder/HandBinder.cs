@@ -21,41 +21,43 @@ namespace Leap.HandsModule
     public class HandBinder : HandModelBase
     {
         #region Inspector
-        /// <summary> 
-        /// The data structure that contains transforms that get bound to the leap data 
+
+        /// <summary>
+        /// The data structure that contains transforms that get bound to the leap data
         /// </summary>
         public BoundHand BoundHand = new BoundHand();
 
-        /// <summary> 
-        /// The length of the elbow to maintain the correct offset from the wrist 
+        /// <summary>
+        /// The length of the elbow to maintain the correct offset from the wrist
         /// </summary>
         [Tooltip("The length of the elbow to maintain the correct offset from the wrist")]
         public float ElbowLength;
 
-        /// <summary> 
-        /// The rotation offset that will be assigned to all the fingers 
+        /// <summary>
+        /// The rotation offset that will be assigned to all the fingers
         /// </summary>
         [Tooltip("The rotation offset that will be assigned to all the fingers")]
         public Vector3 GlobalFingerRotationOffset;
 
-        /// <summary> 
-        /// The rotation offset that will be assigned to the wrist 
+        /// <summary>
+        /// The rotation offset that will be assigned to the wrist
         /// </summary>
         [Tooltip("The rotation offset that will be assigned to the wrist")]
         public Vector3 WristRotationOffset;
 
-        /// <summary> 
-        /// Set the assigned transforms to the same position as the Leap Hand 
+        /// <summary>
+        /// Set the assigned transforms to the same position as the Leap Hand
         /// </summary>
         [Tooltip("Set the assigned transforms to the same position as the Leap Hand")]
         public bool SetPositions = true;
 
 
-        [Tooltip("Moves the elbow so that when the forearm scales the bone doesnt clip into the hand model. Particularly useful for non-skinned hands.")]
+        [Tooltip(
+            "Moves the elbow so that when the forearm scales the bone doesnt clip into the hand model. Particularly useful for non-skinned hands.")]
         public bool UseScaleToPositionElbow = false;
 
-        /// <summary> 
-        /// Set the assigned transforms to the same position as the Leap Hand 
+        /// <summary>
+        /// Set the assigned transforms to the same position as the Leap Hand
         /// </summary>
         [Tooltip("Should binding use metacarpal bones")]
         public bool UseMetaBones = true;
@@ -68,27 +70,30 @@ namespace Leap.HandsModule
         /// <summary>
         /// A multiplier to the base speed of the lerp when scaling hands
         /// </summary>
-        [Tooltip("A multiplier used to adjust the default interpolation of hand scaling, 1 = default, 0.01 = slowest, 100 = fastest"), Range(0.01f, 100f)]
+        [Tooltip(
+             "A multiplier used to adjust the default interpolation of hand scaling, 1 = default, 0.01 = slowest, 100 = fastest"),
+         Range(0.01f, 100f)]
         public float ScalingSpeedMultiplier = 1;
 
-        /// <summary> 
-        /// User defined offsets in editor script 
+        /// <summary>
+        /// User defined offsets in editor script
         /// </summary>
         public List<BoundTypes> Offsets = new List<BoundTypes>();
 
-        /// <summary> 
-        /// Stores all the children's default pose 
+        /// <summary>
+        /// Stores all the children's default pose
         /// </summary>
         public SerializedTransform[] DefaultHandPose;
 
 
         private float lastHandFoundTime = 0;
         private float instantScaleAfterHandFoundTime = 1f; // seconds
+
         #endregion
 
         #region Hand Model Base
 
-        /// <summary> 
+        /// <summary>
         /// The chirality or handedness of the hand.
         /// Custom editor requires Chirality in a non overridden property, Public Chirality exists for the editor.
         /// </summary>
@@ -111,9 +116,9 @@ namespace Leap.HandsModule
         public Hand LeapHand;
 
         /// <summary>
-        /// Returns the Leap Hand object represented by this HandModelBase. 
-        /// Note that any physical quantities and directions obtained from the Leap Hand object are 
-        /// relative to the Leap Motion coordinate system, which uses a right-handed axes and units 
+        /// Returns the Leap Hand object represented by this HandModelBase.
+        /// Note that any physical quantities and directions obtained from the Leap Hand object are
+        /// relative to the Leap Motion coordinate system, which uses a right-handed axes and units
         /// of millimeters.
         /// </summary>
         /// <returns></returns>
@@ -128,6 +133,25 @@ namespace Leap.HandsModule
         #endregion
 
         #region Hand Binder Logic
+
+        private void OnEnable()
+        {
+            // Add the missing tip to the data structure if it was not there to begin with.
+            foreach (var finger in BoundHand.fingers)
+            {
+                if (finger.boundBones.Length == 4)
+                {
+                    finger.boundBones = new BoundBone[]
+                    {
+                        finger.boundBones[0],
+                        finger.boundBones[1],
+                        finger.boundBones[2],
+                        finger.boundBones[3],
+                        new BoundBone(),
+                    };
+                }
+            }
+        }
 
         /// <summary>
         /// Called once per frame when the LeapProvider calls the event OnUpdateFrame.
@@ -203,7 +227,7 @@ namespace Leap.HandsModule
         }
 
         /// <summary>
-        /// Set the scale of the model 
+        /// Set the scale of the model
         /// </summary>
         void ScaleModel()
         {
@@ -227,7 +251,8 @@ namespace Leap.HandsModule
                 else
                 {
                     // Smoothly scale
-                    transform.localScale = Vector3.Lerp(transform.localScale, targetScale, Time.deltaTime * ScalingSpeedMultiplier);
+                    transform.localScale = Vector3.Lerp(transform.localScale, targetScale,
+                        Time.deltaTime * ScalingSpeedMultiplier);
                 }
             }
         }
@@ -237,7 +262,7 @@ namespace Leap.HandsModule
         /// </summary>
         void ScaleFingertips()
         {
-            //Scale all the finger tips to match the leap data 
+            //Scale all the finger tips to match the leap data
             for (int i = 0; i < BoundHand.fingers.Length; i++)
             {
                 BoundFinger finger = BoundHand.fingers[i];
@@ -246,7 +271,8 @@ namespace Leap.HandsModule
                 Finger leapFinger = LeapHand.fingers[i];
 
                 //Check we have the correct information to be able to scale
-                if (intermediateBone.boundTransform == null || distalBone.boundTransform == null || leapFinger == null || finger.fingerTipBaseLength == 0)
+                if (intermediateBone.boundTransform == null || distalBone.boundTransform == null ||
+                    leapFinger == null || finger.fingerTipBaseLength == 0)
                 {
                     return;
                 }
@@ -263,7 +289,8 @@ namespace Leap.HandsModule
                 var serviceProviderScale = leapProvider?.gameObject.transform.lossyScale.x ?? 1f;
                 adjustedRatio /= serviceProviderScale;
                 //Calculate the direction that goes up the bone towards the next bone
-                Vector3 direction = (intermediateBone.boundTransform.position - distalBone.boundTransform.position).normalized;
+                Vector3 direction = (intermediateBone.boundTransform.position - distalBone.boundTransform.position)
+                    .normalized;
 
                 //Calculate which axis to scale along
                 Vector3 axis = CalculateAxis(distalBone.boundTransform, direction);
@@ -278,7 +305,8 @@ namespace Leap.HandsModule
                 else // Lerp the scale during playmode
                 {
                     //Lerp the scale to the target scale
-                    distalBone.boundTransform.localScale = Vector3.Lerp(distalBone.boundTransform.localScale, scale, Time.deltaTime * ScalingSpeedMultiplier);
+                    distalBone.boundTransform.localScale = Vector3.Lerp(distalBone.boundTransform.localScale, scale,
+                        Time.deltaTime * ScalingSpeedMultiplier);
                 }
             }
         }
@@ -288,18 +316,15 @@ namespace Leap.HandsModule
         /// </summary>
         void TransformElbow()
         {
-
-
             if (BoundHand.elbow.boundTransform != null)
             {
-
                 float scaleElbowLength = 1;
                 if (UseScaleToPositionElbow)
                 {
                     scaleElbowLength = BoundHand.elbow.boundTransform.lossyScale.z;
                 }
 
-                //Calculate the direction of the elbow 
+                //Calculate the direction of the elbow
                 Vector3 dir = -LeapHand.Arm.Direction.normalized;
 
                 //Position the elbow at the models elbow length
@@ -315,7 +340,8 @@ namespace Leap.HandsModule
                     else
                     {
                         //Use the models length to position the elbow and allow it to be mofied by elbow offset
-                        position = LeapHand.WristPosition + dir * ((ElbowLength * scaleElbowLength) * BoundHand.elbowOffset);
+                        position = LeapHand.WristPosition +
+                                   dir * ((ElbowLength * scaleElbowLength) * BoundHand.elbowOffset);
                     }
                 }
                 else
@@ -353,7 +379,9 @@ namespace Leap.HandsModule
                 var wristPosition = LeapHand.WristPosition + BoundHand.wrist.offset.position;
 
                 //Calculate rotation offset needed to get the wrist into the same rotation as the leap based on the calculated wrist offset
-                var leapRotationOffset = ((Quaternion.Inverse(BoundHand.wrist.boundTransform.transform.rotation) * LeapHand.Rotation) * Quaternion.Euler(WristRotationOffset)).eulerAngles;
+                var leapRotationOffset =
+                    ((Quaternion.Inverse(BoundHand.wrist.boundTransform.transform.rotation) * LeapHand.Rotation) *
+                     Quaternion.Euler(WristRotationOffset)).eulerAngles;
 
                 //Set the wrist bone to the calculated values
                 BoundHand.wrist.boundTransform.transform.position = wristPosition;
@@ -366,7 +394,6 @@ namespace Leap.HandsModule
         /// </summary>
         void TransformFingerBones()
         {
-
             for (int fingerIndex = 0; fingerIndex < BoundHand.fingers.Length; fingerIndex++)
             {
                 var finger = BoundHand.fingers[fingerIndex];
@@ -375,7 +402,7 @@ namespace Leap.HandsModule
                 {
                     var boundBone = finger.boundBones[boneIndex];
                     var startTransform = boundBone.startTransform;
-                    var leapBone = LeapHand.fingers[fingerIndex].bones[boneIndex];
+                    var leapBone = LeapHand.fingers[fingerIndex].bones[boneIndex < 4 ? boneIndex : boneIndex - 1];
                     var boneOffset = boundBone.offset;
                     var boundTransform = boundBone.boundTransform;
 
@@ -396,7 +423,7 @@ namespace Leap.HandsModule
                         //Only update the finger position if the user has defined this behaviour
                         if (SetPositions)
                         {
-                            boundTransform.transform.position = leapBone.PrevJoint;
+                            boundTransform.transform.position = boneIndex < 4 ? leapBone.PrevJoint : leapBone.NextJoint;
                         }
                         else
                         {
@@ -408,11 +435,11 @@ namespace Leap.HandsModule
                     boundTransform.transform.localPosition += boneOffset.position;
 
                     //Update the bound transforms rotation to the leap's rotation * global rotation offset * any further offsets the user has defined
-                    boundTransform.transform.rotation = leapBone.Rotation * Quaternion.Euler(GlobalFingerRotationOffset) * Quaternion.Euler(boneOffset.rotation);
+                    boundTransform.transform.rotation = leapBone.Rotation *
+                                                        Quaternion.Euler(GlobalFingerRotationOffset) *
+                                                        Quaternion.Euler(boneOffset.rotation);
                 }
             }
-
-
         }
 
         #endregion
@@ -444,6 +471,7 @@ namespace Leap.HandsModule
                     length += (bone.PrevJoint - bone.NextJoint).magnitude;
                 }
             }
+
             return length;
         }
 
@@ -459,6 +487,7 @@ namespace Leap.HandsModule
             boneForward.z = Mathf.Abs(boneForward.z);
             return boneForward;
         }
+
         #endregion
 
         #region Cleanup
@@ -506,6 +535,7 @@ namespace Leap.HandsModule
 
                 baseTransforms.Add(serializedTransform);
             }
+
             DefaultHandPose = baseTransforms.ToArray();
         }
 
@@ -520,7 +550,9 @@ namespace Leap.HandsModule
             {
                 Debug.Log("Default hand pose is missing, please reset the 3D model and rebind the hand");
                 return;
-            };
+            }
+
+            ;
 
             if (BoundHand.startScale != Vector3.zero)
             {
@@ -529,12 +561,12 @@ namespace Leap.HandsModule
 
             for (int i = 0; i < DefaultHandPose.Length; i++)
             {
-
                 var baseTransform = DefaultHandPose[i];
                 if (baseTransform != null && baseTransform.reference != null)
                 {
                     baseTransform.reference.transform.localPosition = baseTransform.transform.position;
-                    baseTransform.reference.transform.localRotation = Quaternion.Euler(baseTransform.transform.rotation);
+                    baseTransform.reference.transform.localRotation =
+                        Quaternion.Euler(baseTransform.transform.rotation);
 
                     if (baseTransform.transform.scale == Vector3.zero)
                     {
@@ -548,13 +580,16 @@ namespace Leap.HandsModule
 
         bool CanUseScaleFeature()
         {
-            if (BoundHand.startScale == Vector3.zero || BoundHand.baseScale == 0 || BoundHand.fingers.Any(x => x.fingerTipBaseLength == 0) || BoundHand.fingers.Any(x => x.boundBones.Any(y => y.boundTransform != null && y.startTransform.scale == Vector3.zero)))
+            if (BoundHand.startScale == Vector3.zero || BoundHand.baseScale == 0 ||
+                BoundHand.fingers.Any(x => x.fingerTipBaseLength == 0) || BoundHand.fingers.Any(x =>
+                    x.boundBones.Any(y => y.boundTransform != null && y.startTransform.scale == Vector3.zero)))
             {
                 if (SetModelScale == true)
                 {
                     Debug.Log("Hand Scale feature is disabled, rebind the hand to enable it", transform);
                     SetModelScale = false;
                 }
+
                 return false;
             }
 
@@ -567,33 +602,36 @@ namespace Leap.HandsModule
 
 #pragma warning disable 0414
 
-        /// <summary> 
-        /// Set the assigned transforms to the leap hand during editor 
+        /// <summary>
+        /// Set the assigned transforms to the leap hand during editor
         /// </summary>
         [Tooltip("Set the assigned transforms to the leap hand during editor"), SerializeField]
         bool SetEditorPose = true;
 
-        /// <summary> 
-        /// The size of the debug gizmos 
+        /// <summary>
+        /// The size of the debug gizmos
         /// </summary>
         [Tooltip("The size of the debug gizmos"), SerializeField]
         float GizmoSize = 0.004f;
 
-        /// <summary> 
-        /// Show the Leap Hand in the scene 
+        /// <summary>
+        /// Show the Leap Hand in the scene
         /// </summary>
         [Tooltip("Show the Leap Hand in the scene"), SerializeField]
         bool DebugLeapHand = true;
-        /// <summary> 
-        /// Show the leap's rotation axis in the scene 
+
+        /// <summary>
+        /// Show the leap's rotation axis in the scene
         /// </summary>
         [Tooltip("Show the leap's rotation axis in the scene"), SerializeField]
         bool DebugLeapRotationAxis = false;
-        /// <summary> 
-        /// Show the assigned gameobjects as gizmos in the scene 
+
+        /// <summary>
+        /// Show the assigned gameobjects as gizmos in the scene
         /// </summary>
         [Tooltip("Show the assigned gameobjects as gizmos in the scene"), SerializeField]
         bool DebugModelTransforms = true;
+
         /// <summary> 
         /// Show the assigned gameobjects rotation axis in the scene 
         /// </summary>

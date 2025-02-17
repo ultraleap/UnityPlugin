@@ -32,7 +32,7 @@ namespace Leap.HandsModule
     [System.Serializable]
     public class BoundFinger
     {
-        public BoundBone[] boundBones = new BoundBone[4];
+        public BoundBone[] boundBones = new BoundBone[5];
         public float fingerTipBaseLength;
         [Range(-1, 3)] public float fingerTipScaleOffset = 1;
     }
@@ -78,30 +78,37 @@ namespace Leap.HandsModule
         THUMB_PROXIMAL,
         THUMB_INTERMEDIATE,
         THUMB_DISTAL,
+        THUMB_TIP,
 
         INDEX_METACARPAL,
         INDEX_PROXIMAL,
         INDEX_INTERMEDIATE,
         INDEX_DISTAL,
+        INDEX_TIP,
 
         MIDDLE_METACARPAL,
         MIDDLE_PROXIMAL,
         MIDDLE_INTERMEDIATE,
         MIDDLE_DISTAL,
+        MIDDLE_TIP,
 
         RING_METACARPAL,
         RING_PROXIMAL,
         RING_INTERMEDIATE,
         RING_DISTAL,
+        RING_TIP,
 
         PINKY_METACARPAL,
         PINKY_PROXIMAL,
         PINKY_INTERMEDIATE,
         PINKY_DISTAL,
+        PINKY_TIP,
 
         WRIST,
         ELBOW,
     }
+
+
 
     public static class HandBinderUtilities
     {
@@ -115,22 +122,27 @@ namespace Leap.HandsModule
             {BoundTypes.THUMB_PROXIMAL, (Finger.FingerType.THUMB, Bone.BoneType.PROXIMAL)},
             {BoundTypes.THUMB_INTERMEDIATE, (Finger.FingerType.THUMB, Bone.BoneType.INTERMEDIATE)},
             {BoundTypes.THUMB_DISTAL, (Finger.FingerType.THUMB, Bone.BoneType.DISTAL)},
+            {BoundTypes.THUMB_TIP, (Finger.FingerType.THUMB, Bone.BoneType.UNKNOWN)},
             {BoundTypes.INDEX_METACARPAL, (Finger.FingerType.INDEX, Bone.BoneType.METACARPAL)},
             {BoundTypes.INDEX_PROXIMAL, (Finger.FingerType.INDEX, Bone.BoneType.PROXIMAL)},
             {BoundTypes.INDEX_INTERMEDIATE, (Finger.FingerType.INDEX, Bone.BoneType.INTERMEDIATE)},
             {BoundTypes.INDEX_DISTAL, (Finger.FingerType.INDEX, Bone.BoneType.DISTAL)},
+            {BoundTypes.INDEX_TIP, (Finger.FingerType.INDEX, Bone.BoneType.UNKNOWN)},
             {BoundTypes.MIDDLE_METACARPAL, (Finger.FingerType.MIDDLE, Bone.BoneType.METACARPAL)},
             {BoundTypes.MIDDLE_PROXIMAL, (Finger.FingerType.MIDDLE, Bone.BoneType.PROXIMAL)},
             {BoundTypes.MIDDLE_INTERMEDIATE, (Finger.FingerType.MIDDLE, Bone.BoneType.INTERMEDIATE)},
             {BoundTypes.MIDDLE_DISTAL, (Finger.FingerType.MIDDLE, Bone.BoneType.DISTAL)},
+            {BoundTypes.MIDDLE_TIP, (Finger.FingerType.MIDDLE, Bone.BoneType.UNKNOWN)},
             {BoundTypes.RING_METACARPAL, (Finger.FingerType.RING, Bone.BoneType.METACARPAL)},
             {BoundTypes.RING_PROXIMAL, (Finger.FingerType.RING, Bone.BoneType.PROXIMAL)},
             {BoundTypes.RING_INTERMEDIATE, (Finger.FingerType.RING, Bone.BoneType.INTERMEDIATE)},
             {BoundTypes.RING_DISTAL, (Finger.FingerType.RING, Bone.BoneType.DISTAL)},
+            {BoundTypes.RING_TIP, (Finger.FingerType.RING, Bone.BoneType.UNKNOWN)},
             {BoundTypes.PINKY_METACARPAL, (Finger.FingerType.PINKY, Bone.BoneType.METACARPAL)},
             {BoundTypes.PINKY_PROXIMAL, (Finger.FingerType.PINKY, Bone.BoneType.PROXIMAL)},
             {BoundTypes.PINKY_INTERMEDIATE, (Finger.FingerType.PINKY, Bone.BoneType.INTERMEDIATE)},
             {BoundTypes.PINKY_DISTAL, (Finger.FingerType.PINKY, Bone.BoneType.DISTAL)},
+            {BoundTypes.PINKY_TIP, (Finger.FingerType.PINKY, Bone.BoneType.UNKNOWN)},
         };
 
         /// <summary>
@@ -272,6 +284,6 @@ namespace Leap.HandsModule
         public static string[] DefinitionRing = { "ring" };
         public static string[] DefinitionPinky = { "pinky", "little" };
         public static string[] DefinitionWrist = { "wrist", "hand", "palm" };
-        public static string[] DefinitionElbow = { "elbow", "lowerArm", "forearm" };
+        public static string[] DefinitionElbow = { "elbow", "lowerArm", "forearm", "arm" };
     }
 }

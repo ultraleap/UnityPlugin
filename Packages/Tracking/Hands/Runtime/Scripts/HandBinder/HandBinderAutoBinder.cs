@@ -76,7 +76,6 @@ namespace Leap.HandsModule
         /// <param name="handBinder"></param>
         public static void BindHand(HandBinder handBinder)
         {
-            handBinder.ResetHand();
             UpdateBoundBones(handBinder);
             CalculateFingerTipLengths(handBinder);
             EstimateWristRotationOffset(handBinder);
@@ -170,6 +169,7 @@ namespace Leap.HandsModule
             Transform proximal = null;
             Transform middle = null;
             Transform distal = null;
+            Transform tip = null;
 
             if (bones.Length == MINIMUM_TRANSFORMS)
             {
@@ -180,6 +180,7 @@ namespace Leap.HandsModule
                     proximal = bones[0];
                     middle = bones[1];
                     distal = bones[2];
+                    tip = null;
                 }
                 else
                 {
@@ -187,6 +188,7 @@ namespace Leap.HandsModule
                     proximal = bones[1];
                     middle = bones[2];
                     distal = null;
+                    tip = null;
                 }
             }
             else if (bones.Length > MINIMUM_TRANSFORMS)
@@ -197,6 +199,7 @@ namespace Leap.HandsModule
                     proximal = bones[0];
                     middle = bones[1];
                     distal = bones[2];
+                    tip = bones.Length > 4 ? bones[3] : null;
                 }
                 else
                 {
@@ -204,6 +207,7 @@ namespace Leap.HandsModule
                     proximal = bones[1];
                     middle = bones[2];
                     distal = bones[3];
+                    tip = bones.Length > 4 ? bones[3] : null;
                 }
             }
 
@@ -212,7 +216,8 @@ namespace Leap.HandsModule
                 meta,
                 proximal,
                 middle,
-                distal
+                distal,
+                tip,
             };
 
             return boundObjects;
@@ -234,6 +239,7 @@ namespace Leap.HandsModule
                     AssignBoundBone(boneTransform[1]),
                     AssignBoundBone(boneTransform[2]),
                     AssignBoundBone(boneTransform[3]),
+                    AssignBoundBone(boneTransform[4]),
                 };
 
             return boundFingers;
@@ -340,8 +346,9 @@ namespace Leap.HandsModule
             for (int i = 0; i < handBinder.BoundHand.fingers.Length; i++)
             {
                 var finger = handBinder.BoundHand.fingers[i];
-                var lastBone = finger.boundBones.LastOrDefault().boundTransform;
-                var previousBone = finger.boundBones[(int)Bone.BoneType.INTERMEDIATE].boundTransform;
+                var lastBoneId = finger.boundBones[4].boundTransform == null ? 3 : 4;
+                var lastBone = finger.boundBones[lastBoneId].boundTransform;
+                var previousBone = finger.boundBones[lastBoneId - 1].boundTransform;
 
                 if (lastBone != null)
                 {

@@ -440,7 +440,7 @@ namespace Leap.HandsModule
 
                         if (target != null)
                         {
-                            if ((index + 1) <= 3)
+                            if ((index + 1) <= 4)
                             {
                                 var joint = FINGER.boundBones[index + 1];
                                 if (joint.boundTransform != null)
@@ -724,11 +724,11 @@ namespace Leap.HandsModule
                 GUILayout.BeginVertical();
 
                 //Draw the wrist bone object field
-                DrawObjectField("WRIST : ", ref handBinder.BoundHand.wrist);
+                DrawObjectField("Wrist", ref handBinder.BoundHand.wrist);
 
                 GUILayout.BeginHorizontal();
                 string length = handBinder.BoundHand.baseScale.ToString();
-                GUILayout.Label("HAND LENGTH", editorSkin.label);
+                GUILayout.Label("Hand Length", editorSkin.label);
                 GUILayout.Label(length, editorSkin.label, GUILayout.MaxWidth(EditorGUIUtility.labelWidth * 2));
                 GUILayout.EndHorizontal();
 
@@ -736,7 +736,7 @@ namespace Leap.HandsModule
 
                 for (int fingerID = 0; fingerID < handBinder.BoundHand.fingers.Length; fingerID++)
                 {
-                    var fingerType = ((Finger.FingerType)fingerID).ToString();
+                    var fingerType = ((Finger.FingerType)fingerID).ToString().ToLower().Capitalize();
                     var objectFieldName = "";
                     for (int boneID = 0; boneID < handBinder.BoundHand.fingers[fingerID].boundBones.Length; boneID++)
                     {
@@ -745,23 +745,22 @@ namespace Leap.HandsModule
                             continue;
                         }
 
-                        var boneType = ((Bone.BoneType)boneID).ToString();
-
-                        objectFieldName = ((fingerType + " " + boneType + " :").ToString());
+                        var boneType = boneID < 4 ? ((Bone.BoneType)boneID).ToString().ToLower().Capitalize() : "Tip";
+                        objectFieldName = $"{fingerType} {boneType}";
                         DrawObjectField(objectFieldName, ref handBinder.BoundHand.fingers[fingerID].boundBones[boneID], true, fingerID, boneID);
                     }
 
 
                     GUILayout.BeginHorizontal();
                     string fingerLength = handBinder.BoundHand.fingers[fingerID].fingerTipBaseLength.ToString();
-                    GUILayout.Label("FINGER LENGTH", editorSkin.label);
+                    GUILayout.Label($"{fingerType} Length", editorSkin.label);
                     GUILayout.Label(fingerLength, editorSkin.label, GUILayout.MaxWidth(EditorGUIUtility.labelWidth * 2));
                     GUILayout.EndHorizontal();
                     GUILayout.Space(spaceSize);
                 }
 
                 //Draw the Elbow bone object field
-                DrawObjectField("Elbow : ", ref handBinder.BoundHand.elbow);
+                DrawObjectField("Elbow", ref handBinder.BoundHand.elbow);
                 GUILayout.Space(spaceSize);
 
                 GUILayout.EndVertical();
@@ -815,7 +814,7 @@ namespace Leap.HandsModule
                 firstChildList = GetFirstChildren(newT, ref firstChildList);
                 for (int i = 0; i < firstChildList.Count; i++)
                 {
-                    if (boneID + i <= 3)
+                    if (boneID + i <= 4)
                     {
                         handBinder.BoundHand.fingers[fingerID].boundBones[boneID + i] = HandBinderAutoBinder.AssignBoundBone(firstChildList[i]);
                     }
@@ -877,35 +876,35 @@ namespace Leap.HandsModule
                 Vector2.Lerp(new Vector2(-20.9F, 51), new Vector2(-94.2f, 146.9f), .2f),
                 Vector2.Lerp(new Vector2(-20.9F, 51), new Vector2(-94.2f, 146.9f), .5f),
                 Vector2.Lerp(new Vector2(-20.9F, 51), new Vector2(-94.2f, 146.9f), .8f),
-                //Vector2.Lerp(new Vector2(-20.9F, 51), new Vector2(-94.2f, 146.9f), 1),
+                Vector2.Lerp(new Vector2(-20.9F, 51), new Vector2(-94.2f, 146.9f), 1),
                 
                 //Index
                 Vector2.Lerp(new Vector2(-7.1f, 89.37f), new Vector2(0.9f, 229.8f), 0),
                 Vector2.Lerp(new Vector2(-7.1f, 89.37f), new Vector2(0.9f, 229.8f), .45f),
                 Vector2.Lerp(new Vector2(-7.1f, 89.37f), new Vector2(0.9f, 229.8f), .65f),
                 Vector2.Lerp(new Vector2(-7.1f, 89.37f), new Vector2(0.9f, 229.8f), .85f),
-                //Vector2.Lerp(new Vector2(-7.1f, 89.37f), new Vector2(0.9f, 229.8f), 1),
+                Vector2.Lerp(new Vector2(-7.1f, 89.37f), new Vector2(0.9f, 229.8f), 1),
 
                 //Middle
                 Vector2.Lerp(new Vector2(17.5f, 99.4f), new Vector2(51.6f, 229.2f), 0),
                 Vector2.Lerp(new Vector2(17.5f, 99.4f), new Vector2(51.6f, 229.2f), .4f),
                 Vector2.Lerp(new Vector2(17.5f, 99.4f), new Vector2(51.6f, 229.2f), .6f),
                 Vector2.Lerp(new Vector2(17.5f, 99.4f), new Vector2(51.6f, 229.2f), .8f),
-                //Vector2.Lerp(new Vector2(17.5f, 99.4f), new Vector2(51.6f, 229.2f), 1),
+                Vector2.Lerp(new Vector2(17.5f, 99.4f), new Vector2(51.6f, 229.2f), 1),
 
                 //Ring
                 Vector2.Lerp(new Vector2(33.2f, 82.3f), new Vector2(91.3f, 200f), 0),
                 Vector2.Lerp(new Vector2(33.2f, 82.3f), new Vector2(91.3f, 200f), .4f),
                 Vector2.Lerp(new Vector2(33.2f, 82.3f), new Vector2(91.3f, 200f), .6f),
                 Vector2.Lerp(new Vector2(33.2f, 82.3f), new Vector2(91.3f, 200f), .8f),
-                //Vector2.Lerp(new Vector2(33.2f, 82.3f), new Vector2(91.3f, 200f), 1),
+                Vector2.Lerp(new Vector2(33.2f, 82.3f), new Vector2(91.3f, 200f), 1),
 
                 //Pinky
                 Vector2.Lerp(new Vector2(39.6f, 53.9f), new Vector2(125, 138.01f), 0),
                 Vector2.Lerp(new Vector2(75.4f, 98.6f), new Vector2(125, 138.01f), 0),
                 Vector2.Lerp(new Vector2(75.4f, 98.6f), new Vector2(125, 138.01f), .4f),
                 Vector2.Lerp(new Vector2(75.4f, 98.6f), new Vector2(125, 138.01f), .7f),
-                //Vector2.Lerp(new Vector2(75.4f, 98.6f), new Vector2(125, 138.01f), 1),
+                Vector2.Lerp(new Vector2(75.4f, 98.6f), new Vector2(125, 138.01f), 1),
 
                 //Wrist
                 new Vector2(0, 0),
