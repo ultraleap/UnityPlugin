@@ -26,6 +26,7 @@ namespace Leap
     /// class that needs hand tracking data from the camera will need a reference to a 
     /// LeapServiceProvider to get that data.
     /// </summary>
+    [AddComponentMenu("Ultraleap/Providers/Leap Provider")]
     public class LeapServiceProvider : LeapProvider
     {
         #region Constants

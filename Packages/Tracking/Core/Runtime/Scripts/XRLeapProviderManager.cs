@@ -21,6 +21,7 @@ namespace Leap
     /// available at the time of application launch.
     /// The order of selection is: UL OpenXR -> Leap Direct -> OpenXR
     /// </summary>
+    [AddComponentMenu("Ultraleap/Providers/Leap Provider (XR Auto)")]
     public class XRLeapProviderManager : LeapProvider
     {
         /// <summary>

@@ -22,6 +22,7 @@ namespace Leap
     /// This component can be placed anywhere in your scene as long as mainCamera 
     /// references the XR camera. 
     /// </summary>
+    [AddComponentMenu("Ultraleap/Providers/Leap Provider (XR)")]
     public class LeapXRServiceProvider : LeapServiceProvider
     {
 

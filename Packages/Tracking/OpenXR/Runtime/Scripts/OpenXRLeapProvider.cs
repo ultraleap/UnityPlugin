@@ -10,6 +10,7 @@ using Hand = Leap.Hand;
 
 namespace Leap.Tracking.OpenXR
 {
+    [AddComponentMenu("Ultraleap/Leap Provider (OpenXR)")]
     public class OpenXRLeapProvider : LeapProvider
     {
         private LeapTransform trackerTransform = new LeapTransform(Vector3.zero, Quaternion.identity);

@@ -18,6 +18,7 @@ namespace Leap.HandsModule
     /// You can bind your model by specifying transforms for the different joints and use the debug and fine tuning options to test and adjust it.
     /// </summary>
     [DisallowMultipleComponent]
+    [AddComponentMenu("Ultraleap/Hand Binder")]
     public class HandBinder : HandModelBase
     {
         #region Inspector

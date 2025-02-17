@@ -19,6 +19,7 @@ namespace Leap
     /// tracking ends.
     /// </summary>
     [DefaultExecutionOrder(1)]
+    [AddComponentMenu("Ultraleap/Hand Enable Disable")]
     public class HandEnableDisable : MonoBehaviour
     {
         [SerializeField]
