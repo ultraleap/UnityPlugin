@@ -139,7 +139,7 @@ namespace Leap.HandsModule
             // Add the missing tip to the data structure if it was not there to begin with.
             foreach (var finger in BoundHand.fingers)
             {
-                if (finger.boundBones.Length == 4)
+                if (finger.boundBones.Length < 5)
                 {
                     finger.boundBones = new BoundBone[]
                     {
@@ -402,7 +402,10 @@ namespace Leap.HandsModule
                 {
                     var boundBone = finger.boundBones[boneIndex];
                     var startTransform = boundBone.startTransform;
-                    var leapBone = LeapHand.fingers[fingerIndex].bones[boneIndex < 4 ? boneIndex : boneIndex - 1];
+
+                    bool isTip = boneIndex == 4;
+
+                    var leapBone = LeapHand.fingers[fingerIndex].bones[!isTip ? boneIndex : boneIndex - 1];
                     var boneOffset = boundBone.offset;
                     var boundTransform = boundBone.boundTransform;
 
@@ -423,7 +426,7 @@ namespace Leap.HandsModule
                         //Only update the finger position if the user has defined this behaviour
                         if (SetPositions)
                         {
-                            boundTransform.transform.position = boneIndex < 4 ? leapBone.PrevJoint : leapBone.NextJoint;
+                            boundTransform.transform.position = !isTip ? leapBone.PrevJoint : leapBone.NextJoint;
                         }
                         else
                         {
