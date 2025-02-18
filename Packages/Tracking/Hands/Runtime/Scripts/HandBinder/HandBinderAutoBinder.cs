@@ -37,10 +37,13 @@ namespace Leap.HandsModule
 
             //If the user has set the wrist, use that as the root to search for bones
             var root = handBinder.transform;
-            if (handBinder.BoundHand.wrist.boundTransform != null)
-            {
-                root = handBinder.BoundHand.wrist.boundTransform;
-            }
+            
+            // Previously the wrist was used as the base if it exists, but this means the elbow was overlooked if
+            // rebound...
+            // if (handBinder.BoundHand.wrist.boundTransform != null)
+            // {
+            //     root = handBinder.BoundHand.wrist.boundTransform;
+            // }
 
             children.Add(root);
             children.AddRange(GetAllChildren(root));
@@ -141,7 +144,7 @@ namespace Leap.HandsModule
                 foreach (var child in children)
                 {
                     //We have found all the bones we need
-                    if (bones.Count == 4)
+                    if (bones.Count == 5)
                     {
                         break;
                     }
@@ -194,12 +197,12 @@ namespace Leap.HandsModule
             else if (bones.Length > MINIMUM_TRANSFORMS)
             {
 
-                if (isThumb == true)
+                if (isThumb)
                 {
                     proximal = bones[0];
                     middle = bones[1];
                     distal = bones[2];
-                    tip = bones.Length > 4 ? bones[3] : null;
+                    tip = bones.Length > 3 ? bones[3] : null;
                 }
                 else
                 {
@@ -207,7 +210,7 @@ namespace Leap.HandsModule
                     proximal = bones[1];
                     middle = bones[2];
                     distal = bones[3];
-                    tip = bones.Length > 4 ? bones[3] : null;
+                    tip = bones.Length > 4 ? bones[4] : null;
                 }
             }
 
