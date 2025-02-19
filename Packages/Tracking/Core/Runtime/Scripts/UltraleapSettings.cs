@@ -166,7 +166,7 @@ namespace Leap
             using (new EditorGUI.IndentLevelScope())
             {
                 // Enable automatic upgrades
-                UltraleapSettings.AutomaticallyUpgradeMaterialsToCurrentRenderPipeline = EditorGUILayout.ToggleLeft("Automatically attempt to upgrade Ultraleap plugin materials to the active render pipeline", UltraleapSettings.AutomaticallyUpgradeMaterialsToCurrentRenderPipeline);
+                UltraleapSettings.AutomaticallyUpgradeMaterialsToCurrentRenderPipeline = EditorGUILayout.ToggleLeft("Enable automatic upgrades of Ultraleap plugin materials to the active render pipeline on this machine. Note: if set to false, this setting will persist across ALL Unity projects that use the plugin. You can still manually force the upgrade.", UltraleapSettings.AutomaticallyUpgradeMaterialsToCurrentRenderPipeline);
             }
 
             EditorGUILayout.Space(30);

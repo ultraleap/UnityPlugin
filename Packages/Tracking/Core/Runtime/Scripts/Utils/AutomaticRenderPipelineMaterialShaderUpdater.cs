@@ -89,70 +89,20 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
             UniversalRenderPipelineShaderName = "Universal Render Pipeline/Simple Lit",
             //OnBeforeConversionToURP = OnBeforeConversionToURPLit,
             //OnAfterConversionToURP = OnAfterConversionToURPLit}
-        },
-
-        new ShaderMapping()
-        {
-            UseBuiltInRenderPipelineShaderName = true,
-            BuiltInRenderPipelineShaderName = "Ultraleap/TransparentColorUnlit",
-
-            UseUniversalRenderPipelineShaderName = true,
-            UniversalRenderPipelineShaderName = "Ultraleap/Universal Render Pipeline/TransparentColorUnlit",
-        },
-
-        new ShaderMapping()
-        {
-            UseBuiltInRenderPipelineShaderName = true,
-            BuiltInRenderPipelineShaderName = "Ultraleap/Gradient Skybox",
-
-            UseUniversalRenderPipelineShaderName = true,
-            UniversalRenderPipelineShaderName = "Ultraleap/Universal Render Pipeline/Gradient Skybox",
-        },
-
-        new ShaderMapping()
-        {
-            UseBuiltInRenderPipelineShaderName = true,
-            BuiltInRenderPipelineShaderName = "Ultraleap/Simple Outline",
-
-            UseUniversalRenderPipelineShaderName = true,
-            UniversalRenderPipelineShaderName = "Ultraleap/Universal Render Pipeline/Simple Outline",
-        },
-
-        new ShaderMapping()
-        {
-            UseBuiltInRenderPipelineShaderName = true,
-            BuiltInRenderPipelineShaderName = "Ultraleap/DottedLineShader",
-
-            UseUniversalRenderPipelineShaderName = true,
-            UniversalRenderPipelineShaderName = "Ultraleap/Universal Render Pipeline/DottedLineShader",
-        },
-
-        new ShaderMapping()
-        {
-            UseBuiltInRenderPipelineShaderName = true,
-            BuiltInRenderPipelineShaderName = "Ultraleap/GenericHandShader",
-
-            UseUniversalRenderPipelineShaderName = true,
-            UniversalRenderPipelineShaderName = "Ultraleap/Universal Render Pipeline/GenericHandShader",
-        },
-
-        new ShaderMapping()
-        {
-            UseBuiltInRenderPipelineShaderName = true,
-            BuiltInRenderPipelineShaderName = "Ultraleap/LegacyHandShader",
-
-            UseUniversalRenderPipelineShaderName = true,
-            UniversalRenderPipelineShaderName = "Ultraleap/Universal Render Pipeline/GenericHandShader"
-        },
+        }
     };
 
 
-    [SerializeField]
     [Tooltip("If true, the user will be prompted to confirm the conversion, even if automatic is on. This is to prevent unwanted upgrades")]
-    bool promptUserToConfirmConversion = true;
+    public bool PromptUserToConfirmConversion = true;
 
     [SerializeField]
-    bool userHasBeenPrompted = false; 
+    //[HideInInspector]
+    public int NumberOfTimesUserRejectedPrompt = 0;
+
+    [SerializeField]
+    //[HideInInspector]
+    public bool AutomaticConversionIsOffForPluginInProject = false;
 
     private readonly List<string> ultraleapPathIdentifiers = new List<string>() { "Ultraleap Tracking", "Ultraleap Tracking Preview", "com.ultraleap.tracking", "com.ultraleap.tracking.preview" };
 
@@ -185,34 +135,37 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
 
     public void AutoRefreshMaterialShadersForPipeline()
     {
-        if (UltraleapSettings.AutomaticallyUpgradeMaterialsToCurrentRenderPipeline && 
+        if (UltraleapSettings.AutomaticallyUpgradeMaterialsToCurrentRenderPipeline &&
+            AutomaticConversionIsOffForPluginInProject == false &&
             FoundPluginMaterialsThatDontMatchCurrentRenderPipeline())
         {
             bool goAhead = false;
 
-            if (!userHasBeenPrompted && promptUserToConfirmConversion)
+            if (PromptUserToConfirmConversion)
             {
                 if (UnityEditorInternal.InternalEditorUtility.isHumanControllingUs)
                 {
                     int option = EditorUtility.DisplayDialogComplex("Convert Ultraleap Plugin Materials",
                         "Materials have been detected in the Ultraleap plugin that don't match the current project's chosen render pipeline." +
-                        "Would you like to convert these materials to the current render pipeline?",
-                        "Convert",
-                        "Cancel",
-                        "Don't Convert");
+                        "Would you like to convert these materials to the current render pipeline? +",
+                        "Yes, but don't ask each time",
+                        "Yes and ask next time too",
+                        "No");
 
                     switch (option)
                     {
                         case 0:
                             goAhead = true;
+                            PromptUserToConfirmConversion = false;
                             break;
 
                         case 1:
-                            goAhead = false;
+                            goAhead = true;
                             break;
 
                         case 2:
                             goAhead = false;
+                            NumberOfTimesUserRejectedPrompt++;
                             break;
 
                         default:
@@ -220,7 +173,14 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
                             break;
                     }
 
-                    userHasBeenPrompted = true;
+                    // Let's give the user the chance to stop being nagged ...
+                    if (NumberOfTimesUserRejectedPrompt >= 3 && NumberOfTimesUserRejectedPrompt <=6)
+                    {
+                        if (EditorUtility.DisplayDialog("Convert Ultraleap Plugin Materials", "You've said no to converting materials a few times now. Do you want to turn this (automatic) feature off?", "Yes", "No"))
+                        {
+                            AutomaticConversionIsOffForPluginInProject = true;
+                        }
+                    }
 
                     // Save this change ...
                     EditorUtility.SetDirty(this);
@@ -229,7 +189,7 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
 
                 }
             }
-            else if (!promptUserToConfirmConversion)
+            else if (!PromptUserToConfirmConversion)
             {
                 goAhead = true;
             }
