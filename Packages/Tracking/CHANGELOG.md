@@ -8,9 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [NEXT]
 
+### Added
+- Added support to upgrade the plugin's Built In Render Pipeline materials (and as a result the example scenes) to the Universal Render Pipeline. This can be set to automatically prompt when the materials don't match the current render pipeline
+
 ### Fixed
 - Fixed some warnings around runtime variables that were only used in editor mode
 - Fixed an issue with Physical Hands and Unity 6 due to the physics Contact Generation setting being removed
+
+### Changed
+- Updated all custom shaders to support the Universal Render Pipeline concurrently with the Built-in Render Pipeline
 
 ## [7.2.0] - 17/01/2025
 
