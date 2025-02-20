@@ -371,7 +371,7 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
 
         if (IsUniveralRenderPipeline)
         {
-            return material.GetTag("RenderPipeline", false) == "UniversalRenderPipeline";
+            return material.GetTag("RenderPipeline", true) == "UniversalPipeline";
         }
 
         return true;
