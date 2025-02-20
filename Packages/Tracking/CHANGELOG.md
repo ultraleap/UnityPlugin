@@ -22,7 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed issue with Unity 6 triggering warnings for scripts that need to be upgraded due to Unity 6 API changes
 - Fixed a broken meta file in Physical Hands XR Examples
 - Fixed a frequent editor freeze that would occur when the Leap service is stopped/uninstalled
-- Fixed issue with pose detection scene. Grab ball was not working / moving the panel. SimpleInteractionGlow script was outputting NullReferenceExceptions
+- Fixed issues with pose detection scene where the grab ball was not moving the panel, SimpleInteractionGlow script was outputting NullReferenceExceptions and it was possible to push the record button out of the UI panel
 
 ## [7.1.0] - 04/09/2024
 
