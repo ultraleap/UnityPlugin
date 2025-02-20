@@ -1,30 +1,59 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 
+/// <summary>
+/// Class to perform any plugin initialization logic when a Ultraleap Unity Package is first loaded
+/// </summary>
+[InitializeOnLoad]
 [ExecuteInEditMode]
-[CreateAssetMenu(fileName = "Package Installation Handler", menuName = "Ultraleap/PackageInstallationHandler", order = 1)]
-public class PackageInstallationHandler : ScriptableObject
+public static class PackageInstallationHandler 
 {
-    [SerializeField]
-    private AutomaticRenderPipelineMaterialShaderUpdater _materialUpdater;
+    private static AutomaticRenderPipelineMaterialShaderUpdater _materialUpdater;
+    private static bool _isInitialized = false;
 
-    private void Awake()
-    {
-        UnityEditor.PackageManager.Events.registeredPackages += Events_registeredPackages;    
+    [InitializeOnLoadMethod]
+    public static void RegisterForPackageLoad()
+    {   
+        if (!_isInitialized)
+        {
+            UnityEditor.PackageManager.Events.registeredPackages += Events_registeredPackages;
+            _isInitialized = true;  
+        }
     }
 
-    private void Events_registeredPackages(UnityEditor.PackageManager.PackageRegistrationEventArgs obj)
+    private static void Events_registeredPackages(UnityEditor.PackageManager.PackageRegistrationEventArgs obj)
     {
         if (obj != null)
         {
             if (obj.added.Any(pi => pi.displayName == "Ultraleap Tracking" || pi.displayName == "Ultraleap Tracking Preview"))
             {
-                // Reset some settings related to upgrade of materials based on the render pipeline
-                _materialUpdater.PromptUserToConfirmConversion = true;
-                _materialUpdater.NumberOfTimesUserRejectedPrompt = 0;
-                _materialUpdater.AutomaticConversionIsOffForPluginInProject = false;
+                Debug.Log($"An Ultraleap Package was just installed");
+
+                if (_materialUpdater == null)
+                {
+                    try
+                    {
+                        _materialUpdater = Resources.Load<AutomaticRenderPipelineMaterialShaderUpdater>("AutomaticRenderPipelineMaterialShaderUpdater");
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogException(e);
+                    }
+                }
+
+                if (_materialUpdater != null)
+                {
+                    // Reset some settings related to upgrade of materials based on the render pipeline
+                    _materialUpdater.PromptUserToConfirmConversion = true;
+                    _materialUpdater.NumberOfTimesUserRejectedPrompt = 0;
+                    _materialUpdater.AutomaticConversionIsOffForPluginInProject = false;
+
+                    _materialUpdater.AutoRefreshMaterialShadersForPipeline();
+                }
             }     
         }
     }
