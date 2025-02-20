@@ -32,29 +32,33 @@ public static class PackageInstallationHandler
             if (obj.added.Any(pi => pi.displayName == "Ultraleap Tracking" || pi.displayName == "Ultraleap Tracking Preview"))
             {
                 Debug.Log($"An Ultraleap Package was just installed");
-
-                if (_materialUpdater == null)
-                {
-                    try
-                    {
-                        _materialUpdater = Resources.Load<AutomaticRenderPipelineMaterialShaderUpdater>("AutomaticRenderPipelineMaterialShaderUpdater");
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.LogException(e);
-                    }
-                }
-
-                if (_materialUpdater != null)
-                {
-                    // Reset some settings related to upgrade of materials based on the render pipeline
-                    _materialUpdater.PromptUserToConfirmConversion = true;
-                    _materialUpdater.NumberOfTimesUserRejectedPrompt = 0;
-                    _materialUpdater.AutomaticConversionIsOffForPluginInProject = false;
-
-                    _materialUpdater.AutoRefreshMaterialShadersForPipeline();
-                }
+                UpgradeMaterialsInProject();
             }     
+        }
+    }
+
+    public static void UpgradeMaterialsInProject()
+    {
+        if (_materialUpdater == null)
+        {
+            try
+            {
+                _materialUpdater = Resources.Load<AutomaticRenderPipelineMaterialShaderUpdater>("AutomaticRenderPipelineMaterialShaderUpdater");
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+            }
+        }
+
+        if (_materialUpdater != null)
+        {
+            // Reset some settings related to upgrade of materials based on the render pipeline
+            _materialUpdater.PromptUserToConfirmConversion = true;
+            _materialUpdater.NumberOfTimesUserRejectedPrompt = 0;
+            _materialUpdater.AutomaticConversionIsOffForPluginInProject = false;
+
+            _materialUpdater.AutoRefreshMaterialShadersForPipeline();
         }
     }
 }

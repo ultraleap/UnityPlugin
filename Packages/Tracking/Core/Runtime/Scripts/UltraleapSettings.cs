@@ -166,7 +166,9 @@ namespace Leap
             using (new EditorGUI.IndentLevelScope())
             {
                 // Enable automatic upgrades
-                UltraleapSettings.AutomaticallyUpgradeMaterialsToCurrentRenderPipeline = EditorGUILayout.ToggleLeft("Enable automatic upgrades of Ultraleap plugin materials to the active render pipeline on this machine. Note: if set to false, this setting will persist across ALL Unity projects that use the plugin. You can still manually force the upgrade.", UltraleapSettings.AutomaticallyUpgradeMaterialsToCurrentRenderPipeline);
+                UltraleapSettings.AutomaticallyUpgradeMaterialsToCurrentRenderPipeline = 
+                    EditorGUILayout.ToggleLeft("Enable automatic upgrades of Ultraleap plugin materials to the active render pipeline on this machine.", UltraleapSettings.AutomaticallyUpgradeMaterialsToCurrentRenderPipeline);
+                EditorGUILayout.TextArea("Note: if set to false, this setting will persist across ALL Unity projects that use the plugin. You can still manually force the upgrade.");
             }
 
             EditorGUILayout.Space(30);
@@ -378,6 +380,32 @@ namespace Leap
         {
             ReplaceUseOfFingersInPoseScriptableObjects();
         }
+
+        [MenuItem("Ultraleap/Updating/Update Materials for Active Render Pipeline", false, 201)]
+        private static void UpdateMaterialsForActiveRenderPipeline()
+        {
+            AutomaticRenderPipelineMaterialShaderUpdater _materialUpdater = null;
+                
+            try
+            {
+                _materialUpdater = Resources.Load<AutomaticRenderPipelineMaterialShaderUpdater>("AutomaticRenderPipelineMaterialShaderUpdater");
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+            }
+            
+            if (_materialUpdater != null)
+            {
+                // Reset some settings related to upgrade of materials based on the render pipeline
+                _materialUpdater.PromptUserToConfirmConversion = true;
+                _materialUpdater.NumberOfTimesUserRejectedPrompt = 0;
+                _materialUpdater.AutomaticConversionIsOffForPluginInProject = false;
+
+                _materialUpdater.AutoRefreshMaterialShadersForPipeline(silentMode: true);
+            }
+        }
+
 #endif
 
         private static UltraleapSettings FindSettingsSO()

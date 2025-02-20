@@ -13,8 +13,7 @@ static class RenderPipelineValidation
 {
     static RenderPipelineValidation()
     {
-        foreach (var pipelineHandler in GetAllInstances())
-            pipelineHandler.AutoRefreshMaterialShadersForPipeline();
+        GetAllInstances();
     }
 
     static List<AutomaticRenderPipelineMaterialShaderUpdater> GetAllInstances()
@@ -133,7 +132,7 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
         AutoRefreshMaterialShadersForPipeline();
     }
 
-    public void AutoRefreshMaterialShadersForPipeline()
+    public void AutoRefreshMaterialShadersForPipeline(bool silentMode = false)
     {
         if (UltraleapSettings.AutomaticallyUpgradeMaterialsToCurrentRenderPipeline &&
             AutomaticConversionIsOffForPluginInProject == false &&
@@ -141,31 +140,34 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
         {
             bool goAhead = false;
 
-            if (PromptUserToConfirmConversion)
+            if (PromptUserToConfirmConversion && !silentMode)
             {
                 if (UnityEditorInternal.InternalEditorUtility.isHumanControllingUs)
                 {
                     int option = EditorUtility.DisplayDialogComplex("Convert Ultraleap Plugin Materials",
                         "Materials have been detected in the Ultraleap plugin that don't match the current project's chosen render pipeline." +
-                        "Would you like to convert these materials to the current render pipeline? +",
+                        "Would you like to convert these materials to the current render pipeline?",
                         "Yes, but don't ask each time",
-                        "Yes and ask next time too",
-                        "No");
+                        "No",
+                        "Yes and ask next time too");
 
                     switch (option)
                     {
+                        // OK - "Yes, but don't ask each time"
                         case 0:
                             goAhead = true;
                             PromptUserToConfirmConversion = false;
                             break;
 
+                        // Cancel - "No"
                         case 1:
-                            goAhead = true;
-                            break;
-
-                        case 2:
                             goAhead = false;
                             NumberOfTimesUserRejectedPrompt++;
+                            break;
+
+                        // Alt - "Yes and ask next time too"
+                        case 2: 
+                            goAhead = true;
                             break;
 
                         default:
