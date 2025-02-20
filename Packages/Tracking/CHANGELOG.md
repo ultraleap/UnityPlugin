@@ -21,7 +21,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Multi device mode will no longer be requested on Connection if arg is set to false
 - Fixed issue with Unity 6 triggering warnings for scripts that need to be upgraded due to Unity 6 API changes
 - Fixed a broken meta file in Physical Hands XR Examples
-- Fixed a frequent editor freeze that would occur when the Leap service is stopped/uninstalled 
+- Fixed a frequent editor freeze that would occur when the Leap service is stopped/uninstalled
+- Fixed issues with pose detection scene where the grab ball was not moving the panel, SimpleInteractionGlow script was outputting NullReferenceExceptions and it was possible to push the record button out of the UI panel
 
 ### Known Issues
  - Multiple issues present in the Pose Recorder Scene - grab ball does not work, pose record button falls through panel and flies away, NullReferenceException raised by SimpleInteractionGlow script
