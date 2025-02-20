@@ -75,9 +75,10 @@ namespace Leap.Recording
             }
         }
 
-        private void Update()
+        private void OnGUI()
         {
-            if (toggleRecordingKey != KeyCode.None && Input.GetKeyDown(toggleRecordingKey))
+            if (toggleRecordingKey != KeyCode.None && Event.current.type == EventType.KeyDown &&
+                Event.current.keyCode == toggleRecordingKey)
             {
                 if (recording)
                     EndRecording();

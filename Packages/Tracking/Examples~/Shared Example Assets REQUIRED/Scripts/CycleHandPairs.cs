@@ -6,8 +6,11 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
-using System.Collections.Generic;
 using UnityEngine;
+
+#if UNITY_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+#endif
 
 namespace Leap.HandsModule.Examples
 {
@@ -41,6 +44,19 @@ namespace Leap.HandsModule.Examples
                 return;
             }
 
+#if UNITY_INPUT_SYSTEM
+            if (Keyboard.current != null)
+            {
+                if (Keyboard.current.rightArrowKey.wasReleasedThisFrame)
+                {
+                    NextHandSet();
+                }
+                if (Keyboard.current.leftArrowKey.wasReleasedThisFrame)
+                {
+                    PreviousHandSet();
+                }
+            }
+#else
             if (Input.GetKeyUp(KeyCode.RightArrow))
             {
                 NextHandSet();
@@ -50,6 +66,7 @@ namespace Leap.HandsModule.Examples
             {
                 PreviousHandSet();
             }
+#endif
         }
 
         private void NextHandSet()
