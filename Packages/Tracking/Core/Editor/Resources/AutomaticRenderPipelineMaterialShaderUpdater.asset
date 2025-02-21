@@ -25,6 +25,16 @@ MonoBehaviour:
     UseUniversalRenderPipelineShaderName: 1
     UniversalRenderPipelineShaderName: Universal Render Pipeline/Simple Lit
     UniversalRenderPipelineShader: {fileID: 0}
-  PromptUserToConfirmConversion: 1
-  NumberOfTimesUserRejectedPrompt: 1
+  - UseBuiltInRenderPipelineShaderName: 1
+    BuiltInRenderPipelineShaderName: Unlit/Color
+    BuiltInRenderPipelineShader: {fileID: 0}
+    UseUniversalRenderPipelineShaderName: 1
+    UniversalRenderPipelineShaderName: Universal Render Pipeline/Particles/Unlit
+    UniversalRenderPipelineShader: {fileID: 0}
+  ShadersToIgnore:
+  - GUI/Text Shader
+  - TextMeshPro/Distance Field
+  - UI/Default
+  PromptUserToConfirmConversion: 0
+  NumberOfTimesUserRejectedPrompt: 0
   AutomaticConversionIsOffForPluginInProject: 0

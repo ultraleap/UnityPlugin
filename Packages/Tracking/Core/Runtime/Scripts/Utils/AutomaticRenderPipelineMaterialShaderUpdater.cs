@@ -88,9 +88,24 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
             UniversalRenderPipelineShaderName = "Universal Render Pipeline/Simple Lit",
             //OnBeforeConversionToURP = OnBeforeConversionToURPLit,
             //OnAfterConversionToURP = OnAfterConversionToURPLit}
+        },
+
+        new ShaderMapping()
+        {
+            UseBuiltInRenderPipelineShaderName = true,
+            BuiltInRenderPipelineShaderName = "Unlit/Color",
+            //OnBeforeConversionToBiRP = OnBeforeConversionFromToBiRPStandard,
+            //OnAfterConversionToBiRP = OnAfterConversionToBiRPStandard,
+
+            UseUniversalRenderPipelineShaderName = true,
+            UniversalRenderPipelineShaderName = "Universal Render Pipeline/Particles/Unlit",
+            //OnBeforeConversionToURP = OnBeforeConversionToURPLit,
+            //OnAfterConversionToURP = OnAfterConversionToURPLit}
         }
     };
 
+    [Tooltip("A list of shaders that should be ignored")]
+    public string[] ShadersToIgnore = new string[] { "GUI/Text Shader", "TextMeshPro/Distance Field", "UI/Default" };
 
     [Tooltip("If true, the user will be prompted to confirm the conversion, even if automatic is on. This is to prevent unwanted upgrades")]
     public bool PromptUserToConfirmConversion = true;
@@ -209,16 +224,30 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
 
         foreach (Material material in materials)
         {
-            if (!MaterialShaderMatchesActiveRenderPipeline(material)) 
+            if (!IgnoreMaterial(material))
             {
-                return true;
+                if (!MaterialShaderMatchesActiveRenderPipeline(material))
+                {
+                    return true;
+                }
             }
         }
 
         return false;
     }
 
-#endif
+    private bool IgnoreMaterial(Material material)
+    {
+        foreach (var shaderName in ShadersToIgnore)
+        {
+            if (material.shader.name == shaderName) 
+            { 
+                return true; 
+            }
+        }
+
+        return false;
+    }
 
     /// <summary>
     /// Applies the appropriate shader to the materials based on the current render pipeline.
@@ -230,22 +259,45 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
 
         foreach (Material material in materials)
         {
-            if (!MaterialShaderMatchesActiveRenderPipeline(material))
+            if (!IgnoreMaterial(material))
             {
-                UpdateMaterialShader(material);
-                count++;    
+                if (!MaterialShaderMatchesActiveRenderPipeline(material))
+                {
+                    UpdateMaterialShader(material);
+                    count++;
+                }
             }
         }
 
-
-#if UNITY_EDITOR
         if (UnityEditorInternal.InternalEditorUtility.isHumanControllingUs)
         {
             EditorUtility.DisplayDialog("Material Upgrade Status", $"Upgraded {count} materials to the current render pipeline", "OK");
         }
-#endif
 
+        CheckForConversionIssues(materials);
     }
+
+    private void CheckForConversionIssues(List<Material> materials)
+    {
+        if (FoundPluginMaterialsThatDontMatchCurrentRenderPipeline() && UnityEditorInternal.InternalEditorUtility.isHumanControllingUs)
+        {
+            if (EditorUtility.DisplayDialog("Material Upgrade Status", "Some materials could not be converted, do you want to ignore those in future?", "Yes", "No"))
+            {
+                foreach (Material material in materials)
+                {
+                    if (!IgnoreMaterial(material))
+                    {
+                        if (!MaterialShaderMatchesActiveRenderPipeline(material))
+                        {
+                            ShadersToIgnore.Append(material.shader.name);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+#endif
 
     private void UpdateMaterialShader(Material material)
     {
