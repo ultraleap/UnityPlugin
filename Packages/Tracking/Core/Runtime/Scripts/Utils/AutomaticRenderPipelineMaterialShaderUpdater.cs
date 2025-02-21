@@ -321,16 +321,20 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
         {
             if (EditorUtility.DisplayDialog("Material Update Status", "Some materials could not be converted, do you want to ignore those in future?", "Yes", "No"))
             {
+                List<string> newIgnoreList = ShadersToIgnore.ToList();
+
                 foreach (Material material in materials)
                 {
                     if (!IgnoreMaterial(material))
                     {
                         if (!MaterialShaderMatchesActiveRenderPipeline(material))
                         {
-                            ShadersToIgnore.Append(material.shader.name);
+                            newIgnoreList.Add(material.shader.name);
                         }
                     }
                 }
+
+                ShadersToIgnore = newIgnoreList.ToArray();  
             }
         }
     }
