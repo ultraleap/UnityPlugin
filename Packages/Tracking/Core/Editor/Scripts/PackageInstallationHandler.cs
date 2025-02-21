@@ -43,7 +43,17 @@ public static class PackageInstallationHandler
         {
             try
             {
+                // Note, loading the instance will cause Enable to be called, if the AutomaticRenderPipelineMaterialShaderUpdater scriptable object instance
+                // has been serialized with the PromptUserToConfirmConversion flag set to false (e.g. in the plugin release or source) then the
+                // user won't be prompted about the render pipeline conversion, that's not the behaviour we want. The plugin source should be fixed.
                 _materialUpdater = Resources.Load<AutomaticRenderPipelineMaterialShaderUpdater>("AutomaticRenderPipelineMaterialShaderUpdater");
+
+                if (_materialUpdater.PromptUserToConfirmConversion == false)
+                {
+                    Debug.LogWarning($"The Ultraleap Unity plugin Resources contains a serialized instance of the AutomaticRenderPipelineMaterialShaderUpdater ScriptableObject " +
+                        $"where PromptUserToConfirmConversion has been set to false. This is undesirable (considered a bug) and the asset should be recommitted with the flag set to true. " +
+                        $"The setting is visible in the Inspector properties.");
+                }
             }
             catch (Exception e)
             {

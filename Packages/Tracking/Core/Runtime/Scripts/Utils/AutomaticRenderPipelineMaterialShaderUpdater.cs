@@ -58,6 +58,11 @@ public class ShaderState
     public float BlendMode;
 }
 
+/// <summary>
+/// <see langword="class"/> to handle upgrading all plugin materials from the Built In Render Pipeline to the Universal Render Pipeline
+/// Does not support downgrading from URP to BiRP, but there are placeholder for that support. Currently that is not an issue as the Plugin ships
+/// with BiRP compatible materials/shaders.
+/// </summary>
 [CreateAssetMenu(fileName = "Automatic Render Pipeline Material Shader Updater", menuName = "Ultraleap/AutomaticRenderPipelineMaterialShaderUpdater", order = 0)]
 [Serializable]
 public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
@@ -255,6 +260,7 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
     public void UpdatePipelineShaders()
     {
         var materials = GetUltraleapMaterialsInPackagesAndAssets(false);
+        
         int count = 0;
 
         foreach (Material material in materials)
@@ -271,7 +277,7 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
 
         if (UnityEditorInternal.InternalEditorUtility.isHumanControllingUs)
         {
-            EditorUtility.DisplayDialog("Material Upgrade Status", $"Upgraded {count} materials to the current render pipeline", "OK");
+            EditorUtility.DisplayDialog("Material Update Status", $"Updated {count} materials to the current render pipeline", "OK");
         }
 
         CheckForConversionIssues(materials);
@@ -281,7 +287,7 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
     {
         if (FoundPluginMaterialsThatDontMatchCurrentRenderPipeline() && UnityEditorInternal.InternalEditorUtility.isHumanControllingUs)
         {
-            if (EditorUtility.DisplayDialog("Material Upgrade Status", "Some materials could not be converted, do you want to ignore those in future?", "Yes", "No"))
+            if (EditorUtility.DisplayDialog("Material Update Status", "Some materials could not be converted, do you want to ignore those in future?", "Yes", "No"))
             {
                 foreach (Material material in materials)
                 {
