@@ -1,3 +1,4 @@
+using Codice.Client.BaseCommands;
 using Leap;
 using System;
 using System.Collections.Generic;
@@ -56,6 +57,19 @@ public class ShaderState
     public Texture MainTexture;
 
     public float BlendMode;
+}
+
+public class MyAssetPostProcessor : AssetPostprocessor
+{
+
+    static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths, bool didDomainReload)
+    {
+        var _materialUpdater = Resources.Load<AutomaticRenderPipelineMaterialShaderUpdater>("AutomaticRenderPipelineMaterialShaderUpdater");
+        if (_materialUpdater != null )
+        {
+            _materialUpdater.AutoRefreshMaterialShadersForPipeline();
+        }
+    }
 }
 
 /// <summary>
@@ -128,6 +142,8 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
     private List<Material> ultraleapMaterialsCache = new List<Material>();
 
     private static bool isInitialized = false;
+
+    private static MyAssetPostProcessor assetPostProcessor;
 
     public bool IsBuiltInRenderPipeline
     {
