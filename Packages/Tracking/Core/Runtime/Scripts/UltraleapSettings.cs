@@ -397,11 +397,6 @@ namespace Leap
             
             if (_materialUpdater != null)
             {
-                // Reset some settings related to upgrade of materials based on the render pipeline
-                _materialUpdater.PromptUserToConfirmConversion = true;
-                _materialUpdater.NumberOfTimesUserRejectedPrompt = 0;
-                _materialUpdater.AutomaticConversionIsOffForPluginInProject = false;
-
                 _materialUpdater.AutoRefreshMaterialShadersForPipeline(silentMode: true);
             }
         }
