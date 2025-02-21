@@ -48,7 +48,7 @@ public static class PackageInstallationHandler
                 // user won't be prompted about the render pipeline conversion, that's not the behaviour we want. The plugin source should be fixed.
                 _materialUpdater = Resources.Load<AutomaticRenderPipelineMaterialShaderUpdater>("AutomaticRenderPipelineMaterialShaderUpdater");
 
-                if (_materialUpdater.PromptUserToConfirmConversion == false)
+                if (_materialUpdater?.PromptUserToConfirmConversion == false)
                 {
                     Debug.LogWarning($"The Ultraleap Unity plugin Resources contains a serialized instance of the AutomaticRenderPipelineMaterialShaderUpdater ScriptableObject " +
                         $"where PromptUserToConfirmConversion has been set to false. This is undesirable (considered a bug) and the asset should be recommitted with the flag set to true. " +

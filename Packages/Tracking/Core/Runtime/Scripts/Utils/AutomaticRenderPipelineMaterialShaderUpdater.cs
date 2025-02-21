@@ -127,6 +127,8 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
 
     private List<Material> ultraleapMaterialsCache = new List<Material>();
 
+    private static bool isInitialized = false;
+
     public bool IsBuiltInRenderPipeline
     {
         get
@@ -149,7 +151,15 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
         if (Application.isPlaying)
             return;
 
-        AutoRefreshMaterialShadersForPipeline();
+        if (!isInitialized)
+        {
+            AssetDatabase.onImportPackageItemsCompleted += delegate (string[] s)
+            {
+                AutoRefreshMaterialShadersForPipeline();
+            };
+
+            isInitialized = true;
+        }
     }
 
     public void AutoRefreshMaterialShadersForPipeline(bool silentMode = false)
@@ -203,12 +213,6 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
                             AutomaticConversionIsOffForPluginInProject = true;
                         }
                     }
-
-                    // Save this change ...
-                    EditorUtility.SetDirty(this);
-                    AssetDatabase.SaveAssets();
-                    AssetDatabase.Refresh();
-
                 }
             }
             else if (!PromptUserToConfirmConversion)
@@ -219,6 +223,18 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
             if (goAhead)
             {
                 UpdatePipelineShaders();
+            }
+
+            try
+            {
+                 // Save this change ...
+                EditorUtility.SetDirty(this);
+                AssetDatabase.SaveAssets();
+                AssetDatabase.Refresh();
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
             }
         }
     }
