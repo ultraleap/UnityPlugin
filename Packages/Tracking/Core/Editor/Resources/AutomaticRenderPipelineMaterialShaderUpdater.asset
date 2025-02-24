@@ -36,5 +36,5 @@ MonoBehaviour:
   - TextMeshPro/Distance Field
   - UI/Default
   PromptUserToConfirmConversion: 1
-  NumberOfTimesUserRejectedPrompt: 0
+  NumberOfTimesUserRejectedPrompt: 3
   AutomaticConversionIsOffForPluginInProject: 0
