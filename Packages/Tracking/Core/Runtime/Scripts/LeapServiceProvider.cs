@@ -1201,7 +1201,7 @@ namespace Leap
                 if (leapInfo.Name == deviceType)
                 {
                     info = leapInfo;
-                    Material mat = Resources.Load("TrackingVolumeVisualization/DeviceModelMat") as Material;
+                    Material mat = Resources.Load("TrackingVolumeVisualization/Materials/Built In Render Pipeline (Dynamically Upgradable)/DeviceModelMat") as Material;
                     mat.SetPass(0);
 
                     Graphics.DrawMeshNow(Resources.Load<Mesh>("TrackingVolumeVisualization/Meshes/" + deviceType), deviceModelMatrix *
@@ -1234,7 +1234,7 @@ namespace Leap
 
             if (OptimalFOV_Visualization && optimalFOVMesh != null)
             {
-                Material mat = Resources.Load("TrackingVolumeVisualization/OptimalFOVMat_Volume") as Material;
+                Material mat = Resources.Load("TrackingVolumeVisualization/Materials/OptimalFOVMat_Volume") as Material;
                 mat.SetPass(0);
 
                 Graphics.DrawMeshNow(optimalFOVMesh, deviceModelMatrix *
@@ -1242,7 +1242,7 @@ namespace Leap
             }
             if (MaxFOV_Visualization && maxFOVMesh != null)
             {
-                Material mat = Resources.Load("TrackingVolumeVisualization/MaxFOVMat_Volume") as Material;
+                Material mat = Resources.Load("TrackingVolumeVisualization/Materials/MaxFOVMat_Volume") as Material;
                 mat.SetPass(0);
 
                 Graphics.DrawMeshNow(maxFOVMesh, deviceModelMatrix *
