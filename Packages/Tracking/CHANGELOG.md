@@ -18,6 +18,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Updated all custom shaders to support the Universal Render Pipeline concurrently with the Built-in Render Pipeline
 
+### Known Issues
+- Pose detection scene does not illuminate all poses in green if built for mobile headsets when using URP
+- Pull chord does not return to the correct position when released in turntable and pull chord example
+- Clicks on UI elements using indirect interaction do not appear to work with the UI Input example 
+
+
 ## [7.2.0] - 17/01/2025
 
 ### Added
