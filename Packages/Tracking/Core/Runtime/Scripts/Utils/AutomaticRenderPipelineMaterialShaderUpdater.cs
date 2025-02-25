@@ -1,4 +1,3 @@
-using Codice.Client.BaseCommands;
 using Leap;
 using System;
 using System.Collections.Generic;
@@ -35,7 +34,6 @@ static class RenderPipelineValidation
         return shaderUpdaterInstances;
     }
 }
-#endif
 
 public enum StandardShaderBlendMode
 {
@@ -59,9 +57,8 @@ public class ShaderState
     public float BlendMode;
 }
 
-public class MyAssetPostProcessor : AssetPostprocessor
+public class RenderPipelineAssetPostprocessor : AssetPostprocessor
 {
-
     static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths, bool didDomainReload)
     {
         var _materialUpdater = Resources.Load<AutomaticRenderPipelineMaterialShaderUpdater>("AutomaticRenderPipelineMaterialShaderUpdater");
@@ -143,7 +140,7 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
 
     private static bool isInitialized = false;
 
-    private static MyAssetPostProcessor assetPostProcessor;
+    private static RenderPipelineAssetPostprocessor assetPostProcessor;
 
     public bool IsBuiltInRenderPipeline
     {
@@ -161,7 +158,6 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
         }
     }
 
-#if UNITY_EDITOR
     void OnEnable()
     {
         if (Application.isPlaying)
@@ -338,8 +334,6 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
             }
         }
     }
-
-#endif
 
     private void UpdateMaterialShader(Material material)
     {
@@ -621,9 +615,7 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
 
     static void MarkMaterialModified(Material material)
     {
-#if UNITY_EDITOR
         EditorUtility.SetDirty(material);
-#endif
     }
 
     [System.Serializable]
@@ -642,8 +634,6 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
         public Action<ShaderState, Material> OnAfterConversionToURP;        // Carried over state, updated material
     }
 
-
-#if UNITY_EDITOR
     /// <summary>
     /// Custom property drawer for the shader mappping class.
     /// </summary>
@@ -745,4 +735,4 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
         }
     }
 }
-#endif
+#endif 
