@@ -121,7 +121,7 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
     };
 
     [Tooltip("A list of shaders that should be ignored")]
-    public string[] ShadersToIgnore = new string[] { "GUI/Text Shader", "TextMeshPro/Distance Field", "UI/Default" };
+    public string[] ShadersToIgnore = new string[] { "GUI/Text Shader", "TextMeshPro/Distance Field", "UI/Default", "Hidden/InternalErrorShader" };
 
     [Tooltip("If true, the user will be prompted to confirm the conversion, even if automatic is on. This is to prevent unwanted upgrades")]
     public bool PromptUserToConfirmConversion = true;
@@ -251,9 +251,10 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
         }
     }
 
-    private bool FoundPluginMaterialsThatDontMatchCurrentRenderPipeline()
+    private bool FoundPluginMaterialsThatDontMatchCurrentRenderPipeline(bool exitOnFirstMaterialFound = false)
     {
         var materials = GetUltraleapMaterialsInPackagesAndAssets(false);
+        bool foundMaterialsThatDontMatchCurrentRenderPipeline = false;
 
         foreach (Material material in materials)
         {
@@ -261,12 +262,18 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
             {
                 if (!MaterialShaderMatchesActiveRenderPipeline(material))
                 {
-                    return true;
+                    Debug.Log($"Material {material.name} does not match the current render pipeline and likely could not be updated");
+                    foundMaterialsThatDontMatchCurrentRenderPipeline = true;
+                    if (exitOnFirstMaterialFound)
+                    {
+                        return true;
+                    }
+   
                 }
             }
         }
 
-        return false;
+        return foundMaterialsThatDontMatchCurrentRenderPipeline;
     }
 
     private bool IgnoreMaterial(Material material)

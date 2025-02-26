@@ -35,6 +35,7 @@ MonoBehaviour:
   - GUI/Text Shader
   - TextMeshPro/Distance Field
   - UI/Default
+  - Hidden/InternalErrorShader
   PromptUserToConfirmConversion: 1
-  NumberOfTimesUserRejectedPrompt: 3
+  NumberOfTimesUserRejectedPrompt: 0
   AutomaticConversionIsOffForPluginInProject: 0
