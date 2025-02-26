@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Fixed some warnings around runtime variables that were only used in editor mode
 - Fixed an issue with Physical Hands and Unity 6 due to the physics Contact Generation setting being removed
+- (UI Input Preview) Added explicit missing dependancy on the "Unity UI" package.
 
 ## [7.2.0] - 17/01/2025
 
