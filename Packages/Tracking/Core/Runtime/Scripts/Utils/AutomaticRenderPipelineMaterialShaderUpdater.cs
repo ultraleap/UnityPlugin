@@ -178,7 +178,7 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
     {
         if (UltraleapSettings.AutomaticallyUpgradeMaterialsToCurrentRenderPipeline &&
             AutomaticConversionIsOffForPluginInProject == false &&
-            FoundPluginMaterialsThatDontMatchCurrentRenderPipeline())
+            FoundPluginMaterialsThatDontMatchCurrentRenderPipeline(exitOnFirstMaterialFound:true, logMaterialsThatDontMatch:false ))
         {
             bool goAhead = false;
 
@@ -251,7 +251,7 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
         }
     }
 
-    private bool FoundPluginMaterialsThatDontMatchCurrentRenderPipeline(bool exitOnFirstMaterialFound = false)
+    private bool FoundPluginMaterialsThatDontMatchCurrentRenderPipeline(bool exitOnFirstMaterialFound = false, bool logMaterialsThatDontMatch = false)
     {
         var materials = GetUltraleapMaterialsInPackagesAndAssets(false);
         bool foundMaterialsThatDontMatchCurrentRenderPipeline = false;
@@ -262,7 +262,10 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
             {
                 if (!MaterialShaderMatchesActiveRenderPipeline(material))
                 {
-                    Debug.Log($"Material {material.name} does not match the current render pipeline and likely could not be updated");
+                    if (logMaterialsThatDontMatch)
+                    {
+                        Debug.Log($"Material {material.name} does not match the current render pipeline and likely could not be updated");
+                    }
                     foundMaterialsThatDontMatchCurrentRenderPipeline = true;
                     if (exitOnFirstMaterialFound)
                     {
@@ -320,7 +323,7 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
 
     private void CheckForConversionIssues(List<Material> materials)
     {
-        if (FoundPluginMaterialsThatDontMatchCurrentRenderPipeline() && UnityEditorInternal.InternalEditorUtility.isHumanControllingUs)
+        if (FoundPluginMaterialsThatDontMatchCurrentRenderPipeline(exitOnFirstMaterialFound:false, logMaterialsThatDontMatch:true) && UnityEditorInternal.InternalEditorUtility.isHumanControllingUs)
         {
             if (EditorUtility.DisplayDialog("Material Update Status", "Some materials could not be converted, do you want to ignore those in future?", "Yes", "No"))
             {
