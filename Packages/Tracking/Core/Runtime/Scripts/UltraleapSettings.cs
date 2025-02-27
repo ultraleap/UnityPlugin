@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2025.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -200,7 +200,7 @@ namespace Leap
         private static readonly bool defaultValueForAutomaticallyUpgradingMaterialsForActiveRenderPipeline = true;
 
         private static readonly string automaticallyUpgradeMaterialsToCurrentRenderPipelineEnvironmentVariableName = "ULTRALEAP_UNITY_PLUGIN_AUTOMATICALLY_UPGRADE_MATERIALS_TO_CURRENT_RENDER_PIPELINE";
-       
+
         static UltraleapSettings instance;
         public static UltraleapSettings Instance
         {

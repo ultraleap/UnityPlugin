@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2025.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -20,7 +20,7 @@ namespace Leap.InputModule
         [Tooltip("The minimum scale of the pointer when reacting to the user's interaction proximity (either pinch or distance, depending on mode)")]
         [Range(0, 1)] [SerializeField] private float interactionPointerScale = 0.4f;
         [Tooltip("The range of user interaction distance from the canvas at which to scale the pointer, when in direct mode")]
-        [Range(0, 1)][SerializeField] private float interactionPointerRange = 0.2f;
+        [Range(0, 1)] [SerializeField] private float interactionPointerRange = 0.2f;
         [Tooltip("If directly interacting, this will fade the cursor at the distance range specified above")]
         [SerializeField] private bool fadeCursorAtDistance = true;
 
@@ -114,12 +114,12 @@ namespace Leap.InputModule
             if (element.IsUserInteractingDirectly && fadeCursorAtDistance)
             {
                 spriteRenderer.color = new Color(
-                    spriteRenderer.color.r, 
-                    spriteRenderer.color.g, 
-                    spriteRenderer.color.b, 
+                    spriteRenderer.color.r,
+                    spriteRenderer.color.g,
+                    spriteRenderer.color.b,
                     spriteRenderer.transform.localScale.x.Map(
-                        initialScale.x, 
-                        initialScale.x * interactionPointerScale, 
+                        initialScale.x,
+                        initialScale.x * interactionPointerScale,
                         0.0f,
                         1.0f));
             }
