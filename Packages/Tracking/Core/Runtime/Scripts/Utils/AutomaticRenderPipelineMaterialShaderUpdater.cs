@@ -182,7 +182,7 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
                 if (UnityEditorInternal.InternalEditorUtility.isHumanControllingUs)
                 {
                     int option = EditorUtility.DisplayDialogComplex("Convert Ultraleap Plugin Materials",
-                        "Materials have been detected in the Ultraleap plugin that don't match the current project's chosen render pipeline." +
+                        "Materials have been detected in the Ultraleap plugin that don't match the current project's chosen render pipeline. " +
                         "Would you like to convert these materials to the current render pipeline?",
                         "Yes, but don't ask each time",
                         "No",
