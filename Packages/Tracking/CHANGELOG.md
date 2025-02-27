@@ -8,10 +8,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [NEXT]
 
+### Added
+- Added support to upgrade the plugin's Built In Render Pipeline materials (and as a result the example scenes) to the Universal Render Pipeline. This can be set to automatically prompt when the materials don't match the current render pipeline. It does not support downgrading.
+
 ### Fixed
 - Fixed some warnings around runtime variables that were only used in editor mode
 - Fixed an issue with Physical Hands and Unity 6 due to the physics Contact Generation setting being removed
 - (UI Input Preview) Added explicit missing dependancy on the "Unity UI" package.
+
+### Changed
+- Updated all custom shaders to support the Universal Render Pipeline concurrently with the Built-in Render Pipeline
+
+### Known Issues
+- Pose detection scene does not illuminate all poses in green if built for mobile headsets when using URP (2022.3), spotlights don't work as intended on Unity 6.
+- Turntable and pullchord scene only works (i.e. the pullchord works) if the physical hands settings are used
+- Clicks on UI elements using indirect interaction do not appear to work with the UI Input example
+- The RuntimeGizmoManager and associated RuntimeGizmo.shader shader are not URP compatible and would require breaking changes to support URP. These remain as BiRP only
 
 ## [7.2.0] - 17/01/2025
 

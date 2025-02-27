@@ -15,7 +15,7 @@ namespace Leap.Examples
                 (
                     "com.ultraleap.tracking",
                     "All Examples",
-                    new string[] { "Shared Example Assets REQUIRED", "XR Examples", "Tabletop Examples", "URP Examples" }
+                    new string[] { "Shared Example Assets REQUIRED", "XR Examples", "Tabletop Examples" }
                 );
             };
         }

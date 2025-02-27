@@ -60,6 +60,7 @@ namespace Leap
                     InputActionsSection(settings);
                     HintingSection(settings);
                     NotificationSection(settings);
+                    RenderPipelineSupportSection(settings); 
                     ResetSection(settings);
 
                     settings.ApplyModifiedProperties();
@@ -156,6 +157,25 @@ namespace Leap
             settings.ApplyModifiedProperties();
         }
 
+
+        private static void RenderPipelineSupportSection(SerializedObject settings)
+        {
+            EditorGUILayout.LabelField("Render Pipeline Support", EditorStyles.boldLabel);
+            EditorGUILayout.Space(5);
+
+            using (new EditorGUI.IndentLevelScope())
+            {
+                // Enable automatic upgrades
+                UltraleapSettings.AutomaticallyUpgradeMaterialsToCurrentRenderPipeline = 
+                    EditorGUILayout.ToggleLeft("Enable automatic updates of the Ultraleap plugin materials to the active render pipeline on this machine.", UltraleapSettings.AutomaticallyUpgradeMaterialsToCurrentRenderPipeline);
+                EditorGUILayout.TextArea("Note: if set to false, this setting will persist across ALL Unity projects that use the plugin. You can still manually force the upgrade.");
+            }
+
+            EditorGUILayout.Space(30);
+
+            settings.ApplyModifiedProperties();
+        }
+
         private static void ResetSection(SerializedObject settings)
         {
             EditorGUILayout.BeginHorizontal();
@@ -177,6 +197,10 @@ namespace Leap
 
     public class UltraleapSettings : ScriptableObject
     {
+        private static readonly bool defaultValueForAutomaticallyUpgradingMaterialsForActiveRenderPipeline = true;
+
+        private static readonly string automaticallyUpgradeMaterialsToCurrentRenderPipelineEnvironmentVariableName = "ULTRALEAP_UNITY_PLUGIN_AUTOMATICALLY_UPGRADE_MATERIALS_TO_CURRENT_RENDER_PIPELINE";
+       
         static UltraleapSettings instance;
         public static UltraleapSettings Instance
         {
@@ -208,6 +232,28 @@ namespace Leap
 
         [HideInInspector, SerializeField]
         public bool showPhysicalHandsPhysicsSettingsWarning = true;
+
+        [HideInInspector]
+        public static bool AutomaticallyUpgradeMaterialsToCurrentRenderPipeline
+        {
+            get
+            {
+                string readValue = System.Environment.GetEnvironmentVariable(automaticallyUpgradeMaterialsToCurrentRenderPipelineEnvironmentVariableName, EnvironmentVariableTarget.User);
+
+                if (string.IsNullOrEmpty(readValue))
+                {
+                    AutomaticallyUpgradeMaterialsToCurrentRenderPipeline = defaultValueForAutomaticallyUpgradingMaterialsForActiveRenderPipeline;
+                    return defaultValueForAutomaticallyUpgradingMaterialsForActiveRenderPipeline;
+                }
+
+                return Convert.ToBoolean(readValue);
+            }
+
+            set
+            {
+                System.Environment.SetEnvironmentVariable(automaticallyUpgradeMaterialsToCurrentRenderPipelineEnvironmentVariableName, Convert.ToString(value), EnvironmentVariableTarget.User);
+            }
+        }
 
         [HideInInspector, SerializeField]
         public string pluginVersion = "Unknown";
@@ -245,6 +291,8 @@ namespace Leap
 
             showAndroidBuildArchitectureWarning = true;
             showPhysicalHandsPhysicsSettingsWarning = true;
+
+            AutomaticallyUpgradeMaterialsToCurrentRenderPipeline = defaultValueForAutomaticallyUpgradingMaterialsForActiveRenderPipeline;
         }
 
 #if UNITY_EDITOR
@@ -332,6 +380,27 @@ namespace Leap
         {
             ReplaceUseOfFingersInPoseScriptableObjects();
         }
+
+        [MenuItem("Ultraleap/Updating/Update Materials for Active Render Pipeline", false, 201)]
+        private static void UpdateMaterialsForActiveRenderPipeline()
+        {
+            AutomaticRenderPipelineMaterialShaderUpdater _materialUpdater = null;
+                
+            try
+            {
+                _materialUpdater = Resources.Load<AutomaticRenderPipelineMaterialShaderUpdater>("AutomaticRenderPipelineMaterialShaderUpdater");
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+            }
+            
+            if (_materialUpdater != null)
+            {
+                _materialUpdater.AutoRefreshMaterialShadersForPipeline(silentMode: true);
+            }
+        }
+
 #endif
 
         private static UltraleapSettings FindSettingsSO()
