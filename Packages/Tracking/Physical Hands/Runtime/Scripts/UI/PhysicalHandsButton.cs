@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2025.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -271,7 +271,7 @@ namespace Leap.PhysicalHands
                 _buttonHelper = _pressableObject.AddComponent<PhysicalHandsButtonHelper>();
             }
 
-            if(!_pressableObject.TryGetComponent<IgnorePhysicalHands>(out _pressableIgnore))
+            if (!_pressableObject.TryGetComponent<IgnorePhysicalHands>(out _pressableIgnore))
             {
                 _pressableIgnore = _pressableObject.AddComponent<IgnorePhysicalHands>();
             }

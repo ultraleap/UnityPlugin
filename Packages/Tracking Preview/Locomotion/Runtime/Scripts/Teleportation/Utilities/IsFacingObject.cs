@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2025.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -55,14 +55,14 @@ namespace Leap.Preview.Locomotion
         private void SetLayerMask()
         {
             _layerMask = -1;
-            
+
             PhysicalHandsManager _physicalHandsManager = FindAnyObjectByType<PhysicalHandsManager>();
             if (_physicalHandsManager != null)
             {
                 _layerMask ^= _physicalHandsManager.HandsLayer.layerMask;
                 _layerMask ^= _physicalHandsManager.HandsResetLayer.layerMask;
             }
-            
+
             FarFieldLayerManager _farFieldLayerManager = FindAnyObjectByType<FarFieldLayerManager>();
             if (_farFieldLayerManager != null)
             {

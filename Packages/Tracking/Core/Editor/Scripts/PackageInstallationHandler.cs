@@ -10,18 +10,18 @@ using UnityEngine;
 /// </summary>
 [InitializeOnLoad]
 [ExecuteInEditMode]
-public static class PackageInstallationHandler 
+public static class PackageInstallationHandler
 {
     private static AutomaticRenderPipelineMaterialShaderUpdater _materialUpdater;
     private static bool _isInitialized = false;
 
     [InitializeOnLoadMethod]
     public static void RegisterForPackageLoad()
-    {   
+    {
         if (!_isInitialized)
         {
             UnityEditor.PackageManager.Events.registeredPackages += Events_registeredPackages;
-            _isInitialized = true;  
+            _isInitialized = true;
         }
     }
 
@@ -33,7 +33,7 @@ public static class PackageInstallationHandler
             {
                 Debug.Log($"An Ultraleap Package was just installed");
                 UpgradeMaterialsInProject();
-            }     
+            }
         }
     }
 
