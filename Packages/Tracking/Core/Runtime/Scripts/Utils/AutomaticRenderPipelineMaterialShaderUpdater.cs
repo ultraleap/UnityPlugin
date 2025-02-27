@@ -39,8 +39,8 @@ public enum StandardShaderBlendMode
 {
     Opaque,
     Cutout,
-    Fade,        // Old school alpha-blending mode, fresnel does not affect amount of transparency
-    Transparent // Physically plausible transparency mode, implemented as alpha pre-multiply
+    Fade,        
+    Transparent 
 }
 
 /// <summary>
@@ -57,6 +57,9 @@ public class ShaderState
     public float BlendMode;
 }
 
+/// <summary>
+/// <see langword="class"> used to hook into asset database changes. required for Unity 6 as it doesn't allow changes to assets during import
+/// </summary>
 public class RenderPipelineAssetPostprocessor : AssetPostprocessor
 {
     static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths, bool didDomainReload)
@@ -97,26 +100,18 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
         {
             UseBuiltInRenderPipelineShaderName = true,
             BuiltInRenderPipelineShaderName = "Leagacy Shaders/Diffuse",
-            //OnBeforeConversionToBiRP = OnBeforeConversionFromToBiRPStandard,
-            //OnAfterConversionToBiRP = OnAfterConversionToBiRPStandard,
 
             UseUniversalRenderPipelineShaderName = true,
             UniversalRenderPipelineShaderName = "Universal Render Pipeline/Simple Lit",
-            //OnBeforeConversionToURP = OnBeforeConversionToURPLit,
-            //OnAfterConversionToURP = OnAfterConversionToURPLit}
         },
 
         new ShaderMapping()
         {
             UseBuiltInRenderPipelineShaderName = true,
             BuiltInRenderPipelineShaderName = "Unlit/Color",
-            //OnBeforeConversionToBiRP = OnBeforeConversionFromToBiRPStandard,
-            //OnAfterConversionToBiRP = OnAfterConversionToBiRPStandard,
 
             UseUniversalRenderPipelineShaderName = true,
             UniversalRenderPipelineShaderName = "Universal Render Pipeline/Particles/Unlit",
-            //OnBeforeConversionToURP = OnBeforeConversionToURPLit,
-            //OnAfterConversionToURP = OnAfterConversionToURPLit}
         }
     };
 
@@ -126,12 +121,12 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
     [Tooltip("If true, the user will be prompted to confirm the conversion, even if automatic is on. This is to prevent unwanted upgrades")]
     public bool PromptUserToConfirmConversion = true;
 
+    [Tooltip("Shows the number of times the user has rejected the material upgrade prompt since the package was imported")]
     [SerializeField]
-    //[HideInInspector]
     public int NumberOfTimesUserRejectedPrompt = 0;
 
+    [Tooltip("Controls whether automatic material conversion is enabled")]
     [SerializeField]
-    //[HideInInspector]
     public bool AutomaticConversionIsOffForPluginInProject = false;
 
     private readonly List<string> ultraleapPathIdentifiers = new List<string>() { "Ultraleap Tracking", "Ultraleap Tracking Preview", "com.ultraleap.tracking", "com.ultraleap.tracking.preview" };
@@ -187,7 +182,7 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
                 if (UnityEditorInternal.InternalEditorUtility.isHumanControllingUs)
                 {
                     int option = EditorUtility.DisplayDialogComplex("Convert Ultraleap Plugin Materials",
-                        "Materials have been detected in the Ultraleap plugin that don't match the current project's chosen render pipeline." +
+                        "Materials have been detected in the Ultraleap plugin that don't match the current project's chosen render pipeline. " +
                         "Would you like to convert these materials to the current render pipeline?",
                         "Yes, but don't ask each time",
                         "No",
@@ -521,14 +516,6 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
 
                 // Blend mode data
                 state.BlendMode = material.GetFloat("_Mode");
-
-                // These values for transparency / opaque appear common beteween render pipelines and don't appear to need converting:
-                // state.SrcBlend = material.GetInt("_SrcBlend");
-                // state.DstBlend = material.GetInt("_DstBlend");
-                // state.ZWrite = material.GetInt("_ZWrite");
-                // state.IsAlphatestOn = material.IsKeywordEnabled("_ALPHATEST_ON");
-                // state.IsAplhaBlendOn = material.IsKeywordEnabled("_ALPHABLEND_ON");
-                // state.IsAplhaPremultiplyOn = material.IsKeywordEnabled("_ALPHAPREMULTIPLY_ON");
             }
             catch (Exception e)
             {
@@ -563,7 +550,7 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
                 // texture.SetPixel(0,0,state.colour); 
 
                 // Several parameter relate to the blend mode / transparency of a meterial,
-                // but appear common to BiRP and URP (see OnBeforeConversionToURPLit).
+                // but appear common to BiRP and URP 
                 StandardShaderBlendMode blendMode = (StandardShaderBlendMode) (int) state.BlendMode;
 
                 switch (blendMode)
@@ -645,7 +632,7 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
     }
 
     /// <summary>
-    /// Custom property drawer for the shader mappping class.
+    /// Custom property drawer for the shader mappping class. Reused from the XRI samples packatge
     /// </summary>
     [CustomPropertyDrawer(typeof(ShaderMapping))]
     public class ShaderMappingDrawer : PropertyDrawer
