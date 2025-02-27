@@ -8,7 +8,7 @@
   "dependencies": {
     "com.ultraleap.tracking": "7.2.0",
     "com.unity.inputsystem": "1.5.0",
-    "com.unity.ugui": "2.0.0"
+    "com.unity.ugui": "1.0.0"
   },
   "keywords": [
     "ultraleap",
