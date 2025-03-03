@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (UI Input Preview) Added explicit missing dependancy on the "Unity UI" package
 - Support either input system for all interactions, fixing HandRecorder and CycleHandPairs
 - Clicks on UI elements using indirect interaction now work with the UI Input example scene
+- Text on the toggle button in the UI Input example scene now shows On or Off based on the toggled state
 
 ### Known Issues
 - Pose detection scene does not illuminate all poses in green if built for mobile headsets when using URP (2022.3), spotlights don't work as intended on Unity 6.
