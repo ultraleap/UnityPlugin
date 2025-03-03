@@ -15,17 +15,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed warning suggesting use of both input systems for OpenXR + Ultraleap compatibility now the new input system is fully supported
 - Updated all custom shaders to support the Universal Render Pipeline concurrently with the Built-in Render Pipeline
 - Updated Copyright year to 2025
+- Split tracking preview examples into different groups - common assets, main examples and examples that need the old input manager to work (e.g. UI input)
 
 ### Fixed
 - Fixed some warnings around runtime variables that were only used in editor mode
 - Fixed an issue with Physical Hands and Unity 6 due to the physics Contact Generation setting being removed
 - (UI Input Preview) Added explicit missing dependancy on the "Unity UI" package
 - Support either input system for all interactions, fixing HandRecorder and CycleHandPairs
+- Clicks on UI elements using indirect interaction now work with the UI Input example scene
 
 ### Known Issues
 - Pose detection scene does not illuminate all poses in green if built for mobile headsets when using URP (2022.3), spotlights don't work as intended on Unity 6.
 - Turntable and pullchord scene only works (i.e. the pullchord works) if the physical hands physics settings are used
-- Clicks on UI elements using indirect interaction do not appear to work with the UI Input example
 - The RuntimeGizmoManager and associated RuntimeGizmo.shader shader are not URP compatible and would require breaking changes to support URP; These remain as BiRP only
 - Support either input system for all interactions, fixing HandRecorder and CycleHandPairs
 

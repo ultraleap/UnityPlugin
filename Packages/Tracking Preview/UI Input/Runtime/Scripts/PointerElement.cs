@@ -259,7 +259,7 @@ namespace Leap.InputModule
             // N.B. Without pinch detector
             if (module.InteractionMode != InteractionCapability.Direct)
             {
-                if (hand.PinchDistance < module.PinchingThreshold)
+                if (hand.PinchDistance < module.PinchingThreshold * 0.001) // Need to convert module.PinchingThreshold from mm to m
                 {
                     return true;
                 }
