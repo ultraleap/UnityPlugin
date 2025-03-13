@@ -25,13 +25,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 188576}
+  serializedVersion: 2
   m_LocalRotation: {x: 0.000000115202326, y: -0.7071067, z: -0.7071068, w: -0.00000011520231}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: -89.980194, y: 180, z: 0}
 --- !u!114 &11407378
 MonoBehaviour:
@@ -55,7 +55,7 @@ MonoBehaviour:
   _joinThumbProximal: 1
   _castShadows: 1
   _material: {fileID: 2100000, guid: 50db6ec9473cfa746a5882bd2a16ced8, type: 2}
-  _sphereMesh: {fileID: 4300002, guid: 2f496b1b1bec86743b418551f859020c, type: 3}
+  _sphereMesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
   _cylinderResolution: 12
   _jointRadius: 0.008
   _cylinderRadius: 0.006
@@ -77,9 +77,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   leapProvider: {fileID: 0}
-  chirality: 0
+  chirality: 1
   disableOnAwake: 1
-  FreezeHandState: 0
+  freezeHandState: 0
   fadeOnHandFound: 0
   fadeInTime: 0.1
   fadeOnHandLost: 0
