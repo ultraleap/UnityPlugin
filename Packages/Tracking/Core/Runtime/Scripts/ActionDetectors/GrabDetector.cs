@@ -34,9 +34,44 @@ namespace Leap
         public bool IsGrabbing => IsDoingAction;
 
         // Accessor actions for readability
-        public Action<Hand> OnGrabStart => onActionStart;
-        public Action<Hand> OnGrabEnd => onActionEnd;
-        public Action<Hand> OnGrabbing => onAction;
+        public Action<Hand> OnGrabStart
+        {
+            get
+            {
+                return onActionStart;
+            }
+
+            set
+            {
+                onActionStart = value;
+            }
+        }
+
+        public Action<Hand> OnGrabEnd
+        {
+            get
+            {
+                return onActionEnd;
+            }
+
+            set
+            {
+                onActionEnd = value;
+            }
+        }
+
+        public Action<Hand> OnGrabbing
+        {
+            get
+            {
+                return onAction;
+            }
+
+            set
+            {
+                onAction = value;
+            }
+        }
 
         /// <summary>
         /// Updates the grab status based on the hand data.
@@ -50,7 +85,8 @@ namespace Leap
             }
 
             float _grabStrength = _hand.GrabStrength;
-            if (_grabStrength < activateStrength)
+
+            if (_grabStrength > activateStrength)
             {
                 if (!IsDoingAction)
                 {
@@ -64,7 +100,7 @@ namespace Leap
 
                 IsDoingAction = true;
             }
-            else if (_grabStrength > deactivateStrength)
+            else if (_grabStrength < deactivateStrength)
             {
                 if (IsDoingAction)
                 {
