@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed some warnings around runtime variables that were only used in editor mode
 - Fixed an issue with Physical Hands and Unity 6 due to the physics Contact Generation setting being removed
 - (UI Input Preview) Added explicit missing dependancy on the "Unity UI" package
+- Clients were not able to subscribe to the events on the PinchDetector and GrabDetector scripts as the properties were exposed as readonly. 
+- GrabDetector detection logic was inverted, so open hands were interpreted as grabs. Now fixed.
 
 ### Changed
 - Updated all custom shaders to support the Universal Render Pipeline concurrently with the Built-in Render Pipeline
