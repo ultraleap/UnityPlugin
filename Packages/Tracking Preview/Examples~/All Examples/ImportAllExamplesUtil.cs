@@ -1,5 +1,6 @@
 #if UNITY_EDITOR
 
+using Leap.Examples;
 using UnityEditor;
 
 namespace Leap.Preview.Examples
@@ -15,7 +16,12 @@ namespace Leap.Preview.Examples
                 (
                     "com.ultraleap.tracking.preview",
                     "All Examples",
-                    new string[] { "Main Examples", "Unity Input Manager (Old)" }
+                    new string[]
+                    {
+                        "Shared Example Assets REQUIRED",
+                        "Main Examples",
+                        "Unity Input Manager (Old)"
+                    }
                 );
             };
         }

@@ -36,12 +36,12 @@
       "path": "Examples~/Shared Example Assets REQUIRED"
     },
     {
-      "displayName": "Main Preview Examples",
+      "displayName": "Main Examples",
       "description": "A collection of examples for the Ultraleap Tracking Preview package, which use the Input System Package (New)",
-      "path": "Examples~/Main Examples"
+      "path": "Examples~/Main Preview Examples"
     },
     {
-      "displayName": "Preview Examples - Require Unity Input Manager (Old)",
+      "displayName": "Unity Input Manager (Old)",
       "description": "A collection of examples for the Ultraleap Tracking Preview package which require the Unity Input Manager (Old).",
       "path": "Examples~/Unity Input Manager (Old)"
     }
