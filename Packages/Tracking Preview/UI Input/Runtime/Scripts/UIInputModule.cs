@@ -125,8 +125,7 @@ namespace Leap.InputModule
             enabled = false;
             Debug.LogError("Ultraleap UIInputModule requires the legacy input system. Please enable legacy input in the Player Settings.");
             return;
-#endif
-
+#else
             //Find and apply LSP/Camera if not already
             if (leapDataProvider == null)
             {
@@ -151,7 +150,9 @@ namespace Leap.InputModule
             }
 
             base.Awake();
+#endif
         }
+
         protected override void Start()
         {
             var shoulderProjectionOriginProvider = new ShoulderProjectionOriginProvider(mainCamera);
