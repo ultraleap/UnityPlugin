@@ -57,42 +57,24 @@ namespace Leap
         // Accessor actions for readability
         public Action<Hand> OnPinchStart
         {
-            get
-            {
-                return onActionStart;
-            }
-
-            set
-            {
-                onActionStart = value;
-            }
+            get =>  onActionStart;
+           
+            set => onActionStart = value;
         }
 
         public Action<Hand> OnPinchEnd
         {
-            get
-            {
-                return onActionEnd;
-            }
-
-            set
-            {
-                onActionEnd = value;
-            }
+            get => onActionEnd;
+            
+            set => onActionEnd = value;
+            
         }
 
         public Action<Hand> OnPinching
         {
-            get
-            {
-                return onAction;
-            }
+            get => onAction;
 
-            set
-            {
-                onAction = value;
-            }
-
+            set => onAction = value;
         }
 
         /// <summary>

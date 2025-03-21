@@ -36,41 +36,23 @@ namespace Leap
         // Accessor actions for readability
         public Action<Hand> OnGrabStart
         {
-            get
-            {
-                return onActionStart;
-            }
+            get => onActionStart;
 
-            set
-            {
-                onActionStart = value;
-            }
+            set => onActionStart = value;
         }
 
         public Action<Hand> OnGrabEnd
         {
-            get
-            {
-                return onActionEnd;
-            }
+            get => onActionEnd;
 
-            set
-            {
-                onActionEnd = value;
-            }
+            set => onActionEnd = value;
         }
 
         public Action<Hand> OnGrabbing
         {
-            get
-            {
-                return onAction;
-            }
-
-            set
-            {
-                onAction = value;
-            }
+            get => onAction;
+            
+            set => onAction = value;
         }
 
         /// <summary>
