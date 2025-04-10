@@ -737,6 +737,13 @@ namespace Leap
 
         void HandleUpdateFrameInterpolationAndTransformation()
         {
+            if (_leapController == null)
+            {
+
+                Debug.LogWarning("LeapController is null");
+                return;
+            }
+
             if (_useInterpolation)
             {
 #if !UNITY_ANDROID || UNITY_EDITOR

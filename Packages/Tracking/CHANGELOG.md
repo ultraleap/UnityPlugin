@@ -24,6 +24,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support either input system for all interactions, fixing HandRecorder and CycleHandPairs
 - Clicks on UI elements using indirect interaction now work with the UI Input example scene
 - Text on the toggle button in the UI Input example scene now shows On or Off based on the toggled state
+- Clients were not able to subscribe to the events on the PinchDetector and GrabDetector scripts as the properties were exposed as readonly. 
+- GrabDetector detection logic was inverted, so open hands were interpreted as grabs. Now fixed.
 
 ### Known Issues
 - Pose detection scene does not illuminate all poses in green if built for mobile headsets when using URP (2022.3), spotlights don't work as intended on Unity 6.

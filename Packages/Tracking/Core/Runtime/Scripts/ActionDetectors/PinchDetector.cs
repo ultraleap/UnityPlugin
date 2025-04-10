@@ -55,9 +55,27 @@ namespace Leap
         public bool IsPinching => IsDoingAction;
 
         // Accessor actions for readability
-        public Action<Hand> OnPinchStart => onActionStart;
-        public Action<Hand> OnPinchEnd => onActionEnd;
-        public Action<Hand> OnPinching => onAction;
+        public Action<Hand> OnPinchStart
+        {
+            get =>  onActionStart;
+           
+            set => onActionStart = value;
+        }
+
+        public Action<Hand> OnPinchEnd
+        {
+            get => onActionEnd;
+            
+            set => onActionEnd = value;
+            
+        }
+
+        public Action<Hand> OnPinching
+        {
+            get => onAction;
+
+            set => onAction = value;
+        }
 
         /// <summary>
         /// Updates the pinch status based on the hand data.
