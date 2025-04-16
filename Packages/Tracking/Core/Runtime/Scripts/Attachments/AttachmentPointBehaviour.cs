@@ -101,6 +101,10 @@ namespace Leap.Attachments
                     rotation = hand.Basis.rotation;
                     break;
 
+                case AttachmentPointFlags.ThumbBase:
+                    position = hand.fingers[0].bones[1].PrevJoint;
+                    rotation = hand.fingers[0].bones[2].Rotation;
+                    break;
                 case AttachmentPointFlags.ThumbProximalJoint:
                     position = hand.fingers[0].bones[1].NextJoint;
                     rotation = hand.fingers[0].bones[2].Rotation;
@@ -114,6 +118,10 @@ namespace Leap.Attachments
                     rotation = hand.fingers[0].bones[3].Rotation;
                     break;
 
+                case AttachmentPointFlags.IndexBase:
+                    position = hand.fingers[1].bones[0].PrevJoint;
+                    rotation = hand.fingers[1].bones[1].Rotation;
+                    break;
                 case AttachmentPointFlags.IndexKnuckle:
                     position = hand.fingers[1].bones[0].NextJoint;
                     rotation = hand.fingers[1].bones[1].Rotation;
@@ -131,6 +139,10 @@ namespace Leap.Attachments
                     rotation = hand.fingers[1].bones[3].Rotation;
                     break;
 
+                case AttachmentPointFlags.MiddleBase:
+                    position = hand.fingers[2].bones[0].PrevJoint;
+                    rotation = hand.fingers[2].bones[1].Rotation;
+                    break;
                 case AttachmentPointFlags.MiddleKnuckle:
                     position = hand.fingers[2].bones[0].NextJoint;
                     rotation = hand.fingers[2].bones[1].Rotation;
@@ -148,6 +160,10 @@ namespace Leap.Attachments
                     rotation = hand.fingers[2].bones[3].Rotation;
                     break;
 
+                case AttachmentPointFlags.RingBase:
+                    position = hand.fingers[3].bones[0].PrevJoint;
+                    rotation = hand.fingers[3].bones[1].Rotation;
+                    break;
                 case AttachmentPointFlags.RingKnuckle:
                     position = hand.fingers[3].bones[0].NextJoint;
                     rotation = hand.fingers[3].bones[1].Rotation;
@@ -165,6 +181,10 @@ namespace Leap.Attachments
                     rotation = hand.fingers[3].bones[3].Rotation;
                     break;
 
+                case AttachmentPointFlags.PinkyBase:
+                    position = hand.fingers[4].bones[0].PrevJoint;
+                    rotation = hand.fingers[4].bones[1].Rotation;
+                    break;
                 case AttachmentPointFlags.PinkyKnuckle:
                     position = hand.fingers[4].bones[0].NextJoint;
                     rotation = hand.fingers[4].bones[1].Rotation;
@@ -181,6 +201,12 @@ namespace Leap.Attachments
                     position = hand.fingers[4].bones[3].NextJoint;
                     rotation = hand.fingers[4].bones[3].Rotation;
                     break;
+
+                case AttachmentPointFlags.Elbow:
+                    position = hand.Arm.ElbowPosition;
+                    rotation = hand.Arm.Basis.rotation;
+                    break;
+
                 case AttachmentPointFlags.PinchPoint:
                     position = hand.GetPredictedPinchPosition();
                     rotation = Quaternion.LookRotation(position - hand.fingers[1].GetBone(Bone.BoneType.PROXIMAL).PrevJoint);

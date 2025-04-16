@@ -73,31 +73,38 @@ namespace Leap.Attachments
             makeAttachmentPointsToggle("Palm", new Vector2(0.100F, 0.160F));
             makeAttachmentPointsToggle("Wrist", new Vector2(0.080F, 0.430F));
 
+            makeAttachmentPointsToggle("ThumbBase", new Vector2(-0.100F, 0.300F));
             makeAttachmentPointsToggle("ThumbProximalJoint", new Vector2(-0.190F, 0.260F));
             makeAttachmentPointsToggle("ThumbDistalJoint", new Vector2(-0.310F, 0.170F));
             makeAttachmentPointsToggle("ThumbTip", new Vector2(-0.390F, 0.110F));
 
+            makeAttachmentPointsToggle("IndexBase", new Vector2(-0.00F, 0.285F));
             makeAttachmentPointsToggle("IndexKnuckle", new Vector2(-0.040F, -0.040F));
             makeAttachmentPointsToggle("IndexMiddleJoint", new Vector2(-0.060F, -0.170F));
             makeAttachmentPointsToggle("IndexDistalJoint", new Vector2(-0.075F, -0.280F));
             makeAttachmentPointsToggle("IndexTip", new Vector2(-0.080F, -0.380F));
 
+            makeAttachmentPointsToggle("MiddleBase", new Vector2(0.080F, 0.270F));
             makeAttachmentPointsToggle("MiddleKnuckle", new Vector2(0.080F, -0.050F));
             makeAttachmentPointsToggle("MiddleMiddleJoint", new Vector2(0.080F, -0.190F));
             makeAttachmentPointsToggle("MiddleDistalJoint", new Vector2(0.080F, -0.310F));
             makeAttachmentPointsToggle("MiddleTip", new Vector2(0.090F, -0.420F));
 
+            makeAttachmentPointsToggle("RingBase", new Vector2(0.155F, 0.270F));
             makeAttachmentPointsToggle("RingKnuckle", new Vector2(0.195F, -0.020F));
             makeAttachmentPointsToggle("RingMiddleJoint", new Vector2(0.220F, -0.150F));
             makeAttachmentPointsToggle("RingDistalJoint", new Vector2(0.230F, -0.270F));
             makeAttachmentPointsToggle("RingTip", new Vector2(0.245F, -0.380F));
 
+            makeAttachmentPointsToggle("PinkyBase", new Vector2(0.235F, 0.285F));
             makeAttachmentPointsToggle("PinkyKnuckle", new Vector2(0.295F, 0.040F));
             makeAttachmentPointsToggle("PinkyMiddleJoint", new Vector2(0.340F, -0.050F));
             makeAttachmentPointsToggle("PinkyDistalJoint", new Vector2(0.380F, -0.130F));
             makeAttachmentPointsToggle("PinkyTip", new Vector2(0.410F, -0.210F));
 
             makeAttachmentPointsToggle("PinchPoint", new Vector2(-0.235F, -0.135F));
+
+            makeAttachmentPointsToggle("Elbow", new Vector2(0.080F, 0.450F));
 
             EditorGUI.EndDisabledGroup();
 

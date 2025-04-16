@@ -46,12 +46,16 @@ namespace Leap.Attachments
         public AttachmentPointBehaviour palm;
 
         [HideInInspector]
+        public AttachmentPointBehaviour thumbBase;
+        [HideInInspector]
         public AttachmentPointBehaviour thumbProximalJoint;
         [HideInInspector]
         public AttachmentPointBehaviour thumbDistalJoint;
         [HideInInspector]
         public AttachmentPointBehaviour thumbTip;
 
+        [HideInInspector]
+        public AttachmentPointBehaviour indexBase;
         [HideInInspector]
         public AttachmentPointBehaviour indexKnuckle;
         [HideInInspector]
@@ -62,6 +66,8 @@ namespace Leap.Attachments
         public AttachmentPointBehaviour indexTip;
 
         [HideInInspector]
+        public AttachmentPointBehaviour middleBase;
+        [HideInInspector]
         public AttachmentPointBehaviour middleKnuckle;
         [HideInInspector]
         public AttachmentPointBehaviour middleMiddleJoint;
@@ -71,6 +77,8 @@ namespace Leap.Attachments
         public AttachmentPointBehaviour middleTip;
 
         [HideInInspector]
+        public AttachmentPointBehaviour ringBase;
+        [HideInInspector]
         public AttachmentPointBehaviour ringKnuckle;
         [HideInInspector]
         public AttachmentPointBehaviour ringMiddleJoint;
@@ -79,6 +87,8 @@ namespace Leap.Attachments
         [HideInInspector]
         public AttachmentPointBehaviour ringTip;
 
+        [HideInInspector]
+        public AttachmentPointBehaviour pinkyBase;
         [HideInInspector]
         public AttachmentPointBehaviour pinkyKnuckle;
         [HideInInspector]
@@ -90,6 +100,9 @@ namespace Leap.Attachments
 
         [HideInInspector]
         public AttachmentPointBehaviour pinchPoint;
+
+        [HideInInspector]
+        public AttachmentPointBehaviour elbow;
 
         #endregion
 
@@ -160,31 +173,38 @@ namespace Leap.Attachments
                 case AttachmentPointFlags.Wrist: behaviour = wrist; break;
                 case AttachmentPointFlags.Palm: behaviour = palm; break;
 
+                case AttachmentPointFlags.ThumbBase: behaviour = thumbBase; break;
                 case AttachmentPointFlags.ThumbProximalJoint: behaviour = thumbProximalJoint; break;
                 case AttachmentPointFlags.ThumbDistalJoint: behaviour = thumbDistalJoint; break;
                 case AttachmentPointFlags.ThumbTip: behaviour = thumbTip; break;
 
+                case AttachmentPointFlags.IndexBase: behaviour = indexBase; break;
                 case AttachmentPointFlags.IndexKnuckle: behaviour = indexKnuckle; break;
                 case AttachmentPointFlags.IndexMiddleJoint: behaviour = indexMiddleJoint; break;
                 case AttachmentPointFlags.IndexDistalJoint: behaviour = indexDistalJoint; break;
                 case AttachmentPointFlags.IndexTip: behaviour = indexTip; break;
 
+                case AttachmentPointFlags.MiddleBase: behaviour = middleBase; break;
                 case AttachmentPointFlags.MiddleKnuckle: behaviour = middleKnuckle; break;
                 case AttachmentPointFlags.MiddleMiddleJoint: behaviour = middleMiddleJoint; break;
                 case AttachmentPointFlags.MiddleDistalJoint: behaviour = middleDistalJoint; break;
                 case AttachmentPointFlags.MiddleTip: behaviour = middleTip; break;
 
+                case AttachmentPointFlags.RingBase: behaviour = ringBase; break;
                 case AttachmentPointFlags.RingKnuckle: behaviour = ringKnuckle; break;
                 case AttachmentPointFlags.RingMiddleJoint: behaviour = ringMiddleJoint; break;
                 case AttachmentPointFlags.RingDistalJoint: behaviour = ringDistalJoint; break;
                 case AttachmentPointFlags.RingTip: behaviour = ringTip; break;
 
+                case AttachmentPointFlags.PinkyBase: behaviour = pinkyBase; break;
                 case AttachmentPointFlags.PinkyKnuckle: behaviour = pinkyKnuckle; break;
                 case AttachmentPointFlags.PinkyMiddleJoint: behaviour = pinkyMiddleJoint; break;
                 case AttachmentPointFlags.PinkyDistalJoint: behaviour = pinkyDistalJoint; break;
                 case AttachmentPointFlags.PinkyTip: behaviour = pinkyTip; break;
 
                 case AttachmentPointFlags.PinchPoint: behaviour = pinchPoint; break;
+
+                case AttachmentPointFlags.Elbow: behaviour = elbow; break;
             }
 
             return behaviour;
@@ -285,31 +305,38 @@ namespace Leap.Attachments
                 case AttachmentPointFlags.Wrist: wrist = behaviour; break;
                 case AttachmentPointFlags.Palm: palm = behaviour; break;
 
+                case AttachmentPointFlags.ThumbBase: thumbBase = behaviour; break;
                 case AttachmentPointFlags.ThumbProximalJoint: thumbProximalJoint = behaviour; break;
                 case AttachmentPointFlags.ThumbDistalJoint: thumbDistalJoint = behaviour; break;
                 case AttachmentPointFlags.ThumbTip: thumbTip = behaviour; break;
 
+                case AttachmentPointFlags.IndexBase: indexBase = behaviour; break;
                 case AttachmentPointFlags.IndexKnuckle: indexKnuckle = behaviour; break;
                 case AttachmentPointFlags.IndexMiddleJoint: indexMiddleJoint = behaviour; break;
                 case AttachmentPointFlags.IndexDistalJoint: indexDistalJoint = behaviour; break;
                 case AttachmentPointFlags.IndexTip: indexTip = behaviour; break;
 
+                case AttachmentPointFlags.MiddleBase: middleBase = behaviour; break;
                 case AttachmentPointFlags.MiddleKnuckle: middleKnuckle = behaviour; break;
                 case AttachmentPointFlags.MiddleMiddleJoint: middleMiddleJoint = behaviour; break;
                 case AttachmentPointFlags.MiddleDistalJoint: middleDistalJoint = behaviour; break;
                 case AttachmentPointFlags.MiddleTip: middleTip = behaviour; break;
 
+                case AttachmentPointFlags.RingBase: ringBase = behaviour; break;
                 case AttachmentPointFlags.RingKnuckle: ringKnuckle = behaviour; break;
                 case AttachmentPointFlags.RingMiddleJoint: ringMiddleJoint = behaviour; break;
                 case AttachmentPointFlags.RingDistalJoint: ringDistalJoint = behaviour; break;
                 case AttachmentPointFlags.RingTip: ringTip = behaviour; break;
 
+                case AttachmentPointFlags.PinkyBase: pinkyBase = behaviour; break;
                 case AttachmentPointFlags.PinkyKnuckle: pinkyKnuckle = behaviour; break;
                 case AttachmentPointFlags.PinkyMiddleJoint: pinkyMiddleJoint = behaviour; break;
                 case AttachmentPointFlags.PinkyDistalJoint: pinkyDistalJoint = behaviour; break;
                 case AttachmentPointFlags.PinkyTip: pinkyTip = behaviour; break;
 
                 case AttachmentPointFlags.PinchPoint: pinchPoint = behaviour; break;
+
+                case AttachmentPointFlags.Elbow: elbow = behaviour; break;
             }
 
 #if UNITY_EDITOR
@@ -441,7 +468,8 @@ namespace Leap.Attachments
             Transform topLevelTransform;
 
             // Thumb
-            topLevelTransform = tryStackTransformHierarchy(thumbProximalJoint,
+            topLevelTransform = tryStackTransformHierarchy(thumbBase,
+                                                           thumbProximalJoint,
                                                            thumbDistalJoint,
                                                            thumbTip);
             if (topLevelTransform != null)
@@ -450,7 +478,8 @@ namespace Leap.Attachments
             }
 
             // Index
-            topLevelTransform = tryStackTransformHierarchy(indexKnuckle,
+            topLevelTransform = tryStackTransformHierarchy(indexBase,
+                                                           indexKnuckle,
                                                            indexMiddleJoint,
                                                            indexDistalJoint,
                                                            indexTip);
@@ -460,7 +489,8 @@ namespace Leap.Attachments
             }
 
             // Middle
-            topLevelTransform = tryStackTransformHierarchy(middleKnuckle,
+            topLevelTransform = tryStackTransformHierarchy(middleBase,
+                                                           middleKnuckle,
                                                            middleMiddleJoint,
                                                            middleDistalJoint,
                                                            middleTip);
@@ -470,7 +500,8 @@ namespace Leap.Attachments
             }
 
             // Ring
-            topLevelTransform = tryStackTransformHierarchy(ringKnuckle,
+            topLevelTransform = tryStackTransformHierarchy(ringBase,
+                                                           ringKnuckle,
                                                            ringMiddleJoint,
                                                            ringDistalJoint,
                                                            ringTip);
@@ -480,7 +511,8 @@ namespace Leap.Attachments
             }
 
             // Pinky
-            topLevelTransform = tryStackTransformHierarchy(pinkyKnuckle,
+            topLevelTransform = tryStackTransformHierarchy(pinkyBase,
+                                                           pinkyKnuckle,
                                                            pinkyMiddleJoint,
                                                            pinkyDistalJoint,
                                                            pinkyTip);
@@ -488,9 +520,15 @@ namespace Leap.Attachments
             {
                 topLevelTransform.SetSiblingIndex(siblingIdx++);
             }
+
+            // Palm
+            if (elbow != null)
+            {
+                elbow.transform.SetSiblingIndex(siblingIdx++);
+            }
         }
 
-        private static Transform[] s_hierarchyTransformsBuffer = new Transform[4];
+        private static Transform[] s_hierarchyTransformsBuffer = new Transform[5];
         /// <summary>
         /// Tries to build a parent-child stack (index 0 is the first parent) of the argument
         /// transforms (they might be null) and returns the top-level parent transform (or null
@@ -526,7 +564,7 @@ namespace Leap.Attachments
             return null;
         }
 
-        private static Transform[] s_transformsBuffer = new Transform[4];
+        private static Transform[] s_transformsBuffer = new Transform[5];
         private Transform tryStackTransformHierarchy(params MonoBehaviour[] monoBehaviours)
         {
             for (int i = 0; i < s_transformsBuffer.Length; i++)
