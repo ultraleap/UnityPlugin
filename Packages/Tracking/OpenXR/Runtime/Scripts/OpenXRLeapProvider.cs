@@ -4,9 +4,7 @@ using System;
 using System.Collections.Generic;
 
 using UnityEngine;
-
-using Bone = Leap.Bone;
-using Hand = Leap.Hand;
+using UnityEngine.XR.OpenXR;
 
 namespace Leap.Tracking.OpenXR
 {
@@ -69,6 +67,41 @@ namespace Leap.Tracking.OpenXR
         [Tooltip("Automatically adds a TrackedPoseDriver to the MainCamera if there is not one already")]
         public bool _autoCreateTrackedPoseDriver = true;
 
+        public enum MetaCompatibilityMode
+        {
+            Automatic,
+            Disabled,
+            Forced,
+        }
+
+        [Header("Experimental")]
+        [SerializeField]
+        private MetaCompatibilityMode _metaCompatibility = MetaCompatibilityMode.Automatic;
+        private bool _metaCompatibilityEnabled = false;
+        
+        [Tooltip("Convert Meta hand-tracking data to better match LeapC")]
+        public MetaCompatibilityMode MetaCompatibility
+        {
+            get => _metaCompatibility;
+            set
+            {
+                _metaCompatibility = value;
+                UpdateMetaCompatibility();
+            }
+        }
+
+        private void UpdateMetaCompatibility()
+        {
+            if (MetaCompatibility == MetaCompatibilityMode.Automatic)
+            {
+                _metaCompatibilityEnabled = OpenXRRuntime.name.StartsWith("Meta") || OpenXRRuntime.name.StartsWith("Oculus");
+            }
+            else
+            {
+                _metaCompatibilityEnabled = MetaCompatibility == MetaCompatibilityMode.Forced;
+            }
+        }
+
         private HandJointLocation[] _joints;
 
         public override TrackingSource TrackingDataSource { get { return CheckOpenXRAvailable(); } }
@@ -102,6 +135,8 @@ namespace Leap.Tracking.OpenXR
             {
                 mainCamera.AddTrackedPoseDriverToCamera();
             }
+
+            UpdateMetaCompatibility();
         }
 
         private void Update()
@@ -331,6 +366,13 @@ namespace Leap.Tracking.OpenXR
                     elbowRotation
                 );
             }
+            
+            // Apply Meta corrections if needed
+            if (_metaCompatibilityEnabled)
+            {
+                hand = hand.FromMetaLayout();
+            }
+            
             return true;
         }
 
