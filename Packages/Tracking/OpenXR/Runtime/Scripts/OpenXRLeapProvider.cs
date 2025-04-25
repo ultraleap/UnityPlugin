@@ -74,11 +74,11 @@ namespace Leap.Tracking.OpenXR
             Forced,
         }
 
+        [Header("Experimental")]
         [SerializeField]
         private MetaCompatibilityMode _metaCompatibility = MetaCompatibilityMode.Automatic;
         private bool _metaCompatibilityEnabled = false;
         
-        [Header("Experimental")]
         [Tooltip("Convert Meta hand-tracking data to better match LeapC")]
         public MetaCompatibilityMode MetaCompatibility
         {
