@@ -9,6 +9,7 @@ namespace Leap.Tracking.OpenXR
         private enum ConversionType { MetaToLeap, LeapToMeta };
 
         // These constants encode the Leap -> Meta scaling / offsets.
+        // They have been dervied from reviewing the differences in the joint positions and rotations between LeapC and Meta OpenXR data when viewing hands in the same pose
         private static readonly float[] MetacarpalOutRotations = { 0.0f, 0.0f, 0.0f, 6.0f, 4.0f };
         private static readonly float[] MetacarpalDownRotations = { 0.0f, 12.0f, 14.0f, 12.0f, 10.0f };
 
