@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2025.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -737,6 +737,13 @@ namespace Leap
 
         void HandleUpdateFrameInterpolationAndTransformation()
         {
+            if (_leapController == null)
+            {
+
+                Debug.LogWarning("LeapController is null");
+                return;
+            }
+
             if (_useInterpolation)
             {
 #if !UNITY_ANDROID || UNITY_EDITOR
@@ -1201,7 +1208,7 @@ namespace Leap
                 if (leapInfo.Name == deviceType)
                 {
                     info = leapInfo;
-                    Material mat = Resources.Load("TrackingVolumeVisualization/DeviceModelMat") as Material;
+                    Material mat = Resources.Load("TrackingVolumeVisualization/Materials/Built In Render Pipeline (Dynamically Upgradable)/DeviceModelMat") as Material;
                     mat.SetPass(0);
 
                     Graphics.DrawMeshNow(Resources.Load<Mesh>("TrackingVolumeVisualization/Meshes/" + deviceType), deviceModelMatrix *
@@ -1234,7 +1241,7 @@ namespace Leap
 
             if (OptimalFOV_Visualization && optimalFOVMesh != null)
             {
-                Material mat = Resources.Load("TrackingVolumeVisualization/OptimalFOVMat_Volume") as Material;
+                Material mat = Resources.Load("TrackingVolumeVisualization/Materials/OptimalFOVMat_Volume") as Material;
                 mat.SetPass(0);
 
                 Graphics.DrawMeshNow(optimalFOVMesh, deviceModelMatrix *
@@ -1242,7 +1249,7 @@ namespace Leap
             }
             if (MaxFOV_Visualization && maxFOVMesh != null)
             {
-                Material mat = Resources.Load("TrackingVolumeVisualization/MaxFOVMat_Volume") as Material;
+                Material mat = Resources.Load("TrackingVolumeVisualization/Materials/MaxFOVMat_Volume") as Material;
                 mat.SetPass(0);
 
                 Graphics.DrawMeshNow(maxFOVMesh, deviceModelMatrix *

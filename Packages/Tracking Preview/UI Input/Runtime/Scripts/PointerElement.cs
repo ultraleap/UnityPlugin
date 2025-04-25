@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2025.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -259,7 +259,7 @@ namespace Leap.InputModule
             // N.B. Without pinch detector
             if (module.InteractionMode != InteractionCapability.Direct)
             {
-                if (hand.PinchDistance < module.PinchingThreshold)
+                if (hand.PinchDistance < module.PinchingThreshold * 0.001) // Need to convert module.PinchingThreshold from mm to m
                 {
                     return true;
                 }

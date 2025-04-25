@@ -10,10 +10,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Experimental Meta compatibility mode for the OpenXR provider
+- Added support to upgrade the plugin's Built In Render Pipeline materials (and as a result the example scenes) to the Universal Render Pipeline. This can be set to automatically prompt when the materials don't match the current render pipeline. It does not support downgrading.
+
+### Changed
+- Removed warning suggesting use of both input systems for OpenXR + Ultraleap compatibility now the new input system is fully supported
+- Updated all custom shaders to support the Universal Render Pipeline concurrently with the Built-in Render Pipeline
+- Updated Copyright year to 2025
+- Split tracking preview examples into different groups - common assets, main examples and examples that need the old input manager to work (e.g. UI input)
 
 ### Fixed
 - Fixed some warnings around runtime variables that were only used in editor mode
 - Fixed an issue with Physical Hands and Unity 6 due to the physics Contact Generation setting being removed
+- (UI Input Preview) Added explicit missing dependancy on the "Unity UI" package
+- Support either input system for all interactions, fixing HandRecorder and CycleHandPairs
+- Clicks on UI elements using indirect interaction now work with the UI Input example scene
+- Text on the toggle button in the UI Input example scene now shows On or Off based on the toggled state
+- Clients were not able to subscribe to the events on the PinchDetector and GrabDetector scripts as the properties were exposed as readonly. 
+- GrabDetector detection logic was inverted, so open hands were interpreted as grabs. Now fixed.
+
+### Known Issues
+- Pose detection scene does not illuminate all poses in green if built for mobile headsets when using URP (2022.3), spotlights don't work as intended on Unity 6.
+- Turntable and pullchord scene only works (i.e. the pullchord works) if the physical hands physics settings are used
+- The RuntimeGizmoManager and associated RuntimeGizmo.shader shader are not URP compatible and would require breaking changes to support URP; These remain as BiRP only
+- Support either input system for all interactions, fixing HandRecorder and CycleHandPairs
 
 ## [7.2.0] - 17/01/2025
 
@@ -34,8 +53,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed issues with pose detection scene where the grab ball was not moving the panel, SimpleInteractionGlow script was outputting NullReferenceExceptions and it was possible to push the record button out of the UI panel
 
 ### Known Issues
- - Multiple issues present in the Pose Recorder Scene - grab ball does not work, pose record button falls through panel and flies away, NullReferenceException raised by SimpleInteractionGlow script
- - Pull chord in Turntable and Pullchord scene gets stuck in pulled state with the grab ball juddering
+- Multiple issues present in the Pose Recorder Scene - grab ball does not work, pose record button falls through panel and flies away, NullReferenceException raised by SimpleInteractionGlow script
+- Pull chord in Turntable and Pullchord scene gets stuck in pulled state with the grab ball juddering
 
 
 ## [7.1.0] - 04/09/2024
