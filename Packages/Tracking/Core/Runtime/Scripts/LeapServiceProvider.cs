@@ -916,7 +916,7 @@ namespace Leap
         }
 
         /// <summary>
-        /// Set the _serviceConnectionInput mode to IP_PORT, set the target IP and port of the service to the parameters and connect to the new service address
+        /// Set the connection mode to IP_PORT, the target IP, and port of the service, and connects to this address.
         /// </summary>
         public void SetTargetServiceIPPortToConnectTo(string IP, string port)
         {
@@ -924,6 +924,20 @@ namespace Leap
 
             _serviceIP = IP;
             _servicePort = port;
+
+            destroyController();
+            createController();
+        }
+
+        /// <summary>
+        /// Set the connection mode to NAME, sets the name, and connects to this server namespace.
+        /// </summary>
+        /// <param name="serverNamespace"></param>
+        public void SetTargetServerNamespaceToConnectTo(string serverNamespace)
+        {
+            _serviceConnectionInput = ServiceConnectionInput.NAME;
+
+            _serverNameSpace = serverNamespace;
 
             destroyController();
             createController();
