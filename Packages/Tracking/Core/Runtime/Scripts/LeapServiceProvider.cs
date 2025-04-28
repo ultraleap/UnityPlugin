@@ -977,11 +977,11 @@ namespace Leap
 
             if (_multipleDeviceMode == MultipleDeviceMode.Disabled)
             {
-                _leapController = new Controller(0, serverNameSpace, true, _trackFiducialMarkers);
+                _leapController = new Controller(0, _serverNameSpace, true, _trackFiducialMarkers);
             }
             else
             {
-                _leapController = new Controller(SpecificSerialNumber.GetHashCode(), serverNameSpace, true, _trackFiducialMarkers);
+                _leapController = new Controller(SpecificSerialNumber.GetHashCode(), _serverNameSpace, true, _trackFiducialMarkers);
             }
 
             _leapController.Device += (s, e) =>
