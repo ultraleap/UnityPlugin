@@ -1,6 +1,6 @@
 
-// Tue this to log out the render colours seen by the camera in the render texture
-#define LOGGING_RENDER_COLOURS
+// Use this to log out the render colours seen by the camera in the render texture
+// #define LOGGING_RENDER_COLOURS
 
 using Leap;
 using Leap.Encoding;
