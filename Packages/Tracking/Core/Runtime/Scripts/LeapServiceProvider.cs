@@ -271,10 +271,33 @@ namespace Leap
         [SerializeField]
         protected bool _preventInitializingTrackingMode;
 
+        /// <summary>
+        /// The type of input to use for connection to the service
+        /// </summary>
+        public enum ServiceConnectionInput
+        {
+            NAME,
+            IP_PORT
+        }
+        [Tooltip("Which input to use for the service connection")]
+        [SerializeField]
+        [EditTimeOnly]
+        protected ServiceConnectionInput _serviceConnectionInput = ServiceConnectionInput.NAME;
+
         [Tooltip("Which Leap Service API Endpoint to connect to.  This is configured on the service with the 'api_namespace' argument.")]
         [SerializeField]
         [EditTimeOnly]
         protected string _serverNameSpace = "Leap Service";
+
+        [Tooltip("The IP address on which the Tracking service listens to. This is configured on the service with 'ip_address' in the 'leap_server_config' session of 'ServerConfig.json'")]
+        [SerializeField]
+        [EditTimeOnly]
+        protected string _serviceIP = "127.0.0.1";
+
+        [Tooltip("The port on which the Tracking service listens to. This is configured on the service with 'port' in the 'leap_server_config' session of 'ServerConfig.json'")]
+        [SerializeField]
+        [EditTimeOnly]
+        protected string _servicePort = "12345";
 
         public override TrackingSource TrackingDataSource { get { return CheckLeapServiceAvailable(); } }
 
@@ -892,6 +915,34 @@ namespace Leap
             throw new Exception("Unknown tracking optimization mode");
         }
 
+        /// <summary>
+        /// Set the connection mode to IP_PORT, the target IP, and port of the service, and connects to this address.
+        /// </summary>
+        public void SetTargetServiceIPPortToConnectTo(string IP, string port)
+        {
+            _serviceConnectionInput = ServiceConnectionInput.IP_PORT;
+
+            _serviceIP = IP;
+            _servicePort = port;
+
+            destroyController();
+            createController();
+        }
+
+        /// <summary>
+        /// Set the connection mode to NAME, sets the name, and connects to this server namespace.
+        /// </summary>
+        /// <param name="serverNamespace"></param>
+        public void SetTargetServerNamespaceToConnectTo(string serverNamespace)
+        {
+            _serviceConnectionInput = ServiceConnectionInput.NAME;
+
+            _serverNameSpace = serverNamespace;
+
+            destroyController();
+            createController();
+        }
+
         #endregion
 
         #region Internal Methods
@@ -899,7 +950,7 @@ namespace Leap
         protected virtual long CalculateInterpolationTime(bool endOfFrame = false)
         {
 #if UNITY_ANDROID && !UNITY_EDITOR
-      return _leapController.Now() - 16000;
+            return _leapController.Now() - 16000;
 #else
             if (_leapController != null)
             {
@@ -931,6 +982,11 @@ namespace Leap
             if (_leapController != null)
             {
                 return;
+            }
+
+            if(_serviceConnectionInput == ServiceConnectionInput.IP_PORT)
+            {
+                _serverNameSpace = $"{{\"tracking_server_ip\": \"{_serviceIP}\", \"tracking_server_port\": {_servicePort}}}";
             }
 
             if (_multipleDeviceMode == MultipleDeviceMode.Disabled)
@@ -1116,6 +1172,21 @@ namespace Leap
             if (HandTrackingSourceUtility.LeapCTrackingAvailable)
             {
                 _trackingSource = TrackingSource.LEAPC;
+                return _trackingSource;
+            }
+
+            if (_serviceConnectionInput == ServiceConnectionInput.IP_PORT)
+            {
+                _serverNameSpace = $"{{\"tracking_server_ip\": \"{_serviceIP}\", \"tracking_server_port\": {_servicePort}}}";
+            }
+
+            if (LeapInternal.Connection.IsConnectionAvailable(_serverNameSpace))
+            {
+                _trackingSource = TrackingSource.LEAPC;
+            }
+            else
+            {
+                _trackingSource = TrackingSource.NONE;
             }
 
             return _trackingSource;

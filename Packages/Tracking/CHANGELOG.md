@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated all custom shaders to support the Universal Render Pipeline concurrently with the Built-in Render Pipeline
 - Updated Copyright year to 2025
 - Split tracking preview examples into different groups - common assets, main examples and examples that need the old input manager to work (e.g. UI input)
+- (Service Provider) Expose service IP and port as user settable variables
 
 ### Fixed
 - Fixed some warnings around runtime variables that were only used in editor mode
@@ -131,9 +132,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Shaders all come under the Ultraleap folder
 - Deleted Interaction Engine
 - Leap and Leap.Unity namespaces are now Leap
-
-### Fixed
-
 
 
 ## [6.15.1] - 26/06/2024
