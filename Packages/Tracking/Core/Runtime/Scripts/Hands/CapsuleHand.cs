@@ -8,10 +8,13 @@
 
 using Leap.Attributes;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace Leap
 {
+
     /// <summary>
     /// The CapsuleHand is a basic Leap hand model that generates a set of spheres and 
     /// cylinders to render hands using Leap hand data.
@@ -65,6 +68,9 @@ namespace Leap
         private bool _showPalmJoint = true;
 
         [SerializeField]
+        private bool _showJointOrientation = true;
+
+        [SerializeField]
         private bool _showPinkyMetacarpal = true;
 
         [Space, SerializeField]
@@ -82,12 +88,16 @@ namespace Leap
 
         [SerializeField]
         private Mesh _sphereMesh;
-
         private Mesh _cylinderMesh;
+        private Mesh _coneMesh;
 
         [MinValue(3)]
         [SerializeField]
         private int _cylinderResolution = 12;
+
+        [MinValue(3)]
+        [SerializeField]
+        private int _coneResolution = 12;
 
         [MinValue(0)]
         [SerializeField]
@@ -112,8 +122,13 @@ namespace Leap
         private Hand _hand;
         private Vector3[] _spherePositions;
         private Matrix4x4[] _sphereMatrices = new Matrix4x4[64],
-                            _cylinderMatrices = new Matrix4x4[64];
-        private int _curSphereIndex = 0, _curCylinderIndex = 0;
+                            _cylinderMatrices = new Matrix4x4[64],
+                            _jointOrientationMatrices_forward = new Matrix4x4[64],
+                            _jointOrientationMatrices_up = new Matrix4x4[64],
+                            _jointOrientationMatrices_right = new Matrix4x4[64];
+
+
+        private int _curSphereIndex = 0, _curCylinderIndex = 0, _curConeIndex = 0;
         private Color _backingDefault = Color.white;
 
         private MaterialPropertyBlock _materialPropertyBlock;
@@ -221,6 +236,7 @@ namespace Leap
                     Debug.LogError("Capsule Hand Material needs Instancing Enabled to render in builds!", this);
                 }
                 _backing_material.enableInstancing = true;
+
                 _sphereMat = new Material(_backing_material);
                 _sphereMat.hideFlags = HideFlags.DontSaveInEditor;
                 if (_useCustomColors)
@@ -274,7 +290,9 @@ namespace Leap
 #if UNITY_EDITOR
         private void OnValidate()
         {
-            _meshMap.Clear();
+            _cylinderMeshMap.Clear();
+            _coneMeshMap.Clear();
+
             if (_material == null || !_material.enableInstancing)
             {
                 Debug.LogWarning("CapsuleHand's Material must have " +
@@ -348,6 +366,7 @@ namespace Leap
 
             _curSphereIndex = 0;
             _curCylinderIndex = 0;
+            _curConeIndex = 0;
 
             if (_spherePositions == null || _spherePositions.Length != TOTAL_JOINT_COUNT)
             {
@@ -363,7 +382,7 @@ namespace Leap
                 _sphereMat.hideFlags = HideFlags.DontSaveInEditor;
             }
 
-            //Update all joint spheres in the fingers
+            // Update all joint spheres in the fingers
             foreach (var finger in _hand.fingers)
             {
                 for (int j = 0; j < 4; j++)
@@ -373,7 +392,7 @@ namespace Leap
                     Vector3 position;
                     if (finger.Type == Finger.FingerType.THUMB && j == 0)
                     {
-                        // Hand the base of the thumb differently, and move it to the base of the index metacarpal.
+                        // Handle the base of the thumb differently, and move it to the base of the index metacarpal.
                         position = _hand.Index.GetBone((Bone.BoneType)j).PrevJoint;
                     }
                     else
@@ -383,6 +402,23 @@ namespace Leap
 
                     _spherePositions[key] = position;
                     drawSphere(position);
+
+                    if (_showJointOrientation)
+                    {
+                        Quaternion orientation;
+
+                        if (finger.Type == Finger.FingerType.THUMB && j == 0)
+                        {
+                            // Handle the base of the thumb differently, and move it to the base of the index metacarpal.
+                            orientation = _hand.Index.GetBone((Bone.BoneType)j).Rotation;
+                        }
+                        else
+                        {
+                            orientation = finger.GetBone((Bone.BoneType)j).Rotation;
+                        }
+
+                        CaptureOrientation(position, orientation);
+                    }
                 }
             }
 
@@ -397,7 +433,7 @@ namespace Leap
                 DrawUpperArm();
             }
 
-            //Draw cylinders between finger joints
+            // Draw cylinders between finger joints
             for (int i = 0; i < 5; i++)
             {
                 for (int j = 0; j < 3; j++)
@@ -436,6 +472,7 @@ namespace Leap
                 //PalmPos, WristPos, and the virtual palm drawn from the metacarpals.
                 Vector3 palmPosition = _hand.PalmPosition;
                 drawSphere(palmPosition, _palmRadius);
+
             }
 
             if (_showPinkyMetacarpal)
@@ -446,6 +483,11 @@ namespace Leap
                 drawSphere(pinkyMetacarpal);
                 drawCylinder(pinkyMetacarpal, indexMetacarpal);
                 drawCylinder(pinkyMetacarpal, PINKY_BASE_INDEX);
+
+                if (_showJointOrientation)
+                {
+                    CaptureOrientation(_hand.Pinky.GetBone(Bone.BoneType.METACARPAL).PrevJoint, _hand.Pinky.GetBone(Bone.BoneType.METACARPAL).Rotation);
+                }
             }
 
             if (SetIndividualSphereColors)
@@ -473,11 +515,75 @@ namespace Leap
             // Draw Cylinders
 #if UNITY_EDITOR
             _cylinderMesh = getCylinderMesh(1f);
+            _coneMesh = getConeMesh(1f);
 #else
             if (_cylinderMesh == null) { _cylinderMesh = getCylinderMesh(1f); }
+            if (_coneMesh == null) { _coneMesh = getConeMesh(1f); }
 #endif
-            Graphics.DrawMeshInstanced(_cylinderMesh, 0, _backing_material, _cylinderMatrices, _curCylinderIndex, null,
+
+            if (_materialPropertyBlock == null)
+            {
+                _materialPropertyBlock = new MaterialPropertyBlock();
+            }
+
+
+            if (_showJointOrientation)
+            {
+                
+                _materialPropertyBlock.SetColor("_Color", Color.red);
+
+                Graphics.DrawMeshInstanced(_coneMesh, 0, _backing_material, _jointOrientationMatrices_forward, _curConeIndex, _materialPropertyBlock,
+                  _castShadows ? UnityEngine.Rendering.ShadowCastingMode.On : UnityEngine.Rendering.ShadowCastingMode.Off, true, gameObject.layer);
+
+                _materialPropertyBlock.SetColor("_Color", Color.green);
+
+                Graphics.DrawMeshInstanced(_coneMesh, 0, _backing_material, _jointOrientationMatrices_up, _curConeIndex, _materialPropertyBlock,
+                  _castShadows ? UnityEngine.Rendering.ShadowCastingMode.On : UnityEngine.Rendering.ShadowCastingMode.Off, true, gameObject.layer);
+
+                _materialPropertyBlock.SetColor("_Color", Color.blue);
+
+                Graphics.DrawMeshInstanced(_coneMesh, 0, _backing_material, _jointOrientationMatrices_right, _curConeIndex, _materialPropertyBlock,
+                  _castShadows ? UnityEngine.Rendering.ShadowCastingMode.On : UnityEngine.Rendering.ShadowCastingMode.Off, true, gameObject.layer);
+            }
+
+            _materialPropertyBlock.SetColor("_Color", _cylinderColor);
+
+            Graphics.DrawMeshInstanced(_cylinderMesh, 0, _backing_material, _cylinderMatrices, _curCylinderIndex, _materialPropertyBlock,
               _castShadows ? UnityEngine.Rendering.ShadowCastingMode.On : UnityEngine.Rendering.ShadowCastingMode.Off, true, gameObject.layer);
+
+        }
+
+        private void CaptureOrientation(Vector3 position, Quaternion orientation)
+        {
+            float cachedScale = currentLossyScaleX;
+
+            LeapTransform t = new LeapTransform(position, orientation);
+            currentLossyScaleX = 0.2f * (0.006f / _cylinderRadius); // 0.006f is the default cylinder radius
+                
+            CalculateMatrixForPrimitive(position, position + t.xBasis.normalized * 0.015f, _jointOrientationMatrices_forward, ref _curConeIndex);
+            CalculateMatrixForPrimitive(position, position + t.yBasis.normalized * 0.015f, _jointOrientationMatrices_right, ref _curConeIndex);
+            CalculateMatrixForPrimitive(position, position + t.zBasis.normalized * 0.015f, _jointOrientationMatrices_up, ref _curConeIndex);
+
+            currentLossyScaleX = cachedScale;
+            _curConeIndex++;
+        }
+
+        private void CalculateMatrixForPrimitive(Vector3 a, Vector3 b, Matrix4x4[] targetMatrix, ref int targetIndex, bool incrementIndex = false)
+        {
+            if (isNaN(a) || isNaN(b)) { return; }
+
+            float length = (a - b).magnitude;
+
+            if ((a - b).magnitude > 0.001f)
+            {
+                targetMatrix[targetIndex] = Matrix4x4.TRS(a,
+                  Quaternion.LookRotation(b - a), new Vector3(currentLossyScaleX, currentLossyScaleX, length));
+            }
+
+            if (incrementIndex)
+            {
+                targetIndex++;
+            }
         }
 
         void DrawArm()
@@ -491,10 +597,18 @@ namespace Leap
             float armLength = Vector3.Distance(wrist, elbow);
             wrist -= arm.Direction * armLength * 0.05f;
 
+            Vector3 handRight = _hand.Basis.xBasis * arm.Width * 0.7f * 0.5f;
+
+            Vector3 armFrontRight_HandRotation = wrist + handRight;
+            Vector3 armFrontLeft_HandRotation = wrist - handRight;
+
             Vector3 armFrontRight = wrist + right;
-            Vector3 armFrontLeft = wrist - right;
+            Vector3 armFrontLeft= wrist - right;
             Vector3 armBackRight = elbow + right;
             Vector3 armBackLeft = elbow - right;
+
+            drawSphere(armFrontRight_HandRotation);
+            drawSphere(armFrontLeft_HandRotation);
 
             drawSphere(armFrontRight);
             drawSphere(armFrontLeft);
@@ -505,6 +619,18 @@ namespace Leap
             drawCylinder(armBackLeft, armBackRight);
             drawCylinder(armFrontLeft, armBackLeft);
             drawCylinder(armFrontRight, armBackRight);
+
+
+            if (_showJointOrientation)
+            {
+                CaptureOrientation(armFrontLeft_HandRotation, _hand.Basis.rotation);
+                CaptureOrientation(armFrontRight_HandRotation, _hand.Basis.rotation);
+
+                CaptureOrientation(armFrontLeft, arm.Rotation);
+                CaptureOrientation(armFrontRight, arm.Rotation);
+                CaptureOrientation(armBackLeft, arm.Rotation);
+                CaptureOrientation(armBackRight, arm.Rotation);
+            }
         }
 
         void DrawUpperArm()
@@ -577,13 +703,13 @@ namespace Leap
             return fingerIndex * 4 + jointIndex;
         }
 
-        private Dictionary<int, Mesh> _meshMap = new Dictionary<int, Mesh>();
+        private Dictionary<int, Mesh> _cylinderMeshMap = new Dictionary<int, Mesh>();
         private Mesh getCylinderMesh(float length)
         {
             int lengthKey = Mathf.RoundToInt(length * 100 / CYLINDER_MESH_RESOLUTION);
 
             Mesh mesh;
-            if (_meshMap.TryGetValue(lengthKey, out mesh))
+            if (_cylinderMeshMap.TryGetValue(lengthKey, out mesh))
             {
                 return mesh;
             }
@@ -630,10 +756,68 @@ namespace Leap
             mesh.RecalculateNormals();
             mesh.UploadMeshData(true);
 
-            _meshMap[lengthKey] = mesh;
+            _cylinderMeshMap[lengthKey] = mesh;
 
             return mesh;
         }
+
+        private Dictionary<int, Mesh> _coneMeshMap = new Dictionary<int, Mesh>();
+        private Mesh getConeMesh(float length)
+        {
+            int lengthKey = Mathf.RoundToInt(length * 100 / CYLINDER_MESH_RESOLUTION);
+
+            Mesh mesh;
+            if (_coneMeshMap.TryGetValue(lengthKey, out mesh))
+            {
+                return mesh;
+            }
+
+            mesh = new Mesh();
+            mesh.name = "GeneratedCone";
+            mesh.hideFlags = HideFlags.DontSave;
+
+            List<Vector3> verts = new List<Vector3>();
+            List<Color> colors = new List<Color>();
+            List<int> tris = new List<int>();
+
+            Vector3 p0 = Vector3.zero;
+            Vector3 p1 = Vector3.forward * length;
+
+      
+            for (int i = 0; i < _coneResolution; i++)
+            {
+                float angle = (Mathf.PI * 2.0f * i) / _coneResolution;
+                float dx = _cylinderRadius * Mathf.Cos(angle);
+                float dy = _cylinderRadius * Mathf.Sin(angle);
+
+                Vector3 spoke = new Vector3(dx, dy, 0);
+
+                int triStart = verts.Count;
+                verts.Add(p0 + spoke);
+             
+                colors.Add(Color.white);
+                colors.Add(Color.white);
+
+                int triCap = _coneResolution;
+
+                tris.Add(_coneResolution);
+                tris.Add((triStart) % (triCap));
+                tris.Add((triStart + 1) % (triCap));
+            }
+
+            verts.Add(p1);
+
+            mesh.SetVertices(verts);
+            mesh.SetIndices(tris.ToArray(), MeshTopology.Triangles, 0);
+            mesh.RecalculateBounds();
+            mesh.RecalculateNormals();
+            mesh.UploadMeshData(true);
+
+            _coneMeshMap[lengthKey] = mesh;
+
+            return mesh;
+        }
+
 
         public void ChangePreset(CapsuleHandPreset preset)
         {
