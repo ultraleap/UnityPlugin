@@ -529,7 +529,6 @@ namespace Leap
 
             if (_showJointOrientation)
             {
-                
                 _materialPropertyBlock.SetColor("_Color", Color.red);
 
                 Graphics.DrawMeshInstanced(_coneMesh, 0, _backing_material, _jointOrientationMatrices_forward, _curConeIndex, _materialPropertyBlock,
@@ -597,18 +596,18 @@ namespace Leap
             float armLength = Vector3.Distance(wrist, elbow);
             wrist -= arm.Direction * armLength * 0.05f;
 
-            Vector3 handRight = _hand.Basis.xBasis * arm.Width * 0.7f * 0.5f;
-
-            Vector3 armFrontRight_HandRotation = wrist + handRight;
-            Vector3 armFrontLeft_HandRotation = wrist - handRight;
 
             Vector3 armFrontRight = wrist + right;
             Vector3 armFrontLeft= wrist - right;
             Vector3 armBackRight = elbow + right;
             Vector3 armBackLeft = elbow - right;
 
-            drawSphere(armFrontRight_HandRotation);
-            drawSphere(armFrontLeft_HandRotation);
+            // Draw the top of the arm represented by the data used in the hand binder - e.g. the hand orientation
+            //Vector3 handRight = _hand.Basis.xBasis * arm.Width * 0.7f * 0.5f;
+            //Vector3 armFrontRight_HandRotation = wrist + handRight;
+            //Vector3 armFrontLeft_HandRotation = wrist - handRight;
+            //drawSphere(armFrontRight_HandRotation);
+            //drawSphere(armFrontLeft_HandRotation);
 
             drawSphere(armFrontRight);
             drawSphere(armFrontLeft);
@@ -623,8 +622,8 @@ namespace Leap
 
             if (_showJointOrientation)
             {
-                CaptureOrientation(armFrontLeft_HandRotation, _hand.Basis.rotation);
-                CaptureOrientation(armFrontRight_HandRotation, _hand.Basis.rotation);
+                //CaptureOrientation(armFrontLeft_HandRotation, _hand.Basis.rotation);
+                //CaptureOrientation(armFrontRight_HandRotation, _hand.Basis.rotation);
 
                 CaptureOrientation(armFrontLeft, arm.Rotation);
                 CaptureOrientation(armFrontRight, arm.Rotation);
