@@ -284,7 +284,14 @@ namespace Leap.HandsModule
                 //Calculate a ratio to use for scaling the finger tip
                 float ratio = leapFingerLength / fingerTipLength;
                 //Adjust the ratio by an offset value exposed in the inspector and the overal scale that has been calculated
-                float adjustedRatio = (ratio * (finger.fingerTipScaleOffset) - BoundHand.scaleOffset);
+
+                bool hasBoundTip = BoundHand.fingers[i].boundBones.Length == 5 &&
+                                   BoundHand.fingers[i].boundBones[4].boundTransform != null;
+
+                float adjustedRatio = hasBoundTip ?
+                    (ratio - BoundHand.scaleOffset) :
+                    (ratio * (finger.fingerTipScaleOffset) - BoundHand.scaleOffset);
+
                 //Adjust the ratio to account for service provider scale, assuming the service provider is uniformly scaled
                 var serviceProviderScale = leapProvider?.gameObject.transform.lossyScale.x ?? 1f;
                 adjustedRatio /= serviceProviderScale;
@@ -352,6 +359,8 @@ namespace Leap.HandsModule
                         position = LeapHand.Arm.ElbowPosition;
                     }
                 }
+
+                position = LeapHand.Arm.ElbowPosition;
 
                 //Set the position of the elbow
                 BoundHand.elbow.boundTransform.transform.position = position;

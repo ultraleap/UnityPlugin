@@ -259,11 +259,19 @@ namespace Leap.HandsModule
 
                     GUI.enabled = true;
 
+                
                     for (int i = 0; i < myTarget.BoundHand.fingers.Length; i++)
                     {
-                        var offset = boundHand.FindPropertyRelative("fingers").GetArrayElementAtIndex(i).FindPropertyRelative("fingerTipScaleOffset");
-                        var fingerType = ((Finger.FingerType)i).ToString();
-                        EditorGUILayout.PropertyField(offset, new GUIContent(fingerType + " Tip Offset", "The hand finger tip scale will be modified by this amount"));
+                        bool hasBoundTip = myTarget.BoundHand.fingers[i].boundBones.Length == 5 &&
+                            myTarget.BoundHand.fingers[i].boundBones[4].boundTransform != null;
+
+                        // Show fingertip scaling offsets if the rigged hand does not bind the fingertips
+                        if (!hasBoundTip)
+                        {
+                            var offset = boundHand.FindPropertyRelative("fingers").GetArrayElementAtIndex(i).FindPropertyRelative("fingerTipScaleOffset");
+                            var fingerType = ((Finger.FingerType)i).ToString();
+                            EditorGUILayout.PropertyField(offset, new GUIContent(fingerType + " Tip Offset", "The hand finger tip scale will be modified by this amount"));
+                        }
                     }
 
                 }

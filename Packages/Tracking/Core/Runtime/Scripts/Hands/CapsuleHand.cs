@@ -14,6 +14,14 @@ using UnityEngine.UIElements;
 
 namespace Leap
 {
+    /// <summary>
+    /// Fingertip representation
+    /// </summary>
+    public enum TipRepresentation
+    {
+        Default,
+        Cone
+    }
 
     /// <summary>
     /// The CapsuleHand is a basic Leap hand model that generates a set of spheres and 
@@ -66,6 +74,11 @@ namespace Leap
 
         [Space, SerializeField]
         private bool _showPalmJoint = true;
+
+        [SerializeField]
+        private bool _showFingertipPosition = true;
+
+        private TipRepresentation _tipRepresentation = TipRepresentation.Cone;
 
         [SerializeField]
         private bool _showJointOrientation = true;
@@ -125,10 +138,11 @@ namespace Leap
                             _cylinderMatrices = new Matrix4x4[64],
                             _jointOrientationMatrices_forward = new Matrix4x4[64],
                             _jointOrientationMatrices_up = new Matrix4x4[64],
-                            _jointOrientationMatrices_right = new Matrix4x4[64];
+                            _jointOrientationMatrices_right = new Matrix4x4[64],
+                            _fingertipMatrices = new Matrix4x4[64];
 
 
-        private int _curSphereIndex = 0, _curCylinderIndex = 0, _curConeIndex = 0;
+        private int _curSphereIndex = 0, _curCylinderIndex = 0, _curJointOrientationIndex = 0, _curFingertipIndex = 0;
         private Color _backingDefault = Color.white;
 
         private MaterialPropertyBlock _materialPropertyBlock;
@@ -366,7 +380,8 @@ namespace Leap
 
             _curSphereIndex = 0;
             _curCylinderIndex = 0;
-            _curConeIndex = 0;
+            _curJointOrientationIndex = 0;
+            _curFingertipIndex = 0;
 
             if (_spherePositions == null || _spherePositions.Length != TOTAL_JOINT_COUNT)
             {
@@ -385,7 +400,9 @@ namespace Leap
             // Update all joint spheres in the fingers
             foreach (var finger in _hand.fingers)
             {
-                for (int j = 0; j < 4; j++)
+                int maxJointIndex = _showFingertipPosition ? 3 : 4;
+                
+                for (int j = 0; j < maxJointIndex; j++)
                 {
                     int key = getFingerJointIndex((int)finger.Type, j);
 
@@ -420,6 +437,29 @@ namespace Leap
                         CaptureOrientation(position, orientation);
                     }
                 }
+
+                if (_showFingertipPosition)
+                {
+                    if (_tipRepresentation == TipRepresentation.Default)
+                    {
+                        //CalculateSphereMatrixForJoint(finger.Tip);
+                        //CalculateMatrixForPrimitive(finger.Distal.PrevJoint, finger.TipPosition);
+                    }
+                    else if (_tipRepresentation == TipRepresentation.Cone)
+                    {
+                        float cachedScale = currentLossyScaleX;
+                        currentLossyScaleX = 0.2f * (0.006f / _cylinderRadius); // 0.006f is the default cylinder radius
+
+                        CalculateMatrixForPrimitive(
+                            finger.Distal.PrevJoint,
+                            finger.TipPosition,
+                            ref _fingertipMatrices,
+                            ref _curFingertipIndex,
+                            true);
+
+                        currentLossyScaleX = cachedScale;
+                    }
+                }
             }
 
             //If we want to show the arm, do the calculations and display the meshes
@@ -436,7 +476,9 @@ namespace Leap
             // Draw cylinders between finger joints
             for (int i = 0; i < 5; i++)
             {
-                for (int j = 0; j < 3; j++)
+                int maxJointIndex = _showFingertipPosition ? 2 : 3;
+
+                for (int j = 0; j < maxJointIndex; j++)
                 {
                     int keyA = getFingerJointIndex(i, j);
                     int keyB = getFingerJointIndex(i, j + 1);
@@ -472,7 +514,6 @@ namespace Leap
                 //PalmPos, WristPos, and the virtual palm drawn from the metacarpals.
                 Vector3 palmPosition = _hand.PalmPosition;
                 drawSphere(palmPosition, _palmRadius);
-
             }
 
             if (_showPinkyMetacarpal)
@@ -531,18 +572,29 @@ namespace Leap
             {
                 _materialPropertyBlock.SetColor("_Color", Color.red);
 
-                Graphics.DrawMeshInstanced(_coneMesh, 0, _backing_material, _jointOrientationMatrices_forward, _curConeIndex, _materialPropertyBlock,
+                Graphics.DrawMeshInstanced(_coneMesh, 0, _backing_material, _jointOrientationMatrices_forward, _curJointOrientationIndex, _materialPropertyBlock,
                   _castShadows ? UnityEngine.Rendering.ShadowCastingMode.On : UnityEngine.Rendering.ShadowCastingMode.Off, true, gameObject.layer);
 
                 _materialPropertyBlock.SetColor("_Color", Color.green);
 
-                Graphics.DrawMeshInstanced(_coneMesh, 0, _backing_material, _jointOrientationMatrices_up, _curConeIndex, _materialPropertyBlock,
+                Graphics.DrawMeshInstanced(_coneMesh, 0, _backing_material, _jointOrientationMatrices_up, _curJointOrientationIndex, _materialPropertyBlock,
                   _castShadows ? UnityEngine.Rendering.ShadowCastingMode.On : UnityEngine.Rendering.ShadowCastingMode.Off, true, gameObject.layer);
 
                 _materialPropertyBlock.SetColor("_Color", Color.blue);
 
-                Graphics.DrawMeshInstanced(_coneMesh, 0, _backing_material, _jointOrientationMatrices_right, _curConeIndex, _materialPropertyBlock,
+                Graphics.DrawMeshInstanced(_coneMesh, 0, _backing_material, _jointOrientationMatrices_right, _curJointOrientationIndex, _materialPropertyBlock,
                   _castShadows ? UnityEngine.Rendering.ShadowCastingMode.On : UnityEngine.Rendering.ShadowCastingMode.Off, true, gameObject.layer);
+            }
+
+            if (_showFingertipPosition)
+            {
+                if (_tipRepresentation == TipRepresentation.Cone)
+                {
+                    _materialPropertyBlock.SetColor("_Color", Color.black);
+
+                    Graphics.DrawMeshInstanced(_coneMesh, 0, _backing_material, _fingertipMatrices, _curFingertipIndex, _materialPropertyBlock,
+                      _castShadows ? UnityEngine.Rendering.ShadowCastingMode.On : UnityEngine.Rendering.ShadowCastingMode.Off, true, gameObject.layer);
+                }
             }
 
             _materialPropertyBlock.SetColor("_Color", _cylinderColor);
@@ -559,15 +611,15 @@ namespace Leap
             LeapTransform t = new LeapTransform(position, orientation);
             currentLossyScaleX = 0.2f * (0.006f / _cylinderRadius); // 0.006f is the default cylinder radius
                 
-            CalculateMatrixForPrimitive(position, position + t.xBasis.normalized * 0.015f, _jointOrientationMatrices_forward, ref _curConeIndex);
-            CalculateMatrixForPrimitive(position, position + t.yBasis.normalized * 0.015f, _jointOrientationMatrices_right, ref _curConeIndex);
-            CalculateMatrixForPrimitive(position, position + t.zBasis.normalized * 0.015f, _jointOrientationMatrices_up, ref _curConeIndex);
+            CalculateMatrixForPrimitive(position, position + t.xBasis.normalized * 0.015f, ref _jointOrientationMatrices_forward, ref _curJointOrientationIndex);
+            CalculateMatrixForPrimitive(position, position + t.yBasis.normalized * 0.015f, ref _jointOrientationMatrices_right, ref _curJointOrientationIndex);
+            CalculateMatrixForPrimitive(position, position + t.zBasis.normalized * 0.015f, ref _jointOrientationMatrices_up, ref _curJointOrientationIndex);
 
             currentLossyScaleX = cachedScale;
-            _curConeIndex++;
+            _curJointOrientationIndex++;
         }
 
-        private void CalculateMatrixForPrimitive(Vector3 a, Vector3 b, Matrix4x4[] targetMatrix, ref int targetIndex, bool incrementIndex = false)
+        private void CalculateMatrixForPrimitive(Vector3 a, Vector3 b, ref Matrix4x4[] targetMatrix, ref int targetIndex, bool incrementIndex = false)
         {
             if (isNaN(a) || isNaN(b)) { return; }
 
