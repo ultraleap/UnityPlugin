@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Experimental Meta compatibility mode for the OpenXR provider
 - Added support to upgrade the plugin's Built In Render Pipeline materials (and as a result the example scenes) to the Universal Render Pipeline. This can be set to automatically prompt when the materials don't match the current render pipeline. It does not support downgrading.
+- Changed LeapC PInvoke signatures to support iOS
 
 ### Changed
 - Removed warning suggesting use of both input systems for OpenXR + Ultraleap compatibility now the new input system is fully supported
