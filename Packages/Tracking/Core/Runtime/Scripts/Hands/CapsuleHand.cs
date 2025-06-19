@@ -590,7 +590,7 @@ namespace Leap
             {
                 if (_tipRepresentation == TipRepresentation.Cone)
                 {
-                    _materialPropertyBlock.SetColor("_Color", Color.black);
+                    _materialPropertyBlock.SetColor("_Color", Color.cyan);
 
                     Graphics.DrawMeshInstanced(_coneMesh, 0, _backing_material, _fingertipMatrices, _curFingertipIndex, _materialPropertyBlock,
                       _castShadows ? UnityEngine.Rendering.ShadowCastingMode.On : UnityEngine.Rendering.ShadowCastingMode.Off, true, gameObject.layer);

@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Ghost Hand_VerticalGradient
-  m_Shader: {fileID: 46, guid: 0000000000000000f000000000000000, type: 0}
+  m_Name: Ghost Hand_VerticalGradient Inverted
+  m_Shader: {fileID: 4800000, guid: c5b35a4c19d643f4f87637cdd8587b98, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -44,11 +44,11 @@ Material:
         m_Offset: {x: 0, y: 0}
     - _EmissionMap:
         m_Texture: {fileID: 0}
-        m_Scale: {x: 3, y: 3}
+        m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 537728fc3ae8d46b4809b696c155bd46, type: 3}
-        m_Scale: {x: 3, y: 3}
+        m_Texture: {fileID: 2800000, guid: 84bf989e70a8d4109bc42488f6f8b895, type: 3}
+        m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
         m_Texture: {fileID: 0}
@@ -88,7 +88,7 @@ Material:
     - _useLighting: 1
     - _useOutline: 1
     m_Colors:
-    - _Color: {r: 0.9150943, g: 0.8935119, b: 0.8935119, a: 0.105882354}
+    - _Color: {r: 2.670157, g: 2.670157, b: 2.670157, a: 0.105882354}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _FresnelColor: {r: 22.408676, g: 22.408676, b: 22.408676, a: 0.09803922}
     - _MainColor: {r: 2.670157, g: 2.670157, b: 2.670157, a: 0.105882354}
