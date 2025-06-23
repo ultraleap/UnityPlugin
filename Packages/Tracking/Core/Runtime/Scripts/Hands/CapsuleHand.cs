@@ -36,7 +36,9 @@ namespace Leap
         {
             Default,
             Minimal,
-            Ultraleap
+            Ultraleap,
+            XRHandDebugHandLike,
+            DefaultThin,
         }
 
         private CapsuleHandPreset _preset;
@@ -697,7 +699,6 @@ namespace Leap
 
             Graphics.DrawMeshInstanced(_cylinderMesh, 0, _backing_material, _cylinderMatrices, _curCylinderIndex, _materialPropertyBlock,
               _castShadows ? UnityEngine.Rendering.ShadowCastingMode.On : UnityEngine.Rendering.ShadowCastingMode.Off, true, gameObject.layer);
-
         }
 
         private void CaptureBoneOrientation(Bone bone)
@@ -710,7 +711,7 @@ namespace Leap
             float cachedScale = currentLossyScaleX;
 
             LeapTransform t = new LeapTransform(position, orientation);
-            currentLossyScaleX = 0.2f * (0.006f / _cylinderRadius); // 0.006f is the default cylinder radius
+            currentLossyScaleX = 2 * (_cylinderRadius / 0.006f); // 0.006f is the default cylinder radius
                 
             CalculateMatrixForPrimitive(position, position + t.xBasis.normalized * 0.015f, ref _jointOrientationMatrices_forward, ref _curJointOrientationIndex);
             CalculateMatrixForPrimitive(position, position + t.yBasis.normalized * 0.015f, ref _jointOrientationMatrices_right, ref _curJointOrientationIndex);
@@ -1017,9 +1018,12 @@ namespace Leap
                 case CapsuleHandPreset.Default:
                     _showArm = true;
                     _showPalmJoint = true;
+                    _showAllMetacarpals = false;
                     _showPinkyMetacarpal = true;
                     _joinFingerProximals = true;
                     _joinThumbProximal = true;
+                    _showJointOrientation = false;
+                    _tipRepresentation = TipRepresentation.Default;
                     _castShadows = true;
                     _cylinderResolution = 12;
                     _jointRadius = 0.008f;
@@ -1030,12 +1034,54 @@ namespace Leap
                     _leftColorList = new Color[] { new Color(0.0f, 0.0f, 1.0f), new Color(0.2f, 0.0f, 0.4f), new Color(0.0f, 0.2f, 0.2f) };
                     _rightColorList = new Color[] { new Color(1.0f, 0.0f, 0.0f), new Color(1.0f, 1.0f, 0.0f), new Color(1.0f, 0.5f, 0.0f) };
                     break;
+
+                case CapsuleHandPreset.DefaultThin:
+                    _showArm = true;
+                    _showPalmJoint = true;
+                    _showAllMetacarpals = false;
+                    _showPinkyMetacarpal = true;
+                    _joinFingerProximals = true;
+                    _joinThumbProximal = true;
+                    _showJointOrientation = false;
+                    _tipRepresentation = TipRepresentation.Default;
+                    _castShadows = true;
+                    _cylinderResolution = 12;
+                    _jointRadius = 0.004f;
+                    _cylinderRadius = 0.002f;
+                    _palmRadius = 0.008f;
+                    _useCustomColors = false;
+                    _cylinderColor = Color.white;
+                    _leftColorList = new Color[] { new Color(0.0f, 0.0f, 1.0f), new Color(0.2f, 0.0f, 0.4f), new Color(0.0f, 0.2f, 0.2f) };
+                    _rightColorList = new Color[] { new Color(1.0f, 0.0f, 0.0f), new Color(1.0f, 1.0f, 0.0f), new Color(1.0f, 0.5f, 0.0f) };
+                    break;
+
+                case CapsuleHandPreset.XRHandDebugHandLike:
+                    _showArm = false;
+                    _showPalmJoint = false;
+                    _showAllMetacarpals = true;
+                    _joinFingerProximals = false;
+                    _showJointOrientation = false;
+                    _tipRepresentation = TipRepresentation.Default;
+                    _castShadows = true;
+                    _cylinderResolution = 12;
+                    _jointRadius = 0.005f;
+                    _cylinderRadius = 0.0025f;
+                    _palmRadius = 0.005f;
+                    _useCustomColors = false;
+                    _cylinderColor = Color.white;
+                    _leftColorList = new Color[] { new Color(0.0f, 0.0f, 1.0f), new Color(0.2f, 0.0f, 0.4f), new Color(0.0f, 0.2f, 0.2f) };
+                    _rightColorList = new Color[] { new Color(1.0f, 0.0f, 0.0f), new Color(1.0f, 1.0f, 0.0f), new Color(1.0f, 0.5f, 0.0f) };
+                    break;
+
                 case CapsuleHandPreset.Minimal:
                     _showArm = true;
                     _showPalmJoint = false;
                     _showPinkyMetacarpal = false;
+                    _showAllMetacarpals = false;
                     _joinFingerProximals = true;
                     _joinThumbProximal = true;
+                    _showJointOrientation = false;
+                    _tipRepresentation = TipRepresentation.Default;
                     _castShadows = true;
                     _cylinderResolution = 12;
                     _jointRadius = 0.006f;
@@ -1044,12 +1090,15 @@ namespace Leap
                     _sphereColor = Color.white;
                     _cylinderColor = Color.white;
                     break;
+
                 case CapsuleHandPreset.Ultraleap:
                     _showArm = true;
                     _showPalmJoint = false;
                     _showPinkyMetacarpal = true;
+                    _showAllMetacarpals = false;
                     _joinFingerProximals = true;
                     _joinThumbProximal = true;
+                    _showJointOrientation = false;
                     _castShadows = true;
                     _cylinderResolution = 12;
                     _jointRadius = 0.006f;
