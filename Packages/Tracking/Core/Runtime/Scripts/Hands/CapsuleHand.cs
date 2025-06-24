@@ -516,6 +516,8 @@ namespace Leap
 
                 if (_tipRepresentation == TipRepresentation.Default && _showFingertipPosition)
                 {
+                    // Fingertip has the same orientation as the distal bone
+                    CaptureBoneOrientation(_finger.TipPosition, _finger.Distal.Rotation);
                     CalculateSphereMatrix(_finger.TipPosition);
                 }
 
