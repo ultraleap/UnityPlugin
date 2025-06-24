@@ -47,21 +47,27 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _leapProvider: {fileID: 0}
   handedness: 0
-  _showArm: 1
+  _showArm: 0
   _showUpperArm: 0
   _showPalmJoint: 1
+  _scalePalmJointToPalmRadius: 1
+  _showFingertipPosition: 1
+  _tipRepresentation: 0
+  _showAllMetacarpals: 0
   _showPinkyMetacarpal: 1
   _joinFingerProximals: 1
   _joinThumbProximal: 1
+  _showJointOrientation: 0
   _castShadows: 1
   _material: {fileID: 2100000, guid: 50db6ec9473cfa746a5882bd2a16ced8, type: 2}
   _sphereMesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
   _cylinderResolution: 12
+  _coneResolution: 12
   _jointRadius: 0.008
   _cylinderRadius: 0.006
   _palmRadius: 0.015
   _useCustomColors: 0
-  _sphereColor: {r: 0, g: 1, b: 0, a: 1}
+  _sphereColor: {r: 1, g: 1, b: 1, a: 1}
   _cylinderColor: {r: 1, g: 1, b: 1, a: 1}
   SetIndividualSphereColors: 0
 --- !u!114 &11478924
