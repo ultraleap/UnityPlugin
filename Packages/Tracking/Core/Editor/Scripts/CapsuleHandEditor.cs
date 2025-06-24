@@ -6,6 +6,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
@@ -13,9 +14,12 @@ using UnityEngine;
 
 namespace Leap
 {
+
     [CustomEditor(typeof(CapsuleHand), editorForChildClasses: true), CanEditMultipleObjects]
     public class CapsuleHandEditor : CustomEditorBase<CapsuleHand>
     {
+        bool showAdvanced = false;
+
         public override void OnInspectorGUI()
         {
             CapsuleHand targ = target;
@@ -27,9 +31,34 @@ namespace Leap
                 EditorUtility.SetDirty(target);
             }
 
+            DrawDefaultInspector();
+
             EditorGUILayout.Space();
 
-            base.OnInspectorGUI();
+            showAdvanced = EditorGUILayout.Foldout(showAdvanced, "Advanced");
+
+            if (showAdvanced)
+            {
+                var prevParent = targ.MeshParent;
+                targ.MeshParent = (GameObject) EditorGUILayout.ObjectField("Mesh Parent", targ.MeshParent, typeof(GameObject), true);
+
+                if (prevParent != targ.MeshParent)
+                {
+                    EditorUtility.SetDirty(targ);
+                }
+
+                EditorGUILayout.Space();
+
+                GUI.enabled = targ.MeshParent != null;
+
+                if (GUILayout.Button("Capture Mesh"))
+                {
+                    GameObject capturedMesh = target.CaptureMesh();
+                    capturedMesh.transform.parent = targ.MeshParent.transform;
+                }
+
+                GUI.enabled = true;
+            }
         }
     }
 }

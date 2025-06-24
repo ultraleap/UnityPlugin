@@ -68,40 +68,46 @@ namespace Leap
         [SerializeField]
         private Chirality handedness;
 
-        [Space, SerializeField]
+        [Space, SerializeField, Tooltip("Shows the forearm. Not availble if all metacarpals are shown.")]
+        [DisableIf("_showAllMetacarpals", isEqualTo: true)]
         private bool _showArm = true;
 
-        [SerializeField, Tooltip("Shows the upper arm. Best in XR, assumes the camera is positioned at the users head")]
+        [SerializeField, Tooltip("Shows the upper arm. Best in XR, assumes the camera is positioned at the users head. Not availble if all metacarpals are shown.")]
+        [DisableIf("_showAllMetacarpals", isEqualTo: true)]
         private bool _showUpperArm = false;
 
-        [Space, SerializeField]
+        [Space, SerializeField, Tooltip("Display the palm position. Not availble if all metacarpals are shown.")]
+        [DisableIf("_showAllMetacarpals", isEqualTo: true)]
         private bool _showPalmJoint = true;
 
-        [SerializeField]
+        [SerializeField, Tooltip("Should the scale of the palm position sphere be scaled to the palm radius value? Not availble if all metacarpals are shown.")]
+        [DisableIf("_showAllMetacarpals", isEqualTo: true)]
         private bool _scalePalmJointToPalmRadius = true;
 
-        [SerializeField]
+        [SerializeField, Tooltip("Display the position of the fingertips")]
         private bool _showFingertipPosition = true;
 
-        [SerializeField]
+        [SerializeField, Tooltip("Determines how the fingertip is drawn")]
         private TipRepresentation _tipRepresentation = TipRepresentation.Cone;
 
-        [SerializeField]
+        [SerializeField, Tooltip("Should all metacarpal joints be displayed?")]
         private bool _showAllMetacarpals = false;
 
-        [SerializeField]
+        [SerializeField, Tooltip("Should the pinky metacarpal be drawn as connected to the proximal joint and index metacarpal. Not availble if all metacarpals are shown.")]
+        [DisableIf("_showAllMetacarpals", isEqualTo: true)]
         private bool _showPinkyMetacarpal = true;
 
-        [SerializeField]
+        [SerializeField, Tooltip("Should the finger proximal joints be shown as connected?")]
         private bool _joinFingerProximals = true;
 
-        [SerializeField]
+        [SerializeField, Tooltip("Should the thumb proximal be shown as connected to the index metacarpal? Not availble if all metacarpals are shown.")]
+        [DisableIf("_showAllMetacarpals", isEqualTo: true)]
         private bool _joinThumbProximal = true;
 
-        [Space,SerializeField]
+        [Space,SerializeField, Tooltip("Display the joint's orientation using cones representing the basis vectors")]
         private bool _showJointOrientation = true;
 
-        [Space, SerializeField]
+        [Space, SerializeField, Tooltip("Should the capsule hand visuals cast shadows?")]
         private bool _castShadows = true;
 
 
@@ -179,6 +185,22 @@ namespace Leap
             }
         }
 
+        [HideInInspector, SerializeField]
+        private GameObject _meshParent;
+
+        public GameObject MeshParent
+        {
+            get
+            {
+                return _meshParent;
+            }
+
+            set
+            {
+                _meshParent = value;
+            }
+        }
+            
         /// <summary>
         /// The type of the Hand model (set to Graphics)
         /// </summary>
@@ -651,7 +673,6 @@ namespace Leap
                   _castShadows ? UnityEngine.Rendering.ShadowCastingMode.On : UnityEngine.Rendering.ShadowCastingMode.Off, true, gameObject.layer);
             }
 
-
             // Draw Cylinders
 #if UNITY_EDITOR
             _cylinderMesh = getCylinderMesh(1f);
@@ -952,6 +973,12 @@ namespace Leap
         }
 
         private Dictionary<int, Mesh> _coneMeshMap = new Dictionary<int, Mesh>();
+
+        public CapsuleHand(bool _showPalmJoint)
+        {
+            this._showPalmJoint = _showPalmJoint;
+        }
+
         private Mesh getConeMesh(float length)
         {
             int lengthKey = Mathf.RoundToInt(length * 100 / CYLINDER_MESH_RESOLUTION);
