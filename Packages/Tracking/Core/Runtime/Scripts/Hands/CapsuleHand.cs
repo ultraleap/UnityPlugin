@@ -176,6 +176,9 @@ namespace Leap
             }
         }
 
+        [HideInInspector]
+        public GameObject MeshParent = null;
+
         /// <summary>
         /// The type of the Hand model (set to Graphics)
         /// </summary>
@@ -310,6 +313,7 @@ namespace Leap
         }
 
 #if UNITY_EDITOR
+
         private void OnValidate()
         {
             _cylinderMeshMap.Clear();
@@ -322,6 +326,7 @@ namespace Leap
                   "Material with a Default Material now...", this);
                 _material = (Material)Resources.Load("InstancedCapsuleHand", typeof(Material));
             }
+
             if (_material != null && _backing_material != null && _sphereMat != null)
             {
                 if (_useCustomColors && (_sphereMat.color != _sphereColor || _backing_material.color != _cylinderColor))
@@ -509,21 +514,24 @@ namespace Leap
                 CalculateSphereMatrixForJoint(_finger.Intermediate);
                 CalculateSphereMatrixForJoint(_finger.Distal);
 
-                if (_tipRepresentation == TipRepresentation.Default)
+                if (_tipRepresentation == TipRepresentation.Default && _showFingertipPosition)
                 {
                     CalculateSphereMatrix(_finger.TipPosition);
                 }
 
                 // Calculate the cylinder bones positions
-                if (_tipRepresentation == TipRepresentation.Default)
+                if (_showFingertipPosition)
                 {
-                    CalculateMatrixForPrimitive(_finger.TipPosition, _finger.Distal.PrevJoint);
-                }
-                else if (_tipRepresentation == TipRepresentation.Cone)
-                {
-                    // Replace the end sphere and cylinder with a cone that ends at the tip
-                    CalculateMatrixForPrimitive(_finger.Distal.PrevJoint, _finger.TipPosition,
-                        _fingertipMatrices, ref _curFingertipIndex, true);
+                    if (_tipRepresentation == TipRepresentation.Default)
+                    {
+                        CalculateMatrixForPrimitive(_finger.TipPosition, _finger.Distal.PrevJoint);
+                    }
+                    else if (_tipRepresentation == TipRepresentation.Cone)
+                    {
+                        // Replace the end sphere and cylinder with a cone that ends at the tip
+                        CalculateMatrixForPrimitive(_finger.Distal.PrevJoint, _finger.TipPosition,
+                            _fingertipMatrices, ref _curFingertipIndex, true);
+                    }
                 }
 
                 CalculateMatrixForPrimitive(_finger.Intermediate.PrevJoint, _finger.Distal.PrevJoint);
@@ -703,11 +711,11 @@ namespace Leap
             float cachedScale = currentLossyScaleX;
 
             LeapTransform t = new LeapTransform(position, orientation);
-            currentLossyScaleX = 2 * (_cylinderRadius / 0.006f); // 0.006f is the default cylinder radius
+            currentLossyScaleX = (_cylinderRadius / 0.006f); // 0.006f is the default cylinder radius
 
-            CalculateMatrixForPrimitive(position, position + t.xBasis.normalized * 0.015f, ref _jointOrientationMatrices_forward, ref _curJointOrientationIndex);
-            CalculateMatrixForPrimitive(position, position + t.yBasis.normalized * 0.015f, ref _jointOrientationMatrices_right, ref _curJointOrientationIndex);
-            CalculateMatrixForPrimitive(position, position + t.zBasis.normalized * 0.015f, ref _jointOrientationMatrices_up, ref _curJointOrientationIndex);
+            CalculateMatrixForPrimitive(position, position + t.xBasis.normalized * 0.03f, ref _jointOrientationMatrices_forward, ref _curJointOrientationIndex);
+            CalculateMatrixForPrimitive(position, position + t.yBasis.normalized * 0.03f, ref _jointOrientationMatrices_right, ref _curJointOrientationIndex);
+            CalculateMatrixForPrimitive(position, position + t.zBasis.normalized * 0.03f, ref _jointOrientationMatrices_up, ref _curJointOrientationIndex);
 
             currentLossyScaleX = cachedScale;
             _curJointOrientationIndex++;
