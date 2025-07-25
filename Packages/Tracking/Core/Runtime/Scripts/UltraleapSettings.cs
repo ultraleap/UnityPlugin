@@ -9,6 +9,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Runtime.InteropServices;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -160,20 +161,24 @@ namespace Leap
 
         private static void RenderPipelineSupportSection(SerializedObject settings)
         {
-            EditorGUILayout.LabelField("Render Pipeline Support", EditorStyles.boldLabel);
-            EditorGUILayout.Space(5);
-
-            using (new EditorGUI.IndentLevelScope())
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                // Enable automatic upgrades
-                UltraleapSettings.AutomaticallyUpgradeMaterialsToCurrentRenderPipeline = 
-                    EditorGUILayout.ToggleLeft("Enable automatic updates of the Ultraleap plugin materials to the active render pipeline on this machine.", UltraleapSettings.AutomaticallyUpgradeMaterialsToCurrentRenderPipeline);
-                EditorGUILayout.TextArea("Note: if set to false, this setting will persist across ALL Unity projects that use the plugin. You can still manually force the upgrade.");
+                EditorGUILayout.LabelField("Render Pipeline Support", EditorStyles.boldLabel);
+                EditorGUILayout.Space(5);
+
+                using (new EditorGUI.IndentLevelScope())
+                {
+
+                    // Enable automatic upgrades
+                    UltraleapSettings.AutomaticallyUpgradeMaterialsToCurrentRenderPipeline =
+                        EditorGUILayout.ToggleLeft("Enable automatic updates of the Ultraleap plugin materials to the active render pipeline on this machine.", UltraleapSettings.AutomaticallyUpgradeMaterialsToCurrentRenderPipeline);
+                    EditorGUILayout.TextArea("Note: if set to false, this setting will persist across ALL Unity projects that use the plugin. You can still manually force the upgrade.");
+                }
+
+                EditorGUILayout.Space(30);
+
+                settings.ApplyModifiedProperties();
             }
-
-            EditorGUILayout.Space(30);
-
-            settings.ApplyModifiedProperties();
         }
 
         private static void ResetSection(SerializedObject settings)
@@ -238,20 +243,31 @@ namespace Leap
         {
             get
             {
-                string readValue = System.Environment.GetEnvironmentVariable(automaticallyUpgradeMaterialsToCurrentRenderPipelineEnvironmentVariableName, EnvironmentVariableTarget.User);
-
-                if (string.IsNullOrEmpty(readValue))
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
-                    AutomaticallyUpgradeMaterialsToCurrentRenderPipeline = defaultValueForAutomaticallyUpgradingMaterialsForActiveRenderPipeline;
-                    return defaultValueForAutomaticallyUpgradingMaterialsForActiveRenderPipeline;
-                }
+                    string readValue = System.Environment.GetEnvironmentVariable(automaticallyUpgradeMaterialsToCurrentRenderPipelineEnvironmentVariableName, EnvironmentVariableTarget.User);
 
-                return Convert.ToBoolean(readValue);
+                    if (string.IsNullOrEmpty(readValue))
+                    {
+                        AutomaticallyUpgradeMaterialsToCurrentRenderPipeline = defaultValueForAutomaticallyUpgradingMaterialsForActiveRenderPipeline;
+                        return defaultValueForAutomaticallyUpgradingMaterialsForActiveRenderPipeline;
+                    }
+
+                    return Convert.ToBoolean(readValue);
+                }
+                else
+                {
+                    return true;
+                }
             }
 
             set
             {
-                System.Environment.SetEnvironmentVariable(automaticallyUpgradeMaterialsToCurrentRenderPipelineEnvironmentVariableName, Convert.ToString(value), EnvironmentVariableTarget.User);
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    // Setting user scoped environment variables is only supported on Windows
+                    System.Environment.SetEnvironmentVariable(automaticallyUpgradeMaterialsToCurrentRenderPipelineEnvironmentVariableName, Convert.ToString(value), EnvironmentVariableTarget.User);
+                }
             }
         }
 
