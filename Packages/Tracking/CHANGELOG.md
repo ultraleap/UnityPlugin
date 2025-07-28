@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated Copyright year to 2025
 - Split tracking preview examples into different groups - common assets, main examples and examples that need the old input manager to work (e.g. UI input)
 - (Service Provider) Expose service IP and port as user settable variables
+- Removed option to disable BiRP->URP upgrade on a per user basis for non-Windows machines as it's not supported.
 
 ### Fixed
 - Fixed some warnings around runtime variables that were only used in editor mode
