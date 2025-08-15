@@ -175,8 +175,6 @@ namespace Leap
                         leapProvider.OnFixedFrame -= FixedUpdateFrame;
                         leapProvider.OnFixedFrame += FixedUpdateFrame;
                     }
-
-
                 }
             }
         }

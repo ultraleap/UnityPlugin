@@ -32,6 +32,7 @@ namespace Leap.HandsModule
             }
 
             handBinder.ResetHand();
+
             //Get all children of the hand
             var children = new List<Transform>();
 
@@ -70,6 +71,7 @@ namespace Leap.HandsModule
                 handBinder.ElbowLength = (wrist.position - elbow.position).magnitude;
             }
 
+            // Calling this seems to repeat stuff done in AutoBind above - e.g. UpdateBoundBones
             BindHand(handBinder);
         }
 
