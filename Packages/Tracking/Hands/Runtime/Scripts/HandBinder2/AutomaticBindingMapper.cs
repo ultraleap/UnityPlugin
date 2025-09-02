@@ -39,14 +39,22 @@ namespace Leap.HandsModule
     };
 
         internal static readonly Dictionary<BoundFingerType, List<string>> FingerTypeToNameMap = new Dictionary<BoundFingerType, List<string>>()
-    {
-        { BoundFingerType.THUMB, new List<string>() { "Thumb" } },
-        { BoundFingerType.INDEX, new List<string>() { "Index" } },
-        { BoundFingerType.MIDDLE, new List<string>() { "Middle" } },
-        { BoundFingerType.RING, new List<string>() { "Ring" } },
-        { BoundFingerType.LITTLE, new List<string>() { "Little", "Pinky" } },
-    };
+        {
+            { BoundFingerType.THUMB, new List<string>() { "Thumb" } },
+            { BoundFingerType.INDEX, new List<string>() { "Index" } },
+            { BoundFingerType.MIDDLE, new List<string>() { "Middle" } },
+            { BoundFingerType.RING, new List<string>() { "Ring" } },
+            { BoundFingerType.LITTLE, new List<string>() { "Little", "Pinky" } },
+        };
 
+        /// <summary>
+        /// Outputs a BindingMap, which maps transforms in the rig to hand tracking bones, given a skinned mesh renderer
+        /// Supports full bipedal skeletons and common naming conventions supported by blender, for separators, chirality and leaf nodes.
+        /// Does not support front/back or top/bottom
+        /// </summary>
+        /// <param name="target">A skinned mesh renderer, e.g. as produced when a rigged FBX file is imported</param>
+        /// <param name="settings">Conversion options</param>
+        /// <returns>The binding map</returns>
         public static BindingMap Bind(SkinnedMeshRenderer target, BindingConversionSettings settings)
         {
             BindingMap map = new BindingMap();

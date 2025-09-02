@@ -26,6 +26,8 @@ namespace Leap.EditorTests
 {
     internal class HandBinder2EditorTests
     {
+
+
         /// <summary>
         /// Helper class for defining the core structure of a body armature, used to test that
         /// we can successfully parse full body armatures and extract the correct hand / arm 
@@ -87,30 +89,16 @@ namespace Leap.EditorTests
             { BoundFingerType.LITTLE, "Little"}
         };
 
-        public static readonly Dictionary<BoundFingerBoneType, string> DefaultNamedFingerBones_AllBones = new Dictionary<BoundFingerBoneType, string>()
-        {
-            { BoundFingerBoneType.METACARPAL, "Meta" },
-            { BoundFingerBoneType.PROXIMAL, "Proximal"},
-            { BoundFingerBoneType.INTERMEDIATE, "Intermediate"},
-            { BoundFingerBoneType.DISTAL, "Distal"},
-            { BoundFingerBoneType.TIP, "Tip"}
-        };
-
-        public static readonly Dictionary<BoundFingerBoneType, string> DefaultNamedThumbBones_AllBones = new Dictionary<BoundFingerBoneType, string>()
-        {
-            { BoundFingerBoneType.METACARPAL, "Meta" },
-            { BoundFingerBoneType.PROXIMAL, "Proximal"},
-            { BoundFingerBoneType.DISTAL, "Distal"},
-            { BoundFingerBoneType.TIP, "Tip"}
-        };
-
         /// <summary>
         /// A set of valid separators, commonly recognized by blender to split a bone name into parts
+        /// See https://docs.blender.org/manual/en/latest/animation/armatures/bones/editing/naming.html
         /// </summary>
         public static char[] BoneSeparators = { '_', ' ', '-', '_' };
 
         /// <summary>
         /// A set of valid identifiers to mark the chirality of a bone, supported by Blender
+        /// See https://docs.blender.org/manual/en/latest/animation/armatures/bones/editing/naming.html
+        /// Note L/l and R/r are only vaild if a separator is used
         /// </summary>
         public static string[] ChiralityIdentifiers_Left = { "L", "l", "Left", "LEFT" };
         public static string[] ChiralityIdentifiers_Right = { "R", "r", "Right", "RIGHT" };
@@ -144,8 +132,8 @@ namespace Leap.EditorTests
                 hasElbow: true, "Elbow",
                 wristName: "Hand",
                 fingers: DefaultRiggedFingers,
-                fingerBones: DefaultNamedFingerBones_AllBones,
-                thumbBones: DefaultNamedThumbBones_AllBones,
+                fingerBones: DigitNameListGenerator.DefaultNamedFingerBones_AllBones,
+                thumbBones: DigitNameListGenerator.DefaultNamedThumbBones_AllBones,
                 generateLeafBones: true
                 );
 
@@ -245,7 +233,7 @@ namespace Leap.EditorTests
             bool hasElbow = false,
             string elbowName = "Elbow",
             string wristName = "Wrist",
-            Dictionary<BoundFingerType, string>? fingers = null, // Annyingly we cannot assign a default dictionary as its not a compile time constant 
+            Dictionary<BoundFingerType, string>? fingers = null, // Annoyingly we cannot assign a default dictionary as its not a compile time constant 
             Dictionary<BoundFingerBoneType, string>? fingerBones = null,
             Dictionary<BoundFingerBoneType, string>? thumbBones = null,
             bool generateLeafBones = false)
@@ -298,16 +286,15 @@ namespace Leap.EditorTests
                 var bones = currentFinger.Key == BoundFingerType.THUMB ? thumbBones : fingerBones;
 
                 string boneName = String.Empty;
-                foreach (KeyValuePair<BoundFingerBoneType, string> fingerBone in fingerBones)
+                foreach (KeyValuePair<BoundFingerBoneType, string> fingerBone in bones)
                 {
-
-                    boneName = $"{fingerBone.Value}";
+                    boneName = $"{currentFinger.Value}{separator}{fingerBone.Value}";
                     parentGO = AddChildTransform(parentGO, GenerateFullBoneName(boneName, boneChirality), returnObjectAdded: true);
                 }
 
                 if (generateLeafBones && !String.IsNullOrEmpty(boneName))
                 {
-                    AddChildTransform(parentGO, $"{boneName}_end", true);
+                    AddChildTransform(parentGO, GenerateFullBoneName(boneName, boneChirality, "end"), true);
                 }
             }
 
@@ -366,18 +353,15 @@ namespace Leap.EditorTests
                     {
                         if (generateLeafBones)
                         {
-                            AddChildTransform(parentGO, $"{parentGO.name}_end", true);
+                            AddChildTransform(parentGO, GenerateFullBoneName(node.BoneName, boneChirality, "end"), true);
                         }
                     }
 
-                
                     return parentGO;
                 }
             }
 
-
-
-            string GenerateFullBoneName(string boneName, BoneChirality boneChirality)
+            string GenerateFullBoneName(string boneName, BoneChirality boneChirality, string endBoneName = "")
             {
                 string chiralityString = String.Empty;
 
@@ -393,13 +377,18 @@ namespace Leap.EditorTests
                         break;
                 }
 
+                if (!String.IsNullOrEmpty(endBoneName) && !endBoneName.StartsWith(separator))
+                {
+                    endBoneName = separator + endBoneName;
+                }
+
                 if (chiralitySeparatorPosition == ChiralitySeparatorPosition.prefix)
                 {
-                    return $"{bonePrefix}{chiralityString}{boneName}";
+                    return $"{bonePrefix}{chiralityString}{boneName}{endBoneName}";
                 }
                 else
                 {
-                    return $"{bonePrefix}{boneName}{chiralityString}";
+                    return $"{bonePrefix}{boneName}{endBoneName}{chiralityString}";
                 }
             }
         }
@@ -478,7 +467,7 @@ namespace Leap.EditorTests
 
             return string.Empty;
         }
-        
+
         void BuildTransformHierarchyString(GameObject currentRoot, ref List<bool> lastChild, ref StringBuilder output)
         {
             Append(currentRoot, ref lastChild, ref output);
@@ -498,7 +487,7 @@ namespace Leap.EditorTests
             {
                 if (currentChildIndex == childCount)
                 {
-                    lastChild[lastChild.Count-1] = true;
+                    lastChild[lastChild.Count - 1] = true;
                 }
 
                 BuildTransformHierarchyString(child.gameObject, ref lastChild, ref output);
@@ -506,7 +495,7 @@ namespace Leap.EditorTests
             }
 
             lastChild.RemoveAt(lastChild.Count - 1);
- 
+
             //⌞_|___ 
             void Append(GameObject go, ref List<bool> lastChild, ref StringBuilder output)
             {
@@ -568,5 +557,85 @@ namespace Leap.EditorTests
     {
         prefix,
         suffix
+    }
+
+    /// <summary>
+    /// Utility class for generating hand digit names based on requested options
+    /// </summary>
+    internal static class DigitNameListGenerator
+    {
+        internal static readonly Dictionary<BoundFingerBoneType, string> DefaultNamedFingerBones_AllBones = new Dictionary<BoundFingerBoneType, string>()
+        {
+            { BoundFingerBoneType.METACARPAL, "Meta" },
+            { BoundFingerBoneType.PROXIMAL, "Proximal"},
+            { BoundFingerBoneType.INTERMEDIATE, "Intermediate"},
+            { BoundFingerBoneType.DISTAL, "Distal"},
+            { BoundFingerBoneType.TIP, "Tip"}
+        };
+
+        internal static readonly Dictionary<BoundFingerBoneType, string> DefaultNamedThumbBones_AllBones = new Dictionary<BoundFingerBoneType, string>()
+        {
+            { BoundFingerBoneType.METACARPAL, "Meta" },
+            { BoundFingerBoneType.PROXIMAL, "Proximal"},
+            { BoundFingerBoneType.DISTAL, "Distal"},
+            { BoundFingerBoneType.TIP, "Tip"}
+        };
+
+        internal enum DigitNamingOptions
+        {
+            DefaultBoneNames,
+            NumericList,
+            AlphabeticallyList
+        }
+
+        internal static Dictionary<BoundFingerBoneType, string> Generate(bool isThumb, DigitNamingOptions boneNameConvention, bool generateMetacarpals, bool generateTips)
+        {
+            var list = new Dictionary<BoundFingerBoneType, string>();
+
+            var toGenerate = new List<BoundFingerBoneType>();
+
+            if (isThumb || generateMetacarpals)
+            {
+                toGenerate.Add(BoundFingerBoneType.METACARPAL);
+            }
+
+            if (isThumb)
+            {
+                toGenerate.AddRange(new List<BoundFingerBoneType>() { BoundFingerBoneType.PROXIMAL, BoundFingerBoneType.DISTAL });
+            }
+            else
+            {
+                toGenerate.AddRange(new List<BoundFingerBoneType>() { BoundFingerBoneType.PROXIMAL, BoundFingerBoneType.INTERMEDIATE, BoundFingerBoneType.DISTAL });
+            }
+
+            if (generateTips)
+            {
+                toGenerate.Add(BoundFingerBoneType.TIP);
+            }
+
+            int index = 0;
+            foreach (var bone in toGenerate)
+            {
+                list.Add(bone, GetBoneName(index++,bone));
+            }
+
+            return list;
+
+            string GetBoneName(int index, BoundFingerBoneType bone)
+            {
+                switch (boneNameConvention)
+                {
+                    case DigitNamingOptions.NumericList:
+                        return $"{index}";
+
+                    case DigitNamingOptions.AlphabeticallyList:
+                        return char.ToString((char)(index + 97)); // Lowercase a = char value of 97
+
+                    case DigitNamingOptions.DefaultBoneNames:
+                    default:
+                        return DefaultNamedFingerBones_AllBones[bone];
+                }
+            }
+        }
     }
 }
