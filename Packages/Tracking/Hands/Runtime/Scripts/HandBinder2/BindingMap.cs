@@ -84,6 +84,8 @@ namespace Leap.HandsModule
         public Transform RootHandOrArmJoint;
         public BoundBoneType RootBoneJointType;
 
+        public NamingConvention RigBoneNamingConvention;
+
         public Dictionary<BoundBoneType, BoundBoneData> BoundTransformMap = new Dictionary<BoundBoneType, BoundBoneData>();
 
         // Indexer declaration.

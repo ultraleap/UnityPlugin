@@ -7,6 +7,7 @@
  ******************************************************************************/
 
 using Leap;
+using log4net.Layout.Pattern;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -19,26 +20,32 @@ namespace Leap.HandsModule
     public class BindingConversionSettings
     {
         public bool RigHasMetacarpalsForAllFingers = false;
+
+        public Chirality TargetChirality = Chirality.Left;
     }
 
-    /// <summary>
-    /// Analyses the bones in a skinned mesh renderer and maps them to hand tracking data 
-    /// </summary>
-    public class AutomaticBindingMapper : MonoBehaviour
+    public enum ChiralityPosition
     {
-        internal static readonly Dictionary<BoundFingerBoneType, List<string>> FingerBoneTypeToNameMap = new Dictionary<BoundFingerBoneType, List<string>>()
+        NotPresent,
+        Prefix,
+        Suffix
+    }
+
+    public class NamingConvention
     {
-        { BoundFingerBoneType.METACARPAL, new List<string>() { "Meta" } },
-        { BoundFingerBoneType.PROXIMAL, new List<string>() { "Proximal" } },
-        { BoundFingerBoneType.INTERMEDIATE, new List<string>() { "Intermediate" } },
-        { BoundFingerBoneType.DISTAL, new List<string>() { "Distal" } },
-        { BoundFingerBoneType.TIP, new List<string>() { "Tip" } },
+        public static readonly Dictionary<BoundFingerBoneType, List<string>> FingerBoneTypeToNameMap = new Dictionary<BoundFingerBoneType, List<string>>()
+        {
+            { BoundFingerBoneType.METACARPAL, new List<string>() { "Meta" } },
+            { BoundFingerBoneType.PROXIMAL, new List<string>() { "Proximal" } },
+            { BoundFingerBoneType.INTERMEDIATE, new List<string>() { "Intermediate" } },
+            { BoundFingerBoneType.DISTAL, new List<string>() { "Distal" } },
+            { BoundFingerBoneType.TIP, new List<string>() { "Tip" } },
 
-        { BoundFingerBoneType.ELBOW, new List<string>() { "Elbow", "Forearm" } },
-        { BoundFingerBoneType.WRIST, new List<string>() { "Wrist", "Hand" } }
-    };
+            { BoundFingerBoneType.ELBOW, new List<string>() { "Elbow", "Forearm" } },
+            { BoundFingerBoneType.WRIST, new List<string>() { "Wrist", "Hand" } }
+        };
 
-        internal static readonly Dictionary<BoundFingerType, List<string>> FingerTypeToNameMap = new Dictionary<BoundFingerType, List<string>>()
+        public static readonly Dictionary<BoundFingerType, List<string>> FingerTypeToNameMap = new Dictionary<BoundFingerType, List<string>>()
         {
             { BoundFingerType.THUMB, new List<string>() { "Thumb" } },
             { BoundFingerType.INDEX, new List<string>() { "Index" } },
@@ -47,6 +54,120 @@ namespace Leap.HandsModule
             { BoundFingerType.LITTLE, new List<string>() { "Little", "Pinky" } },
         };
 
+        public char Separator;
+        public bool UsesSeparator = false;
+
+        public string ChiralityIdentifer;
+
+        public ChiralityPosition ChiralityPosition = ChiralityPosition.NotPresent;
+
+        public string Prefix;
+
+        /// <summary>
+        /// A set of valid separators, commonly recognized by blender to split a bone name into parts
+        /// See https://docs.blender.org/manual/en/latest/animation/armatures/bones/editing/naming.html
+        /// </summary>
+        public static char[] BoneSeparators = { '_', ' ', '-', '_' };
+
+        /// <summary>
+        /// A set of valid identifiers to mark the chirality of a bone, supported by Blender
+        /// See https://docs.blender.org/manual/en/latest/animation/armatures/bones/editing/naming.html
+        /// Note L/l and R/r are only vaild if a separator is used
+        /// </summary>
+        public static string[] ChiralityIdentifiers_Left = { "L", "l", "Left", "LEFT" };
+        public static string[] ChiralityIdentifiers_Right = { "R", "r", "Right", "RIGHT" };
+
+        /// <summary>
+        /// A set of valid identifiers to mark the chirality of a bone, supported by Blender
+        /// See https://docs.blender.org/manual/en/latest/animation/armatures/bones/editing/naming.html
+        /// Note L/l and R/r are only vaild if a separator is used
+        /// </summary>
+        public static string[] ChiralityIdentifiers_Left_NoSeparator = { "Left", "LEFT" };
+        public static string[] ChiralityIdentifiers_Right_NoSeparator = { "Right", "RIGHT" };
+
+        /// <summary>
+        /// Given a likely node mapped to hand data, normally something like the wrist or elbow, determines the naming convention used to name nodes
+        /// </summary>
+        /// <param name="nodeName">The name</param>
+        /// <returns>The naming convention used</returns>
+        public static NamingConvention Determine(string nodeName, BoundBoneType boundType)
+        {
+            NamingConvention namingConvention = new();
+
+            if (boundType != BoundBoneType.WRIST || boundType != BoundBoneType.ELBOW)
+            {
+                Debug.LogWarning("This function only supports the Elbow or Wrist node");
+                return namingConvention;
+            }
+
+            // Might need to harden this to take the boundType
+            (int startIndex, int endIndex) = FindIndexOfMatchToName(nodeName, FingerBoneTypeToNameMap);
+            string prefix = nodeName.Substring(0, startIndex);
+            string suffix = nodeName.Substring(endIndex, nodeName.Length - endIndex);
+
+            // Identify the separator, if used
+            foreach (var separator in BoneSeparators)
+            {
+                if (nodeName.Contains(separator))
+                {
+                    namingConvention.Separator = separator;
+                    namingConvention.UsesSeparator = true;
+                    break;
+                }
+            }
+
+            // Identify the chirality string and placement, if used
+            var legalChiralityIdentifiers = namingConvention.UsesSeparator ? ChiralityIdentifiers_Left.Concat(ChiralityIdentifiers_Right) :
+                                                                            ChiralityIdentifiers_Left_NoSeparator.Concat(ChiralityIdentifiers_Right_NoSeparator);
+
+            namingConvention.ChiralityIdentifer = legalChiralityIdentifiers.Where(cid => nodeName.Contains(cid)).FirstOrDefault();
+
+            if (!String.IsNullOrEmpty(namingConvention.ChiralityIdentifer))
+            {
+                if (prefix.Contains(namingConvention.ChiralityIdentifer))
+                {
+                    namingConvention.ChiralityPosition = ChiralityPosition.Prefix;
+
+                    namingConvention.Prefix = nodeName.Substring(0, prefix.IndexOf(namingConvention.ChiralityIdentifer));
+                }
+                else if (suffix.Contains(namingConvention.ChiralityIdentifer))
+                {
+                    namingConvention.ChiralityPosition = ChiralityPosition.Suffix;
+                    namingConvention.Prefix = prefix;
+                }
+                else
+                {
+                    Debug.LogError($"Chriality identifier {namingConvention.ChiralityIdentifer} looks to be in an unexpected place");
+                }
+            }
+
+            // Identify any prefix
+            return namingConvention;
+
+            (int startIndex, int endIndex) FindIndexOfMatchToName<T>(string name, Dictionary<T, List<string>> map)
+            {
+                foreach (var item in map)
+                {
+                    foreach (var nameToken in item.Value)
+                    {
+                        if (name.Contains(nameToken, StringComparison.CurrentCultureIgnoreCase))
+                        {
+                            int startIndex = name.IndexOf(nameToken);
+                            return (startIndex, startIndex + nameToken.Length);
+                        }
+                    }
+                }
+
+                return (-1, -1);
+            }  
+        }
+    }
+
+    /// <summary>
+    /// Analyses the bones in a skinned mesh renderer and maps them to hand tracking data 
+    /// </summary>
+    public class AutomaticBindingMapper : MonoBehaviour
+    {
         /// <summary>
         /// Outputs a BindingMap, which maps transforms in the rig to hand tracking bones, given a skinned mesh renderer
         /// Supports full bipedal skeletons and common naming conventions supported by blender, for separators, chirality and leaf nodes.
@@ -74,8 +195,10 @@ namespace Leap.HandsModule
             }
 
             // Identify the root bone type ...
-            map.RootHandOrArmJoint = FindHandDataRoot(rootBoneTransform);
+            NamingConvention namingConvention;
+            (map.RootHandOrArmJoint, namingConvention) = FindHandDataRootAndNamingConvention(rootBoneTransform, settings.TargetChirality);
             map.RootBoneJointType = NameToBoneType(map.RootHandOrArmJoint.name);
+            map.RigBoneNamingConvention = namingConvention;
 
             switch (map.RootBoneJointType)
             {
@@ -109,7 +232,7 @@ namespace Leap.HandsModule
             }
             else // Rig only contains a subset of hand joints, try to brute force map them
             {
-
+                Debug.LogWarning("Rig only contains a subset of hand joints (e.g. no wrist), this is not currently supported");
             }
             return map;
         }
@@ -121,7 +244,7 @@ namespace Leap.HandsModule
             // as that's ambiguous between a tip being rigged or a metacarpal being rigged
             int boneCount = GetTransformHierarchyDepth(digitRoot);
             bool isThumb = IsThumb(digitRoot);
-            
+
             if (isThumb ? boneCount > 4 : boneCount > 5)
             {
                 Debug.LogWarning($"Found more than 5 bones in the digit {digitRoot.name}. Is it possible the rig has been imported with unecessary leaf bones?");
@@ -341,7 +464,7 @@ namespace Leap.HandsModule
                 {
                     depth++;
                     node = child;
-                    break;   
+                    break;
                 }
             }
 
@@ -370,10 +493,10 @@ namespace Leap.HandsModule
         /// </summary>
         /// <param name="root"></param>
         /// <returns>The first transform that maps to a known hand tracking data source</returns>
-        private static Transform FindHandDataRoot(Transform root)
+        private static (Transform root, NamingConvention namingConvention) FindHandDataRootAndNamingConvention(Transform root, Chirality targetChirality)
         {
             if (root == null)
-                return null;
+                return (null, null);
 
             Queue<Transform> queue = new Queue<Transform>();
             queue.Enqueue(root);
@@ -383,7 +506,18 @@ namespace Leap.HandsModule
                 Transform current = queue.Dequeue();
 
                 if (NameToBoneType(current.name) != BoundBoneType.UNKNOWN)
-                    return current;
+                {
+                    NamingConvention context = NamingConvention.Determine(current.name, NameToBoneType(current.name));
+                    if (targetChirality == NameToChirality(current.name))
+                    {
+                        return (current, context);
+                    }
+                    else
+                    {
+                        // Don't search the children as the chirality is wrong
+                        continue;
+                    }
+                }
 
                 foreach (var child in current.GetChildren())
                 {
@@ -391,19 +525,26 @@ namespace Leap.HandsModule
                 }
             }
 
-            return null;
+            return (null,null);
+        }
+
+        private static Chirality NameToChirality(string name)
+        {
+            Chirality chirality = Chirality.Left;
+
+            return chirality;
         }
 
         private static BoundFingerType NameToFingerType(string name)
         {
-            return FindMatchToName<BoundFingerType>(name, FingerTypeToNameMap);
+            return FindMatchToName<BoundFingerType>(name, NamingConvention.FingerTypeToNameMap);
         }
 
         private static BoundFingerBoneType NameToFingerBoneType(string name)
         {
-            return FindMatchToName<BoundFingerBoneType>(name, FingerBoneTypeToNameMap);
+            return FindMatchToName<BoundFingerBoneType>(name, NamingConvention.FingerBoneTypeToNameMap);
         }
-        
+
         private static BoundBoneType NameToBoneType(string name)
         {
             return FingerAndFingerBoneToBoneType(NameToFingerType(name), NameToFingerBoneType(name));

@@ -21,6 +21,8 @@ using JetBrains.Annotations;
 using UnityEngine.Experimental.AI;
 using System.Text;
 using System.Linq;
+using System.CodeDom;
+using UnityEditor.VersionControl;
 
 namespace Leap.EditorTests
 {
@@ -89,19 +91,73 @@ namespace Leap.EditorTests
             { BoundFingerType.LITTLE, "Little"}
         };
 
-        /// <summary>
-        /// A set of valid separators, commonly recognized by blender to split a bone name into parts
-        /// See https://docs.blender.org/manual/en/latest/animation/armatures/bones/editing/naming.html
-        /// </summary>
-        public static char[] BoneSeparators = { '_', ' ', '-', '_' };
+        [Test]
+        public void BoneNamingConventionTests_AllVariants()
+        {
+            var bonePrefixVariants = new[] { String.Empty, "Prefix", "Prefix:" };
+            var validBones = new[] { BoundFingerBoneType.ELBOW, BoundFingerBoneType.WRIST};
+            var endBoneNameVariants = new[] { String.Empty, "end" };
 
-        /// <summary>
-        /// A set of valid identifiers to mark the chirality of a bone, supported by Blender
-        /// See https://docs.blender.org/manual/en/latest/animation/armatures/bones/editing/naming.html
-        /// Note L/l and R/r are only vaild if a separator is used
-        /// </summary>
-        public static string[] ChiralityIdentifiers_Left = { "L", "l", "Left", "LEFT" };
-        public static string[] ChiralityIdentifiers_Right = { "R", "r", "Right", "RIGHT" };
+            foreach (var prefix in bonePrefixVariants)
+            {
+                foreach (var validBone in validBones)
+                {
+                    foreach (var validBoneName in NamingConvention.FingerBoneTypeToNameMap[validBone])
+                    {
+                        foreach (var boneChirality in Enum.GetValues(typeof(BoneChirality)))
+                        {
+                            foreach (var chiralitySeparatorPosition in Enum.GetValues(typeof(ChiralitySeparatorPosition)))
+                            {
+                                foreach (var chiralityName in (Chirality)boneChirality == Chirality.Left ? NamingConvention.ChiralityIdentifiers_Left : NamingConvention.ChiralityIdentifiers_Right)
+                                {
+                                    foreach (var separator in NamingConvention.BoneSeparators)
+                                    {
+                                        foreach (var endBoneName in endBoneNameVariants)
+                                        {
+                                            string boneName = GenerateFullBoneName(prefix, validBoneName, (BoneChirality)boneChirality, (ChiralitySeparatorPosition)chiralitySeparatorPosition, chiralityName, chiralityName, separator, endBoneName);
+
+                                            // Check we can decode all typical variants of a bone name (according to Blender's naming conventions), extracting the correct information
+                                            NamingConvention namingConvention = NamingConvention.Determine(boneName, validBone == BoundFingerBoneType.ELBOW ? BoundBoneType.ELBOW : BoundBoneType.WRIST);
+
+                                            Assert.AreEqual(namingConvention.Prefix, prefix);
+                                            Assert.AreEqual(namingConvention.Separator, separator);
+                                            Assert.AreEqual(namingConvention.ChiralityIdentifer, chiralityName);
+                                            Assert.AreEqual(namingConvention.ChiralityPosition, chiralitySeparatorPosition);
+                                            Assert.AreEqual(namingConvention.UsesSeparator, true); 
+                                        }
+                                    }
+                                } 
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        [Test]
+        public void BoneNamingConventionTests2()
+        {
+            var boolValues = new[] { false, true };
+
+            foreach (var digitNamingConvention in Enum.GetValues(typeof(DigitNameListGenerator.DigitNamingOptions)))
+            {
+                foreach (bool isThumb in boolValues)
+                {
+                    foreach (bool generateMetacarpals in boolValues)
+                    {
+                        foreach (bool generateTips in boolValues)
+                        {
+                            var nameList = DigitNameListGenerator.Generate(isThumb,
+                                                                            (DigitNameListGenerator.DigitNamingOptions)digitNamingConvention,
+                                                                            generateMetacarpals,
+                                                                            generateTips);
+
+                            
+                        }
+                    }
+                }
+            }
+        }
 
         [Test]
         public void AutomaticBindingMapper_CanBindCorrectlyToGenericHandRig()
@@ -142,6 +198,8 @@ namespace Leap.EditorTests
                 LogTransformHierarchy(syntheticRig);
                 var skinnedMeshRenderer = syntheticRig.GetComponentInChildren<SkinnedMeshRenderer>();
                 var bindingMap = AutomaticBindingMapper.Bind(skinnedMeshRenderer, new BindingConversionSettings() { RigHasMetacarpalsForAllFingers = true });
+
+                // All bones should be bound
                 Assert.AreEqual(bindingMap.BoundTransformMap.Count, 26);
             }
         }
@@ -255,7 +313,6 @@ namespace Leap.EditorTests
             if (bodyArmature != null)
             {
                 var value = GenerateBodyArmature(current);
-                Debug.Log("leftArmRoot {value.leftArmRoot}");
                 GenerateHand(value.leftArmRoot, boneChirality: BoneChirality.LEFT);
                 GenerateHand(value.rightArmRoot, boneChirality: BoneChirality.RIGHT);
             }
@@ -264,16 +321,18 @@ namespace Leap.EditorTests
                 GenerateHand(current, chirality);
             }
 
+            skinnedMeshRenderer.rootBone = transformRoot.transform;
+
             return root;
 
             void GenerateHand(GameObject currentRoot, BoneChirality boneChirality = BoneChirality.LEFT)
             {
                 if (hasElbow)
                 {
-                    currentRoot = AddChildTransform(currentRoot, GenerateFullBoneName(elbowName, boneChirality), returnObjectAdded: true);
+                    currentRoot = AddChildTransform(currentRoot, GenerateFullBoneNameLocal(elbowName, boneChirality), returnObjectAdded: true);
                 }
 
-                currentRoot = AddChildTransform(currentRoot, GenerateFullBoneName(wristName, boneChirality), returnObjectAdded: true);
+                currentRoot = AddChildTransform(currentRoot, GenerateFullBoneNameLocal(wristName, boneChirality), returnObjectAdded: true);
 
                 foreach (var finger in fingers)
                 {
@@ -289,12 +348,12 @@ namespace Leap.EditorTests
                 foreach (KeyValuePair<BoundFingerBoneType, string> fingerBone in bones)
                 {
                     boneName = $"{currentFinger.Value}{separator}{fingerBone.Value}";
-                    parentGO = AddChildTransform(parentGO, GenerateFullBoneName(boneName, boneChirality), returnObjectAdded: true);
+                    parentGO = AddChildTransform(parentGO, GenerateFullBoneNameLocal(boneName, boneChirality), returnObjectAdded: true);
                 }
 
                 if (generateLeafBones && !String.IsNullOrEmpty(boneName))
                 {
-                    AddChildTransform(parentGO, GenerateFullBoneName(boneName, boneChirality, "end"), true);
+                    AddChildTransform(parentGO, GenerateFullBoneNameLocal(boneName, boneChirality, "end"), true);
                 }
             }
 
@@ -323,7 +382,7 @@ namespace Leap.EditorTests
 
                 GameObject AddGameObjectAndProcessChildren(GameObject parentGO, BodyBoneNode node, BoneChirality boneChirality, ref GameObject leftArmRoot, ref GameObject? rightArmRoot)
                 {
-                    parentGO = AddChildTransform(parentGO, GenerateFullBoneName(node.BoneName, boneChirality), returnObjectAdded: true);
+                    parentGO = AddChildTransform(parentGO, GenerateFullBoneNameLocal(node.BoneName, boneChirality), returnObjectAdded: true);
 
                     Debug.Log($"{node.BoneType} {hasElbow} {boneChirality}");
                     if ((node.BoneType == BodyArmatureBone.UPPER_ARM && hasElbow) ||
@@ -353,7 +412,7 @@ namespace Leap.EditorTests
                     {
                         if (generateLeafBones)
                         {
-                            AddChildTransform(parentGO, GenerateFullBoneName(node.BoneName, boneChirality, "end"), true);
+                            AddChildTransform(parentGO, GenerateFullBoneNameLocal(node.BoneName, boneChirality, "end"), true);
                         }
                     }
 
@@ -361,35 +420,40 @@ namespace Leap.EditorTests
                 }
             }
 
-            string GenerateFullBoneName(string boneName, BoneChirality boneChirality, string endBoneName = "")
+            string GenerateFullBoneNameLocal(string boneName, BoneChirality boneChirality, string endBoneName = "")
             {
-                string chiralityString = String.Empty;
+                return GenerateFullBoneName(bonePrefix, boneName, boneChirality, chiralitySeparatorPosition, leftChiralityName, rightChiralityName, separator, endBoneName);
+            }
+        }
 
-                switch (boneChirality)
-                {
-                    case BoneChirality.LEFT:
-                        chiralityString = chiralitySeparatorPosition == ChiralitySeparatorPosition.prefix ? $"{leftChiralityName}{separator}" : $"{separator}{leftChiralityName}";
-                        break;
-                    case BoneChirality.RIGHT:
-                        chiralityString = chiralitySeparatorPosition == ChiralitySeparatorPosition.prefix ? $"{rightChiralityName}{separator}" : $"{separator}{rightChiralityName}";
-                        break;
-                    default:
-                        break;
-                }
+        string GenerateFullBoneName(string bonePrefix, string boneName, BoneChirality boneChirality, ChiralitySeparatorPosition chiralitySeparatorPosition, string leftChiralityName, string rightChiralityName, char separator, string endBoneName = "")
+        {
+            string chiralityString = String.Empty;
 
-                if (!String.IsNullOrEmpty(endBoneName) && !endBoneName.StartsWith(separator))
-                {
-                    endBoneName = separator + endBoneName;
-                }
+            switch (boneChirality)
+            {
+                case BoneChirality.LEFT:
+                    chiralityString = chiralitySeparatorPosition == ChiralitySeparatorPosition.prefix ? $"{leftChiralityName}{separator}" : $"{separator}{leftChiralityName}";
+                    break;
+                case BoneChirality.RIGHT:
+                    chiralityString = chiralitySeparatorPosition == ChiralitySeparatorPosition.prefix ? $"{rightChiralityName}{separator}" : $"{separator}{rightChiralityName}";
+                    break;
+                default:
+                    break;
+            }
 
-                if (chiralitySeparatorPosition == ChiralitySeparatorPosition.prefix)
-                {
-                    return $"{bonePrefix}{chiralityString}{boneName}{endBoneName}";
-                }
-                else
-                {
-                    return $"{bonePrefix}{boneName}{endBoneName}{chiralityString}";
-                }
+            if (!String.IsNullOrEmpty(endBoneName) && !endBoneName.StartsWith(separator))
+            {
+                endBoneName = separator + endBoneName;
+            }
+
+            if (chiralitySeparatorPosition == ChiralitySeparatorPosition.prefix)
+            {
+                return $"{bonePrefix}{chiralityString}{boneName}{endBoneName}";
+            }
+            else
+            {
+                return $"{bonePrefix}{boneName}{endBoneName}{chiralityString}";
             }
         }
 
