@@ -140,6 +140,9 @@ namespace LeapInternal
 
         private bool _disposed = false;
 
+        private bool _loggedNullDeviceWarningForGetInterpolatedFrame = false;
+        private bool _loggedNullDeviceWarningForGetInterpolatedFrameSize = false;
+
         public void Dispose()
         {
             Dispose(true);
@@ -428,7 +431,6 @@ namespace LeapInternal
             }
         }
 
-
         public UInt64 GetInterpolatedFrameSize(Int64 time, Device device = null)
         {
             UInt64 size = 0;
@@ -440,14 +442,17 @@ namespace LeapInternal
             }
             else
             {
-                result = LeapC.GetFrameSize(_leapConnection, time, out size);
+                if (!_loggedNullDeviceWarningForGetInterpolatedFrameSize)
+                {
+                    UnityEngine.Debug.LogWarning($"Device is null, requesting the frame size without a valid device (handle) is no longer supported and should be considered obsolete");
+                    _loggedNullDeviceWarningForGetInterpolatedFrameSize = true;
+                }
+                result = eLeapRS.eLeapRS_Unsupported;
             }
 
             reportAbnormalResults("LeapC get interpolated frame call was ", result);
             return size;
         }
-
-
 
         public void GetInterpolatedFrame(Frame toFill, Int64 time, Device device = null)
         {
@@ -461,7 +466,12 @@ namespace LeapInternal
             }
             else
             {
-                result = LeapC.InterpolateFrame(_leapConnection, time, trackingBuffer, size);
+                if (!_loggedNullDeviceWarningForGetInterpolatedFrame)
+                {
+                    UnityEngine.Debug.LogWarning($"Device is null, requesting an interpolated frame without a valid device (handle) is no longer supported and should be considered obsolete");
+                    _loggedNullDeviceWarningForGetInterpolatedFrame= true;
+                }
+                result = eLeapRS.eLeapRS_Unsupported;
             }
 
             reportAbnormalResults("LeapC get interpolated frame call was ", result);
@@ -482,12 +492,17 @@ namespace LeapInternal
 
             if (device != null)
             {
-
                 result = LeapC.InterpolateFrameFromTimeEx(_leapConnection, device.Handle, time, sourceTime, trackingBuffer, size);
             }
             else
             {
-                result = LeapC.InterpolateFrameFromTime(_leapConnection, time, sourceTime, trackingBuffer, size);
+                if (!_loggedNullDeviceWarningForGetInterpolatedFrame)
+                {
+                    UnityEngine.Debug.LogWarning($"Device is null, requesting an interpolated frame (from time) without a valid device (handle) is no longer supported and should be considered obsolete");
+                    _loggedNullDeviceWarningForGetInterpolatedFrame = true; 
+                }
+
+                result = eLeapRS.eLeapRS_Unsupported;
             }
 
             reportAbnormalResults("LeapC get interpolated frame from time call was ", result);
