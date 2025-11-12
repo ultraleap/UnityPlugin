@@ -173,7 +173,7 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
     {
         if (UltraleapSettings.AutomaticallyUpgradeMaterialsToCurrentRenderPipeline &&
             AutomaticConversionIsOffForPluginInProject == false &&
-            FoundPluginMaterialsThatDontMatchCurrentRenderPipeline(exitOnFirstMaterialFound:true, logMaterialsThatDontMatch:false ))
+            FoundPluginMaterialsThatDontMatchCurrentRenderPipeline(exitOnFirstMaterialFound: true, logMaterialsThatDontMatch: false))
         {
             bool goAhead = false;
 
@@ -278,10 +278,16 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
     {
         foreach (var shaderName in ShadersToIgnore)
         {
-            if (material.shader.name == shaderName) 
-            { 
-                return true; 
+            if (material.shader.name == shaderName)
+            {
+                return true;
             }
+        }
+
+        // Ignore the URP examples if present as they have now been removed
+        if (AssetDatabase.GetAssetOrScenePath(material).Contains("URP Examples"))
+        {
+            return true;
         }
 
         return false;
