@@ -1,7 +1,9 @@
 using Leap;
+using LeapInternal;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static Leap.HandPoseDetector;
 
 public class HandPoseValidator : MonoBehaviour
 {
@@ -75,17 +77,18 @@ public class HandPoseValidator : MonoBehaviour
             }
 
             lineRenderers.Clear();
-        }
+        } 
 
         if (poseDetector != null)
         {
             ColorHandJoints();
             RenderDirectionRays();
+            RenderProximityRays();
         }
     }
 
     private void ColorHandJoints()
-    {
+    { 
         CapsuleHand colourCapsuleHand = storedValidationHands.FirstOrDefault();
 
         if (colourCapsuleHand != null)
@@ -93,7 +96,7 @@ public class HandPoseValidator : MonoBehaviour
             Leap.Utils.Fill(leftCapsuleHandColours, Color.grey);
             Leap.Utils.Fill(rightCapsuleHandColours, Color.grey);
         }
-
+ 
         if (storedValidationHands.Count > 0)
         {
             List<HandPoseDetector.ValidationData> validationData = poseDetector.GetValidationData();
@@ -144,6 +147,110 @@ public class HandPoseValidator : MonoBehaviour
         else
         {
             return;
+        }
+    }
+
+    private void RenderProximityRays()
+    {
+        int lineRenderCount = lineRenderers.Count;
+
+        for (int j = 0; j < storedValidationHands.Count; j++)
+        {
+            if (storedValidationHands.ElementAt(j).enabled)
+            {
+                for (int i = 0; i < poseDetector.poseProximityRules.Count; i++)
+                {
+                    PoseProximityRule boneProximityRuleTarget = poseDetector.poseProximityRules.ElementAt(i);
+
+                    if (boneProximityRuleTarget.enabled)
+                    {
+                        foreach (var proximityRule in boneProximityRuleTarget.proximityRules)
+                        {
+                            if (proximityRule.enabled)
+                            {
+                                Color lineColor = Color.gray;
+                                CapsuleHand capsuleHand = storedValidationHands.ElementAt(j);
+
+                                if (capsuleHand != null && capsuleHand.enabled)
+                                {
+                                    foreach (var validityData in poseDetector.poseProximityRulesForValidator)
+                                    {
+                                        if (validityData.chirality != capsuleHand.Handedness &&
+                                            !validityData.poseRuleAndStatus.Item1.Equals(proximityRule))
+                                            break;
+
+                                        if (validityData.poseRuleAndStatus.Item2 == true)
+                                        {
+                                            lineColor = Color.green;
+                                        }
+                                        else
+                                        {
+                                            lineColor = Color.red;
+                                        }
+                                        
+                                        var lineRenderer = GetLineRendererFromPool(capsuleHand.gameObject.transform, lineRenderCount++, lineColor);
+                                        var startPosition = GetStartPosition(boneProximityRuleTarget, capsuleHand.GetLeapHand());
+
+                                        if (startPosition.HasValue)
+                                        {
+                                            var endPosition = proximityRule.proximityTarget.position;
+                                            lineRenderer.SetPosition(0, startPosition.Value);
+                                            lineRenderer.SetPosition(1, endPosition);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        Vector3? GetStartPosition(PoseProximityRule boneProximityRuleTarget, Hand leapHand)
+        {
+            if ((int)boneProximityRuleTarget.finger != 5 &&
+                boneProximityRuleTarget.finger != (int)Leap.Finger.FingerType.UNKNOWN &&
+                boneProximityRuleTarget.bone != (int)Leap.Bone.BoneType.UNKNOWN)
+            {
+                int fingNum = (int)boneProximityRuleTarget.finger;
+                int boneNum = (int)boneProximityRuleTarget.bone;
+
+
+                return leapHand.fingers[fingNum].bones[boneNum].PrevJoint;
+            }
+            else
+            {
+                if (leapHand != null &&
+                    leapHand.PalmPosition != null)
+                {
+                    return leapHand.PalmPosition;
+                }
+            }
+
+            return null;
+        }
+    
+        LineRenderer GetLineRendererFromPool(Transform parent, int index, Color lineColor)
+        {
+            if (lineRenderers.ElementAtOrDefault(index) == null)
+            {
+                var lineRendChild = new GameObject();
+                lineRendChild.transform.SetParent(parent);
+                lineRendChild.AddComponent<LineRenderer>();
+                lineRenderers.Add(lineRendChild);
+            }
+
+            var lineRend = lineRenderers.ElementAt(index).GetComponent<LineRenderer>();
+
+            if (lineRend)
+            {
+                lineRend.material = new Material(Shader.Find("Particles/Standard Unlit"));
+                lineRend.startWidth = 0.005f;
+                lineRend.endWidth = 0.005f;
+                lineRend.material.color = lineColor;
+            }
+
+            return lineRend;
         }
     }
 
