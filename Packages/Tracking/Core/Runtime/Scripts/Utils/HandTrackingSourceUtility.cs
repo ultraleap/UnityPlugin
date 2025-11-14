@@ -32,7 +32,7 @@ namespace Leap
                 return leapCTrackingAvailable;
             }
 
-#if UNITY_ANDROID && !UNITY_EDITOR
+#if UNITY_ANDROID && !UNITY_EDITOR && XR_OR_VR_AVAILABLE
             if(AndroidServiceBinder.Bind())
             {
                 return true;

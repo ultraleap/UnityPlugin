@@ -10,6 +10,7 @@
 namespace LeapInternal
 {
     using System;
+    using System.Diagnostics;
     using System.Runtime.InteropServices;
 
     public enum eLeapConnectionFlag : uint
@@ -1017,7 +1018,7 @@ namespace LeapInternal
 
 #if UNITY_IOS && !UNITY_EDITOR
         private const string DllName = "__Internal";
-#elif UNITY_ANDROID && XR_OR_VR_AVAILABLE
+#elif UNITY_ANDROID && XR_OR_VR_AVAILABLE && !UNITY_EDITOR 
         private const string DllName = "LeapCLegacy";
 #else
         private const string DllName = "LeapC";

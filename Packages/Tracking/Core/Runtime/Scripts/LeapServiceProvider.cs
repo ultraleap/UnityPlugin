@@ -585,11 +585,11 @@ namespace Leap
 
         #region Android Support
 
-#if UNITY_ANDROID
+#if UNITY_ANDROID 
 
         protected virtual void OnEnable()
         {
-#if !UNITY_EDITOR
+#if !UNITY_EDITOR && XR_OR_VR_AVAILABLE
             AndroidServiceBinder.Bind();
 #endif
         }

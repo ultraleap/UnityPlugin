@@ -1,4 +1,4 @@
-#if UNITY_ANDROID
+#if UNITY_ANDROID && XR_OR_VR_AVAILABLE
 namespace Leap
 {
     using System;
@@ -18,6 +18,7 @@ namespace Leap
 
         public static bool Bind()
         {
+            Debug.Log("Attempting to bind to tracking service using the AndroidServiceBinder");
             bool isBound = _serviceBinder?.Call<bool>("isBound") ?? false;
 
             if (!isBound)
