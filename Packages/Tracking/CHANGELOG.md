@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Changed LeapC PInvoke signatures to support iOS.
 - Added support for proximity rules in pose detection. Use the attachment hands to generate transforms for the other hand joints that can then be assigned to a proximity rule, if the target should be a joint in the other hand.
 - Added support for a pose detection to require that both hands are in the target pose for the pose to be recognized.
+- Added stencil based variants of the generic hand materials to force a hand to render over another - e.g. when live hands need to match posed hands.
 
 ### Changed
 - Removed warning suggesting use of both input systems for OpenXR + Ultraleap compatibility now the new input system is fully supported
