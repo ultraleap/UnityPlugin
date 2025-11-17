@@ -64,7 +64,7 @@ namespace Leap
             IsStreaming = isStreaming;
             SerialNumber = serialNumber;
             DeviceID = deviceID;
-            firmwareVersion = firmwareVersion;
+            FirmwareVersion = firmwareVersion;
             UpdateStatus((eLeapDeviceStatus)status);
         }
 
