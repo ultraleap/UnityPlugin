@@ -250,16 +250,16 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1282522827012814712, guid: 8801e643e53a19d488f5168057473354, type: 3}
       propertyPath: m_text
-      value: 'This scene demonstrates pose detection using a pose shape and proximity
-        rule
+      value: 'This scene demonstrates pose detection using a pose shape, orientation
+        and proximity rule
 
 
-        Match the poses in the three locations shown by the colored
-        spheres, using an open hand with palm facing down
+        Match the hand pose in the three locations shown
+        by the colored spheres, using an open hand with palm facing down
 
 
-        ONLY THE RIGHT
-        HAND IS CAPABLE OF DETECTING POSES'
+        ONLY
+        THE RIGHT HAND IS CAPABLE OF DETECTING POSES'
       objectReference: {fileID: 0}
     - target: {fileID: 1282522827012814712, guid: 8801e643e53a19d488f5168057473354, type: 3}
       propertyPath: m_fontSize
@@ -833,7 +833,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'No pose detected '
+  m_text: No poses in target locations detected
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 342802517badcf44c811584e5b42a888, type: 2}
   m_sharedMaterial: {fileID: 556829042121458119, guid: 342802517badcf44c811584e5b42a888, type: 2}
@@ -985,7 +985,7 @@ Light:
   m_Type: 2
   m_Shape: 0
   m_Color: {r: 0.9410307, g: 0.9547169, b: 0, a: 1}
-  m_Intensity: 1
+  m_Intensity: 4
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -1727,7 +1727,19 @@ MonoBehaviour:
         m_CallState: 2
   WhilePoseDetected:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 236718074}
+        m_TargetAssemblyTypeName: TMPro.TMP_Text, Unity.TextMeshPro
+        m_MethodName: set_text
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: Pose Shape & Yellow Position Detected
+          m_BoolArgument: 0
+        m_CallState: 2
   OnPoseLost:
     m_PersistentCalls:
       m_Calls:
@@ -1755,7 +1767,17 @@ MonoBehaviour:
           m_StringArgument: No poses in target locations detected
           m_BoolArgument: 0
         m_CallState: 2
-  poseRules: []
+  poseRules:
+  - enabled: 1
+    finger: 5
+    bone: 3
+    directions:
+    - enabled: 1
+      typeOfDirectionCheck: 1
+      isPalmDirection: 0
+      poseTarget: {fileID: 0}
+      axisToFace: 1
+      rotationThreshold: 45
   poseProximityRules:
   - enabled: 1
     finger: 5
@@ -3288,7 +3310,7 @@ Light:
   m_Type: 2
   m_Shape: 0
   m_Color: {r: 0, g: 0.047258615, b: 1, a: 1}
-  m_Intensity: 1
+  m_Intensity: 4
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -3415,7 +3437,7 @@ Light:
   m_Type: 2
   m_Shape: 0
   m_Color: {r: 1, g: 0.013207495, b: 0.013207495, a: 1}
-  m_Intensity: 1
+  m_Intensity: 4
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -3721,9 +3743,33 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
+      - m_Target: {fileID: 236718074}
+        m_TargetAssemblyTypeName: TMPro.TMP_Text, Unity.TextMeshPro
+        m_MethodName: set_text
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: Pose Shape & Blue Position Detected
+          m_BoolArgument: 1
+        m_CallState: 2
   WhilePoseDetected:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 236718074}
+        m_TargetAssemblyTypeName: TMPro.TMP_Text, Unity.TextMeshPro
+        m_MethodName: set_text
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: Pose Shape & Blue Position Detected
+          m_BoolArgument: 0
+        m_CallState: 2
   OnPoseLost:
     m_PersistentCalls:
       m_Calls:
@@ -3739,7 +3785,29 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  poseRules: []
+      - m_Target: {fileID: 236718074}
+        m_TargetAssemblyTypeName: TMPro.TMP_Text, Unity.TextMeshPro
+        m_MethodName: set_text
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: No poses in target locations detected
+          m_BoolArgument: 0
+        m_CallState: 2
+  poseRules:
+  - enabled: 1
+    finger: 5
+    bone: 3
+    directions:
+    - enabled: 1
+      typeOfDirectionCheck: 1
+      isPalmDirection: 0
+      poseTarget: {fileID: 0}
+      axisToFace: 1
+      rotationThreshold: 45
   poseProximityRules:
   - enabled: 1
     finger: 5
@@ -5480,9 +5548,33 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
+      - m_Target: {fileID: 236718074}
+        m_TargetAssemblyTypeName: TMPro.TMP_Text, Unity.TextMeshPro
+        m_MethodName: set_text
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: Pose Shape & Red Position Detected
+          m_BoolArgument: 1
+        m_CallState: 2
   WhilePoseDetected:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 236718074}
+        m_TargetAssemblyTypeName: TMPro.TMP_Text, Unity.TextMeshPro
+        m_MethodName: set_text
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: Pose Shape & Red Position Detected
+          m_BoolArgument: 0
+        m_CallState: 2
   OnPoseLost:
     m_PersistentCalls:
       m_Calls:
@@ -5496,6 +5588,18 @@ MonoBehaviour:
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 236718074}
+        m_TargetAssemblyTypeName: TMPro.TMP_Text, Unity.TextMeshPro
+        m_MethodName: set_text
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: No poses in target locations detected
           m_BoolArgument: 0
         m_CallState: 2
   poseRules:

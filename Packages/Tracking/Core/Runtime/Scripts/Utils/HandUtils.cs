@@ -6,6 +6,7 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -34,7 +35,8 @@ namespace Leap
         /// - First XRLeapProviderManager found
         /// - First LeapProvider found
         /// </summary>
-        private static void AssignBestLeapProvider()
+        /// <param name="preferLiveLeapProviderOverHandPoseViewer">If the search gets to LeapProviders, return providers that are not hand pose viewers</param>
+        private static void AssignBestLeapProvider(bool preferLiveLeapProviderOverHandPoseViewer = false)
         {
             // Fall through to the best available Leap Provider if none is assigned
             if (s_provider == null)
@@ -46,9 +48,22 @@ namespace Leap
                     s_provider = UnityEngine.Object.FindAnyObjectByType<XRLeapProviderManager>();
                     if (s_provider == null)
                     {
-                        s_provider = UnityEngine.Object.FindAnyObjectByType<LeapProvider>();
-                        if (s_provider == null)
+                        var candidates = UnityEngine.Object.FindObjectsByType<LeapProvider>(FindObjectsSortMode.None);
+                        if (candidates.Any())
                         {
+                            if (preferLiveLeapProviderOverHandPoseViewer)
+                            {
+                                s_provider = candidates.Where(_candidates => _candidates.GetType() != typeof(HandPoseViewer)).FirstOrDefault();
+                            }
+
+                            if (s_provider == null)
+                            {
+                                s_provider = candidates.FirstOrDefault();
+                            }
+                        }
+
+                        if (s_provider == null)
+                        { 
                             Debug.Log("There are no Leap Providers in the scene, please assign one manually." +
                                 "Alternatively, use Hands.CreateXRLeapProvider() to automatically create an XRLeapProvider");
                             return;
@@ -93,7 +108,7 @@ namespace Leap
             {
                 if (s_provider == null)
                 {
-                    AssignBestLeapProvider();
+                    AssignBestLeapProvider(true);
                 }
                 return s_provider;
             }

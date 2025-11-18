@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added support for proximity rules in pose detection. Use the attachment hands to generate transforms for the other hand joints that can then be assigned to a proximity rule, if the target should be a joint in the other hand.
 - Added support for a pose detection to require that both hands are in the target pose for the pose to be recognized.
 - Added stencil based variants of the generic hand materials to force a hand to render over another - e.g. when live hands need to match posed hands.
+- Added optional argument to AssignBestLeapProvider in HandUtils to prefer potentially live data LeapProviders vs. HandPoseViewer. Fixes a potential pose detection bug.
 
 ### Changed
 - Removed warning suggesting use of both input systems for OpenXR + Ultraleap compatibility now the new input system is fully supported

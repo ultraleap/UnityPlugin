@@ -28,7 +28,7 @@
         Tags
         {
             "RenderPipeline" = "UniversalPipeline"
-            "Queue" = "Transparent"
+            "Queue" = "Transparent+1"
             "RenderType" = "Transparent"
             "IgnoreProjector" = "True"
         }
@@ -56,6 +56,7 @@
         ZWrite On
         Blend SrcAlpha OneMinusSrcAlpha
 
+        
         // Underlay support, use with an overlay shader that reads from the stencil buffer
         // Write 2 to the stencil buffer, must be done before any overlay shader reading / looking for this value
         Stencil
@@ -292,7 +293,7 @@
     {
         Tags
         {
-            "Queue" = "Transparent"
+            "Queue" = "Transparent+1"
             "IgnoreProjector" = "True"
             "RenderType" = "Transparent"
             "LightMode" = "ForwardBase"
@@ -308,6 +309,7 @@
             Ref 2
             Comp NotEqual
         }
+
 
         CGINCLUDE
         #include "UnityCG.cginc"   // for & UNITY_VERTEX_OUTPUT_STEREO UnityObjectToWorldNormal()
