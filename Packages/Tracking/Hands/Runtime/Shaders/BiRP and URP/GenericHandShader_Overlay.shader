@@ -28,7 +28,7 @@
         Tags
         {
             "RenderPipeline" = "UniversalPipeline"
-            "Queue" = "Transparent"
+            "Queue" = "Transparent+1"
             "RenderType" = "Transparent"
             "IgnoreProjector" = "True"
         }
@@ -293,7 +293,7 @@
     {
         Tags
         {
-            "Queue" = "Transparent"
+            "Queue" = "Transparent+1"
             "IgnoreProjector" = "True"
             "RenderType" = "Transparent"
             "LightMode" = "ForwardBase"

@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Ghost Hand Dark Grey Fill
-  m_Shader: {fileID: 4800000, guid: f3c5947e7dfc2450587be5587852aef9, type: 3}
+  m_Name: Ghost Hand - Overlay
+  m_Shader: {fileID: 4800000, guid: c6199779b875b4f6287dc3fab3ed44b0, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
@@ -75,7 +75,7 @@ Material:
     - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 1
-    - _Outline: 0.0005
+    - _Outline: 0.002
     - _Parallax: 0.02
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
@@ -86,7 +86,7 @@ Material:
     - _useLighting: 0
     - _useOutline: 1
     m_Colors:
-    - _Color: {r: 0.13962269, g: 0.13962269, b: 0.13962269, a: 1}
+    - _Color: {r: 0.7509433, g: 0.7353577, b: 0.7353577, a: 0.98039216}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _FresnelColor: {r: 22.408676, g: 22.408676, b: 22.408676, a: 0.09803922}
     - _MainColor: {r: 0.033333335, g: 0.033333335, b: 0.033333335, a: 0.19607843}
