@@ -35,8 +35,8 @@ namespace Leap
         /// - First XRLeapProviderManager found
         /// - First LeapProvider found
         /// </summary>
-        /// <param name="preferLiveLeapProviderOverHandPoseViewer">If the search gets to LeapProviders, return providers that are not hand pose viewers</param>
-        private static void AssignBestLeapProvider(bool preferLiveLeapProviderOverHandPoseViewer = false)
+        /// <param name="preferLiveLeapProviderOverHandPoseViewer">If the search gets to LeapProviders, return providers that are not sources of static data - e.g. hand pose viewers</param>
+        private static void AssignBestLeapProvider(bool preferLiveLeapProviderOverStaticHandPoseProviders = false)
         {
             // Fall through to the best available Leap Provider if none is assigned
             if (s_provider == null)
@@ -51,9 +51,10 @@ namespace Leap
                         var candidates = UnityEngine.Object.FindObjectsByType<LeapProvider>(FindObjectsSortMode.None);
                         if (candidates.Any())
                         {
-                            if (preferLiveLeapProviderOverHandPoseViewer)
+                            if (preferLiveLeapProviderOverStaticHandPoseProviders)
                             {
-                                s_provider = candidates.Where(_candidates => _candidates.GetType() != typeof(HandPoseViewer)).FirstOrDefault();
+                                s_provider = candidates.Where(_candidates => _candidates.GetType() != typeof(HandPoseViewer) && 
+                                                                             _candidates.GetType() != typeof(HandPoseEditor)).FirstOrDefault();
                             }
 
                             if (s_provider == null)
