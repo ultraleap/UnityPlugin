@@ -32,6 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Text on the toggle button in the UI Input example scene now shows On or Off based on the toggled state
 - Clients were not able to subscribe to the events on the PinchDetector and GrabDetector scripts as the properties were exposed as readonly. 
 - GrabDetector detection logic was inverted, so open hands were interpreted as grabs. Now fixed.
+- Fixed issue with scale of outline in GenericHandShader if hand model normals are not a normalized length 
 - Fixed issue with attachment hands red/green/blue materials meta file IDs clashing with the IDs of the files in the original examples, since being moved
 
 ### Known Issues

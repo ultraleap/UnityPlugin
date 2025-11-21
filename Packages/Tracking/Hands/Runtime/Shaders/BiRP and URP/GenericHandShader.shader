@@ -1,4 +1,4 @@
-﻿Shader "Ultraleap/GenericHandShader"
+Shader "Ultraleap/GenericHandShader"
 {
     Properties
     {
@@ -349,7 +349,9 @@
 
                 #if _USEOUTLINE_ON
                 float3 norm = mul((float3x3)UNITY_MATRIX_IT_MV, v.normal);
-                float2 offset = TransformViewToProjection(norm.xy);
+                // Some hand models may include non normalized (length) normals, so we normalize the length of the normal first
+                float3 normalizedVector = normalize(norm);
+                float2 offset = TransformViewToProjection(normalizedVector.xy);
                 o.pos.xy += offset * _Outline;
                 #endif
 
