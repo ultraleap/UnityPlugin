@@ -1012,60 +1012,65 @@ namespace LeapInternal
         private LeapC() { }
         public static int DistortionSize = 64;
 
-        [DllImport("LeapC", EntryPoint = "LeapSetTrackingMode")]
+#if UNITY_IOS && !UNITY_EDITOR
+        private const string DllName = "__Internal";
+#else
+        private const string DllName = "LeapC";
+#endif
+        [DllImport(DllName, EntryPoint = "LeapSetTrackingMode")]
         public static extern eLeapRS SetTrackingMode(IntPtr hConnection, eLeapTrackingMode mode);
 
-        [DllImport("LeapC", EntryPoint = "LeapSetTrackingModeEx")]
+        [DllImport(DllName, EntryPoint = "LeapSetTrackingModeEx")]
         public static extern eLeapRS SetTrackingModeEx(IntPtr hConnection, IntPtr hDevice, eLeapTrackingMode mode);
 
-        [DllImport("LeapC", EntryPoint = "LeapGetTrackingMode")]
+        [DllImport(DllName, EntryPoint = "LeapGetTrackingMode")]
         public static extern eLeapRS LeapGetTrackingMode(IntPtr hConnection);
 
-        [DllImport("LeapC", EntryPoint = "LeapGetTrackingModeEx")]
+        [DllImport(DllName, EntryPoint = "LeapGetTrackingModeEx")]
         public static extern eLeapRS LeapGetTrackingModeEx(IntPtr hConnection, IntPtr hDevice);
 
-        [DllImport("LeapC", EntryPoint = "LeapGetNow")]
+        [DllImport(DllName, EntryPoint = "LeapGetNow")]
         public static extern long GetNow();
 
-        [DllImport("LeapC", EntryPoint = "LeapCreateClockRebaser")]
+        [DllImport(DllName, EntryPoint = "LeapCreateClockRebaser")]
         public static extern eLeapRS CreateClockRebaser(out IntPtr phClockRebaser);
 
-        [DllImport("LeapC", EntryPoint = "LeapDestroyClockRebaser")]
+        [DllImport(DllName, EntryPoint = "LeapDestroyClockRebaser")]
         public static extern eLeapRS DestroyClockRebaser(IntPtr hClockRebaser);
 
-        [DllImport("LeapC", EntryPoint = "LeapUpdateRebase")]
+        [DllImport(DllName, EntryPoint = "LeapUpdateRebase")]
         public static extern eLeapRS UpdateRebase(IntPtr hClockRebaser, Int64 userClock, Int64 leapClock);
 
-        [DllImport("LeapC", EntryPoint = "LeapRebaseClock")]
+        [DllImport(DllName, EntryPoint = "LeapRebaseClock")]
         public static extern eLeapRS RebaseClock(IntPtr hClockRebaser, Int64 userClock, out Int64 leapClock);
 
-        [DllImport("LeapC", EntryPoint = "LeapCreateConnection")]
+        [DllImport(DllName, EntryPoint = "LeapCreateConnection")]
         public static extern eLeapRS CreateConnection(ref LEAP_CONNECTION_CONFIG pConfig, out IntPtr pConnection);
 
         //Overrides to allow config to be set to null to use default config
-        [DllImport("LeapC", EntryPoint = "LeapCreateConnection")]
+        [DllImport(DllName, EntryPoint = "LeapCreateConnection")]
         private static extern eLeapRS CreateConnection(IntPtr nulled, out IntPtr pConnection);
         public static eLeapRS CreateConnection(out IntPtr pConnection)
         {
             return CreateConnection(IntPtr.Zero, out pConnection);
         }
 
-        [DllImport("LeapC", EntryPoint = "LeapGetConnectionInfo")]
+        [DllImport(DllName, EntryPoint = "LeapGetConnectionInfo")]
         public static extern eLeapRS GetConnectionInfo(IntPtr hConnection, ref LEAP_CONNECTION_INFO pInfo);
 
-        [DllImport("LeapC", EntryPoint = "LeapOpenConnection")]
+        [DllImport(DllName, EntryPoint = "LeapOpenConnection")]
         public static extern eLeapRS OpenConnection(IntPtr hConnection);
 
-        [DllImport("LeapC", EntryPoint = "LeapSetConnectionMetadata")]
+        [DllImport(DllName, EntryPoint = "LeapSetConnectionMetadata")]
         public static extern eLeapRS SetConnectionMetadata(IntPtr hConnection, string metadata, UIntPtr len);
 
-        [DllImport("LeapC", EntryPoint = "LeapSetAllocator")]
+        [DllImport(DllName, EntryPoint = "LeapSetAllocator")]
         public static extern eLeapRS SetAllocator(IntPtr hConnection, ref LEAP_ALLOCATOR pAllocator);
 
-        [DllImport("LeapC", EntryPoint = "LeapGetDeviceList")]
+        [DllImport(DllName, EntryPoint = "LeapGetDeviceList")]
         public static extern eLeapRS GetDeviceList(IntPtr hConnection, [In, Out] LEAP_DEVICE_REF[] pArray, out UInt32 pnArray);
 
-        [DllImport("LeapC", EntryPoint = "LeapGetDeviceList")]
+        [DllImport(DllName, EntryPoint = "LeapGetDeviceList")]
         private static extern eLeapRS GetDeviceList(IntPtr hConnection, [In, Out] IntPtr pArray, out UInt32 pnArray);
         //Override to allow pArray argument to be set to null (IntPtr.Zero) in order to get the device count
         public static eLeapRS GetDeviceCount(IntPtr hConnection, out UInt32 deviceCount)
@@ -1073,109 +1078,109 @@ namespace LeapInternal
             return GetDeviceList(hConnection, IntPtr.Zero, out deviceCount);
         }
 
-        [DllImport("LeapC", EntryPoint = "LeapOpenDevice")]
+        [DllImport(DllName, EntryPoint = "LeapOpenDevice")]
         public static extern eLeapRS OpenDevice(LEAP_DEVICE_REF rDevice, out IntPtr pDevice);
 
-        [DllImport("LeapC", EntryPoint = "LeapSetPrimaryDevice")]
+        [DllImport(DllName, EntryPoint = "LeapSetPrimaryDevice")]
         public static extern eLeapRS LeapSetPrimaryDevice(IntPtr hConnection, IntPtr hDevice, bool unsubscribeOthers);
 
-        [DllImport("LeapC", EntryPoint = "LeapSubscribeEvents")]
+        [DllImport(DllName, EntryPoint = "LeapSubscribeEvents")]
         public static extern eLeapRS LeapSubscribeEvents(IntPtr hConnection, IntPtr hDevice);
 
-        [DllImport("LeapC", EntryPoint = "LeapUnsubscribeEvents")]
+        [DllImport(DllName, EntryPoint = "LeapUnsubscribeEvents")]
         public static extern eLeapRS LeapUnsubscribeEvents(IntPtr hConnection, IntPtr hDevice);
 
-        [DllImport("LeapC", EntryPoint = "LeapGetDeviceInfo", CharSet = CharSet.Ansi)]
+        [DllImport(DllName, EntryPoint = "LeapGetDeviceInfo", CharSet = CharSet.Ansi)]
         public static extern eLeapRS GetDeviceInfo(IntPtr hDevice, ref LEAP_DEVICE_INFO info);
 
-        [DllImport("LeapC", EntryPoint = "LeapDeviceTransformAvailable")]
+        [DllImport(DllName, EntryPoint = "LeapDeviceTransformAvailable")]
         public static extern bool GetDeviceTransformAvailable(IntPtr hDevice);
 
-        [DllImport("LeapC", EntryPoint = "LeapGetDeviceTransform")]
+        [DllImport(DllName, EntryPoint = "LeapGetDeviceTransform")]
         public static extern eLeapRS GetDeviceTransform(IntPtr hDevice, [MarshalAs(UnmanagedType.LPArray, SizeConst = 16)] float[] transform);
 
-        [DllImport("LeapC", EntryPoint = "LeapSetPolicyFlags")]
+        [DllImport(DllName, EntryPoint = "LeapSetPolicyFlags")]
         public static extern eLeapRS SetPolicyFlags(IntPtr hConnection, UInt64 set, UInt64 clear);
 
-        [DllImport("LeapC", EntryPoint = "LeapSetPolicyFlagsEx")]
+        [DllImport(DllName, EntryPoint = "LeapSetPolicyFlagsEx")]
         public static extern eLeapRS SetPolicyFlagsEx(IntPtr hConnection, IntPtr hDevice, UInt64 set, UInt64 clear);
 
-        [DllImport("LeapC", EntryPoint = "LeapSetPause")]
+        [DllImport(DllName, EntryPoint = "LeapSetPause")]
         public static extern eLeapRS LeapSetPause(IntPtr hConnection, bool pause);
 
-        [DllImport("LeapC", EntryPoint = "LeapSetDeviceFlags")]
-        public static extern eLeapRS SetDeviceFlags(IntPtr hDevice, UInt64 set, UInt64 clear, out UInt64 prior);
+        // [DllImport(DllName, EntryPoint = "LeapSetDeviceFlags")]
+        // public static extern eLeapRS SetDeviceFlags(IntPtr hDevice, UInt64 set, UInt64 clear, out UInt64 prior);
 
-        [DllImport("LeapC", EntryPoint = "LeapPollConnection")]
+        [DllImport(DllName, EntryPoint = "LeapPollConnection")]
         public static extern eLeapRS PollConnection(IntPtr hConnection, UInt32 timeout, ref LEAP_CONNECTION_MESSAGE msg);
 
-        [DllImport("LeapC", EntryPoint = "LeapGetFrameSize")]
+        [DllImport(DllName, EntryPoint = "LeapGetFrameSize")]
         public static extern eLeapRS GetFrameSize(IntPtr hConnection, Int64 timestamp, out UInt64 pncbEvent);
 
-        [DllImport("LeapC", EntryPoint = "LeapGetFrameSizeEx")]
+        [DllImport(DllName, EntryPoint = "LeapGetFrameSizeEx")]
         public static extern eLeapRS GetFrameSizeEx(IntPtr hConnection, IntPtr hDevice, Int64 timestamp, out UInt64 pncbEvent);
 
-        [DllImport("LeapC", EntryPoint = "LeapInterpolateFrame")]
+        [DllImport(DllName, EntryPoint = "LeapInterpolateFrame")]
         public static extern eLeapRS InterpolateFrame(IntPtr hConnection, Int64 timestamp, IntPtr pEvent, UInt64 ncbEvent);
 
-        [DllImport("LeapC", EntryPoint = "LeapInterpolateFrameEx")]
+        [DllImport(DllName, EntryPoint = "LeapInterpolateFrameEx")]
         public static extern eLeapRS InterpolateFrameEx(IntPtr hConnection, IntPtr hDevice, Int64 timestamp, IntPtr pEvent, UInt64 ncbEvent);
 
-        [DllImport("LeapC", EntryPoint = "LeapInterpolateFrameFromTime")]
+        [DllImport(DllName, EntryPoint = "LeapInterpolateFrameFromTime")]
         public static extern eLeapRS InterpolateFrameFromTime(IntPtr hConnection, Int64 timestamp, Int64 sourceTimestamp, IntPtr pEvent, UInt64 ncbEvent);
 
-        [DllImport("LeapC", EntryPoint = "LeapInterpolateFrameFromTimeEx")]
+        [DllImport(DllName, EntryPoint = "LeapInterpolateFrameFromTimeEx")]
         public static extern eLeapRS InterpolateFrameFromTimeEx(IntPtr hConnection, IntPtr hDevice, Int64 timestamp, Int64 sourceTimestamp, IntPtr pEvent, UInt64 ncbEvent);
 
-        [DllImport("LeapC", EntryPoint = "LeapInterpolateHeadPose")]
+        [DllImport(DllName, EntryPoint = "LeapInterpolateHeadPose")]
         public static extern eLeapRS InterpolateHeadPose(IntPtr hConnection, Int64 timestamp, ref LEAP_HEAD_POSE_EVENT headPose);
 
-        [DllImport("LeapC", EntryPoint = "LeapInterpolateEyePositions")]
+        [DllImport(DllName, EntryPoint = "LeapInterpolateEyePositions")]
         public static extern eLeapRS InterpolateEyePositions(IntPtr hConnection, Int64 timestamp, ref LEAP_EYE_EVENT eyes);
 
-        [DllImport("LeapC", EntryPoint = "LeapPixelToRectilinear")]
+        [DllImport(DllName, EntryPoint = "LeapPixelToRectilinear")]
         public static extern LEAP_VECTOR LeapPixelToRectilinear(IntPtr hConnection,
           eLeapPerspectiveType camera, LEAP_VECTOR pixel);
 
-        [Obsolete("Use of calibrationType is not valid. Use alternative LeapPixelToRectilinearEx method."), DllImport("LeapC", EntryPoint = "LeapPixelToRectilinearEx")]
+        [Obsolete("Use of calibrationType is not valid. Use alternative LeapPixelToRectilinearEx method."), DllImport(DllName, EntryPoint = "LeapPixelToRectilinearEx")]
         public static extern LEAP_VECTOR LeapPixelToRectilinearEx(IntPtr hConnection,
           IntPtr hDevice, eLeapPerspectiveType camera, eLeapCameraCalibrationType calibrationType, LEAP_VECTOR pixel);
 
-        [DllImport("LeapC", EntryPoint = "LeapPixelToRectilinearEx")]
+        [DllImport(DllName, EntryPoint = "LeapPixelToRectilinearEx")]
         public static extern LEAP_VECTOR LeapPixelToRectilinearEx(IntPtr hConnection,
             IntPtr hDevice, eLeapPerspectiveType camera, LEAP_VECTOR pixel);
 
-        [DllImport("LeapC", EntryPoint = "LeapRectilinearToPixel")]
+        [DllImport(DllName, EntryPoint = "LeapRectilinearToPixel")]
         public static extern LEAP_VECTOR LeapRectilinearToPixel(IntPtr hConnection,
           eLeapPerspectiveType camera, LEAP_VECTOR rectilinear);
 
-        [DllImport("LeapC", EntryPoint = "LeapRectilinearToPixelEx")]
+        [DllImport(DllName, EntryPoint = "LeapRectilinearToPixelEx")]
         public static extern LEAP_VECTOR LeapRectilinearToPixelEx(IntPtr hConnection,
           IntPtr hDevice, eLeapPerspectiveType camera, LEAP_VECTOR rectilinear);
 
-        [DllImport("LeapC", EntryPoint = "LeapExtrinsicCameraMatrix")]
+        [DllImport(DllName, EntryPoint = "LeapExtrinsicCameraMatrix")]
         public static extern eLeapRS LeapExtrinsicCameraMatrix(IntPtr hConnection, eLeapPerspectiveType camera,
             [MarshalAs(UnmanagedType.LPArray, SizeConst = 16)] float[] extrinsicMatrix);
 
-        [DllImport("LeapC", EntryPoint = "LeapExtrinsicCameraMatrixEx")]
+        [DllImport(DllName, EntryPoint = "LeapExtrinsicCameraMatrixEx")]
         public static extern eLeapRS LeapExtrinsicCameraMatrixEx(IntPtr hConnection, IntPtr hDevice, eLeapPerspectiveType camera,
             [MarshalAs(UnmanagedType.LPArray, SizeConst = 16)] float[] extrinsicMatrix);
 
-        [DllImport("LeapC", EntryPoint = "LeapCloseDevice")]
+        [DllImport(DllName, EntryPoint = "LeapCloseDevice")]
         public static extern void CloseDevice(IntPtr pDevice);
 
-        [DllImport("LeapC", EntryPoint = "LeapCloseConnection")]
+        [DllImport(DllName, EntryPoint = "LeapCloseConnection")]
         public static extern eLeapRS CloseConnection(IntPtr hConnection);
 
-        [DllImport("LeapC", EntryPoint = "LeapDestroyConnection")]
+        [DllImport(DllName, EntryPoint = "LeapDestroyConnection")]
         public static extern void DestroyConnection(IntPtr connection);
 
         [Obsolete("Config is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
-        [DllImport("LeapC", EntryPoint = "LeapSaveConfigValue")]
+        [DllImport(DllName, EntryPoint = "LeapSaveConfigValue")]
         private static extern eLeapRS SaveConfigValue(IntPtr hConnection, string key, IntPtr value, out UInt32 requestId);
 
         [Obsolete("Config is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
-        [DllImport("LeapC", EntryPoint = "LeapRequestConfigValue")]
+        [DllImport(DllName, EntryPoint = "LeapRequestConfigValue")]
         public static extern eLeapRS RequestConfigValue(IntPtr hConnection, string name, out UInt32 request_id);
 
         [Obsolete("Config is not used in Ultraleap's Tracking Service 5.X+. This will be removed in the next Major release")]
@@ -1245,10 +1250,10 @@ namespace LeapInternal
             return callResult;
         }
 
-        [DllImport("LeapC", EntryPoint = "LeapGetPointMappingSize")]
+        [DllImport(DllName, EntryPoint = "LeapGetPointMappingSize")]
         public static extern eLeapRS GetPointMappingSize(IntPtr hConnection, ref ulong pSize);
 
-        [DllImport("LeapC", EntryPoint = "LeapGetPointMapping")]
+        [DllImport(DllName, EntryPoint = "LeapGetPointMapping")]
         public static extern eLeapRS GetPointMapping(IntPtr hConnection, IntPtr pointMapping, ref ulong pSize);
 
         [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
@@ -1262,37 +1267,37 @@ namespace LeapInternal
             public UInt32 mode;
         }
 
-        [DllImport("LeapC", EntryPoint = "LeapRecordingOpen")]
+        [DllImport(DllName, EntryPoint = "LeapRecordingOpen")]
         public static extern eLeapRS RecordingOpen(ref IntPtr ppRecording, string userPath, LEAP_RECORDING_PARAMETERS parameters);
 
-        [DllImport("LeapC", EntryPoint = "LeapRecordingClose")]
+        [DllImport(DllName, EntryPoint = "LeapRecordingClose")]
         public static extern eLeapRS RecordingClose(ref IntPtr ppRecording);
 
-        [DllImport("LeapC", EntryPoint = "LeapRecordingGetStatus")]
+        [DllImport(DllName, EntryPoint = "LeapRecordingGetStatus")]
         public static extern eLeapRS LeapRecordingGetStatus(IntPtr pRecording, ref LEAP_RECORDING_STATUS status);
 
-        [DllImport("LeapC", EntryPoint = "LeapRecordingReadSize")]
+        [DllImport(DllName, EntryPoint = "LeapRecordingReadSize")]
         public static extern eLeapRS RecordingReadSize(IntPtr pRecording, ref UInt64 pncbEvent);
 
-        [DllImport("LeapC", EntryPoint = "LeapRecordingRead")]
+        [DllImport(DllName, EntryPoint = "LeapRecordingRead")]
         public static extern eLeapRS RecordingRead(IntPtr pRecording, ref LEAP_TRACKING_EVENT pEvent, UInt64 ncbEvent);
 
-        [DllImport("LeapC", EntryPoint = "LeapRecordingWrite")]
+        [DllImport(DllName, EntryPoint = "LeapRecordingWrite")]
         public static extern eLeapRS RecordingWrite(IntPtr pRecording, ref LEAP_TRACKING_EVENT pEvent, ref UInt64 pnBytesWritten);
 
-        [DllImport("LeapC", EntryPoint = "LeapTelemetryProfiling")]
+        [DllImport(DllName, EntryPoint = "LeapTelemetryProfiling")]
         public static extern eLeapRS LeapTelemetryProfiling(IntPtr hConnection, ref LEAP_TELEMETRY_DATA telemetryData);
 
-        [DllImport("LeapC", EntryPoint = "LeapTelemetryGetNow")]
+        [DllImport(DllName, EntryPoint = "LeapTelemetryGetNow")]
         public static extern UInt64 TelemetryGetNow();
 
-        [DllImport("LeapC", EntryPoint = "LeapGetVersion")]
+        [DllImport(DllName, EntryPoint = "LeapGetVersion")]
         public static extern eLeapRS GetVersion(IntPtr hConnection, eLeapVersionPart versionPart, ref LEAP_VERSION pVersion);
 
-        [DllImport("LeapC", EntryPoint = "LeapGetServerStatus")]
+        [DllImport(DllName, EntryPoint = "LeapGetServerStatus")]
         public static extern eLeapRS GetServerStatus(UInt32 timeout, ref IntPtr status);
 
-        [DllImport("LeapC", EntryPoint = "LeapReleaseServerStatus")]
+        [DllImport(DllName, EntryPoint = "LeapReleaseServerStatus")]
         public static extern eLeapRS ReleaseServerStatus(ref LEAP_SERVER_STATUS status);
 
 
@@ -1313,17 +1318,18 @@ namespace LeapInternal
 
         public static eLeapRS SetDeviceHints(IntPtr hConnection, IntPtr hDevice, string[] hints)
         {
-            // Ensure the final element of the array is null terminated.
-            if (hints.Length == 0 || hints[^1] != null)
-            {
-                Array.Resize(ref hints, hints.Length + 1);
-                hints[^1] = null;
-            }
-
-            return SetDeviceHintsInternal(hConnection, hDevice, hints);
+            return eLeapRS.eLeapRS_Success;
+            // // Ensure the final element of the array is null terminated.
+            // if (hints.Length == 0 || hints[^1] != null)
+            // {
+            //     Array.Resize(ref hints, hints.Length + 1);
+            //     hints[^1] = null;
+            // }
+            //
+            // return SetDeviceHintsInternal(hConnection, hDevice, hints);
         }
 
-        [DllImport("LeapC", EntryPoint = "LeapSetDeviceHints")]
-        private static extern eLeapRS SetDeviceHintsInternal(IntPtr hConnection, IntPtr hDevice, string[] hints);
+        // [DllImport(DllName, EntryPoint = "LeapSetDeviceHints")]
+        // private static extern eLeapRS SetDeviceHintsInternal(IntPtr hConnection, IntPtr hDevice, string[] hints);
     }
 }
