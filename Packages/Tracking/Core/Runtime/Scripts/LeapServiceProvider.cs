@@ -669,6 +669,8 @@ namespace Leap
 
         protected virtual void FixedUpdate()
         {
+            if (!checkConnectionIntegrity()) { return; }
+
             if (_useInterpolation)
             {
                 long timestamp;
@@ -691,7 +693,10 @@ namespace Leap
                           "Unexpected frame optimization mode: " + _frameOptimization);
                 }
 
-                _leapController.GetInterpolatedFrame(_untransformedFixedFrame, timestamp, _currentDevice);
+                if (_currentDevice != null)
+                {
+                    _leapController.GetInterpolatedFrame(_untransformedFixedFrame, timestamp, _currentDevice);
+                }
             }
             else
             {
@@ -767,7 +772,7 @@ namespace Leap
                 return;
             }
 
-            if (_useInterpolation)
+            if (_useInterpolation && _currentDevice != null)
             {
 #if !UNITY_ANDROID || UNITY_EDITOR
                 _smoothedTrackingLatency.value = Mathf.Min(_smoothedTrackingLatency.value, 30000f);
