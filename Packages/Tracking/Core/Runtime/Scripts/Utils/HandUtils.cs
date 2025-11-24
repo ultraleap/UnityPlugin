@@ -6,7 +6,6 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Leap
@@ -34,7 +33,8 @@ namespace Leap
         /// - First XRLeapProviderManager found
         /// - First LeapProvider found
         /// </summary>
-        private static void AssignBestLeapProvider()
+        /// <param name="preferLiveLeapProviderOverHandPoseViewer">If the search gets to LeapProviders, return providers that are not sources of static data - e.g. hand pose viewers</param>
+        private static void AssignBestLeapProvider(bool preferLiveLeapProviderOverStaticHandPoseProviders = false)
         {
             // Fall through to the best available Leap Provider if none is assigned
             if (s_provider == null)
@@ -46,9 +46,32 @@ namespace Leap
                     s_provider = UnityEngine.Object.FindAnyObjectByType<XRLeapProviderManager>();
                     if (s_provider == null)
                     {
-                        s_provider = UnityEngine.Object.FindAnyObjectByType<LeapProvider>();
-                        if (s_provider == null)
+                        var candidates = UnityEngine.Object.FindObjectsByType<LeapProvider>(FindObjectsSortMode.None);
+                        if (candidates.Length > 0)
                         {
+                            if (preferLiveLeapProviderOverStaticHandPoseProviders)
+                            {
+                                foreach (var provider in candidates)
+                                {
+                                    if (provider.GetType() != typeof(HandPoseViewer) && 
+                                        provider.GetType() != typeof(HandPoseEditor))
+                                    {
+                                        s_provider = provider;
+                                    }
+                                }
+                            }
+
+                            if (s_provider == null)
+                            {
+                                if (candidates.Length > 0)
+                                {
+                                    s_provider = candidates[0];
+                                }
+                            }
+                        }
+
+                        if (s_provider == null)
+                        { 
                             Debug.Log("There are no Leap Providers in the scene, please assign one manually." +
                                 "Alternatively, use Hands.CreateXRLeapProvider() to automatically create an XRLeapProvider");
                             return;
@@ -93,7 +116,7 @@ namespace Leap
             {
                 if (s_provider == null)
                 {
-                    AssignBestLeapProvider();
+                    AssignBestLeapProvider(true);
                 }
                 return s_provider;
             }
