@@ -585,11 +585,12 @@ namespace Leap
 
         #region Android Support
 
-#if UNITY_ANDROID 
+#if UNITY_ANDROID
 
         protected virtual void OnEnable()
         {
-#if !UNITY_EDITOR && XR_OR_VR_AVAILABLE
+#if !UNITY_EDITOR 
+            Debug.Log("In LeapServiceProvider:OnEnable about to call AndroidServiceBinder.Bind()");
             AndroidServiceBinder.Bind();
 #endif
         }
@@ -603,6 +604,7 @@ namespace Leap
         // No longer necessary but would be a breaking change if removed
         protected virtual void OnEnable()
         {
+            Debug.Log("In LeapServiceProvider:OnEnable - no need to call AndroidServiceBinder - not running on Android)");
         }
 
         // No longer necessary but would be a breaking change if removed
