@@ -1,4 +1,4 @@
-#if UNITY_ANDROID && XR_OR_VR_AVAILABLE
+#if UNITY_ANDROID
 namespace Leap
 {
     using System;
