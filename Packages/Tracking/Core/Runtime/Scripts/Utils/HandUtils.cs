@@ -6,8 +6,6 @@
  * between Ultraleap and you, your company or other organization.             *
  ******************************************************************************/
 using System;
-using System.Linq;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Leap
@@ -49,17 +47,26 @@ namespace Leap
                     if (s_provider == null)
                     {
                         var candidates = UnityEngine.Object.FindObjectsByType<LeapProvider>(FindObjectsSortMode.None);
-                        if (candidates.Any())
+                        if (candidates.Length > 0)
                         {
                             if (preferLiveLeapProviderOverStaticHandPoseProviders)
                             {
-                                s_provider = candidates.Where(_candidates => _candidates.GetType() != typeof(HandPoseViewer) && 
-                                                                             _candidates.GetType() != typeof(HandPoseEditor)).FirstOrDefault();
+                                foreach (var provider in candidates)
+                                {
+                                    if (provider.GetType() != typeof(HandPoseViewer) && 
+                                        provider.GetType() != typeof(HandPoseEditor))
+                                    {
+                                        s_provider = provider;
+                                    }
+                                }
                             }
 
                             if (s_provider == null)
                             {
-                                s_provider = candidates.FirstOrDefault();
+                                if (candidates.Length > 0)
+                                {
+                                    s_provider = candidates[0];
+                                }
                             }
                         }
 

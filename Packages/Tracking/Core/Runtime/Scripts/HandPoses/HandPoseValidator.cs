@@ -1,5 +1,4 @@
 using Leap;
-using LeapInternal;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -77,7 +76,7 @@ public class HandPoseValidator : MonoBehaviour
             }
 
             lineRenderers.Clear();
-        } 
+        }
 
         if (poseDetector != null)
         {
@@ -88,7 +87,7 @@ public class HandPoseValidator : MonoBehaviour
     }
 
     private void ColorHandJoints()
-    { 
+    {
         CapsuleHand colourCapsuleHand = storedValidationHands.FirstOrDefault();
 
         if (colourCapsuleHand != null)
@@ -96,7 +95,7 @@ public class HandPoseValidator : MonoBehaviour
             Leap.Utils.Fill(leftCapsuleHandColours, Color.grey);
             Leap.Utils.Fill(rightCapsuleHandColours, Color.grey);
         }
- 
+
         if (storedValidationHands.Count > 0)
         {
             List<HandPoseDetector.ValidationData> validationData = poseDetector.GetValidationData();
@@ -187,7 +186,7 @@ public class HandPoseValidator : MonoBehaviour
                                         {
                                             lineColor = Color.red;
                                         }
-                                        
+
                                         var lineRenderer = GetLineRendererFromPool(capsuleHand.gameObject.transform, lineRenderCount++, lineColor);
                                         var startPosition = GetStartPosition(boneProximityRuleTarget, capsuleHand.GetLeapHand());
 
@@ -205,7 +204,7 @@ public class HandPoseValidator : MonoBehaviour
                 }
             }
         }
-        
+
         Vector3? GetStartPosition(PoseProximityRule boneProximityRuleTarget, Hand leapHand)
         {
             if ((int)boneProximityRuleTarget.finger != 5 &&
@@ -229,7 +228,7 @@ public class HandPoseValidator : MonoBehaviour
 
             return null;
         }
-    
+
         LineRenderer GetLineRendererFromPool(Transform parent, int index, Color lineColor)
         {
             if (lineRenderers.ElementAtOrDefault(index) == null)
