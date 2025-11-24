@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added stencil based variants of the generic hand materials to force a hand to render over another - e.g. when live hands need to match posed hands.
 - Added optional argument to AssignBestLeapProvider in HandUtils to prefer potentially live data LeapProviders vs. HandPoseViewer. Fixes a potential pose detection bug.
 
+
 ### Changed
 - Removed warning suggesting use of both input systems for OpenXR + Ultraleap compatibility now the new input system is fully supported
 - Updated all custom shaders to support the Universal Render Pipeline concurrently with the Built-in Render Pipeline
@@ -26,6 +27,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Functions for InterpolateFrame / InterpolateFrameFromTime / GetInterpolatedFrameSize will no longer call LeapC unless a valid device is passed/set
 - LeapServiceProvider Update will no longer request an interpolated frame without a valid device being set
 - LeapServiceProvider FixedUpdate will no longer request an interpolated frame without a valid device and connection, bringing it into line with Update
+- Added client libraries for iOS. Updated other client libraries to 7.4
+- Binding to Android clients will use an older client if running on XR or the service is installed. Essentially we now ship with two clients for this reason.
+- Changed to recent clients requires support for reading / setting the device firmware version on the DeviceInfo. This will be set to a valid value if the service is recent enough.
 
 ### Fixed
 - Fixed some warnings around runtime variables that were only used in editor mode
