@@ -211,11 +211,11 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
                             goAhead = false;
                             break;
                     }
-
+ 
                     // Let's give the user the chance to stop being nagged ...
                     if (goAhead == false && NumberOfTimesUserRejectedPrompt >= 3 && NumberOfTimesUserRejectedPrompt <=5)
                     {
-                        if (EditorUtility.DisplayDialog("Convert Ultraleap Plugin Materials", "You've said no to converting materials a few times now. Do you want to turn this (automatic) feature off?", "Yes", "No"))
+                        if (EditorUtility.DisplayDialog("Convert Ultraleap Plugin Materials", "You've said no to converting materials a few times now. Do you want to turn this (automatic) feature off for this project?", "Yes", "No"))
                         {
                             AutomaticConversionIsOffForPluginInProject = true;
                         }
@@ -226,7 +226,7 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
             {
                 goAhead = true;
             }
-
+ 
             if (goAhead)
             {
                 UpdatePipelineShaders();

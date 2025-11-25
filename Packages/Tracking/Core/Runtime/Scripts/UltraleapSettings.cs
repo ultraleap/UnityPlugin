@@ -236,23 +236,42 @@ namespace Leap
         [HideInInspector]
         public static bool AutomaticallyUpgradeMaterialsToCurrentRenderPipeline
         {
+
+#if UNITY_EDITOR
             get
             {
-                string readValue = System.Environment.GetEnvironmentVariable(automaticallyUpgradeMaterialsToCurrentRenderPipelineEnvironmentVariableName, EnvironmentVariableTarget.User);
-
-                if (string.IsNullOrEmpty(readValue))
+                if (!EditorPrefs.HasKey(automaticallyUpgradeMaterialsToCurrentRenderPipelineEnvironmentVariableName))
                 {
                     AutomaticallyUpgradeMaterialsToCurrentRenderPipeline = defaultValueForAutomaticallyUpgradingMaterialsForActiveRenderPipeline;
                     return defaultValueForAutomaticallyUpgradingMaterialsForActiveRenderPipeline;
                 }
-
-                return Convert.ToBoolean(readValue);
+                else
+                {
+                    bool value = EditorPrefs.GetBool(automaticallyUpgradeMaterialsToCurrentRenderPipelineEnvironmentVariableName);
+                    return value;
+                }
+            }
+ 
+            set
+            {
+                if (value != AutomaticallyUpgradeMaterialsToCurrentRenderPipeline)
+                {
+                    // Note the EditorPref value seems to only persist on Editor close
+                    EditorPrefs.SetBool(automaticallyUpgradeMaterialsToCurrentRenderPipelineEnvironmentVariableName, value);
+                }
+            }
+#else
+            // Should not be used at runtime
+            get
+            {
+                return false;
             }
 
             set
             {
-                System.Environment.SetEnvironmentVariable(automaticallyUpgradeMaterialsToCurrentRenderPipelineEnvironmentVariableName, Convert.ToString(value), EnvironmentVariableTarget.User);
+                // Do nothing
             }
+#endif 
         }
 
         [HideInInspector, SerializeField]
