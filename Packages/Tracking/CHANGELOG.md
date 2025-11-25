@@ -17,7 +17,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added stencil based variants of the generic hand materials to force a hand to render over another - e.g. when live hands need to match posed hands.
 - Added optional argument to AssignBestLeapProvider in HandUtils to prefer potentially live data LeapProviders vs. HandPoseViewer. Fixes a potential pose detection bug.
 
-
 ### Changed
 - Removed warning suggesting use of both input systems for OpenXR + Ultraleap compatibility now the new input system is fully supported
 - Updated all custom shaders to support the Universal Render Pipeline concurrently with the Built-in Render Pipeline
@@ -45,6 +44,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed compile error and editor runtime issue in Unity 6.3 when importing the plugin (thanks a3geek).
   
 ### Known Issues
+- Ultraleap tracking with Ultraleap hardware no longer works on a Meta Quest 3 headset running an OS version >76 due to [changes in which permissions are allowed.](https://developers.meta.com/horizon/resources/permissions-prohibited/)
 - Pose detection scene does not illuminate all poses in green if built for mobile headsets when using URP (2022.3), spotlights don't work as intended on Unity 6.
 - Turntable and pullchord scene only works (i.e. the pullchord works) if the physical hands physics settings are used
 - The RuntimeGizmoManager and associated RuntimeGizmo.shader shader are not URP compatible and would require breaking changes to support URP; These remain as BiRP only
