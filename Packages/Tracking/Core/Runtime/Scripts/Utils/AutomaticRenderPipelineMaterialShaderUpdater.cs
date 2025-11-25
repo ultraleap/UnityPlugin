@@ -211,7 +211,6 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
                             goAhead = false;
                             break;
                     }
- 
                     // Let's give the user the chance to stop being nagged ...
                     if (goAhead == false && NumberOfTimesUserRejectedPrompt >= 3 && NumberOfTimesUserRejectedPrompt <=5)
                     {
@@ -226,7 +225,6 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
             {
                 goAhead = true;
             }
- 
             if (goAhead)
             {
                 UpdatePipelineShaders();
