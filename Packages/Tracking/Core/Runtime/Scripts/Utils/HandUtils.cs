@@ -53,7 +53,7 @@ namespace Leap
                             {
                                 foreach (var provider in candidates)
                                 {
-                                    if (provider.GetType() != typeof(HandPoseViewer) && 
+                                    if (provider.GetType() != typeof(HandPoseViewer) &&
                                         provider.GetType() != typeof(HandPoseEditor))
                                     {
                                         s_provider = provider;
@@ -71,7 +71,7 @@ namespace Leap
                         }
 
                         if (s_provider == null)
-                        { 
+                        {
                             Debug.Log("There are no Leap Providers in the scene, please assign one manually." +
                                 "Alternatively, use Hands.CreateXRLeapProvider() to automatically create an XRLeapProvider");
                             return;

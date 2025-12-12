@@ -474,7 +474,7 @@ namespace LeapInternal
                 if (!_loggedNullDeviceWarningForGetInterpolatedFrame)
                 {
                     UnityEngine.Debug.LogWarning($"Device is null, requesting an interpolated frame without a valid device (handle) is no longer supported and should be considered obsolete");
-                    _loggedNullDeviceWarningForGetInterpolatedFrame= true;
+                    _loggedNullDeviceWarningForGetInterpolatedFrame = true;
                 }
                 result = eLeapRS.eLeapRS_Unsupported;
             }
@@ -504,7 +504,7 @@ namespace LeapInternal
                 if (!_loggedNullDeviceWarningForGetInterpolatedFrame)
                 {
                     UnityEngine.Debug.LogWarning($"Device is null, requesting an interpolated frame (from time) without a valid device (handle) is no longer supported and should be considered obsolete");
-                    _loggedNullDeviceWarningForGetInterpolatedFrame = true; 
+                    _loggedNullDeviceWarningForGetInterpolatedFrame = true;
                 }
 
                 result = eLeapRS.eLeapRS_Unsupported;
@@ -691,7 +691,7 @@ namespace LeapInternal
                     UnityEngine.Debug.Log("Buffer for device info is not the correct size. Is the structure definition out of step with the client?");
                 }
                 return;
-            }    
+            }
 
             deviceInfo.serial = Marshal.AllocCoTaskMem((int)deviceInfo.serial_length);
             result = LeapC.GetDeviceInfo(device, ref deviceInfo); //Query the serial

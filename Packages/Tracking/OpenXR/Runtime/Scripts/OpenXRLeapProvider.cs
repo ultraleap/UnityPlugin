@@ -78,7 +78,7 @@ namespace Leap.Tracking.OpenXR
         [SerializeField]
         private MetaCompatibilityMode _metaCompatibility = MetaCompatibilityMode.Automatic;
         private bool _metaCompatibilityEnabled = false;
-        
+
         [Tooltip("Convert Meta hand-tracking data to better match LeapC")]
         public MetaCompatibilityMode MetaCompatibility
         {
@@ -366,13 +366,13 @@ namespace Leap.Tracking.OpenXR
                     elbowRotation
                 );
             }
-            
+
             // Apply Meta corrections if needed
             if (_metaCompatibilityEnabled)
             {
                 hand = hand.FromMetaLayout();
             }
-            
+
             return true;
         }
 

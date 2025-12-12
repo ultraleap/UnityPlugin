@@ -991,7 +991,7 @@ namespace Leap
                 return;
             }
 
-            if(_serviceConnectionInput == ServiceConnectionInput.IP_PORT)
+            if (_serviceConnectionInput == ServiceConnectionInput.IP_PORT)
             {
                 _serverNameSpace = $"{{\"tracking_server_ip\": \"{_serviceIP}\", \"tracking_server_port\": {_servicePort}}}";
             }

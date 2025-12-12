@@ -738,4 +738,4 @@ public class AutomaticRenderPipelineMaterialShaderUpdater : ScriptableObject
         }
     }
 }
-#endif 
+#endif

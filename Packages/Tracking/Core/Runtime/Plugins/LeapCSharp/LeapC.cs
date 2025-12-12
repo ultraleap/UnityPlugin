@@ -770,7 +770,7 @@ namespace LeapInternal
         public UInt32 range;
         /* The firmware version for this device. @since 7.3.1 */
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)]
-        public char[] firmware_version;  
+        public char[] firmware_version;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
