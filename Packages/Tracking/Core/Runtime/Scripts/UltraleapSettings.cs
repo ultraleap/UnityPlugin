@@ -242,16 +242,16 @@ namespace Leap
             {
                 if (!EditorPrefs.HasKey(automaticallyUpgradeMaterialsToCurrentRenderPipelineEnvironmentVariableName))
                 {
-                    AutomaticallyUpgradeMaterialsToCurrentRenderPipeline = defaultValueForAutomaticallyUpgradingMaterialsForActiveRenderPipeline;
-                    return defaultValueForAutomaticallyUpgradingMaterialsForActiveRenderPipeline;
+                    _AutomaticallyUpgradeMaterialsToCurrentRenderPipeline = defaultValueForAutomaticallyUpgradingMaterialsForActiveRenderPipeline;
                 }
                 else
                 {
-                    bool value = EditorPrefs.GetBool(automaticallyUpgradeMaterialsToCurrentRenderPipelineEnvironmentVariableName);
-                    return value;
+                    _AutomaticallyUpgradeMaterialsToCurrentRenderPipeline = EditorPrefs.GetBool(automaticallyUpgradeMaterialsToCurrentRenderPipelineEnvironmentVariableName);
                 }
+
+                return _AutomaticallyUpgradeMaterialsToCurrentRenderPipeline;
             }
- 
+
             set
             {
                 if (value != AutomaticallyUpgradeMaterialsToCurrentRenderPipeline)
@@ -273,6 +273,7 @@ namespace Leap
             }
 #endif 
         }
+        private static bool _AutomaticallyUpgradeMaterialsToCurrentRenderPipeline;
 
         [HideInInspector, SerializeField]
         public string pluginVersion = "Unknown";
