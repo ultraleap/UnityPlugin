@@ -28,8 +28,8 @@ namespace Leap
             Ultraleap
         }
 
-        private CapsuleHandPreset _preset;
         [SerializeField]
+        private CapsuleHandPreset _preset;
         public CapsuleHandPreset Preset
         {
             get
