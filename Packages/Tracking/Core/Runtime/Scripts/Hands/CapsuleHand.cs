@@ -29,7 +29,7 @@ namespace Leap
         }
 
         private CapsuleHandPreset _preset;
-        [SerializeField]
+        [field: SerializeField]
         public CapsuleHandPreset Preset
         {
             get
