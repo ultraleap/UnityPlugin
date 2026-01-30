@@ -33,6 +33,11 @@
             "name": "com.unity.modules.xr",
             "expression": "0",
             "define": "XR_OR_VR_AVAILABLE"
+        },
+        {
+            "name": "com.unity.xr.picoxr",
+            "expression": "0",
+            "define": "XR_OR_VR_AVAILABLE"
         }
     ],
     "noEngineReferences": false
