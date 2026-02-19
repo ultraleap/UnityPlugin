@@ -62,7 +62,8 @@ namespace Leap
                 _serviceBinder = new AndroidJavaObject("com.ultraleap.tracking.service_binder.ServiceBinder", context, serviceCallbacks);
 
                 // Check if there is a service installed before trying to bind to it. If this returns false, there is either nothing to bind to, or the service might be being used in direct mode (part of the running process)
-                if (_serviceBinder.Call<bool>("isServiceInstalled", new object[] {context}))
+                //if (_serviceBinder.Call<bool>("isServiceInstalled", new object[] {context}))
+                if (true)
                 {
                     success = _serviceBinder.Call<bool>("bind");
                     Debug.Log($"AndroidServiceBinder.TryBind - calling bind returned {success}.");
