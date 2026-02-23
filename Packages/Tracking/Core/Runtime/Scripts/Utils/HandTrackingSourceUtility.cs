@@ -32,8 +32,8 @@ namespace Leap
                 return leapCTrackingAvailable;
             }
 
-#if UNITY_ANDROID && !UNITY_EDITOR
-            if(AndroidServiceBinder.Bind())
+#if UNITY_ANDROID && !UNITY_EDITOR && XR_OR_VR_AVAILABLE
+            if (AndroidServiceBinder.Bind())
             {
                 return true;
             }
@@ -42,7 +42,6 @@ namespace Leap
             {
                 return true;
             }
-
 
             leapCConnectionChecked = true;
             return false;

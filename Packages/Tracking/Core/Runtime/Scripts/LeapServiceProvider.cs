@@ -589,7 +589,8 @@ namespace Leap
 
         protected virtual void OnEnable()
         {
-#if !UNITY_EDITOR
+#if !UNITY_EDITOR 
+            Debug.Log("In LeapServiceProvider:OnEnable about to call AndroidServiceBinder.Bind()");
             AndroidServiceBinder.Bind();
 #endif
         }
@@ -603,6 +604,7 @@ namespace Leap
         // No longer necessary but would be a breaking change if removed
         protected virtual void OnEnable()
         {
+            Debug.Log("In LeapServiceProvider:OnEnable - no need to call AndroidServiceBinder - not running on Android)");
         }
 
         // No longer necessary but would be a breaking change if removed
@@ -989,7 +991,7 @@ namespace Leap
                 return;
             }
 
-            if(_serviceConnectionInput == ServiceConnectionInput.IP_PORT)
+            if (_serviceConnectionInput == ServiceConnectionInput.IP_PORT)
             {
                 _serverNameSpace = $"{{\"tracking_server_ip\": \"{_serviceIP}\", \"tracking_server_port\": {_servicePort}}}";
             }

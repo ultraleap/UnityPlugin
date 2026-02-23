@@ -10,6 +10,7 @@
 namespace LeapInternal
 {
     using System;
+    using System.Diagnostics;
     using System.Runtime.InteropServices;
 
     public enum eLeapConnectionFlag : uint
@@ -767,6 +768,9 @@ namespace LeapInternal
         public float h_fov;
         public float v_fov;
         public UInt32 range;
+        /* The firmware version for this device. @since 7.3.1 */
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)]
+        public char[] firmware_version;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -1014,6 +1018,8 @@ namespace LeapInternal
 
 #if UNITY_IOS && !UNITY_EDITOR
         private const string DllName = "__Internal";
+#elif UNITY_ANDROID && XR_OR_VR_AVAILABLE && !UNITY_EDITOR 
+        private const string DllName = "LeapCLegacy";
 #else
         private const string DllName = "LeapC";
 #endif

@@ -17,7 +17,7 @@ public class ToggleStateUpdater : MonoBehaviour
         if (ToggleButton.isOn)
         {
             ButtonText.text = "On";
-        } 
+        }
         else
         {
             ButtonText.text = "Off";

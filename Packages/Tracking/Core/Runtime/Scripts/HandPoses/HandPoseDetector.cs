@@ -252,7 +252,7 @@ namespace Leap
             public Transform proximityTarget;
             public float distanceThreshold;
         }
-        
+
         /// <summary>
         /// What type of distance check is this for the hand position and target?
         /// </summary>
@@ -384,7 +384,7 @@ namespace Leap
                                 else
                                 {
                                     rightHandMatched = true;
-                                } 
+                                }
                             }
                         }
                     }
@@ -518,7 +518,7 @@ namespace Leap
 
             return false;
         }
-        
+
         private bool CheckRules(Hand playerHand)
         {
             // Check any finger directions set up in the pose detector
@@ -540,7 +540,7 @@ namespace Leap
                     return false;
                 }
             }
-            
+
             allRulesMatchedLastFrame = true;
             return true;
         }
@@ -611,7 +611,7 @@ namespace Leap
                              new Tuple<PoseProximityRule, bool>(rule, proximityPositionMatchInRule)));
                     }
                 }
-            
+
                 if (proximityPositionMatchInRule == false)
                 {
                     allRulesPassed = false;

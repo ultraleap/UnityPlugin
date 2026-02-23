@@ -459,7 +459,7 @@ namespace Leap
                 GUILayout.Space(10);
             }
 
-            EditorGUI.indentLevel = 0; 
+            EditorGUI.indentLevel = 0;
             #endregion
 
             GUILayout.Space(5);

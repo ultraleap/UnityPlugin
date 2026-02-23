@@ -26,6 +26,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Functions for InterpolateFrame / InterpolateFrameFromTime / GetInterpolatedFrameSize will no longer call LeapC unless a valid device is passed/set
 - LeapServiceProvider Update will no longer request an interpolated frame without a valid device being set
 - LeapServiceProvider FixedUpdate will no longer request an interpolated frame without a valid device and connection, bringing it into line with Update
+- Added client libraries for iOS. Updated other client libraries to 7.4
+- Binding to Android clients will use an older client if running on XR or the service is installed. Essentially we now ship with two clients for this reason.
+- Changed to recent clients requires support for reading / setting the device firmware version on the DeviceInfo. This will be set to a valid value if the service is recent enough.
 
 ### Fixed
 - Fixed some warnings around runtime variables that were only used in editor mode
@@ -41,6 +44,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed compile error and editor runtime issue in Unity 6.3 when importing the plugin (thanks a3geek).
   
 ### Known Issues
+- Ultraleap tracking with Ultraleap hardware no longer works on a Meta Quest 3 headset running an OS version >76 due to [changes in which permissions are allowed.](https://developers.meta.com/horizon/resources/permissions-prohibited/)
 - Pose detection scene does not illuminate all poses in green if built for mobile headsets when using URP (2022.3), spotlights don't work as intended on Unity 6.
 - Turntable and pullchord scene only works (i.e. the pullchord works) if the physical hands physics settings are used
 - The RuntimeGizmoManager and associated RuntimeGizmo.shader shader are not URP compatible and would require breaking changes to support URP; These remain as BiRP only

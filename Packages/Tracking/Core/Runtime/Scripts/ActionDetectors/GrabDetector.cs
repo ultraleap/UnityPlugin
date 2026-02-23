@@ -51,7 +51,7 @@ namespace Leap
         public Action<Hand> OnGrabbing
         {
             get => onAction;
-            
+
             set => onAction = value;
         }
 
