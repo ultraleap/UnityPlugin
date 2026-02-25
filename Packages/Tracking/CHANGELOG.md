@@ -51,7 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Turntable and pullchord - origin material is pink (error) and only renders in one eye - BiRP and URP - Unity 2022 only
 - Turntable and pullchord - scene produces a couple of 'the referenced script (unknown) on this Behaviour is missing' warnings - unless the tracking preview package/examples are imported
 - Unable to import the main samples/examples for the Tracking Preview package
-- A number of .so plugin files are not 16-byte aligned and produce warnings when a build is made (libLeapC.so, libUnityOpenXR.so,libLeapCLegacy.so)
+- A number of .so plugin files are not 16-byte aligned and produce warnings when a build is made (libLeapC.so, libUnityOpenXR.so, libLeapCLegacy.so)
 - Console error on shader Ultraleap/GenericHandShader - Material 'GhostCapsule Hand (Instance)' with Shader 'Ultraleap/GenericHandShader' doesn't have a color property '_MainColor'
 - Certain scenes containing physical interactions produce 'Setting linear velocity of a kinematic body is not supported' warnings (UnityEngine.RigidBody:set_velocity)
 - Text missing on example scene panels in Unity 6.3, need to manually import TextMeshPro Essential Resources - Window > TextMeshPro > Import TMP Essential Resources
