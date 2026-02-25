@@ -53,7 +53,7 @@ To use this plugin you will need the following:
 
 1. The latest Ultraleap Hand Tracking Software. You can get this [here][developer-site-tracking-software].
 2. An Ultraleap Hand Tracking Camera - follow setup process [here][developer-site-setup-camera].
-3. Unity 2022.3 LTS or newer. UnityPlugin packages have been tested to work against 2022.3 LTS and Unity 6.3 and URP/BiRP
+3. Unity 2022.3 LTS or newer. UnityPlugin packages have been tested to work against 2022.3 LTS and Unity 6.3 and URP/BiRP. We currently ship the materials for BiRP but the user will be prompted to convert material to URP, if it is detected.
 4. Follow one of the Installation workflows listed below.
 
 There are also some notable known issues in this release, worth mentioning here:
