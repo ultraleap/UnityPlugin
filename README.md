@@ -53,8 +53,13 @@ To use this plugin you will need the following:
 
 1. The latest Ultraleap Hand Tracking Software. You can get this [here][developer-site-tracking-software].
 2. An Ultraleap Hand Tracking Camera - follow setup process [here][developer-site-setup-camera].
-3. Unity 2021.3 LTS or newer. UnityPlugin packages have been tested to work against 2022.3 LTS. Light testing has been done with Unity 6. However, there are still issues with the render pipeline switching to URP - many of the materials and sample scenes will not render correctly due to broken shaders.
+3. Unity 2022.3 LTS or newer. UnityPlugin packages have been tested to work against 2022.3 LTS and Unity 6.3 and URP/BiRP
 4. Follow one of the Installation workflows listed below.
+
+There are also some notable known issues in this release, worth mentioning here:
+- Ultraleap tracking with Ultraleap hardware no longer works on a Meta Quest 3 headset running an OS version >76 due to [changes in which permissions are allowed.](https://developers.meta.com/horizon/resources/permissions-prohibited/)
+- On MacOS only, the client libraries now default to using a different tracking server port. For hand tracking to work, either change the Server Connection Input mode to PORT or set the port in the Server Name Space field to {"tracking_server_port": 12345}
+
 
 More detailed Getting Started documentation is available on [our website][documentation]
 
@@ -215,7 +220,7 @@ Use of Ultraleap's Unity Plugin is subject to the [Apache V2 License Agreement][
 
 ## Community Support
 
-Our [Discord Server][discord], [Github Discussions][github-discussions] and [Developer Forum][developer-forum] are places where you are actively encouraged to share your questions, insights, ideas, feature requests and projects.
+Our [Discord Server][discord], [Github Discussions][github-discussions] and [Developer Forum][developer-forum] are now read only.
 
 ## Links
 
