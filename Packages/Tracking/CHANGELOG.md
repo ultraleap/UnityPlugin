@@ -45,6 +45,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   
 ### Known Issues
 - Ultraleap tracking with Ultraleap hardware no longer works on a Meta Quest 3 headset running an OS version >76 due to [changes in which permissions are allowed.](https://developers.meta.com/horizon/resources/permissions-prohibited/)
+- On Mac OS only, the client libraries now default to using a different tracking server port. For hand tracking to work, either change the Server Connection Input mode to PORT or set the port in the Server Name Space field to {"tracking_server_port": 12345}
 - Pose detection scene does not illuminate all poses in green if built for mobile headsets when using URP (2022.3), spotlights don't work as intended on Unity 6.
 - Turntable and pullchord scene only works (i.e. the pullchord works) if the physical hands physics settings are used
 - Turntable and pullchord - origin material is pink (error) and only renders in one eye - BiRP and URP - Unity 2022 only
