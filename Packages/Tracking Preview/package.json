@@ -1,12 +1,12 @@
 {
   "name": "com.ultraleap.tracking.preview",
-  "version": "7.2.0",
+  "version": "7.3.0",
   "description": "Ultraleap Tracking Preview, contains code and examples for interactions that are in a preview state and subject to potential breaking changes",
   "displayName": "Ultraleap Tracking Preview",
-  "unity": "2021.3",
+  "unity": "2022.3",
   "license": "Apache-2.0",
   "dependencies": {
-    "com.ultraleap.tracking": "7.2.0",
+    "com.ultraleap.tracking": "7.3.0",
     "com.unity.inputsystem": "1.5.0",
     "com.unity.ugui": "1.0.0"
   },
@@ -38,7 +38,7 @@
     {
       "displayName": "Main Examples",
       "description": "A collection of examples for the Ultraleap Tracking Preview package, which use the Input System Package (New)",
-      "path": "Examples~/Main Preview Examples"
+      "path": "Examples~/Main Examples"
     },
     {
       "displayName": "Unity Input Manager (Old)",
