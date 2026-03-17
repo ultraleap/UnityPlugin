@@ -6,6 +6,61 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
 
+## [7.3.0] - 25/02/2026
+
+### Added
+- Experimental Meta compatibility mode for the OpenXR provider
+- Added support to upgrade the plugin's Built In Render Pipeline materials (and as a result the example scenes) to the Universal Render Pipeline. This can be set to automatically prompt when the materials don't match the current render pipeline. It does not support downgrading.
+- Changed LeapC PInvoke signatures to support iOS.
+- Added support for proximity rules in pose detection. Use the attachment hands to generate transforms for the other hand joints that can then be assigned to a proximity rule, if the target should be a joint in the other hand.
+- Added support for pose detection to require that both hands are in the target pose for the pose to be recognized.
+- Added stencil based variants of the generic hand materials to force a hand to render over another - e.g. when live hands need to match posed hands.
+- Added optional argument to AssignBestLeapProvider in HandUtils to prefer potentially live data LeapProviders vs. HandPoseViewer. Fixes a potential pose detection bug.
+
+### Changed
+- Removed warning suggesting use of both input systems for OpenXR + Ultraleap compatibility now the new input system is fully supported
+- Updated all custom shaders to support the Universal Render Pipeline concurrently with the Built-in Render Pipeline
+- Updated Copyright year to 2025
+- Split tracking preview examples into different groups - common assets, main examples and examples that need the old input manager to work (e.g. UI input)
+- (Service Provider) Expose service IP and port as user settable variables
+- Functions for InterpolateFrame / InterpolateFrameFromTime / GetInterpolatedFrameSize will no longer call LeapC unless a valid device is passed/set
+- LeapServiceProvider Update will no longer request an interpolated frame without a valid device being set
+- LeapServiceProvider FixedUpdate will no longer request an interpolated frame without a valid device and connection, bringing it into line with Update
+- Added client libraries for iOS. Updated other client libraries to 7.4
+- Binding to Android clients will use an older client if running on XR or the service is installed. Essentially we now ship with two clients for this reason.
+- Changed to recent clients requires support for reading / setting the device firmware version on the DeviceInfo. This will be set to a valid value if the service is recent enough.
+
+### Fixed
+- Fixed some warnings around runtime variables that were only used in editor mode
+- Fixed an issue with Physical Hands and Unity 6 due to the physics Contact Generation setting being removed
+- (UI Input Preview) Added explicit missing dependency on the "Unity UI" package
+- Support either input system for all interactions, fixing HandRecorder and CycleHandPairs
+- Clicks on UI elements using indirect interaction now work with the UI Input example scene
+- Text on the toggle button in the UI Input example scene now shows On or Off based on the toggled state
+- Clients were not able to subscribe to the events on the PinchDetector and GrabDetector scripts as the properties were exposed as readonly. 
+- GrabDetector detection logic was inverted, so open hands were interpreted as grabs. Now fixed.
+- Fixed issue with scale of outline in GenericHandShader if hand model normals are not a normalized length 
+- Fixed issue with attachment hands red/green/blue materials meta file IDs clashing with the IDs of the files in the original examples, since being moved
+- Fixed compile error and editor runtime issue in Unity 6.3 when importing the plugin (thanks a3geek).
+  
+### Known Issues
+- Ultraleap tracking with Ultraleap hardware no longer works on a Meta Quest 3 headset running an OS version >76 due to [changes in which permissions are allowed.](https://developers.meta.com/horizon/resources/permissions-prohibited/)
+- On Mac OS only, the client libraries now default to using a different tracking server port. For hand tracking to work, either change the Server Connection Input mode to PORT or set the port in the Server Name Space field to {"tracking_server_port": 12345}
+- Pose detection scene does not illuminate all poses in green if built for mobile headsets when using URP (2022.3), spotlights don't work as intended on Unity 6.
+- Turntable and pullchord scene only works (i.e. the pullchord works) if the physical hands physics settings are used
+- Turntable and pullchord - origin material is pink (error) and only renders in one eye - BiRP and URP - Unity 2022 only
+- Turntable and pullchord - scene produces a couple of 'the referenced script (unknown) on this Behaviour is missing' warnings - unless the tracking preview package/examples are imported
+- A number of .so plugin files are not 16-byte aligned and produce warnings when a build is made (libLeapC.so, libUnityOpenXR.so, libLeapCLegacy.so)
+- Console error on shader Ultraleap/GenericHandShader - Material 'GhostCapsule Hand (Instance)' with Shader 'Ultraleap/GenericHandShader' doesn't have a color property '_MainColor'
+- Certain scenes containing physical interactions produce 'Setting linear velocity of a kinematic body is not supported' warnings (UnityEngine.RigidBody:set_velocity)
+- Text missing on example scene panels in Unity 6.3, need to manually import TextMeshPro Essential Resources - Window > TextMeshPro > Import TMP Essential Resources
+- Warnings about deprecated components when importing plugin into Unity 6.3 - XRStats, Physics.autoSyncTransforms
+- The RuntimeGizmoManager and associated RuntimeGizmo.shader shader are not URP compatible and would require breaking changes to support URP; These remain as BiRP only
+- Support either input system for all interactions, fixing HandRecorder and CycleHandPairs
+- Scene(s) using physical hand interactions will prompt to go to settings to change parameters. One parameter is not being set, when set which is causing this repeated prompting
+- Hand distortion seen on Pico devices using Ultraleap Tracking hardware (large hands, messed up hand rotation vectors)
+
+
 ## [7.2.0] - 17/01/2025
 
 ### Added
@@ -21,7 +76,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Multi device mode will no longer be requested on Connection if arg is set to false
 - Fixed issue with Unity 6 triggering warnings for scripts that need to be upgraded due to Unity 6 API changes
 - Fixed a broken meta file in Physical Hands XR Examples
-- Fixed a frequent editor freeze that would occur when the Leap service is stopped/uninstalled 
+- Fixed a frequent editor freeze that would occur when the Leap service is stopped/uninstalled
+- Fixed issues with pose detection scene where the grab ball was not moving the panel, SimpleInteractionGlow script was outputting NullReferenceExceptions and it was possible to push the record button out of the UI panel
+
+### Known Issues
+- Multiple issues present in the Pose Recorder Scene - grab ball does not work, pose record button falls through panel and flies away, NullReferenceException raised by SimpleInteractionGlow script
+- Pull chord in Turntable and Pullchord scene gets stuck in pulled state with the grab ball juddering
+
 
 ## [7.1.0] - 04/09/2024
 
@@ -97,9 +158,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Shaders all come under the Ultraleap folder
 - Deleted Interaction Engine
 - Leap and Leap.Unity namespaces are now Leap
-
-### Fixed
-
 
 
 ## [6.15.1] - 26/06/2024

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2025.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -15,10 +15,9 @@ namespace Leap.Attributes
 {
     public class IndentAttribute : CombinablePropertyAttribute, IBeforeLabelAdditiveDrawer
     {
-        float width = 20;
-
-
 #if UNITY_EDITOR
+        private float width;
+
         public IndentAttribute()
         {
             width = 20;
@@ -38,7 +37,6 @@ namespace Leap.Attributes
         {
             return width;
         }
-
 #endif
     }
 }

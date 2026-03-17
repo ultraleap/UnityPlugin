@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2025.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -136,15 +136,14 @@ namespace Leap.Attachments
             initializeAttachmentPointFlagConstants();
         }
 
-#if !UNITY_EDITOR
-#endif
+#if UNITY_EDITOR
         private bool _isBeingDestroyed = false;
-#if !UNITY_EDITOR
-#endif
+
         void OnDestroy()
         {
             _isBeingDestroyed = true;
         }
+#endif
 
         /// <summary>
         /// Returns the AttachmentPointBehaviour child object of this AttachmentHand given a

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2025.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -67,7 +67,10 @@ namespace Leap
 
             specifyCustomDrawer("_specificSerialNumber", drawSerialNumberToggle);
 
+            deferProperty("_serviceConnectionInput");
             deferProperty("_serverNameSpace");
+            deferProperty("_servicePort");
+            deferProperty("_serviceIP");
             deferProperty("_useInterpolation");
 
             deferProperty("_reconnectionAttempts");
@@ -83,7 +86,24 @@ namespace Leap
             }
 
             addPropertyToFoldout("_useInterpolation", "Advanced Options");
+
+            addPropertyToFoldout("_serviceConnectionInput", "Advanced Options");
+
+            specifyConditionalDrawing("_serviceConnectionInput",
+                (int)LeapServiceProvider.ServiceConnectionInput.NAME,
+                "_serverNameSpace");
+
+            specifyConditionalDrawing("_serviceConnectionInput",
+                (int)LeapServiceProvider.ServiceConnectionInput.IP_PORT,
+                "_serviceIP");
+
+            specifyConditionalDrawing("_serviceConnectionInput",
+                (int)LeapServiceProvider.ServiceConnectionInput.IP_PORT,
+                "_servicePort");
+
             addPropertyToFoldout("_serverNameSpace", "Advanced Options");
+            addPropertyToFoldout("_serviceIP", "Advanced Options");
+            addPropertyToFoldout("_servicePort", "Advanced Options");
 
             addPropertyToFoldout("_reconnectionAttempts", "Advanced Options");
             addPropertyToFoldout("_reconnectionInterval", "Advanced Options");

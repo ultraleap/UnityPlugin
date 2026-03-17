@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2025.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -271,10 +271,33 @@ namespace Leap
         [SerializeField]
         protected bool _preventInitializingTrackingMode;
 
+        /// <summary>
+        /// The type of input to use for connection to the service
+        /// </summary>
+        public enum ServiceConnectionInput
+        {
+            NAME,
+            IP_PORT
+        }
+        [Tooltip("Which input to use for the service connection")]
+        [SerializeField]
+        [EditTimeOnly]
+        protected ServiceConnectionInput _serviceConnectionInput = ServiceConnectionInput.NAME;
+
         [Tooltip("Which Leap Service API Endpoint to connect to.  This is configured on the service with the 'api_namespace' argument.")]
         [SerializeField]
         [EditTimeOnly]
         protected string _serverNameSpace = "Leap Service";
+
+        [Tooltip("The IP address on which the Tracking service listens to. This is configured on the service with 'ip_address' in the 'leap_server_config' session of 'ServerConfig.json'")]
+        [SerializeField]
+        [EditTimeOnly]
+        protected string _serviceIP = "127.0.0.1";
+
+        [Tooltip("The port on which the Tracking service listens to. This is configured on the service with 'port' in the 'leap_server_config' session of 'ServerConfig.json'")]
+        [SerializeField]
+        [EditTimeOnly]
+        protected string _servicePort = "12345";
 
         public override TrackingSource TrackingDataSource { get { return CheckLeapServiceAvailable(); } }
 
@@ -566,7 +589,8 @@ namespace Leap
 
         protected virtual void OnEnable()
         {
-#if !UNITY_EDITOR
+#if !UNITY_EDITOR 
+            Debug.Log("In LeapServiceProvider:OnEnable about to call AndroidServiceBinder.Bind()");
             AndroidServiceBinder.Bind();
 #endif
         }
@@ -580,6 +604,7 @@ namespace Leap
         // No longer necessary but would be a breaking change if removed
         protected virtual void OnEnable()
         {
+            Debug.Log("In LeapServiceProvider:OnEnable - no need to call AndroidServiceBinder - not running on Android)");
         }
 
         // No longer necessary but would be a breaking change if removed
@@ -646,6 +671,8 @@ namespace Leap
 
         protected virtual void FixedUpdate()
         {
+            if (!checkConnectionIntegrity()) { return; }
+
             if (_useInterpolation)
             {
                 long timestamp;
@@ -668,7 +695,10 @@ namespace Leap
                           "Unexpected frame optimization mode: " + _frameOptimization);
                 }
 
-                _leapController.GetInterpolatedFrame(_untransformedFixedFrame, timestamp, _currentDevice);
+                if (_currentDevice != null)
+                {
+                    _leapController.GetInterpolatedFrame(_untransformedFixedFrame, timestamp, _currentDevice);
+                }
             }
             else
             {
@@ -737,7 +767,14 @@ namespace Leap
 
         void HandleUpdateFrameInterpolationAndTransformation()
         {
-            if (_useInterpolation)
+            if (_leapController == null)
+            {
+
+                Debug.LogWarning("LeapController is null");
+                return;
+            }
+
+            if (_useInterpolation && _currentDevice != null)
             {
 #if !UNITY_ANDROID || UNITY_EDITOR
                 _smoothedTrackingLatency.value = Mathf.Min(_smoothedTrackingLatency.value, 30000f);
@@ -885,6 +922,34 @@ namespace Leap
             throw new Exception("Unknown tracking optimization mode");
         }
 
+        /// <summary>
+        /// Set the connection mode to IP_PORT, the target IP, and port of the service, and connects to this address.
+        /// </summary>
+        public void SetTargetServiceIPPortToConnectTo(string IP, string port)
+        {
+            _serviceConnectionInput = ServiceConnectionInput.IP_PORT;
+
+            _serviceIP = IP;
+            _servicePort = port;
+
+            destroyController();
+            createController();
+        }
+
+        /// <summary>
+        /// Set the connection mode to NAME, sets the name, and connects to this server namespace.
+        /// </summary>
+        /// <param name="serverNamespace"></param>
+        public void SetTargetServerNamespaceToConnectTo(string serverNamespace)
+        {
+            _serviceConnectionInput = ServiceConnectionInput.NAME;
+
+            _serverNameSpace = serverNamespace;
+
+            destroyController();
+            createController();
+        }
+
         #endregion
 
         #region Internal Methods
@@ -892,7 +957,7 @@ namespace Leap
         protected virtual long CalculateInterpolationTime(bool endOfFrame = false)
         {
 #if UNITY_ANDROID && !UNITY_EDITOR
-      return _leapController.Now() - 16000;
+            return _leapController.Now() - 16000;
 #else
             if (_leapController != null)
             {
@@ -924,6 +989,11 @@ namespace Leap
             if (_leapController != null)
             {
                 return;
+            }
+
+            if (_serviceConnectionInput == ServiceConnectionInput.IP_PORT)
+            {
+                _serverNameSpace = $"{{\"tracking_server_ip\": \"{_serviceIP}\", \"tracking_server_port\": {_servicePort}}}";
             }
 
             if (_multipleDeviceMode == MultipleDeviceMode.Disabled)
@@ -1109,6 +1179,21 @@ namespace Leap
             if (HandTrackingSourceUtility.LeapCTrackingAvailable)
             {
                 _trackingSource = TrackingSource.LEAPC;
+                return _trackingSource;
+            }
+
+            if (_serviceConnectionInput == ServiceConnectionInput.IP_PORT)
+            {
+                _serverNameSpace = $"{{\"tracking_server_ip\": \"{_serviceIP}\", \"tracking_server_port\": {_servicePort}}}";
+            }
+
+            if (LeapInternal.Connection.IsConnectionAvailable(_serverNameSpace))
+            {
+                _trackingSource = TrackingSource.LEAPC;
+            }
+            else
+            {
+                _trackingSource = TrackingSource.NONE;
             }
 
             return _trackingSource;
@@ -1201,7 +1286,7 @@ namespace Leap
                 if (leapInfo.Name == deviceType)
                 {
                     info = leapInfo;
-                    Material mat = Resources.Load("TrackingVolumeVisualization/DeviceModelMat") as Material;
+                    Material mat = Resources.Load("TrackingVolumeVisualization/Materials/Built In Render Pipeline (Dynamically Upgradable)/DeviceModelMat") as Material;
                     mat.SetPass(0);
 
                     Graphics.DrawMeshNow(Resources.Load<Mesh>("TrackingVolumeVisualization/Meshes/" + deviceType), deviceModelMatrix *
@@ -1234,7 +1319,7 @@ namespace Leap
 
             if (OptimalFOV_Visualization && optimalFOVMesh != null)
             {
-                Material mat = Resources.Load("TrackingVolumeVisualization/OptimalFOVMat_Volume") as Material;
+                Material mat = Resources.Load("TrackingVolumeVisualization/Materials/OptimalFOVMat_Volume") as Material;
                 mat.SetPass(0);
 
                 Graphics.DrawMeshNow(optimalFOVMesh, deviceModelMatrix *
@@ -1242,7 +1327,7 @@ namespace Leap
             }
             if (MaxFOV_Visualization && maxFOVMesh != null)
             {
-                Material mat = Resources.Load("TrackingVolumeVisualization/MaxFOVMat_Volume") as Material;
+                Material mat = Resources.Load("TrackingVolumeVisualization/Materials/MaxFOVMat_Volume") as Material;
                 mat.SetPass(0);
 
                 Graphics.DrawMeshNow(maxFOVMesh, deviceModelMatrix *

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2025.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -123,9 +123,9 @@ namespace Leap.InputModule
 #if ENABLE_INPUT_SYSTEM && !ENABLE_LEGACY_INPUT_MANAGER
             //We must have legacy input enabled, or be using an older Unity version
             enabled = false;
+            Debug.LogError("Ultraleap UIInputModule requires the legacy input system. Please enable legacy input in the Player Settings.");
             return;
-#endif
-
+#else
             //Find and apply LSP/Camera if not already
             if (leapDataProvider == null)
             {
@@ -150,7 +150,9 @@ namespace Leap.InputModule
             }
 
             base.Awake();
+#endif
         }
+
         protected override void Start()
         {
             var shoulderProjectionOriginProvider = new ShoulderProjectionOriginProvider(mainCamera);

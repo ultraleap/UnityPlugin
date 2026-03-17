@@ -17,6 +17,12 @@ namespace Leap
         public bool checkBothHands = true;
 
         /// <summary>
+        /// Should the pose only be detected if both hands match the pose?
+        /// </summary>
+        [HideInInspector]
+        public bool bothHandsMustMatchPose = false;
+
+        /// <summary>
         /// Which hand should the detector check?
         /// </summary>
         [HideInInspector]
@@ -220,6 +226,89 @@ namespace Leap
 
         #endregion
 
+        #region Proximity rules
+
+        /// <summary>
+        /// TODO - refactor the rules to be based around a common interface pattern, rather than having two sets of proximity/pose rules. 
+        /// Requires a breaking change / major version bump.
+        /// </summary>
+        [SerializeField]
+        public List<PoseProximityRule> poseProximityRules;
+
+        [Serializable]
+        public struct PoseProximityRule
+        {
+            public bool enabled;
+            public int finger;
+            public int bone;
+            public List<RuleProximity> proximityRules;
+        }
+
+        [Serializable]
+        public struct RuleProximity
+        {
+            public bool enabled;
+            public TypeOfProximityCheck typeOfProximityCheck;
+            public Transform proximityTarget;
+            public float distanceThreshold;
+        }
+
+        /// <summary>
+        /// What type of distance check is this for the hand position and target?
+        /// </summary>
+        public enum TypeOfProximityCheck
+        {
+            IsNearerThanThreshold = 0,
+            IsFurtherAwayThanThreshold = 1
+        };
+
+        public void CreatePoseProximityRule()
+        {
+            PoseProximityRule poseRule = new PoseProximityRule();
+            poseRule.enabled = true;
+            poseRule.finger = (int)Finger.FingerType.INDEX;
+            poseRule.bone = (int)Bone.BoneType.INTERMEDIATE;
+            poseRule.proximityRules = new List<RuleProximity>();
+
+            poseProximityRules.Add(poseRule);
+
+            CreateProximityRule(poseProximityRules.Count - 1);
+        }
+
+        public void CreateProximityRule(int sourceIndex)
+        {
+            RuleProximity fingerProximityRule = new RuleProximity();
+            fingerProximityRule.typeOfProximityCheck = TypeOfProximityCheck.IsNearerThanThreshold;
+            fingerProximityRule.proximityTarget = null;
+            fingerProximityRule.distanceThreshold = 0.05f;
+            fingerProximityRule.enabled = true;
+
+            poseProximityRules.ElementAt(sourceIndex).proximityRules.Add(fingerProximityRule);
+        }
+
+        public void RemovePoseProximityRule(int index)
+        {
+            poseProximityRules.RemoveAt(index);
+        }
+
+        public void RemoveProximityRule(int ruleIndex, int proximityRuleIndex)
+        {
+            poseProximityRules[ruleIndex].proximityRules.RemoveAt(proximityRuleIndex);
+        }
+
+        public List<PoseProximityRuleCache> poseProximityRulesForValidator = new List<PoseProximityRuleCache>();
+        public struct PoseProximityRuleCache
+        {
+            public Chirality chirality;
+            public Tuple<PoseProximityRule, bool> poseRuleAndStatus;
+            public PoseProximityRuleCache(Chirality chirality, Tuple<PoseProximityRule, bool> poseRuleAndStatus)
+            {
+                this.chirality = chirality;
+                this.poseRuleAndStatus = poseRuleAndStatus;
+            }
+        }
+        #endregion
+
         /// <summary>
         /// This function determines whether a pose is currently detected or not.
         /// If a pose is currently detected, it will return the pose
@@ -247,13 +336,13 @@ namespace Leap
 
         private void Update()
         {
-            bool anyHandMatched = CompareAllHandsAndPoses();
-            if (anyHandMatched && !poseAlreadyDetected)
+            bool anyHandOrHandPairMatched = CompareAllHandsAndPoses();
+            if (anyHandOrHandPairMatched && !poseAlreadyDetected)
             {
                 poseAlreadyDetected = true;
                 OnPoseDetected.Invoke();
             }
-            else if (!anyHandMatched && poseAlreadyDetected)
+            else if (!anyHandOrHandPairMatched && poseAlreadyDetected)
             {
                 poseAlreadyDetected = false;
                 OnPoseLost.Invoke();
@@ -272,6 +361,8 @@ namespace Leap
             validationDatas.Clear();
             poseRulesForValidator.Clear();
 
+            bool leftHandMatched = false, rightHandMatched = false;
+
             if (leapProvider != null && leapProvider.CurrentFrame != null)
             {
                 foreach (var activePlayerHand in leapProvider.CurrentFrame.Hands)
@@ -285,24 +376,28 @@ namespace Leap
                             {
                                 detectedPose = pose;
                                 poseDetectedOnEitherHand = true;
+
+                                if (activePlayerHand.GetChirality() == Chirality.Left)
+                                {
+                                    leftHandMatched = true;
+                                }
+                                else
+                                {
+                                    rightHandMatched = true;
+                                }
                             }
                         }
                     }
                 }
             }
-            return poseDetectedOnEitherHand;
+            return bothHandsMustMatchPose ? leftHandMatched && rightHandMatched : poseDetectedOnEitherHand;
         }
 
         private bool ComparePoseToHand(HandPoseScriptableObject pose, Hand playerHand)
         {
-
-            // Check any finger directions set up in the pose detector
-            if (poseRules.Count > 0)
+            if (!CheckRules(playerHand))
             {
-                if (CheckPoseDirection(playerHand) == false)
-                {
-                    return false;
-                }
+                return false;
             }
 
             Hand serializedHand = pose.GetSerializedHand();
@@ -422,6 +517,108 @@ namespace Leap
             }
 
             return false;
+        }
+
+        private bool CheckRules(Hand playerHand)
+        {
+            // Check any finger directions set up in the pose detector
+            if (poseRules.Count > 0)
+            {
+                if (CheckPoseDirection(playerHand) == false)
+                {
+                    allRulesMatchedLastFrame = false;
+                    return false;
+                }
+            }
+
+            // Check any finger/hand positions set up in the pose detector
+            if (poseProximityRules.Count > 0)
+            {
+                if (CheckPoseProximity(playerHand) == false)
+                {
+                    allRulesMatchedLastFrame = false;
+                    return false;
+                }
+            }
+
+            allRulesMatchedLastFrame = true;
+            return true;
+        }
+
+        private bool CheckPoseProximity(Hand playerHand)
+        {
+            bool allRulesPassed = true;
+            foreach (var rule in poseProximityRules)
+            {
+                bool proximityPositionMatchInRule = false;
+                if (rule.proximityRules.Count <= 0) // If there are no proximity rules for this, skip 
+                {
+                    proximityPositionMatchInRule = true;
+                    continue;
+                }
+
+                foreach (var proximityRule in rule.proximityRules)
+                {
+                    if (proximityRule.enabled == false)
+                    {
+                        continue;
+                    }
+                    else // This is an active position rule, check that it is correct
+                    {
+                        Vector3 pointPosition;
+
+                        if ((int)rule.finger == 5) // This represents the palm
+                        {
+                            pointPosition = playerHand.PalmPosition;
+                        }
+                        else
+                        {
+                            pointPosition = playerHand.fingers[(int)rule.finger].bones[rule.bone].NextJoint;
+                        }
+
+                        float hysteresisToAdd = 0;
+
+                        if (allRulesMatchedLastFrame)
+                        {
+                            hysteresisToAdd = 0.005f;
+                        }
+
+                        var targetPositionWorld = this.gameObject.transform.TransformPoint(proximityRule.proximityTarget.position);
+                        var pointPositionWorld = this.gameObject.transform.TransformPoint(pointPosition);
+
+                        switch (proximityRule.typeOfProximityCheck)
+                        {
+
+                            case TypeOfProximityCheck.IsNearerThanThreshold:
+                                {
+                                    if (Vector3.Distance(this.gameObject.transform.TransformPoint(proximityRule.proximityTarget.position), this.gameObject.transform.TransformPoint(pointPosition)) < proximityRule.distanceThreshold + hysteresisToAdd)
+                                    {
+                                        proximityPositionMatchInRule = true;
+                                    }
+                                    break;
+                                }
+                            case TypeOfProximityCheck.IsFurtherAwayThanThreshold:
+                                {
+                                    if (Vector3.Distance(this.gameObject.transform.TransformPoint(proximityRule.proximityTarget.position), this.gameObject.transform.TransformPoint(pointPosition)) > proximityRule.distanceThreshold - hysteresisToAdd)
+                                    {
+                                        proximityPositionMatchInRule = true;
+                                    }
+                                    break;
+                                }
+                        }
+
+                        poseProximityRulesForValidator.Add(new PoseProximityRuleCache(playerHand.GetChirality(),
+                             new Tuple<PoseProximityRule, bool>(rule, proximityPositionMatchInRule)));
+                    }
+                }
+
+                if (proximityPositionMatchInRule == false)
+                {
+                    allRulesPassed = false;
+                }
+            }
+
+            return allRulesPassed;
         }
 
         private bool CheckPoseDirection(Hand playerHand)

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2025.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -52,7 +52,8 @@ namespace Leap
                       bool isStreaming,
                       uint status,
                       string serialNumber,
-                      uint deviceID)
+                      uint deviceID,
+                      string firmwareVersion)
         {
             Handle = deviceHandle;
             HorizontalViewAngle = horizontalViewAngle;
@@ -63,6 +64,7 @@ namespace Leap
             IsStreaming = isStreaming;
             SerialNumber = serialNumber;
             DeviceID = deviceID;
+            FirmwareVersion = firmwareVersion;
             UpdateStatus((eLeapDeviceStatus)status);
         }
 
@@ -76,7 +78,7 @@ namespace Leap
                       bool isStreaming,
                       uint status,
                       string serialNumber) : this(deviceHandle, internalHandle, horizontalViewAngle,
-                          verticalViewAngle, range, baseline, type, isStreaming, status, serialNumber, 0)
+                          verticalViewAngle, range, baseline, type, isStreaming, status, serialNumber, 0, "Unknown")
         {
         }
 
@@ -413,5 +415,12 @@ namespace Leap
             /// </summary>
             TYPE_LMC2 = (int)eLeapDeviceType.eLeapDevicePID_LMC2
         }
+
+        /// <summary>
+        /// The version of the firmware running on the device
+        /// 
+        /// @since 7.3.1
+        /// </summary>
+        public string FirmwareVersion { get; internal set; }
     }
 }

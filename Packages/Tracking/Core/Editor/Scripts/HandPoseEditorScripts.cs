@@ -282,7 +282,8 @@ namespace Leap
         }
         BoneName boneName = BoneName.Distal;
 
-        List<bool> sourceFoldout = new List<bool>();
+        List<bool> directionSourceFoldout = new List<bool>();
+        List<bool> proximitySourceFoldout = new List<bool>();
 
         public override void OnInspectorGUI()
         {
@@ -304,7 +305,13 @@ namespace Leap
             if (!poseDetectionScript.checkBothHands)
             {
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("chiralityToCheck"));
+                poseDetectionScript.bothHandsMustMatchPose = false;
             }
+            else
+            {
+                poseDetectionScript.bothHandsMustMatchPose = EditorGUILayout.Toggle("Both hands must match pose", poseDetectionScript.bothHandsMustMatchPose);
+            }
+
             GUILayout.Space(10);
 
             #region Bone Directions 
@@ -326,7 +333,7 @@ namespace Leap
             GUILayout.Space(10);
 
             EditorGUILayout.BeginHorizontal();
-            if (GUILayout.Button(" + Add a new rule for finger/palm"))
+            if (GUILayout.Button(" + Add a new direction rule for finger/palm"))
             {
                 poseDetectionScript.CreatePoseRule();
             }
@@ -336,12 +343,12 @@ namespace Leap
             GUILayout.Space(10);
 
             SerializedProperty sources = serializedObject.FindProperty("poseRules");
-            if (sourceFoldout.Count != sources.arraySize)
+            if (directionSourceFoldout.Count != sources.arraySize)
             {
-                sourceFoldout.Clear();
+                directionSourceFoldout.Clear();
                 foreach (var item in sources)
                 {
-                    sourceFoldout.Add(true);
+                    directionSourceFoldout.Add(true);
                 }
             }
 
@@ -350,10 +357,10 @@ namespace Leap
                 var source = sources.GetArrayElementAtIndex(i);
                 fingerName = (FingerName)source.FindPropertyRelative("finger").intValue;
 
-                sourceFoldout[i] = EditorGUILayout.BeginFoldoutHeaderGroup(sourceFoldout.ElementAt(i),
+                directionSourceFoldout[i] = EditorGUILayout.BeginFoldoutHeaderGroup(directionSourceFoldout.ElementAt(i),
                 "Rule for " + fingerName.ToString() + " direction");
 
-                if (sourceFoldout[i])
+                if (directionSourceFoldout[i])
                 {
                     GUILayout.BeginVertical("box");
                     EditorGUILayout.BeginHorizontal();
@@ -451,6 +458,143 @@ namespace Leap
                 EditorGUILayout.EndFoldoutHeaderGroup();
                 GUILayout.Space(10);
             }
+
+            EditorGUI.indentLevel = 0;
+            #endregion
+
+            GUILayout.Space(5);
+            var thinGreyLine3 = EditorGUILayout.GetControlRect(false, GUILayout.Height(2), GUILayout.Width(Screen.width));
+            EditorGUI.DrawRect(thinGreyLine3, Color.grey);
+
+            #region Bone Proximmity Rules 
+            EditorGUILayout.LabelField("Proximity Rules", EditorStyles.boldLabel);
+            thinGreyLine = EditorGUILayout.GetControlRect(false, GUILayout.Height(2), GUILayout.Width(Screen.width));
+            EditorGUI.DrawRect(thinGreyLine, Color.grey);
+
+            string poseProximityExplanationText = "Proximity rules allow you to specify that a pose should only be detected based on the proximity of part of the hand to a target.";
+
+            GUILayout.BeginVertical();
+            EditorStyles.textField.clipping = TextClipping.Overflow;
+            textArea = EditorStyles.textArea.CalcHeight(new GUIContent(poseProximityExplanationText), Screen.width);
+            EditorStyles.textField.wordWrap = true;
+            GUILayout.Label(poseProximityExplanationText, EditorStyles.textField);
+            GUILayout.EndVertical();
+
+            GUILayout.Space(10);
+
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button(" + Add a new proximity rule for finger/palm"))
+            {
+                poseDetectionScript.CreatePoseProximityRule();
+            }
+            GUILayout.FlexibleSpace();
+            EditorGUILayout.EndHorizontal();
+
+            GUILayout.Space(10);
+
+            SerializedProperty proximitySources = serializedObject.FindProperty("poseProximityRules");
+            if (proximitySourceFoldout.Count != proximitySources.arraySize)
+            {
+                proximitySourceFoldout.Clear();
+                foreach (var item in proximitySources)
+                {
+                    proximitySourceFoldout.Add(true);
+                }
+            }
+
+            for (int i = 0; i < proximitySources.arraySize; i++)
+            {
+                var proximitySource = proximitySources.GetArrayElementAtIndex(i);
+                fingerName = (FingerName)proximitySource.FindPropertyRelative("finger").intValue;
+
+                proximitySourceFoldout[i] = EditorGUILayout.BeginFoldoutHeaderGroup(proximitySourceFoldout.ElementAt(i),
+                "Rule for " + fingerName.ToString() + " proximity");
+
+                if (proximitySourceFoldout[i])
+                {
+                    GUILayout.BeginVertical("box");
+                    EditorGUILayout.BeginHorizontal();
+                    EditorGUILayout.LabelField("Observed part of the hand");
+
+                    proximitySource.FindPropertyRelative("finger").intValue = (int)(FingerName)EditorGUILayout.EnumPopup(fingerName);
+
+                    int boneNumber = (int)boneName;
+                    EditorGUILayout.EndHorizontal();
+
+                    GUILayout.Space(10);
+                    EditorGUILayout.LabelField("Targets:", EditorStyles.boldLabel);
+
+                    EditorStyles.textField.clipping = TextClipping.Overflow;
+                    EditorStyles.textField.wordWrap = true;
+                    GUILayout.Label("At least one of the following targets need to be met for the event to activate.", EditorStyles.miniLabel);
+                    GUILayout.Space(5);
+
+                    GUILayout.Space(5);
+                    var thinnerGreyLine = EditorGUILayout.GetControlRect(false, GUILayout.Height(1), GUILayout.Width(Screen.width));
+                    EditorGUI.DrawRect(thinnerGreyLine, Color.grey);
+
+                    var proximityList = proximitySource.FindPropertyRelative("proximityRules");
+                    for (int j = 0; j < proximityList.arraySize; j++)
+                    {
+                        EditorGUI.indentLevel = 0;
+                        var proximityRule = proximityList.GetArrayElementAtIndex(j);
+
+                        proximityRule.FindPropertyRelative("enabled").boolValue = EditorGUILayout.BeginToggleGroup(GetProxmityTargetName(proximityRule), proximityRule.FindPropertyRelative("enabled").boolValue);
+
+                        proximitySource.FindPropertyRelative("bone").intValue = boneNumber;
+
+                        EditorGUI.indentLevel = 1;
+
+                        EditorGUILayout.PropertyField(proximityRule.FindPropertyRelative("typeOfProximityCheck"), new GUIContent("Proximity relative to:"));
+
+                        EditorGUILayout.PropertyField(proximityRule.FindPropertyRelative("distanceThreshold"), new GUIContent("Distance threshold:"));
+
+                        EditorGUILayout.PropertyField(proximityRule.FindPropertyRelative("proximityTarget"), new GUIContent("Proximity Target"));
+                        EditorGUILayout.EndToggleGroup();
+
+                        EditorGUILayout.BeginHorizontal();
+                        GUILayout.Space(15);
+
+                        if (GUILayout.Button("Remove target"))
+                        {
+                            poseDetectionScript.RemoveProximityRule(i, j);
+                        }
+
+                        GUILayout.FlexibleSpace();
+                        EditorGUILayout.EndHorizontal();
+                        GUILayout.Space(5);
+
+                        var thinnerGreyLine2 = EditorGUILayout.GetControlRect(false, GUILayout.Height(1), GUILayout.Width(Screen.width));
+                        EditorGUI.DrawRect(thinnerGreyLine2, Color.grey);
+                        GUILayout.Space(5);
+                    }
+                    GUILayout.Space(5);
+                    EditorGUILayout.BeginHorizontal();
+                    GUILayout.FlexibleSpace();
+                    if (GUILayout.Button("+ Add target"))
+                    {
+                        poseDetectionScript.CreateProximityRule(i);
+                    }
+                    GUILayout.FlexibleSpace();
+                    EditorGUILayout.EndHorizontal();
+
+                    GUILayout.EndVertical();
+
+                    EditorGUILayout.BeginHorizontal();
+                    GUILayout.FlexibleSpace();
+                    if (GUILayout.Button("Remove rule"))
+                    {
+                        poseDetectionScript.RemovePoseProximityRule(i);
+                    }
+                    EditorGUILayout.EndHorizontal();
+
+                    EditorGUI.DrawRect(thinGreyLine, Color.grey);
+                }
+                EditorGUILayout.EndFoldoutHeaderGroup();
+                GUILayout.Space(10);
+            }
+
+            EditorGUI.indentLevel = 0;
             GUILayout.Space(20);
             #endregion
 
@@ -491,6 +635,25 @@ namespace Leap
                 case HandPoseDetector.TypeOfDirectionCheck.CameraDirection:
                 case HandPoseDetector.TypeOfDirectionCheck.WorldDirection:
                     name += (HandPoseDetector.AxisToFace)direction.FindPropertyRelative("axisToFace").enumValueIndex;
+                    break;
+            }
+
+            return name;
+        }
+
+        string GetProxmityTargetName(SerializedProperty proximityRule)
+        {
+            HandPoseDetector.TypeOfProximityCheck proximityType = (HandPoseDetector.TypeOfProximityCheck)proximityRule.FindPropertyRelative("typeOfProximityCheck").enumValueIndex;
+
+            string name = "";
+
+            switch (proximityType)
+            {
+                case HandPoseDetector.TypeOfProximityCheck.IsNearerThanThreshold:
+                    name = "Is nearer than (threshold distance)";
+                    break;
+                case HandPoseDetector.TypeOfProximityCheck.IsFurtherAwayThanThreshold:
+                    name = "Is further away Than (threshold distance)";
                     break;
             }
 

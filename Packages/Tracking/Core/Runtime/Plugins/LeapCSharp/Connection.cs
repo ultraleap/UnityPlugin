@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2025.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -81,6 +81,11 @@ namespace LeapInternal
         /// </summary>
         private static LEAP_VERSION MinServiceVersionForMultiModeSupport = new LEAP_VERSION() { major = 5, minor = 4, patch = 4 };
 
+        /// <summary>
+        /// The minimum tracking service version that supports reading the tracking device's firmware version
+        /// </summary>
+        private static LEAP_VERSION MinServiceVersionForFirmwareVersionInDeviceInfo = new LEAP_VERSION() { major = 7, minor = 3, patch = 1 };
+
         //Policy and enabled features, indexed by device ID
         private Dictionary<uint, UInt64> _activePolicies = new Dictionary<uint, ulong>();
 
@@ -139,6 +144,9 @@ namespace LeapInternal
         public Action<EndProfilingBlockArgs> LeapEndProfilingBlock;
 
         private bool _disposed = false;
+
+        private bool _loggedNullDeviceWarningForGetInterpolatedFrame = false;
+        private bool _loggedNullDeviceWarningForGetInterpolatedFrameSize = false;
 
         public void Dispose()
         {
@@ -428,7 +436,6 @@ namespace LeapInternal
             }
         }
 
-
         public UInt64 GetInterpolatedFrameSize(Int64 time, Device device = null)
         {
             UInt64 size = 0;
@@ -440,14 +447,17 @@ namespace LeapInternal
             }
             else
             {
-                result = LeapC.GetFrameSize(_leapConnection, time, out size);
+                if (!_loggedNullDeviceWarningForGetInterpolatedFrameSize)
+                {
+                    UnityEngine.Debug.LogWarning($"Device is null, requesting the frame size without a valid device (handle) is no longer supported and should be considered obsolete");
+                    _loggedNullDeviceWarningForGetInterpolatedFrameSize = true;
+                }
+                result = eLeapRS.eLeapRS_Unsupported;
             }
 
             reportAbnormalResults("LeapC get interpolated frame call was ", result);
             return size;
         }
-
-
 
         public void GetInterpolatedFrame(Frame toFill, Int64 time, Device device = null)
         {
@@ -461,7 +471,12 @@ namespace LeapInternal
             }
             else
             {
-                result = LeapC.InterpolateFrame(_leapConnection, time, trackingBuffer, size);
+                if (!_loggedNullDeviceWarningForGetInterpolatedFrame)
+                {
+                    UnityEngine.Debug.LogWarning($"Device is null, requesting an interpolated frame without a valid device (handle) is no longer supported and should be considered obsolete");
+                    _loggedNullDeviceWarningForGetInterpolatedFrame = true;
+                }
+                result = eLeapRS.eLeapRS_Unsupported;
             }
 
             reportAbnormalResults("LeapC get interpolated frame call was ", result);
@@ -482,12 +497,17 @@ namespace LeapInternal
 
             if (device != null)
             {
-
                 result = LeapC.InterpolateFrameFromTimeEx(_leapConnection, device.Handle, time, sourceTime, trackingBuffer, size);
             }
             else
             {
-                result = LeapC.InterpolateFrameFromTime(_leapConnection, time, sourceTime, trackingBuffer, size);
+                if (!_loggedNullDeviceWarningForGetInterpolatedFrame)
+                {
+                    UnityEngine.Debug.LogWarning($"Device is null, requesting an interpolated frame (from time) without a valid device (handle) is no longer supported and should be considered obsolete");
+                    _loggedNullDeviceWarningForGetInterpolatedFrame = true;
+                }
+
+                result = eLeapRS.eLeapRS_Unsupported;
             }
 
             reportAbnormalResults("LeapC get interpolated frame from time call was ", result);
@@ -641,11 +661,15 @@ namespace LeapInternal
         {
             IntPtr deviceHandle = deviceMsg.device.handle;
             if (deviceHandle == IntPtr.Zero)
+            {
                 return;
+            }
 
             IntPtr connectionHandle = deviceMsg.device.handle;
             if (connectionHandle == IntPtr.Zero)
+            {
                 return;
+            }
 
             LEAP_DEVICE_INFO deviceInfo = new LEAP_DEVICE_INFO();
             eLeapRS result;
@@ -653,19 +677,33 @@ namespace LeapInternal
             IntPtr device;
             result = LeapC.OpenDevice(deviceMsg.device, out device);
             if (result != eLeapRS.eLeapRS_Success)
+            {
                 return;
+            }
 
             deviceInfo.serial = IntPtr.Zero;
             deviceInfo.size = (uint)Marshal.SizeOf(deviceInfo);
             result = LeapC.GetDeviceInfo(device, ref deviceInfo); //Query the serial length
             if (result != eLeapRS.eLeapRS_Success)
+            {
+                if (result == eLeapRS.eLeapRS_InsufficientBuffer)
+                {
+                    UnityEngine.Debug.Log("Buffer for device info is not the correct size. Is the structure definition out of step with the client?");
+                }
                 return;
+            }
 
             deviceInfo.serial = Marshal.AllocCoTaskMem((int)deviceInfo.serial_length);
             result = LeapC.GetDeviceInfo(device, ref deviceInfo); //Query the serial
 
             if (result == eLeapRS.eLeapRS_Success)
             {
+                string firmwareVersion = "Unknown";
+                if (Controller.CheckRequiredServiceVersion(MinServiceVersionForFirmwareVersionInDeviceInfo, this))
+                {
+                    firmwareVersion = new string(deviceInfo.firmware_version);
+                }
+
                 Device apiDevice = new Device(device,
                                        deviceHandle,
                                        deviceInfo.h_fov, //radians
@@ -676,7 +714,8 @@ namespace LeapInternal
                                        deviceInfo.status == (uint)eLeapDeviceStatus.eLeapDeviceStatus_Streaming,
                                        deviceInfo.status,
                                        Marshal.PtrToStringAnsi(deviceInfo.serial),
-                                       deviceMsg.device.id);
+                                       deviceMsg.device.id,
+                                       firmwareVersion);
 
                 Marshal.FreeCoTaskMem(deviceInfo.serial);
                 _devices.AddOrUpdate(apiDevice);
@@ -685,6 +724,10 @@ namespace LeapInternal
                 {
                     LeapDevice.DispatchOnContext(this, EventContext, new DeviceEventArgs(apiDevice));
                 }
+            }
+            else
+            {
+                UnityEngine.Debug.LogError($"Failed to read and populate the device info {result}");
             }
         }
 

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) Ultraleap, Inc. 2011-2024.                                   *
+ * Copyright (C) Ultraleap, Inc. 2011-2025.                                   *
  *                                                                            *
  * Use subject to the terms of the Apache License 2.0 available at            *
  * http://www.apache.org/licenses/LICENSE-2.0, or another agreement           *
@@ -60,6 +60,7 @@ namespace Leap
                     InputActionsSection(settings);
                     HintingSection(settings);
                     NotificationSection(settings);
+                    RenderPipelineSupportSection(settings); 
                     ResetSection(settings);
 
                     settings.ApplyModifiedProperties();
@@ -156,6 +157,25 @@ namespace Leap
             settings.ApplyModifiedProperties();
         }
 
+
+        private static void RenderPipelineSupportSection(SerializedObject settings)
+        {
+            EditorGUILayout.LabelField("Render Pipeline Support", EditorStyles.boldLabel);
+            EditorGUILayout.Space(5);
+
+            using (new EditorGUI.IndentLevelScope())
+            {
+                // Enable automatic upgrades
+                UltraleapSettings.AutomaticallyUpgradeMaterialsToCurrentRenderPipeline = 
+                    EditorGUILayout.ToggleLeft("Enable automatic updates of the Ultraleap plugin materials to the active render pipeline on this machine.", UltraleapSettings.AutomaticallyUpgradeMaterialsToCurrentRenderPipeline);
+                EditorGUILayout.TextArea("Note: if set to false, this setting will persist across ALL Unity projects that use the plugin. You can still manually force the upgrade.");
+            }
+
+            EditorGUILayout.Space(30);
+
+            settings.ApplyModifiedProperties();
+        }
+
         private static void ResetSection(SerializedObject settings)
         {
             EditorGUILayout.BeginHorizontal();
@@ -177,6 +197,10 @@ namespace Leap
 
     public class UltraleapSettings : ScriptableObject
     {
+        private static readonly bool defaultValueForAutomaticallyUpgradingMaterialsForActiveRenderPipeline = true;
+
+        private static readonly string automaticallyUpgradeMaterialsToCurrentRenderPipelineEnvironmentVariableName = "ULTRALEAP_UNITY_PLUGIN_AUTOMATICALLY_UPGRADE_MATERIALS_TO_CURRENT_RENDER_PIPELINE";
+
         static UltraleapSettings instance;
         public static UltraleapSettings Instance
         {
@@ -208,6 +232,48 @@ namespace Leap
 
         [HideInInspector, SerializeField]
         public bool showPhysicalHandsPhysicsSettingsWarning = true;
+
+        [HideInInspector]
+        public static bool AutomaticallyUpgradeMaterialsToCurrentRenderPipeline
+        {
+
+#if UNITY_EDITOR
+            get
+            {
+                if (!EditorPrefs.HasKey(automaticallyUpgradeMaterialsToCurrentRenderPipelineEnvironmentVariableName))
+                {
+                    _AutomaticallyUpgradeMaterialsToCurrentRenderPipeline = defaultValueForAutomaticallyUpgradingMaterialsForActiveRenderPipeline;
+                }
+                else
+                {
+                    _AutomaticallyUpgradeMaterialsToCurrentRenderPipeline = EditorPrefs.GetBool(automaticallyUpgradeMaterialsToCurrentRenderPipelineEnvironmentVariableName);
+                }
+
+                return _AutomaticallyUpgradeMaterialsToCurrentRenderPipeline;
+            }
+
+            set
+            {
+                if (value != AutomaticallyUpgradeMaterialsToCurrentRenderPipeline)
+                {
+                    // Note the EditorPref value seems to only persist on Editor close
+                    EditorPrefs.SetBool(automaticallyUpgradeMaterialsToCurrentRenderPipelineEnvironmentVariableName, value);
+                }
+            }
+#else
+            // Should not be used at runtime
+            get
+            {
+                return false;
+            }
+
+            set
+            {
+                // Do nothing
+            }
+#endif 
+        }
+        private static bool _AutomaticallyUpgradeMaterialsToCurrentRenderPipeline;
 
         [HideInInspector, SerializeField]
         public string pluginVersion = "Unknown";
@@ -245,6 +311,8 @@ namespace Leap
 
             showAndroidBuildArchitectureWarning = true;
             showPhysicalHandsPhysicsSettingsWarning = true;
+
+            AutomaticallyUpgradeMaterialsToCurrentRenderPipeline = defaultValueForAutomaticallyUpgradingMaterialsForActiveRenderPipeline;
         }
 
 #if UNITY_EDITOR
@@ -332,6 +400,27 @@ namespace Leap
         {
             ReplaceUseOfFingersInPoseScriptableObjects();
         }
+
+        [MenuItem("Ultraleap/Updating/Update Materials for Active Render Pipeline", false, 201)]
+        private static void UpdateMaterialsForActiveRenderPipeline()
+        {
+            AutomaticRenderPipelineMaterialShaderUpdater _materialUpdater = null;
+                
+            try
+            {
+                _materialUpdater = Resources.Load<AutomaticRenderPipelineMaterialShaderUpdater>("AutomaticRenderPipelineMaterialShaderUpdater");
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+            }
+            
+            if (_materialUpdater != null)
+            {
+                _materialUpdater.AutoRefreshMaterialShadersForPipeline(silentMode: true);
+            }
+        }
+
 #endif
 
         private static UltraleapSettings FindSettingsSO()
