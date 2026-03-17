@@ -13,19 +13,8 @@
 ### After Approval
 - [ ] Tag the branch (e.g. com.ultraleap.tracking/5.9.0 and com.ultraleap.tracking.preview/5.9.0)
 - [ ] Merge to main
-- [ ] Crate Github Release with CI artefact for .unitypackage
+- [ ] Create a GitHub Release with the CI artifact for the .unitypackage
 - [ ] Resolve any public GitHub issues
 - [ ] Merge main to develop (also add [NEXT] - unreleased to changelog)
 - [ ] Announce release on various platforms
 - [ ] Publish any accompanying docs
-
-## Pull Request Templates
-
-Switch template by going to preview and clicking the link - note it not work if you've made any changes to the description.
-
-- [default.md](?expand=1) - for contributions to stable packages.
-- [release.md](?expand=1&template=release.md) - for release merge requests.
-
-**You are currently using: release.md**
-
-Note: these links work by overwriting query parameters of the current url. If the current url contains any you may want to amend the url with `&template=name.md` instead of using the link. See [query parameter docs](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/using-query-parameters-to-create-a-pull-request) for more information.
