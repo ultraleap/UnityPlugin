@@ -1,0 +1,61 @@
+name: Export Unity Package
+description: Generate Version.txt and export a Unity package artifact
+
+inputs:
+  package_root_path:
+    description: Path to the package root
+    required: true
+  package_import_path:
+    description: Import path inside the Unity package
+    required: true
+  package_file_name:
+    description: File name for the generated .unitypackage
+    required: true
+  artifact_root_path:
+    description: Root path that will contain the generated unitypackage artifacts
+    required: true
+  package_output_path:
+    description: Existing output path to reuse for the generated .unitypackage directory
+    required: false
+
+outputs:
+  package_version:
+    description: Exported package version
+    value: ${{ steps.export.outputs.package_version }}
+  package_output_path:
+    description: Output path containing the generated .unitypackage
+    value: ${{ steps.export.outputs.package_output_path }}
+
+runs:
+  using: composite
+  steps:
+    - name: Export Unity Package
+      id: export
+      shell: pwsh
+      run: |
+        . "Scripts/ExportUnityPackage.ps1"
+
+        Export-VersionTxt "${{ inputs.package_root_path }}"
+
+        $packageVersion = Get-Content (Join-Path "${{ inputs.package_root_path }}" "Version.txt")
+        $packageOutputPath = "${{ inputs.package_output_path }}"
+        if ([string]::IsNullOrWhiteSpace($packageOutputPath)) {
+          $packageOutputPath = Join-Path "${{ inputs.artifact_root_path }}" "Ultraleap.UnityPlugin-$packageVersion"
+        }
+        New-Item -Path $packageOutputPath -ItemType Directory -Force | Out-Null
+
+        $unitypackageOutputPath = Join-Path $packageOutputPath "${{ inputs.package_file_name }}"
+
+        $exportErrors = $null
+        Export-UnityPackage `
+          -PackageRootPath "${{ inputs.package_root_path }}" `
+          -PackageImportPath "${{ inputs.package_import_path }}" `
+          -PackageOutputPath $unitypackageOutputPath `
+          -ErrorVariable exportErrors
+
+        if ($exportErrors) {
+          throw "Failed to generate $unitypackageOutputPath"
+        }
+
+        "package_version=$packageVersion" >> $env:GITHUB_OUTPUT
+        "package_output_path=$packageOutputPath" >> $env:GITHUB_OUTPUT
