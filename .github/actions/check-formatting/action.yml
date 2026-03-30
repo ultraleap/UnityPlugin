@@ -1,0 +1,59 @@
+name: Check formatting
+description: Run formatting checks and write a diff artifact when changes are required
+
+outputs:
+  has_diff:
+    description: Whether the formatting check produced a diff artifact
+    value: ${{ steps.result.outputs.has_diff }}
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: 8.0.x
+
+    - name: Install dotnet-format
+      shell: bash
+      run: |
+        set -euo pipefail
+        echo "$HOME/.dotnet/tools" >> "$GITHUB_PATH"
+        dotnet tool install --global dotnet-format || dotnet tool update --global dotnet-format
+
+    - name: Run dotnet-format
+      shell: bash
+      run: |
+        set -euo pipefail
+        dotnet-format -f --exclude .git Scripts Markdown
+
+    - name: Apply Copyright Year and Namespace Fixes
+      shell: bash
+      run: |
+        set -euo pipefail
+        export CURRENT_YEAR="$(date +%Y)"
+        find Packages -type f -name '*.cs' -print0 | xargs -0 perl -0pi -e '
+          s/^ \* Copyright \(C\) Ultraleap.*$/ * Copyright (C) Ultraleap, Inc. 2011-$ENV{CURRENT_YEAR}.                                   */mg;
+          if (/using Leap\.Unity|namespace Leap\.Unity/) {
+            s/ Utils\./ Leap.Unity.Utils./g;
+          }
+        '
+
+    - name: Generate Formatting Diff
+      id: result
+      shell: bash
+      run: |
+        set -euo pipefail
+        diff_path="$ARTIFACTS_PATH/dotnet_format_results.diff"
+
+        mapfile -t linter_errors < <(git --no-pager diff --name-only -- '*.cs')
+        if ((${#linter_errors[@]})); then
+          printf 'Detected %s formatting issues:\n' "${#linter_errors[@]}"
+          printf '%s\n' "${linter_errors[@]}"
+          mkdir -p "$ARTIFACTS_PATH"
+          git diff > "$diff_path"
+          echo "has_diff=true" >> "$GITHUB_OUTPUT"
+          exit 1
+        else
+           echo "No formatting issues detected."
+           echo "has_diff=false" >> "$GITHUB_OUTPUT"
+        fi

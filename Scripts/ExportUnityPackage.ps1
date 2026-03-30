@@ -16,7 +16,6 @@ function global:Export-VersionTxt
     # Reuse package.json.meta for the generated Version.txt so that the GUID is persistent which is better than generating a new GUID at it won't change between versions arbitrarily.
     # It may cause issues if a user switches between consuming via UPM and .unitypackages as a different asset is referenced by this GUID. Unlikely to cause any issues.
     Move-Item package.json.meta Version.txt.meta
-    Get-ChildItem
     Pop-Location
 }
 
@@ -66,7 +65,7 @@ function global:Export-UnityPackage
         $outPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($Output)
         $tmpdir = "$([IO.Path]::GetTempPath())unitypackage"
         Remove-Item -Recurse -Force $tmpdir -ErrorAction SilentlyContinue | Out-Null
-        mkdir $tmpdir -Force | Out-Null
+        New-Item -Path $tmpdir -ItemType Directory -Force | Out-Null
         
         Function RecursivelyFilterSubDirectories($directoryPath) {
             $SubDirectories = Get-ChildItem $directoryPath -Directory |
@@ -110,14 +109,13 @@ function global:Export-UnityPackage
                 $MetaFilePath = "$FilePath.meta"
                 if (-not (Test-Path $MetaFilePath -PathType Leaf)) { Write-Error "Meta file not found: $MetaFilePath"; $AnyErrors = $true; return }
         
-                $MatchSuccess = $(Get-Content $MetaFilePath -Raw) -match 'guid:\s*([0-9A-Fa-f]{32})\s'
+                $MatchSuccess = $(Get-Content $MetaFilePath -Raw) -match 'guid:\s*([0-9A-Fa-f]{32})(?:\s|$)'
                 if (-not $MatchSuccess) { Write-Error "Meta file does not contain GUID or GUID is malformed: $MetaFilePath"; $AnyErrors = $true; return}
                 $guid = $Matches[1]
-                mkdir "$tmpdir/$guid" | Out-Null
+                New-Item -Path "$tmpdir/$guid" -ItemType Directory -Force | Out-Null
                 Copy-Item $_.FullName "$tmpdir/$guid/asset" | Out-Null
                 Copy-Item $MetaFilePath "$tmpdir/$guid/asset.meta" | Out-Null
                 [IO.File]::WriteAllText("$tmpdir/$guid/pathname", $FixedImportPath)
-                Write-Host "Processed: $FixedImportPath"
             }
         
         if ($AnyErrors) {

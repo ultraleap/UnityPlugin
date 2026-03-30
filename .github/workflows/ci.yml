@@ -1,0 +1,125 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+    inputs:
+      check_formatting:
+        description: Check formatting
+        required: false
+        default: true
+        type: boolean
+      generate_api_docs:
+        description: Generate API documentation
+        required: false
+        default: false
+        type: boolean
+      export_unitypackages:
+        description: Export .unitypackage artifacts
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  ARTIFACTS_PATH: UnityPlugin_CI_artifacts
+  PACKAGE_PATH_TRACKING: Packages/Tracking
+  PACKAGE_PATH_TRACKING_PREVIEW: Packages/Tracking Preview
+
+jobs:
+  check-formatting:
+    name: Check Formatting
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    if: github.event_name != 'workflow_dispatch' || inputs.check_formatting
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Check Formatting
+        uses: ./.github/actions/check-formatting
+        id: formatting
+
+      - name: Upload Formatting Diff
+        if: always() && steps.formatting.outputs.has_diff == 'true'
+        uses: actions/upload-artifact@v7
+        with:
+          name: UnityPlugin-${{ github.sha }}-format-diff
+          path: ${{ env.ARTIFACTS_PATH }}/
+          if-no-files-found: error
+
+  generate-api-docs:
+    name: Generate API Docs
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.generate_api_docs)
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+
+      - name: Install Doxygen
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y doxygen
+
+      - name: Generate API Documentation
+        run: doxygen ./Doxyfile
+
+      - name: Collect API Documentation
+        run: |
+          mkdir -p "$ARTIFACTS_PATH"
+          mv docs/xml "$ARTIFACTS_PATH/unity_xml"
+          mv docs/html "$ARTIFACTS_PATH/unity_html"
+
+      - name: Upload API Documentation
+        uses: actions/upload-artifact@v7
+        with:
+          name: UnityPlugin-${{ github.sha }}-api-docs
+          path: ${{ env.ARTIFACTS_PATH }}/
+          if-no-files-found: error
+
+  export-unitypackages:
+    name: Export Unity Packages
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.export_unitypackages)
+    env:
+      UNITYPLUGIN_ASSETS_PATH: Assets/ThirdParty/Ultraleap
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+
+      - name: Export Tracking Unity Package
+        uses: ./.github/actions/export-unitypackage
+        id: export_tracking
+        with:
+          package_root_path: ${{ env.PACKAGE_PATH_TRACKING }}
+          package_import_path: ${{ env.UNITYPLUGIN_ASSETS_PATH }}/Tracking
+          package_file_name: Ultraleap Tracking.unitypackage
+          artifact_root_path: ${{ env.ARTIFACTS_PATH }}
+
+      - name: Export Tracking Preview Unity Package
+        uses: ./.github/actions/export-unitypackage
+        id: export_tracking_preview
+        with:
+          package_root_path: ${{ env.PACKAGE_PATH_TRACKING_PREVIEW }}
+          package_import_path: ${{ env.UNITYPLUGIN_ASSETS_PATH }}/Tracking Preview
+          package_file_name: Ultraleap Tracking Preview.unitypackage
+          artifact_root_path: ${{ env.ARTIFACTS_PATH }}
+          package_output_path: ${{ steps.export_tracking.outputs.package_output_path }}
+
+      - name: Upload Unity Packages
+        uses: actions/upload-artifact@v7
+        with:
+          name: UnityPlugin-${{ github.sha }}-unitypackage
+          path: ${{ env.ARTIFACTS_PATH }}/
+          if-no-files-found: error
