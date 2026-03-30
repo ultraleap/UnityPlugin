@@ -17,6 +17,8 @@ namespace LeapInternal
 
     public class Connection
     {
+        private const uint DEFAULT_TIMEOUT_MILLISECONDS = 150;
+
         public struct Key
         {
             public readonly int connectionId;
@@ -272,7 +274,9 @@ namespace LeapInternal
             //before trying to join the worker thread.
             LeapC.CloseConnection(_leapConnection);
 
-            _polster.Join();
+            //Using a timeout for Join() to prevent the application from hanging
+            //if the worker thread does not exit quickly during shutdown.
+            _polster.Join((int)DEFAULT_TIMEOUT_MILLISECONDS);
         }
 
         /// <summary>
@@ -308,9 +312,7 @@ namespace LeapInternal
                     }
 
                     LEAP_CONNECTION_MESSAGE _msg = new LEAP_CONNECTION_MESSAGE();
-                    uint timeout = 150;
-
-                    result = LeapC.PollConnection(_leapConnection, timeout, ref _msg);
+                    result = LeapC.PollConnection(_leapConnection, DEFAULT_TIMEOUT_MILLISECONDS, ref _msg);
 
                     if (result != eLeapRS.eLeapRS_Success)
                     {
@@ -406,6 +408,11 @@ namespace LeapInternal
                         LeapEndProfilingBlock(new EndProfilingBlockArgs(HANDLE_EVENT_PROFILER_BLOCK));
                     }
                 } //while running
+            }
+            catch (ThreadAbortException)
+            {
+                // Handle thread abort gracefully without logging as this can occur under normal circumstances.
+                _isRunning = false;
             }
             catch (Exception e)
             {
@@ -1031,12 +1038,11 @@ namespace LeapInternal
             }
 
             LEAP_CONNECTION_MESSAGE _msg = new LEAP_CONNECTION_MESSAGE();
-            uint timeout = 150;
-            result = LeapC.PollConnection(tempConnection, timeout, ref _msg);
+            LeapC.PollConnection(tempConnection, DEFAULT_TIMEOUT_MILLISECONDS, ref _msg);
 
             LEAP_CONNECTION_INFO pInfo = new LEAP_CONNECTION_INFO();
             pInfo.size = (uint)Marshal.SizeOf(pInfo);
-            result = LeapC.GetConnectionInfo(tempConnection, ref pInfo);
+            LeapC.GetConnectionInfo(tempConnection, ref pInfo);
 
             if (pInfo.status == eLeapConnectionStatus.eLeapConnectionStatus_Connected)
             {

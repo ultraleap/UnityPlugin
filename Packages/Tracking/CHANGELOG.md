@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
 
+## NEXT
+
+### Fixed
+- Fixed an issue with ThreadAbortExceptions being raised during normal shutdown.
+
 ## [7.3.0] - 25/02/2026
 
 ### Added
