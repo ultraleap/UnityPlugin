@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Fixed an issue with ThreadAbortExceptions being raised during normal shutdown.
+- Fixed some deprecated API usage of `Physics.autoSyncTransforms` and `XRStats.TryGetGPUTimeLastFrame` in Unity 6.3+.
 
 ## [7.3.0] - 25/02/2026
 
