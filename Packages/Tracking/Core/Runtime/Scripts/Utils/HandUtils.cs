@@ -36,6 +36,9 @@ namespace Leap
         /// <param name="preferLiveLeapProviderOverHandPoseViewer">If the search gets to LeapProviders, return providers that are not sources of static data - e.g. hand pose viewers</param>
         private static void AssignBestLeapProvider(bool preferLiveLeapProviderOverStaticHandPoseProviders = false)
         {
+            // True only if never assigned; bypasses Unity's destroyed-equals-null check.
+            bool wasNeverAssigned = ReferenceEquals(s_provider, null);
+
             // Fall through to the best available Leap Provider if none is assigned
             if (s_provider == null)
             {
@@ -80,7 +83,10 @@ namespace Leap
                 }
             }
 
-            Debug.Log("LeapProvider was not assigned. Auto assigning: " + s_provider);
+            if (wasNeverAssigned && s_provider != null)
+            {
+                Debug.Log("LeapProvider was not assigned. Auto assigning: " + s_provider);
+            }
         }
 
         /// <summary>
