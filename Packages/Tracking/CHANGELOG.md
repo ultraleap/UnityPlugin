@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
 
+## [NEXT]
+
+### Fixed
+- Fixed several resource leaks in `Connection`, including unmanaged memory, connection handles and event handlers.
+
+### Changed
+- Deprecated `Dispose()` on `Connection` and made it a thin shim to `Stop()` to enable better cleanup of resources.
+- Added a timeout to `Connection.Stop()` to reduce hang time on teardown.
+
 ## [7.3.0] - 25/02/2026
 
 ### Added

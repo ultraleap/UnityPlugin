@@ -41,7 +41,6 @@ namespace Leap
       IController
     {
         Connection _connection;
-        bool _disposed = false;
         string _serverNamespace = "Leap Service";
         bool _supportsMultipleDevices = true;
         bool _supportsFiducialMarkers = false;
@@ -430,12 +429,10 @@ namespace Leap
         // Protected implementation of Dispose pattern.
         protected virtual void Dispose(bool disposing)
         {
-            if (_disposed)
-            {
-                return;
-            }
-            _connection.Dispose();
-            _disposed = true;
+            _connection.LeapInit -= OnInit;
+            _connection.LeapConnection -= OnConnect;
+            _connection.LeapConnectionLost -= OnDisconnect;
+            _connection.Stop();
         }
 
         /// <summary>

@@ -17,6 +17,11 @@ namespace LeapInternal
 
     public class Connection
     {
+        // Timeout used both for the PollConnection wait inside the worker thread and
+        // for the Join wait when stopping it. They match because Stop is essentially
+        // waiting for one final Poll cycle to complete after CloseConnection signals it.
+        private const uint DEFAULT_TIMEOUT_MILLISECONDS = 150;
+
         public struct Key
         {
             public readonly int connectionId;
@@ -59,6 +64,28 @@ namespace LeapInternal
             long palmOffset = Marshal.OffsetOf(typeof(LEAP_HAND), "palm").ToInt64();
             _handPositionOffset = Marshal.OffsetOf(typeof(LEAP_PALM), "position").ToInt64() + palmOffset;
             _handOrientationOffset = Marshal.OffsetOf(typeof(LEAP_PALM), "orientation").ToInt64() + palmOffset;
+
+            // Stop every pooled connection on domain unload / process exit so native
+            // LeapC handles and worker threads are released deterministically.
+            // Registered once here rather than per-Start() to avoid handler accumulation.
+            AppDomain.CurrentDomain.DomainUnload += (s, e) => StopAll();
+            AppDomain.CurrentDomain.ProcessExit += (s, e) => StopAll();
+        }
+
+        private static void StopAll()
+        {
+            foreach (var conn in connectionDictionary.Values)
+            {
+                try
+                {
+                    conn.Stop();
+                }
+                catch
+                {
+                    // Ignore all errors during shutdown.
+                }
+            }
+            connectionDictionary.Clear();
         }
 
         public Key ConnectionKey { get; private set; }
@@ -143,33 +170,26 @@ namespace LeapInternal
         public Action<BeginProfilingBlockArgs> LeapBeginProfilingBlock;
         public Action<EndProfilingBlockArgs> LeapEndProfilingBlock;
 
-        private bool _disposed = false;
-
         private bool _loggedNullDeviceWarningForGetInterpolatedFrame = false;
         private bool _loggedNullDeviceWarningForGetInterpolatedFrameSize = false;
 
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
+        [Obsolete("Dispose is deprecated; Call Stop() instead.")]
+        public void Dispose() => Stop();
 
-        // Protected implementation of Dispose pattern.
-        protected virtual void Dispose(bool disposing)
-        {
-            if (_disposed)
-                return;
-
-            Stop();
-            LeapC.DestroyConnection(_leapConnection);
-            _leapConnection = IntPtr.Zero;
-
-            _disposed = true;
-        }
+        [Obsolete("Dispose is deprecated; Call Stop() instead.")]
+        protected virtual void Dispose(bool disposing) => Stop();
 
         ~Connection()
         {
-            Dispose(false);
+            // Safety net for a connection that is abandoned without Stop() being
+            // called. The worker thread roots this instance while running, so by the
+            // time we finalize it has already exited and only the native handle is
+            // left to release. No-op once Stop() has zeroed the handle.
+            if (_leapConnection != IntPtr.Zero)
+            {
+                LeapC.DestroyConnection(_leapConnection);
+                _leapConnection = IntPtr.Zero;
+            }
         }
 
         private Connection(Key connectionKey)
@@ -184,15 +204,21 @@ namespace LeapInternal
 
         public void Start(string serverNamespace = "Leap Service", bool multiDeviceAware = true, bool enableFiducialMarkers = false)
         {
-            LEAP_CONNECTION_CONFIG config = new LEAP_CONNECTION_CONFIG();
-            config.server_namespace = Marshal.StringToHGlobalAnsi(serverNamespace);
-            config.flags = 0;
-            if (multiDeviceAware)
-                config.flags |= (uint)eLeapConnectionFlag.eLeapConnectionFlag_MultipleDevicesAware;
-            if (enableFiducialMarkers)
-                config.flags |= (uint)eLeapConnectionFlag.eLeapConnectionFlag_FiducialTracking;
-            config.size = (uint)Marshal.SizeOf(config);
-            Start(config);
+            LEAP_CONNECTION_CONFIG config = new LEAP_CONNECTION_CONFIG
+            {
+                server_namespace = Marshal.StringToHGlobalAnsi(serverNamespace),
+                flags = (multiDeviceAware ? (uint)eLeapConnectionFlag.eLeapConnectionFlag_MultipleDevicesAware : 0u)
+                      | (enableFiducialMarkers ? (uint)eLeapConnectionFlag.eLeapConnectionFlag_FiducialTracking : 0u),
+                size = (uint)Marshal.SizeOf<LEAP_CONNECTION_CONFIG>()
+            };
+            try
+            {
+                Start(config);
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(config.server_namespace);
+            }
         }
 
         public void Start(LEAP_CONNECTION_CONFIG config)
@@ -247,7 +273,6 @@ namespace LeapInternal
             LeapC.SetAllocator(_leapConnection, ref _pLeapAllocator);
 
             _isRunning = true;
-            AppDomain.CurrentDomain.DomainUnload += (arg1, arg2) => Dispose(true);
 
             _polster = new Thread(new ThreadStart(this.processMessages));
             _polster.Name = "LeapC Worker";
@@ -257,26 +282,25 @@ namespace LeapInternal
 
         public void Stop()
         {
-            if (!_isRunning)
-                return;
-
             _isRunning = false;
 
-            //Very important to close the connection before we try to join the
-            //worker thread!  The call to PollConnection can sometimes block,
-            //despite the timeout, causing an attempt to join the thread waiting
-            //forever and preventing the connection from stopping.
-            //
-            //It seems that closing the connection causes PollConnection to 
-            //unblock in these cases, so just make sure to close the connection
-            //before trying to join the worker thread.
-            LeapC.CloseConnection(_leapConnection);
+            if (_leapConnection != IntPtr.Zero)
+            {
+                // Close the connection before joining the worker thread. PollConnection
+                // can block past its timeout; closing the connection unblocks it so the
+                // join doesn't hang.
+                LeapC.CloseConnection(_leapConnection);
+                _polster?.Join((int)DEFAULT_TIMEOUT_MILLISECONDS);
+                _polster = null;
 
-            _polster.Join();
+                // Always destroy the connection to avoid leaking native handle.
+                LeapC.DestroyConnection(_leapConnection);
+                _leapConnection = IntPtr.Zero;
+            }
         }
 
         /// <summary>
-        /// Returns the version of the currently installed Tracking Service. 
+        /// Returns the version of the currently installed Tracking Service.
         /// Might return 0.0.0 if no device is connected or it cannot get the current version.
         /// </summary>
         /// <returns>the current tracking service version</returns>
@@ -308,9 +332,7 @@ namespace LeapInternal
                     }
 
                     LEAP_CONNECTION_MESSAGE _msg = new LEAP_CONNECTION_MESSAGE();
-                    uint timeout = 150;
-
-                    result = LeapC.PollConnection(_leapConnection, timeout, ref _msg);
+                    result = LeapC.PollConnection(_leapConnection, DEFAULT_TIMEOUT_MILLISECONDS, ref _msg);
 
                     if (result != eLeapRS.eLeapRS_Success)
                     {
@@ -406,6 +428,11 @@ namespace LeapInternal
                         LeapEndProfilingBlock(new EndProfilingBlockArgs(HANDLE_EVENT_PROFILER_BLOCK));
                     }
                 } //while running
+            }
+            catch (ThreadAbortException)
+            {
+                // Expected to occur during shutdown.
+                _isRunning = false;
             }
             catch (Exception e)
             {
@@ -1005,48 +1032,48 @@ namespace LeapInternal
         /// </summary>
         public static bool IsConnectionAvailable(string serverNamespace = "Leap Service")
         {
-            LEAP_CONNECTION_CONFIG config = new LEAP_CONNECTION_CONFIG();
-            config.server_namespace = Marshal.StringToHGlobalAnsi(serverNamespace);
-            config.flags = 0;
-            config.size = (uint)Marshal.SizeOf(config);
-
-            IntPtr tempConnection;
-
-            eLeapRS result;
-
-            result = LeapC.CreateConnection(ref config, out tempConnection);
-
-            if (result != eLeapRS.eLeapRS_Success || tempConnection == IntPtr.Zero)
+            LEAP_CONNECTION_CONFIG config = new LEAP_CONNECTION_CONFIG
             {
-                LeapC.CloseConnection(tempConnection);
-                return false;
-            }
+                server_namespace = Marshal.StringToHGlobalAnsi(serverNamespace),
+                flags = 0,
+                size = (uint)Marshal.SizeOf<LEAP_CONNECTION_CONFIG>()
+            };
 
-            result = LeapC.OpenConnection(tempConnection);
-
-            if (result != eLeapRS.eLeapRS_Success)
+            IntPtr tempConnection = IntPtr.Zero;
+            try
             {
-                LeapC.CloseConnection(tempConnection);
-                return false;
+                if (LeapC.CreateConnection(ref config, out tempConnection) != eLeapRS.eLeapRS_Success
+                    || tempConnection == IntPtr.Zero)
+                {
+                    return false;
+                }
+
+                if (LeapC.OpenConnection(tempConnection) != eLeapRS.eLeapRS_Success)
+                {
+                    return false;
+                }
+
+                LEAP_CONNECTION_MESSAGE _msg = new LEAP_CONNECTION_MESSAGE();
+                LeapC.PollConnection(tempConnection, DEFAULT_TIMEOUT_MILLISECONDS, ref _msg);
+
+                LEAP_CONNECTION_INFO pInfo = new LEAP_CONNECTION_INFO
+                {
+                    size = (uint)Marshal.SizeOf<LEAP_CONNECTION_INFO>()
+                };
+                LeapC.GetConnectionInfo(tempConnection, ref pInfo);
+
+                return pInfo.status == eLeapConnectionStatus.eLeapConnectionStatus_Connected;
             }
-
-            LEAP_CONNECTION_MESSAGE _msg = new LEAP_CONNECTION_MESSAGE();
-            uint timeout = 150;
-            result = LeapC.PollConnection(tempConnection, timeout, ref _msg);
-
-            LEAP_CONNECTION_INFO pInfo = new LEAP_CONNECTION_INFO();
-            pInfo.size = (uint)Marshal.SizeOf(pInfo);
-            result = LeapC.GetConnectionInfo(tempConnection, ref pInfo);
-
-            if (pInfo.status == eLeapConnectionStatus.eLeapConnectionStatus_Connected)
+            finally
             {
-                LeapC.CloseConnection(tempConnection);
-                return true;
+                if (tempConnection != IntPtr.Zero)
+                {
+                    LeapC.CloseConnection(tempConnection);
+                    LeapC.DestroyConnection(tempConnection);
+                }
+
+                Marshal.FreeHGlobal(config.server_namespace);
             }
-
-            LeapC.CloseConnection(tempConnection);
-
-            return false;
         }
 
         /// <summary>
@@ -1203,11 +1230,11 @@ namespace LeapInternal
 
         /// <summary>
         /// Subscribes to the events coming from an individual device
-        /// 
+        ///
         /// If this is not called, only the primary device will be subscribed.
-        /// Will automatically unsubscribe the primary device if this is called 
-        /// on a secondary device, but not a primary one.  
-        /// 
+        /// Will automatically unsubscribe the primary device if this is called
+        /// on a secondary device, but not a primary one.
+        ///
         /// @since 4.1
         /// </summary>
         public void SubscribeToDeviceEvents(Device device)
@@ -1218,9 +1245,9 @@ namespace LeapInternal
 
         /// <summary>
         /// Unsubscribes from the events coming from an individual device
-        /// 
+        ///
         /// This can be called safely, even if the device has not been subscribed.
-        /// 
+        ///
         /// @since 4.1
         /// </summary>
         public void UnsubscribeFromDeviceEvents(Device device)
@@ -1262,7 +1289,7 @@ namespace LeapInternal
 
         /// <summary>
         /// Converts from image-space pixel coordinates to camera-space rectilinear coordinates
-        /// 
+        ///
         /// Also allows specifying a specific device handle and calibration type.
         /// </summary>
         public UnityEngine.Vector3 PixelToRectilinearEx(IntPtr deviceHandle,
@@ -1294,7 +1321,7 @@ namespace LeapInternal
 
         /// <summary>
         /// Converts from camera-space rectilinear coordinates to image-space pixel coordinates
-        /// 
+        ///
         /// Also allows specifying a specific device handle and calibration type.
         /// </summary>
         public UnityEngine.Vector3 RectilinearToPixelEx(IntPtr deviceHandle,
