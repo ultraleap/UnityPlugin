@@ -84,6 +84,9 @@ namespace Leap.PhysicalHands
 
         private void Start()
         {
+#if !UNITY_6000_3_OR_NEWER
+            // This was deprecated in Unity 6, but only warns on our usage of it
+            // in version 6.3+.
             if (Physics.autoSyncTransforms)
             {
                 Debug.LogWarning(
@@ -92,6 +95,7 @@ namespace Leap.PhysicalHands
                 + "move a parent transform. You can modify this setting in "
                 + "Edit->Project Settings->Physics.");
             }
+#endif
 
             _head = Camera.main.transform;
 

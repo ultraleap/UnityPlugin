@@ -186,9 +186,27 @@ namespace Leap
 
         public static float GetGPUTime()
         {
+#if UNITY_6000_3_OR_NEWER
+            var displaySubsystems = new List<XRDisplaySubsystem>();
+            SubsystemManager.GetSubsystems(displaySubsystems);
+
+            foreach (XRDisplaySubsystem displaySubsystem in displaySubsystems)
+            {
+                if (displaySubsystem != null &&
+                    displaySubsystem.running &&
+                    displaySubsystem.TryGetAppGPUTimeLastFrame(
+                        out float gpuTime))
+                {
+                    return gpuTime;
+                }
+            }
+
+            return 0f;
+#else
             float gpuTime = 0f;
             XRStats.TryGetGPUTimeLastFrame(out gpuTime);
             return gpuTime;
+#endif
         }
 
         public static string GetLoadedDeviceName()
