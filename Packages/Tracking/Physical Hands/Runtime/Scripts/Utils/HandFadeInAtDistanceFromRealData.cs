@@ -71,7 +71,9 @@ namespace Leap.PhysicalHands
 
             if (physManager == null)
             {
-#if UNITY_6000_0_OR_NEWER
+#if UNITY_6000_4_OR_NEWER
+                physManager = FindAnyObjectByType<PhysicalHandsManager>();
+#elif UNITY_6000_0_OR_NEWER
                 physManager = FindFirstObjectByType<PhysicalHandsManager>();
 #else
                 physManager = FindObjectOfType<PhysicalHandsManager>();

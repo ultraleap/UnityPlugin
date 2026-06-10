@@ -93,13 +93,21 @@ namespace Leap.PhysicalHands
 
         private void WarningsSection()
         {
+#if UNITY_6000_4_OR_NEWER
+            var physicalHandsManager = GameObject.FindAnyObjectByType<PhysicalHandsManager>(FindObjectsInactive.Include);
+#else
             var physicalHandsManager = GameObject.FindFirstObjectByType<PhysicalHandsManager>(FindObjectsInactive.Include);
+#endif
             if (physicalHandsManager == null)
             {
                 EditorGUILayout.HelpBox($"There is no Physical Hands Manager in your scene.\nThis button will not work correctly.", MessageType.Warning);
                 EditorGUILayout.Space(5);
             }
+#if UNITY_6000_4_OR_NEWER
+            else if (GameObject.FindAnyObjectByType<GrabHelper>(FindObjectsInactive.Include) == null)
+#else
             else if (GameObject.FindFirstObjectByType<GrabHelper>(FindObjectsInactive.Include) == null)
+#endif
             {
                 EditorGUILayout.HelpBox($"There is no Grab Helper on your Physical Hands Manager.\nThis button will not work correctly.", MessageType.Warning);
                 if (GUILayout.Button("Add Grab Helper"))

@@ -30,9 +30,12 @@ namespace Leap
         /// </summary>
         public static void ReplaceSceneReferences<T>(T a, T b) where T : UnityObject
         {
+#if UNITY_6000_4_OR_NEWER
+            var aId = a.GetEntityId();
+#else
             var aId = a.GetInstanceID();
+#endif 
             var refType = typeof(T);
-
             var curScene = SceneManager.GetActiveScene();
             var rootObjs = curScene.GetRootGameObjects();
             foreach (var rootObj in rootObjs)
@@ -53,7 +56,12 @@ namespace Leap
                             Where(fi => fi.FieldType.IsAssignableFrom(refType)))
                         {
                             var refValue = fieldInfo.GetValue(component) as T;
+
+#if UNITY_6000_4_OR_NEWER
+                            if (refValue.GetEntityId() == aId)
+#else
                             if (refValue.GetInstanceID() == aId)
+#endif
                             {
                                 objectChanges.Add(() =>
                                 {

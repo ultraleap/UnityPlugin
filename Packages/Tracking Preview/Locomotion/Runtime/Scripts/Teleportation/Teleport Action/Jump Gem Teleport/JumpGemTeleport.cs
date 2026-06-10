@@ -48,7 +48,11 @@ namespace Leap.Preview.Locomotion
 
         private void Awake()
         {
+#if UNITY_6000_4_OR_NEWER
+            _jumpGems = FindObjectsByType<JumpGem>(FindObjectsInactive.Include).ToList();
+#else
             _jumpGems = FindObjectsByType<JumpGem>(FindObjectsInactive.Include, FindObjectsSortMode.None).ToList();
+#endif
             for (int i = 0; i < _jumpGems.Count; i++)
             {
                 int j = i;
