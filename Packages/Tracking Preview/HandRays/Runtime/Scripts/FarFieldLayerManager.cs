@@ -65,7 +65,12 @@ namespace Leap.Preview.HandRays
 
         protected void AssignLayers()
         {
+#if UNITY_6000_4_OR_NEWER
+            FarFieldObject[] farFieldObjects = FindObjectsByType<FarFieldObject>(FindObjectsInactive.Include);
+#else
             FarFieldObject[] farFieldObjects = FindObjectsByType<FarFieldObject>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+#endif
+
             foreach (FarFieldObject ffo in farFieldObjects)
             {
                 ffo.gameObject.layer = FarFieldObjectLayer;

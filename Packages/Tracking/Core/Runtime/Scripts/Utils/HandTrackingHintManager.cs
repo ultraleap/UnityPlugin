@@ -147,7 +147,10 @@ namespace Leap
             {
                 if (_leapController == null) // Find any existing controller
                 {
-#if UNITY_6000_0_OR_NEWER
+#if UNITY_6000_4_OR_NEWER
+                    LeapServiceProvider provider =
+                        UnityEngine.Object.FindAnyObjectByType<LeapServiceProvider>(FindObjectsInactive.Include);
+#elif UNITY_6000_0_OR_NEWER
                     LeapServiceProvider provider =
                         UnityEngine.Object.FindFirstObjectByType<LeapServiceProvider>(FindObjectsInactive.Include);
 #else
