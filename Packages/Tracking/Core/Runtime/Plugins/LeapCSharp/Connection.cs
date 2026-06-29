@@ -65,11 +65,13 @@ namespace LeapInternal
             _handPositionOffset = Marshal.OffsetOf(typeof(LEAP_PALM), "position").ToInt64() + palmOffset;
             _handOrientationOffset = Marshal.OffsetOf(typeof(LEAP_PALM), "orientation").ToInt64() + palmOffset;
 
-            // Stop every pooled connection on domain unload / process exit so native
-            // LeapC handles and worker threads are released deterministically.
+            // Stop every pooled connection on editor assembly reload and application quit
+            // so native LeapC handles and worker threads are released deterministically.
             // Registered once here rather than per-Start() to avoid handler accumulation.
-            AppDomain.CurrentDomain.DomainUnload += (s, e) => StopAll();
-            AppDomain.CurrentDomain.ProcessExit += (s, e) => StopAll();
+            Application.quitting += StopAll;
+#if UNITY_EDITOR
+            UnityEditor.AssemblyReloadEvents.beforeAssemblyReload += StopAll;
+#endif
         }
 
         private static void StopAll()
@@ -336,7 +338,10 @@ namespace LeapInternal
 
                     if (result != eLeapRS.eLeapRS_Success)
                     {
-                        reportAbnormalResults("LeapC PollConnection call was ", result);
+                        // While stopping, CloseConnection interrupts the final poll, which
+                        // returns a non-success code by design; don't log that as abnormal.
+                        if (_isRunning)
+                            reportAbnormalResults("LeapC PollConnection call was ", result);
                         continue;
                     }
 

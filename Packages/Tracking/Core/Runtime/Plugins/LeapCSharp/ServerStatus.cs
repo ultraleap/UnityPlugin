@@ -11,6 +11,9 @@ namespace LeapInternal
     using System;
     using System.Runtime.InteropServices;
     using System.Threading;
+#if UNITY_EDITOR
+    using UnityEditor;
+#endif
 
     public static class ServerStatus
     {
@@ -43,31 +46,60 @@ namespace LeapInternal
             static LeapC.LEAP_SERVER_STATUS_DEVICE[] lastDevices;
 
             static readonly object lockObject = new object();
-            static bool isCheckingStatus = false;
+            static int isCheckingStatus = 0;
+            static CancellationTokenSource cancellation;
+            static Thread statusThread;
 
             private static void GetStatus()
             {
-                if (isCheckingStatus)
+                // Start the poller exactly once, even under concurrent first-callers.
+                if (Interlocked.Exchange(ref isCheckingStatus, 1) != 0)
                     return;
 
-                UpdateStatus();
+                cancellation = new CancellationTokenSource();
+                UnityEngine.Application.quitting += Stop;
+#if UNITY_EDITOR
+                AssemblyReloadEvents.beforeAssemblyReload += Stop;
+#endif
 
-                Thread thread = new Thread(() =>
+                UpdateStatus();   // prime the cache synchronously for the first caller
+
+                statusThread = new Thread(StatusLoop) { IsBackground = true, Name = "LeapC ServerStatus" };
+                statusThread.Start();
+            }
+
+            private static void StatusLoop()
+            {
+                CancellationToken token = cancellation.Token;
+                while (!token.IsCancellationRequested)
                 {
-                    isCheckingStatus = true;
-                    while (true)
-                    {
-                        UpdateStatus();
-                        Thread.Sleep(10000);
-                    }
-                });
-                thread.IsBackground = true;
-                thread.Start();
+                    UpdateStatus();
+                    token.WaitHandle.WaitOne(10000);   // 10s poll, wakes immediately on Stop()
+                }
+            }
+
+            private static void Stop()
+            {
+                // Flip the flag back (allows a later restart); only one Stop proceeds.
+                if (Interlocked.Exchange(ref isCheckingStatus, 0) == 0)
+                    return;
+
+                UnityEngine.Application.quitting -= Stop;
+#if UNITY_EDITOR
+                AssemblyReloadEvents.beforeAssemblyReload -= Stop;
+#endif
+                cancellation.Cancel();
+                statusThread.Join(2000);
+                cancellation.Dispose();
+                cancellation = null;
             }
 
             private static void UpdateStatus()
             {
                 IntPtr statusPtr = new IntPtr();
+                // Best-effort refresh: the eLeapRS return is ignored on purpose. A null status
+                // pointer already signals failure (service down / timeout / bad data), so we
+                // just keep the last known status.
                 LeapC.GetServerStatus(1500, ref statusPtr);
 
                 if (statusPtr != IntPtr.Zero)

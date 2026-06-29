@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Fixed several resource leaks in `Connection`, including unmanaged memory, connection handles and event handlers.
 - Fixed erroneous "LeapProvider not assigned" log messages during teardown.
+- Fixed duplicate server status polling threads, and threads not stopping on editor reload/application quit.
+- Fixed spurious error logs when a connection is closed mid-poll.
 
 ### Changed
 - Deprecated `Dispose()` on `Connection` and made it a thin shim to `Stop()` to enable better cleanup of resources.
