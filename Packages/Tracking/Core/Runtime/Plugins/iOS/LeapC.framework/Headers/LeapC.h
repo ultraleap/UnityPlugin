@@ -1005,6 +1005,9 @@ typedef enum _eLeapDevicePID {
   /** The Ultraleap Leap Motion Controller 2 hand tracking camera. @since 5.11.0 */
   eLeapDevicePID_LMC2             = 0x1206,
 
+  /** The Roli Universal Airwave device. */
+  eLeapDevicePID_UniversalAirwave = 0x1100,
+
   /** An invalid device type. Not currently in use. @since 3.1.3 */
   eLeapDevicePID_Invalid = 0xFFFFFFFF
 } eLeapDevicePID;
@@ -2482,6 +2485,38 @@ LEAP_EXPORT eLeapRS LEAP_CALL LeapInterpolateFrameFromTime(LEAP_CONNECTION hConn
 LEAP_EXPORT eLeapRS LEAP_CALL LeapInterpolateFrameFromTimeEx(LEAP_CONNECTION hConnection, LEAP_DEVICE hDevice, int64_t timestamp, int64_t sourceTimestamp, LEAP_TRACKING_EVENT* pEvent, uint64_t ncbEvent);
 
 /** \ingroup Functions
+ * Set the framerate for the connected device.
+ * 
+ * eLeapRS_InvalidArgument will be returned if the requested fps is outside of the range [15, 200].
+ * Values inside this range may still be rejected by the camera. In this case eLeapRS_Success will be returned,
+ * but the framerate will not change. Using LeapGetDeviceFrameRate() or its extended function is advised after
+ * calling this function to verify the change.
+ * 
+ * @param hConnection The connection handle created by LeapCreateConnection().
+ * @param fps The requested fps
+ * @return The operation result code, a member of the eLeapRS enumeration.
+ */
+LEAP_EXPORT eLeapRS LEAP_CALL LeapSetDeviceFrameRate(
+  LEAP_CONNECTION hConnection,
+  float fps);
+/** \ingroup Functions
+ * Set the framerate for the specified device.
+ * 
+ * eLeapRS_InvalidArgument will be returned if the requested fps is outside of the range [15, 200].
+ * Values inside this range may still be rejected by the camera. In this case eLeapRS_Success will be returned,
+ * but the framerate will not change. Using LeapGetDeviceFrameRate() or its extended function is advised after
+ * calling this function to verify the change.
+ * 
+ * @param hConnection The connection handle created by LeapCreateConnection().
+ * @param hDevice A device handle returned by LeapOpenDevice().
+ * @param fps The device fps to set
+ * @return The operation result code, a member of the eLeapRS enumeration.
+ */
+LEAP_EXPORT eLeapRS LEAP_CALL LeapSetDeviceFrameRateEx(
+  LEAP_CONNECTION hConnection,
+  LEAP_DEVICE hDevice,
+  float fps);
+/** \ingroup Functions
  * Get the frequency the default device is providing the hand tracking service with images.
  * @sa LeapGetDeviceFrameRateEx for additional information
  *
@@ -3433,6 +3468,42 @@ LEAP_EXPORT eLeapRS LEAP_CALL LeapGetImageMaskEx(
   LEAP_CONNECTION hConnection,
   LEAP_DEVICE hDevice,
   LEAP_IMAGE_MASK mask
+);
+
+/** \ingroup Functions
+ * Starts recording hand tracking data to a zip file.
+ *
+ * This function initiates recording of images, midi and audio to a file.
+ * The recording will continue until LeapStopRecording() is called, the
+ * specified number of frames is reached, or the connection is closed.
+ *
+ * If midi or audio data is available, this will be recorded as well.
+ *
+ * @param hConnection The connection handle created by LeapCreateConnection().
+ * @param filePath The path where the recording file will be saved. (nullptr for default path and name).
+ * @param duration Number of frames to record (0 for recording until LeapStopRecording is called or service teardown).
+ * @returns The operation result code, a member of the eLeapRS enumeration.
+ */
+LEAP_EXPORT eLeapRS LEAP_CALL LeapStartRecording(
+  LEAP_CONNECTION hConnection,
+  const char* filePath,
+  uint32_t duration
+);
+
+LEAP_EXPORT eLeapRS LEAP_CALL LeapStartRecordingEx(
+  LEAP_CONNECTION hConnection,
+  LEAP_DEVICE hDevice,
+  const char* filePath,
+  uint32_t duration
+);
+
+LEAP_EXPORT eLeapRS LEAP_CALL LeapStopRecording(
+  LEAP_CONNECTION hConnection
+);
+
+LEAP_EXPORT eLeapRS LEAP_CALL LeapStopRecordingEx(
+  LEAP_CONNECTION hConnection,
+  LEAP_DEVICE hDevice
 );
 
 /** \ingroup Functions

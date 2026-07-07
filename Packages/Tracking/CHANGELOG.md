@@ -6,31 +6,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [docs-website]: https://docs.ultraleap.com/unity-api/ "Ultraleap Docs"
 
-## [vNext] - TBD
-
-### Added
- - Updated scripts and some FBX assets to remove warnings in Unity 6.4 due to obsolete or deprecated Unity APIs/interfaces
-
-### Changed
+## [NEXT]
 
 ### Fixed
+- Fixed several resource leaks in `Connection`, including unmanaged memory, connection handles and event handlers.
+- Fixed erroneous "LeapProvider not assigned" log messages during teardown.
+- Fixed duplicate server status polling threads, and threads not stopping on editor reload/application quit.
+- Fixed spurious error logs when a connection is closed mid-poll.
+- Fixed a hang when retrieving tracking service status via `ServerStatus`.
 
-### Known Issues
-- Ultraleap tracking with Ultraleap hardware no longer works on a Meta Quest 3 headset running an OS version >76 due to [changes in which permissions are allowed.](https://developers.meta.com/horizon/resources/permissions-prohibited/)
-- On Mac OS only, the client libraries now default to using a different tracking server port. For hand tracking to work, either change the Server Connection Input mode to PORT or set the port in the Server Name Space field to {"tracking_server_port": 12345}
-- Pose detection scene does not illuminate all poses in green if built for mobile headsets when using URP (2022.3), spotlights don't work as intended on Unity 6.
-- Turntable and pullchord scene only works (i.e. the pullchord works) if the physical hands physics settings are used
-- Turntable and pullchord - origin material is pink (error) and only renders in one eye - BiRP and URP - Unity 2022 only
-- Turntable and pullchord - scene produces a couple of 'the referenced script (unknown) on this Behaviour is missing' warnings - unless the tracking preview package/examples are imported
-- A number of .so plugin files are not 16-byte aligned and produce warnings when a build is made (libLeapC.so, libUnityOpenXR.so, libLeapCLegacy.so)
-- Console error on shader Ultraleap/GenericHandShader - Material 'GhostCapsule Hand (Instance)' with Shader 'Ultraleap/GenericHandShader' doesn't have a color property '_MainColor'
-- Certain scenes containing physical interactions produce 'Setting linear velocity of a kinematic body is not supported' warnings (UnityEngine.RigidBody:set_velocity)
-- Text missing on example scene panels in Unity 6.3, need to manually import TextMeshPro Essential Resources - Window > TextMeshPro > Import TMP Essential Resources
-- Warnings about deprecated components when importing plugin into Unity 6.3 - XRStats, Physics.autoSyncTransforms
-- The RuntimeGizmoManager and associated RuntimeGizmo.shader shader are not URP compatible and would require breaking changes to support URP; These remain as BiRP only
-- Support either input system for all interactions, fixing HandRecorder and CycleHandPairs
-- Scene(s) using physical hand interactions will prompt to go to settings to change parameters. One parameter is not being set, when set which is causing this repeated prompting
-- Hand distortion seen on Pico devices using Ultraleap Tracking hardware (large hands, messed up hand rotation vectors)
+### Changed
+- Deprecated `Dispose()` on `Connection` and made it a thin shim to `Stop()` to enable better cleanup of resources.
+- Added a timeout to `Connection.Stop()` to reduce hang time on teardown.
+- Updated the LeapC native libraries to 7.9.0.102.
+- Connection teardown no longer waits on an in-flight poll; closing a connection now cancels it.
 
 ## [7.3.0] - 25/02/2026
 
