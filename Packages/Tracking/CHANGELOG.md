@@ -13,10 +13,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed erroneous "LeapProvider not assigned" log messages during teardown.
 - Fixed duplicate server status polling threads, and threads not stopping on editor reload/application quit.
 - Fixed spurious error logs when a connection is closed mid-poll.
+- Fixed a hang when retrieving tracking service status via `ServerStatus`.
 
 ### Changed
 - Deprecated `Dispose()` on `Connection` and made it a thin shim to `Stop()` to enable better cleanup of resources.
 - Added a timeout to `Connection.Stop()` to reduce hang time on teardown.
+- Updated the LeapC native libraries to 7.9.0.102.
+- Connection teardown no longer waits on an in-flight poll; closing a connection now cancels it.
 
 ## [7.3.0] - 25/02/2026
 
