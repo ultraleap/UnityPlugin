@@ -39,7 +39,9 @@ namespace Leap.PhysicalHands
 
         private static void ShowPopupIfRequired()
         {
-#if UNITY_6000_0_OR_NEWER
+#if UNITY_6000_4_OR_NEWER
+            if (Object.FindAnyObjectByType<PhysicalHandsManager>() != null
+#elif UNITY_6000_0_OR_NEWER
             if (Object.FindFirstObjectByType<PhysicalHandsManager>() != null
 #else
             if (Object.FindObjectOfType<PhysicalHandsManager>() != null

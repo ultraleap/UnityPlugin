@@ -49,7 +49,11 @@ namespace Leap
                     s_provider = UnityEngine.Object.FindAnyObjectByType<XRLeapProviderManager>();
                     if (s_provider == null)
                     {
+#if UNITY_6000_4_OR_NEWER
+                        var candidates = UnityEngine.Object.FindObjectsByType<LeapProvider>();
+#else
                         var candidates = UnityEngine.Object.FindObjectsByType<LeapProvider>(FindObjectsSortMode.None);
+#endif
                         if (candidates.Length > 0)
                         {
                             if (preferLiveLeapProviderOverStaticHandPoseProviders)

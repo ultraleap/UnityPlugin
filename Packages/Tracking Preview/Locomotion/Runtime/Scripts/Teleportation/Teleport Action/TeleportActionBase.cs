@@ -111,7 +111,11 @@ namespace Leap.Preview.Locomotion
 
             if (findTeleportAnchorsOnStart)
             {
+#if UNITY_6000_4_OR_NEWER
+                _teleportAnchors = new List<TeleportAnchor>(FindObjectsByType<TeleportAnchor>(FindObjectsInactive.Include));
+#else
                 _teleportAnchors = new List<TeleportAnchor>(FindObjectsByType<TeleportAnchor>(FindObjectsInactive.Include, FindObjectsSortMode.None));
+#endif
             }
 
             if (freeTeleportAnchor.TryGetComponent(out MeshCollider anchorCollider))

@@ -36,7 +36,9 @@ namespace Leap
             // Ensure the LeapServiceProvider exists for us to position the device in world space
             if (leapServiceProvider == null)
             {
-#if UNITY_6000_0_OR_NEWER
+#if UNITY_6000_4_OR_NEWER
+                leapServiceProvider = FindAnyObjectByType<LeapServiceProvider>();
+#elif UNITY_6000_0_OR_NEWER
                 leapServiceProvider = FindFirstObjectByType<LeapServiceProvider>();
 #else
                 leapServiceProvider = FindObjectOfType<LeapServiceProvider>();

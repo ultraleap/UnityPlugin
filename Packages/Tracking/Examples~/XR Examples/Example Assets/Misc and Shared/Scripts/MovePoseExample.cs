@@ -23,7 +23,9 @@ namespace Leap.Examples
 
         private void Start()
         {
+#pragma warning disable CS0618 
             if (Physics.autoSyncTransforms)
+#pragma warning restore CS0618 
             {
                 Debug.LogWarning(
                     "Physics.autoSyncTransforms is enabled. This will cause Interaction "
